@@ -11,3 +11,14 @@
 *.lai
 *.la
 *.a
+
+Debug/
+Release/
+ipch/
+*.sdf
+*.opensdf
+*.suo
+*.log
+*.dll
+!lib/*.dll
+*.exe

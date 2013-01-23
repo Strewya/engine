@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="winmain.cpp" />
+    <ClCompile Include="..\..\source\Win32\WindowClass.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\StandardWindow.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\GameWindow.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\AbstractWindow.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Logger.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp">
+      <Filter>Subsystems/Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Dimensional.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Color.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Form\Form2D.cpp">
+      <Filter>Core/Form</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Form\SpriteForm.cpp">
+      <Filter>Core/Form</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureInfo.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Clock.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\State\Statemap.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\State\State.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\Win32\WindowClass.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\StandardWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\GameWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\AbstractWindow.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Defines.h" />
+    <ClInclude Include="..\..\source\Util\Logger.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h">
+      <Filter>Subsystems/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h">
+      <Filter>Subsystems/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Dimensional.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Color.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Form\Form2D.h">
+      <Filter>Core/Form</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Form\SpriteForm.h">
+      <Filter>Core/Form</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureInfo.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Clock.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\Statemap.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\DataStore.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\Entity.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{9e70d6ad-322f-4aa3-b68e-30148a2152b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystems/Script">
+      <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystems/Graphics">
+      <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Form">
+      <UniqueIdentifier>{1996716f-160d-4d8a-9227-63ed5eab7da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/State">
+      <UniqueIdentifier>{523c40e5-7ff9-41c9-8cf9-142a86564af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Entity">
+      <UniqueIdentifier>{36ed7cd0-141f-4d27-b32b-91b421708503}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.lua" />
+    <None Include="logger.log" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+return {
+	name = "pong.sheet",
+	texture = "resources/pong.png",
+	framecount = 5,
+	frames = {
+		{name="ball", 		rect={33, 0,  32, 32}},
+		{name="rectangle", 	rect={33, 33, 32, 32}},
+		{name="paddle", 	rect={0,  0,  32, 128}},
+		{name="cherry", 	rect={66, 0,  32, 32}},
+		{name="cupcake", 	rect={33, 66, 32, 32}},
+		{name="strawberry", rect={66, 33, 32, 32}}
+	}
+};

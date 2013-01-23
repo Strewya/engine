@@ -1,0 +1,85 @@
+#ifndef WIN32_ABSTRACTWINDOW_H_
+#define WIN32_ABSTRACTWINDOW_H_
+/********************************************
+	class:	
+	usage:	
+********************************************/
+	/*** common and C++ headers ***/
+#include "Defines.h"
+#include <string>
+#include <windows.h>
+	/*** extra headers if needed (alphabetically ordered) ***/
+	/*** end header inclusion ***/
+
+namespace Win32
+{
+	class AbstractWindow
+	{
+	public:
+		static LRESULT CALLBACK MessageRouter(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
+
+		AbstractWindow();
+		virtual ~AbstractWindow() {};
+
+		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)=0;
+		virtual bool Create();
+		virtual void Show();
+		virtual bool HasMessagesToProcess();
+
+		void setFullscreen(bool fs);
+		void setExtendedStyle(ulong style);
+		void setClass(const String& name);
+		void setClass(const char* name);
+		void setTitle(const String& name);
+		void setTitle(const char* name);
+		void setStyle(ulong style);
+		void setPosition(int x, int y);
+		void setSize(int x, int y);
+		void setParent(HWND parent);
+		void setMenu(HMENU menu);
+		void setInstance(HINSTANCE instance);
+		void setUsePeekMessage(bool peek);
+		void setUseWaitMessage(bool wait);
+
+		HWND getWindowHandle() const;
+		bool getFullscreen() const;
+		ulong getExtendedStyle() const;
+		const String& getClass() const;
+		const String& getTitle() const;
+		ulong getStyle() const;
+		int getPositionX() const;
+		int getPositionY() const;
+		int getSizeX() const;
+		int getSizeY() const;
+		HWND getParent() const;
+		HMENU getMenu() const;
+		HINSTANCE getInstance() const;
+		bool getUsePeekMessage() const;
+		bool getUseWaitMessage() const;
+		int getExitCode() const;
+		bool isAlive() const;
+
+	protected:
+		HWND _hwnd;
+
+		bool _usePeekMessage;
+		bool _useWaitMessage;
+		bool _fullscreen;
+		int _exitCode;
+		bool _alive;
+
+		ulong _extendedStyle;
+		String _class;
+		String _title;
+		ulong _style;
+		int _xPos;
+		int _yPos;
+		int _xSize;
+		int _ySize;
+		HWND _hwndParent;
+		HMENU _hMenu;
+		HINSTANCE _hInstance;
+	};
+}
+
+#endif //WIN32_ABSTRACTWINDOW_H_
