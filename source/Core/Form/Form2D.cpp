@@ -3,10 +3,30 @@
 #include "Core/Form/Form2D.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Subsystems/Graphics/Interface.h"
 	/*** end headers ***/
+
+namespace Graphics
+{
+	void DrawSprite(Graphics::Interface& gfx, Core::Form& form)
+	{
+	}
+}
 
 namespace Core
 {
+	void Form::setDrawFunction(Graphics::DrawFunction drawer)
+	{
+		_drawer = drawer;
+	}
+
+	void Form::DrawSelf(Graphics::Interface& gfx)
+	{
+		_drawer(gfx, *this);
+	}
+
+	
+
 	InstanceID Form2D::_idCounter = 0;
 
 	Form2D::Form2D()

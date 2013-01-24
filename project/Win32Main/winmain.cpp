@@ -59,7 +59,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		Core::Entity ent(0);
 		//ent.setForm(new Core::Sprite());
 
-		uint tex = gfx->getTextureHandle(sheet.getTextureName().c_str());
+		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);
 		const Graphics::TextureInfo& texinfo = gfx->getTextureInfo(tex);
 

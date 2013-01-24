@@ -10,7 +10,7 @@ namespace Core
 	{
 	}
 
-	const InstanceID& Entity::getID() const
+	InstanceID Entity::getID() const
 	{
 		return _id;
 	}
@@ -54,21 +54,7 @@ namespace Core
 		return *this;
 	}
 
-	Entity& Entity::setForm(const std::shared_ptr<Form2D>& f)
-	{
-		assert(f.get());
-		if(f != nullptr)
-		{
-			/*
-			if(_form != nullptr)
-			{
-				_form->setContents(f->AcquireContents());
-			}
-			*/
-			_form = f;
-		}
-		return *this;
-	}
+
 	/*
 	Entity& Entity::setForm(const Form2D* f)
 	{

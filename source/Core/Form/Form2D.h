@@ -15,10 +15,26 @@
 namespace Graphics
 {
 	class Interface;
+
+	typedef void (*DrawFunction)(Graphics::Interface& gfx, Core::Form& form);
+
+	void DrawSprite(Graphics::Interface& gfx, Core::Form& form);
 }
 
 namespace Core
 {
+	class Form
+	{
+	private:
+		Graphics::DrawFunction _drawer;
+	public:
+
+		void setDrawFunction(Graphics::DrawFunction func);
+		void DrawSelf(Graphics::Interface& gfx);
+	};
+
+
+
 	class Form2D
 	{
 	private:

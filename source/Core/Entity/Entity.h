@@ -25,23 +25,22 @@ namespace Core
 		String _alias;
 		
 		Statemap _states;
-		std::shared_ptr<Form2D> _form;
+		Form _form;
 
 	public:
 		Entity(const InstanceID& id);
 
-		const InstanceID& getID() const;
+		InstanceID		getID() const;
 		Statemap&		getStates();
 		const String&	getType() const;
 		const String&	getAlias() const;
-		Form2D&			getForm();
+		Form&			getForm();
 
 		Entity& setAlias(const char* alias);
 		Entity& setAlias(const String& alias);
 		Entity& setType(const char* type);
 		Entity& setType(const String& type);
-		//Entity& setForm(const Form2D* form);
-		Entity& setForm(const std::shared_ptr<Form2D>& form);
+		
 	};
 
 	/*
