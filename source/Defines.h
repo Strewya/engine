@@ -27,7 +27,6 @@ const float  RAD2DEG_RATIO_F = 180.0f/PI_F;
 #define NOT_FOUND -1
 
 /*		FUNCTIONS	*/
-constexpr double pi() { return std::atan(1)*4; }
 float  Deg2Rad(float angle);
 double Deg2Rad(double angle);
 float  Rad2Deg(float radians);

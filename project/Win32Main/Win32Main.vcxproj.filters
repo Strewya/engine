@@ -29,12 +29,6 @@
     <ClCompile Include="..\..\source\Util\Color.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Form\Form2D.cpp">
-      <Filter>Core/Form</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Form\SpriteForm.cpp">
-      <Filter>Core/Form</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
@@ -59,6 +53,10 @@
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Form\Form.cpp">
+      <Filter>Core/Form</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Defines.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -98,12 +96,6 @@
     <ClInclude Include="..\..\source\Util\Color.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Form\Form2D.h">
-      <Filter>Core/Form</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Form\SpriteForm.h">
-      <Filter>Core/Form</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
@@ -130,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\Entity.h">
       <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Form\Form.h">
+      <Filter>Core/Form</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

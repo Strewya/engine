@@ -76,18 +76,11 @@ namespace Graphics
 		uint getTextureHandle(const String& filename) { return getTextureHandle(filename.c_str()); };
 		uint getFontHandle(const String& filename) { return getFontHandle(filename.c_str()); };
 		void DrawFont(uint hFont, const String& text, const Util::Rect* bounds) { DrawFont(hFont, text.c_str(), bounds); };
-		
-
 		/*
-		
-		//new
-		virtual void SetPosition(Util::Vector& pos) = 0;
-		virtual void SetTranslation(Util::Vector& trans) = 0;
-		virtual void SetScale(Util::Vector& scale) = 0;
-		virtual void SetColor(Util::Color& col) = 0;
-		virtual void SetRotation(float rot) = 0;
-		virtual void SetLineWidth(float width) = 0;
+		SpritesheetCache& getSpritesheetCache() { return _spriteSheetCache; }
 
+	private:
+		SpritesheetCache _spriteSheetCache;
 		*/
 	};
 }

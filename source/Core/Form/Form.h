@@ -18,7 +18,15 @@ namespace Graphics
 }
 namespace Core
 {
-	enum class FormType;
+	enum class FormType
+	{
+		Null,
+		Font,
+		Sprite,
+		Texture,
+		Model,
+		Shader
+	};
 	
 	class Form
 	{
@@ -46,6 +54,8 @@ namespace Core
 	public:
 		Form();
 		Form(const FormType& type);
+		Form(const Form& rhs);
+		Form& operator=(const Form& rhs);
 		
 
 		InstanceID 	getID() const;
@@ -74,7 +84,7 @@ namespace Core
 		void Translate(const Util::Vec2& translation);
 	};
 	
-	void DrawForms(std::vector<Form*>& frms, Graphics::Interface& gfx);
+	void DrawForms(std::vector<Form>& frms, Graphics::Interface& gfx);
 }
 
 #endif //CORE_FORM_FORM2D_H_

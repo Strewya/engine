@@ -79,10 +79,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
-    <ClCompile Include="..\..\source\Core\Form\Form2D.cpp" />
-    <ClCompile Include="..\..\source\Core\Form\SpriteForm.cpp" />
+    <ClCompile Include="..\..\source\Core\Form\Form.cpp" />
     <ClCompile Include="..\..\source\Core\State\State.cpp" />
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
+    <ClCompile Include="..\..\source\Defines.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp" />
@@ -101,8 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
-    <ClInclude Include="..\..\source\Core\Form\Form2D.h" />
-    <ClInclude Include="..\..\source\Core\Form\SpriteForm.h" />
+    <ClInclude Include="..\..\source\Core\Form\Form.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Defines.h" />

@@ -55,20 +55,21 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		uint cherryHandle = sheet.getHandle("cherry");
 		uint cupcakeHandle = sheet.getHandle("cupcake");
 
+		
 
 		Core::Entity ent(0);
-		ent.getForm().setType(FormType::Sprite);
+		ent.getForm().setType(Core::FormType::Sprite);
 
 		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);
 		const Graphics::TextureInfo& texinfo = gfx->getTextureInfo(tex);
 
-		std::vector<Core::Sprite> sprites;
-	
+		std::vector<Core::Form> sprites;
+		Core::State sheetState(sheet);
 		//cherry
-		sprites.push_back(Core::Sprite());
-		sprites.back().setSpritesheet(sheet);
-		sprites.back().setSpriteInfo(cherryHandle);
+		sprites.push_back(Core::Form(Core::FormType::Sprite));
+		sprites.back().getStates().Insert("Spritesheet", sheetState);
+		sprites.back().getStates().Insert("CurrentSprite", cherryHandle);
 		sprites.back().setPosition(Util::Vec2(500,300));
 		sprites.back().setScale(Util::Vec2(1,1));
 		sprites.back().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
@@ -80,9 +81,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().setRotation(0);
 
 		//point at (0,0) of cherry texture
-		sprites.push_back(Core::Sprite());
-		sprites.back().setSpritesheet(sheet);
-		sprites.back().setSpriteInfo(ballHandle);
+		sprites.push_back(Core::Form(Core::FormType::Sprite));
+		sprites.back().getStates().Insert("Spritesheet", sheetState);
+		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
 		sprites.back().setPosition(Util::Vec2(500,300) - sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -90,9 +91,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().setRotation(0);
 
 		//point at center of cherry texture
-		sprites.push_back(Core::Sprite());
-		sprites.back().setSpritesheet(sheet);
-		sprites.back().setSpriteInfo(ballHandle);
+		sprites.push_back(Core::Form(Core::FormType::Sprite));
+		sprites.back().getStates().Insert("Spritesheet", sheetState);
+		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
 		sprites.back().setPosition(Util::Vec2(500,300));
 		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -100,9 +101,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().setRotation(0);
 
 		//point at (w,h) of cherry texture
-		sprites.push_back(Core::Sprite());
-		sprites.back().setSpritesheet(sheet);
-		sprites.back().setSpriteInfo(ballHandle);
+		sprites.push_back(Core::Form(Core::FormType::Sprite));
+		sprites.back().getStates().Insert("Spritesheet", sheetState);
+		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
 		sprites.back().setPosition(Util::Vec2(500,300) + sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -139,11 +140,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 				gfx->BeginScene();
 				gfx->BeginSpriteBatch(true);
 		
-				for( auto& spr : sprites )
-				{
-					spr.DrawSelf(*gfx);
-				}
-
+				DrawForms(sprites, *gfx);
+				
 				gfx->setFontStyle(false, false, false, false, false, false);
 				gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
 				gfx->DrawRectangle(fontBounds);
