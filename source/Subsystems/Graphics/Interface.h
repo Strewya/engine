@@ -57,7 +57,7 @@ namespace Graphics
 		virtual bool BeginSpriteBatch(bool alphablend) = 0;
 		virtual void EndSpriteBatch() = 0;
 
-		virtual void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, const float rotationAngle, const Util::Color* colorTint) = 0;
+		virtual void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint) = 0;
 		virtual void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom) = 0;
 		
 		virtual void DrawTexture(uint handle) = 0;
@@ -76,7 +76,7 @@ namespace Graphics
 		uint getTextureHandle(const String& filename) { return getTextureHandle(filename.c_str()); };
 		uint getFontHandle(const String& filename) { return getFontHandle(filename.c_str()); };
 		void DrawFont(uint hFont, const String& text, const Util::Rect* bounds) { DrawFont(hFont, text.c_str(), bounds); };
-
+		
 
 		/*
 		

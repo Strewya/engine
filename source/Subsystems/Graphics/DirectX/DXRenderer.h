@@ -83,7 +83,7 @@ namespace Graphics
 		bool BeginSpriteBatch(bool alphablend);
 		void EndSpriteBatch();
 		
-		void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, const float rotationAngle, const Util::Color* colorTint);
+		void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint);
 		void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom);
 
 		void DrawTexture(uint hTexture);

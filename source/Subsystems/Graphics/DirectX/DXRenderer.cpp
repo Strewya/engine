@@ -373,7 +373,7 @@ namespace Graphics
 		_spriteHandler->End();
 	}
 
-	void DXRenderer::setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, const float rotationAngle, const Util::Color* colorTint)
+	void DXRenderer::setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint)
 	{
 		_tintColor = colorTint ? MakeCOLOR(*colorTint) : D3DCOLOR_XRGB(255,255,255);
 
@@ -382,7 +382,7 @@ namespace Graphics
 			0,
 			scale ? &MakeVECTOR(*scale) : nullptr,
 			rotationPivot ? &MakeVECTOR(*rotationPivot) : nullptr,
-			D3DXToRadian(rotationAngle),
+			rotationRadians,
 			translation ? &MakeVECTOR(*translation) : nullptr);
 	}
 	

@@ -8,7 +8,7 @@
 #include "Defines.h"
 #include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Form/Form2D.h"
+#include "Core/Form/Form.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
 
@@ -28,19 +28,19 @@ namespace Core
 		Form _form;
 
 	public:
-		Entity(const InstanceID& id);
+		Entity(InstanceID id);
 
 		InstanceID		getID() const;
-		Statemap&		getStates();
 		const String&	getType() const;
 		const String&	getAlias() const;
-		Form&			getForm();
+		Form&			getForm(); //const?
+		Statemap&		getStates(); //const?
 
 		Entity& setAlias(const char* alias);
 		Entity& setAlias(const String& alias);
 		Entity& setType(const char* type);
 		Entity& setType(const String& type);
-		
+		Entity& setForm(const Form& form);
 	};
 
 	/*

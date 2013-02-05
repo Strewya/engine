@@ -5,7 +5,7 @@
 
 namespace Core
 {
-	Entity::Entity(const InstanceID& id)
+	Entity::Entity(InstanceID id)
 		: _id(id)
 	{
 	}
@@ -13,11 +13,6 @@ namespace Core
 	InstanceID Entity::getID() const
 	{
 		return _id;
-	}
-
-	Statemap& Entity::getStates()
-	{
-		return _states;
 	}
 
 	const String& Entity::getType() const
@@ -30,6 +25,16 @@ namespace Core
 		return _alias;
 	}
 	
+	Form& Entity::getForm()
+	{
+		return _form;
+	}
+	
+	Statemap& Entity::getStates()
+	{
+		return _states;
+	}
+
 	Entity& Entity::setAlias(const char* alias)
 	{
 		_alias = alias;
@@ -51,6 +56,12 @@ namespace Core
 	Entity& Entity::setType(const String& type)
 	{
 		_type = type;
+		return *this;
+	}
+	
+	Entity& Entity::setForm(const Form& form)
+	{
+		_form = form;
 		return *this;
 	}
 

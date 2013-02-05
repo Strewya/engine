@@ -10,7 +10,7 @@
 #include "Win32/WindowClass.h"
 //---------- testing purposes
 #include "Core/Entity/Entity.h"
-#include "Core/Form/SpriteForm.h"
+#include "Core/Form/Form.h"
 #include "Core/State/State.h"
 #include "Core/State/Statemap.h"
 #include "Subsystems/Graphics/Interface.h"
@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 
 		Core::Entity ent(0);
-		//ent.setForm(new Core::Sprite());
+		ent.getForm().setType(FormType::Sprite);
 
 		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);
