@@ -6,7 +6,7 @@
 #include <windows.h>
 	/*** extra headers ***/
 #include "Defines.h"
-#include "Win32/StandardWindow.h"
+#include "Win32/GameWindow.h"
 #include "Win32/WindowClass.h"
 //---------- testing purposes
 #include "Core/Entity/Entity.h"

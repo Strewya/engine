@@ -11,14 +11,14 @@ namespace Win32
 {
 	WindowClass::WindowClass(const char* className)
 	{
-		this->hInstance		= ::GetModuleHandle(NULL);
+		this->hInstance		= ::GetModuleHandle(nullptr);
 		this->lpszClassName = TEXT(className);
 		FillDefaultData();
 	}
 
 	WindowClass::WindowClass(const String& className)
 	{
-		this->hInstance		= ::GetModuleHandle(NULL);
+		this->hInstance		= ::GetModuleHandle(nullptr);
 		this->lpszClassName = TEXT(className.c_str());
 		FillDefaultData();
 	}
@@ -48,8 +48,8 @@ namespace Win32
 		this->hIcon			= LoadIcon(this->hInstance, IDI_APPLICATION);
 		this->hCursor		= LoadCursor(this->hInstance, IDC_ARROW);
 		this->hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
-		this->lpszMenuName	= NULL;
-		this->hIconSm		= NULL;
+		this->lpszMenuName	= nullptr;
+		this->hIconSm		= nullptr;
 	}
 
 	ATOM WindowClass::Register()

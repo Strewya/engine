@@ -23,10 +23,6 @@ namespace Win32
 	{
 		switch(msg)
 		{
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-		break;
 
 		default:
 			return ::DefWindowProcA(hwnd, msg, wParam, lParam);

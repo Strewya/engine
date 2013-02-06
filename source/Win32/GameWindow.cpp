@@ -18,8 +18,12 @@ namespace Win32
 	}
 
 	GameWindow::GameWindow(const String& title, const String& className)
-		: this(title.c_str(), className.c_str())
-	{}
+	{
+		setTitle(title);
+		setClass(className);
+		setUsePeekMessage(true);
+		setUseWaitMessage(false);
+	}
 
 	LRESULT WINAPI GameWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -29,7 +33,7 @@ namespace Win32
 		{
 		/*
 		case WM_ACTIVATE:
-			if(_engine != NULL)
+			if(_engine != nullptr)
 			{
 				
 				if((GetAsyncKeyState(SG::Keys::_Alt)&0x8000) == 0)
@@ -169,7 +173,7 @@ namespace Win32
 			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseY, cursor.y);
 			return 0;
 		break;*/
-	
+	/*
 		case WM_SETCURSOR:
 			POINT cur;
 			GetCursorPos(&cur);
@@ -178,12 +182,14 @@ namespace Win32
 			ScreenToClient(_hwnd, &cur);
 			if(cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
 			{
-				SetCursor( nullptr );
+				SetCursor( nullptrptr );
 				return true;
 			}
 		break;
-
+		*/
+		default:
+			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
-		return DefWindowProc(hwnd, msg, wParam, lParam);
+		
 	}
 }

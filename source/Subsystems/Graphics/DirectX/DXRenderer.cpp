@@ -4,7 +4,6 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "Defines.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -455,7 +454,7 @@ namespace Graphics
 		float angle = 360.0f/numVertex;
 		for(int i = 0; i < numVertex; ++i)
 		{
-			circle.push_back(D3DXVECTOR2(pos.x + (radius*std::cos(Deg2Rad(angle*i))), pos.y + (radius*std::sin(Deg2Rad(angle*i)))));
+			circle.push_back(D3DXVECTOR2(pos.x + (radius*std::cos(D3DXToRadian(angle*i))), pos.y + (radius*std::sin(D3DXToRadian(angle*i)))));
 		}
 		circle.push_back(circle.front());
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
@@ -471,7 +470,7 @@ namespace Graphics
 		float angle = 360.0f/numVertex;
 		for(int i = 0; i < numVertex; ++i)
 		{
-			circle.push_back(D3DXVECTOR2(pos.x + (xRadius*std::cos(Deg2Rad(angle*i))), pos.y + (yRadius*std::sin(Deg2Rad(angle*i)))));
+			circle.push_back(D3DXVECTOR2(pos.x + (xRadius*std::cos(D3DXToRadian(angle*i))), pos.y + (yRadius*std::sin(D3DXToRadian(angle*i)))));
 		}
 		circle.push_back(circle.front());
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);

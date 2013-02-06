@@ -9,8 +9,8 @@ namespace Win32
 {
 	AbstractWindow::AbstractWindow()
 		: _extendedStyle(0), _class("AbstractWindow"), _title("Window"), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
-		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(NULL),
-		_hInstance(NULL), _hMenu(NULL), _style(0), _usePeekMessage(false), _useWaitMessage(false), _exitCode(0), _alive(true)
+		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
+		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(false), _useWaitMessage(false), _exitCode(0)
 	{
 		setFullscreen(false);
 	}
@@ -37,7 +37,7 @@ namespace Win32
 			this
 			);
 
-		return _hwnd != NULL;
+		return _hwnd != nullptr;
 	}
 
 	void AbstractWindow::Show()
@@ -51,7 +51,7 @@ namespace Win32
 		static MSG msg;
 		if(!_hwnd)
 		{
-			MessageBox(NULL, "Window::HandleMEssage(): The window has not been created yet.", "Runtime error", MB_OK);
+			MessageBox(nullptr, "Window::HandleMEssage(): The window has not been created yet.", "Runtime error", MB_OK);
 			_exitCode = ErrorCode::WindowNotExists;
 			return false;
 		}
@@ -59,16 +59,16 @@ namespace Win32
 		while(true)
 		{
 			if((_usePeekMessage)
-				? ::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)
-				: ::GetMessage(&msg, NULL, 0, 0))
+				? PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)
+				: GetMessage(&msg, nullptr, 0, 0))
 			{
 				if(msg.message == WM_QUIT)
 				{
 					_exitCode = msg.wParam;
 					return false;
 				}
-				::TranslateMessage(&msg);
-				::DispatchMessage(&msg);
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
 			else if(_useWaitMessage)
 			{
@@ -84,7 +84,7 @@ namespace Win32
 
 	LRESULT CALLBACK AbstractWindow::MessageRouter(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 	{
-		AbstractWindow* window = NULL;
+		AbstractWindow* window = nullptr;
 
 		if(msg == WM_NCCREATE)
 		{
@@ -101,7 +101,7 @@ namespace Win32
 			return 0;
 		}
 		
-		if(window != NULL)
+		if(window != nullptr)
 		{
 			return window->WindowProc(hwnd, msg, wParam, lParam);
 		}
