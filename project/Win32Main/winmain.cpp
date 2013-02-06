@@ -114,6 +114,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		Util::Rect fontBounds(50, 50, 300, 300);
 
 
+
 		gameWindow.setUsePeekMessage(true);
 		gameWindow.setUseWaitMessage(false);
 		gameWindow.Show();
@@ -138,12 +139,22 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			}
 			gfx->BeginScene();
 			gfx->BeginSpriteBatch(true);
-	
+		
 			DrawForms(sprites, *gfx);
-			
+				
 			gfx->setFontStyle(false, false, false, false, false, false);
 			gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
 			gfx->DrawRectangle(fontBounds);
+
+			gfx->DrawRectangle(Util::Vec2(250,400), 30, 30);
+
+			gfx->DrawCircle(Util::Vec2(500,500), 10);
+			gfx->DrawCircle(Util::Vec2(500,500), 40);
+			gfx->DrawCircle(Util::Vec2(500,500), 100);
+
+			gfx->DrawElipse(Util::Vec2(800,500), 10, 15);
+			gfx->DrawElipse(Util::Vec2(800,500), 40, 20);
+			gfx->DrawElipse(Util::Vec2(800,500), 100, 90);
 
 			gfx->EndSpriteBatch();
 			gfx->EndScene();

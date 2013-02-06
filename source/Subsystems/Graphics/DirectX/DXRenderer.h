@@ -95,7 +95,7 @@ namespace Graphics
 		void DrawRectangle(const Util::Vec2& pos, uint hwidth, uint hheight, const Util::Color* color, float lineWidth);
 		void DrawRectangle(const Util::Rect& rect, const Util::Color* color, float lineWidth);
 		void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth);
-
+		void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth);
 
 		/*
 		void SetPosition(Vector& pos);

@@ -70,6 +70,7 @@ namespace Graphics
 		virtual void DrawRectangle(const Util::Vec2& pos, uint hwidth, uint hheight, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawRectangle(const Util::Rect& rect, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
+		virtual void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		
 		
 		

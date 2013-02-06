@@ -4,6 +4,7 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
+#include "Defines.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -417,8 +418,7 @@ namespace Graphics
 		D3DXVECTOR2 pts[] = { MakeVECTOR(p1), MakeVECTOR(p2), MakeVECTOR(p3), MakeVECTOR(p1) };
 		_line->SetWidth(lineWidth);
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		for(int i = 0; i < 3; ++i)
-			_line->Draw(pts+i, 2, c);
+		_line->Draw(pts, 4, c);
 	}
 
 	void DXRenderer::DrawRectangle(const Util::Vec2& pos, uint hwidth, uint hheight, const Util::Color* color, float lineWidth)
@@ -428,10 +428,11 @@ namespace Graphics
 		D3DXVECTOR2 pts[] = { MakeVECTOR(pos - ul), MakeVECTOR(pos + bl),
 							MakeVECTOR(pos + ul), MakeVECTOR(pos - bl),
 							MakeVECTOR(pos - ul) };
+		
 		_line->SetWidth(lineWidth);
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		for(int i = 0; i < 4; ++i)
-			_line->Draw(pts+i, 2, c);
+		_line->Draw(pts, 5, c);
+
 	}
 
 	void DXRenderer::DrawRectangle(const Util::Rect& rect, const Util::Color* color, float lineWidth)
@@ -444,28 +445,39 @@ namespace Graphics
 							};
 		_line->SetWidth(lineWidth);
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		for(int i = 0; i < 4; ++i)
-			_line->Draw(pts+i, 2, c);
+		_line->Draw(pts, 5, c);
 	}
 
 	void DXRenderer::DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth)
 	{
-		const int numVertex = 36;
-		D3DXVECTOR2 circle[2];
-		float angle = 0;
-		float complete = 0;
-		circle[0].x = pos.x + (radius*std::cos(6.2831f*complete));
-		circle[0].y = pos.y + (radius*std::sin(6.2831f*complete));
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->SetWidth(lineWidth);
-		for(float vertex = -1; vertex < numVertex; ++vertex)
+		const int numVertex = max(36, (int)(radius*0.5));
+		std::vector<D3DXVECTOR2> circle;
+		float angle = 360.0f/numVertex;
+		for(int i = 0; i < numVertex; ++i)
 		{
-			complete = vertex/numVertex;
-			circle[1].x = pos.x + (radius*std::cos(6.2831f*complete));
-			circle[1].y = pos.y + (radius*std::sin(6.2831f*complete));
-			_line->Draw(circle, 2, c);
-			circle[0] = circle[1];
+			circle.push_back(D3DXVECTOR2(pos.x + (radius*std::cos(Deg2Rad(angle*i))), pos.y + (radius*std::sin(Deg2Rad(angle*i)))));
 		}
+		circle.push_back(circle.front());
+		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
+
+		_line->SetWidth(lineWidth);
+		_line->Draw(&circle[0], numVertex+1, c);
+	}
+
+	void DXRenderer::DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth)
+	{
+		const int numVertex = max(36, (int)(min(xRadius, yRadius)*0.5));
+		std::vector<D3DXVECTOR2> circle;
+		float angle = 360.0f/numVertex;
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x + (xRadius*std::cos(Deg2Rad(angle*i))), pos.y + (yRadius*std::sin(Deg2Rad(angle*i)))));
+		}
+		circle.push_back(circle.front());
+		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
+
+		_line->SetWidth(lineWidth);
+		_line->Draw(&circle[0], numVertex+1, c);
 	}
 	
 	void DXRenderer::DrawTexture(uint hTexture)
