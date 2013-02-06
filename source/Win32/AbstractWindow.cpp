@@ -46,39 +46,40 @@ namespace Win32
 		::UpdateWindow(_hwnd);
 	}
 
-	bool AbstractWindow::HasMessagesToProcess()
+	bool AbstractWindow::Update()
 	{
 		static MSG msg;
 		if(!_hwnd)
 		{
 			MessageBox(NULL, "Window::HandleMEssage(): The window has not been created yet.", "Runtime error", MB_OK);
-			_exitCode = -4;
-			_alive = false;
-			return true;
+			_exitCode = ErrorCode::WindowNotExists;
+			return false;
 		}
 
-		if((_usePeekMessage)
-			? ::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)
-			: ::GetMessage(&msg, NULL, 0, 0))
+		while(true)
 		{
-			if(msg.message == WM_QUIT)
+			if((_usePeekMessage)
+				? ::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)
+				: ::GetMessage(&msg, NULL, 0, 0))
 			{
-				_exitCode = msg.wParam;
-				_alive = false;
-				return true;
+				if(msg.message == WM_QUIT)
+				{
+					_exitCode = msg.wParam;
+					return false;
+				}
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
 			}
-			::TranslateMessage(&msg);
-			::DispatchMessage(&msg);
-		}
-		else
-		{
-			if(_useWaitMessage)
+			else if(_useWaitMessage)
 			{
 				WaitMessage();
+			}
+			else
+			{
 				return true;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	LRESULT CALLBACK AbstractWindow::MessageRouter(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
@@ -94,6 +95,12 @@ namespace Win32
 		
 		window = reinterpret_cast<AbstractWindow*>(::GetWindowLong(hwnd, GWL_USERDATA));
 
+		if(msg == WM_DESTROY)
+		{
+			PostQuitMessage(0);
+			return 0;
+		}
+		
 		if(window != NULL)
 		{
 			return window->WindowProc(hwnd, msg, wParam, lParam);
@@ -146,5 +153,4 @@ namespace Win32
 	bool			AbstractWindow::getUsePeekMessage() const { return _usePeekMessage; }
 	bool			AbstractWindow::getUseWaitMessage() const { return _useWaitMessage; }
 	int				AbstractWindow::getExitCode() const { return _exitCode; }
-	bool			AbstractWindow::isAlive() const { return _alive; }
 }

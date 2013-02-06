@@ -24,7 +24,7 @@ namespace Win32
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)=0;
 		virtual bool Create();
 		virtual void Show();
-		virtual bool HasMessagesToProcess();
+		virtual bool Update();
 
 		void setFullscreen(bool fs);
 		void setExtendedStyle(ulong style);
@@ -57,7 +57,6 @@ namespace Win32
 		bool getUsePeekMessage() const;
 		bool getUseWaitMessage() const;
 		int getExitCode() const;
-		bool isAlive() const;
 
 	protected:
 		HWND _hwnd;
@@ -66,7 +65,6 @@ namespace Win32
 		bool _useWaitMessage;
 		bool _fullscreen;
 		int _exitCode;
-		bool _alive;
 
 		ulong _extendedStyle;
 		String _class;

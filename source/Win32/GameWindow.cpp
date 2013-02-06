@@ -9,31 +9,29 @@
 
 namespace Win32
 {
-	GameWindow::GameWindow(const char* title, const char* className, SG::Engine* engine)
+	GameWindow::GameWindow(const char* title, const char* className)
 	{
 		setTitle(title);
 		setClass(className);
-		_engine = engine;
-		assert(_engine);
+		setUsePeekMessage(true);
+		setUseWaitMessage(false);
 	}
 
-	GameWindow::GameWindow(const String& title, const String& className, SG::Engine* engine)
-	{
-		setTitle(title);
-		setClass(className);
-		_engine = engine;
-		assert(_engine);
-	}
+	GameWindow::GameWindow(const String& title, const String& className)
+		: this(title.c_str(), className.c_str())
+	{}
 
 	LRESULT WINAPI GameWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		
 		bool repeated = false;
 		switch(msg)
 		{
+		/*
 		case WM_ACTIVATE:
 			if(_engine != NULL)
 			{
-				/*
+				
 				if((GetAsyncKeyState(SG::Keys::_Alt)&0x8000) == 0)
 				{
 					pEngine->getServices().getInput().SetButtonState(SG::Keys::_Alt, false, true);
@@ -46,7 +44,7 @@ namespace Win32
 				{
 					pEngine->getServices().getInput().SetButtonState(SG::Keys::_Shift, false, true);
 				}
-				*/
+				
 				if(LOWORD(wParam) == WA_INACTIVE)
 				{
 					//_engine->Defocus();
@@ -59,11 +57,7 @@ namespace Win32
 				}
 			}
 		break;
-
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-		break;
+		
 		//----------------------- DOWN -----------------------
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
@@ -80,10 +74,10 @@ namespace Win32
 		break;
 		//----------------------- CHAR -----------------------
 		case WM_CHAR:
-			/*
+			
 			pEngine->getServices().getInput().SetButtonState(wParam, true, LOWORD(lParam) > 0);
 			return 0;
-			*/
+			
 		break;
 		//----------------------- LMB -----------------------
 		case WM_LBUTTONDOWN:
@@ -95,11 +89,11 @@ namespace Win32
 			//_engine->getServices().getInput().SetButtonState(SG::Keys::_LeftButton, false, true);
 			return 0;
 		break;
-		/*
+		
 		case WM_LBUTTONDBLCLK:
 			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_LeftButton);
 			return 0;
-		break;*/
+		break;
 		//----------------------- RMB -----------------------
 		case WM_RBUTTONDOWN:
 			//_engine->getServices().getInput().SetButtonState(SG::Keys::_RightButton, true, false);
@@ -110,11 +104,11 @@ namespace Win32
 			//_engine->getServices().getInput().SetButtonState(SG::Keys::_RightButton, false, true);
 			return 0;
 		break;
-		/*
+		
 		case WM_RBUTTONDBLCLK:
 			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_RightButton);
 			return 0;
-		break;*/
+		break;
 		//----------------------- MMB -----------------------
 		case WM_MBUTTONDOWN:
 			//_engine->getServices().getInput().SetButtonState(SG::Keys::_MiddleButton, true, false);
@@ -125,11 +119,11 @@ namespace Win32
 			//_engine->getServices().getInput().SetButtonState(SG::Keys::_MiddleButton, false, true);
 			return 0;
 		break;
-		/*
+		
 		case WM_MBUTTONDBLCLK:
 			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_MiddleButton);
 			return 0;
-		break;*/
+		break;
 		//----------------------- XMB -----------------------
 		case WM_XBUTTONDOWN:
 		{
@@ -152,7 +146,7 @@ namespace Win32
 			return TRUE;
 		}
 		break;
-		/*
+		
 		case WM_XBUTTONDBLCLK:
 			uint btn = GET_XBUTTON_WPARAM(wParam);
 			if(btn == XBUTTON1)
@@ -160,7 +154,7 @@ namespace Win32
 			else if(btn == XBUTTON2)
 				pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_XButton2);
 			return TRUE;
-		break;*/
+		break;
 		//----------------------- WHEEL -----------------------
 		case WM_MOUSEWHEEL:
 			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseWheel, HIWORD(wParam));
@@ -174,7 +168,7 @@ namespace Win32
 			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseX, cursor.x);
 			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseY, cursor.y);
 			return 0;
-		break;
+		break;*/
 	
 		case WM_SETCURSOR:
 			POINT cur;
@@ -184,7 +178,7 @@ namespace Win32
 			ScreenToClient(_hwnd, &cur);
 			if(cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
 			{
-				SetCursor( NULL );
+				SetCursor( nullptr );
 				return true;
 			}
 		break;

@@ -22,6 +22,14 @@ const float  PI_F = 3.14159265358979f;
 const float  DEG2RAD_RATIO_F = PI_F/180.0f;
 const float  RAD2DEG_RATIO_F = 180.0f/PI_F;
 
+enum class ErrorCode
+{
+	WindowClassRegistration = 1,
+	WindowCreation,
+	WindowNotExists,
+	ExceptionThrown
+};
+
 /*		MACROS		*/
 #define NO_ID 0
 #define NOT_FOUND -1

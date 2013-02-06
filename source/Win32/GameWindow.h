@@ -11,23 +11,16 @@
 #include "Win32/AbstractWindow.h"
 	/*** end header inclusion ***/
 
-namespace SG
-{
-	class Engine;
-}
-
 namespace Win32
 {
 	class GameWindow : public AbstractWindow
 	{
 	public:
-		GameWindow(const char* title, const char* className, SG::Engine* engine);
-		GameWindow(const String& title, const String& className, SG::Engine* engine);
+		GameWindow(const char* title, const char* className);
+		GameWindow(const String& title, const String& className);
 
 		LRESULT WINAPI WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	protected:
-		SG::Engine* _engine;
 	};
 }
 

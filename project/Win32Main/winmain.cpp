@@ -30,16 +30,16 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	if(wndClass.Register() == 0)
 	{
 		MessageBox(nullptr, "WindowClass::Register(): Failed to register the window class.", "Initialization error", MB_OK);
-		return -2;
+		return ErrorCode::WindowClassRegistration;
 	}
 
-	Win32::StandardWindow gameWindow(wndClass.getClassName(), wndClass.getClassName());
+	Win32::GameWindow gameWindow(wndClass.getClassName(), wndClass.getClassName());
 	gameWindow.setFullscreen(false);
 	
 	if(!gameWindow.Create())
 	{
 		MessageBoxA(nullptr, "Window::Create(): Failed to create a window.", "Initialization error", MB_OK);
-		return -3;
+		return ErrorCode::WindowCreation;
 	}
 
 	try
@@ -121,34 +121,32 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	
 		float ticksPerSec = 1/40;
 		//start main loop
-		while(gameWindow.isAlive())
-		{
-			if(!gameWindow.HasMessagesToProcess())
+		while(gameWindow.Update())
+		{	
+			gClock.FrameStep();
+			//engine.Update();
+			
+			//the rest of this code should be inside Engine::Update()
+			
+			if( mainLoopTimer.EatTime(ticksPerSec) )
 			{
-				//engine or game code
-				
-				gClock.FrameStep();
-				
-				if( mainLoopTimer.EatTime(ticksPerSec) )
+				for( auto& spr : sprites )
 				{
-					for( auto& spr : sprites )
-					{
-						//spr.setRotation(spr.getRotation()+1);
-					}
-					//fontRot = ++fontRot >= 360 ? fontRot-360 : fontRot;
+					//spr.setRotation(spr.getRotation()+1);
 				}
-				gfx->BeginScene();
-				gfx->BeginSpriteBatch(true);
-		
-				DrawForms(sprites, *gfx);
-				
-				gfx->setFontStyle(false, false, false, false, false, false);
-				gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
-				gfx->DrawRectangle(fontBounds);
-
-				gfx->EndSpriteBatch();
-				gfx->EndScene();
+				//fontRot = ++fontRot >= 360 ? fontRot-360 : fontRot;
 			}
+			gfx->BeginScene();
+			gfx->BeginSpriteBatch(true);
+	
+			DrawForms(sprites, *gfx);
+			
+			gfx->setFontStyle(false, false, false, false, false, false);
+			gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
+			gfx->DrawRectangle(fontBounds);
+
+			gfx->EndSpriteBatch();
+			gfx->EndScene();
 		}
 
 		return gameWindow.getExitCode();
@@ -156,6 +154,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	catch(std::exception& ex)
 	{
 		MessageBox(nullptr, ex.what(), "Exception error", MB_OK);
-		return -1;
+		return ErrorCode::ExceptionThrown;
 	}
 }
