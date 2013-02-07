@@ -15,6 +15,7 @@
 #include "Core/State/Statemap.h"
 #include "Subsystems/Graphics/Interface.h"
 #include "Subsystems/Graphics/RendererFactory.h"
+#include "Subsystems/Graphics/RenderingQueue.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureInfo.h"
 #include "Subsystems/Script/LuaEngine.h"
@@ -35,12 +36,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 	Win32::GameWindow gameWindow(wndClass.getClassName(), wndClass.getClassName());
 	gameWindow.setFullscreen(false);
+	gameWindow.setSize(gameWindow.getSizeX()-30, gameWindow.getSizeY()-120);
 	
 	if(!gameWindow.Create())
 	{
 		MessageBoxA(nullptr, "Window::Create(): Failed to create a window.", "Initialization error", MB_OK);
 		return ErrorCode::WindowCreation;
 	}
+
+	gameWindow.Show();
 
 	try
 	{
@@ -56,7 +60,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		uint cupcakeHandle = sheet.getHandle("cupcake");
 
 		
-
+		
 		Core::Entity ent(0);
 		ent.getForm().setType(Core::FormType::Sprite);
 
@@ -113,14 +117,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		uint hFont = gfx->MakeFont("Arial", 20, 400, false);
 		Util::Rect fontBounds(50, 50, 300, 300);
 
-
-
-		gameWindow.setUsePeekMessage(true);
-		gameWindow.setUseWaitMessage(false);
-		gameWindow.Show();
+		Graphics::RenderingQueue queue;
+		
+		
 		Util::Timer mainLoopTimer;
 	
-		float ticksPerSec = 1/40;
+		float ticksPerSec = 1.0f/40;
 		//start main loop
 		while(gameWindow.Update())
 		{	
@@ -128,8 +130,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			//engine.Update();
 			
 			//the rest of this code should be inside Engine::Update()
+
 			
-			if( mainLoopTimer.EatTime(ticksPerSec) )
+			while( mainLoopTimer.TimeToUpdate(ticksPerSec) )
 			{
 				for( auto& spr : sprites )
 				{
@@ -140,7 +143,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			gfx->BeginScene();
 			gfx->BeginSpriteBatch(true);
 		
-			DrawForms(sprites, *gfx);
+			for( auto& form : sprites)
+			{
+				queue.Add(1, &form);
+			}		
+			queue.Render(*gfx);
+			queue.Clear();
 				
 			gfx->setFontStyle(false, false, false, false, false, false);
 			gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
@@ -155,6 +163,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			gfx->DrawElipse(Util::Vec2(800,500), 10, 15);
 			gfx->DrawElipse(Util::Vec2(800,500), 40, 20);
 			gfx->DrawElipse(Util::Vec2(800,500), 100, 90);
+
+			gfx->DrawCircle(Util::Vec2(500,600), 10);
+			gfx->DrawCircle(Util::Vec2(500,600), 40);
+			gfx->DrawCircle(Util::Vec2(500,600), 100);
+
+			gfx->DrawElipse(Util::Vec2(800,600), 10, 15);
+			gfx->DrawElipse(Util::Vec2(800,600), 40, 20);
+			gfx->DrawElipse(Util::Vec2(800,600), 100, 90);
 
 			gfx->EndSpriteBatch();
 			gfx->EndScene();

@@ -24,11 +24,11 @@ namespace Util
 		Timer();
 		~Timer();
 		
-		void FeedTimeDelta(float dt);
+		void AdvanceTime(float dt);
 		void setTimeScaling(float scale);
 		void Reset();
 
-		bool EatTime(float time);
+		bool TimeToUpdate(float time);
 
 		float getLastTimeDelta() const;
 		float getElapsedTime() const;
@@ -43,6 +43,7 @@ namespace Util
 		float _maxDeltaAllowed;
 
 	public:
+		Clock();
 		void FrameStep();
 		void RegisterTimer(Timer* timer);
 		void UnregisterTimer(Timer* timer);

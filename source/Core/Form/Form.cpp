@@ -9,20 +9,19 @@
 
 namespace Core
 {
-	
-	void DrawForms(std::vector<Form>& frms, Graphics::Interface& gfx)
+	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx)
 	{
-		for(Form f : frms)
+		for(Form* f : frms)
 		{
-			switch(f.getType())
+			switch(f->getType())
 			{
 			case FormType::Font:
 			{
-				if(f.getStates().Contains("Text") && f.getStates().Contains("Font"))
+				if(f->getStates().Contains("Text") && f->getStates().Contains("Font"))
 				{
-					State text = f.getStates().Get("Text");
-					State font = f.getStates().Get("Font");
-					State bounds = f.getStates()["Area"];
+					State text = f->getStates().Get("Text");
+					State font = f->getStates().Get("Font");
+					State bounds = f->getStates()["Area"];
 					gfx.DrawFont(font.as<int>(), text.as<String>(), &bounds.as<Util::Rect>());
 				}
 			}
@@ -30,11 +29,11 @@ namespace Core
 			
 			case FormType::Sprite:
 			{
-				if(f.getStates().Contains("Spritesheet") && f.getStates().Contains("CurrentSprite"))
+				if(f->getStates().Contains("Spritesheet") && f->getStates().Contains("CurrentSprite"))
 				{
-					State sheet = f.getStates().Get("Spritesheet");
-					State currentFrame = f.getStates().Get("CurrentSprite");
-					gfx.setTransform2D(&f.getPosition(), &f.getScalingCenter(), &f.getScale(), &f.getPivotPoint(), Deg2Rad(f.getRotation()), &f.getColor());
+					State sheet = f->getStates().Get("Spritesheet");
+					State currentFrame = f->getStates().Get("CurrentSprite");
+					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawSprite(sheet.as<Graphics::Spritesheet>().getTextureHandle(), sheet.as<Graphics::Spritesheet>().getSprite(currentFrame.as<uint>()));
 				}
 			}
@@ -47,8 +46,6 @@ namespace Core
 			}
 		}
 	}
-	
-	
 	
 
 	InstanceID Form::_idCounter = 0;

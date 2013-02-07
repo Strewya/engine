@@ -84,6 +84,7 @@
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
     <ClCompile Include="..\..\source\Defines.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp" />
@@ -108,6 +109,7 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />

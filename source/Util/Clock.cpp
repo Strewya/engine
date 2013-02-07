@@ -10,14 +10,19 @@ Util::Clock gClock;
 
 namespace Util
 {
+	Clock::Clock()
+		: _maxDeltaAllowed(0.25f), _lastUpdate(std::chrono::high_resolution_clock::now())
+	{}
+
 	void Clock::FrameStep()
 	{
 		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
 		float delta = std::chrono::duration_cast<std::chrono::duration<float>>(now-_lastUpdate).count();
+		_lastUpdate = now;
 		delta = delta > _maxDeltaAllowed ? _maxDeltaAllowed : delta;
 		for(auto timer : _timers)
 		{
-			if(timer) timer->FeedTimeDelta(delta);
+			if(timer) timer->AdvanceTime(delta);
 		}
 	}
 
@@ -77,7 +82,7 @@ namespace Util
 		gClock.UnregisterTimer(this);
 	}
 
-	void Timer::FeedTimeDelta(float dt)
+	void Timer::AdvanceTime(float dt)
 	{
 		_deltaTime = dt;
 		_accumulator += (dt*_scale);
@@ -93,7 +98,7 @@ namespace Util
 		_accumulator = 0.0f;
 	}
 
-	bool Timer::EatTime(float time)
+	bool Timer::TimeToUpdate(float time)
 	{
 		if(_accumulator >= time)
 		{

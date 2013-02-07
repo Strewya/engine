@@ -57,6 +57,9 @@
       <Filter>Core/Form</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Defines.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -125,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Form\Form.h">
       <Filter>Core/Form</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h">
+      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

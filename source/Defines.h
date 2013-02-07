@@ -4,6 +4,7 @@
 /*		C++ HEADERS	*/
 #include <cassert>
 #include <string>
+#include <sstream>
 
 /*		TYPEDEFS	*/
 typedef std::string String;
@@ -39,6 +40,12 @@ float  Deg2Rad(float angle);
 double Deg2Rad(double angle);
 float  Rad2Deg(float radians);
 double Rad2Deg(double radians);
+template <typename T> String ToString(T value)
+{
+	std::stringstream ss;
+	ss << value;
+	return ss.str();
+}
 
 /*		MY HEADERS	*/
 #include "Util/Clock.h"

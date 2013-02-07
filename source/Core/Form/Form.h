@@ -84,7 +84,7 @@ namespace Core
 		void Translate(const Util::Vec2& translation);
 	};
 	
-	void DrawForms(std::vector<Form>& frms, Graphics::Interface& gfx);
+	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx);
 }
 
 #endif //CORE_FORM_FORM2D_H_
