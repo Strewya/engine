@@ -156,21 +156,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 			gfx->DrawRectangle(Util::Vec2(250,400), 30, 30);
 
-			gfx->DrawCircle(Util::Vec2(500,500), 10);
-			gfx->DrawCircle(Util::Vec2(500,500), 40);
-			gfx->DrawCircle(Util::Vec2(500,500), 100);
+			gfx->DrawCircle(Util::Vec2(600,200), 10);
+			gfx->DrawCircle(Util::Vec2(700,200), 40);
+			gfx->DrawCircle(Util::Vec2(900,200), 100);
 
 			gfx->DrawElipse(Util::Vec2(800,500), 10, 15);
 			gfx->DrawElipse(Util::Vec2(800,500), 40, 20);
 			gfx->DrawElipse(Util::Vec2(800,500), 100, 90);
 
-			gfx->DrawCircle(Util::Vec2(500,600), 10);
-			gfx->DrawCircle(Util::Vec2(500,600), 40);
-			gfx->DrawCircle(Util::Vec2(500,600), 100);
-
-			gfx->DrawElipse(Util::Vec2(800,600), 10, 15);
-			gfx->DrawElipse(Util::Vec2(800,600), 40, 20);
-			gfx->DrawElipse(Util::Vec2(800,600), 100, 90);
+			
 
 			gfx->EndSpriteBatch();
 			gfx->EndScene();

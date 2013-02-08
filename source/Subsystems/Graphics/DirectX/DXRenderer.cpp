@@ -449,34 +449,66 @@ namespace Graphics
 
 	void DXRenderer::DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth)
 	{
-		const int numVertex = max(36, (int)(radius*0.5));
+		const int numVertex = (int) (max(36*0.25, std::ceil((radius*0.5)*0.25)  ));
 		std::vector<D3DXVECTOR2> circle;
-		float angle = 360.0f/numVertex;
+		std::vector<D3DXVECTOR2> quarterCircle;
+		circle.reserve(numVertex*4 + 1);
+		quarterCircle.reserve(numVertex);
+		float angle = 360.0f/(numVertex*4);
 		for(int i = 0; i < numVertex; ++i)
 		{
-			circle.push_back(D3DXVECTOR2(pos.x + (radius*std::cos(D3DXToRadian(angle*i))), pos.y + (radius*std::sin(D3DXToRadian(angle*i)))));
+			quarterCircle.push_back(D3DXVECTOR2((radius*std::cos(D3DXToRadian(angle*i))), (radius*std::sin(D3DXToRadian(angle*i)))));
+			circle.push_back(D3DXVECTOR2(pos.x + quarterCircle[i].x, pos.y + quarterCircle[i].y));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x - quarterCircle[i].y, pos.y + quarterCircle[i].x));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x - quarterCircle[i].x, pos.y - quarterCircle[i].y));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x + quarterCircle[i].y, pos.y - quarterCircle[i].x));
 		}
 		circle.push_back(circle.front());
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
 
 		_line->SetWidth(lineWidth);
-		_line->Draw(&circle[0], numVertex+1, c);
+		_line->Draw(&circle[0], numVertex*4+1, c);
 	}
 
 	void DXRenderer::DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth)
 	{
-		const int numVertex = max(36, (int)(min(xRadius, yRadius)*0.5));
+		const int numVertex = (int) (max(36*0.25, std::ceil((min(xRadius, yRadius)*0.5)*0.25)  ));
 		std::vector<D3DXVECTOR2> circle;
-		float angle = 360.0f/numVertex;
+		std::vector<D3DXVECTOR2> quarterCircle;
+		circle.reserve(numVertex*4 + 1);
+		quarterCircle.reserve(numVertex);
+		float angle = 360.0f/(numVertex*4);
 		for(int i = 0; i < numVertex; ++i)
 		{
-			circle.push_back(D3DXVECTOR2(pos.x + (xRadius*std::cos(D3DXToRadian(angle*i))), pos.y + (yRadius*std::sin(D3DXToRadian(angle*i)))));
+			quarterCircle.push_back(D3DXVECTOR2((std::cos(D3DXToRadian(angle*i))), (std::sin(D3DXToRadian(angle*i)))));
+			circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].x, pos.y + yRadius*quarterCircle[i].y));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].y, pos.y + yRadius*quarterCircle[i].x));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].x, pos.y - yRadius*quarterCircle[i].y));
+		}
+		for(int i = 0; i < numVertex; ++i)
+		{
+			circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].y, pos.y - yRadius*quarterCircle[i].x));
 		}
 		circle.push_back(circle.front());
 		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
 
 		_line->SetWidth(lineWidth);
-		_line->Draw(&circle[0], numVertex+1, c);
+		_line->Draw(&circle[0], numVertex*4+1, c);
 	}
 	
 	void DXRenderer::DrawTexture(uint hTexture)
