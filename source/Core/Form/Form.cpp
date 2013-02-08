@@ -21,8 +21,10 @@ namespace Core
 				{
 					State text = f->getStates().Get("Text");
 					State font = f->getStates().Get("Font");
-					State bounds = f->getStates()["Area"];
-					gfx.DrawFont(font.as<int>(), text.as<String>(), &bounds.as<Util::Rect>());
+					Util::Rect bounds = f->getStates().Contains("Area") ? f->getStates().Get("Area").as<Util::Rect>() : Util::Rect(f->getPosition(), 1, 1);
+					//read these from states!
+					gfx.setFontStyle(false, false, false, false, false, false);
+					gfx.DrawFont(font.as<uint>(), text.as<String>(), &bounds);
 				}
 			}
 			break;
@@ -41,8 +43,70 @@ namespace Core
 			
 			case FormType::Texture:
 			{
+				if(f->getStates().Contains("Texture"))
+				{
+					State texture = f->getStates().Get("Texture");
+					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
+					gfx.DrawTexture(texture.as<uint>());
+				}
 			}
-			break;	
+			break;
+
+			case FormType::Line:
+			{
+				if(f->getStates().Contains("StartPoint") && f->getStates().Contains("EndPoint"))
+				{
+					State start = f->getStates().Get("StartPoint");
+					State end = f->getStates().Get("EndPoint");
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					gfx.DrawLine(start.as<Util::Vec2>(), end.as<Util::Vec2>(), &f->getColor(), lineWidth);
+				}
+			}
+			break;
+
+			case FormType::Triangle:
+			{
+				if(f->getStates().Contains("Point1") && f->getStates().Contains("Point2") && f->getStates().Contains("Point3"))
+				{
+					State pts[] = { f->getStates().Get("Point1"), f->getStates().Get("Point2"), f->getStates().Get("Point3")};
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					gfx.DrawTriangle(pts[0].as<Util::Vec2>(), pts[1].as<Util::Vec2>(), pts[2].as<Util::Vec2>(), &f->getColor(), lineWidth);
+				}
+			}
+			break;
+
+			case FormType::Rectangle:
+			{
+				if(f->getStates().Contains("Area"))
+				{
+					State bounds = f->getStates().Get("Area");
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					gfx.DrawRectangle(bounds.as<Util::Rect>(), &f->getColor(), lineWidth);
+				}
+			}
+			break;
+
+			case FormType::Circle:
+			{
+				if(f->getStates().Contains("Radius"))
+				{
+					State radius = f->getStates().Get("Radius");
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					gfx.DrawCircle(f->getPosition(), radius.as<float>(), &f->getColor(), lineWidth);
+				}
+			}
+			break;
+
+			case FormType::Elipse:
+			{
+				if(f->getStates().Contains("RadiusX") && f->getStates().Contains("RadiusY"))
+				{
+					State radius[] = {f->getStates().Get("RadiusX"), f->getStates().Get("RadiusY")};
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					gfx.DrawElipse(f->getPosition(), radius[0].as<float>(), radius[1].as<float>(),&f->getColor(), lineWidth);
+				}
+			}
+			break;
 			}
 		}
 	}

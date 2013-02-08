@@ -59,8 +59,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		uint cherryHandle = sheet.getHandle("cherry");
 		uint cupcakeHandle = sheet.getHandle("cupcake");
 
-		
-		
 		Core::Entity ent(0);
 		ent.getForm().setType(Core::FormType::Sprite);
 
@@ -114,11 +112,27 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().setPivotPoint(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setRotation(0);
 
+		//font type
 		uint hFont = gfx->MakeFont("Arial", 20, 400, false);
 		Util::Rect fontBounds(50, 50, 300, 300);
+		sprites.push_back(Core::Form(Core::FormType::Font));
+		sprites.back().getStates().Insert("Font", hFont);
+		sprites.back().getStates().Insert("Area", fontBounds);
+		sprites.back().getStates().Insert("Text", String("Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text."));
 
-		Graphics::RenderingQueue queue;
+
+		sprites.push_back(Core::Form(Core::FormType::Triangle));
+		sprites.back().getStates().Insert("Point1", Util::Vec2(700,700));
+		sprites.back().getStates().Insert("Point2", Util::Vec2(900,900));
+		sprites.back().getStates().Insert("Point3", Util::Vec2(500,900));
 		
+
+		sprites.push_back(Core::Form(Core::FormType::Rectangle));
+		sprites.back().getStates().Insert("Area", fontBounds);
+
+
+		Graphics::RenderingQueue opaque;
+		Graphics::RenderingQueue alphaBlended;
 		
 		Util::Timer mainLoopTimer;
 	
@@ -131,7 +145,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			
 			//the rest of this code should be inside Engine::Update()
 
-			
 			while( mainLoopTimer.TimeToUpdate(ticksPerSec) )
 			{
 				for( auto& spr : sprites )
@@ -145,14 +158,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		
 			for( auto& form : sprites)
 			{
-				queue.Add(1, &form);
-			}		
-			queue.Render(*gfx);
-			queue.Clear();
-				
-			gfx->setFontStyle(false, false, false, false, false, false);
-			gfx->DrawFont(hFont, "Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.", &fontBounds);
-			gfx->DrawRectangle(fontBounds);
+				opaque.Add(&form);
+			}
+			opaque.Render(*gfx);
+			opaque.Clear();
+			
+			
+			gfx->EndSpriteBatch();
+			gfx->BeginSpriteBatch(false);
 
 			gfx->DrawRectangle(Util::Vec2(250,400), 30, 30);
 
@@ -163,8 +176,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 			gfx->DrawElipse(Util::Vec2(800,500), 10, 15);
 			gfx->DrawElipse(Util::Vec2(800,500), 40, 20);
 			gfx->DrawElipse(Util::Vec2(800,500), 100, 90);
-
-			
 
 			gfx->EndSpriteBatch();
 			gfx->EndScene();

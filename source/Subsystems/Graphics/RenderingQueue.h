@@ -6,7 +6,6 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <map>
 #include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
@@ -23,15 +22,14 @@ namespace Graphics
     class RenderingQueue
 	{
 	public:
-		void Add(int layer, Core::Form* f);
+		void Add(Core::Form* f);
 		void Clear();
 		void Render(Interface& gfx) const;
 
 	private:
 		typedef std::vector<Core::Form*> FormVector;
-		typedef std::map<int, FormVector> FormMap;
 
-		FormMap _queue;
+		FormVector _queue;
 
 
 	};

@@ -21,11 +21,14 @@ namespace Core
 	enum class FormType
 	{
 		Null,
+		Line,
+		Triangle,
+		Rectangle,
+		Circle,
+		Elipse,
 		Font,
 		Sprite,
-		Texture,
-		Model,
-		Shader
+		Texture
 	};
 	
 	class Form
