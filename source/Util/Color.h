@@ -28,6 +28,7 @@ namespace Util
 		void setGreen(uint value);
 		void setBlue(uint value);
 		void setAlpha(uint value);
+		void setChannels(uint r, uint g, uint b, uint a);
 
 		uint const& red;
 		uint const& green;

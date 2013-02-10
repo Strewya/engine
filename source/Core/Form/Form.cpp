@@ -54,12 +54,11 @@ namespace Core
 
 			case FormType::Line:
 			{
-				if(f->getStates().Contains("StartPoint") && f->getStates().Contains("EndPoint"))
+				if(f->getStates().Contains("LineVector"))
 				{
-					State start = f->getStates().Get("StartPoint");
-					State end = f->getStates().Get("EndPoint");
+					State line = f->getStates().Get("LineVector");
 					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawLine(start.as<Util::Vec2>(), end.as<Util::Vec2>(), &f->getColor(), lineWidth);
+					gfx.DrawLine(f->getPosition(), f->getPosition()+line.as<Util::Vec2>(), &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -70,7 +69,7 @@ namespace Core
 				{
 					State pts[] = { f->getStates().Get("Point1"), f->getStates().Get("Point2"), f->getStates().Get("Point3")};
 					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawTriangle(pts[0].as<Util::Vec2>(), pts[1].as<Util::Vec2>(), pts[2].as<Util::Vec2>(), &f->getColor(), lineWidth);
+					gfx.DrawTriangle(f->getPosition()+pts[0].as<Util::Vec2>(), f->getPosition()+pts[1].as<Util::Vec2>(), f->getPosition()+pts[2].as<Util::Vec2>(), &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -79,9 +78,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("Area"))
 				{
-					State bounds = f->getStates().Get("Area");
+					Util::Rect bounds = f->getStates().Get("Area").as<Util::Rect>();
 					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawRectangle(bounds.as<Util::Rect>(), &f->getColor(), lineWidth);
+					gfx.DrawRectangle(bounds, &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -212,10 +211,21 @@ namespace Core
 	{
 		_color = color;
 	}
+
+	void Form::setColor(uint r, uint g, uint b, uint a)
+	{
+		_color.setChannels(r, g, b, a);
+	}
 	
 	void Form::setPosition(const Util::Vec2& position)
 	{
 		_position = position;
+	}
+
+	void Form::setPosition(float x, float y)
+	{
+		_position.x = x;
+		_position.y = y;
 	}
 
 	void Form::setScalingCenter(const Util::Vec2& scaleCenter)
@@ -223,14 +233,32 @@ namespace Core
 		_scalingCenter = scaleCenter;
 	}
 
+	void Form::setScalingCenter(float x, float y)
+	{
+		_scalingCenter.x = x;
+		_scalingCenter.y = y;
+	}
+
 	void Form::setScale(const Util::Vec2& scale)
 	{
 		_scale = scale;
 	}
 
+	void Form::setScale(float x, float y)
+	{
+		_scale.x = x;
+		_scale.y = y;
+	}
+
 	void Form::setPivotPoint(const Util::Vec2& pivot)
 	{
 		_pivotPoint = pivot;
+	}
+	
+	void Form::setPivotPoint(float x, float y)
+	{
+		_pivotPoint.x = x;
+		_pivotPoint.y = y;
 	}
 
 	void Form::setRotation(const float rotation)
@@ -248,6 +276,12 @@ namespace Core
 	{
 		_scale += scaling;
 	}
+
+	void Form::Scale(float x, float y)
+	{
+		_scale.x += x;
+		_scale.y += y;
+	}
 	
 	void Form::Rotate(float rotation)
 	{
@@ -257,5 +291,11 @@ namespace Core
 	void Form::Translate(const Util::Vec2& translation)
 	{
 		_position += translation;
+	}
+
+	void Form::Translate(float x, float y)
+	{
+		_position.x += x;
+		_position.y += y;
 	}
 }

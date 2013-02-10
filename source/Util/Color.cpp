@@ -74,6 +74,14 @@ namespace Util
 	{
 		_alpha = a > 255 ? 255 : ( a < 0 ? 0 : a);
 	}
+
+	void Color::setChannels(uint r, uint g, uint b, uint a)
+	{
+		_red = r > 255 ? 255 : ( r < 0 ? 0 : r );
+		_green = g > 255 ? 255 : ( g < 0 ? 0 : g );
+		_blue = b > 255 ? 255 : ( b < 0 ? 0 : b );
+		_alpha = a > 255 ? 255 : ( a < 0 ? 0 : a);
+	}
 }
 
 std::istream& operator>>(std::istream& ss, Util::Color& c)

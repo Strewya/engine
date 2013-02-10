@@ -75,16 +75,23 @@ namespace Core
 		
 		void setType(const FormType& type);
 		void setColor(const Util::Color& color);
+		void setColor(uint r, uint g, uint b, uint a=255);
 		void setPosition(const Util::Vec2& position);
+		void setPosition(float x, float y);
 		void setScalingCenter(const Util::Vec2& scaleCenter);
+		void setScalingCenter(float x, float y);
 		void setScale(const Util::Vec2& scale);
+		void setScale(float x, float y);
 		void setPivotPoint(const Util::Vec2& pivot);
+		void setPivotPoint(float x, float y);
 		void setRotation(float rotation);
 		void setVisibility(bool state);
 		
 		void Scale(const Util::Vec2& scaling);
+		void Scale(float x, float y);
 		void Rotate(float rotation);
 		void Translate(const Util::Vec2& translation);
+		void Translate(float x, float y);
 	};
 	
 	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx);
