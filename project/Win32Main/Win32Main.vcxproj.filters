@@ -60,6 +60,12 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Action.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -132,6 +138,12 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Action.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Windows">
@@ -154,6 +166,9 @@
     </Filter>
     <Filter Include="Core/Entity">
       <UniqueIdentifier>{36ed7cd0-141f-4d27-b32b-91b421708503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Action">
+      <UniqueIdentifier>{8b8ca550-38c1-4bc3-9433-33fed5d1c035}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

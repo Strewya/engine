@@ -1,30 +1,48 @@
-#ifndef _SGAction_h_
-#define _SGAction_h_
+#ifndef CORE_ACTION_ACTION_H_
+#define CORE_ACTION_ACTION_H_
 /********************************************
 	class:	
 	usage:	
 ********************************************/
-	/*** common header ***/
-#include "Common.h"
-#include "SGForwardDeclarations.h"
-	/*** extra headers if needed ***/
-//#include "SGActionFactory.h"
-#include "SGGameSpace.h"
-#include "SGMappedInput.h"
-#include "SGServiceHolder.h"
-#include "SGFactoryRouter.h"
+	/*** common and C++ headers ***/
+#include "Defines.h"
+#include <set>
+	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
-namespace SG
+namespace Core
 {
+	class Entity;
+}
+
+typedef void(*Func)(const std::set<Core::Entity>&);
+
+namespace Core
+{
+	class Action
+	{
+	public:
+		Action();
+		Action(Func fn);
+
+
+	private:
+		Func actionLogic;
+	};
+
+
+
+
+	
+	/*
 	//fwds
 	class ActionPriorityQueue;
 	//end fwds
 
-	/*
-		INTERFACE CLASS
-			ActionContainer
-	*/
+	//
+	//	INTERFACE CLASS
+	//		ActionContainer
+	//
 	class ActionContainer
 	{
 	public:
@@ -34,10 +52,10 @@ namespace SG
 	};
 
 
-	/*
-		BASE CLASS
-			Action
-	*/
+	//
+	//	BASE CLASS
+	//		Action
+	//
 	class Action : public ServiceHolder
 	{
 	public:
@@ -112,10 +130,10 @@ namespace SG
 		InstanceID		getID() const;
 	};
 
-	/*
-		TEMPLATE CLASS
-			ActionTemplate
-	*/
+	//
+	//	TEMPLATE CLASS
+	//		ActionTemplate
+	//
 	template<class T>
 	class ActionTemplate : public Action
 	{
@@ -160,6 +178,8 @@ namespace SG
 			return static_cast<T*>(ptr);
 		}
 	};
+
+	*/
 }
 
-#endif //_SGAction_h_
+#endif //CORE_ACTION_ACTION_H_

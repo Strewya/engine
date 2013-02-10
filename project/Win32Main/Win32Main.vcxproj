@@ -78,6 +78,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
     <ClCompile Include="..\..\source\Core\Form\Form.cpp" />
     <ClCompile Include="..\..\source\Core\State\State.cpp" />
@@ -101,6 +103,8 @@
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\Core\Action\Action.h" />
+    <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
     <ClInclude Include="..\..\source\Core\Form\Form.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />

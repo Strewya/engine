@@ -1,14 +1,29 @@
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "SGAction.h"
+#include "Core/Action/Action.h"
+	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "SGActionPriorityQueue.h"
-#include "SGGameEntity.h"
-#include "SGServices.h"
-#include "SGEngine.h"
 	/*** end headers ***/
 
-namespace SG
+
+namespace Core
 {
+	Action::Action()
+		: actionLogic(nullptr)
+	{}
+
+	Action::Action(Func fn)
+		: actionLogic(fn)
+	{}
+
+
+
+
+
+
+
+
+	/*
 	InstanceID Action::_idCounter = 0;
 	shared_ptr<ActionPriorityQueue> Action::_defaultQueue;
 
@@ -250,4 +265,6 @@ namespace SG
 	
 	void Action::OnCallback(Action* action)
 	{}
+
+	*/
 }

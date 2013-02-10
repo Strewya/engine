@@ -72,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
 		sprites.back().getStates().Insert("Spritesheet", sheetState);
 		sprites.back().getStates().Insert("CurrentSprite", cherryHandle);
-		sprites.back().setPosition(Util::Vec2(500,300));
-		sprites.back().setScale(Util::Vec2(1,1));
+		sprites.back().setPosition(500,300);
+		sprites.back().setScale(1,1);
 		sprites.back().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		//sprites.back().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize());
 		//sprites.back().setScalingCenter(Util::Vec2(0,0));
@@ -87,7 +87,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().getStates().Insert("Spritesheet", sheetState);
 		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
 		sprites.back().setPosition(Util::Vec2(500,300) - sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
+		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setPivotPoint(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setRotation(0);
@@ -96,8 +96,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
 		sprites.back().getStates().Insert("Spritesheet", sheetState);
 		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
-		sprites.back().setPosition(Util::Vec2(500,300));
-		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
+		sprites.back().setPosition(500,300);
+		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setPivotPoint(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setRotation(0);
@@ -107,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		sprites.back().getStates().Insert("Spritesheet", sheetState);
 		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
 		sprites.back().setPosition(Util::Vec2(500,300) + sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		sprites.back().setScale(Util::Vec2(0.1f,0.1f));
+		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setPivotPoint(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
 		sprites.back().setRotation(0);
@@ -122,9 +122,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 
 		sprites.push_back(Core::Form(Core::FormType::Triangle));
-		sprites.back().getStates().Insert("Point1", Util::Vec2(700,700));
-		sprites.back().getStates().Insert("Point2", Util::Vec2(900,900));
-		sprites.back().getStates().Insert("Point3", Util::Vec2(500,900));
+		sprites.back().getStates().Insert("Point1", Util::Vec2(0,-10));
+		sprites.back().getStates().Insert("Point2", Util::Vec2(-10,0));
+		sprites.back().getStates().Insert("Point3", Util::Vec2(10,0));
+		sprites.back().setPosition(500,500);
 		
 
 		sprites.push_back(Core::Form(Core::FormType::Rectangle));
@@ -158,10 +159,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		
 			for( auto& form : sprites)
 			{
-				opaque.Add(&form);
+				alphaBlended.Add(&form);
 			}
-			opaque.Render(*gfx);
-			opaque.Clear();
+			alphaBlended.Render(*gfx);
+			alphaBlended.Clear();
 			
 			
 			gfx->EndSpriteBatch();
@@ -185,7 +186,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	}
 	catch(std::exception& ex)
 	{
-		MessageBox(nullptr, ex.what(), "Exception error", MB_OK);
+		MessageBox(gameWindow.getWindowHandle(), ex.what(), "Exception error", MB_OK);
 		return ErrorCode::ExceptionThrown;
 	}
 }
