@@ -25,9 +25,14 @@ namespace Core
 		Action();
 		Action(Func fn);
 
+		void operator()(float deltaTime);
+		void Update(float deltaTime);
+
 
 	private:
-		Func actionLogic;
+		Func _actionLogic;
+
+		std::set<Entity> _entities;
 	};
 
 

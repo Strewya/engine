@@ -9,14 +9,25 @@
 namespace Core
 {
 	Action::Action()
-		: actionLogic(nullptr)
+		: _actionLogic(nullptr)
 	{}
 
 	Action::Action(Func fn)
-		: actionLogic(fn)
+		: _actionLogic(fn)
 	{}
 
+	void Action::Update(float dt)
+	{
+		if(_actionLogic)
+		{
+			_actionLogic(_entities);
+		}
+	}
 
+	void Action::operator()(float dt)
+	{
+		Update(dt);
+	}
 
 
 
