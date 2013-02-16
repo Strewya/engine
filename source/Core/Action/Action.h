@@ -15,7 +15,7 @@ namespace Core
 	class Entity;
 }
 
-typedef void(*Func)(const std::set<Core::Entity>&);
+typedef void(*Func)(const std::set<Core::Entity*>& ents);
 
 namespace Core
 {
@@ -32,7 +32,7 @@ namespace Core
 	private:
 		Func _actionLogic;
 
-		std::set<Entity> _entities;
+		std::set<Entity*> _entities;
 	};
 
 

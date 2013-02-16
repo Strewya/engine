@@ -16,6 +16,7 @@ namespace Graphics
 {
 	class Interface;
 }
+
 namespace Core
 {
 	enum class FormType

@@ -66,6 +66,7 @@
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -144,6 +145,7 @@
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Engine.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Windows">

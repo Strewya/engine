@@ -7,8 +7,7 @@ namespace Core
 {
 	Entity::Entity(InstanceID id)
 		: _id(id)
-	{
-	}
+	{}
 
 	InstanceID Entity::getID() const
 	{
@@ -33,6 +32,11 @@ namespace Core
 	Statemap& Entity::getStates()
 	{
 		return _states;
+	}
+
+	Actionmap& Entity::getActions()
+	{
+		return _actions;
 	}
 
 	Entity& Entity::setAlias(const char* alias)

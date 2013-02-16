@@ -6,6 +6,7 @@
 #include <windows.h>
 	/*** extra headers ***/
 #include "Defines.h"
+#include "Engine.h"
 #include "Win32/GameWindow.h"
 #include "Win32/WindowClass.h"
 //---------- testing purposes
@@ -48,6 +49,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 	try
 	{
+		Core::Engine engine(gameWindow);
 		Graphics::RendererFactory factory(hInst, gameWindow.getWindowHandle());
 		factory.InitInterface("dx");
 		auto gfx = factory.getInterface();
@@ -61,6 +63,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		Core::Entity ent(0);
 		ent.getForm().setType(Core::FormType::Sprite);
+		ent.getActions().Insert();
 
 		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);

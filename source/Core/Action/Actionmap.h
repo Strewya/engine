@@ -1,43 +1,27 @@
-#ifndef _SGActionmap_h_
-#define _SGActionmap_h_
+#ifndef CORE_ACTION_ACTIONMAP_H_
+#define CORE_ACTION_ACTIONMAP_H_
 /********************************************
 	class:	
 	usage:	
 ********************************************/
-	/*** common header ***/
-#include "Common.h"
-#include "SGForwardDeclarations.h"
-	/*** extra headers if needed ***/
+	/*** common and C++ headers ***/
+#include "Defines.h"
+	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Core/Action/Action.h"
 	/*** end header inclusion ***/
 
-namespace SG
+namespace Core
 {
-	//fwds
-	//end fwds
-
 	class Actionmap
 	{
 	private:
-		typedef std::unordered_map<String, spAction> Container;
-		Container _container;
-
-		Actionmap(const Actionmap& am);
-		Actionmap& operator=(const Actionmap& am);
+		typedef std::unordered_map<String, Action> ActionCache;
+		ActionCache _cache;
 
 	public:
-		Actionmap();
-		~Actionmap();
 		
-		bool Insert(spAction action, bool replace = true);
-		Action* Get(const String& type);
-		Action* operator[](const String& type);	//syntactic sugar for Get
-
-		spAction Acquire(const String& name);
-
-		bool Exists(const String& type) const;
-		bool Remove(const String& type);
-		void Clear();
+		
 	};
 }
 
-#endif //_SGActionmap_h_
+#endif //CORE_ACTION_ACTIONMAP_H_

@@ -1,49 +1,35 @@
-#ifndef _SGEngine_h_
-#define _SGEngine_h_
+#ifndef CORE_ENGINE_H_
+#define CORE_ENGINE_H_
 /********************************************
-	class:	Engine
-	usage:	Primary driver of the game's internals, 
-			provides all the services needed by other
-			parts of the system
+	class:	
+	usage:	
 ********************************************/
-	/*** common header ***/
-#include "Common.h"
-#include "SGForwardDeclarations.h"
-	/*** extra headers if needed ***/
-#include "windows.h"			//used for HWND handler
-#include "SGAppSettings.h"		//used for composition of application settings
-#include "SGServiceHolder.h"
+	/*** common and C++ headers ***/
+#include "Defines.h"
+	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Subsystems/Graphics/RendererFactory.h"
 	/*** end header inclusion ***/
 
-namespace SG
+namespace Win32
 {
-	//fwds
-	//end fwds
+	class AbstractWindow;
+}
 
-	class Engine : public ServiceHolder
+namespace Core
+{
+	class Engine
 	{
 	public:
-		Engine();
-		~Engine();
-		void Init(HWND hwnd);
+		Engine(const Win32::AbstractWindow& window);
 		void Loop();
 		void Shutdown();
 
-		void Focus();
-		void Defocus();
+		const Win32::AbstractWindow& getWindow() const;
 
-		AppSettings& GetAppSettings();
-		HWND GetWindowHandle();
-		Entity* GetGame();
-		
 	private:
-		HWND _hwnd;
-		TIME _oldFrameTime;
-		TIME _accumulator;
-		bool _focused;
-		shared_ptr<Entity> _game;
-		AppSettings _appSettings;
+		const Win32::AbstractWindow& _window;
+		Graphics::RendererFactory _rendererFactory;
 	};
 }
 
-#endif //_SGEngine_h_
+#endif //CORE_ENGINE_H_

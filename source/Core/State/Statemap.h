@@ -43,9 +43,9 @@ namespace Core
 		//Inserts 'state' in the container under the identifier 'name' using the move semantics. If it already exists, it is replaced.
 		State& Insert(const String& name, State&& state);
 		//Checks whether a State identified by 'name' exists in the container.
-		bool Contains(const char* name);
+		bool Contains(const char* name) const;
 		//Checks whether a State identified by 'name' exists in the container.
-		bool Contains(const String& name);
+		bool Contains(const String& name) const;
 		//Removes the state with the identifier 'name' exists in the container. Does nothing if it doesn't exists.
 		void Remove(const char* name);
 		//Removes the state with the identifier 'name' exists in the container. Does nothing if it doesn't exists.

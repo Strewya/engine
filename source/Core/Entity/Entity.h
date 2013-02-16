@@ -6,8 +6,8 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Core/Action/Actionmap.h"
 #include "Core/Form/Form.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
@@ -20,10 +20,11 @@ namespace Core
 	class Entity
 	{
 	private:
-		const InstanceID _id;
+		InstanceID _id;
 		String _type;
 		String _alias;
 		
+		Actionmap _actions;
 		Statemap _states;
 		Form _form;
 
@@ -33,8 +34,9 @@ namespace Core
 		InstanceID		getID() const;
 		const String&	getType() const;
 		const String&	getAlias() const;
-		Form&			getForm(); //const?
-		Statemap&		getStates(); //const?
+		Form&			getForm();
+		Statemap&		getStates();
+		Actionmap&		getActions();
 
 		Entity& setAlias(const char* alias);
 		Entity& setAlias(const String& alias);

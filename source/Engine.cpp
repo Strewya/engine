@@ -1,139 +1,75 @@
-
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "SGEngine.h"
+#include "Engine.h"
+	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "SGGameState.h"
-#include "SGGameForm.h"
-#include "SGGameAction.h"
-#include "SGGameEntity.h"
-
-#include "SGIGraphics.h"
-#include "SGISound.h"
-#include "SGScriptEngine.h"
-#include "SGInputSystem.h"
+#include "Win32/AbstractWindow.h"
 	/*** end headers ***/
 
-namespace SG
+namespace Core
 {
-	Engine::Engine() : _hwnd(NULL)
+	Engine::Engine(const Win32::AbstractWindow& window) : _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle())
 	{
-		InitializeInputConstants();
-		getServices().Register(this);
-	}
-
-	void Engine::Init(HWND hwnd)
-	{
-		_hwnd = hwnd;
-		_focused = true;
-
 		SYSTEMTIME st;
 		GetSystemTime(&st);
-		Logger log;
+		Util::Logger& log = Util::GetDefaultLogger();
 
-		log << log.endline;
-		log << "*********************************************" << log.endline;
+		log << log.endl;
+		log << "*********************************************" << log.endl;
 		log	<< "* New program start @ ";
 		log << st.wHour << ":" << st.wMinute << ":" << st.wSecond << " on " << st.wDay << "." << st.wMonth << "." << st.wYear << ".  ";
-		log << "Application: " << _appSettings.GetTitle() << log.endline;
-		log << "*********************************************" << log.endline << log.endline;
+		log << "Application: " << _window.getTitle() << log.endl;
+		log << "*********************************************" << log.endl << log.endl;
 
+		/*	read the config file for engine configuration, which needs to include the following:
+			* fullscreen status
+			* resolution (width and height)
+			* display engine (directx by default)
+			* audio engine (fmod by default)
+		*/
+		String renderer = "dx";
 		/*
-		String s = "my game is awesome";
-		const std::collate<char>& coll = std::use_facet<std::collate<char> >(std::locale());
-		long h = coll.hash(s.data(), s.data() + s.length());
-		s += ".";
-		long g = coll.hash(s.data(), s.data() + s.length());
+			initialize the subsystems:
+			* display
+			* audio
+			* input
+			* script
+			* communications
+			* persistence
+		*/
+		_rendererFactory.InitInterface(renderer);
+		/*
+			initialize the resource caches
+			* textures
+			* spritesheets
+			* meshes
+			* sounds
+			* scripts
+			* TODO: strings
 		*/
 
-		Entity* e = NULL;
-		spAction initer(BasicInit::Make(*e));
-		initer->setActive(true).Update(0);
+		/*
+			load the game configuration script and execute it
+			* the script should create the game contexts that define the game's execution flow
 
-		FormFactory::LoadTemplatesFromFile();
-		EntityFactory::LoadTemplatesFromFile();
-		getServices().getGraphics().LoadGraphics("resources.xml");
-		getServices().getScript().File("scripts/main.lua").Do();
-		
-		_game = EntityFactory::Construct("game");
+			push the main context on the context stack
 
-		ActionPriorityQueue::Ptr pq = ActionPriorityQueue::Make(*_game);
-		Action::setDefaultQueue(pq);
-		Action::getDefaultQueue().setActive(true);
-		_game->getActions().Insert(pq);
-
-		spAction draw = DrawGame::Make(*_game);
-		draw->Start();
-		_game->getActions().Insert(draw);
-		
-		
-		if(_game->getActions().Exists("Startup"))
-		{
-			_game->getActions().Get("Startup")->Start();
-		}
-		else
-		{
-			String msg = "No startup action found in the game entity!";
-			Logger() << msg << Logger::endline;
-			int res = MessageBox(_hwnd, (msg + " Do you want to continue?").c_str(), "Warning", MB_YESNO | MB_ICONWARNING);
-			if(res == IDNO)
-				Shutdown();
-		}
-
-
-		_accumulator = 0;
-		_oldFrameTime = GetTickCount();
-	}
-
-	Engine::~Engine()
-	{
+			~~end of initialization, if everything passes and no exceptions are thrown, the configuration is OK
+		*/
 	}
 
 	void Engine::Loop()
 	{
-		TIME currentFrameTime = GetTickCount();
-		if(_focused)
-		{
-			_accumulator += currentFrameTime - _oldFrameTime;
-			TIME timer = _appSettings.GetUpdateTime();
-			if(_accumulator >= timer)
-			{
-				_accumulator -= timer;
-				getServices().getInput().Dispatch();
-				getServices().getInput().Clear();
-				Action::getDefaultQueue().Update(timer);
-				getServices().getSound().Update(timer);
-			}
-		}
-		_oldFrameTime = currentFrameTime;
+		
 	}
 
 	void Engine::Shutdown()
 	{
-		PostMessage(_hwnd, WM_DESTROY, 0, 0);
+		PostMessage(_window.getWindowHandle(), WM_DESTROY, 0, 0);
 	}
 
-	AppSettings& Engine::GetAppSettings()
+	const Win32::AbstractWindow& Engine::getWindow() const
 	{
-		return _appSettings;
-	}
-
-	HWND Engine::GetWindowHandle()
-	{
-		return _hwnd;
-	}
-
-	Entity* Engine::GetGame()
-	{
-		return _game.get();
-	}
-
-	void Engine::Focus()
-	{
-		_focused = true;
-	}
-
-	void Engine::Defocus()
-	{
-		_focused = false;
+		return _window;
 	}
 }
