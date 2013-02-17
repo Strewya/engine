@@ -67,6 +67,9 @@
       <Filter>Core/Action</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Engine.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -146,6 +149,9 @@
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine.h" />
+    <ClInclude Include="..\..\source\Core\Action\Functions.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Windows">

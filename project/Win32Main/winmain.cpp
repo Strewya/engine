@@ -10,6 +10,9 @@
 #include "Win32/GameWindow.h"
 #include "Win32/WindowClass.h"
 //---------- testing purposes
+#include "Core/Action/Action.h"
+#include "Core/Action/Actionmap.h"
+#include "Core/Action/Functions.h"
 #include "Core/Entity/Entity.h"
 #include "Core/Form/Form.h"
 #include "Core/State/State.h"
@@ -63,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		Core::Entity ent(0);
 		ent.getForm().setType(Core::FormType::Sprite);
-		ent.getActions().Insert();
+		ent.getActions().Insert("Render", Core::Action(Core::Render, ent));
 
 		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);

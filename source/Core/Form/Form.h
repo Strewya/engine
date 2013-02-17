@@ -94,7 +94,7 @@ namespace Core
 		void Translate(const Util::Vec2& translation);
 		void Translate(float x, float y);
 	};
-	
+
 	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx);
 }
 

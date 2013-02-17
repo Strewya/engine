@@ -1,8 +1,27 @@
 #ifndef CORE_ACTION_ACTION_H_
 #define CORE_ACTION_ACTION_H_
 /********************************************
-	class:	
-	usage:	
+	class:	Action
+	usage:	Each Entity class has instances of this class contained within.
+			Each instance of Action has a function pointer as it's own member.
+			The use pattern for the Action is:
+				* Action is created and the function pointer is set for it
+				* Action is added to an Entity's list of possible actions
+				* Action is started, and it's member 'active' is set to true
+					- this is a mere simplification, and is used instead of
+					  moving the action from an 'inactive' to an 'active' list
+				* when started, the Action's owning Entity is added to a list 
+				  of all Entities that are being processed for that function pointer
+				* an Action queue is set so that it invokes the function pointers in a certain order
+				* when an action is invoked, it's passed the list of entities to process, 
+				  the resource locator and the subsystem locator objects
+			Updating the action:
+				* the Engine calls context.Update(dt);
+				* the Context invokes Update on the ActionUpdater object
+				* the ActionUpdater object has a priority sorted list of pairs <function pointer, entities to process>
+				* for each pair the function pointer is invoked by passing in the list of entities, the subsystems locator and the resources locator
+				* sexyyyyyyyyyyy
+				* 
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
@@ -15,24 +34,29 @@ namespace Core
 	class Entity;
 }
 
-typedef void(*Func)(const std::set<Core::Entity*>& ents);
+typedef void(*Func)(/*const ResourceLocator& resources, const ServiceLocator& services,*/ const std::set<Core::Entity*>& ents);
 
 namespace Core
 {
 	class Action
 	{
+	private:
+		Func _actionLogic;
+		bool _active;
+		Entity* _owner;
+		Entity* _target;
+
 	public:
 		Action();
-		Action(Func fn);
+		Action(Func fn, Entity& owner);
 
 		void operator()(float deltaTime);
 		void Update(float deltaTime);
 
+		void setFunction(Func fn);
+		
+		bool isActive() const;
 
-	private:
-		Func _actionLogic;
-
-		std::set<Entity*> _entities;
 	};
 
 

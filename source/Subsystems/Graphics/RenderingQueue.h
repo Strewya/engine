@@ -22,6 +22,7 @@ namespace Graphics
     class RenderingQueue
 	{
 	public:
+		void Add(Core::Form& f);
 		void Add(Core::Form* f);
 		void Clear();
 		void Render(Interface& gfx) const;

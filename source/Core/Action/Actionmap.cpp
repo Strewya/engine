@@ -1,77 +1,46 @@
-	/* personal header */
-#include "SGActionmap.h"
-	/* extra headers */
-#include "SGAction.h"
-	/* end headers */
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** personal header ***/
+#include "Core/Action/Actionmap.h"
+	/*** C++ headers ***/
+	/*** extra headers ***/
+	/*** end headers ***/
 
-namespace SG
+namespace Core
 {
-	Actionmap::Actionmap()
-		: _container()
+	Action& Actionmap::Insert(const char* name, const Action& action)
 	{
-	}
-
-	Actionmap::~Actionmap()
-	{
-		Clear();
-	}
-
-	bool Actionmap::Insert(spAction a, bool replace)
-	{
-		if(a == NULL)
+		auto it = _cache.find(name);
+		if(it == _cache.end())
 		{
-			Logger() << "NULL action passed to Actionmap." << Logger::endline;
-			return false;
+			it = _cache.emplace(name, action).first;
 		}
-
-		Container::iterator it = _container.find(a->getAlias());
-		if(it == _container.end())
+		else
 		{
-			return _container.insert( std::make_pair(a->getAlias(), a) ).second;
+			it->second = action;
 		}
+		return it->second;
+	}
 
-		if(replace)
+	Action& Actionmap::Insert(const String& name, const Action& action)
+	{
+		return Insert(name.c_str(), action);
+	}
+
+	Action& Actionmap::Get(const char* name)
+	{
+		auto it = _cache.find(name);
+		if(it == _cache.end())
 		{
-			it->second = a;
-			return true;
+			String message = "Actionmap::Get(): Attempted to acquire non-existant Action '";
+			message += name;
+			message += "'.";
+			throw std::exception(message.c_str());
 		}
-		return false;
+		return it->second;
 	}
 
-	Action* Actionmap::Get(const String& type)
+	Action& Actionmap::Get(const String& name)
 	{
-		return Acquire(type).get();
-	}
-	
-	Action* Actionmap::operator[](const String& type)
-	{
-		return Get(type);
-	}
-
-	spAction Actionmap::Acquire(const String& type)
-	{
-		Container::iterator found = _container.find(type);
-		if(found != _container.end())
-			return found->second;
-		return spAction();
-	}
-	
-	bool Actionmap::Exists(const String& type) const
-	{
-		return _container.find(type) != _container.end();
-	}
-
-	bool Actionmap::Remove(const String& type)
-	{
-		Container::iterator it = _container.find(type);
-		if(it == _container.end())
-			return false;
-		_container.erase(it);
-		return true;
-	}
-
-	void Actionmap::Clear()
-	{
-		_container.clear();
+		return Get(name.c_str());
 	}
 }

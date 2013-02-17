@@ -6,6 +6,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/Action.h"
 	/*** end header inclusion ***/
@@ -19,8 +20,11 @@ namespace Core
 		ActionCache _cache;
 
 	public:
-		
-		
+		Action& Insert(const char* name, const Action& action);
+		Action& Insert(const String& name, const Action& action);
+
+		Action& Get(const char* name);
+		Action& Get(const String& name);
 	};
 }
 

@@ -8,6 +8,11 @@
 
 namespace Graphics
 {
+	void RenderingQueue::Add(Core::Form& f)
+    {
+		_queue.push_back(&f);
+    }
+
 	void RenderingQueue::Add(Core::Form* f)
     {
 		_queue.push_back(f);

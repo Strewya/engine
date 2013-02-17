@@ -75,12 +75,12 @@ namespace Core
 		return Insert(name.c_str(), state);
 	}
 
-	bool Statemap::Contains(const char* name)
+	bool Statemap::Contains(const char* name) const
 	{
 		return _cache.find(name) != _cache.end();
 	}
 
-	bool Statemap::Contains(const String& name)
+	bool Statemap::Contains(const String& name) const
 	{
 		return Contains(name.c_str());
 	}
