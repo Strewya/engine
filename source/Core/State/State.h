@@ -12,13 +12,6 @@
 
 namespace Core
 {
-	template<typename T>
-	Util::DataStore<T>& getDataStoreReference()
-	{
-		static Util::DataStore<T> store;
-		return store;
-	}
-	
 	/*
 		State class, version 2
 		Description:
@@ -43,13 +36,15 @@ namespace Core
 	class State
 	{
 	private:
+		static Util::DataStoreRepository* _storeRepo;
 		Util::IDataStore* _dataStore;
-		int _myDataIndex;
+		int _dataHandle;
 
-		void AddRef(uint handle = NOT_FOUND);
+		void AddRef(int handle = NOT_FOUND);
 		void Release();
 
 	public:
+		static void BindStoreRepository(Util::DataStoreRepository& repo);
 		State();
 		State(const State& rhs);
 		State(State&& rhs);
@@ -59,30 +54,30 @@ namespace Core
 		bool isValid();
 
 		template<typename T> State(const T& value)
-			: _dataStore(&getDataStoreReference<T>()), _myDataIndex(getDataStoreReference<T>().AcquireDataIndex())
+			: _dataStore(&_storeRepo->getDataStore<T>()), _dataHandle(_storeRepo->getDataStore<T>().AcquireDataIndex())
 		{
-			getDataStoreReference<T>().getData(_myDataIndex) = value;
+			as<T>() = value;
 		}
 
 		template<typename T> State& operator=(const T& rhs)
 		{
-			Util::DataStore<T>& store = getDataStoreReference<T>();
+			Util::DataStore<T>& store = _storeRepo->getDataStore<T>();
 			if(_dataStore != &store)
 			{
 				Release();
 				_dataStore = &store;
 				AddRef();
 			}
-			store.getData(_myDataIndex) = rhs;
+			as<T>() = rhs;
 			return *this;
 		}
 
 		template<typename T> T& as()
 		{
-			Util::DataStore<T>& store = getDataStoreReference<T>();
+			Util::DataStore<T>& store = _storeRepo->getDataStore<T>();
 			if(&store == _dataStore)
 			{
-				return store.getData(_myDataIndex);
+				return store.getData(_dataHandle);
 			}
 			throw std::exception("State::as<T>(): Tried to access wrong type!");
 		}

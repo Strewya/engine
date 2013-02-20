@@ -7,6 +7,10 @@
 	/*** common and C++ headers ***/
 #include "Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include <memory>
+#include <set>
+#include <typeinfo>
+#include <unordered_map>
 #include <vector>
 	/*** end header inclusion ***/
 
@@ -21,6 +25,7 @@ namespace Util
 	class IDataStore
 	{
 	public:
+		virtual ~IDataStore() {}
 		virtual uint AcquireDataIndex(int index = NOT_FOUND) = 0;
 		virtual void ReleaseDataIndex(uint index) = 0;
 	};
@@ -47,11 +52,12 @@ namespace Util
 	{
 	private:
 		typedef std::vector<T> TypeCache;
-		typedef std::vector<uint> NumberCache;
+		typedef std::vector<uint> ReferenceCount;
+		typedef std::set<uint> FreeSlots;
 		
 		TypeCache _data;
-		NumberCache _refs;
-		NumberCache _freeSlots;
+		ReferenceCount _refs;
+		FreeSlots _freeSlots;
 		uint _defaultSize;
 
 	public:
@@ -60,7 +66,6 @@ namespace Util
 		{
 			_data.reserve(size);
 			_refs.reserve(size);
-			_freeSlots.reserve(size);
 		}
 
 		uint AcquireDataIndex(int index = NOT_FOUND)
@@ -70,13 +75,9 @@ namespace Util
 				//new data index
 				if(!_freeSlots.empty())
 				{
-					index = _freeSlots.back();
-					_freeSlots.pop_back();
-					if(_freeSlots.capacity() - _freeSlots.size() > _defaultSize)
-					{
-						_freeSlots.swap(_freeSlots);
-						_freeSlots.reserve(_defaultSize);
-					}
+					auto it = _freeSlots.begin();
+					index = *it;
+					_freeSlots.erase(it);
 					_data[index] = T();
 				}
 				else
@@ -97,7 +98,7 @@ namespace Util
 			{
 				if(--_refs[index] == 0)
 				{
-					_freeSlots.push_back(index);
+					_freeSlots.insert(index);
 				}
 			}
 		}
@@ -105,6 +106,34 @@ namespace Util
 		T& getData(uint index)
 		{
 			return _data[index];
+		}
+	};
+
+
+
+	/*
+		class DataStoreRepository
+		Description:
+			This class is used to provide a source of DataStore classes.
+			It contains a map of unique_ptrs to heap allocated DataStores of a certain type.
+			The DataStores are created and acquired via a template method.
+			The key for the DataStore pointers is the hash code of that specific type, determined by calling typeid.
+	*/
+	class DataStoreRepository
+	{
+	private:
+		std::unordered_map<size_t, std::unique_ptr<IDataStore>> _storeMap;
+
+	public:
+		template<typename T> DataStore<T>& getDataStore()
+		{
+			auto hash = typeid(T).hash_code();
+			auto it = _storeMap.find(hash);
+			if(it == _storeMap.end())
+			{
+				it = _storeMap.insert(std::make_pair(hash, std::unique_ptr<IDataStore>(new DataStore<T>()))).first;
+			}
+			return *static_cast<DataStore<T>*>(it->second.get());
 		}
 	};
 }

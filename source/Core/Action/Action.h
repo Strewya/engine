@@ -48,7 +48,7 @@ namespace Core
 
 	public:
 		Action();
-		Action(Func fn, Entity& owner);
+		Action(Func fn);
 
 		void operator()(float deltaTime);
 		void Update(float deltaTime);
@@ -56,7 +56,7 @@ namespace Core
 		void setFunction(Func fn);
 		
 		bool isActive() const;
-
+		
 	};
 
 

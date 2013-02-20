@@ -58,6 +58,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		auto gfx = factory.getInterface();
 		gfx->setScreenSize(gameWindow.getSizeX(), gameWindow.getSizeY());
 
+		
+
 		Graphics::SpritesheetCache sheetCache;
 		Graphics::Spritesheet& sheet = sheetCache.CreateFromFile("resources/pong.sheet");
 		uint ballHandle = sheet.getHandle("ball");
@@ -66,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		Core::Entity ent(0);
 		ent.getForm().setType(Core::FormType::Sprite);
-		ent.getActions().Insert("Render", Core::Action(Core::Render, ent));
+		ent.getActions().Insert("Render", Core::Action(Core::Render));
 
 		uint tex = gfx->getTextureHandle(sheet.getTextureName());
 		sheet.setTextureHandle(tex);

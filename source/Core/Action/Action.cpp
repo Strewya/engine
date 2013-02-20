@@ -20,7 +20,7 @@ namespace Core
 	{
 		if(_actionLogic)
 		{
-			_actionLogic(_entities);
+			//_actionLogic(_entities);
 		}
 	}
 

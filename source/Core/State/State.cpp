@@ -7,11 +7,18 @@
 
 namespace Core
 {
-	void State::AddRef(uint handle)
+	Util::DataStoreRepository* State::_storeRepo = nullptr;
+
+	void State::BindStoreRepository(Util::DataStoreRepository& repo)
+	{
+		_storeRepo = &repo;
+	}
+
+	void State::AddRef(int handle)
 	{
 		if(_dataStore != nullptr)
 		{
-			_myDataIndex = _dataStore->AcquireDataIndex(handle);
+			_dataHandle = _dataStore->AcquireDataIndex(handle);
 		}
 	}
 
@@ -19,27 +26,26 @@ namespace Core
 	{
 		if(_dataStore != nullptr)
 		{
-			_dataStore->ReleaseDataIndex(_myDataIndex);
+			_dataStore->ReleaseDataIndex(_dataHandle);
 		}
 	}
 
 	State::State()
-		: _dataStore(nullptr), _myDataIndex(NOT_FOUND)
+		: _dataStore(nullptr), _dataHandle(NOT_FOUND)
 	{}
 
 	State::State(const State& rhs)
-		: _dataStore(nullptr), _myDataIndex(NOT_FOUND)
+		: _dataStore(nullptr), _dataHandle(NOT_FOUND)
 	{
-		Release();
 		_dataStore = rhs._dataStore;
-		AddRef(rhs._myDataIndex);
+		AddRef(rhs._dataHandle);
 	}
 
 	State::State(State&& rhs)
-		: _dataStore(rhs._dataStore), _myDataIndex(rhs._myDataIndex)
+		: _dataStore(rhs._dataStore), _dataHandle(rhs._dataHandle)
 	{
 		rhs._dataStore = nullptr;
-		rhs._myDataIndex = NOT_FOUND;
+		rhs._dataHandle = NOT_FOUND;
 	}
 
 	State& State::operator=(const State& rhs)
@@ -48,7 +54,7 @@ namespace Core
 		{
 			Release();
 			_dataStore = rhs._dataStore;
-			AddRef(rhs._myDataIndex); 
+			AddRef(rhs._dataHandle); 
 		}
 		return *this;
 	}
@@ -59,10 +65,10 @@ namespace Core
 		{
 			Release();
 			_dataStore = rhs._dataStore;
-			_myDataIndex = rhs._myDataIndex;
+			_dataHandle = rhs._dataHandle;
 				
 			rhs._dataStore = nullptr;
-			rhs._myDataIndex = NOT_FOUND;
+			rhs._dataHandle = NOT_FOUND;
 		}
 		return *this;
 	}
@@ -74,6 +80,6 @@ namespace Core
 
 	bool State::isValid()
 	{
-		return _myDataIndex != NOT_FOUND && _dataStore != nullptr;
+		return _dataHandle != NOT_FOUND && _dataStore != nullptr;
 	}
 }
