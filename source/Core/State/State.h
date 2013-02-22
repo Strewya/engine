@@ -39,6 +39,7 @@ namespace Core
 		static Util::DataStoreRepository* _storeRepo;
 		Util::IDataStore* _dataStore;
 		int _dataHandle;
+		size_t _hash;
 
 		void AddRef(int handle = NOT_FOUND);
 		void Release();
@@ -54,18 +55,20 @@ namespace Core
 		bool isValid();
 
 		template<typename T> State(const T& value)
-			: _dataStore(&_storeRepo->getDataStore<T>()), _dataHandle(_storeRepo->getDataStore<T>().AcquireDataIndex())
+			: _dataStore(&_storeRepo->getDataStore<T>())
 		{
+			_hash = _dataStore->getHash();
+			AddRef();
 			as<T>() = value;
 		}
 
 		template<typename T> State& operator=(const T& rhs)
 		{
-			Util::DataStore<T>& store = _storeRepo->getDataStore<T>();
-			if(_dataStore != &store)
+			if(_hash != typeid(T).hash_code())
 			{
 				Release();
-				_dataStore = &store;
+				_dataStore = &_storeRepo->getDataStore<T>();
+				_hash = _dataStore->getHash();
 				AddRef();
 			}
 			as<T>() = rhs;
@@ -74,10 +77,9 @@ namespace Core
 
 		template<typename T> T& as()
 		{
-			Util::DataStore<T>& store = _storeRepo->getDataStore<T>();
-			if(&store == _dataStore)
+			if(_hash == typeid(T).hash_code())
 			{
-				return store.getData(_dataHandle);
+				return static_cast<Util::DataStore<T>*>(_dataStore)->getData(_dataHandle);
 			}
 			throw std::exception("State::as<T>(): Tried to access wrong type!");
 		}

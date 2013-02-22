@@ -7,11 +7,11 @@
 	/*** common and C++ headers ***/
 #include "Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include <deque>
 #include <memory>
 #include <set>
 #include <typeinfo>
 #include <unordered_map>
-#include <vector>
 	/*** end header inclusion ***/
 
 namespace Util
@@ -28,6 +28,7 @@ namespace Util
 		virtual ~IDataStore() {}
 		virtual uint AcquireDataIndex(int index = NOT_FOUND) = 0;
 		virtual void ReleaseDataIndex(uint index) = 0;
+		virtual size_t getHash() = 0;
 	};
 
 
@@ -51,21 +52,24 @@ namespace Util
 	template<typename T> class DataStore : public IDataStore
 	{
 	private:
-		typedef std::vector<T> TypeCache;
-		typedef std::vector<uint> ReferenceCount;
+		typedef std::deque<T> TypeCache;
+		typedef std::deque<uint> ReferenceCount;
 		typedef std::set<uint> FreeSlots;
 		
 		TypeCache _data;
 		ReferenceCount _refs;
 		FreeSlots _freeSlots;
-		uint _defaultSize;
+		size_t _hash;
 
 	public:
-		DataStore(uint size = gDefaultDataStoreSize)
-			: _defaultSize(size)
+		DataStore()
 		{
-			_data.reserve(size);
-			_refs.reserve(size);
+			_hash = typeid(T).hash_code();
+		}
+
+		size_t getHash()
+		{
+			return _hash;
 		}
 
 		uint AcquireDataIndex(int index = NOT_FOUND)
@@ -75,9 +79,8 @@ namespace Util
 				//new data index
 				if(!_freeSlots.empty())
 				{
-					auto it = _freeSlots.begin();
-					index = *it;
-					_freeSlots.erase(it);
+					index = *_freeSlots.begin();
+					_freeSlots.erase(_freeSlots.begin());
 					_data[index] = T();
 				}
 				else
