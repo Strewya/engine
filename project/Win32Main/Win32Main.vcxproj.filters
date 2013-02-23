@@ -56,7 +56,6 @@
     <ClCompile Include="..\..\source\Core\Form\Form.cpp">
       <Filter>Core/Form</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Defines.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
@@ -66,9 +65,20 @@
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Engine.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
       <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Defines.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\GameContext.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ServiceLocator.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,7 +94,6 @@
     <ClInclude Include="..\..\source\Win32\AbstractWindow.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Defines.h" />
     <ClInclude Include="..\..\source\Util\Logger.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -148,9 +157,20 @@
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine.h" />
     <ClInclude Include="..\..\source\Core\Action\Functions.h">
       <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Defines.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GameContext.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ServiceLocator.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +197,9 @@
     </Filter>
     <Filter Include="Core/Action">
       <UniqueIdentifier>{8b8ca550-38c1-4bc3-9433-33fed5d1c035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

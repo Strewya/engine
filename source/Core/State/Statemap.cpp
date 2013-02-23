@@ -47,7 +47,7 @@ namespace Core
 
 	bool Statemap::Contains(const char* name)
 	{
-		return _cache.find(name) != _cache.end();
+		return _cache.find(name) != _cache.end() || (_prototype && _prototype->Contains(name));
 	}
 
 	bool Statemap::Contains(const String& name)

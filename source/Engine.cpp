@@ -38,6 +38,8 @@ namespace Core
 			* persistence
 		*/
 		_rendererFactory.InitInterface(renderer);
+		_services.Register(_rendererFactory.getInterface());
+
 		/*
 			initialize the resource caches
 			* textures
@@ -60,16 +62,54 @@ namespace Core
 
 	void Engine::Loop()
 	{
-		
+		if(!_activeContext || !_activeContext->Update())
+		{
+			Shutdown();
+		}
 	}
 
 	void Engine::Shutdown()
 	{
 		PostMessage(_window.getWindowHandle(), WM_DESTROY, 0, 0);
 	}
-
-	const Win32::AbstractWindow& Engine::getWindow() const
+	/*
+	GameContext& Engine::CreateContext(const char* name)
 	{
-		return _window;
+	}
+
+	GameContext& Engine::CreateContext(const String& name)
+	{
+		return CreateContext(name.c_str());
+	}
+	*/
+	GameContext& Engine::getContext(const char* name)
+	{
+		auto it = _gameContexts.find(name);
+		if(it == _gameContexts.end())
+		{
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(_services))).first;
+		}
+		return *it->second;
+	}
+
+	GameContext& Engine::getContext(const String& name)
+	{
+		return getContext(name.c_str());
+	}
+
+	bool Engine::PushContext(const char* name)
+	{
+		auto it = _gameContexts.find(name);
+		if(it != _gameContexts.end())
+		{
+			_activeContext = it->second.get();
+			return true;
+		}
+		return false;
+	}
+
+	bool Engine::PushContext(const String& name)
+	{
+		return PushContext(name.c_str());
 	}
 }

@@ -14,7 +14,6 @@ typedef unsigned long DWORD;
 typedef unsigned long ulong;
 
 /*		CONTANTS	*/
-const uint gDefaultDataStoreSize = 64;
 const double PI_D = 3.141592653589793238462;
 const double DEG2RAD_RATIO_D = PI_D/180.0;
 const double RAD2DEG_RATIO_D = 180.0/PI_D;
@@ -22,6 +21,8 @@ const double RAD2DEG_RATIO_D = 180.0/PI_D;
 const float  PI_F = 3.14159265358979f;
 const float  DEG2RAD_RATIO_F = PI_F/180.0f;
 const float  RAD2DEG_RATIO_F = 180.0f/PI_F;
+
+const float gUpdateInterval = 1.0f/40.0f;
 
 enum ErrorCode
 {

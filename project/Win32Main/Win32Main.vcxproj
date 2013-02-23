@@ -87,6 +87,8 @@
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
     <ClCompile Include="..\..\source\Defines.cpp" />
     <ClCompile Include="..\..\source\Engine.cpp" />
+    <ClCompile Include="..\..\source\GameContext.cpp" />
+    <ClCompile Include="..\..\source\ServiceLocator.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
@@ -114,6 +116,8 @@
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Defines.h" />
     <ClInclude Include="..\..\source\Engine.h" />
+    <ClInclude Include="..\..\source\GameContext.h" />
+    <ClInclude Include="..\..\source\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h" />
