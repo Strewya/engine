@@ -19,12 +19,12 @@ namespace Core
 			{
 				if(f->getStates().Contains("Text") && f->getStates().Contains("Font"))
 				{
-					State text = f->getStates().Get("Text");
-					State font = f->getStates().Get("Font");
-					Util::Rect bounds = f->getStates().Contains("Area") ? f->getStates().Get("Area").as<Util::Rect>() : Util::Rect(f->getPosition(), 1, 1);
+					auto& text = f->getStates().GetValue<String>("Text");
+					auto font = f->getStates().GetValue<uint>("Font");
+					auto& bounds = f->getStates().Contains("Area") ? f->getStates().GetValue<Util::Rect>("Area") : Util::Rect(f->getPosition(),1,1);
 					//read these from states!
 					gfx.setFontStyle(false, false, false, false, false, false);
-					gfx.DrawFont(font.as<uint>(), text.as<String>(), &bounds);
+					gfx.DrawFont(font, text, &bounds);
 				}
 			}
 			break;
@@ -33,10 +33,10 @@ namespace Core
 			{
 				if(f->getStates().Contains("Spritesheet") && f->getStates().Contains("CurrentSprite"))
 				{
-					State sheet = f->getStates().Get("Spritesheet");
-					State currentFrame = f->getStates().Get("CurrentSprite");
+					auto& sheet = f->getStates().GetValue<Graphics::Spritesheet>("Spritesheet");
+					auto currentFrame = f->getStates().GetValue<uint>("CurrentSprite");
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawSprite(sheet.as<Graphics::Spritesheet>().getTextureHandle(), sheet.as<Graphics::Spritesheet>().getSprite(currentFrame.as<uint>()));
+					gfx.DrawSprite(sheet.getTextureHandle(), sheet.getSprite(currentFrame));
 				}
 			}
 			break;
@@ -45,9 +45,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("Texture"))
 				{
-					State texture = f->getStates().Get("Texture");
+					auto texture = f->getStates().GetValue<uint>("Texture");
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawTexture(texture.as<uint>());
+					gfx.DrawTexture(texture);
 				}
 			}
 			break;
@@ -56,9 +56,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("LineVector"))
 				{
-					State line = f->getStates().Get("LineVector");
-					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawLine(f->getPosition(), f->getPosition()+line.as<Util::Vec2>(), &f->getColor(), lineWidth);
+					auto& line = f->getStates().GetValue<Util::Vec2>("LineVector");
+					auto lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().GetValue<float>("LineWidth") : 1.0f;
+					gfx.DrawLine(f->getPosition(), f->getPosition()+line, &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -67,9 +67,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("Point1") && f->getStates().Contains("Point2") && f->getStates().Contains("Point3"))
 				{
-					State pts[] = { f->getStates().Get("Point1"), f->getStates().Get("Point2"), f->getStates().Get("Point3")};
-					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawTriangle(f->getPosition()+pts[0].as<Util::Vec2>(), f->getPosition()+pts[1].as<Util::Vec2>(), f->getPosition()+pts[2].as<Util::Vec2>(), &f->getColor(), lineWidth);
+					Util::Vec2 pts[] = { f->getStates().GetValue<Util::Vec2>("Point1"), f->getStates().GetValue<Util::Vec2>("Point2"), f->getStates().GetValue<Util::Vec2>("Point3")};
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().GetValue<float>("LineWidth") : 1.0f;
+					gfx.DrawTriangle(f->getPosition()+pts[0], f->getPosition()+pts[1], f->getPosition()+pts[2], &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -78,8 +78,8 @@ namespace Core
 			{
 				if(f->getStates().Contains("Area"))
 				{
-					Util::Rect bounds = f->getStates().Get("Area").as<Util::Rect>();
-					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
+					auto& bounds = f->getStates().GetValue<Util::Rect>("Area");
+					auto lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().GetValue<float>("LineWidth") : 1.0f;
 					gfx.DrawRectangle(bounds, &f->getColor(), lineWidth);
 				}
 			}
@@ -89,9 +89,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("Radius"))
 				{
-					State radius = f->getStates().Get("Radius");
-					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawCircle(f->getPosition(), radius.as<float>(), &f->getColor(), lineWidth);
+					auto radius = f->getStates().GetValue<float>("Radius");
+					auto lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().GetValue<float>("LineWidth") : 1.0f;
+					gfx.DrawCircle(f->getPosition(), radius, &f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -100,9 +100,9 @@ namespace Core
 			{
 				if(f->getStates().Contains("RadiusX") && f->getStates().Contains("RadiusY"))
 				{
-					State radius[] = {f->getStates().Get("RadiusX"), f->getStates().Get("RadiusY")};
-					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().Get("LineWidth").as<float>() : 1.0f;
-					gfx.DrawElipse(f->getPosition(), radius[0].as<float>(), radius[1].as<float>(),&f->getColor(), lineWidth);
+					float radius[] = {f->getStates().GetValue<float>("RadiusX"), f->getStates().GetValue<float>("RadiusY")};
+					float lineWidth = f->getStates().Contains("LineWidth") ? f->getStates().GetValue<float>("LineWidth") : 1.0f;
+					gfx.DrawElipse(f->getPosition(), radius[0], radius[1],&f->getColor(), lineWidth);
 				}
 			}
 			break;
@@ -130,6 +130,30 @@ namespace Core
 		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
 		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible), _states(rhs._states)
 	{
+	}
+
+	Form::Form(Form&& rhs)
+		: _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
+		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
+		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible), _states(std::move(rhs._states))
+	{
+	}
+
+	Form& Form::operator=(Form&& rhs)
+	{
+		if(this != &rhs)
+		{
+			_type = rhs._type;
+			_states = std::move(rhs._states);
+			_color = rhs._color;
+			_position = rhs._position;
+			_scalingCenter = rhs._scalingCenter;
+			_scale = rhs._scale;
+			_pivotPoint = rhs._pivotPoint;
+			_rotation = rhs._rotation;
+			_visible = rhs._visible;
+		}
+		return *this;
 	}
 
 	Form& Form::operator=(const Form& rhs)

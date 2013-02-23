@@ -75,11 +75,11 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		const Graphics::TextureInfo& texinfo = gfx->getTextureInfo(tex);
 
 		std::vector<Core::Form> sprites;
-		Core::State sheetState(sheet);
+		
 		//cherry
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
-		sprites.back().getStates().Insert("Spritesheet", sheetState);
-		sprites.back().getStates().Insert("CurrentSprite", cherryHandle);
+		sprites.back().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
+		sprites.back().getStates().AddState("CurrentSprite", Core::IState::Create(cherryHandle));
 		sprites.back().setPosition(500,300);
 		sprites.back().setScale(1,1);
 		sprites.back().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
@@ -92,8 +92,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		//point at (0,0) of cherry texture
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
-		sprites.back().getStates().Insert("Spritesheet", sheetState);
-		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
+		sprites.back().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
+		sprites.back().getStates().AddState("CurrentSprite", Core::IState::Create(ballHandle));
 		sprites.back().setPosition(Util::Vec2(500,300) - sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -102,8 +102,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		//point at center of cherry texture
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
-		sprites.back().getStates().Insert("Spritesheet", sheetState);
-		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
+		sprites.back().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
+		sprites.back().getStates().AddState("CurrentSprite", Core::IState::Create(ballHandle));
 		sprites.back().setPosition(500,300);
 		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -112,8 +112,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 		//point at (w,h) of cherry texture
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
-		sprites.back().getStates().Insert("Spritesheet", sheetState);
-		sprites.back().getStates().Insert("CurrentSprite", ballHandle);
+		sprites.back().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
+		sprites.back().getStates().AddState("CurrentSprite", Core::IState::Create(ballHandle));
 		sprites.back().setPosition(Util::Vec2(500,300) + sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		sprites.back().setScale(0.1f,0.1f);
 		sprites.back().setScalingCenter(sheet.getSprite(ballHandle).getSrcRect().GetSize()/2);
@@ -124,20 +124,20 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		uint hFont = gfx->MakeFont("Arial", 20, 400, false);
 		Util::Rect fontBounds(50, 50, 300, 300);
 		sprites.push_back(Core::Form(Core::FormType::Font));
-		sprites.back().getStates().Insert("Font", hFont);
-		sprites.back().getStates().Insert("Area", fontBounds);
-		sprites.back().getStates().Insert("Text", String("Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text."));
+		sprites.back().getStates().AddState("Font", Core::IState::Create(hFont));
+		sprites.back().getStates().AddState("Area", Core::IState::Create(fontBounds));
+		sprites.back().getStates().AddState("Text", Core::IState::Create(String("Determines the width and height of the rectangle. If there are multiple lines of text, DrawText uses the width of the rectangle pointed to by the pRect parameter and extends the base of the rectangle to bound the last line of text. If there is only one line of text, DrawText modifies the right side of the rectangle so that it bounds the last character in the line. In either case, DrawText returns the height of the formatted text but does not draw the text.")));
 
 
 		sprites.push_back(Core::Form(Core::FormType::Triangle));
-		sprites.back().getStates().Insert("Point1", Util::Vec2(0,-10));
-		sprites.back().getStates().Insert("Point2", Util::Vec2(-10,0));
-		sprites.back().getStates().Insert("Point3", Util::Vec2(10,0));
+		sprites.back().getStates().AddState("Point1", Core::IState::Create(Util::Vec2(0,-10)));
+		sprites.back().getStates().AddState("Point2", Core::IState::Create(Util::Vec2(-10,0)));
+		sprites.back().getStates().AddState("Point3", Core::IState::Create(Util::Vec2(10,0)));
 		sprites.back().setPosition(500,500);
 		
 
 		sprites.push_back(Core::Form(Core::FormType::Rectangle));
-		sprites.back().getStates().Insert("Area", fontBounds);
+		sprites.back().getStates().AddState("Area", Core::IState::Create(fontBounds));
 
 
 		Graphics::RenderingQueue opaque;

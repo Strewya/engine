@@ -1,172 +1,82 @@
 #ifndef CORE_STATE_STATE_H_
 #define CORE_STATE_STATE_H_
+#define STATE_VERSION 2
 /********************************************
 	class:	
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <typeinfo>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Util/DataStore.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	/*
-		State class, version 2
-		Description:
-			Each instance of the State class is a wrapper around any data type.
-			The wrapper contains only a index based handle to the actual data.
-			The actual data is stored in a static container accessible by calling getDataStoreReference().
-			Because of this, the wrappers are lightweight objects, which can be cheaply copied around.
-			The data the wrappers point to is reference counted via ctors and dtor.
-			The reference counting mechanism is part of the data container.
-			The data type MUST be default constructible.
-			The data itself is reference returned by calling a template method as<T>().
-		Example usage:
-			State n; //default constructor - n points to no data
-			State n2(10); //template<T> constructor - n2 points to int(10)
-			State n3 = n2; //copy constructor - n2 and n3 point to the same int(10)
-			State n4 = State(16); //move constructor - n4 points to int(16)
-			n = n3; //assignment operator - n, n2 and n3 point to the same int(10)
-			n2 = State('a'); //move assignment operator - n2 points to char('a')
-			n4 = 20; //template<T> assignment operator - n4 points to a new int(20)
-			n.as<int>() = 42; //modifies the value n and n3 point to from 10 to 42
-	*/
-	class State
+	template<typename T> class State;
+
+	class IState
 	{
-	private:
-		static Util::DataStoreRepository* _storeRepo;
-		Util::IDataStore* _dataStore;
-		int _dataHandle;
-		size_t _hash;
-
-		void AddRef(int handle = NOT_FOUND);
-		void Release();
-
+	protected:
+		const std::type_info& _type;
 	public:
-		static void BindStoreRepository(Util::DataStoreRepository& repo);
-		State();
-		State(const State& rhs);
-		State(State&& rhs);
-		State& operator=(const State& rhs);
-		State& operator=(State&& rhs);
-		~State();
-		bool isValid();
+		IState(const std::type_info& typeInfo) : _type(typeInfo) {};
+		virtual ~IState() {};
 
-		template<typename T> State(const T& value)
-			: _dataStore(&_storeRepo->getDataStore<T>())
-		{
-			_hash = _dataStore->getHash();
-			AddRef();
-			as<T>() = value;
-		}
-
-		template<typename T> State& operator=(const T& rhs)
-		{
-			if(_hash != typeid(T).hash_code())
-			{
-				Release();
-				_dataStore = &_storeRepo->getDataStore<T>();
-				_hash = _dataStore->getHash();
-				AddRef();
-			}
-			as<T>() = rhs;
-			return *this;
-		}
-
-		template<typename T> T& as()
-		{
-			if(_hash == typeid(T).hash_code())
-			{
-				return static_cast<Util::DataStore<T>*>(_dataStore)->getData(_dataHandle);
-			}
-			throw std::exception("State::as<T>(): Tried to access wrong type!");
-		}
+		template<typename T> T& as();
+		template<typename T> static State<T>* Create(const T& value);
 	};
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	/*
-		simple base class for the State class
-	*/
-	/*
-	class BaseState
-	{
-	private:
-
-	public:
-		virtual ~BaseState() {}
-	};
-	*/
-	
-	/*
-		template State class
+		State class, version 3
 		Description:
-			Each instance of a State class is a wrapper for the data type it is templated upon.
-			The wrapper contains only a handle to the actual data.
-			The actual data is stored in a static container accessible only to the wrapper.
-			Because of this, the wrappers are lightweight objects, which can be freely copied.
-			The data the wrappers point to is reference counted via ctors and dtor.
-			The reference counting mechanism is part of the data container.
-			The data type MUST be default constructible.
-			The data is only mutable via an overloaded function 'value'.
-		Example usage:
-			State<int> number;
-			State<int> number2(10);
-			State<int> number3 = number2;
-			number = number3;
-			number.value(42);
-			int numberData = number.value();
-			const int& numberDataReference = number2.value();
+			A much more simple version of the State functionality.
+			States must be created by the new keyword.
+			A potential method might be to make the constructor private and make a static method that creates the state instance.
+			This change would allow optimizations in the construction of the state instance, as it could use an object or memory pool for the instances.			
 	*/
-	/*
-	template<typename T> class State : public BaseState
+	template<typename T> class State : public IState
 	{
-	private:
-		Util::DataStore<T>& _dataStore;
-		int _myDataIndex;
 	public:
+		T value;
+		
 		State()
-			: _dataStore(getDataStoreReference()), _myDataIndex(_dataStore.AcquireDataIndex())
+			: IState(typeid(T))
 		{}
-	
+
 		State(const T& value)
-			: _dataStore(getDataStoreReference()), _myDataIndex(_dataStore.AcquireDataIndex())
-		{
-			_dataStore.getData(_myDataIndex) = value;
-		}
+			: IState(typeid(T)), value(value)
+		{}
 
 		State(const State& rhs)
-			: _dataStore(getDataStoreReference()), _myDataIndex(_dataStore.AcquireDataIndex(rhs._myDataIndex))
+			: IState(rhs._type)
 		{}
 
 		State& operator=(const State& rhs)
 		{
 			if(this != &rhs)
 			{
-				_dataStore.ReleaseDataIndex(_myDataIndex);
-				_myDataIndex = _dataStore.AcquireDataIndex(rhs._myDataIndex);
+				value = rhs.value;
 			}
 			return *this;
 		}
 
-		~State()
-		{
-			_dataStore.ReleaseDataIndex(_myDataIndex);
-		}
-
-		const T& value() const
-		{
-			return _dataStore.getData(_myDataIndex);
-		}
-
-		void value(const T& val)
-		{
-			_dataStore.getData(_myDataIndex) = val;
-		}
+		~State() {};
 	};
-	*/
+
+	template<typename T> T& IState::as()
+	{
+		if(typeid(T) == _type)
+		{
+			return static_cast<State<T>*>(this)->value;
+		}
+		throw std::exception("State::as<T>(): Tried to access wrong type!");
+	}
+
+	template<typename T> static State<T>* IState::Create(const T& value)
+	{
+		return new State<T>(value);
+	}
 }
 
 #endif //CORE_STATE_STATE_H_

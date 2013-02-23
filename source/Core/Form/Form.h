@@ -59,6 +59,8 @@ namespace Core
 		Form();
 		Form(const FormType& type);
 		Form(const Form& rhs);
+		Form(Form&& rhs);
+		Form& operator=(Form&& rhs);
 		Form& operator=(const Form& rhs);
 		
 

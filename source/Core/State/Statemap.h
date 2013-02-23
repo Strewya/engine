@@ -6,6 +6,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "State.h"
@@ -21,145 +22,59 @@ namespace Core
 	class Statemap
 	{
 	private:
-		typedef std::unordered_map<String, State> StateCache;
+
+		typedef std::unordered_map<String, std::unique_ptr<IState>> StateCache;
 		StateCache _cache;
 
+		Statemap* _prototype;
+
 	public:
-		
-		//Gets the State identified by 'name'. Throws an exception if the State doesn't exist.
-		State& Get(const char* name);
-		//Gets the State identified by 'name'. Throws an exception if the State doesn't exist.
-		State& Get(const String& name);
-		//Gets the State identified by 'name'. If it doesn't exist, it will create a new one with the specified name.
-		State& operator[](const char* name);
-		//Gets the State identified by 'name'. If it doesn't exist, it will create a new one with the specified name.
-		State& operator[](const String& name);
-		//Inserts 'state' in the container under the identifier 'name' using copy semantics. If it already exists, it is replaced.
-		State& Insert(const char* name, const State& state);
-		//Inserts 'state' in the container under the identifier 'name' using copy semantics. If it already exists, it is replaced.
-		State& Insert(const String& name, const State& state);
-		//Inserts 'state' in the container under the identifier 'name' using the move semantics. If it already exists, it is replaced.
-		State& Insert(const char* name, State&& state);
-		//Inserts 'state' in the container under the identifier 'name' using the move semantics. If it already exists, it is replaced.
-		State& Insert(const String& name, State&& state);
-		//Checks whether a State identified by 'name' exists in the container.
-		bool Contains(const char* name) const;
-		//Checks whether a State identified by 'name' exists in the container.
-		bool Contains(const String& name) const;
-		//Removes the state with the identifier 'name' exists in the container. Does nothing if it doesn't exists.
-		void Remove(const char* name);
-		//Removes the state with the identifier 'name' exists in the container. Does nothing if it doesn't exists.
-		void Remove(const String& name);
-		//Clears the container of all states.
+		Statemap();
+		Statemap(const Statemap& rhs);
+		Statemap(Statemap&& rhs);
+		Statemap& operator=(const Statemap& rhs);
+		Statemap& operator=(Statemap&& rhs);
+
+		void SetPrototype(Statemap& prototype);
+
+		bool Contains(const char* name);
+		bool Contains(const String& name);
+
+		bool RemoveState(const char* name);
+		bool RemoveState(const String& name);
+
+		bool AddState(const char* name, IState* state);
+		bool AddState(const String& name, IState* state);
+		bool AddState(const char* name, std::unique_ptr<IState> state);
+		bool AddState(const String& name, std::unique_ptr<IState> state);
+
+		IState* GetState(const char* name);
+		IState* GetState(const String& name);
+
 		void Clear();
-		//Inserts 'value' in the container under the identifier 'name' by creating a new State of replacing the value of the existing State object.
-		template<typename T> State& Insert(const char* name, const T& value)
+
+		template<typename T> T& GetValue(const char* name)
 		{
 			auto it = _cache.find(name);
 			if(it == _cache.end())
 			{
-				it = _cache.emplace(name, value).first;
+				if(_prototype != nullptr)
+				{
+					_prototype->GetValue<T>(name);
+				}
+				else
+				{
+					throw std::exception(String("Missing state ").append(name).append(" in Statemap::GetValue()").c_str());
+				}
 			}
-			else
-			{
-				it->second = value;
-			}
-			return it->second;
+			return it->second->as<T>();
 		}
-		//Inserts 'value' in the container under the identifier 'name' by creating a new State of replacing the value of the existing State object.
-		template<typename T> State& Insert(const String& name, const T& value)
+
+		template<typename T> T& GetValue(const String& name)
 		{
-			return Insert(name.c_str(), value);
-		}
-		//Inserts 'value' in the container under the identifier 'name' by creating a new State of replacing the value of the existing State object.
-		template<typename T> State& Insert(const char* name, T&& value)
-		{
-			auto it = _cache.find(name);
-			if(it == _cache.end())
-			{
-				it = _cache.emplace(name, value).first;
-			}
-			else
-			{
-				it->second = value;
-			}
-			return it->second;
-		}
-		//Inserts 'value' in the container under the identifier 'name' by creating a new State of replacing the value of the existing State object.
-		template<typename T> State& Insert(const String& name, T&& value)
-		{
-			return Insert(name.c_str(), value);
+			return GetValue<T>(name.c_str());
 		}
 	};
-
-
-
-
-
-	/*
-		Statemap class
-		Description:
-			Contains State classes via their base class BaseState.
-			The internal states are allocated dynamically, and stored in a hash map via shared_ptr.
-			The map functions like a regular map, with methods to insert, remove and retrieve States.
-	*/
-	/*
-	class Statemap
-	{
-	private:
-		typedef std::unordered_map<String, std::shared_ptr<BaseState>> StateCache;
-		StateCache _cache;
-
-	public:
-		template<typename T>
-		State<T>& Get(const char* name)
-		{
-			auto it = _cache.find(name);
-			if(it == _cache.end())
-			{
-				throw std::exception();
-			}
-			return static_cast<State<T>&>(*it->second);
-		}
-
-		template<typename T>
-		State<T>& Get(const String& name)
-		{
-			return Get(name.c_str());
-		}
-
-		template<typename T>
-		State<T>& Insert(const char* name, const State<T>& state)
-		{
-			std::shared_ptr<State<T>> dataPtr(new State<T>(state));
-			auto it = _cache.find(name);
-			if(it == _cache.end())
-			{
-				_cache.insert(std::make_pair(name, dataPtr));
-			}
-			else
-			{
-				it->second = dataPtr;
-			}
-			return *dataPtr;
-		}
-
-		template<typename T>
-		State<T>& Insert(const String& name, const State<T>& state)
-		{
-			return Insert(name.c_str(), state);
-		}
-
-		void Remove(const String& name)
-		{
-			auto it = _cache.find(name);
-			if(it != _cache.end())
-			{
-				_cache.erase(it);
-			}
-		}
-	};
-	*/
 }
 
 #endif //CORE_STATE_STATEMAP_H_
