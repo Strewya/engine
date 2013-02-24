@@ -9,14 +9,12 @@
 
 namespace Core
 {
-	void Render(const std::set<Core::Entity*>& ents)
+	void Render(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, const std::set<Core::Entity*>& ents)
 	{
 		Graphics::RenderingQueue alphaQueue;
 		for(Entity* entity : ents)
 		{
 			alphaQueue.Add(entity->getForm());
 		}
-
-
 	}
 }

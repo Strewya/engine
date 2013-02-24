@@ -20,41 +20,38 @@
 				* the Context invokes Update on the ActionUpdater object
 				* the ActionUpdater object has a priority sorted list of pairs <function pointer, entities to process>
 				* for each pair the function pointer is invoked by passing in the list of entities, the subsystems locator and the resources locator
-				* sexyyyyyyyyyyy
+				* 
 				* 
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Core/Action/ActionLogic.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	class Entity;
+	class ActionUpdater;
 }
-
-typedef void(*Func)(/*const ResourceLocator& resources, const ServiceLocator& services,*/ const std::set<Core::Entity*>& ents);
 
 namespace Core
 {
 	class Action
 	{
 	private:
-		Func _actionLogic;
+		static ActionUpdater* _actionUpdater;
+
+		ActionLogic _actionLogic;
 		bool _active;
 		Entity* _owner;
 		Entity* _target;
 
 	public:
+		static void BindActionUpdater(ActionUpdater& updater);
 		Action();
-		Action(Func fn);
-
-		void operator()(float deltaTime);
-		void Update(float deltaTime);
-
-		void setFunction(Func fn);
-		
+		Action(ActionLogic fn);
+		void setFunction(ActionLogic fn);
+		bool Activate();
 		bool isActive() const;
 		
 	};

@@ -8,25 +8,24 @@
 
 namespace Core
 {
+	ActionUpdater* Action::_actionUpdater = nullptr;
+
+	void Action::BindActionUpdater(ActionUpdater& updater)
+	{
+		_actionUpdater = &updater;
+	}
+
 	Action::Action()
 		: _actionLogic(nullptr)
 	{}
 
-	Action::Action(Func fn)
+	Action::Action(ActionLogic fn)
 		: _actionLogic(fn)
 	{}
 
-	void Action::Update(float dt)
+	bool Action::Activate()
 	{
-		if(_actionLogic)
-		{
-			//_actionLogic(_entities);
-		}
-	}
-
-	void Action::operator()(float dt)
-	{
-		Update(dt);
+		_active = true;
 	}
 
 

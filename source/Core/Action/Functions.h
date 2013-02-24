@@ -6,20 +6,13 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "ActionLogic.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	class Entity;
-}
-
-typedef void(*Func)(const std::set<Core::Entity*>& ents);
-
-namespace Core
-{
-	void Render(const std::set<Core::Entity*>& ents);
+	void Render(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, const std::set<Core::Entity*>& ents);
 }
 
 #endif //CORE_ACTION_FUNCTIONS_H_

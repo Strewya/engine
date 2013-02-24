@@ -7,6 +7,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <memory>
 #include <typeinfo>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
@@ -24,7 +25,7 @@ namespace Core
 		virtual ~IState() {};
 
 		template<typename T> T& as();
-		template<typename T> static State<T>* Create(const T& value);
+		template<typename T> static std::unique_ptr<State<T>> Create(const T& value);
 	};
 
 	/*
@@ -73,9 +74,9 @@ namespace Core
 		throw std::exception("State::as<T>(): Tried to access wrong type!");
 	}
 
-	template<typename T> static State<T>* IState::Create(const T& value)
+	template<typename T> static std::unique_ptr<State<T>> IState::Create(const T& value)
 	{
-		return new State<T>(value);
+		return std::unique_ptr<State<T>>(new State<T>(value));
 	}
 }
 

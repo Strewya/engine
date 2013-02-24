@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Functions.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
@@ -108,6 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Action\Action.h" />
+    <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
+    <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Functions.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />

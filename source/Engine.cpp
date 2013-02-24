@@ -62,10 +62,23 @@ namespace Core
 
 	void Engine::Loop()
 	{
-		if(!_activeContext || !_activeContext->Update())
+		if(!_activeContext)
 		{
 			Shutdown();
 		}
+		//if there can be only one active context
+		_activeContext->Update();
+		
+		//if there are more than one active contexts
+		/*
+		for(auto context : _activeContexts)
+		{
+			if(context->Update())
+			{
+				break;
+			}
+		}
+		*/
 	}
 
 	void Engine::Shutdown()
@@ -87,7 +100,7 @@ namespace Core
 		auto it = _gameContexts.find(name);
 		if(it == _gameContexts.end())
 		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(_services))).first;
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(*this, _services))).first;
 		}
 		return *it->second;
 	}
@@ -100,9 +113,11 @@ namespace Core
 	bool Engine::PushContext(const char* name)
 	{
 		auto it = _gameContexts.find(name);
-		if(it != _gameContexts.end())
+		if(it != _gameContexts.end() && it->second.get() != _activeContext)
 		{
+			_activeContext->Deactivate();
 			_activeContext = it->second.get();
+			_activeContext->Activate();
 			return true;
 		}
 		return false;

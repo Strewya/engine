@@ -80,6 +80,9 @@
     <ClCompile Include="..\..\source\ServiceLocator.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -171,6 +174,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\ServiceLocator.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionLogic.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h">
+      <Filter>Core/Action</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
