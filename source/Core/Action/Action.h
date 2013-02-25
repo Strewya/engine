@@ -32,10 +32,7 @@
 namespace Core
 {
 	class ActionUpdater;
-}
 
-namespace Core
-{
 	class Action
 	{
 	private:
@@ -50,7 +47,11 @@ namespace Core
 		static void BindActionUpdater(ActionUpdater& updater);
 		Action();
 		Action(ActionLogic fn);
+		
 		void setFunction(ActionLogic fn);
+		void setOwner(Entity& owner);
+		void setTarget(Entity& target);
+
 		bool Activate();
 		bool isActive() const;
 		

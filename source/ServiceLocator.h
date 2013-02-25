@@ -15,17 +15,22 @@ namespace Graphics { class Interface; }
 
 namespace Core
 {
+	class Engine;
+
 	class ServiceLocator
 	{
 	public:
 		ServiceLocator();
 
 		void Register(Graphics::Interface* graphics);
-		
+		void Register(Engine* engine);
+
 		Graphics::Interface& getGraphics() const;
-		
+		Engine& getEngine() const;
 	private:
+		Engine* _engine;
 		Graphics::Interface* _graphics;
+
 	};
 }
 

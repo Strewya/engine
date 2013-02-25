@@ -14,8 +14,10 @@ namespace Core
 {
 	class Entity;
 	class ServiceLocator;
+
+	typedef void(*ActionLogic)(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, std::set<Core::Entity*>& ents);
 }
 
-typedef void(*ActionLogic)(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, const std::set<Core::Entity*>& ents);
+
 
 #endif //CORE_ACTION_ACTION_LOGIC_H_

@@ -3,6 +3,7 @@
 #include "Core/Action/Action.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Core/Action/ActionUpdater.h"
 	/*** end headers ***/
 
 
@@ -23,12 +24,30 @@ namespace Core
 		: _actionLogic(fn)
 	{}
 
-	bool Action::Activate()
+	void Action::setFunction(ActionLogic logic)
 	{
-		_active = true;
+		_actionLogic = logic;
 	}
 
+	void Action::setOwner(Entity& owner)
+	{
+		_owner = &owner;
+	}
 
+	void Action::setTarget(Entity& target)
+	{
+		_target = &target;
+	}
+
+	bool Action::Activate()
+	{
+		return _active = _actionUpdater->ActivateEntity(_actionLogic, _owner);
+	}
+
+	bool Action::isActive() const
+	{
+		return _active;
+	}
 
 
 

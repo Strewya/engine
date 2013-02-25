@@ -8,7 +8,7 @@
 namespace Core
 {
 	ServiceLocator::ServiceLocator()
-		: _graphics(nullptr)
+		: _graphics(nullptr), _engine(nullptr)
 	{
 	}
 
@@ -21,5 +21,16 @@ namespace Core
 	{
 		assert(_graphics != nullptr);
 		return *_graphics;
+	}
+
+	void ServiceLocator::Register(Engine* engine)
+	{
+		_engine = engine;
+	}
+	
+	Engine& ServiceLocator::getEngine() const
+	{
+		assert(_engine != nullptr);
+		return *_engine;
 	}
 }

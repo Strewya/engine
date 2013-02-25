@@ -26,6 +26,7 @@ namespace Core
 	public:
 		void Update(float dt, ServiceLocator& services);
 
+		bool EnqueueAction(ActionLogic logic);
 		bool ActivateEntity(ActionLogic logic, Entity* entity);
 	};
 }

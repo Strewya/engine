@@ -3,6 +3,7 @@
 #include "Core/Action/ActionUpdater.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Core/Entity/Entity.h"
 	/*** end headers ***/
 
 namespace Core
@@ -13,6 +14,17 @@ namespace Core
 		{
 			fn(dt, services, _activeActions[fn]);
 		}
+	}
+
+	bool ActionUpdater::EnqueueAction(ActionLogic logic)
+	{
+		auto it = std::find(_actionQueue.begin(), _actionQueue.end(), logic);
+		if(it != _actionQueue.end())
+		{
+			return false;
+		}
+		_actionQueue.push_back(logic);
+		return true;
 	}
 
 	bool ActionUpdater::ActivateEntity(ActionLogic logic, Entity* entity)

@@ -38,7 +38,10 @@ namespace Core
 			* persistence
 		*/
 		_rendererFactory.InitInterface(renderer);
+		
+		_services.Register(this);
 		_services.Register(_rendererFactory.getInterface());
+		
 
 		/*
 			initialize the resource caches

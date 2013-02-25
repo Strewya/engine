@@ -53,6 +53,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	try
 	{
 		Core::Engine engine(gameWindow);
+		engine.getContext("main");
+		assert(engine.PushContext("main"));
+		assert(!engine.PushContext("main"));
+
+
+
+		/*
 		Graphics::RendererFactory factory(hInst, gameWindow.getWindowHandle());
 		factory.InitInterface("dx");
 		auto gfx = factory.getInterface();
@@ -146,12 +153,16 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		Util::Timer mainLoopTimer;
 	
 		float ticksPerSec = 1.0f/40;
+		
+
+		*/
+
 		//start main loop
 		while(gameWindow.Update())
 		{	
 			gClock.FrameStep();
-			//engine.Update();
-			
+			engine.Loop();
+			/*
 			//the rest of this code should be inside Engine::Update()
 
 			while( mainLoopTimer.TimeToUpdate(ticksPerSec) )
@@ -188,6 +199,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 			gfx->EndSpriteBatch();
 			gfx->EndScene();
+			*/
 		}
 
 		return gameWindow.getExitCode();

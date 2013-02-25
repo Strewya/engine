@@ -6,9 +6,12 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <memory>
+#include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
+#include "Core/Entity/Entity.h"
 #include "Util/Clock.h"
 	/*** end header inclusion ***/
 
@@ -23,6 +26,7 @@ namespace Core
 		ActionUpdater _actionMaster;
 		Util::Timer _timer;
 		Engine& _engine;
+		std::set<std::unique_ptr<Entity>> _entities;
 	
 	public:
 		GameContext(Engine& engine, const ServiceLocator& services);
