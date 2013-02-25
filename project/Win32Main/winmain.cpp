@@ -58,8 +58,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		assert(!engine.PushContext("main"));
 
 
-
 		/*
+		
 		Graphics::RendererFactory factory(hInst, gameWindow.getWindowHandle());
 		factory.InitInterface("dx");
 		auto gfx = factory.getInterface();
@@ -96,7 +96,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		//sprites.back().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize());
 		//sprites.back().setPivotPoint(Util::Vec2(0,0));
 		sprites.back().setRotation(0);
-
+		/*
 		//point at (0,0) of cherry texture
 		sprites.push_back(Core::Form(Core::FormType::Sprite));
 		sprites.back().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
@@ -148,7 +148,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 
 		Graphics::RenderingQueue opaque;
-		Graphics::RenderingQueue alphaBlended;
+		
 		
 		Util::Timer mainLoopTimer;
 	
@@ -161,45 +161,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		while(gameWindow.Update())
 		{	
 			gClock.FrameStep();
+			
 			engine.Loop();
-			/*
-			//the rest of this code should be inside Engine::Update()
-
-			while( mainLoopTimer.TimeToUpdate(ticksPerSec) )
-			{
-				for( auto& spr : sprites )
-				{
-					//spr.setRotation(spr.getRotation()+1);
-				}
-				//fontRot = ++fontRot >= 360 ? fontRot-360 : fontRot;
-			}
-			gfx->BeginScene();
-			gfx->BeginSpriteBatch(true);
-		
-			for( auto& form : sprites)
-			{
-				alphaBlended.Add(&form);
-			}
-			alphaBlended.Render(*gfx);
-			alphaBlended.Clear();
-			
-			
-			gfx->EndSpriteBatch();
-			gfx->BeginSpriteBatch(false);
-
-			gfx->DrawRectangle(Util::Vec2(250,400), 30, 30);
-
-			gfx->DrawCircle(Util::Vec2(600,200), 10);
-			gfx->DrawCircle(Util::Vec2(700,200), 40);
-			gfx->DrawCircle(Util::Vec2(900,200), 100);
-
-			gfx->DrawElipse(Util::Vec2(800,500), 10, 15);
-			gfx->DrawElipse(Util::Vec2(800,500), 40, 20);
-			gfx->DrawElipse(Util::Vec2(800,500), 100, 90);
-
-			gfx->EndSpriteBatch();
-			gfx->EndScene();
-			*/
 		}
 
 		return gameWindow.getExitCode();

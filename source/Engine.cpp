@@ -3,6 +3,7 @@
 #include "Engine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Subsystems/Graphics/Interface.h"
 #include "Win32/AbstractWindow.h"
 	/*** end headers ***/
 
@@ -41,7 +42,7 @@ namespace Core
 		
 		_services.Register(this);
 		_services.Register(_rendererFactory.getInterface());
-		
+		_services.getGraphics().setScreenSize(_window.getSizeX(), _window.getSizeY());
 
 		/*
 			initialize the resource caches

@@ -35,12 +35,10 @@ namespace Core
 		auto* ent = _entities.emplace(std::unique_ptr<Entity>(new Entity(entityID++))).first->get();
 		
 		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().setPosition(200,200);
-		ent->getForm().setScale(1,1);
 		ent->getForm().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
 		ent->getForm().getStates().AddState("CurrentSprite", Core::IState::Create(cherryHandle));
-	//	ent->getForm().setPosition(500,300);
-	//	ent->getForm().setScale(1,1);
+		ent->getForm().setPosition(500,300);
+		ent->getForm().setScale(1,1);
 		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		//ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize());
 		//ent->getForm().setScalingCenter(Util::Vec2(0,0));
