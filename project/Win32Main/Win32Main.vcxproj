@@ -96,7 +96,8 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureInfo.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
@@ -130,7 +131,8 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureInfo.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
@@ -146,6 +148,9 @@
   <ItemGroup>
     <None Include="config.lua" />
     <None Include="logger.log" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Planning.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

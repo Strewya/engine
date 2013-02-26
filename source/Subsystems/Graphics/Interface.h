@@ -45,8 +45,8 @@ namespace Graphics
 		virtual bool getFullscreenState() const = 0;
 		virtual void setFullscreenState(bool state) = 0;
 		
-		virtual uint getTextureHandle(const char* filename) = 0;
-		virtual const TextureInfo& getTextureInfo(uint handle) const = 0;
+		virtual uint LoadTexture(const char* filename) = 0;
+		virtual void ReleaseTexture(uint handle) const = 0;
 
 		virtual uint MakeFont(const char* name, uint size, uint weight, bool italic) = 0;
 		virtual uint getFontHandle(const char* filename) = 0;
@@ -74,7 +74,7 @@ namespace Graphics
 		
 		
 		
-		uint getTextureHandle(const String& filename) { return getTextureHandle(filename.c_str()); };
+		uint LoadTexture(const String& filename) { return LoadTexture(filename.c_str()); };
 		uint getFontHandle(const String& filename) { return getFontHandle(filename.c_str()); };
 		void DrawFont(uint hFont, const String& text, const Util::Rect* bounds) { DrawFont(hFont, text.c_str(), bounds); };
 		/*

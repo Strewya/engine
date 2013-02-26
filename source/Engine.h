@@ -11,6 +11,7 @@
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "GameContext.h"
+#include "ResourceLocator.h"
 #include "ServiceLocator.h"
 #include "Subsystems/Graphics/RendererFactory.h"
 #include "Subsystems/Script/LuaEngine.h"

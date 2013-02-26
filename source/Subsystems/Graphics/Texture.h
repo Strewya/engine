@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_TEXTUREINFO_H_
-#define GRAPHICS_TEXTUREINFO_H_
+#ifndef GRAPHICS_TEXTURE_H_
+#define GRAPHICS_TEXTURE_H_
 /********************************************
 	class:	
 	usage:	
@@ -11,25 +11,34 @@
 
 namespace Graphics
 {
-	class TextureInfo
+	class Interface;
+
+	class Texture
 	{
 	public:
-		TextureInfo();
-		TextureInfo(const char* filename, uint width, uint height);
-		TextureInfo(const String& filename, uint width, uint height);
+		Texture();
+		Texture(const char* filename, uint width, uint height, Interface* gfx = nullptr, uint dataHandle = 0);
+		Texture(const String& filename, uint width, uint height, Interface* gfx = nullptr, uint dataHandle = 0);
+		Texture(const Texture& rhs);
+		Texture& operator=(const Texture& rhs);
+		~Texture();
 
 		const String& getFilename() const;
 		uint getWidth() const;
 		uint getHeight() const;
+		uint getDataHandle() const;
 
 		void setFilename(const char* filename);
 		void setFilename(const String& filename);
 		void setWidth(uint w);
 		void setHeight(uint h);
+		void setSize(uint width, uint height);
 
 	private:
 		String _filename;
 		uint _width, _height;
+		uint _dataHandle;
+		Interface* _gfx;
 	};
 }
 

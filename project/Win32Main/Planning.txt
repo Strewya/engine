@@ -1,0 +1,53 @@
+This document contains the plan for features that i have to implement.
+
+- expose classes to Lua
+- GameWindow extension
+	* a method for registration for certain windows messages
+	* when messages are received in window, they are first checked for in the subscribed list
+	* if a message is subscribed for, it is saved in a container
+	* the container is instanced in Engine or GameContext, and only passed to the window as a pointer
+	* messages are processed by a message handler written for that purpose
+- Texture wrapper that contains
+	* texture info (width, height, filename)
+	* handle that points into the renderer specific data (LPD3DXTEXTURE9 or GLuint, but in case of GLuint it is the handle itself)
+	* a reference/pointer to the graphics interface to do the cleanup (copied Texture wrappers don't have this pointer, only the original one)
+- Texture cache to store Texture wrappers
+- change in Graphics::Interface methods, to allow initialization of a Texture wrapper
+- Spritesheet object that contains
+	* name
+	* number of frames defined on it
+	* list of all frames (a vector should do fine)
+	* list of animations that the frames define (if any)
+	* a texture that it's bound to
+	- Image object should contain
+		* name
+		* rectangle of it's definition (position and dimensions)
+	- Animation object should contain
+		* name
+		* list of images that define it (any linear array container)
+- SpritesheetCache object
+	* contains one or more Spritesheet objects
+- SpriteAtlas object
+	* similair to Spritesheet, but it contains other spritesheets instead of images and animations
+	* defines a texture which it is bound to
+	* the same texture is passed to all of it's contained sheets
+	* the positions of the sheet images should be modified accordingly
+- Script object
+	* only the name for it should be defined
+- Script cache
+	* contains Script objects
+	* refreshes the Lua state if any of it's children changes (listens to FileChanged event or similair)
+- Sound wrapper
+	* filename
+	* handle to the actual data
+	* optional pointer to the audio interface to cleanup the data (copied wrappers don't have this, only the original)
+- Sound cache
+	* contains Sound wrappers
+- all of the cache objects should listen to the file changed event, and reload their children in case they changed
+- GameContext extension functions
+	* OnActivate
+	* OnDeactivate
+	* OnCreate
+	* OnDestroy
+- ResourceLocator should have references to actual caches
+- audio service implementation
