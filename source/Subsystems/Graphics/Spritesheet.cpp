@@ -74,9 +74,9 @@ namespace Graphics
 		return index;
 	}
 
-	uint Spritesheet::getTextureHandle() const
+	const Texture& Spritesheet::getTexture() const
 	{
-		return _textureHandle;
+		return _texture;
 	}
 
 	const String& Spritesheet::getTextureName() const
@@ -99,9 +99,9 @@ namespace Graphics
 		_textureName = name;
 	}
 
-	void Spritesheet::setTextureHandle(uint handle)
+	void Spritesheet::setTexture(const Texture& texture)
 	{
-		_textureHandle = handle;
+		_texture = texture;
 	}
 
 	void Spritesheet::setSpritesheetName(const char* name)

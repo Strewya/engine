@@ -32,6 +32,7 @@ namespace Graphics
 			_filename = rhs._filename;
 			_width = rhs._width;
 			_height = rhs._height;
+			_gfx = nullptr;
 		}
 		return *this;
 	}
@@ -40,7 +41,7 @@ namespace Graphics
     {
 		if(_gfx)
 		{
-			//_gfx->ReleaseData();
+			_gfx->ReleaseTexture(_dataHandle);
 		}
 	}
 

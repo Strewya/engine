@@ -53,7 +53,9 @@ namespace Core
 			* scripts
 			* TODO: strings
 		*/
+		_textureCache.setReferences(_textureCache, _services.getGraphics());
 
+		_resources.Register(_textureCache);
 		/*
 			load the game configuration script and execute it
 			* the script should create the game contexts that define the game's execution flow
@@ -104,7 +106,7 @@ namespace Core
 		auto it = _gameContexts.find(name);
 		if(it == _gameContexts.end())
 		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(*this, _services))).first;
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(*this, _services, _resources))).first;
 		}
 		return *it->second;
 	}

@@ -9,6 +9,7 @@
 #include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/SpriteInfo.h"
+#include "Subsystems/Graphics/Texture.h"
 	/*** end header inclusion ***/
 
 namespace Graphics
@@ -18,7 +19,7 @@ namespace Graphics
 	private:
 		String _sheetName;
 		String _textureName;
-		uint _textureHandle;
+		Texture _texture;
 		std::vector<SpriteInfo> _sprites;
 
 	public:
@@ -27,11 +28,11 @@ namespace Graphics
 		Spritesheet(const String& sheetName);
 		~Spritesheet();
 
-		uint getTextureHandle() const;
+		const Texture& getTexture() const;
 		const String& getTextureName() const;
 		const String& getSpritesheetName() const;
 
-		void setTextureHandle(uint handle);
+		void setTexture(const Texture& handle);
 		void setTextureName(const char* name);
 		void setTextureName(const String& name);
 		void setSpritesheetName(const char* name);

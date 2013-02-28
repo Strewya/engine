@@ -7,14 +7,14 @@
 	/*** common and C++ headers ***/
 #include "Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Util/Color.h"
 	/*** end header inclusion ***/
 
 namespace Util
 {
+	class Color;
+	class Rect;
 	class Vec2;
 	class Vec3;
-	class Rect;
 }
 
 namespace Graphics
@@ -22,7 +22,7 @@ namespace Graphics
 	class FontInfo;
 	class SpriteInfo;
 	class Spritesheet;
-	class TextureInfo;
+	class Texture;
 }
 
 namespace Graphics
@@ -45,8 +45,8 @@ namespace Graphics
 		virtual bool getFullscreenState() const = 0;
 		virtual void setFullscreenState(bool state) = 0;
 		
-		virtual uint LoadTexture(const char* filename) = 0;
-		virtual void ReleaseTexture(uint handle) const = 0;
+		virtual Texture LoadTexture(const char* filename) = 0;
+		virtual void ReleaseTexture(uint handle) = 0;
 
 		virtual uint MakeFont(const char* name, uint size, uint weight, bool italic) = 0;
 		virtual uint getFontHandle(const char* filename) = 0;
@@ -60,8 +60,8 @@ namespace Graphics
 		virtual void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint) = 0;
 		virtual void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom) = 0;
 		
-		virtual void DrawTexture(uint handle) = 0;
-		virtual void DrawSprite(uint hTexture, const SpriteInfo& sprite) = 0;
+		virtual void DrawTexture(const Texture& texture) = 0;
+		virtual void DrawSprite(const Texture& texture, const SpriteInfo& sprite) = 0;
 		virtual void DrawFont(uint hFont, const char* text, const Util::Rect* bounds) = 0;
 		
 		virtual void DrawPoint(const Util::Vec2& pos, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
@@ -71,18 +71,6 @@ namespace Graphics
 		virtual void DrawRectangle(const Util::Rect& rect, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
-		
-		
-		
-		uint LoadTexture(const String& filename) { return LoadTexture(filename.c_str()); };
-		uint getFontHandle(const String& filename) { return getFontHandle(filename.c_str()); };
-		void DrawFont(uint hFont, const String& text, const Util::Rect* bounds) { DrawFont(hFont, text.c_str(), bounds); };
-		/*
-		SpritesheetCache& getSpritesheetCache() { return _spriteSheetCache; }
-
-	private:
-		SpritesheetCache _spriteSheetCache;
-		*/
 	};
 }
 

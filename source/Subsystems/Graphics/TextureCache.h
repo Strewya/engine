@@ -19,7 +19,6 @@ namespace Graphics
 	{
 	public:
 		TextureCache();
-		~TextureCache();
 
 		Texture& getTexture(const char* name);
 

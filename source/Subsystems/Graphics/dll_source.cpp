@@ -7,8 +7,15 @@ int createRendererInterface(HWND hwnd, Graphics::Interface** renderer)
 {
 	if(!*renderer)
 	{
-		*renderer = new Graphics::DXRenderer(hwnd);
-		return 1;
+		try
+		{
+			*renderer = new Graphics::DXRenderer(hwnd);
+			return 1;
+		}
+		catch(std::exception& ex)
+		{
+			ex;
+		}
 	}
 	return 0;
 }

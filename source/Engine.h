@@ -14,6 +14,7 @@
 #include "ResourceLocator.h"
 #include "ServiceLocator.h"
 #include "Subsystems/Graphics/RendererFactory.h"
+#include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 	/*** end header inclusion ***/
 
@@ -34,6 +35,10 @@ namespace Core
 		//Input::InputEngine _inputEngine;
 		//Network::CommEngine _commEngine;
 		ServiceLocator _services;
+
+		Graphics::TextureCache _textureCache;
+
+		ResourceLocator _resources;
 
 		std::unordered_map<String, std::unique_ptr<GameContext>> _gameContexts;
 		GameContext* _activeContext;

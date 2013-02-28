@@ -11,5 +11,13 @@ namespace Core
 	{
 	}
 
+	void ResourceLocator::Register(Graphics::TextureCache& cache)
+	{
+		_textureCache = &cache;
+	}
 
+	Graphics::TextureCache& ResourceLocator::getTextureCache() const
+	{
+		return *_textureCache;
+	}
 }

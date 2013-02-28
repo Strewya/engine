@@ -24,7 +24,7 @@ namespace Core
 					auto& bounds = f->getStates().Contains("Area") ? f->getStates().GetValue<Util::Rect>("Area") : Util::Rect(f->getPosition(),1,1);
 					//read these from states!
 					gfx.setFontStyle(false, false, false, false, false, false);
-					gfx.DrawFont(font, text, &bounds);
+					gfx.DrawFont(font, text.c_str(), &bounds);
 				}
 			}
 			break;
@@ -36,7 +36,7 @@ namespace Core
 					auto& sheet = f->getStates().GetValue<Graphics::Spritesheet>("Spritesheet");
 					auto currentFrame = f->getStates().GetValue<uint>("CurrentSprite");
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawSprite(sheet.getTextureHandle(), sheet.getSprite(currentFrame));
+					gfx.DrawSprite(sheet.getTexture(), sheet.getSprite(currentFrame));
 				}
 			}
 			break;
@@ -45,7 +45,7 @@ namespace Core
 			{
 				if(f->getStates().Contains("Texture"))
 				{
-					auto texture = f->getStates().GetValue<uint>("Texture");
+					auto texture = f->getStates().GetValue<Graphics::Texture>("Texture");
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawTexture(texture);
 				}

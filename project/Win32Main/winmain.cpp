@@ -9,22 +9,6 @@
 #include "Engine.h"
 #include "Win32/GameWindow.h"
 #include "Win32/WindowClass.h"
-//---------- testing purposes
-#include "Core/Action/Action.h"
-#include "Core/Action/Actionmap.h"
-#include "Core/Action/Functions.h"
-#include "Core/Entity/Entity.h"
-#include "Core/Form/Form.h"
-#include "Core/State/State.h"
-#include "Core/State/Statemap.h"
-#include "Subsystems/Graphics/Interface.h"
-#include "Subsystems/Graphics/RendererFactory.h"
-#include "Subsystems/Graphics/RenderingQueue.h"
-#include "Subsystems/Graphics/SpritesheetCache.h"
-#include "Subsystems/Graphics/TextureInfo.h"
-#include "Subsystems/Script/LuaEngine.h"
-#include "Util/Color.h"
-#include "Util/Dimensional.h"
 	/*** end headers ***/
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)

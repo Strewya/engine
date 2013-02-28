@@ -13,10 +13,6 @@ namespace Graphics
 	{
 	}
 
-	TextureCache::~TextureCache()
-	{
-	}
-
 	void TextureCache::setReferences(TextureCache& parent, Interface& gfx)
 	{
 		if(this != &parent)
@@ -38,11 +34,13 @@ namespace Graphics
 		//texture doesn't exist in this cache, ask the parent to get it or load it
 		if(_parent)
 		{
-			Texture& tex = _parent->getTexture(name);
-			_textures.push_back(tex);
-			return tex;
+			_textures.push_back(_parent->getTexture(name));
 		}
 		//we have no parent, meaning we are top layer, so we ask to load the texture
-		
+		else
+		{
+			_textures.emplace_back(_gfx->LoadTexture(name));
+		}
+		return _textures.back();
 	}
 }

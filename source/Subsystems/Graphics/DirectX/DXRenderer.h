@@ -11,7 +11,6 @@
 #include "Subsystems/Graphics/Interface.h"
 #include "Subsystems/Graphics/DirectX/DXFontCache.h"
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
-#include "Subsystems/Graphics/DirectX/DXTextureCache.h"
 #include "Util/Dimensional.h"
 #include "Util/Color.h"
 	/*** end header inclusion ***/
@@ -41,7 +40,8 @@ namespace Graphics
 		
 		D3DPRESENT_PARAMETERS _d3dpp;
 		
-		DXTextureCache _textures;
+		std::vector<LPDIRECT3DTEXTURE9> _textures;
+		std::list<uint> _freeTextureSlots;
 		DXFontCache _fonts;
 
 		D3DXMATRIX _transformMatrix;
@@ -68,11 +68,11 @@ namespace Graphics
 		bool getFullscreenState() const;
 		void setFullscreenState(bool state);
 
-		DXTexture LoadTexture(const char* filename) const;
+		
 		DXFont LoadFont(const char* name, uint size, uint weight, bool italic) const;
 
-		uint getTextureHandle(const char* filename);
-		const TextureInfo& getTextureInfo(uint handle) const;
+		Texture LoadTexture(const char* filename);
+		void ReleaseTexture(uint handle);
 
 		uint MakeFont(const char* name, uint size, uint weight, bool italic);
 		uint getFontHandle(const char* filename);
@@ -86,8 +86,8 @@ namespace Graphics
 		void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint);
 		void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom);
 
-		void DrawTexture(uint hTexture);
-		void DrawSprite(uint hTexture, const SpriteInfo& sprite);
+		void DrawTexture(const Texture& texture);
+		void DrawSprite(const Texture& texture, const SpriteInfo& sprite);
 		void DrawFont(uint hFont, const char* text, const Util::Rect* bounds);
 		void DrawPoint(const Util::Vec2& pos, const Util::Color* color, float lineWidth);
 		void DrawLine(const Util::Vec2& start, const Util::Vec2& finish, const Util::Color* color, float lineWidth);
@@ -96,17 +96,6 @@ namespace Graphics
 		void DrawRectangle(const Util::Rect& rect, const Util::Color* color, float lineWidth);
 		void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth);
 		void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth);
-
-		/*
-		void SetPosition(Vector& pos);
-		void SetTranslation(Vector& trans);
-		void SetScale(Vector& scale);
-		void SetColor(Color& col);
-		void SetRotation(float rot);
-		void SetLineWidth(float width);
-
-		void LoadGraphics(const String& resourceFile);
-		*/
 	};
 
 	inline RECT DXRenderer::MakeRECT(const Util::Rect& in) const

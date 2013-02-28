@@ -4,6 +4,7 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
+#include "Subsystems/Graphics/Texture.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -20,6 +21,11 @@ namespace Graphics
 
 	DXRenderer::~DXRenderer()
 	{
+		for(auto tex : _textures)
+		{
+			tex->Release();
+		}
+
 		if(_line != nullptr)
 		{
 			_line->Release();
@@ -94,6 +100,11 @@ namespace Graphics
 			return false;
 		//create pointer to line class
 		if(FAILED(D3DXCreateLine(_d3ddev, &_line)))
+			return false;
+		//create a default texture to use when another texture fails to load
+		//should be embedded into the DLL if possible
+		_textures.emplace_back();
+		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_textures.back())))
 			return false;
 
 		return true;
@@ -194,22 +205,6 @@ namespace Graphics
 		}
 	}
 
-	uint DXRenderer::getTextureHandle(const char* filename)
-	{
-		int index = _textures.getHandle(filename);
-		if(index == NOT_FOUND)
-		{
-			DXTexture tex = LoadTexture(filename);
-			index = _textures.Insert(tex);
-		}
-		return index;
-	}
-
-	const TextureInfo& DXRenderer::getTextureInfo(uint handle) const
-	{
-		return _textures.getTexture(handle).info;
-	}
-
 	uint DXRenderer::MakeFont(const char* name, uint size, uint weight, bool italic)
 	{
 		int index = _fonts.getHandle(name);
@@ -235,7 +230,7 @@ namespace Graphics
 		return _fonts.getFont(handle).info;
 	}
 
-	DXTexture DXRenderer::LoadTexture(const char* filename) const
+	Texture DXRenderer::LoadTexture(const char* filename)
 	{
 		//the struct for reading bitmap file info
 		D3DXIMAGE_INFO info;
@@ -244,32 +239,51 @@ namespace Graphics
 
 		//create the new texture by loading a bitmap image file
 		result = D3DXGetImageInfoFromFile(filename, &info);
-		if(FAILED(result))
+		if(SUCCEEDED(result))
 		{
-			throw (String("Failed to load texture '") + filename + "'!").c_str();
-		}
-		
-		result = D3DXCreateTextureFromFileEx(
-			_d3ddev,					//direct3D device object
-			filename,					//the image filename
-			info.Width,					//the image width
-			info.Height,				//the image height
-			1,							//mip-map levels (1 for no chain)
-			D3DPOOL_DEFAULT,			//the type of surface (default)
-			D3DFMT_UNKNOWN,				//texture format
-			D3DPOOL_MANAGED,			//memory class for the image
-			D3DX_DEFAULT,				//image filter
-			D3DX_DEFAULT,				//mip filter
-			_transparentColor,			//color key for transparency
-			&info,						//bitmap file info (from loaded file)
-			nullptr,					//color palette
-			&texture);					//destination texture
+			result = D3DXCreateTextureFromFileEx(
+				_d3ddev,					//direct3D device object
+				filename,					//the image filename
+				info.Width,					//the image width
+				info.Height,				//the image height
+				1,							//mip-map levels (1 for no chain)
+				D3DPOOL_DEFAULT,			//the type of surface (default)
+				D3DFMT_UNKNOWN,				//texture format
+				D3DPOOL_MANAGED,			//memory class for the image
+				D3DX_DEFAULT,				//image filter
+				D3DX_DEFAULT,				//mip filter
+				_transparentColor,			//color key for transparency
+				&info,						//bitmap file info (from loaded file)
+				nullptr,					//color palette
+				&texture);					//destination texture
 
-		if(FAILED(result))
-		{
-			throw std::exception((String("Failed to load texture '") + filename + "'!").c_str());
+			if(SUCCEEDED(result))
+			{
+				int handle;
+				if(_freeTextureSlots.empty())
+				{
+					handle = _textures.size();
+					_textures.push_back(texture);
+				}
+				else
+				{
+					handle = _freeTextureSlots.front();
+					_freeTextureSlots.pop_front();
+				}
+				return Texture(filename, info.Width, info.Height, this, handle);
+			}
 		}
-		return DXTexture(filename, info.Width, info.Height, texture);
+		return Texture(filename, info.Width, info.Height);
+	}
+
+	void DXRenderer::ReleaseTexture(uint handle)
+	{
+		if(0 < handle && handle < _textures.size())
+		{
+			_textures[handle]->Release();
+			_textures[handle] = nullptr;
+			_freeTextureSlots.push_back(handle);
+		}
 	}
 
 	DXFont DXRenderer::LoadFont(const char* name, uint size, uint weight, bool italic) const
@@ -511,31 +525,29 @@ namespace Graphics
 		_line->Draw(&circle[0], numVertex*4+1, c);
 	}
 	
-	void DXRenderer::DrawTexture(uint hTexture)
+	void DXRenderer::DrawTexture(const Texture& texture)
 	{
-		if(!_textures.Valid(hTexture))
+		uint textureIndex = texture.getDataHandle();
+		if(textureIndex <= 0 || _textures.size() <= textureIndex)
 		{
-			//potentionally throw exception, maybe log the error, or maybe draw an empty rectangle
 			return;
 		}
-		const DXTexture& texture = _textures.getTexture(hTexture);
-		Util::Rect source(0,0,float(texture.info.getWidth()), float(texture.info.getHeight()));
+		Util::Rect source(0,0,float(texture.getWidth()), float(texture.getHeight()));
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(texture.data, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(_textures[textureIndex], &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
-	void DXRenderer::DrawSprite(uint hTexture, const SpriteInfo& sprite)
+	void DXRenderer::DrawSprite(const Texture& texture, const SpriteInfo& sprite)
 	{
-		if(!_textures.Valid(hTexture))
+		uint textureIndex = texture.getDataHandle();
+		if(textureIndex <= 0 || _textures.size() <= textureIndex)
 		{
-			//potentionally throw exception, maybe log the error, or maybe draw an empty rectangle
 			return;
 		}
-		const DXTexture& texture = _textures.getTexture(hTexture);
 		Util::Rect source = sprite.getSrcRect();
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(texture.data, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(_textures[textureIndex], &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	

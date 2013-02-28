@@ -11,13 +11,13 @@
 #include "Subsystems/Graphics/Interface.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
-#include "Subsystems/Graphics/TextureInfo.h"
+#include "Subsystems/Graphics/Texture.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	GameContext::GameContext(Engine& engine, const ServiceLocator& services)
-		: _engine(engine), _services(services)
+	GameContext::GameContext(Engine& engine, const ServiceLocator& services, const ResourceLocator& resources)
+		: _engine(engine), _services(services), _resources(resources)
 	{
 		_actionMaster.EnqueueAction(Core::Render);
 
@@ -27,10 +27,8 @@ namespace Core
 		uint ballHandle = sheet.getHandle("ball");
 		uint cherryHandle = sheet.getHandle("cherry");
 		uint cupcakeHandle = sheet.getHandle("cupcake");
-		uint tex = services.getGraphics().getTextureHandle(sheet.getTextureName());
-		sheet.setTextureHandle(tex);
-		const Graphics::TextureInfo& texinfo = services.getGraphics().getTextureInfo(tex);
-
+		Graphics::Texture& tex = _resources.getTextureCache().getTexture(sheet.getTextureName().c_str());
+		sheet.setTexture(tex);
 
 		auto* ent = _entities.emplace(std::unique_ptr<Entity>(new Entity(entityID++))).first->get();
 		

@@ -13,12 +13,6 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.h">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
@@ -31,9 +25,6 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureInfo.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\FontInfo.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
@@ -42,6 +33,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.h">
       <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h">
+      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,12 +48,6 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.cpp">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\dll_source.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
@@ -67,9 +55,6 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureInfo.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\FontInfo.cpp">
@@ -80,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.cpp">
       <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp">
+      <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
