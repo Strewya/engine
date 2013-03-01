@@ -23,7 +23,7 @@ namespace Graphics
 	{
 		for(auto tex : _textures)
 		{
-			tex->Release();
+			tex.texture->Release();
 		}
 
 		if(_line != nullptr)
@@ -104,9 +104,9 @@ namespace Graphics
 		//create a default texture to use when another texture fails to load
 		//should be embedded into the DLL if possible
 		_textures.emplace_back();
-		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_textures.back())))
+		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_textures.back().texture)))
 			return false;
-
+		_textures.back().refs = 1;
 		return true;
 	}
 
@@ -263,26 +263,37 @@ namespace Graphics
 				if(_freeTextureSlots.empty())
 				{
 					handle = _textures.size();
-					_textures.push_back(texture);
+					_textures.push_back(dxtexture());
 				}
 				else
 				{
 					handle = _freeTextureSlots.front();
 					_freeTextureSlots.pop_front();
 				}
+				_textures[handle].texture = texture;
+				_textures[handle].refs = 1;
 				return Texture(filename, info.Width, info.Height, this, handle);
 			}
 		}
 		return Texture(filename, info.Width, info.Height);
 	}
 
+	void DXRenderer::LoadTexture(uint index)
+	{
+		++_textures[index].refs;
+	}
+
 	void DXRenderer::ReleaseTexture(uint handle)
 	{
 		if(0 < handle && handle < _textures.size())
 		{
-			_textures[handle]->Release();
-			_textures[handle] = nullptr;
-			_freeTextureSlots.push_back(handle);
+			--_textures[handle].refs;
+			if(_textures[handle].refs == 0)
+			{
+				_textures[handle].texture->Release();
+				_textures[handle].texture = nullptr;
+				_freeTextureSlots.push_back(handle);
+			}
 		}
 	}
 
@@ -534,7 +545,7 @@ namespace Graphics
 		}
 		Util::Rect source(0,0,float(texture.getWidth()), float(texture.getHeight()));
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(_textures[textureIndex], &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(_textures[textureIndex].texture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
@@ -547,7 +558,7 @@ namespace Graphics
 		}
 		Util::Rect source = sprite.getSrcRect();
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(_textures[textureIndex], &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(_textures[textureIndex].texture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	

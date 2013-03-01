@@ -6,7 +6,7 @@
 namespace Core
 {
 	Entity::Entity(InstanceID id)
-		: _id(id)
+		: _id(id), _actions(*this)
 	{}
 
 	InstanceID Entity::getID() const

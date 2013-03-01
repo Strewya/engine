@@ -46,6 +46,7 @@ namespace Graphics
 		virtual void setFullscreenState(bool state) = 0;
 		
 		virtual Texture LoadTexture(const char* filename) = 0;
+		virtual void LoadTexture(uint index) = 0;
 		virtual void ReleaseTexture(uint handle) = 0;
 
 		virtual uint MakeFont(const char* name, uint size, uint weight, bool italic) = 0;

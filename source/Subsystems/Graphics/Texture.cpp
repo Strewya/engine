@@ -21,8 +21,13 @@ namespace Graphics
     {}
     
 	Texture::Texture(const Texture& rhs)
-		: _filename(rhs._filename), _width(rhs._width), _height(rhs._height), _dataHandle(rhs._dataHandle), _gfx(nullptr)
-    {}
+		: _filename(rhs._filename), _width(rhs._width), _height(rhs._height), _dataHandle(rhs._dataHandle), _gfx(rhs._gfx)
+    {
+		if(_gfx != nullptr)
+		{
+			_gfx->LoadTexture(_dataHandle);
+		}
+	}
 	
 	Texture& Texture::operator=(const Texture& rhs)
     {
@@ -32,7 +37,11 @@ namespace Graphics
 			_filename = rhs._filename;
 			_width = rhs._width;
 			_height = rhs._height;
-			_gfx = nullptr;
+			_gfx = rhs._gfx;
+			if(_gfx != nullptr)
+			{
+				_gfx->LoadTexture(_dataHandle);
+			}
 		}
 		return *this;
 	}

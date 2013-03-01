@@ -40,7 +40,12 @@ namespace Graphics
 		
 		D3DPRESENT_PARAMETERS _d3dpp;
 		
-		std::vector<LPDIRECT3DTEXTURE9> _textures;
+		struct dxtexture
+		{
+			LPDIRECT3DTEXTURE9 texture;
+			uint refs;
+		};
+		std::vector<dxtexture> _textures;
 		std::list<uint> _freeTextureSlots;
 		DXFontCache _fonts;
 
@@ -72,6 +77,7 @@ namespace Graphics
 		DXFont LoadFont(const char* name, uint size, uint weight, bool italic) const;
 
 		Texture LoadTexture(const char* filename);
+		void LoadTexture(uint index);
 		void ReleaseTexture(uint handle);
 
 		uint MakeFont(const char* name, uint size, uint weight, bool italic);

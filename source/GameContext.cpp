@@ -38,17 +38,11 @@ namespace Core
 		ent->getForm().setPosition(500,300);
 		ent->getForm().setScale(1,1);
 		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		//ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize());
-		//ent->getForm().setScalingCenter(Util::Vec2(0,0));
 		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		//ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize());
-		//ent->getForm().setPivotPoint(Util::Vec2(0,0));
 		ent->getForm().setRotation(0);
 
 		ent->getActions().Insert("Render", Action(Core::Render));
 		
-		auto& action = ent->getActions().Get("Render");
-		action.setOwner(*ent);
 	}
 
 	void GameContext::Activate()

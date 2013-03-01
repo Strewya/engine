@@ -7,6 +7,11 @@
 
 namespace Core
 {
+	Actionmap::Actionmap(Entity& owner)
+		: _owner(owner)
+	{
+	}
+
 	Action& Actionmap::Insert(const char* name, const Action& action)
 	{
 		auto it = _cache.find(name);
@@ -18,6 +23,7 @@ namespace Core
 		{
 			it->second = action;
 		}
+		it->second.setOwner(_owner);
 		return it->second;
 	}
 

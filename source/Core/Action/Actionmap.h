@@ -13,13 +13,17 @@
 
 namespace Core
 {
+	class Entity;
+
 	class Actionmap
 	{
 	private:
 		typedef std::unordered_map<String, Action> ActionCache;
 		ActionCache _cache;
+		Entity& _owner;
 
 	public:
+		Actionmap(Entity& owner);
 		Action& Insert(const char* name, const Action& action);
 		Action& Insert(const String& name, const Action& action);
 
