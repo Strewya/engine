@@ -19,7 +19,7 @@ namespace Core
 
 	public:
 		ResourceLocator();
-
+		
 		void Register(Graphics::TextureCache& cache);
 		Graphics::TextureCache& getTextureCache() const;
 	};

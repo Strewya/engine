@@ -3,16 +3,17 @@
 #include "Core/Action/ActionUpdater.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "GameContext.h"
 #include "Core/Entity/Entity.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	void ActionUpdater::Update(float dt, ServiceLocator& services)
+	void ActionUpdater::Update(GameContext& context)
 	{
 		for(ActionLogic fn : _actionQueue)
 		{
-			fn(dt, services, _activeActions[fn]);
+			fn(context.timer.getLastTimeDelta(), context, _activeActions[fn]);
 		}
 	}
 

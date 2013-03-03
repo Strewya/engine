@@ -89,6 +89,9 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -192,6 +195,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h">
       <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GameContextEvent.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GameContextEvents_Pong.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

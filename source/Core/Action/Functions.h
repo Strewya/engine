@@ -14,7 +14,7 @@
 
 namespace Core
 {
-	void Render(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, std::set<Core::Entity*>& ents);
+	void Render(float dt, GameContext& context, std::set<Core::Entity*>& ents);
 }
 
 #endif //CORE_ACTION_FUNCTIONS_H_

@@ -3,7 +3,7 @@
 #include "Core/Action/Functions.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "ServiceLocator.h"
+#include "GameContext.h"
 #include "Core/Entity/Entity.h"
 #include "Subsystems/Graphics/Interface.h"
 #include "Subsystems/Graphics/RenderingQueue.h"
@@ -11,7 +11,7 @@
 
 namespace Core
 {
-	void Render(float dt, /*const ResourceLocator& resources,*/ const Core::ServiceLocator& services, std::set<Core::Entity*>& ents)
+	void Render(float dt, GameContext& context, std::set<Core::Entity*>& ents)
 	{
 		Graphics::RenderingQueue alphaQueue;
 		for(auto& entity : ents)
@@ -19,12 +19,12 @@ namespace Core
 			alphaQueue.Add(entity->getForm());
 		}
 
-		services.getGraphics().BeginScene();
-		services.getGraphics().BeginSpriteBatch(true);
+		context.services.getGraphics().BeginScene();
+		context.services.getGraphics().BeginSpriteBatch(true);
 		
-		alphaQueue.Render(services.getGraphics());
+		alphaQueue.Render(context.services.getGraphics());
 
-		services.getGraphics().EndSpriteBatch();
-		services.getGraphics().EndScene();
+		context.services.getGraphics().EndSpriteBatch();
+		context.services.getGraphics().EndScene();
 	}
 }

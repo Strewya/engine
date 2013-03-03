@@ -7,6 +7,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <algorithm>
 #include <memory>
 #include <typeinfo>
 	/*** extra headers if needed (alphabetically ordered) ***/
@@ -76,7 +77,7 @@ namespace Core
 
 	template<typename T> static std::unique_ptr<State<T>> IState::Create(const T& value)
 	{
-		return std::unique_ptr<State<T>>(new State<T>(value));
+		return (std::unique_ptr<State<T>>(new State<T>(value)));
 	}
 }
 

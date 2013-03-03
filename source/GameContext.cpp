@@ -16,54 +16,79 @@
 
 namespace Core
 {
-	GameContext::GameContext(Engine& engine, const ServiceLocator& services, const ResourceLocator& resources)
-		: _engine(engine), _services(services), _resources(resources)
+	GameContext::GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources)
+		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr)
 	{
-		_actionMaster.EnqueueAction(Core::Render);
+		Action::BindActionUpdater(actionMaster);
 
-		int entityID = 0;
-		Graphics::SpritesheetCache sheetCache;
-		Graphics::Spritesheet& sheet = sheetCache.CreateFromFile("resources/pong.sheet");
-		uint ballHandle = sheet.getHandle("ball");
-		uint cherryHandle = sheet.getHandle("cherry");
-		uint cupcakeHandle = sheet.getHandle("cupcake");
-		Graphics::Texture& tex = _resources.getTextureCache().getTexture(sheet.getTextureName().c_str());
-		sheet.setTexture(tex);
+		this->resources.Register(_textureCache);
+		//...
 
-		auto* ent = _entities.emplace(std::unique_ptr<Entity>(new Entity(entityID++))).first->get();
-		
-		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
-		ent->getForm().getStates().AddState("CurrentSprite", Core::IState::Create(cherryHandle));
-		ent->getForm().setPosition(500,300);
-		ent->getForm().setScale(1,1);
-		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setRotation(0);
+		this->resources.getTextureCache().setReferences(resources.getTextureCache(), services.getGraphics());
+		//...
 
-		ent->getActions().Insert("Render", Action(Core::Render));
-		
+		if(_onCreate)
+		{
+			_onCreate(*this);
+		}
+	}
+
+	GameContext::~GameContext()
+	{
+		if(_onDestroy)
+		{
+			_onDestroy(*this);
+		}
 	}
 
 	void GameContext::Activate()
 	{
-		Action::BindActionUpdater(_actionMaster);
+		Action::BindActionUpdater(actionMaster);
 
-		auto& action = _entities.begin()->get()->getActions().Get("Render");
-		assert(action.Activate());
+		if(_onActivate)
+		{
+			_onActivate(*this);
+		}
 	}
 
 	void GameContext::Deactivate()
 	{
+		if(_onDeactivate)
+		{
+			_onDeactivate(*this);
+		}
 	}
 
 	bool GameContext::Update()
 	{
-		if(_timer.TimeToUpdate(gUpdateInterval))
+		if(_onUpdate)
 		{
-			_actionMaster.Update(_timer.getLastTimeDelta(), _services);
+			_onUpdate(*this);
+		}
+
+		if(timer.TimeToUpdate(gUpdateInterval))
+		{
+			actionMaster.Update(*this);
 		}
 		return true;
 	}
 
+	void GameContext::setContextEventLogic(EventType type, GameContextEvent function)
+	{
+		switch(type)
+		{
+		case OnActivate:
+			_onActivate = function;
+			break;
+		case OnDeactivate:
+			_onDeactivate = function;
+			break;
+		case OnUpdate:
+			_onUpdate = function;
+			break;
+		case OnDestroy:
+			_onDestroy = function;
+			break;
+		}
+	}
 }

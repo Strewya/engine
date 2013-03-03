@@ -9,7 +9,8 @@
 
 namespace Core
 {
-	Engine::Engine(const Win32::AbstractWindow& window) : _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle())
+	Engine::Engine(const Win32::AbstractWindow& window) 
+		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -92,28 +93,34 @@ namespace Core
 		PostMessage(_window.getWindowHandle(), WM_DESTROY, 0, 0);
 	}
 	/*
-	GameContext& Engine::CreateContext(const char* name)
-	{
-	}
-
-	GameContext& Engine::CreateContext(const String& name)
-	{
-		return CreateContext(name.c_str());
-	}
-	*/
-	GameContext& Engine::getContext(const char* name)
+	GameContext& Engine::CreateContext(const char* name, GameContextEvent onCreate)
 	{
 		auto it = _gameContexts.find(name);
 		if(it == _gameContexts.end())
 		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(*this, _services, _resources))).first;
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, *this, _services, _resources))).first;
 		}
 		return *it->second;
 	}
 
-	GameContext& Engine::getContext(const String& name)
+	GameContext& Engine::CreateContext(const String& name, GameContextEvent onCreate)
 	{
-		return getContext(name.c_str());
+		return CreateContext(name.c_str(), onCreate);
+	}
+	*/
+	GameContext& Engine::getContext(const char* name, GameContextEvent onCreate)
+	{
+		auto it = _gameContexts.find(name);
+		if(it == _gameContexts.end())
+		{
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, _services, _resources))).first;
+		}
+		return *it->second;
+	}
+
+	GameContext& Engine::getContext(const String& name, GameContextEvent onCreate)
+	{
+		return getContext(name.c_str(), onCreate);
 	}
 
 	bool Engine::PushContext(const char* name)
@@ -121,7 +128,10 @@ namespace Core
 		auto it = _gameContexts.find(name);
 		if(it != _gameContexts.end() && it->second.get() != _activeContext)
 		{
-			_activeContext->Deactivate();
+			if(_activeContext != nullptr)
+			{
+				_activeContext->Deactivate();
+			}
 			_activeContext = it->second.get();
 			_activeContext->Activate();
 			return true;

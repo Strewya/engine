@@ -9,6 +9,7 @@
 #include <memory>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "GameContextEvent.h"
 #include "ResourceLocator.h"
 #include "ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
@@ -23,18 +24,34 @@ namespace Core
 	class GameContext
 	{
 	private:
-		ServiceLocator _services;
-		ResourceLocator _resources;
-		ActionUpdater _actionMaster;
-		Util::Timer _timer;
-		Engine& _engine;
-		std::set<std::unique_ptr<Entity>> _entities;
+		Graphics::TextureCache _textureCache;
+		
+		GameContextEvent _onActivate;
+		GameContextEvent _onDeactivate;
+		GameContextEvent _onCreate;
+		GameContextEvent _onDestroy;
+		GameContextEvent _onUpdate;
 	
 	public:
-		GameContext(Engine& engine, const ServiceLocator& services, const ResourceLocator& resources);
+		enum EventType
+		{
+			OnActivate,
+			OnDeactivate,
+			OnDestroy,
+			OnUpdate
+		};
+		Util::Timer timer;
+		ActionUpdater actionMaster;
+		std::set<std::unique_ptr<Entity>> entities;
+		ServiceLocator services;
+		ResourceLocator resources;
+
+		GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources);
+		~GameContext();
 		void Activate();
 		void Deactivate();
 		bool Update();
+		void setContextEventLogic(EventType type, GameContextEvent function);
 	};
 }
 

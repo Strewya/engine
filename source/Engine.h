@@ -48,10 +48,10 @@ namespace Core
 		void Loop();
 		void Shutdown();
 
-		//GameContext& CreateContext(const char* name);
-		//GameContext& CreateContext(const String& name);
-		GameContext& getContext(const char* name);
-		GameContext& getContext(const String& name);
+		//GameContext& CreateContext(const char* name, GameContextEvent onCreate);
+		//GameContext& CreateContext(const String& name, GameContextEvent onCreate);
+		GameContext& getContext(const char* name, GameContextEvent onCreate = nullptr);
+		GameContext& getContext(const String& name, GameContextEvent onCreate = nullptr);
 		bool PushContext(const char* name);
 		bool PushContext(const String& name);
 	};

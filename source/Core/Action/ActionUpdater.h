@@ -24,7 +24,7 @@ namespace Core
 		std::vector<ActionLogic> _actionQueue;
 
 	public:
-		void Update(float dt, ServiceLocator& services);
+		void Update(GameContext& context);
 
 		bool EnqueueAction(ActionLogic logic);
 		bool ActivateEntity(ActionLogic logic, Entity* entity);
