@@ -5,7 +5,8 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include <unordered_map>
+#include <deque>
+#include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/SpriteInfo.h"
 #include "Subsystems/Graphics/Interface.h"
@@ -45,8 +46,8 @@ namespace Graphics
 			LPDIRECT3DTEXTURE9 texture;
 			uint refs;
 		};
-		std::vector<dxtexture> _textures;
-		std::list<uint> _freeTextureSlots;
+		std::deque<dxtexture> _textures;
+		std::set<uint> _freeTextureSlots;
 		DXFontCache _fonts;
 
 		D3DXMATRIX _transformMatrix;

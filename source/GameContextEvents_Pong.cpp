@@ -21,6 +21,8 @@ namespace Pong
 {
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
+		context.actionMaster.EnqueueAction(Core::InfinityPattern);
+		context.actionMaster.EnqueueAction(Core::Rotate);
 		context.actionMaster.EnqueueAction(Core::Render);
 
 		int entityID = 0;
@@ -43,7 +45,13 @@ namespace Pong
 		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setRotation(0);
 
+		ent->getStates().AddState("SpringVel", Core::IState::Create(Util::Vec2(1,0)));
+		ent->getStates().AddState("SpringAcc", Core::IState::Create(Util::Vec2(0.1,0)));
+		ent->getStates().AddState("SpringForce", Core::IState::Create(Util::Vec2(1,0)));
+
 		assert(ent->getActions().Insert("Render", Core::Action(Core::Render)).Activate());
+		assert(ent->getActions().Insert("Rotate", Core::Action(Core::Rotate)).Activate());
+		assert(ent->getActions().Insert("InfinityPattern", Core::Action(Core::InfinityPattern)).Activate());
 
 		ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
 		
@@ -57,6 +65,7 @@ namespace Pong
 		ent->getForm().setRotation(0);
 
 		assert(ent->getActions().Insert("Render", Core::Action(Core::Render)).Activate());
+		assert(ent->getActions().Insert("Rotate", Core::Action(Core::Rotate)).Activate());
 
 		return true;
 	}

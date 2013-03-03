@@ -267,8 +267,8 @@ namespace Graphics
 				}
 				else
 				{
-					handle = _freeTextureSlots.front();
-					_freeTextureSlots.pop_front();
+					handle = *_freeTextureSlots.begin();
+					_freeTextureSlots.erase(_freeTextureSlots.begin());
 				}
 				_textures[handle].texture = texture;
 				_textures[handle].refs = 1;
@@ -285,14 +285,14 @@ namespace Graphics
 
 	void DXRenderer::ReleaseTexture(uint handle)
 	{
-		if(0 < handle && handle < _textures.size())
+		if(0 < handle && handle < _textures.size() && _textures[handle].texture != nullptr)
 		{
 			--_textures[handle].refs;
 			if(_textures[handle].refs == 0)
 			{
 				_textures[handle].texture->Release();
 				_textures[handle].texture = nullptr;
-				_freeTextureSlots.push_back(handle);
+				_freeTextureSlots.insert(handle);
 			}
 		}
 	}
