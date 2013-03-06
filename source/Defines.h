@@ -22,7 +22,7 @@ const float  PI_F = 3.14159265358979f;
 const float  DEG2RAD_RATIO_F = PI_F/180.0f;
 const float  RAD2DEG_RATIO_F = 180.0f/PI_F;
 
-const float gUpdateInterval = 1.0f/40.0f;
+const double gUpdateInterval = 1.0/40.0;
 
 enum ErrorCode
 {

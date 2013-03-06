@@ -11,13 +11,13 @@ Util::Clock gClock;
 namespace Util
 {
 	Clock::Clock()
-		: _maxDeltaAllowed(0.25f), _lastUpdate(std::chrono::high_resolution_clock::now())
+		: _maxDeltaAllowed(0.25), _lastUpdate(std::chrono::high_resolution_clock::now())
 	{}
 
 	void Clock::FrameStep()
 	{
 		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-		float delta = std::chrono::duration_cast<std::chrono::duration<float>>(now-_lastUpdate).count();
+		double delta = std::chrono::duration_cast<std::chrono::duration<double>>(now-_lastUpdate).count();
 		_lastUpdate = now;
 		delta = delta > _maxDeltaAllowed ? _maxDeltaAllowed : delta;
 		for(auto timer : _timers)
@@ -46,7 +46,7 @@ namespace Util
 		}
 		else
 		{
-			_timers[slot-_timers.begin()] = timer;
+			*slot = timer;
 		}
 	}
 
@@ -55,16 +55,16 @@ namespace Util
 		auto it = std::find_if(_timers.begin(), _timers.end(), [&timer](const Timer* t){return timer == t;});
 		if(it != _timers.end())
 		{
-			_timers[it-_timers.begin()] = nullptr;
+			*it = nullptr;
 		}
 	}
 
-	float Clock::getMaxDeltaAllowed() const
+	double Clock::getMaxDeltaAllowed() const
 	{
 		return _maxDeltaAllowed;
 	}
 
-	void Clock::setMaxDeltaAllowed(float delta)
+	void Clock::setMaxDeltaAllowed(double delta)
 	{
 		_maxDeltaAllowed = delta;
 	}
@@ -77,28 +77,46 @@ namespace Util
 		gClock.RegisterTimer(this);
 	}
 
+	Timer::Timer(const Timer& rhs)
+		: _scale(rhs._scale), _deltaTime(rhs._deltaTime), _accumulator(rhs._accumulator)
+	{
+		gClock.RegisterTimer(this);
+	}
+
+	Timer& Timer::operator=(const Timer& rhs)
+	{
+		if(this != &rhs)
+		{
+			_scale = rhs._scale;
+			_accumulator = rhs._accumulator;
+			_deltaTime = rhs._deltaTime;
+			gClock.RegisterTimer(this);
+		}
+		return *this;
+	}
+
 	Timer::~Timer()
 	{
 		gClock.UnregisterTimer(this);
 	}
 
-	void Timer::AdvanceTime(float dt)
+	void Timer::AdvanceTime(double dt)
 	{
 		_deltaTime = dt;
 		_accumulator += (dt*_scale);
 	}
 
-	float Timer::getLastTimeDelta() const
+	double Timer::getLastTimeDelta() const
 	{
 		return _deltaTime;
 	}
 
 	void Timer::Reset()
 	{
-		_accumulator = 0.0f;
+		_accumulator = 0.0;
 	}
 
-	bool Timer::TimeToUpdate(float time)
+	bool Timer::TimeToUpdate(double time)
 	{
 		if(_accumulator >= time)
 		{
@@ -108,17 +126,17 @@ namespace Util
 		return false;
 	}
 
-	float Timer::getElapsedTime() const
+	double Timer::getElapsedTime() const
 	{
 		return _accumulator;
 	}
 
-	void Timer::setTimeScaling(float scale)
+	void Timer::setTimeScaling(double scale)
 	{
 		_scale = scale;
 	}
 
-	float Timer::getTimeScaling() const
+	double Timer::getTimeScaling() const
 	{
 		return _scale;
 	}

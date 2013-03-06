@@ -68,7 +68,7 @@ namespace Core
 
 		while(timer.TimeToUpdate(gUpdateInterval))
 		{
-			actionMaster.Update(*this);
+			actionMaster.Update(gUpdateInterval, *this);
 		}
 		return true;
 	}

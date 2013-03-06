@@ -6,6 +6,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <list>
 #include <set>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
@@ -14,20 +15,24 @@
 
 namespace Core
 {
-	class Entity;
+	class Action;
 	class ServiceLocator;
 
 	class ActionUpdater
 	{
 	private:
-		std::unordered_map<ActionLogic, std::set<Entity*>> _activeActions;
+		std::unordered_map<ActionLogic, std::set<Action*>> _activeActions;
+		std::list<std::pair<ActionLogic, Action*>> _actionsForDeletion;
 		std::vector<ActionLogic> _actionQueue;
 
-	public:
-		void Update(GameContext& context);
+		void PurgeActions();
 
-		bool EnqueueAction(ActionLogic logic);
-		bool ActivateEntity(ActionLogic logic, Entity* entity);
+	public:
+		void Update(double dt, GameContext& context);
+
+		bool EnqueueActionLogic(ActionLogic logic);
+		bool ActivateAction(ActionLogic logic, Action* action);
+		bool DeactivateAction(ActionLogic logic, Action* action);
 	};
 }
 

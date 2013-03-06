@@ -32,6 +32,7 @@
 namespace Core
 {
 	class ActionUpdater;
+	class Entity;
 
 	class Action
 	{
@@ -52,7 +53,11 @@ namespace Core
 		void setOwner(Entity& owner);
 		void setTarget(Entity& target);
 
+		Entity& getOwner() const;
+		Entity& getTarget() const;
+
 		bool Activate();
+		bool Deactivate();
 		bool isActive() const;
 		
 	};

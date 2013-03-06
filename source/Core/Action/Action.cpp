@@ -39,9 +39,24 @@ namespace Core
 		_target = &target;
 	}
 
+	Entity& Action::getOwner() const
+	{
+		return *_owner;
+	}
+
+	Entity& Action::getTarget() const
+	{
+		return *_target;
+	}
+
 	bool Action::Activate()
 	{
-		return _active = _actionUpdater->ActivateEntity(_actionLogic, _owner);
+		return _active = _actionUpdater->ActivateAction(_actionLogic, this);
+	}
+
+	bool Action::Deactivate()
+	{
+		return !(_active = !_actionUpdater->DeactivateAction(_actionLogic, this));
 	}
 
 	bool Action::isActive() const

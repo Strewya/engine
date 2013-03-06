@@ -12,10 +12,10 @@
 
 namespace Core
 {
-	class Entity;
+	class Action;
 	class GameContext;
 }
 
-typedef void(*ActionLogic)(float dt, Core::GameContext& context, std::set<Core::Entity*>& ents);
+typedef void(*ActionLogic)(double dt, Core::GameContext& context, std::set<Core::Action*>& actions);
 
 #endif //CORE_ACTION_ACTION_LOGIC_H_

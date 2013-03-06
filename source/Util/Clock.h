@@ -16,23 +16,25 @@ namespace Util
 	class Timer
 	{
 	private:
-		float _accumulator;
-		float _scale;
-		float _deltaTime;
+		double _accumulator;
+		double _scale;
+		double _deltaTime;
 
 	public:
 		Timer();
+		Timer(const Timer& rhs);
+		Timer& operator=(const Timer& rhs);
 		~Timer();
 		
-		void AdvanceTime(float dt);
-		void setTimeScaling(float scale);
+		void AdvanceTime(double dt);
+		void setTimeScaling(double scale);
 		void Reset();
 
-		bool TimeToUpdate(float time);
+		bool TimeToUpdate(double time);
 
-		float getLastTimeDelta() const;
-		float getElapsedTime() const;
-		float getTimeScaling() const;
+		double getLastTimeDelta() const;
+		double getElapsedTime() const;
+		double getTimeScaling() const;
 	};
 
 	class Clock
@@ -40,7 +42,7 @@ namespace Util
 	private:
 		std::vector<Timer*> _timers;
 		std::chrono::time_point<std::chrono::high_resolution_clock> _lastUpdate;
-		float _maxDeltaAllowed;
+		double _maxDeltaAllowed;
 
 	public:
 		Clock();
@@ -48,8 +50,8 @@ namespace Util
 		void RegisterTimer(Timer* timer);
 		void UnregisterTimer(Timer* timer);
 
-		float getMaxDeltaAllowed() const;
-		void  setMaxDeltaAllowed(float delta);
+		double getMaxDeltaAllowed() const;
+		void  setMaxDeltaAllowed(double delta);
 	};
 }
 

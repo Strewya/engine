@@ -21,9 +21,9 @@ namespace Pong
 {
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
-		context.actionMaster.EnqueueAction(Core::InfinityPattern);
-		context.actionMaster.EnqueueAction(Core::Rotate);
-		context.actionMaster.EnqueueAction(Core::Render);
+		context.actionMaster.EnqueueActionLogic(Core::InfinityPattern);
+		context.actionMaster.EnqueueActionLogic(Core::Rotate);
+		context.actionMaster.EnqueueActionLogic(Core::Render);
 
 		int entityID = 0;
 		Graphics::SpritesheetCache sheetCache;
@@ -45,9 +45,10 @@ namespace Pong
 		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setRotation(0);
 
-		ent->getStates().AddState("SpringVel", Core::IState::Create(Util::Vec2(1,0)));
-		ent->getStates().AddState("SpringAcc", Core::IState::Create(Util::Vec2(0.1,0)));
-		ent->getStates().AddState("SpringForce", Core::IState::Create(Util::Vec2(1,0)));
+		ent->getStates().AddState("SpringVel", Core::IState::Create(Util::Vec2(100,0)));
+		ent->getStates().AddState("SpringMaxVel", Core::IState::Create(Util::Vec2(200,400)));
+		ent->getStates().AddState("SpringAcc", Core::IState::Create(Util::Vec2(-20,40)));
+		ent->getStates().AddState("SpringForce", Core::IState::Create(Util::Vec2(20,40)));
 
 		assert(ent->getActions().Insert("Render", Core::Action(Core::Render)).Activate());
 		assert(ent->getActions().Insert("Rotate", Core::Action(Core::Rotate)).Activate());
