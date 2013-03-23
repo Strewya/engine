@@ -64,11 +64,11 @@ namespace Core
 		Form& operator=(const Form& rhs);
 		
 
-		InstanceID 	getID() const;
-		FormType	getType() const;
-		Statemap& 	getStates();
-		float 		getRotation() const;
-		bool 		getVisibility() const;
+		InstanceID 			getID() const;
+		FormType			getType() const;
+		Statemap& 			getStates();
+		float 				getRotation() const;
+		bool 				getVisibility() const;
 		const Util::Color& 	getColor() const;
 		const Util::Vec2& 	getPosition() const;
 		const Util::Vec2& 	getScalingCenter() const;

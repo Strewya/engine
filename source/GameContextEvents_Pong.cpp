@@ -40,19 +40,22 @@ namespace Pong
 		ent->getForm().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
 		ent->getForm().getStates().AddState("CurrentSprite", Core::IState::Create(cherryHandle));
 		ent->getForm().setPosition(500,300);
-		ent->getForm().setScale(1,1);
+		ent->getForm().setScale(1,-1);
 		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setRotation(0);
 
-		ent->getStates().AddState("SpringVel", Core::IState::Create(Util::Vec2(100,0)));
-		ent->getStates().AddState("SpringMaxVel", Core::IState::Create(Util::Vec2(200,400)));
-		ent->getStates().AddState("SpringAcc", Core::IState::Create(Util::Vec2(-20,40)));
-		ent->getStates().AddState("SpringForce", Core::IState::Create(Util::Vec2(20,40)));
+		ent->Insert("SpringVel", Core::IState::Create(Util::Vec2(100,0)));
+		ent->Insert("SpringMaxVel", Core::IState::Create(Util::Vec2(200,400)));
+		ent->Insert("SpringAcc", Core::IState::Create(Util::Vec2(-20,40)));
+		ent->Insert("SpringForce", Core::IState::Create(Util::Vec2(20,40)));
 
-		assert(ent->getActions().Insert("Render", Core::Action(Core::Render)).Activate());
-		assert(ent->getActions().Insert("Rotate", Core::Action(Core::Rotate)).Activate());
-		assert(ent->getActions().Insert("InfinityPattern", Core::Action(Core::InfinityPattern)).Activate());
+		ent->Insert("Render", Core::Action(Core::Render));
+		assert(ent->getAction("Render").Activate());
+		ent->Insert("Rotate", Core::Action(Core::Rotate));
+		assert(ent->getAction("Rotate").Activate());
+		ent->Insert("InfinityPattern", Core::Action(Core::InfinityPattern));
+		assert(ent->getAction("InfinityPattern").Activate());
 
 		ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
 		
@@ -65,8 +68,10 @@ namespace Pong
 		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setRotation(0);
 
-		assert(ent->getActions().Insert("Render", Core::Action(Core::Render)).Activate());
-		assert(ent->getActions().Insert("Rotate", Core::Action(Core::Rotate)).Activate());
+		ent->Insert("Render", Core::Action(Core::Render));
+		assert(ent->getAction("Render").Activate());
+		ent->Insert("Rotate", Core::Action(Core::Rotate));
+		assert(ent->getAction("Rotate").Activate());
 
 		return true;
 	}

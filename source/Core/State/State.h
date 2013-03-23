@@ -25,6 +25,7 @@ namespace Core
 		IState(const std::type_info& typeInfo) : _type(typeInfo) {};
 		virtual ~IState() {};
 
+		virtual std::unique_ptr<IState> Clone() = 0;
 		template<typename T> T& as();
 		template<typename T> static std::unique_ptr<State<T>> Create(const T& value);
 	};
@@ -51,7 +52,7 @@ namespace Core
 		{}
 
 		State(const State& rhs)
-			: IState(rhs._type)
+			: IState(rhs._type), value(rhs.value)
 		{}
 
 		State& operator=(const State& rhs)
@@ -64,6 +65,11 @@ namespace Core
 		}
 
 		~State() {};
+
+		std::unique_ptr<IState> Clone()
+		{
+			return std::unique_ptr<State<T>>(new State<T>(*this));
+		}
 	};
 
 	template<typename T> T& IState::as()

@@ -22,10 +22,9 @@ namespace Core
 	*/
 	class Statemap
 	{
-	private:
-
+	protected:
 		typedef std::unordered_map<String, std::unique_ptr<IState>> StateCache;
-		StateCache _cache;
+		StateCache _states;
 
 		Statemap* _prototype;
 

@@ -5,9 +5,62 @@
 
 namespace Core
 {
+	/////////////////////////// CONSTRUCTORS ///////////////////////////
+
 	Entity::Entity(InstanceID id)
-		: _id(id), _actions(*this)
+		: _id(id), _prototype(nullptr)
 	{}
+
+	Entity::Entity(const Entity& rhs)
+		: _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _prototype(rhs._prototype), _form(rhs._form), _actions(rhs._actions)
+	{
+		for(auto& pair : rhs._states)
+		{
+			Insert(pair.first, pair.second->Clone());
+		}
+	}
+
+	Entity& Entity::operator=(const Entity& rhs)
+	{
+		if(this != &rhs)
+		{
+			_id = rhs._id;
+			_type = rhs._type;
+			_alias = rhs._alias;
+			_prototype = rhs._prototype;
+			_form = rhs._form;
+			_actions = rhs._actions;
+			for(auto& pair : rhs._states)
+			{
+				Insert(pair.first, pair.second->Clone());
+			}
+		}
+		return *this;
+	}
+
+	/////////////////////////// EXISTANCE CHECKS ///////////////////////////
+
+	bool Entity::hasAction(const char* name)
+	{
+		return _actions.find(name) != _actions.end();
+	}
+
+	bool Entity::hasAction(const String& name)
+	{
+		return _actions.find(name) != _actions.end();
+	}
+
+	bool Entity::hasState(const char* name)
+	{
+		return _states.find(name) != _states.end();
+	}
+
+	bool Entity::hasState(const String& name)
+	{
+		return _states.find(name) != _states.end();
+	}
+
+	/////////////////////////// GETTERS ///////////////////////////
 
 	InstanceID Entity::getID() const
 	{
@@ -28,17 +81,79 @@ namespace Core
 	{
 		return _form;
 	}
+
+	Action& Entity::getAction(const char* name)
+	{
+		auto it = _actions.find(name);
+		if(it == _actions.end())
+		{
+			String message = "Entity::getAction(): Attempted to acquire non-existant Action '";
+			message += name;
+			message += "'.";
+			throw std::exception(message.c_str());
+		}
+		return it->second;
+	}
+
+	Action& Entity::getAction(const String& name)
+	{
+		return getAction(name.c_str());
+	}
 	
-	Statemap& Entity::getStates()
+	IState* Entity::getState(const char* name)
 	{
-		return _states;
+		auto it = _states.find(name);
+		if(it == _states.end())
+		{
+			if(_prototype)
+			{
+				return _prototype->getState(name);
+			}
+			return nullptr;
+		}
+		return it->second.get();
 	}
 
-	Actionmap& Entity::getActions()
+	IState* Entity::getState(const String& name)
 	{
-		return _actions;
+		return getState(name.c_str());
 	}
 
+	/////////////////////////// REMOVAL METHODS ///////////////////////////
+
+	void Entity::ClearStates()
+	{
+		_states.clear();
+	}
+
+	bool Entity::RemoveState(const char* name)
+	{
+		return _states.erase(name) != 0;
+	}
+
+	bool Entity::RemoveState(const String& name)
+	{
+		return _states.erase(name) != 0;
+	}
+
+	void Entity::ClearActions()
+	{
+		_actions.clear();
+	}
+
+	bool Entity::RemoveAction(const char* name)
+	{
+		return _actions.erase(name) != 0;
+	}
+
+	bool Entity::RemoveAction(const String& name)
+	{
+		return _actions.erase(name) != 0;
+	}
+
+
+	/////////////////////////// SETTERS ///////////////////////////
+	
 	Entity& Entity::setAlias(const char* alias)
 	{
 		_alias = alias;
@@ -62,6 +177,12 @@ namespace Core
 		_type = type;
 		return *this;
 	}
+
+	Entity& Entity::setPrototype(Entity& prototype)
+	{
+		_prototype = &prototype;
+		return *this;
+	}
 	
 	Entity& Entity::setForm(const Form& form)
 	{
@@ -69,113 +190,57 @@ namespace Core
 		return *this;
 	}
 
-
-	/*
-	Entity& Entity::setForm(const Form2D* f)
+	Entity& Entity::setForm(Form&& form)
 	{
-		assert(f);
-		return setForm(std::make_shared<Form2D>(f));
-	}
-	*/
-	/*
-	InstanceID Entity::_idCounter = 0;
-
-	InstanceID Entity::_GenerateID()
-	{
-		return ++_idCounter;
-	}
-
-	Entity::Entity(const String& type)
-		: _id(_GenerateID()), _parent(NULL), _location(NULL), _type(type), _alias(type+ToString(_id)), _form()
-	{
-		setForm(NullForm::Make(*this));
-	}
-
-	Entity::~Entity()
-	{}
-
-	// ------------------- UNSETTERS
-	Entity& Entity::UnsetParent()
-	{
-		_parent = NULL;
+		_form = std::move(form);
 		return *this;
 	}
 
-	Entity& Entity::UnsetLocation()
-	{
-		_location = NULL;
-		return *this;
-	}
+	/////////////////////////// INSERT METHODS ///////////////////////////
 
-	
-	// ------------------------- SETTERS
-	Entity& Entity::setParent(Entity* e)
+	bool Entity::Insert(const char* name, const Action& action)
 	{
-		assert(e);
-		if(_parent == NULL)
+		auto it = _actions.find(name);
+		if(it == _actions.end())
 		{
-			_parent = e;
+			it = _actions.emplace(name, action).first;
 		}
-		return *this;
-	}
-
-	Entity& Entity::setLocation(Space* loc)
-	{
-		assert(loc);
-		if(_location == NULL)
+		else
 		{
-			_location = loc;
+			return false;
 		}
-		return *this;
+		it->second.setOwner(*this);
+		return true;
 	}
 
-	Entity& Entity::setForm(spForm f)
+	bool Entity::Insert(const String& name, const Action& action)
 	{
-		assert(f.get());
-		if(f != NULL)
+		return Insert(name.c_str(), action);
+	}
+
+	bool Entity::Insert(const char* name, IState* state)
+	{
+		return Insert(name, std::unique_ptr<IState>(state));
+	}
+
+	bool Entity::Insert(const String& name, IState* state)
+	{
+		return Insert(name.c_str(), std::unique_ptr<IState>(state));
+	}
+	
+	bool Entity::Insert(const char* name, std::unique_ptr<IState> state)
+	{
+		auto it = _states.find(name);
+		if(it == _states.end())
 		{
-			if(_form != NULL)
-			{
-				_form->setContents(f->AcquireContents());
-			}
-			_form = f;
+			return _states.emplace(std::make_pair(name, std::move(state))).second;
 		}
-		return *this;
+		it->second.swap(state);
+		return true;
 	}
-
 	
-
-
-	// ------------------------------- GETTERS
-	
-
-	Entity* Entity::getParent()
+	bool Entity::Insert(const String& name, std::unique_ptr<IState> state)
 	{
-		return _parent;
+		return Insert(name.c_str(), std::move(state));
 	}
-
-	Space* Entity::getLocation()
-	{
-		return _location;
-	}
-
-	
-
-	
-
-	Actionmap& Entity::getActions()
-	{
-		return _actions;
-	}
-
-	Form& Entity::getForm()
-	{
-		return *_form;
-	}
-
-	spForm Entity::AcquireForm()
-	{
-		return _form;
-	}
-	*/
 }

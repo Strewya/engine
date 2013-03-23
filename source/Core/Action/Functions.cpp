@@ -42,21 +42,21 @@ namespace Core
 		for(auto& action : actions)
 		{
 			Entity& entity = action->getOwner();
-			if( entity.getStates().Contains("SpringVel") && 
-				entity.getStates().Contains("SpringMaxVel") && 
-				entity.getStates().Contains("SpringAcc") && 
-				entity.getStates().Contains("SpringForce"))
+			if( entity.hasState("SpringVel") && 
+				entity.hasState("SpringMaxVel") && 
+				entity.hasState("SpringAcc") && 
+				entity.hasState("SpringForce"))
 			{
-				Util::Vec2& vel = entity.getStates().GetValue<Util::Vec2>("SpringVel");
-				Util::Vec2& maxvel = entity.getStates().GetValue<Util::Vec2>("SpringMaxVel");
-				Util::Vec2& acc = entity.getStates().GetValue<Util::Vec2>("SpringAcc");
-				Util::Vec2& force = entity.getStates().GetValue<Util::Vec2>("SpringForce");
+				Util::Vec2& vel = entity.getValue<Util::Vec2>("SpringVel");
+				Util::Vec2& maxvel = entity.getValue<Util::Vec2>("SpringMaxVel");
+				Util::Vec2& acc = entity.getValue<Util::Vec2>("SpringAcc");
+				Util::Vec2& force = entity.getValue<Util::Vec2>("SpringForce");
 				
-				IState* pOrigin = entity.getStates().GetState("SpringOrigin");
+				IState* pOrigin = entity.getState("SpringOrigin");
 				if(pOrigin == nullptr)
 				{
-					entity.getStates().AddState("SpringOrigin", IState::Create(entity.getForm().getPosition()));
-					pOrigin = entity.getStates().GetState("SpringOrigin");
+					entity.Insert("SpringOrigin", IState::Create(entity.getForm().getPosition()));
+					pOrigin = entity.getState("SpringOrigin");
 				}
 				Util::Vec2 origin = pOrigin->as<Util::Vec2>();
 				float mass = 1.0f;
