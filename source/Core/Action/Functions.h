@@ -16,7 +16,6 @@ namespace Core
 {
 	void Render(double dt, GameContext& context, std::set<Core::Action*>& actions);
 	void Rotate(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void InfinityPattern(double dt, GameContext& context, std::set<Core::Action*>& actions);
 }
 
 #endif //CORE_ACTION_FUNCTIONS_H_

@@ -21,57 +21,32 @@ namespace Pong
 {
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
-		context.actionMaster.EnqueueActionLogic(Core::InfinityPattern);
 		context.actionMaster.EnqueueActionLogic(Core::Rotate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
-		int entityID = 0;
-		Graphics::SpritesheetCache sheetCache;
-		Graphics::Spritesheet& sheet = sheetCache.CreateFromFile("resources/pong.sheet");
+		Graphics::Spritesheet& sheet = context.resources.getSpritesheetCache().CreateFromFile("resources/pong.sheet");
+		auto& charSheet = context.resources.getSpritesheetCache().CreateFromFile("resources/character.sheet");
 		uint ballHandle = sheet.getHandle("ball");
 		uint cherryHandle = sheet.getHandle("cherry");
 		uint cupcakeHandle = sheet.getHandle("cupcake");
+		uint paddleHandle = sheet.getHandle("paddle");
 		Graphics::Texture& tex = context.resources.getTextureCache().getTexture(sheet.getTextureName().c_str());
 		sheet.setTexture(tex);
 
-		auto* ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
+		auto* ent = context.entities.getNewEntity();
 		
 		ent->getForm().setType(Core::FormType::Sprite);
 		ent->getForm().Insert("Spritesheet", Core::IState::Create(sheet));
-		ent->getForm().Insert("CurrentSprite", Core::IState::Create(cherryHandle));
+		ent->getForm().Insert("CurrentSprite", Core::IState::Create(paddleHandle));
 		ent->getForm().setPosition(500,300);
-		ent->getForm().setScale(1,-1);
-		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setRotation(0);
-
-		ent->Insert("SpringVel", Core::IState::Create(Util::Vec2(100,0)));
-		ent->Insert("SpringMaxVel", Core::IState::Create(Util::Vec2(200,400)));
-		ent->Insert("SpringAcc", Core::IState::Create(Util::Vec2(-20,40)));
-		ent->Insert("SpringForce", Core::IState::Create(Util::Vec2(20,40)));
-
-		ent->Insert("Render", Core::Action(Core::Render));
-		assert(ent->getAction("Render").Activate());
-		ent->Insert("Rotate", Core::Action(Core::Rotate));
-		assert(ent->getAction("Rotate").Activate());
-		ent->Insert("InfinityPattern", Core::Action(Core::InfinityPattern));
-		assert(ent->getAction("InfinityPattern").Activate());
-
-		ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
-		
-		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().Insert("Spritesheet", Core::IState::Create(sheet));
-		ent->getForm().Insert("CurrentSprite", Core::IState::Create(cupcakeHandle));
-		ent->getForm().setPosition(200,300);
-		ent->getForm().setScale(2,2);
-		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setPivotPoint(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
+		ent->getForm().setScale(1,1);
+		ent->getForm().setScalingCenter(sheet.getSprite(paddleHandle).getSrcRect().GetSize()/2);
+		ent->getForm().setPivotPoint(sheet.getSprite(paddleHandle).getSrcRect().GetSize()/2);
 		ent->getForm().setRotation(0);
 
 		ent->Insert("Render", Core::Action(Core::Render));
 		assert(ent->getAction("Render").Activate());
-		ent->Insert("Rotate", Core::Action(Core::Rotate));
-		assert(ent->getAction("Rotate").Activate());
+
 
 		return true;
 	}

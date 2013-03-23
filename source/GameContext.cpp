@@ -10,7 +10,6 @@
 #include "Core/State/State.h"
 #include "Subsystems/Graphics/Interface.h"
 #include "Subsystems/Graphics/Spritesheet.h"
-#include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/Texture.h"
 	/*** end headers ***/
 
@@ -22,6 +21,7 @@ namespace Core
 		Action::BindActionUpdater(actionMaster);
 
 		this->resources.Register(_textureCache);
+		this->resources.Register(_spritesheetCache);
 		//...
 
 		this->resources.getTextureCache().setReferences(resources.getTextureCache(), services.getGraphics());

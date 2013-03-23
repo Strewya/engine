@@ -8,6 +8,7 @@
 namespace Core
 {
 	ResourceLocator::ResourceLocator()
+		: _textureCache(nullptr), _spritesheetCache(nullptr)
 	{
 	}
 
@@ -19,5 +20,15 @@ namespace Core
 	Graphics::TextureCache& ResourceLocator::getTextureCache() const
 	{
 		return *_textureCache;
+	}
+
+	void ResourceLocator::Register(Graphics::SpritesheetCache& cache)
+	{
+		_spritesheetCache = &cache;
+	}
+
+	Graphics::SpritesheetCache& ResourceLocator::getSpritesheetCache() const
+	{
+		return *_spritesheetCache;
 	}
 }

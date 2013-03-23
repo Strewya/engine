@@ -14,6 +14,9 @@
 #include "ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/Entity.h"
+#include "Core/Entity/EntityPool.h"
+#include "Subsystems/Graphics/SpritesheetCache.h"
+#include "Subsystems/Graphics/TextureCache.h"
 #include "Util/Clock.h"
 	/*** end header inclusion ***/
 
@@ -25,6 +28,7 @@ namespace Core
 	{
 	private:
 		Graphics::TextureCache _textureCache;
+		Graphics::SpritesheetCache _spritesheetCache;
 		
 		GameContextEvent _onActivate;
 		GameContextEvent _onDeactivate;
@@ -40,9 +44,10 @@ namespace Core
 			OnDestroy,
 			OnUpdate
 		};
+
 		Util::Timer timer;
 		ActionUpdater actionMaster;
-		std::set<std::unique_ptr<Entity>> entities;
+		EntityPool entities;
 		ServiceLocator services;
 		ResourceLocator resources;
 

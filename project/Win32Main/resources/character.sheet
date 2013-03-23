@@ -1,0 +1,11 @@
+return {
+	name = "character.sheet",
+	texture = "resources/character.png",
+	frames = {
+		{name="walk_1", 	rect={0, 0,  32, 32}},
+		{name="walk_2", 	rect={32, 0, 32, 32}},
+		{name="walk_3", 	rect={64,  0,  32, 32}},
+		{name="walk_4", 	rect={96, 0,  32, 32}},
+	},
+	framecount = 4
+};

@@ -92,6 +92,12 @@
     <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -201,6 +207,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\GameContextEvents_Pong.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
+      <Filter>Core/Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
