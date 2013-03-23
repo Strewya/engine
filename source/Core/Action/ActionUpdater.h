@@ -1,5 +1,5 @@
-#ifndef CORE_ACTION_ACTION_UPDATER_H_
-#define CORE_ACTION_ACTION_UPDATER_H_
+#ifndef CORE_ACTION_ACTIONUPDATER_H_
+#define CORE_ACTION_ACTIONUPDATER_H_
 /********************************************
 	class:	
 	usage:	
@@ -36,4 +36,4 @@ namespace Core
 	};
 }
 
-#endif //CORE_ACTION_ACTION_UPDATER_H_
+#endif //CORE_ACTION_ACTIONUPDATER_H_

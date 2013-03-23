@@ -1,5 +1,5 @@
-#ifndef SCRIPT_LUAENGINE_H_
-#define SCRIPT_LUAENGINE_H_
+#ifndef SUBSYSTEMS_SCRIPT_LUAENGINE_H_
+#define SUBSYSTEMS_SCRIPT_LUAENGINE_H_
 /********************************************
 	class:	
 	usage:	
@@ -93,4 +93,4 @@ namespace Script
 	};
 }
 
-#endif //SCRIPT_LUAENGINE_H_
+#endif //SUBSYSTEMS_SCRIPT_LUAENGINE_H_

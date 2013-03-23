@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_SPRITEINFO_H_
-#define GRAPHICS_SPRITEINFO_H_
+#ifndef SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_
+#define SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_
 /********************************************
 	class:	
 	usage:	
@@ -32,4 +32,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_SPRITEINFO_H_
+#endif //SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_

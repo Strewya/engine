@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_RENDERINGQUEUE_H_
-#define GRAPHICS_RENDERINGQUEUE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_
+#define SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_
 /********************************************
 	class:	
 	usage:	
@@ -36,4 +36,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_RENDERINGQUEUE_H_
+#endif //SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_

@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_INTERFACE_H_
-#define GRAPHICS_INTERFACE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_INTERFACE_H_
+#define SUBSYSTEMS_GRAPHICS_INTERFACE_H_
 /********************************************
 	class:	
 	usage:	
@@ -75,4 +75,4 @@ namespace Graphics
 	};
 }
 
-#endif //_GRAPHICS_INTERFACE_H_
+#endif //SUBSYSTEMS_GRAPHICS_INTERFACE_H_

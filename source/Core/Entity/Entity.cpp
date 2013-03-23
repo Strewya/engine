@@ -8,32 +8,48 @@ namespace Core
 	/////////////////////////// CONSTRUCTORS ///////////////////////////
 
 	Entity::Entity(InstanceID id)
-		: _id(id), _prototype(nullptr)
+		: _id(id)
 	{}
 
 	Entity::Entity(const Entity& rhs)
-		: _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _prototype(rhs._prototype), _form(rhs._form), _actions(rhs._actions)
+		: Statemap(rhs), _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _form(rhs._form), _actions(rhs._actions)
 	{
-		for(auto& pair : rhs._states)
-		{
-			Insert(pair.first, pair.second->Clone());
-		}
+	}
+
+	Entity::Entity(Entity&& rhs)
+		: Statemap(rhs), _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _form(rhs._form), _actions(rhs._actions)
+	{
 	}
 
 	Entity& Entity::operator=(const Entity& rhs)
 	{
 		if(this != &rhs)
 		{
+			Statemap::operator=(rhs);
 			_id = rhs._id;
 			_type = rhs._type;
 			_alias = rhs._alias;
-			_prototype = rhs._prototype;
 			_form = rhs._form;
 			_actions = rhs._actions;
-			for(auto& pair : rhs._states)
-			{
-				Insert(pair.first, pair.second->Clone());
-			}
+		}
+		return *this;
+	}
+
+	Entity& Entity::operator=(Entity&& rhs)
+	{
+		if(this != &rhs)
+		{
+			Statemap::operator=(std::move(rhs));
+			_id = std::move(rhs._id);
+			_type = std::move(rhs._type);
+			_alias = std::move(rhs._alias);
+			_form = std::move(rhs._form);
+			_actions = std::move(rhs._actions);
+
+			rhs._id = -1;
+			rhs._type.clear();
+			rhs._alias.clear();
+			rhs._actions.clear();
 		}
 		return *this;
 	}
@@ -48,16 +64,6 @@ namespace Core
 	bool Entity::hasAction(const String& name)
 	{
 		return _actions.find(name) != _actions.end();
-	}
-
-	bool Entity::hasState(const char* name)
-	{
-		return _states.find(name) != _states.end();
-	}
-
-	bool Entity::hasState(const String& name)
-	{
-		return _states.find(name) != _states.end();
 	}
 
 	/////////////////////////// GETTERS ///////////////////////////
@@ -100,41 +106,7 @@ namespace Core
 		return getAction(name.c_str());
 	}
 	
-	IState* Entity::getState(const char* name)
-	{
-		auto it = _states.find(name);
-		if(it == _states.end())
-		{
-			if(_prototype)
-			{
-				return _prototype->getState(name);
-			}
-			return nullptr;
-		}
-		return it->second.get();
-	}
-
-	IState* Entity::getState(const String& name)
-	{
-		return getState(name.c_str());
-	}
-
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
-
-	void Entity::ClearStates()
-	{
-		_states.clear();
-	}
-
-	bool Entity::RemoveState(const char* name)
-	{
-		return _states.erase(name) != 0;
-	}
-
-	bool Entity::RemoveState(const String& name)
-	{
-		return _states.erase(name) != 0;
-	}
 
 	void Entity::ClearActions()
 	{
@@ -178,12 +150,6 @@ namespace Core
 		return *this;
 	}
 
-	Entity& Entity::setPrototype(Entity& prototype)
-	{
-		_prototype = &prototype;
-		return *this;
-	}
-	
 	Entity& Entity::setForm(const Form& form)
 	{
 		_form = form;
@@ -216,31 +182,5 @@ namespace Core
 	bool Entity::Insert(const String& name, const Action& action)
 	{
 		return Insert(name.c_str(), action);
-	}
-
-	bool Entity::Insert(const char* name, IState* state)
-	{
-		return Insert(name, std::unique_ptr<IState>(state));
-	}
-
-	bool Entity::Insert(const String& name, IState* state)
-	{
-		return Insert(name.c_str(), std::unique_ptr<IState>(state));
-	}
-	
-	bool Entity::Insert(const char* name, std::unique_ptr<IState> state)
-	{
-		auto it = _states.find(name);
-		if(it == _states.end())
-		{
-			return _states.emplace(std::make_pair(name, std::move(state))).second;
-		}
-		it->second.swap(state);
-		return true;
-	}
-	
-	bool Entity::Insert(const String& name, std::unique_ptr<IState> state)
-	{
-		return Insert(name.c_str(), std::move(state));
 	}
 }

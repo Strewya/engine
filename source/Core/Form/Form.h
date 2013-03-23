@@ -1,5 +1,5 @@
-#ifndef CORE_FORM_FORM2D_H_
-#define CORE_FORM_FORM2D_H_
+#ifndef CORE_FORM_FORM_H_
+#define CORE_FORM_FORM_H_
 /********************************************
 	class:	
 	usage:	
@@ -32,14 +32,13 @@ namespace Core
 		Texture
 	};
 	
-	class Form
+	class Form : public Statemap
 	{
 	private:
 		static InstanceID _idCounter;
 		
 		const InstanceID _id;
 		FormType _type;
-		Statemap _states;
 		Util::Color _color;
 		Util::Vec2 _position;
 		Util::Vec2 _scalingCenter;
@@ -66,7 +65,6 @@ namespace Core
 
 		InstanceID 			getID() const;
 		FormType			getType() const;
-		Statemap& 			getStates();
 		float 				getRotation() const;
 		bool 				getVisibility() const;
 		const Util::Color& 	getColor() const;
@@ -100,4 +98,4 @@ namespace Core
 	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx);
 }
 
-#endif //CORE_FORM_FORM2D_H_
+#endif //CORE_FORM_FORM_H_

@@ -1,5 +1,5 @@
-#ifndef CORE_GAMECONTEXT_EVENT_H_
-#define CORE_GAMECONTEXT_EVENT_H_
+#ifndef CORE_GAMECONTEXTEVENT_H_
+#define CORE_GAMECONTEXTEVENT_H_
 /********************************************
 	class:	
 	usage:	
@@ -16,4 +16,4 @@ namespace Core
 
 typedef bool(*GameContextEvent)(Core::GameContext& context);
 
-#endif //CORE_GAMECONTEXT_EVENT_H_
+#endif //CORE_GAMECONTEXTEVENT_H_

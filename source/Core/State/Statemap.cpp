@@ -13,11 +13,14 @@ namespace Core
 	Statemap::Statemap(const Statemap& rhs)
 		: _prototype(rhs._prototype)
 	{
-
+		for(auto& pair : rhs._states)
+		{
+			Insert(pair.first, pair.second->Clone());
+		}
 	}
 
 	Statemap::Statemap(Statemap&& rhs)
-		: _prototype(rhs._prototype), _cache(std::move(rhs._cache))
+		: _prototype(rhs._prototype), _states(std::move(rhs._states))
 	{
 	}
 
@@ -26,6 +29,10 @@ namespace Core
 		if(this != &rhs)
 		{
 			_prototype = rhs._prototype;
+			for(auto& pair : rhs._states)
+			{
+				Insert(pair.first, pair.second->Clone());
+			}
 		}
 		return *this;
 	}
@@ -35,89 +42,93 @@ namespace Core
 		if(this != &rhs)
 		{
 			_prototype = rhs._prototype;
-			_cache = std::move(rhs._cache);
+			_states = std::move(rhs._states);
+			
+			rhs._prototype = nullptr;
+			rhs._states.clear();
 		}
 		return *this;
 	}
 
-	void Statemap::SetPrototype(Statemap& prototype)
+	void Statemap::setPrototype(Statemap& prototype)
 	{
 		_prototype = &prototype;
 	}
 
-	bool Statemap::Contains(const char* name)
+	bool Statemap::hasState(const char* name, bool recursive)
 	{
-		return _cache.find(name) != _cache.end() || (_prototype && _prototype->Contains(name));
+		bool found = _states.find(name) != _states.end();
+		if(!found && recursive && _prototype != nullptr)
+		{
+			return _prototype->hasState(name, recursive);
+		}
+		return found;
 	}
 
-	bool Statemap::Contains(const String& name)
+	bool Statemap::hasState(const String& name, bool recursive)
 	{
-		return Contains(name.c_str());
+		return hasState(name.c_str());
+	}
+
+	void Statemap::ClearStates()
+	{
+		_states.clear();
 	}
 
 	bool Statemap::RemoveState(const char* name)
 	{
-		auto it = _cache.find(name);
-		if(it != _cache.end())
-		{
-			_cache.erase(it);
-			return true;
-		}
-		return false;
+		return _states.erase(name) != 0;
 	}
 
 	bool Statemap::RemoveState(const String& name)
 	{
-		return RemoveState(name.c_str());
+		return _states.erase(name) != 0;
 	}
 	
-	bool Statemap::AddState(const char* name, IState* state)
+	bool Statemap::Insert(const char* name, IState* state)
 	{
-		return AddState(name, std::unique_ptr<IState>(state));
+		return Insert(name, std::unique_ptr<IState>(state));
 	}
 
-	bool Statemap::AddState(const String& name, IState* state)
+	bool Statemap::Insert(const String& name, IState* state)
 	{
-		return AddState(name.c_str(), std::unique_ptr<IState>(state));
+		return Insert(name.c_str(), std::unique_ptr<IState>(state));
 	}
 	
-	bool Statemap::AddState(const char* name, std::unique_ptr<IState> state)
+	bool Statemap::Insert(const char* name, std::unique_ptr<IState> state)
 	{
-		auto it = _cache.find(name);
-		if(it == _cache.end())
+		auto it = _states.find(name);
+		if(it == _states.end())
 		{
-			return _cache.emplace(std::make_pair(name, std::move(state))).second;
+			return _states.emplace(std::make_pair(name, std::move(state))).second;
 		}
 		it->second.swap(state);
 		return true;
 	}
 	
-	bool Statemap::AddState(const String& name, std::unique_ptr<IState> state)
+	bool Statemap::Insert(const String& name, std::unique_ptr<IState> state)
 	{
-		return AddState(name.c_str(), std::move(state));
+		return Insert(name.c_str(), std::move(state));
 	}
 	
-	IState* Statemap::GetState(const char* name)
+	IState* Statemap::getState(const char* name)
 	{
-		auto it = _cache.find(name);
-		if(it == _cache.end())
+		auto it = _states.find(name);
+		if(it == _states.end())
 		{
 			if(_prototype)
 			{
-				return _prototype->GetState(name);
+				return _prototype->getState(name);
 			}
 			return nullptr;
 		}
 		return it->second.get();
 	}
 
-	IState* Statemap::GetState(const String& name)
+	IState* Statemap::getState(const String& name)
 	{
-		return GetState(name.c_str());
+		return getState(name.c_str());
 	}
 
-	void Statemap::Clear()
-	{
-		_cache.clear();
-	}
+	
 }

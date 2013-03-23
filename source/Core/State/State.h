@@ -1,6 +1,5 @@
 #ifndef CORE_STATE_STATE_H_
 #define CORE_STATE_STATE_H_
-#define STATE_VERSION 2
 /********************************************
 	class:	
 	usage:	

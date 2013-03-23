@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_TEXTURE_H_
-#define GRAPHICS_TEXTURE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_TEXTURE_H_
+#define SUBSYSTEMS_GRAPHICS_TEXTURE_H_
 /********************************************
 	class:	
 	usage:	
@@ -42,4 +42,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_TEXTUREINFO_H_
+#endif //SUBSYSTEMS_GRAPHICS_TEXTURE_H_

@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_FONTINFO_H_
-#define GRAPHICS_FONTINFO_H_
+#ifndef SUBSYSTEMS_GRAPHICS_FONTINFO_H_
+#define SUBSYSTEMS_GRAPHICS_FONTINFO_H_
 /********************************************
 	class:	
 	usage:	
@@ -36,4 +36,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_FONTINFO_H_
+#endif //SUBSYSTEMS_GRAPHICS_FONTINFO_H_

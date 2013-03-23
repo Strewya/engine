@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_DXFONT_H_
-#define GRAPHICS_DXFONT_H_
+#ifndef SUBSYSTEMS_GRAPHICS_DXFONT_H_
+#define SUBSYSTEMS_GRAPHICS_DXFONT_H_
 /********************************************
 	class:	
 	usage:	
@@ -27,4 +27,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_DXFONT_H_
+#endif //SUBSYSTEMS_GRAPHICS_DXFONT_H_

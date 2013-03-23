@@ -37,8 +37,8 @@ namespace Pong
 		auto* ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
 		
 		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
-		ent->getForm().getStates().AddState("CurrentSprite", Core::IState::Create(cherryHandle));
+		ent->getForm().Insert("Spritesheet", Core::IState::Create(sheet));
+		ent->getForm().Insert("CurrentSprite", Core::IState::Create(cherryHandle));
 		ent->getForm().setPosition(500,300);
 		ent->getForm().setScale(1,-1);
 		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);
@@ -60,8 +60,8 @@ namespace Pong
 		ent = context.entities.emplace(std::unique_ptr<Core::Entity>(new Core::Entity(entityID++))).first->get();
 		
 		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().getStates().AddState("Spritesheet", Core::IState::Create(sheet));
-		ent->getForm().getStates().AddState("CurrentSprite", Core::IState::Create(cupcakeHandle));
+		ent->getForm().Insert("Spritesheet", Core::IState::Create(sheet));
+		ent->getForm().Insert("CurrentSprite", Core::IState::Create(cupcakeHandle));
 		ent->getForm().setPosition(200,300);
 		ent->getForm().setScale(2,2);
 		ent->getForm().setScalingCenter(sheet.getSprite(cherryHandle).getSrcRect().GetSize()/2);

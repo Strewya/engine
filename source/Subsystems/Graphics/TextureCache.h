@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_TEXTURECACHE_H_
-#define GRAPHICS_TEXTURECACHE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_
+#define SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_
 /********************************************
 	class:	
 	usage:	
@@ -31,4 +31,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_TEXTURECACHE_H_
+#endif //SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_

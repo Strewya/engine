@@ -1,5 +1,5 @@
-#ifndef CORE_RESOURCE_LOCATOR_H_
-#define CORE_RESOURCE_LOCATOR_H_
+#ifndef CORE_RESOURCELOCATOR_H_
+#define CORE_RESOURCELOCATOR_H_
 /********************************************
 	class:	
 	usage:	
@@ -25,4 +25,4 @@ namespace Core
 	};
 }
 
-#endif //CORE_RESOURCE_LOCATOR_H_
+#endif //CORE_RESOURCELOCATOR_H_

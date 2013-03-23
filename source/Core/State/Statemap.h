@@ -22,7 +22,8 @@ namespace Core
 	*/
 	class Statemap
 	{
-	protected:
+	private:
+
 		typedef std::unordered_map<String, std::unique_ptr<IState>> StateCache;
 		StateCache _states;
 
@@ -35,32 +36,33 @@ namespace Core
 		Statemap& operator=(const Statemap& rhs);
 		Statemap& operator=(Statemap&& rhs);
 
-		void SetPrototype(Statemap& prototype);
+		void setPrototype(Statemap& prototype);
 
-		bool Contains(const char* name);
-		bool Contains(const String& name);
+		bool hasState(const char* name, bool recursive = false);
+		bool hasState(const String& name, bool recursive = false);
 
+		void ClearStates();
 		bool RemoveState(const char* name);
 		bool RemoveState(const String& name);
 
-		bool AddState(const char* name, IState* state);
-		bool AddState(const String& name, IState* state);
-		bool AddState(const char* name, std::unique_ptr<IState> state);
-		bool AddState(const String& name, std::unique_ptr<IState> state);
+		bool Insert(const char* name, IState* state);
+		bool Insert(const String& name, IState* state);
+		bool Insert(const char* name, std::unique_ptr<IState> state);
+		bool Insert(const String& name, std::unique_ptr<IState> state);
 
-		IState* GetState(const char* name);
-		IState* GetState(const String& name);
+		IState* getState(const char* name);
+		IState* getState(const String& name);
 
-		void Clear();
+		
 
-		template<typename T> T& GetValue(const char* name)
+		template<typename T> T& getValue(const char* name)
 		{
-			auto it = _cache.find(name);
-			if(it == _cache.end())
+			auto it = _states.find(name);
+			if(it == _states.end())
 			{
 				if(_prototype != nullptr)
 				{
-					_prototype->GetValue<T>(name);
+					return _prototype->getValue<T>(name);
 				}
 				else
 				{
@@ -70,9 +72,9 @@ namespace Core
 			return it->second->as<T>();
 		}
 
-		template<typename T> T& GetValue(const String& name)
+		template<typename T> T& getValue(const String& name)
 		{
-			return GetValue<T>(name.c_str());
+			return getValue<T>(name.c_str());
 		}
 	};
 }

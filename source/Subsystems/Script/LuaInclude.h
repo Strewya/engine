@@ -1,5 +1,5 @@
-#ifndef SCRIPT_LUAINCLUDE_H_
-#define SCRIPT_LUAINCLUDE_H_
+#ifndef SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_
+#define SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_
 
 extern "C"
 {
@@ -9,4 +9,4 @@ extern "C"
 }
 //#include <tolua++.h>
 
-#endif //SCRIPT_LUAINCLUDE_H_
+#endif //SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_

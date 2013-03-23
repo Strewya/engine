@@ -1,5 +1,5 @@
-#ifndef GRAPHICS_DXFONTCACHE_H_
-#define GRAPHICS_DXFONTCACHE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_
+#define SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_
 /********************************************
 	class:	
 	usage:	
@@ -46,4 +46,4 @@ namespace Graphics
 	};
 }
 
-#endif //GRAPHICS_DXFONTCACHE_H_
+#endif //SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_

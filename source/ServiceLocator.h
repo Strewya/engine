@@ -1,5 +1,5 @@
-#ifndef CORE_SERVICE_LOCATOR_H_
-#define CORE_SERVICE_LOCATOR_H_
+#ifndef CORE_SERVICELOCATOR_H_
+#define CORE_SERVICELOCATOR_H_
 /********************************************
 	class:	Services
 	usage:	Wrapper class for all the core services a game
@@ -34,4 +34,4 @@ namespace Core
 	};
 }
 
-#endif //CORE_SERVICE_LOCATOR_H_
+#endif //CORE_SERVICELOCATOR_H_

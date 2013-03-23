@@ -1,5 +1,5 @@
-#ifndef CORE_GAME_CONTEXT_H_
-#define CORE_GAME_CONTEXT_H_
+#ifndef CORE_GAMECONTEXT_H_
+#define CORE_GAMECONTEXT_H_
 /********************************************
 	class:	
 	usage:	
@@ -55,4 +55,4 @@ namespace Core
 	};
 }
 
-#endif //CORE_GAME_CONTEXT_H_
+#endif //CORE_GAMECONTEXT_H_

@@ -1,5 +1,5 @@
-#ifndef CORE_GAMECONTEXT_EVENT_PONG_H_
-#define CORE_GAMECONTEXT_EVENT_PONG_H_
+#ifndef CORE_GAMECONTEXTEVENT_PONG_H_
+#define CORE_GAMECONTEXTEVENT_PONG_H_
 /********************************************
 	class:	
 	usage:	
@@ -15,4 +15,4 @@ namespace Pong
 	bool ContextGameplayCreate(Core::GameContext& context);
 }
 
-#endif //CORE_GAMECONTEXT_EVENT_PONG_H_
+#endif //CORE_GAMECONTEXTEVENT_PONG_H_

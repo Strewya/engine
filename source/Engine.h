@@ -6,7 +6,6 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <list>
 #include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
