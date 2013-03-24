@@ -40,7 +40,7 @@ namespace Core
 			* persistence
 		*/
 		_rendererFactory.InitInterface(renderer);
-		
+		_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
 		/*
 			register all of the initialized subsystems
 			* display
@@ -52,7 +52,7 @@ namespace Core
 		*/
 		_services.Register(this);
 		_services.Register(_rendererFactory.getInterface());
-		_services.getGraphics().setScreenSize(_window.getSizeX(), _window.getSizeY());
+		_services.Register(&_scriptEngine);
 
 		/*
 			initialize the resource caches

@@ -12,6 +12,7 @@
 #include "Core/State/State.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
+#include "Subsystems/Script/LuaEngine.h"
 	/*** end headers ***/
 
 namespace Pong
@@ -32,7 +33,7 @@ namespace Pong
 		auto* ent = context.entities.getNewEntity();
 		
 		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().Insert("Spritesheet", Core::IState::Create(sheet));
+		ent->getForm().Insert("Spritesheet", Core::IState::Create<String>("pong.sheet"));
 		ent->getForm().Insert("CurrentSprite", Core::IState::Create(paddleHandle));
 		ent->getForm().setPosition(500,300);
 		ent->getForm().setScale(1,1);

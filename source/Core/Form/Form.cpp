@@ -3,14 +3,18 @@
 #include "Core/Form/Form.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "ResourceLocator.h"
+#include "ServiceLocator.h"
 #include "Subsystems/Graphics/IRenderer.h"
-#include "Subsystems/Graphics/Spritesheet.h"
+#include "Subsystems/Graphics/SpritesheetCache.h"
+#include "Subsystems/Graphics/TextureCache.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	void DrawForms(const std::vector<Form*>& frms, Graphics::IRenderer& gfx)
+	void DrawForms(const std::deque<Form*>& frms, const Core::ServiceLocator& services, const Core::ResourceLocator& resources)
 	{
+		Graphics::IRenderer& gfx = services.getGraphics();
 		for(Form* f : frms)
 		{
 			switch(f->getType())
@@ -33,10 +37,12 @@ namespace Core
 			{
 				if(f->hasState("Spritesheet") && f->hasState("CurrentSprite"))
 				{
-					auto& sheet = f->getValue<Graphics::Spritesheet>("Spritesheet");
+					auto& sheetName = f->getValue<String>("Spritesheet");
+					auto& sheet = resources.getSpritesheetCache().getSpritesheet(sheetName);
 					auto currentFrame = f->getValue<uint>("CurrentSprite");
+					Graphics::Texture& texture = resources.getTextureCache().getTexture(sheet.getTextureHandle());
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawSprite(sheet.getTexture(), sheet.getSprite(currentFrame));
+					gfx.DrawSprite(texture, sheet.getSprite(currentFrame));
 				}
 			}
 			break;
@@ -45,7 +51,8 @@ namespace Core
 			{
 				if(f->hasState("Texture"))
 				{
-					auto texture = f->getValue<Graphics::Texture>("Texture");
+					auto textureHandle = f->getValue<uint>("Texture");
+					auto& texture = resources.getTextureCache().getTexture(textureHandle);
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawTexture(texture);
 				}

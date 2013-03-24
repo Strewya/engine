@@ -23,7 +23,7 @@ namespace Core
 		context.services.getGraphics().BeginScene();
 		context.services.getGraphics().BeginSpriteBatch(true);
 		
-		alphaQueue.Render(context.services.getGraphics());
+		alphaQueue.Render(context.services, context.resources);
 
 		context.services.getGraphics().EndSpriteBatch();
 		context.services.getGraphics().EndScene();

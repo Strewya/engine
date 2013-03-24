@@ -20,7 +20,7 @@ namespace Graphics
 	private:
 		String _sheetName;
 		String _textureName;
-		Texture _texture;
+		uint _textureHandle;
 		std::deque<SpriteInfo> _sprites;
 		std::deque<AnimationInfo> _animations;
 
@@ -30,11 +30,11 @@ namespace Graphics
 		Spritesheet(const String& sheetName);
 		~Spritesheet();
 
-		const Texture& getTexture() const;
+		uint getTextureHandle() const;
 		const String& getTextureName() const;
 		const String& getSpritesheetName() const;
 
-		void setTexture(const Texture& texture);
+		void setTexture(uint textureHandle);
 		void setTextureName(const char* name);
 		void setTextureName(const String& name);
 		void setSpritesheetName(const char* name);

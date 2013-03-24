@@ -33,4 +33,15 @@ namespace Core
 		assert(_engine != nullptr);
 		return *_engine;
 	}
+
+	void ServiceLocator::Register(Script::LuaEngine* script)
+	{
+		_script = script;
+	}
+
+	Script::LuaEngine& ServiceLocator::getLuaEngine() const
+	{
+		assert(_script != nullptr);
+		return *_script;
+	}
 }

@@ -12,12 +12,12 @@ namespace Graphics
 	}
 
 	Spritesheet::Spritesheet(const char* name)
-		: _sheetName(name)
+		: _sheetName(name), _textureHandle(NOT_FOUND)
 	{
 	}
 
 	Spritesheet::Spritesheet(const String& name)
-		: _sheetName(name)
+		: _sheetName(name), _textureHandle(NOT_FOUND)
 	{
 	}
 
@@ -118,9 +118,9 @@ namespace Graphics
 		return index;
 	}
 
-	const Texture& Spritesheet::getTexture() const
+	uint Spritesheet::getTextureHandle() const
 	{
-		return _texture;
+		return _textureHandle;
 	}
 
 	const String& Spritesheet::getTextureName() const
@@ -143,9 +143,9 @@ namespace Graphics
 		_textureName = name;
 	}
 
-	void Spritesheet::setTexture(const Texture& texture)
+	void Spritesheet::setTexture(uint texture)
 	{
-		_texture = texture;
+		_textureHandle = texture;
 	}
 
 	void Spritesheet::setSpritesheetName(const char* name)

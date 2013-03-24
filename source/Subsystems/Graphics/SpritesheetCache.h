@@ -21,6 +21,11 @@ namespace Graphics
 	class TextureCache;
 }
 
+namespace Script
+{
+	class LuaEngine;
+}
+
 namespace Graphics
 {
 	class SpritesheetCache
@@ -43,6 +48,7 @@ namespace Graphics
 		std::deque<Spritesheet> _cache;
 		std::deque<Spritesheet>::iterator _Find(const char* sheetName);
 		TextureCache* _textureCache;
+		Script::LuaEngine* _script;
 
 	};
 }

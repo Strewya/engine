@@ -23,8 +23,8 @@ namespace Graphics
 		_queue.clear();
     }
     
-	void RenderingQueue::Render(IRenderer& gfx) const
+	void RenderingQueue::Render(const Core::ServiceLocator& services, const Core::ResourceLocator& resources) const
 	{
-		Core::DrawForms(_queue, gfx);
+		Core::DrawForms(_queue, services, resources);
 	}
 }

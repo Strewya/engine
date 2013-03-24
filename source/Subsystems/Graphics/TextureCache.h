@@ -28,6 +28,9 @@ namespace Graphics
 
 		Texture& getTexture(const char* name);
 		Texture& getTexture(const String& name);
+		Texture& getTexture(uint handle);
+		uint getTextureHandle(const char* name);
+		uint getTextureHandle(const String& name);
 
 		void setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services);
 

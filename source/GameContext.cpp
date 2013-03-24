@@ -21,6 +21,10 @@ namespace Core
 		_spritesheetCache.setReferences(resources, services);
 		//...
 
+		_textureCache.setReferences(this->resources, this->services);
+		_spritesheetCache.setReferences(this->resources, this->services);
+		//...
+
 		if(_onCreate)
 		{
 			_onCreate(*this);

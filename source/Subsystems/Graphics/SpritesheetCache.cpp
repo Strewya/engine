@@ -5,6 +5,7 @@
 #include <algorithm>
 	/*** extra headers ***/
 #include "ResourceLocator.h"
+#include "ServiceLocator.h"
 #include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Dimensional.h"
@@ -13,12 +14,14 @@
 namespace Graphics
 {
 	SpritesheetCache::SpritesheetCache()
+		: _textureCache(nullptr), _script(nullptr)
 	{
 	}
 
 	void SpritesheetCache::setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services)
 	{
 		_textureCache = &resources.getTextureCache();
+		_script = &services.getLuaEngine();
 	}
 
 	std::deque<Spritesheet>::iterator SpritesheetCache::_Find(const char* sheetName)
@@ -69,78 +72,77 @@ namespace Graphics
 
 	Spritesheet& SpritesheetCache::LoadFromFile(const char* filename)
 	{
-		Script::LuaEngine script;
-		if(!script.DoFile(filename))
+		if(!_script->DoFile(filename))
 			throw std::exception("Spritesheet definition has failed to parse, see the log file for reasons.");
 		
 		String name;
-		script.GetField("name", -1);
-		script.Pop(name);
+		_script->GetField("name", -1);
+		_script->Pop(name);
 		Spritesheet& sheet = CreateEmpty(name);
 
-		script.GetField("texture", -1);
-		script.Pop(name);
+		_script->GetField("texture", -1);
+		_script->Pop(name);
 		sheet.setTextureName(name);
-		sheet.setTexture(_textureCache->getTexture(name));
+		sheet.setTexture(_textureCache->getTextureHandle(name));
 
 		int frameCount;
 
-		if(script.GetField("frames", -1) && script.GetObjLength(frameCount))
+		if(_script->GetField("frames", -1) && _script->GetObjLength(frameCount))
 		{
 			for(int i=1; i<=frameCount; ++i)
 			{
 				Util::Rect rect;
-				script.Push(i);
-				script.GetField(-2);
+				_script->Push(i);
+				_script->GetField(-2);
 			
-				script.GetField("name", -1);
-				script.Pop(name);
-				script.GetField("rect", -1);
-				script.Pop(rect);
-				script.Pop();
+				_script->GetField("name", -1);
+				_script->Pop(name);
+				_script->GetField("rect", -1);
+				_script->Pop(rect);
+				_script->Pop();
 
 				SpriteInfo si;
 				si.setName(name);
 				si.setSrcRect(rect);
 				sheet.Insert(si);
 			}
-			script.Pop();
+			_script->Pop();
 		
 			int animCount;
-			if(script.GetField("animations", -1) && script.GetObjLength(animCount))
+			if(_script->GetField("animations", -1) && _script->GetObjLength(animCount))
 			{
 				for(int anim=1; anim<=animCount; ++anim)
 				{
 					AnimationInfo animation;
 
-					script.Push(anim);
-					script.GetField(-2);
+					_script->Push(anim);
+					_script->GetField(-2);
 			
-					script.GetField("name", -1);
-					script.Pop(name);
+					_script->GetField("name", -1);
+					_script->Pop(name);
 					animation.setName(name);
 
-					script.GetField("sequence", -1);
-					script.GetObjLength(frameCount);
+					_script->GetField("sequence", -1);
+					_script->GetObjLength(frameCount);
 					for(int frame=1; frame<=frameCount; ++frame)
 					{
-						script.Push(frame);
-						script.GetField(-2);
-						script.Pop(name);
+						_script->Push(frame);
+						_script->GetField(-2);
+						_script->Pop(name);
 
 						animation.AddToSequence(sheet.getSpriteHandle(name));
 					}
-					script.Pop();
+					_script->Pop();
 
-					script.Pop();
+					_script->Pop();
 
 					sheet.Insert(animation);
 				}
-				script.Pop();
+				_script->Pop();
 			}
 		}
 
-		script.Pop();
+		_script->Pop();
 		return sheet;
 	}
 

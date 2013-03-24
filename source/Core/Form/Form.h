@@ -6,15 +6,17 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/State/Statemap.h"
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
 	/*** end header inclusion ***/
 
-namespace Graphics
+namespace Core
 {
-	class IRenderer;
+	class ResourceLocator;
+	class ServiceLocator;
 }
 
 namespace Core
@@ -95,7 +97,7 @@ namespace Core
 		void Translate(float x, float y);
 	};
 
-	void DrawForms(const std::vector<Form*>& frms, Graphics::IRenderer& gfx);
+	void DrawForms(const std::deque<Form*>& frms, const Core::ServiceLocator& services, const Core::ResourceLocator& resources);
 }
 
 #endif //CORE_FORM_FORM_H_

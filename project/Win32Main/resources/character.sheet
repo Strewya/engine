@@ -2,10 +2,10 @@ return {
 	name = "character.sheet",
 	texture = "resources/character.png",
 	frames = {
-		{name="walk_1", 	rect={0, 0,  32, 32}},
-		{name="walk_2", 	rect={32, 0, 32, 32}},
-		{name="walk_3", 	rect={64,  0,  32, 32}},
-		{name="walk_4", 	rect={96, 0,  32, 32}},
+		{name="walk_1", 	rect={x=0, 	y=0, w=32, h=32}},
+		{name="walk_2", 	rect={x=32,	y=0, w=32, h=32}},
+		{name="walk_3", 	rect={x=64, y=0, w=32, h=32}},
+		{name="walk_4", 	rect={x=96, y=0, w=32, h=32}},
 	},
 	animations = {
 		{ name="walk", sequence = {"walk_1", "walk_2", "walk_3", "walk_4"} }
