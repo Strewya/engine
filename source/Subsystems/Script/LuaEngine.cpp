@@ -115,10 +115,10 @@ namespace Script
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
-		Push(1);
+		Push("x");
 		Push(in.x);
 		lua_settable(_lua, table);
-		Push(2);
+		Push("y");
 		Push(in.y);
 		lua_settable(_lua, table);
 		return true;
@@ -128,13 +128,13 @@ namespace Script
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
-		Push(1);
+		Push("x");
 		Push(in.x);
 		lua_settable(_lua, table);
-		Push(2);
+		Push("y");
 		Push(in.y);
 		lua_settable(_lua, table);
-		Push(3);
+		Push("z");
 		Push(in.z);
 		lua_settable(_lua, table);
 		return true;
@@ -144,16 +144,16 @@ namespace Script
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
-		Push(1);
+		Push("x");
 		Push(in.position.x);
 		lua_settable(_lua, table);
-		Push(2);
+		Push("y");
 		Push(in.position.y);
 		lua_settable(_lua, table);
-		Push(3);
+		Push("w");
 		Push(in.width);
 		lua_settable(_lua, table);
-		Push(4);
+		Push("h");
 		Push(in.height);
 		lua_settable(_lua, table);
 		return true;
@@ -163,16 +163,16 @@ namespace Script
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
-		Push(1);
+		Push("r");
 		Push(in.red);
 		lua_settable(_lua, table);
-		Push(2);
+		Push("g");
 		Push(in.green);
 		lua_settable(_lua, table);
-		Push(3);
+		Push("b");
 		Push(in.blue);
 		lua_settable(_lua, table);
-		Push(4);
+		Push("a");
 		Push(in.alpha);
 		lua_settable(_lua, table);
 		return true;
@@ -180,206 +180,126 @@ namespace Script
 	//************************************POP*************************************//
 	bool LuaEngine::Pop(int& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isnumber(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
 			out = lua_tointeger(_lua, index);
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(uint& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isnumber(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
 			out = lua_tointeger(_lua, index);
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(bool& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isboolean(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isboolean(_lua, index))
 		{
 			out = lua_toboolean(_lua, index) != 0;
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(String& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isstring(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isstring(_lua, index))
 		{
 			out = lua_tostring(_lua, index);
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(double& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isnumber(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
 			out = lua_tonumber(_lua, index);
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(float& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
-		{
-			return false;
-		}
-		bool status = false;
-		if(lua_isnumber(_lua, index))
+		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
 			out = (float)lua_tonumber(_lua, index);
 			lua_remove(_lua, index);
-			status = true;
+			return true;
 		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(Util::Vec2& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
+		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
-			return false;
+			if(GetField("x", -1) && Pop(out.x) && GetField("y", -1) && Pop(out.y))
+			{
+				lua_remove(_lua, index);
+				return true;
+			}
 		}
-		bool status = false;
-		if(lua_istable(_lua, index))
-		{
-			int i = 1;
-			Push(i++);
-			GetField(-2);
-			Pop(out.x);
-			Push(i++);
-			GetField(-2);
-			Pop(out.y);
-			lua_remove(_lua, index);
-			status = true;
-		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(Util::Vec3& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
+		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
-			return false;
+			if(GetField("x", -1) && Pop(out.x) && GetField("y", -1) && Pop(out.y) && GetField("z", -1) && Pop(out.z))
+			{
+				lua_remove(_lua, index);
+				return true;
+			}
 		}
-		bool status = false;
-		if(lua_istable(_lua, index))
-		{
-			int i = 1;
-			Push(i++);
-			GetField(-2);
-			Pop(out.x);
-			Push(i++);
-			GetField(-2);
-			Pop(out.y);
-			Push(i++);
-			GetField(-2);
-			Pop(out.z);
-			lua_remove(_lua, index);
-			status = true;
-		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(Util::Rect& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
+		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
-			return false;
+			if(GetField("x", -1) && Pop(out.position.x) && GetField("y", -1) && Pop(out.position.y) && GetField("w", -1) && Pop(out.width) && GetField("h", -1) && Pop(out.height))
+			{
+				lua_remove(_lua, index);
+				return true;
+			}
 		}
-		bool status = false;
-		if(lua_istable(_lua, index))
-		{
-			int i = 1;
-			Push(i++);
-			GetField(-2);
-			Pop(out.position.x);
-			Push(i++);
-			GetField(-2);
-			Pop(out.position.y);
-			Push(i++);
-			GetField(-2);
-			Pop(out.width);
-			Push(i++);
-			GetField(-2);
-			Pop(out.height);
-			lua_remove(_lua, index);
-			status = true;
-		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop(Util::Color& out, int index)
 	{
-		if(lua_gettop(_lua) == 0)
+		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
-			return false;
+			int r, g, b, a;
+			if(GetField("r", -1) && Pop(r) && GetField("g", -1) && Pop(g) && GetField("b", -1) && Pop(b))
+			{
+				out.setChannels(r, g, b);
+				if(GetField("a", -1) && Pop(a))
+				{
+					out.setAlpha(a);
+				}
+				lua_remove(_lua, index);
+				return true;
+			}
 		}
-		bool status = false;
-		if(lua_istable(_lua, index))
-		{
-			int i = 1;
-			uint value;
-			Push(i++);
-			GetField(-2);
-			Pop(value);
-			out.setRed(value);
-			Push(i++);
-			GetField(-2);
-			Pop(value);
-			out.setGreen(value);
-			Push(i++);
-			GetField(-2);
-			Pop(value);
-			out.setBlue(value);
-			Push(i++);
-			GetField(-2);
-			Pop(value);
-			out.setAlpha(value);
-			lua_remove(_lua, index);
-			status = true;
-		}
-		return status;
+		return false;
 	}
 
 	bool LuaEngine::Pop()
@@ -399,7 +319,7 @@ namespace Script
 
 	bool LuaEngine::GetObjLength(int& out, int index)
 	{
-		if(lua_isstring(_lua, index) || lua_istable(_lua, index))
+		if(lua_gettop(_lua) != 0 && (lua_isstring(_lua, index) || lua_istable(_lua, index)))
 		{
 			out = lua_objlen(_lua, index);
 			return true;
@@ -422,12 +342,9 @@ namespace Script
 			{
 				return false;
 			}
+			RemoveElement(-2);
 		}
-		if(lua_isnil(_lua, -1))
-		{
-			return false;
-		}
-		return true;
+		return !lua_isnil(_lua, -1);
 	}
 
 	bool LuaEngine::GetField(int tableIndex)
@@ -437,32 +354,24 @@ namespace Script
 			return false;
 		}
 		lua_gettable(_lua, tableIndex);
-		if(lua_isnil(_lua, -1))
-		{
-			return false;
-		}
-		return true;
+		return !lua_isnil(_lua, -1);
 	}
 	//************************************CALL FUNCTION*************************************//
 	bool LuaEngine::CallFunction(int arguments, int expectedResults)
 	{
-		bool status = false;
 		if(lua_isfunction(_lua, -arguments-1))
 		{
 			int bottom = GetStackSize() - arguments - 1;
 			int result = lua_pcall(_lua, arguments, expectedResults, 0);
-			if(result != 0)
+			if(result == 0)
 			{
-				HandleError("function call", result);
-				status = false;
-			}
-			else
-			{
-				status = true;
 				_nresults = GetStackSize() - bottom;
+				return true;
+				
 			}
+			HandleError("function call", result);
 		}
-		return status;
+		return false;
 	}
 
 	void LuaEngine::HandleError(const char* name, int result)
