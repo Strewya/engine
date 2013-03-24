@@ -5,6 +5,7 @@
 #include <algorithm>
 	/*** extra headers ***/
 #include "Subsystems/Graphics/Texture.h"
+#include "Util/Logger.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -275,6 +276,8 @@ namespace Graphics
 				return Texture(filename, info.Width, info.Height, this, handle);
 			}
 		}
+		Util::Logger& log = Util::GetDefaultLogger();
+		log << "Failed to load texture " << filename << "." << Util::Logger::endl;
 		return Texture(filename, info.Width, info.Height);
 	}
 

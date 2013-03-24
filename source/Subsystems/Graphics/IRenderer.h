@@ -1,5 +1,5 @@
-#ifndef SUBSYSTEMS_GRAPHICS_INTERFACE_H_
-#define SUBSYSTEMS_GRAPHICS_INTERFACE_H_
+#ifndef SUBSYSTEMS_GRAPHICS_IRENDERER_H_
+#define SUBSYSTEMS_GRAPHICS_IRENDERER_H_
 /********************************************
 	class:	
 	usage:	
@@ -27,7 +27,7 @@ namespace Graphics
 
 namespace Graphics
 {
-	class Interface
+	class IRenderer
 	{
 	public:
 		virtual Util::Vec2 getScreenSize() const = 0;
@@ -75,4 +75,4 @@ namespace Graphics
 	};
 }
 
-#endif //SUBSYSTEMS_GRAPHICS_INTERFACE_H_
+#endif //SUBSYSTEMS_GRAPHICS_IRENDERER_H_

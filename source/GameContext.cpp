@@ -4,13 +4,6 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Core/Action/Action.h"
-#include "Core/Action/Functions.h"
-#include "Core/Entity/Entity.h"
-#include "Core/Form/Form.h"
-#include "Core/State/State.h"
-#include "Subsystems/Graphics/Interface.h"
-#include "Subsystems/Graphics/Spritesheet.h"
-#include "Subsystems/Graphics/Texture.h"
 	/*** end headers ***/
 
 namespace Core
@@ -24,7 +17,8 @@ namespace Core
 		this->resources.Register(_spritesheetCache);
 		//...
 
-		this->resources.getTextureCache().setReferences(resources.getTextureCache(), services.getGraphics());
+		_textureCache.setReferences(resources, services);
+		_spritesheetCache.setReferences(resources, services);
 		//...
 
 		if(_onCreate)

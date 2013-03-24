@@ -14,7 +14,7 @@
 
 namespace Graphics
 {
-	class Interface;
+	class IRenderer;
 }
 
 namespace Core
@@ -95,7 +95,7 @@ namespace Core
 		void Translate(float x, float y);
 	};
 
-	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx);
+	void DrawForms(const std::vector<Form*>& frms, Graphics::IRenderer& gfx);
 }
 
 #endif //CORE_FORM_FORM_H_

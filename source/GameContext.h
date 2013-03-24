@@ -13,7 +13,6 @@
 #include "ResourceLocator.h"
 #include "ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
-#include "Core/Entity/Entity.h"
 #include "Core/Entity/EntityPool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureCache.h"

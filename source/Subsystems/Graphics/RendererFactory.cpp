@@ -4,7 +4,7 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Subsystems/Graphics/dll_header.h"
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -19,7 +19,7 @@ namespace Graphics
 		FreeLibrary(_dll);
 	}
 
-	Interface* RendererFactory::getInterface()
+	IRenderer* RendererFactory::getInterface()
 	{
 		return _renderer;
 	}

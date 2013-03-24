@@ -23,7 +23,7 @@ namespace Graphics
 		_queue.clear();
     }
     
-	void RenderingQueue::Render(Interface& gfx) const
+	void RenderingQueue::Render(IRenderer& gfx) const
 	{
 		Core::DrawForms(_queue, gfx);
 	}

@@ -11,14 +11,17 @@
 
 namespace Graphics
 {
-	class Interface;
+	class IRenderer;
+}
 
+namespace Graphics
+{
 	class Texture
 	{
 	public:
 		Texture();
-		Texture(const char* filename, uint width, uint height, Interface* gfx = nullptr, uint dataHandle = 0);
-		Texture(const String& filename, uint width, uint height, Interface* gfx = nullptr, uint dataHandle = 0);
+		Texture(const char* filename, uint width, uint height, IRenderer* gfx = nullptr, uint dataHandle = 0);
+		Texture(const String& filename, uint width, uint height, IRenderer* gfx = nullptr, uint dataHandle = 0);
 		Texture(const Texture& rhs);
 		Texture& operator=(const Texture& rhs);
 		~Texture();
@@ -38,7 +41,7 @@ namespace Graphics
 		String _filename;
 		uint _width, _height;
 		uint _dataHandle;
-		Interface* _gfx;
+		IRenderer* _gfx;
 	};
 }
 

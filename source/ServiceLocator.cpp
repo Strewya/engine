@@ -12,12 +12,12 @@ namespace Core
 	{
 	}
 
-	void ServiceLocator::Register(Graphics::Interface* graphics)
+	void ServiceLocator::Register(Graphics::IRenderer* graphics)
 	{
 		_graphics = graphics;
 	}
 	
-	Graphics::Interface& ServiceLocator::getGraphics() const
+	Graphics::IRenderer& ServiceLocator::getGraphics() const
 	{
 		assert(_graphics != nullptr);
 		return *_graphics;

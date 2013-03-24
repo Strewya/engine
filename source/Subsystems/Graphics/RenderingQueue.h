@@ -17,7 +17,7 @@ namespace Core
 
 namespace Graphics
 {
-	class Interface;
+	class IRenderer;
 
     class RenderingQueue
 	{
@@ -25,7 +25,7 @@ namespace Graphics
 		void Add(Core::Form& f);
 		void Add(Core::Form* f);
 		void Clear();
-		void Render(Interface& gfx) const;
+		void Render(IRenderer& gfx) const;
 
 	private:
 		typedef std::vector<Core::Form*> FormVector;

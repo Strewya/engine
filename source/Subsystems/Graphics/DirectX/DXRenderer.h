@@ -9,7 +9,7 @@
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/SpriteInfo.h"
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/DirectX/DXFontCache.h"
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
 #include "Util/Dimensional.h"
@@ -18,7 +18,7 @@
 
 namespace Graphics
 {
-	class DXRenderer : public Interface
+	class DXRenderer : public IRenderer
 	{
 	private:
 		DXRenderer(DXRenderer& dxg);

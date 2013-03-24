@@ -17,7 +17,7 @@
     <ClInclude Include="..\..\source\subsystems\graphics\directx\DXInclude.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\FontInfo.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />

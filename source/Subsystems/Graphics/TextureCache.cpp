@@ -3,7 +3,9 @@
 #include "Subsystems/Graphics/TextureCache.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Subsystems/Graphics/Interface.h"
+#include "ResourceLocator.h"
+#include "ServiceLocator.h"
+#include "Subsystems/Graphics/IRenderer.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -13,13 +15,18 @@ namespace Graphics
 	{
 	}
 
-	void TextureCache::setReferences(TextureCache& parent, Interface& gfx)
+	void TextureCache::setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services)
 	{
-		if(this != &parent)
+		if(this != &resources.getTextureCache())
 		{
-			_parent = &parent;
+			_parent = &resources.getTextureCache();
 		}
-		_gfx = &gfx;
+		_gfx = &services.getGraphics();
+	}
+
+	Texture& TextureCache::getTexture(const String& name)
+	{
+		return getTexture(name.c_str());
 	}
 
 	Texture& TextureCache::getTexture(const char* name)

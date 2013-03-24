@@ -12,14 +12,14 @@
 
 namespace Graphics
 {
-	class Interface;
+	class IRenderer;
 
 	class RendererFactory
 	{
 	protected:
 		HINSTANCE _hInst;
 		HMODULE _dll;
-		Interface* _renderer;
+		IRenderer* _renderer;
 		HWND _hwnd;
 
 	public:
@@ -29,7 +29,7 @@ namespace Graphics
 
 		void InitInterface(const char* name);
 		void InitInterface(const String& name) { InitInterface(name.c_str()); };
-		Interface* getInterface();
+		IRenderer* getInterface();
 		void DestroyInterface();
 	};
 }

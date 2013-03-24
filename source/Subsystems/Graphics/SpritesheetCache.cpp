@@ -4,6 +4,8 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
+#include "ResourceLocator.h"
+#include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Dimensional.h"
 	/*** end headers ***/
@@ -12,24 +14,28 @@ namespace Graphics
 {
 	SpritesheetCache::SpritesheetCache()
 	{
-		_cache.reserve(16);
 	}
 
-	std::vector<SpritesheetCache::DataWrapper>::iterator SpritesheetCache::Find(const char* sheetName)
+	void SpritesheetCache::setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services)
+	{
+		_textureCache = &resources.getTextureCache();
+	}
+
+	std::deque<Spritesheet>::iterator SpritesheetCache::_Find(const char* sheetName)
 	{
 		return std::find_if(_cache.begin(), _cache.end(),
-			[&sheetName](const DataWrapper& wrapper)
+			[&sheetName](const Spritesheet& sheet)
 			{
-				return wrapper.valid && wrapper.sheet.getSpritesheetName().compare(sheetName) == 0;
+				return sheet.getSpritesheetName().compare(sheetName) == 0;
 		});
 	}
 
 	Spritesheet& SpritesheetCache::getSpritesheet(const char* sheetName)
 	{
-		auto it = Find(sheetName);
+		auto it = _Find(sheetName);
 		if(it != _cache.end())
 		{
-			return it->sheet;
+			return *it;
 		}
 		throw std::exception("Attempted to get inexisting sheet!");
 	}
@@ -41,7 +47,13 @@ namespace Graphics
 
 	Spritesheet& SpritesheetCache::CreateEmpty(const char* sheetName)
 	{
-		return Insert(Spritesheet(sheetName));
+		auto it = _Find(sheetName);
+		if(it == _cache.end())
+		{
+			_cache.emplace_back();
+			return _cache.back();
+		}
+		return *it;
 	}
 
 	Spritesheet& SpritesheetCache::CreateEmpty(const String& sheetName)
@@ -49,12 +61,12 @@ namespace Graphics
 		return CreateEmpty(sheetName.c_str());
 	}
 
-	Spritesheet& SpritesheetCache::CreateFromFile(const String& filename)
+	Spritesheet& SpritesheetCache::LoadFromFile(const String& filename)
 	{
-		return CreateFromFile(filename.c_str());
+		return LoadFromFile(filename.c_str());
 	}
 
-	Spritesheet& SpritesheetCache::CreateFromFile(const char* filename)
+	Spritesheet& SpritesheetCache::LoadFromFile(const char* filename)
 	{
 		Script::LuaEngine script;
 		if(!script.DoFile(filename))
@@ -68,6 +80,7 @@ namespace Graphics
 		script.GetField("texture", -1);
 		script.Pop(name);
 		sheet.setTextureName(name);
+		sheet.setTexture(_textureCache->getTexture(name));
 
 		int frameCount;
 		script.GetField("framecount", -1);
@@ -94,60 +107,13 @@ namespace Graphics
 		return sheet;
 	}
 
-	Spritesheet& SpritesheetCache::Insert(const Spritesheet& sheet)
-	{
-		auto it = Find(sheet.getSpritesheetName().c_str());
-		if(it == _cache.end())
-		{
-			uint index;
-			if(_freeSlots.empty())
-			{
-				DataWrapper data;
-				index = data.id = _cache.size();
-				_cache.push_back(data);
-			}
-			else
-			{
-				index = _freeSlots.top();
-				_freeSlots.pop();
-			}
-			_cache[index].sheet = sheet;
-			_cache[index].valid = true;
-			return _cache[index].sheet;
-		}
-		return it->sheet;
-	}
-
 	bool SpritesheetCache::Exists(const char* sheetName)
 	{
-		return Find(sheetName) != _cache.end();
+		return _Find(sheetName) != _cache.end();
 	}
 
 	bool SpritesheetCache::Exists(const String& sheetName)
 	{
 		return Exists(sheetName.c_str());
-	}
-
-	void SpritesheetCache::DestroyAll()
-	{
-		_cache.clear();
-		while(!_freeSlots.empty())
-			_freeSlots.pop();
-	}
-
-	void SpritesheetCache::Destroy(const char* sheetName)
-	{
-		auto it = Find(sheetName);
-		if(it != _cache.end())
-		{
-			it->valid = false;
-			it->sheet.~Spritesheet();
-			_freeSlots.push(it->id);
-		}
-	}
-
-	void SpritesheetCache::Destroy(const String& sheetName)
-	{
-		Destroy(sheetName.c_str());
 	}
 }

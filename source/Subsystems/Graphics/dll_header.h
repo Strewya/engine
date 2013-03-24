@@ -3,12 +3,12 @@
 
 #include <windows.h>
 
-namespace Graphics { class Interface; }
+namespace Graphics { class IRenderer; }
 
-int createRendererInterface(HWND hwnd, Graphics::Interface** renderer);
-int destroyRendererInterface(Graphics::Interface** renderer);
+int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer);
+int destroyRendererInterface(Graphics::IRenderer** renderer);
 
-typedef int(*CREATE_RENDERER)(HWND hwnd, Graphics::Interface** renderer);
-typedef int(*DESTROY_RENDERER)(Graphics::Interface** renderer);
+typedef int(*CREATE_RENDERER)(HWND hwnd, Graphics::IRenderer** renderer);
+typedef int(*DESTROY_RENDERER)(Graphics::IRenderer** renderer);
 
 #endif //SUBSYSTEMS_GRAPHICS_DLL_HEADER_H_

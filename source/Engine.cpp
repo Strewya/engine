@@ -3,7 +3,7 @@
 #include "Engine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Win32/AbstractWindow.h"
 	/*** end headers ***/
 
@@ -41,6 +41,15 @@ namespace Core
 		*/
 		_rendererFactory.InitInterface(renderer);
 		
+		/*
+			register all of the initialized subsystems
+			* display
+			* audio
+			* input
+			* script
+			* comms
+			* persistence
+		*/
 		_services.Register(this);
 		_services.Register(_rendererFactory.getInterface());
 		_services.getGraphics().setScreenSize(_window.getSizeX(), _window.getSizeY());
@@ -54,9 +63,19 @@ namespace Core
 			* scripts
 			* TODO: strings
 		*/
-		_textureCache.setReferences(_textureCache, _services.getGraphics());
+		_textureCache.setReferences(_resources, _services);
 
+		/*
+			register the resource caches
+			* textures
+			* spritesheets
+			* meshes
+			* sounds
+			* scripts
+			* TODO: strings
+		*/
 		_resources.Register(_textureCache);
+
 		/*
 			load the game configuration script and execute it
 			* the script should create the game contexts that define the game's execution flow

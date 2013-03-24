@@ -6,7 +6,7 @@
 #include "GameContext.h"
 #include "Core/Action/Action.h"
 #include "Core/Entity/Entity.h"
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/RenderingQueue.h"
 	/*** end headers ***/
 

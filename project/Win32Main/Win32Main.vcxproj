@@ -132,7 +132,7 @@
     <ClInclude Include="..\..\source\ResourceLocator.h" />
     <ClInclude Include="..\..\source\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
@@ -157,7 +157,8 @@
     <None Include="logger.log" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Planning.txt" />
+    <Text Include="..\..\docs\Planning.txt" />
+    <Text Include="..\..\docs\TODO list.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

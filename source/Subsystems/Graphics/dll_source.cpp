@@ -1,9 +1,9 @@
 
 #include "dll_header.h"
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/DirectX/DXRenderer.h"
 
-int createRendererInterface(HWND hwnd, Graphics::Interface** renderer)
+int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 {
 	if(!*renderer)
 	{
@@ -20,7 +20,7 @@ int createRendererInterface(HWND hwnd, Graphics::Interface** renderer)
 	return 0;
 }
 
-int destroyRendererInterface(Graphics::Interface** renderer)
+int destroyRendererInterface(Graphics::IRenderer** renderer)
 {
 	if(!*renderer)
 	{

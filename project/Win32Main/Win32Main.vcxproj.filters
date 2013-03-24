@@ -3,16 +3,16 @@
   <ItemGroup>
     <ClCompile Include="winmain.cpp" />
     <ClCompile Include="..\..\source\Win32\WindowClass.cpp">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Win32\StandardWindow.cpp">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Win32\GameWindow.cpp">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Win32\AbstractWindow.cpp">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
@@ -101,16 +101,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Win32\StandardWindow.h">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Win32\GameWindow.h">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Win32\AbstractWindow.h">
-      <Filter>Windows</Filter>
+      <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Logger.h">
       <Filter>Util</Filter>
@@ -120,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h">
       <Filter>Subsystems/Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h">
-      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h">
       <Filter>Subsystems/Graphics</Filter>
@@ -214,11 +211,11 @@
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
       <Filter>Core/Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Windows">
-      <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{9e70d6ad-322f-4aa3-b68e-30148a2152b1}</UniqueIdentifier>
     </Filter>
@@ -243,12 +240,16 @@
     <Filter Include="Core">
       <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Win32">
+      <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.lua" />
     <None Include="logger.log" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Planning.txt" />
+    <Text Include="..\..\docs\Planning.txt" />
+    <Text Include="..\..\docs\TODO list.txt" />
   </ItemGroup>
 </Project>

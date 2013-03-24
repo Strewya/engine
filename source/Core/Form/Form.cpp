@@ -3,13 +3,13 @@
 #include "Core/Form/Form.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	void DrawForms(const std::vector<Form*>& frms, Graphics::Interface& gfx)
+	void DrawForms(const std::vector<Form*>& frms, Graphics::IRenderer& gfx)
 	{
 		for(Form* f : frms)
 		{

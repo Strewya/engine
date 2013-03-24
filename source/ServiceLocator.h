@@ -11,7 +11,7 @@
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
-namespace Graphics { class Interface; }
+namespace Graphics { class IRenderer; }
 
 namespace Core
 {
@@ -22,14 +22,14 @@ namespace Core
 	public:
 		ServiceLocator();
 
-		void Register(Graphics::Interface* graphics);
+		void Register(Graphics::IRenderer* graphics);
 		void Register(Engine* engine);
 
-		Graphics::Interface& getGraphics() const;
+		Graphics::IRenderer& getGraphics() const;
 		Engine& getEngine() const;
 	private:
 		Engine* _engine;
-		Graphics::Interface* _graphics;
+		Graphics::IRenderer* _graphics;
 
 	};
 }

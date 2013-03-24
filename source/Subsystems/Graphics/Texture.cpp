@@ -3,7 +3,7 @@
 #include "Subsystems/Graphics/Texture.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Subsystems/Graphics/Interface.h"
+#include "Subsystems/Graphics/IRenderer.h"
 	/*** end headers ***/
 
 namespace Graphics
@@ -12,11 +12,11 @@ namespace Graphics
 		: _filename(), _width(0), _height(0), _dataHandle(0), _gfx(nullptr)
 	{}
 
-	Texture::Texture(const char* filename, uint width, uint height, Interface* gfx, uint dataHandle)
+	Texture::Texture(const char* filename, uint width, uint height, IRenderer* gfx, uint dataHandle)
 		: _filename(filename), _width(width), _height(height), _dataHandle(dataHandle), _gfx(gfx)
     {}
 
-	Texture::Texture(const String& filename, uint width, uint height, Interface* gfx, uint dataHandle)
+	Texture::Texture(const String& filename, uint width, uint height, IRenderer* gfx, uint dataHandle)
 		: _filename(filename), _width(width), _height(height), _dataHandle(dataHandle), _gfx(gfx)
     {}
     

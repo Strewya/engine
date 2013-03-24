@@ -32,7 +32,7 @@ namespace Graphics
 		const String& getTextureName() const;
 		const String& getSpritesheetName() const;
 
-		void setTexture(const Texture& handle);
+		void setTexture(const Texture& texture);
 		void setTextureName(const char* name);
 		void setTextureName(const String& name);
 		void setSpritesheetName(const char* name);

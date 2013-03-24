@@ -16,9 +16,6 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Interface.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Util\Logger.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -35,6 +32,9 @@
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
   </ItemGroup>
