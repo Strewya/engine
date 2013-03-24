@@ -22,12 +22,12 @@ namespace Pong
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
 		Graphics::Spritesheet& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
-		auto& emptySheet = context.resources.getSpritesheetCache().CreateEmpty("emptySheet");
+		Graphics::Spritesheet& sheet2 = context.resources.getSpritesheetCache().LoadFromFile("resources/character.sheet");
 		
-		uint ballHandle = sheet.getHandle("ball");
-		uint cherryHandle = sheet.getHandle("cherry");
-		uint cupcakeHandle = sheet.getHandle("cupcake");
-		uint paddleHandle = sheet.getHandle("paddle");
+		uint ballHandle = sheet.getSpriteHandle("ball");
+		uint cherryHandle = sheet.getSpriteHandle("cherry");
+		uint cupcakeHandle = sheet.getSpriteHandle("cupcake");
+		uint paddleHandle = sheet.getSpriteHandle("paddle");
 
 		auto* ent = context.entities.getNewEntity();
 		
@@ -37,7 +37,10 @@ namespace Pong
 		ent->getForm().setPosition(500,300);
 		ent->getForm().setScale(1,1);
 		ent->getForm().setScalingCenter(sheet.getSprite(paddleHandle).getSrcRect().GetSize()/2);
-		ent->getForm().setPivotPoint(sheet.getSprite(paddleHandle).getSrcRect().GetSize()/2);
+		auto pivot = sheet.getSprite(paddleHandle).getSrcRect().GetSize();
+		pivot.x *= 0.5f;
+		pivot.y *= 0.9f;
+		ent->getForm().setPivotPoint(pivot);
 		ent->getForm().setRotation(0);
 
 		ent->Insert("Render", Core::Action(Core::Render));

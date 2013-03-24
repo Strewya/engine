@@ -6,8 +6,9 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
-#include <vector>
+#include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Subsystems/Graphics/AnimationInfo.h"
 #include "Subsystems/Graphics/SpriteInfo.h"
 #include "Subsystems/Graphics/Texture.h"
 	/*** end header inclusion ***/
@@ -20,7 +21,8 @@ namespace Graphics
 		String _sheetName;
 		String _textureName;
 		Texture _texture;
-		std::vector<SpriteInfo> _sprites;
+		std::deque<SpriteInfo> _sprites;
+		std::deque<AnimationInfo> _animations;
 
 	public:
 		Spritesheet();
@@ -39,10 +41,16 @@ namespace Graphics
 		void setSpritesheetName(const String& name);
 
 		uint Insert(const SpriteInfo& sprite);
-		int getHandle(const char* name) const;
-		int getHandle(const String& name) const;
+		uint Insert(const AnimationInfo& animation);
+
+		int getSpriteHandle(const char* name) const;
+		int getSpriteHandle(const String& name) const;
+		int getAnimationHandle(const char* name) const;
+		int getAnimationHandle(const String& name) const;
 		const SpriteInfo& getSprite(uint handle) const;
-		bool Valid(uint handle) const;
+		const AnimationInfo& getAnimation(uint handle) const;
+		bool SpriteValid(uint handle) const;
+		bool AnimationValid(uint handle) const;
 
 	};
 }

@@ -64,6 +64,8 @@ namespace Script
 		bool Pop();
 		bool RemoveElement(int index);
 
+		bool GetObjLength(int& out, int index = -1);
+
 		template<class T>
 		bool GetValue(const char* name, T& out)
 		{

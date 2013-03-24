@@ -7,5 +7,7 @@ return {
 		{name="walk_3", 	rect={64,  0,  32, 32}},
 		{name="walk_4", 	rect={96, 0,  32, 32}},
 	},
-	framecount = 4
+	animations = {
+		{ name="walk", sequence = {"walk_1", "walk_2", "walk_3", "walk_4"} }
+	}
 };

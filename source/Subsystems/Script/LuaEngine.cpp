@@ -397,6 +397,16 @@ namespace Script
 		return true;
 	}
 
+	bool LuaEngine::GetObjLength(int& out, int index)
+	{
+		if(lua_isstring(_lua, index) || lua_istable(_lua, index))
+		{
+			out = lua_objlen(_lua, index);
+			return true;
+		}
+		return false;
+	}
+
 	//************************************GET FIELD*************************************//
 	bool LuaEngine::GetField(const char* name, int tableIndex)
 	{

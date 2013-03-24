@@ -51,6 +51,7 @@ namespace Graphics
 		if(it == _cache.end())
 		{
 			_cache.emplace_back();
+			_cache.back().setSpritesheetName(sheetName);
 			return _cache.back();
 		}
 		return *it;
@@ -83,27 +84,63 @@ namespace Graphics
 		sheet.setTexture(_textureCache->getTexture(name));
 
 		int frameCount;
-		script.GetField("framecount", -1);
-		script.Pop(frameCount);
-		
-		script.GetField("frames", -1);
-		for(int i=1; i<=frameCount; ++i)
-		{
-			Util::Rect rect;
-			script.Push(i);
-			script.GetField(-2);
-			
-			script.GetField("name", -1);
-			script.Pop(name);
-			script.GetField("rect", -1);
-			script.Pop(rect);
-			script.Pop();
 
-			SpriteInfo si;
-			si.setName(name);
-			si.setSrcRect(rect);
-			sheet.Insert(si);
+		if(script.GetField("frames", -1) && script.GetObjLength(frameCount))
+		{
+			for(int i=1; i<=frameCount; ++i)
+			{
+				Util::Rect rect;
+				script.Push(i);
+				script.GetField(-2);
+			
+				script.GetField("name", -1);
+				script.Pop(name);
+				script.GetField("rect", -1);
+				script.Pop(rect);
+				script.Pop();
+
+				SpriteInfo si;
+				si.setName(name);
+				si.setSrcRect(rect);
+				sheet.Insert(si);
+			}
+			script.Pop();
+		
+			int animCount;
+			if(script.GetField("animations", -1) && script.GetObjLength(animCount))
+			{
+				for(int anim=1; anim<=animCount; ++anim)
+				{
+					AnimationInfo animation;
+
+					script.Push(anim);
+					script.GetField(-2);
+			
+					script.GetField("name", -1);
+					script.Pop(name);
+					animation.setName(name);
+
+					script.GetField("sequence", -1);
+					script.GetObjLength(frameCount);
+					for(int frame=1; frame<=frameCount; ++frame)
+					{
+						script.Push(frame);
+						script.GetField(-2);
+						script.Pop(name);
+
+						animation.AddToSequence(sheet.getSpriteHandle(name));
+					}
+					script.Pop();
+
+					script.Pop();
+
+					sheet.Insert(animation);
+				}
+				script.Pop();
+			}
 		}
+
+		script.Pop();
 		return sheet;
 	}
 

@@ -52,12 +52,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>lua5.1.lib;lua51.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -94,6 +98,7 @@
     <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp" />
     <ClCompile Include="..\..\source\ResourceLocator.cpp" />
     <ClCompile Include="..\..\source\ServiceLocator.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
@@ -131,6 +136,7 @@
     <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
     <ClInclude Include="..\..\source\ResourceLocator.h" />
     <ClInclude Include="..\..\source\ServiceLocator.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h" />
@@ -158,7 +164,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
-    <Text Include="..\..\docs\TODO list.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

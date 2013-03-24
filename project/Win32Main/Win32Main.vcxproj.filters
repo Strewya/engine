@@ -98,6 +98,9 @@
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -214,6 +217,9 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -250,6 +256,5 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
-    <Text Include="..\..\docs\TODO list.txt" />
   </ItemGroup>
 </Project>

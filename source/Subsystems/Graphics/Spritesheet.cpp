@@ -9,30 +9,32 @@ namespace Graphics
 {
 	Spritesheet::Spritesheet()
 	{
-		_sprites.reserve(16);
 	}
 
 	Spritesheet::Spritesheet(const char* name)
 		: _sheetName(name)
 	{
-		_sprites.reserve(16);
 	}
 
 	Spritesheet::Spritesheet(const String& name)
 		: _sheetName(name)
 	{
-		_sprites.reserve(16);
 	}
 
 	Spritesheet::~Spritesheet()
 	{}
 
-	bool Spritesheet::Valid(uint index) const
+	bool Spritesheet::SpriteValid(uint index) const
 	{
 		return (0 <= index && index < _sprites.size());
 	}
+
+	bool Spritesheet::AnimationValid(uint index) const
+	{
+		return (0 <= index && index < _animations.size());
+	}
 	
-	int Spritesheet::getHandle(const char* name) const
+	int Spritesheet::getSpriteHandle(const char* name) const
 	{
 		for(auto it = _sprites.begin(); it != _sprites.end(); ++it)
 		{
@@ -44,18 +46,44 @@ namespace Graphics
 		return NOT_FOUND;
 	}
 
-	int Spritesheet::getHandle(const String& name) const
+	int Spritesheet::getSpriteHandle(const String& name) const
 	{
-		return getHandle(name.c_str());
+		return getSpriteHandle(name.c_str());
 	}
-		
+	
+	int Spritesheet::getAnimationHandle(const char* name) const
+	{
+		for(auto it = _animations.begin(); it != _animations.end(); ++it)
+		{
+			if(it->getName().compare(name) == 0)
+			{
+				return it - _animations.begin();
+			}
+		}
+		return NOT_FOUND;
+	}
+
+	int Spritesheet::getAnimationHandle(const String& name) const
+	{
+		return getAnimationHandle(name.c_str());
+	}
+
 	const SpriteInfo& Spritesheet::getSprite(uint index) const
 	{
-		if(Valid(index))
+		if(SpriteValid(index))
 		{
 			return _sprites[index];
 		}
-		throw std::exception("Attempted to dereference inexisting texture");
+		throw std::exception("Spritesheet::getSprite(): Attempted to get inexisting sprite.");
+	}
+
+	const AnimationInfo& Spritesheet::getAnimation(uint index) const
+	{
+		if(AnimationValid(index))
+		{
+			return _animations[index];
+		}
+		throw std::exception("Spritesheet::getAnimation(): Attempted to get inexisting animation");
 	}
 
 	uint Spritesheet::Insert(const SpriteInfo& sprite)
@@ -64,13 +92,29 @@ namespace Graphics
 		{
 			return NOT_FOUND;
 		}
-		int index = getHandle(sprite.getName().c_str());
+		int index = getSpriteHandle(sprite.getName().c_str());
 		if(index != NOT_FOUND)
 		{
 			return index;
 		}
 		index = _sprites.size();
 		_sprites.push_back(sprite);
+		return index;
+	}
+
+	uint Spritesheet::Insert(const AnimationInfo& animation)
+	{
+		if(animation.getName().empty())
+		{
+			return NOT_FOUND;
+		}
+		int index = getAnimationHandle(animation.getName().c_str());
+		if(index != NOT_FOUND)
+		{
+			return index;
+		}
+		index = _animations.size();
+		_animations.push_back(animation);
 		return index;
 	}
 
