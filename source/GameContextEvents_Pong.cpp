@@ -20,6 +20,7 @@ namespace Pong
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
 		context.actionMaster.EnqueueActionLogic(Core::Rotate);
+		context.actionMaster.EnqueueActionLogic(Core::Animate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
 		Graphics::Spritesheet& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
@@ -30,24 +31,24 @@ namespace Pong
 		uint cupcakeHandle = sheet.getSpriteHandle("cupcake");
 		uint paddleHandle = sheet.getSpriteHandle("paddle");
 
+		uint animationHandle = sheet2.getAnimationHandle("walk");
+
 		auto* ent = context.entities.getNewEntity();
+		auto& frm = ent->getForm();
+		frm.setType(Core::FormType::Sprite);
+		frm.setPosition(500,300);
+		frm.setScale(4,4);
 		
-		ent->getForm().setType(Core::FormType::Sprite);
-		ent->getForm().Insert("Spritesheet", Core::IState::Create<String>("pong.sheet"));
-		ent->getForm().Insert("CurrentSprite", Core::IState::Create(paddleHandle));
-		ent->getForm().setPosition(500,300);
-		ent->getForm().setScale(1,1);
-		ent->getForm().setScalingCenter(sheet.getSprite(paddleHandle).getSrcRect().GetSize()/2);
-		auto pivot = sheet.getSprite(paddleHandle).getSrcRect().GetSize();
-		pivot.x *= 0.5f;
-		pivot.y *= 0.9f;
-		ent->getForm().setPivotPoint(pivot);
-		ent->getForm().setRotation(0);
+		frm.Insert("Spritesheet", Core::IState::Create<String>(sheet2.getSpritesheetName()));
+		frm.Insert("CurrentSprite", Core::IState::Create(sheet2.getAnimation(animationHandle).getSequenceFrame(0)));
+		frm.Insert("CurrentAnimationFrame", Core::IState::Create<uint>(0));
+		frm.Insert("CurrentAnimation", Core::IState::Create(animationHandle));
+
 
 		ent->Insert("Render", Core::Action(Core::Render));
 		assert(ent->getAction("Render").Activate());
-		ent->Insert("Rotate", Core::Action(Core::Rotate));
-		assert(ent->getAction("Rotate").Activate());
+		ent->Insert("Animate", Core::Action(Core::Animate));
+		assert(ent->getAction("Animate").Activate());
 
 		return true;
 	}

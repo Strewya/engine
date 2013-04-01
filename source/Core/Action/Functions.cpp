@@ -29,6 +29,24 @@ namespace Core
 		context.services.getGraphics().EndScene();
 	}
 
+	void Animate(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	{
+		for(auto action : actions)
+		{
+			auto& owner = action->getOwner().getForm();
+			if(owner.hasState("CurrentSprite") && owner.hasState("CurrentAnimationFrame") && owner.hasState("CurrentAnimation") && owner.hasState("Spritesheet"))
+			{
+				IState* states[] = {owner.getState("Spritesheet"), owner.getState("CurrentAnimation"), owner.getState("CurrentAnimationFrame"), owner.getState("CurrentSprite")};
+				auto& spritesheet = context.resources.getSpritesheetCache().getSpritesheet(states[0]->as<String>());
+				auto& animation = spritesheet.getAnimation(states[1]->as<uint>());
+				auto& curFrame = states[2]->as<uint>();
+				auto& curSprite = states[3]->as<uint>();
+				curFrame = (++curFrame) % animation.getSequenceSize();
+				curSprite = animation.getSequenceFrame(curFrame);
+			}
+		}
+	}
+
 	void Rotate(double dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		for(auto action : actions)

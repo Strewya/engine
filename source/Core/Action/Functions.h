@@ -15,6 +15,7 @@
 namespace Core
 {
 	void Render(double dt, GameContext& context, std::set<Core::Action*>& actions);
+	void Animate(double dt, GameContext& context, std::set<Core::Action*>& actions);
 	void Rotate(double dt, GameContext& context, std::set<Core::Action*>& actions);
 }
 

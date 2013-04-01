@@ -20,9 +20,14 @@ namespace Core
 	{
 	private:
 		std::deque<std::shared_ptr<Entity>> _entityList;
+		std::list<int> _availableSlots;
+		InstanceID _idCounter;
+		InstanceID _NewID();
 
 	public:
+		EntityPool();
 		Entity* getEntityByAlias(const String& alias) const;
+		Entity* getEntityByID(InstanceID id) const;
 		Entity* getNewEntity();
 	};
 }

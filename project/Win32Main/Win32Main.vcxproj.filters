@@ -249,12 +249,35 @@
     <Filter Include="Win32">
       <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Subsystems/Input">
+      <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{af13eb68-4100-43be-bdff-4fcdc5921d7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.lua" />
     <None Include="logger.log" />
+    <None Include="resources\character.sheet">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="resources\pong.sheet">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\character.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="resources\gui_window.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="resources\pong.png">
+      <Filter>Resources</Filter>
+    </Image>
   </ItemGroup>
 </Project>

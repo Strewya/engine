@@ -31,6 +31,7 @@ namespace Core
 
 	public:
 		//////////// CONSTRUCTORS ////////////
+
 		Entity(InstanceID id);
 		Entity(const Entity& rhs);
 		Entity(Entity&& rhs);
@@ -38,10 +39,12 @@ namespace Core
 		Entity& operator=(Entity&& rhs);
 		
 		//////////// EXISTANCE CHECKS ////////////
+
 		bool hasAction(const char* name);
 		bool hasAction(const String& name);
 		
 		//////////// GETTERS ////////////
+
 		InstanceID		getID() const;
 		const String&	getType() const;
 		const String&	getAlias() const;
@@ -50,11 +53,13 @@ namespace Core
 		Action&			getAction(const String& name);
 		
 		//////////// REMOVAL METHODS ////////////
+
 		void ClearActions();
 		bool RemoveAction(const char* name);
 		bool RemoveAction(const String& name);
 
 		//////////// SETTERS ////////////
+
 		Entity& setAlias(const char* alias);
 		Entity& setAlias(const String& alias);
 		Entity& setType(const char* type);
@@ -64,6 +69,7 @@ namespace Core
 		Entity& setForm(Form&& form);
 		
 		//////////// INSERT METHODS ////////////
+
 		using Statemap::Insert;
 		bool Insert(const char* name, const Action& action);
 		bool Insert(const String& name, const Action& action);

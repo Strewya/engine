@@ -31,7 +31,7 @@ namespace Graphics
 		_sequence.push_back(id);
 	}
 
-	int AnimationInfo::getSequenceFrame(uint index) const
+	uint AnimationInfo::getSequenceFrame(uint index) const
 	{
 		return _sequence[index];
 	}

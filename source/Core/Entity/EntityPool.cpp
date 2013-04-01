@@ -8,6 +8,15 @@
 
 namespace Core
 {
+	EntityPool::EntityPool()
+		: _idCounter(0)
+	{}
+
+	InstanceID EntityPool::_NewID()
+	{
+		return ++_idCounter;
+	}
+
 	Entity* EntityPool::getEntityByAlias(const String& alias) const
 	{
 		for(auto& entityPtr : _entityList)
@@ -20,15 +29,26 @@ namespace Core
 		return nullptr;
 	}
 
+	Entity* EntityPool::getEntityByID(InstanceID id) const
+	{
+		for(auto& entityPtr : _entityList)
+		{
+			if(entityPtr->getID() == id)
+			{
+				return entityPtr.get();
+			}
+		}
+		return nullptr;
+	}
+
 	Entity* EntityPool::getNewEntity()
 	{
-		for(auto it = _entityList.begin(); it != _entityList.end(); ++it)
+		if(!_availableSlots.empty())
 		{
-			if(it->get() == nullptr)
-			{
-				it->reset(new Entity(it - _entityList.begin()));
-				return it->get();
-			}
+			int index = _availableSlots.front();
+			_availableSlots.pop_front();
+			_entityList[index].reset(new Entity(_NewID()));
+			return _entityList[index].get();
 		}
 		_entityList.emplace_back(new Entity(_entityList.size()));
 		return _entityList.back().get();

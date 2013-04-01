@@ -161,9 +161,16 @@
   <ItemGroup>
     <None Include="config.lua" />
     <None Include="logger.log" />
+    <None Include="resources\character.sheet" />
+    <None Include="resources\pong.sheet" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\character.png" />
+    <Image Include="resources\gui_window.png" />
+    <Image Include="resources\pong.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
