@@ -1,59 +1,57 @@
-#ifndef _SGKeys_h_
-#define _SGKeys_h_
-
+#ifndef SUBSYSTEMS_INPUT_KEYCODES_H_
+#define SUBSYSTEMS_INPUT_KEYCODES_H_
+/********************************************
+	class:	
+	usage:	
+********************************************/
+	/*** common and C++ headers ***/
 #include <unordered_map>
 #include <string>
+	/*** extra headers if needed (alphabetically ordered) ***/
+	/*** end header inclusion ***/
 
-namespace SG
+
+namespace Input
 {
 	void InitializeInputConstants();
 
-	class Axis
+	class Mouse
 	{
 	private:
 		typedef std::unordered_map<unsigned int, std::string> Map;
 		static Map _map;
 
+		friend void InitializeInputConstants();
+		static void Init();
+
 	public:
 		static unsigned int Code(const std::string& name);
 		static std::string Name(const unsigned int &code);
 
-		static void Init();
-
-		static const unsigned int _Unknown			= 0x00;
-		
-		static const unsigned int _MouseX			= 0x01;
-		static const unsigned int _MouseY			= 0x02;
-		static const unsigned int _MouseWheel		= 0x03;
-
-		/*
-			ADD OWN VALUES, LIKE JOYSTICKS AND SUCH
-		*/
-	};
-
-
-
-	class Keys
-	{
-		typedef std::unordered_map<unsigned int, std::string> Map;
-		static Map _map;
-	public:
-		static unsigned int Code(const std::string& name);
-		static std::string Name(const unsigned int &code);
-	
-		static void Init();
-	
-		
-		//0x00 is unasigned, but added here for empty value
 		static const unsigned int _Unknown		= 0x00;
 		
 		static const unsigned int _LeftButton	= 0x01;
 		static const unsigned int _RightButton	= 0x02;
-		static const unsigned int _Cancel		= 0x03;
 		static const unsigned int _MiddleButton	= 0x04;
 		static const unsigned int _XButton1		= 0x05;
 		static const unsigned int _XButton2		= 0x06;
+	};
 
+	class Key
+	{
+		typedef std::unordered_map<unsigned int, std::string> Map;
+		static Map _map;
+
+		friend void InitializeInputConstants();
+		static void Init();
+	public:
+		static unsigned int Code(const std::string& name);
+		static std::string Name(const unsigned int &code);
+		
+		//0x00 is unasigned, but added here for empty value
+		static const unsigned int _Unknown		= 0x00;
+		static const unsigned int _Cancel		= 0x03;
+	
 		/*
 		 * 0x07 : unassigned
 		 */
@@ -326,4 +324,4 @@ namespace SG
 	};
 }
 
-#endif //_SGKeys_h_
+#endif //SUBSYSTEMS_INPUT_KEYCODES_H_

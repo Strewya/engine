@@ -14,6 +14,7 @@
 #include "ServiceLocator.h"
 #include "Subsystems/Graphics/RendererFactory.h"
 #include "Subsystems/Graphics/TextureCache.h"
+#include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
 	/*** end header inclusion ***/
 
@@ -27,11 +28,11 @@ namespace Core
 	class Engine
 	{
 	private:
-		const Win32::AbstractWindow& _window;
+		Win32::AbstractWindow& _window;
 		Graphics::RendererFactory _rendererFactory;
 		//Audio::AudioFactory _audioFactory;
-		Script::LuaEngine _scriptEngine;
-		//Input::InputEngine _inputEngine;
+		Script::Engine _scriptEngine;
+		Input::Engine _inputEngine;
 		//Network::CommEngine _commEngine;
 		ServiceLocator _services;
 
@@ -43,7 +44,7 @@ namespace Core
 		GameContext* _activeContext;
 	
 	public:
-		Engine(const Win32::AbstractWindow& window);
+		Engine(Win32::AbstractWindow& window);
 		void Loop();
 		void Shutdown();
 

@@ -10,7 +10,8 @@ namespace Win32
 	AbstractWindow::AbstractWindow()
 		: _extendedStyle(0), _class("AbstractWindow"), _title("Window"), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
 		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
-		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(false), _useWaitMessage(false), _exitCode(0)
+		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(false), _useWaitMessage(false), _exitCode(0),
+		_queue(nullptr)
 	{
 		setFullscreen(false);
 	}
@@ -51,7 +52,7 @@ namespace Win32
 		static MSG msg;
 		if(!_hwnd)
 		{
-			MessageBox(nullptr, "Window::HandleMEssage(): The window has not been created yet.", "Runtime error", MB_OK);
+			MessageBox(nullptr, "Window::HandleMessage(): The window has not been created yet.", "Runtime error", MB_OK);
 			_exitCode = ErrorCode::WindowNotExists;
 			return false;
 		}
@@ -136,6 +137,7 @@ namespace Win32
 	void AbstractWindow::setInstance(HINSTANCE instance) { _hInstance = instance; }
 	void AbstractWindow::setUsePeekMessage(bool peek) { _usePeekMessage = peek; }
 	void AbstractWindow::setUseWaitMessage(bool wait) { _useWaitMessage = wait; }
+	void AbstractWindow::setEventQueue(std::list<Input::Event>& queue) { _queue = &queue; }
 
 	HWND			AbstractWindow::getWindowHandle() const { return _hwnd; }
 	bool			AbstractWindow::getFullscreen() const { return _fullscreen; }

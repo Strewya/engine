@@ -21,7 +21,7 @@ namespace Graphics
 	void SpritesheetCache::setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services)
 	{
 		_textureCache = &resources.getTextureCache();
-		_script = &services.getLuaEngine();
+		_script = &services.getScript();
 	}
 
 	std::deque<Spritesheet>::iterator SpritesheetCache::_Find(const char* sheetName)

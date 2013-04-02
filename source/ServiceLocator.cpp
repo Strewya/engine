@@ -8,7 +8,7 @@
 namespace Core
 {
 	ServiceLocator::ServiceLocator()
-		: _graphics(nullptr), _engine(nullptr)
+		: _graphics(nullptr), _engine(nullptr), _input(nullptr), _script(nullptr)
 	{
 	}
 
@@ -34,14 +34,25 @@ namespace Core
 		return *_engine;
 	}
 
-	void ServiceLocator::Register(Script::LuaEngine* script)
+	void ServiceLocator::Register(Script::Engine* script)
 	{
 		_script = script;
 	}
 
-	Script::LuaEngine& ServiceLocator::getLuaEngine() const
+	Script::Engine& ServiceLocator::getScript() const
 	{
 		assert(_script != nullptr);
 		return *_script;
+	}
+
+	void ServiceLocator::Register(Input::Engine* input)
+	{
+		_input = input;
+	}
+
+	Input::Engine& ServiceLocator::getInput() const
+	{
+		assert(_input != nullptr);
+		return *_input;
 	}
 }

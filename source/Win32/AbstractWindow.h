@@ -6,10 +6,13 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Defines.h"
+#include <list>
 #include <string>
 #include <windows.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
+
+namespace Input { class Event; }
 
 namespace Win32
 {
@@ -40,6 +43,7 @@ namespace Win32
 		void setInstance(HINSTANCE instance);
 		void setUsePeekMessage(bool peek);
 		void setUseWaitMessage(bool wait);
+		void setEventQueue(std::list<Input::Event>& queue);
 
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
@@ -77,6 +81,8 @@ namespace Win32
 		HWND _hwndParent;
 		HMENU _hMenu;
 		HINSTANCE _hInstance;
+
+		std::list<Input::Event>* _queue;
 	};
 }
 

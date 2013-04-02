@@ -12,7 +12,8 @@
 	/*** end header inclusion ***/
 
 namespace Graphics { class IRenderer; }
-namespace Script { class LuaEngine; }
+namespace Input { class Engine; }
+namespace Script { class Engine; }
 
 namespace Core
 {
@@ -23,17 +24,20 @@ namespace Core
 	public:
 		ServiceLocator();
 
-		void Register(Script::LuaEngine* script);
+		void Register(Input::Engine* input);
+		void Register(Script::Engine* script);
 		void Register(Graphics::IRenderer* graphics);
 		void Register(Engine* engine);
 
-		Script::LuaEngine& getLuaEngine() const;
+		Input::Engine& getInput() const;
+		Script::Engine& getScript() const;
 		Graphics::IRenderer& getGraphics() const;
 		Engine& getEngine() const;
 	private:
 		Engine* _engine;
 		Graphics::IRenderer* _graphics;
-		Script::LuaEngine* _script;
+		Script::Engine* _script;
+		Input::Engine* _input;
 	};
 }
 

@@ -1,5 +1,7 @@
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "SGMappedInput.h"
+#include "Subsystems/Input/MappedInput.h"
+	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/
 

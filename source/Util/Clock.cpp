@@ -14,7 +14,7 @@ namespace Util
 		: _maxDeltaAllowed(0.25), _lastUpdate(std::chrono::high_resolution_clock::now())
 	{}
 
-	void Clock::FrameStep()
+	void Clock::AdvanceTime()
 	{
 		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
 		double delta = std::chrono::duration_cast<std::chrono::duration<double>>(now-_lastUpdate).count();

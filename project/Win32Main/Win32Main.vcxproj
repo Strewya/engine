@@ -106,10 +106,8 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Input\InputContext.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Input\InputSystem.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Input\InputEngine.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Input\MappedInput.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
@@ -150,11 +148,9 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h" />
-    <ClInclude Include="..\..\source\Subsystems\Input\InputContext.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\Event.h" />
-    <ClInclude Include="..\..\source\Subsystems\Input\InputSystem.h" />
+    <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h" />
-    <ClInclude Include="..\..\source\Subsystems\Input\MappedInput.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />

@@ -10,39 +10,39 @@
 
 namespace Script
 {
-	LuaEngine::LuaEngine()
+	Engine::Engine()
 		: _lua(luaL_newstate()), _nresults(0)
 	{
 		luaL_openlibs(_lua);
 	}
 
-	LuaEngine::~LuaEngine()
+	Engine::~Engine()
 	{
 		lua_close(_lua);
 	}
 
-	void LuaEngine::ClearStack()
+	void Engine::ClearStack()
 	{
 		lua_pop(_lua, lua_gettop(_lua));
 	}
 
-	int LuaEngine::GetStackSize()
+	int Engine::GetStackSize()
 	{
 		return lua_gettop(_lua);
 	}
 
-	int LuaEngine::GetResultCount()
+	int Engine::GetResultCount()
 	{
 		return _nresults;
 	}
 
 	//************************************DO FILE*************************************//
-	bool LuaEngine::DoFile(const String& filename)
+	bool Engine::DoFile(const String& filename)
 	{
 		return DoFile(filename.c_str());
 	}
 
-	bool LuaEngine::DoFile(const char* filename)
+	bool Engine::DoFile(const char* filename)
 	{
 		int result = luaL_dofile(_lua, filename);
 		if(result != 0)
@@ -53,12 +53,12 @@ namespace Script
 		return true;
 	}
 	//************************************DO STRING*************************************//
-	bool LuaEngine::DoString(const String& script)
+	bool Engine::DoString(const String& script)
 	{
 		return DoString(script.c_str());
 	}
 
-	bool LuaEngine::DoString(const char* script)
+	bool Engine::DoString(const char* script)
 	{
 		int result = luaL_dostring(_lua, script);
 		if(result != 0)
@@ -69,49 +69,49 @@ namespace Script
 		return true;
 	}
 	//************************************PUSH*************************************//
-	bool LuaEngine::Push(const int& in)
+	bool Engine::Push(const int& in)
 	{
 		lua_pushinteger(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const uint& in)
+	bool Engine::Push(const uint& in)
 	{
 		lua_pushinteger(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const String& in)
+	bool Engine::Push(const String& in)
 	{
 		lua_pushstring(_lua, in.c_str());
 		return true;
 	}
 
-	bool LuaEngine::Push(const char* in)
+	bool Engine::Push(const char* in)
 	{
 		lua_pushstring(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const bool& in)
+	bool Engine::Push(const bool& in)
 	{
 		lua_pushboolean(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const double& in)
+	bool Engine::Push(const double& in)
 	{
 		lua_pushnumber(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const float& in)
+	bool Engine::Push(const float& in)
 	{
 		lua_pushnumber(_lua, in);
 		return true;
 	}
 
-	bool LuaEngine::Push(const Util::Vec2& in)
+	bool Engine::Push(const Util::Vec2& in)
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
@@ -124,7 +124,7 @@ namespace Script
 		return true;
 	}
 
-	bool LuaEngine::Push(const Util::Vec3& in)
+	bool Engine::Push(const Util::Vec3& in)
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
@@ -140,7 +140,7 @@ namespace Script
 		return true;
 	}
 
-	bool LuaEngine::Push(const Util::Rect& in)
+	bool Engine::Push(const Util::Rect& in)
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
@@ -159,7 +159,7 @@ namespace Script
 		return true;
 	}
 
-	bool LuaEngine::Push(const Util::Color& in)
+	bool Engine::Push(const Util::Color& in)
 	{
 		lua_newtable(_lua);
 		int table = GetStackSize();
@@ -178,7 +178,7 @@ namespace Script
 		return true;
 	}
 	//************************************POP*************************************//
-	bool LuaEngine::Pop(int& out, int index)
+	bool Engine::Pop(int& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
@@ -189,7 +189,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(uint& out, int index)
+	bool Engine::Pop(uint& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
@@ -200,7 +200,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(bool& out, int index)
+	bool Engine::Pop(bool& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isboolean(_lua, index))
 		{
@@ -211,7 +211,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(String& out, int index)
+	bool Engine::Pop(String& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isstring(_lua, index))
 		{
@@ -222,7 +222,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(double& out, int index)
+	bool Engine::Pop(double& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
@@ -233,7 +233,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(float& out, int index)
+	bool Engine::Pop(float& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
@@ -244,7 +244,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(Util::Vec2& out, int index)
+	bool Engine::Pop(Util::Vec2& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
@@ -257,7 +257,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(Util::Vec3& out, int index)
+	bool Engine::Pop(Util::Vec3& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
@@ -270,7 +270,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(Util::Rect& out, int index)
+	bool Engine::Pop(Util::Rect& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
@@ -283,7 +283,7 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop(Util::Color& out, int index)
+	bool Engine::Pop(Util::Color& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_istable(_lua, index))
 		{
@@ -302,12 +302,12 @@ namespace Script
 		return false;
 	}
 
-	bool LuaEngine::Pop()
+	bool Engine::Pop()
 	{
 		return RemoveElement(-1);
 	}
 
-	bool LuaEngine::RemoveElement(int index)
+	bool Engine::RemoveElement(int index)
 	{
 		if(lua_gettop(_lua) == 0 || GetStackSize() < std::abs(index))
 		{
@@ -317,7 +317,7 @@ namespace Script
 		return true;
 	}
 
-	bool LuaEngine::GetObjLength(int& out, int index)
+	bool Engine::GetObjLength(int& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && (lua_isstring(_lua, index) || lua_istable(_lua, index)))
 		{
@@ -328,7 +328,7 @@ namespace Script
 	}
 
 	//************************************GET FIELD*************************************//
-	bool LuaEngine::GetField(const char* name, int tableIndex)
+	bool Engine::GetField(const char* name, int tableIndex)
 	{
 		String value = name;
 		int pos = value.find('.');
@@ -347,7 +347,7 @@ namespace Script
 		return !lua_isnil(_lua, -1);
 	}
 
-	bool LuaEngine::GetField(int tableIndex)
+	bool Engine::GetField(int tableIndex)
 	{
 		if(lua_gettop(_lua) == 0)
 		{
@@ -357,7 +357,7 @@ namespace Script
 		return !lua_isnil(_lua, -1);
 	}
 	//************************************CALL FUNCTION*************************************//
-	bool LuaEngine::CallFunction(int arguments, int expectedResults)
+	bool Engine::CallFunction(int arguments, int expectedResults)
 	{
 		if(lua_isfunction(_lua, -arguments-1))
 		{
@@ -374,7 +374,7 @@ namespace Script
 		return false;
 	}
 
-	void LuaEngine::HandleError(const char* name, int result)
+	void Engine::HandleError(const char* name, int result)
 	{
 		Util::Logger& log = Util::GetDefaultLogger();
 		log << "Error for " << name << ": ";
@@ -431,7 +431,7 @@ end;
 
 		TESTS
 
-	SG::LuaEngine script;
+	SG::Engine script;
 	int number, num2, num3, x, y;
 	bool bul;
 	double pi;

@@ -8,6 +8,7 @@
 #include "Core/Entity/Entity.h"
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/RenderingQueue.h"
+#include "Subsystems/Input/InputEngine.h"
 	/*** end headers ***/
 
 namespace Core
@@ -64,6 +65,22 @@ namespace Core
 			{
 				String item = spawnItem->as<String>();
 				
+			}
+		}
+	}
+
+	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	{
+		for(auto action : actions)
+		{
+			auto& entity = action->getOwner();
+			if(context.services.getInput().isKeyPressed(Input::Key::_ArrowLeft))
+			{
+				entity.getForm().Translate(-2, 0);
+			}
+			if(context.services.getInput().isKeyPressed(Input::Key::_ArrowRight))
+			{
+				entity.getForm().Translate(2, 0);
 			}
 		}
 	}

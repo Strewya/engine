@@ -19,6 +19,7 @@ namespace Pong
 {
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
+		context.actionMaster.EnqueueActionLogic(Core::SIH);
 		context.actionMaster.EnqueueActionLogic(Core::Rotate);
 		context.actionMaster.EnqueueActionLogic(Core::Animate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
@@ -49,6 +50,8 @@ namespace Pong
 		assert(ent->getAction("Render").Activate());
 		ent->Insert("Animate", Core::Action(Core::Animate));
 		assert(ent->getAction("Animate").Activate());
+		ent->Insert("SIH", Core::Action(Core::SIH));
+		assert(ent->getAction("SIH").Activate());
 
 		return true;
 	}

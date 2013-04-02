@@ -20,15 +20,15 @@ namespace Util
 
 namespace Script
 {
-	class LuaEngine
+	class Engine
 	{
 	private:
-		LuaEngine(const LuaEngine& rhs);
-		LuaEngine& operator=(const LuaEngine& rhs);
+		Engine(const Engine& rhs);
+		Engine& operator=(const Engine& rhs);
 
 	public:
-		LuaEngine();
-		~LuaEngine();
+		Engine();
+		~Engine();
 
 		bool DoFile(const String& filename);
 		bool DoFile(const char* filename);

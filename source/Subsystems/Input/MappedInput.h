@@ -5,10 +5,11 @@
 	usage:	
 ********************************************/
 	/*** common header ***/
-#include "Common.h"
-#include "SGForwardDeclarations.h"
-	/*** extra headers if needed ***/
+#include "Defines.h"
+#include <map>
 #include <set>
+	/*** extra headers if needed ***/
+
 	/*** end header inclusion ***/
 
 namespace SG

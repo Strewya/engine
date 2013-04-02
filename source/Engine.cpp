@@ -9,7 +9,7 @@
 
 namespace Core
 {
-	Engine::Engine(const Win32::AbstractWindow& window) 
+	Engine::Engine(Win32::AbstractWindow& window) 
 		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr)
 	{
 		SYSTEMTIME st;
@@ -53,6 +53,7 @@ namespace Core
 		_services.Register(this);
 		_services.Register(_rendererFactory.getInterface());
 		_services.Register(&_scriptEngine);
+		_services.Register(&_inputEngine);
 
 		/*
 			initialize the resource caches
@@ -92,6 +93,11 @@ namespace Core
 		{
 			Shutdown();
 		}
+
+		//update input
+		_inputEngine.Update(_window);
+
+		//update logic and draw entities
 		//if there can be only one active context
 		_activeContext->Update();
 		
@@ -105,6 +111,8 @@ namespace Core
 			}
 		}
 		*/
+
+		_inputEngine.PurgeOldEvents();
 	}
 
 	void Engine::Shutdown()

@@ -46,7 +46,7 @@ namespace Util
 
 	public:
 		Clock();
-		void FrameStep();
+		void AdvanceTime();
 		void RegisterTimer(Timer* timer);
 		void UnregisterTimer(Timer* timer);
 
