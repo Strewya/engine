@@ -101,6 +101,18 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\InputContext.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\InputSystem.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\MappedInput.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -219,6 +231,21 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h">
       <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\InputContext.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\InputSystem.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\MappedInput.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\Event.h">
+      <Filter>Subsystems/Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
