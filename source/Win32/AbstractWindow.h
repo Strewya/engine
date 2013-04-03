@@ -84,6 +84,8 @@ namespace Win32
 
 		std::list<Input::Event>* _queue;
 	};
+
+	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint width, uint height);
 }
 
 #endif //WIN32_ABSTRACTWINDOW_H_

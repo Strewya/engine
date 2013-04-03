@@ -15,6 +15,7 @@ namespace Input
 	{
 		KeyPressed,
 		KeyReleased,
+		TextEntered,
 		MouseMoved,
 		MouseWheelMoved,
 		MouseButtonPressed,
@@ -32,10 +33,15 @@ namespace Input
 		bool shift;
 	};
 
+	struct TextEvent
+	{
+		char16_t character;
+	};
+
 	struct MouseMoveEvent
 	{
-		uint dx;
-		uint dy;
+		uint x;
+		uint y;
 	};
 
 	struct MouseButtonEvent
@@ -62,6 +68,7 @@ namespace Input
 		union
 		{
 			KeyEvent key;
+			TextEvent text;
 			MouseMoveEvent mouseMove;
 			MouseButtonEvent mouseButton;
 			MouseWheelEvent mouseWheel;

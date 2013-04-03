@@ -4,138 +4,165 @@
 	/*** C++ headers ***/
 #include <cassert>
 	/*** extra headers ***/
-//#include "Subsystems/Input/SGKeyCodes.h"
+#include "Subsystems/Input/Event.h"
+#include "Subsystems/Input/KeyCodes.h"
 	/*** end headers ***/
 
 namespace Win32
 {
-	GameWindow::GameWindow(const char* title, const char* className)
+	GameWindow::GameWindow(const char* title)
 	{
 		setTitle(title);
-		setClass(className);
+		setClass(title);
 		setUsePeekMessage(true);
 		setUseWaitMessage(false);
 	}
 
-	GameWindow::GameWindow(const String& title, const String& className)
+	GameWindow::GameWindow(const String& title)
 	{
 		setTitle(title);
-		setClass(className);
+		setClass(title);
 		setUsePeekMessage(true);
 		setUseWaitMessage(false);
 	}
 
 	LRESULT WINAPI GameWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		
-		bool repeated = false;
+		if(_queue == nullptr)
+		{
+			return DefWindowProc(hwnd, msg, wParam, lParam);
+		}
+
 		switch(msg)
 		{
-		/*
 		case WM_ACTIVATE:
-			if(_engine != nullptr)
+		{
+			Input::Event e;
+			if(LOWORD(wParam) == WA_INACTIVE)
 			{
-				
-				if((GetAsyncKeyState(SG::Keys::_Alt)&0x8000) == 0)
-				{
-					pEngine->getServices().getInput().SetButtonState(SG::Keys::_Alt, false, true);
-				}
-				if((GetAsyncKeyState(SG::Keys::_Control)&0x8000) == 0)
-				{
-					pEngine->getServices().getInput().SetButtonState(SG::Keys::_Control, false, true);
-				}
-				if((GetAsyncKeyState(SG::Keys::_Shift)&0x8000) == 0)
-				{
-					pEngine->getServices().getInput().SetButtonState(SG::Keys::_Shift, false, true);
-				}
-				
-				if(LOWORD(wParam) == WA_INACTIVE)
-				{
-					//_engine->Defocus();
-					int i;
-				}
-				else
-				{
-					//_engine->Focus();
-					int j;
-				}
+				e.type = Input::EventType::LostFocus;
 			}
+			else
+			{
+				e.type = Input::EventType::GainedFocus;
+			}
+			_queue->push_back(e);
+		}
 		break;
 		
 		//----------------------- DOWN -----------------------
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			repeated = (lParam & (1 << 30)) != 0;
-			//if(repeat == 1)
-				//_engine->getServices().getInput().SetButtonState(wParam, true, repeated);
+		{
+			Input::Event e;
+			e.type = Input::EventType::KeyPressed;
+			e.key.code = wParam;
+			e.key.alt = GetAsyncKeyState(VK_MENU) != 0;
+			e.key.shift = GetAsyncKeyState(VK_SHIFT) != 0;
+			e.key.control = GetAsyncKeyState(VK_CONTROL) != 0;
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 		//----------------------- UP -----------------------
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			//_engine->getServices().getInput().SetButtonState(wParam, false, true);
+		{
+			Input::Event e;
+			e.type = Input::EventType::KeyReleased;
+			e.key.code = wParam;
+			e.key.alt = GetAsyncKeyState(VK_MENU) != 0;
+			e.key.shift = GetAsyncKeyState(VK_SHIFT) != 0;
+			e.key.control = GetAsyncKeyState(VK_CONTROL) != 0;
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 		//----------------------- CHAR -----------------------
 		case WM_CHAR:
-			
-			pEngine->getServices().getInput().SetButtonState(wParam, true, LOWORD(lParam) > 0);
+		{
+			Input::Event e;
+			e.type = Input::EventType::TextEntered;
+			e.text.character = wParam;
+			_queue->push_back(e);
 			return 0;
-			
+		}	
 		break;
 		//----------------------- LMB -----------------------
 		case WM_LBUTTONDOWN:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_LeftButton, true, false);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonPressed;
+			e.mouseButton.button = Input::Mouse::_LeftButton;
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 
 		case WM_LBUTTONUP:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_LeftButton, false, true);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonReleased;
+			e.mouseButton.button = Input::Mouse::_LeftButton;
+			_queue->push_back(e);
 			return 0;
-		break;
-		
-		case WM_LBUTTONDBLCLK:
-			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_LeftButton);
-			return 0;
+		}
 		break;
 		//----------------------- RMB -----------------------
 		case WM_RBUTTONDOWN:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_RightButton, true, false);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonPressed;
+			e.mouseButton.button = Input::Mouse::_RightButton;
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 
 		case WM_RBUTTONUP:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_RightButton, false, true);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonReleased;
+			e.mouseButton.button = Input::Mouse::_RightButton;
+			_queue->push_back(e);
 			return 0;
-		break;
-		
-		case WM_RBUTTONDBLCLK:
-			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_RightButton);
-			return 0;
+		}
 		break;
 		//----------------------- MMB -----------------------
 		case WM_MBUTTONDOWN:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_MiddleButton, true, false);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonPressed;
+			e.mouseButton.button = Input::Mouse::_MiddleButton;
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 
 		case WM_MBUTTONUP:
-			//_engine->getServices().getInput().SetButtonState(SG::Keys::_MiddleButton, false, true);
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonReleased;
+			e.mouseButton.button = Input::Mouse::_MiddleButton;
+			_queue->push_back(e);
 			return 0;
-		break;
-		
-		case WM_MBUTTONDBLCLK:
-			pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_MiddleButton);
-			return 0;
+		}
 		break;
 		//----------------------- XMB -----------------------
 		case WM_XBUTTONDOWN:
 		{
 			uint btn = GET_XBUTTON_WPARAM(wParam);
-			if(btn == XBUTTON1) int j;
-				//_engine->getServices().getInput().SetButtonState(SG::Keys::_XButton1, true, false);
-			else if(btn == XBUTTON2) int i;
-				//_engine->getServices().getInput().SetButtonState(SG::Keys::_XButton2, true, false);
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonPressed;
+			if(btn == XBUTTON1)
+			{
+				e.mouseButton.button = Input::Mouse::_XButton1;
+			}
+			else if(btn == XBUTTON2)
+			{
+				e.mouseButton.button = Input::Mouse::_XButton2;
+			}
+			_queue->push_back(e);
 			return TRUE;
 		}
 		break;
@@ -143,36 +170,44 @@ namespace Win32
 		case WM_XBUTTONUP:
 		{
 			uint btn = GET_XBUTTON_WPARAM(wParam);
-			if(btn == XBUTTON1) 0;
-				//_engine->getServices().getInput().SetButtonState(SG::Keys::_XButton1, false, true);
-			else if(btn == XBUTTON2) 0;
-				//_engine->getServices().getInput().SetButtonState(SG::Keys::_XButton2, false, true);
+			Input::Event e;
+			e.type = Input::EventType::MouseButtonReleased;
+			if(btn == XBUTTON1)
+			{
+				e.mouseButton.button = Input::Mouse::_XButton1;
+			}
+			else if(btn == XBUTTON2)
+			{
+				e.mouseButton.button = Input::Mouse::_XButton2;
+			}
+			_queue->push_back(e);
 			return TRUE;
 		}
 		break;
-		
-		case WM_XBUTTONDBLCLK:
-			uint btn = GET_XBUTTON_WPARAM(wParam);
-			if(btn == XBUTTON1)
-				pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_XButton1);
-			else if(btn == XBUTTON2)
-				pEngine->getServices().getInput().InjectMouseButtonDoubleClick(SG::Keys::_XButton2);
-			return TRUE;
-		break;
 		//----------------------- WHEEL -----------------------
 		case WM_MOUSEWHEEL:
-			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseWheel, HIWORD(wParam));
+		{
+			Input::Event e;
+			e.type = Input::EventType::MouseWheelMoved;
+			e.mouseWheel.delta = HIWORD(wParam);
+			_queue->push_back(e);
 			return 0;
+		}
 		break;
 		//----------------------- MOVE -----------------------
 		case WM_MOUSEMOVE:
+		{
 			POINT cursor;
 			GetCursorPos(&cursor);
 			ScreenToClient(_hwnd, &cursor);
-			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseX, cursor.x);
-			//_engine->getServices().getInput().SetAxisValue(SG::Axis::_MouseY, cursor.y);
+			Input::Event e;
+			e.type = Input::EventType::MouseMoved;
+			e.mouseMove.x = cursor.x;
+			e.mouseMove.y = cursor.y;
+			_queue->push_back(e);
 			return 0;
-		break;*/
+		}
+		break;
 	/*
 		case WM_SETCURSOR:
 			POINT cur;
@@ -187,9 +222,7 @@ namespace Win32
 			}
 		break;
 		*/
-		default:
-			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
-		
+		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 }

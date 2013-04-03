@@ -10,7 +10,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::AbstractWindow& window) 
-		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr)
+		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr), _inputEngine(window)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -32,10 +32,10 @@ namespace Core
 		String renderer = "dx";
 		/*
 			initialize the subsystems:
-			* display
+			* display - done
 			* audio
-			* input
-			* script
+			* input - done (in initialization list)
+			* script - done (no special ctor)
 			* communications
 			* persistence
 		*/
@@ -43,10 +43,10 @@ namespace Core
 		_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
 		/*
 			register all of the initialized subsystems
-			* display
+			* display - done
 			* audio
-			* input
-			* script
+			* input - done
+			* script - done
 			* comms
 			* persistence
 		*/
@@ -57,7 +57,7 @@ namespace Core
 
 		/*
 			initialize the resource caches
-			* textures
+			* textures - done
 			* spritesheets
 			* meshes
 			* sounds
@@ -68,7 +68,7 @@ namespace Core
 
 		/*
 			register the resource caches
-			* textures
+			* textures - done
 			* spritesheets
 			* meshes
 			* sounds
@@ -95,7 +95,7 @@ namespace Core
 		}
 
 		//update input
-		_inputEngine.Update(_window);
+		_inputEngine.Update();
 
 		//update logic and draw entities
 		//if there can be only one active context

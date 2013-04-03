@@ -14,26 +14,12 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-	String className = "Snake";
-	Win32::WindowClass wndClass(className);
-	
-	if(wndClass.Register() == 0)
+	Win32::GameWindow gameWindow("Snake");
+	int result = InitializeWindow(gameWindow, false, gameWindow.getSizeX()-120, gameWindow.getSizeY()-120);
+	if(result != ErrorCode::OK)
 	{
-		MessageBox(nullptr, "WindowClass::Register(): Failed to register the window class.", "Initialization error", MB_OK);
-		return ErrorCode::WindowClassRegistration;
+		return result;
 	}
-
-	Win32::GameWindow gameWindow(wndClass.getClassName(), wndClass.getClassName());
-	gameWindow.setFullscreen(false);
-	gameWindow.setSize(gameWindow.getSizeX()-30, gameWindow.getSizeY()-120);
-	
-	if(!gameWindow.Create())
-	{
-		MessageBoxA(nullptr, "Window::Create(): Failed to create a window.", "Initialization error", MB_OK);
-		return ErrorCode::WindowCreation;
-	}
-
-	gameWindow.Show();
 
 	try
 	{

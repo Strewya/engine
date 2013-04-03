@@ -26,7 +26,8 @@ const double gUpdateInterval = 1.0/40.0;
 
 enum ErrorCode
 {
-	WindowClassRegistration = 1,
+	OK = 0,
+	WindowClassRegistration,
 	WindowCreation,
 	WindowNotExists,
 	ExceptionThrown

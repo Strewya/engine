@@ -3,6 +3,7 @@
 #include "Win32/AbstractWindow.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Win32/WindowClass.h"
 	/*** end headers ***/
 
 namespace Win32
@@ -155,4 +156,28 @@ namespace Win32
 	bool			AbstractWindow::getUsePeekMessage() const { return _usePeekMessage; }
 	bool			AbstractWindow::getUseWaitMessage() const { return _useWaitMessage; }
 	int				AbstractWindow::getExitCode() const { return _exitCode; }
+
+
+	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint width, uint height)
+	{
+		WindowClass wndClass(window.getClass());
+	
+		if(wndClass.Register() == 0)
+		{
+			MessageBox(nullptr, "WindowClass::Register(): Failed to register the window class.", "Initialization error", MB_OK);
+			return ErrorCode::WindowClassRegistration;
+		}
+
+		window.setFullscreen(fullscreen);
+		window.setSize(width, height);
+	
+		if(!window.Create())
+		{
+			MessageBoxA(nullptr, "Window::Create(): Failed to create a window.", "Initialization error", MB_OK);
+			return ErrorCode::WindowCreation;
+		}
+
+		window.Show();
+		return ErrorCode::OK;
+	}
 }

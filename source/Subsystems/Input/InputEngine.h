@@ -20,15 +20,19 @@ namespace Input
 	{
 	private:
 		std::vector<bool> _keys;
+		std::vector<bool> _mouseKeys;
+
 		std::list<Event> _eventQueue;
 		
 	public:
-		Engine();
+		Engine(Win32::AbstractWindow& window);
 		
-		void Update(Win32::AbstractWindow& window);
+		void Update();
 		void PurgeOldEvents();
 
-		bool isKeyPressed(uint keyCode) const;
+		bool isKeyPressed(Keyboard::Keys key) const;
+		bool isMouseButtonPressed(Mouse::Keys button) const;
+		bool PollEvent(Event& out);
 	};
 }
 

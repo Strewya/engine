@@ -74,11 +74,11 @@ namespace Core
 		for(auto action : actions)
 		{
 			auto& entity = action->getOwner();
-			if(context.services.getInput().isKeyPressed(Input::Key::_ArrowLeft))
+			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowLeft))
 			{
 				entity.getForm().Translate(-2, 0);
 			}
-			if(context.services.getInput().isKeyPressed(Input::Key::_ArrowRight))
+			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowRight))
 			{
 				entity.getForm().Translate(2, 0);
 			}

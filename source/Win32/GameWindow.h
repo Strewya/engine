@@ -16,8 +16,8 @@ namespace Win32
 	class GameWindow : public AbstractWindow
 	{
 	public:
-		GameWindow(const char* title, const char* className);
-		GameWindow(const String& title, const String& className);
+		GameWindow(const char* title);
+		GameWindow(const String& title);
 
 		LRESULT WINAPI WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
