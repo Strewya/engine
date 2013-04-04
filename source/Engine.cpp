@@ -112,12 +112,12 @@ namespace Core
 		}
 		*/
 
-		_inputEngine.PurgeOldEvents();
+		_inputEngine.PurgeEvents();
 	}
 
 	void Engine::Shutdown()
 	{
-		PostMessage(_window.getWindowHandle(), WM_DESTROY, 0, 0);
+		_window.Shutdown();
 	}
 	/*
 	GameContext& Engine::CreateContext(const char* name, GameContextEvent onCreate)

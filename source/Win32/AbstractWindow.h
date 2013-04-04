@@ -28,6 +28,7 @@ namespace Win32
 		virtual bool Create();
 		virtual void Show();
 		virtual bool Update();
+		void Shutdown();
 
 		void setFullscreen(bool fs);
 		void setExtendedStyle(ulong style);

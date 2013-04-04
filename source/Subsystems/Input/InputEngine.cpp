@@ -49,7 +49,7 @@ namespace Input
 		}
 	}
 
-	void Engine::PurgeOldEvents()
+	void Engine::PurgeEvents()
 	{
 		_eventQueue.clear();
 	}

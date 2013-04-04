@@ -4,6 +4,7 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "GameContext.h"
+#include "Engine.h"
 #include "Core/Action/Action.h"
 #include "Core/Entity/Entity.h"
 #include "Subsystems/Graphics/IRenderer.h"
@@ -71,17 +72,31 @@ namespace Core
 
 	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
+		float speed = 5;
 		for(auto action : actions)
 		{
 			auto& entity = action->getOwner();
 			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowLeft))
 			{
-				entity.getForm().Translate(-2, 0);
+				entity.getForm().Translate(-speed, 0);
 			}
 			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowRight))
 			{
-				entity.getForm().Translate(2, 0);
+				entity.getForm().Translate(speed, 0);
 			}
+			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowDown))
+			{
+				entity.getForm().Translate(0, speed);
+			}
+			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowUp))
+			{
+				entity.getForm().Translate(0, -speed);
+			}
+		}
+
+		if(context.services.getInput().isKeyPressed(Input::Keyboard::_Escape))
+		{
+			context.services.getEngine().Shutdown();
 		}
 	}
 }

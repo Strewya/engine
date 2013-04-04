@@ -28,7 +28,7 @@ namespace Input
 		Engine(Win32::AbstractWindow& window);
 		
 		void Update();
-		void PurgeOldEvents();
+		void PurgeEvents();
 
 		bool isKeyPressed(Keyboard::Keys key) const;
 		bool isMouseButtonPressed(Mouse::Keys button) const;

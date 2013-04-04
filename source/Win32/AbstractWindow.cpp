@@ -48,6 +48,11 @@ namespace Win32
 		::UpdateWindow(_hwnd);
 	}
 
+	void AbstractWindow::Shutdown()
+	{
+		PostMessage(_hwnd, WM_DESTROY, 0, 0);
+	}
+
 	bool AbstractWindow::Update()
 	{
 		static MSG msg;

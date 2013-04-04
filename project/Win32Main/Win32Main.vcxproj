@@ -87,7 +87,6 @@
     <ClCompile Include="..\..\source\Core\Action\Functions.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
-    <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp" />
     <ClCompile Include="..\..\source\Core\Form\Form.cpp" />
     <ClCompile Include="..\..\source\Core\State\State.cpp" />
@@ -126,7 +125,6 @@
     <ClInclude Include="..\..\source\Core\Action\Functions.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
-    <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h" />
     <ClInclude Include="..\..\source\Core\Form\Form.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
