@@ -4,8 +4,8 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "ResourceLocator.h"
-#include "ServiceLocator.h"
+#include "Engine/ResourceLocator.h"
+#include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Dimensional.h"

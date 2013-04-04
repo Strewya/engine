@@ -3,8 +3,8 @@
 #include "Subsystems/Graphics/TextureCache.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "ResourceLocator.h"
-#include "ServiceLocator.h"
+#include "Engine/ResourceLocator.h"
+#include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/IRenderer.h"
 	/*** end headers ***/
 

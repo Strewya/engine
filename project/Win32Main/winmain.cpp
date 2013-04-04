@@ -5,9 +5,10 @@
 #include <string>
 #include <windows.h>
 	/*** extra headers ***/
-#include "Defines.h"
-#include "Engine.h"
+#include "Engine/Defines.h"
+#include "Engine/Engine.h"
 #include "GameContextEvents_Pong.h"
+#include "Util/Clock.h"
 #include "Win32/GameWindow.h"
 #include "Win32/WindowClass.h"
 	/*** end headers ***/
@@ -31,7 +32,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		//start main loop
 		while(gameWindow.Update())
 		{	
-			gClock.AdvanceTime();
+			Util::Clock::WallClock().AdvanceTime();
 			
 			engine.Loop();
 		}

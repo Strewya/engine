@@ -3,8 +3,8 @@
 #include "Core/Form/Form.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "ResourceLocator.h"
-#include "ServiceLocator.h"
+#include "Engine/ResourceLocator.h"
+#include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureCache.h"

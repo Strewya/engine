@@ -5,18 +5,18 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 #include <memory>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "GameContextEvent.h"
-#include "ResourceLocator.h"
-#include "ServiceLocator.h"
+#include "Engine/GameContextEvent.h"
+#include "Engine/ResourceLocator.h"
+#include "Engine/ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/EntityPool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureCache.h"
-#include "Util/Clock.h"
+#include "Util/Timer.h"
 	/*** end header inclusion ***/
 
 namespace Core

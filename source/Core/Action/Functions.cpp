@@ -3,8 +3,8 @@
 #include "Core/Action/Functions.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "GameContext.h"
-#include "Engine.h"
+#include "Engine/GameContext.h"
+#include "Engine/Engine.h"
 #include "Core/Action/Action.h"
 #include "Core/Entity/Entity.h"
 #include "Subsystems/Graphics/IRenderer.h"

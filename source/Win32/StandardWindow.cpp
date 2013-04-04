@@ -21,11 +21,6 @@ namespace Win32
 
 	LRESULT WINAPI StandardWindow::WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
 	{
-		switch(msg)
-		{
-
-		default:
-			return ::DefWindowProcA(hwnd, msg, wParam, lParam);
-		}
+		return ::DefWindowProcA(hwnd, msg, wParam, lParam);
 	}
 }

@@ -5,7 +5,7 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
 #include "Subsystems/Graphics/FontInfo.h"

@@ -5,7 +5,7 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 #include <chrono>
 #include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
@@ -13,48 +13,26 @@
 
 namespace Util
 {
-	class Timer
-	{
-	private:
-		double _accumulator;
-		double _scale;
-		double _deltaTime;
-
-	public:
-		Timer();
-		Timer(const Timer& rhs);
-		Timer& operator=(const Timer& rhs);
-		~Timer();
-		
-		void AdvanceTime(double dt);
-		void setTimeScaling(double scale);
-		void Reset();
-
-		bool TimeToUpdate(double time);
-
-		double getLastTimeDelta() const;
-		double getElapsedTime() const;
-		double getTimeScaling() const;
-	};
-
+	class ITimer;
+	
 	class Clock
 	{
 	private:
-		std::vector<Timer*> _timers;
+		std::vector<ITimer*> _timers;
 		std::chrono::time_point<std::chrono::high_resolution_clock> _lastUpdate;
-		double _maxDeltaAllowed;
+		float _maxDeltaAllowed;
 
-	public:
 		Clock();
+		static Clock _wallClock;
+	public:
+		static Clock& WallClock();
 		void AdvanceTime();
-		void RegisterTimer(Timer* timer);
-		void UnregisterTimer(Timer* timer);
+		void RegisterTimer(ITimer* timer);
+		void UnregisterTimer(ITimer* timer);
 
-		double getMaxDeltaAllowed() const;
-		void  setMaxDeltaAllowed(double delta);
+		float getMaxDeltaAllowed() const;
+		void  setMaxDeltaAllowed(float delta);
 	};
 }
-
-extern Util::Clock gClock;
 
 #endif //UTIL_CLOCK_H_

@@ -5,9 +5,9 @@
 	usage:	
 ********************************************/
 	/*** common header ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 	/*** extra headers if needed ***/
-#include "GameContextEvent.h"
+#include "Engine/GameContextEvent.h"
 	/*** end header inclusion ***/
 
 namespace Pong

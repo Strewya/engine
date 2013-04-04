@@ -1,6 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "ResourceLocator.h"
+#include "Engine/ResourceLocator.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

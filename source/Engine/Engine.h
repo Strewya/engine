@@ -5,13 +5,13 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 #include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "GameContext.h"
-#include "ResourceLocator.h"
-#include "ServiceLocator.h"
+#include "Engine/GameContext.h"
+#include "Engine/ResourceLocator.h"
+#include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/RendererFactory.h"
 #include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Input/InputEngine.h"

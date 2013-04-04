@@ -42,6 +42,10 @@ float  Deg2Rad(float angle);
 double Deg2Rad(double angle);
 float  Rad2Deg(float radians);
 double Rad2Deg(double radians);
+String trim(const String& s, const char* t = " \t\n\r\f\v");
+String lowercase(const String& s);
+String uppercase(const String& s);
+
 template <typename T> String ToString(T value)
 {
 	std::stringstream ss;
@@ -50,7 +54,6 @@ template <typename T> String ToString(T value)
 }
 
 /*		MY HEADERS	*/
-#include "Util/Clock.h"
 #include "Util/Logger.h"
 
 #endif //DEFINES_H_

@@ -65,32 +65,14 @@
     <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Engine.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Defines.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\GameContext.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\ServiceLocator.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
       <Filter>Core/Action</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\ResourceLocator.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp">
       <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
@@ -103,6 +85,28 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Input\InputEngine.cpp">
       <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\ITimer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Timer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp" />
+    <ClCompile Include="..\..\source\Engine\Defines.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\Engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\GameContext.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,38 +182,17 @@
     <ClInclude Include="..\..\source\Core\Action\Functions.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Defines.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\GameContext.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\ServiceLocator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\ResourceLocator.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h">
       <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\GameContextEvent.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\GameContextEvents_Pong.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
       <Filter>Core/Entity</Filter>
@@ -228,6 +211,31 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h">
       <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\ITimer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Timer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
+    <ClInclude Include="..\..\source\Engine\Defines.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GameContext.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GameContextEvent.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\ResourceLocator.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\ServiceLocator.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -252,9 +260,6 @@
     <Filter Include="Core/Action">
       <UniqueIdentifier>{8b8ca550-38c1-4bc3-9433-33fed5d1c035}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Win32">
       <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
     </Filter>
@@ -263,6 +268,9 @@
     </Filter>
     <Filter Include="Resources">
       <UniqueIdentifier>{af13eb68-4100-43be-bdff-4fcdc5921d7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

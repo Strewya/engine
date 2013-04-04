@@ -4,7 +4,7 @@
 	/*** C++ headers ***/
 #include <memory>
 	/*** extra headers ***/
-#include "GameContext.h"
+#include "Engine/GameContext.h"
 #include "Core/Action/Action.h"
 #include "Core/Action/Functions.h"
 #include "Core/Entity/Entity.h"

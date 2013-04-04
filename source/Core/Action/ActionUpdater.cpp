@@ -3,7 +3,7 @@
 #include "Core/Action/ActionUpdater.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "GameContext.h"
+#include "Engine/GameContext.h"
 #include "Core/Action/Action.h"
 	/*** end headers ***/
 
