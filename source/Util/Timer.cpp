@@ -3,19 +3,27 @@
 #include "Util/Timer.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Engine/Defines.h"
 	/*** end headers ***/
 
 namespace Util
 {
+	Timer::Timer()
+		: _accumulator(0), _scale(1), _updatePeriod(gUpdateInterval)
+	{}
+
+	Timer::Timer(float updatePeriod, float scale)
+		: _accumulator(0), _scale(scale), _updatePeriod(updatePeriod)
+	{}
+
 	void Timer::AdvanceTime(float dt)
 	{
-		_deltaTime = dt;
 		_accumulator += (dt*_scale);
 	}
 
-	double Timer::getLastTimeDelta() const
+	float Timer::getUpdatePeriod() const
 	{
-		return _deltaTime;
+		return _updatePeriod;
 	}
 
 	void Timer::Reset()
@@ -23,27 +31,27 @@ namespace Util
 		_accumulator = 0.0;
 	}
 
-	bool Timer::TimeToUpdate(double time)
+	bool Timer::HasUpdatePeriodElapsed()
 	{
-		if(_accumulator >= time)
+		if(_accumulator >= _updatePeriod)
 		{
-			_accumulator -= time;
+			_accumulator -= _updatePeriod;
 			return true;
 		}
 		return false;
 	}
 
-	double Timer::getElapsedTime() const
+	float Timer::getElapsedTime() const
 	{
 		return _accumulator;
 	}
 
-	void Timer::setTimeScaling(double scale)
+	void Timer::setTimeScaling(float scale)
 	{
 		_scale = scale;
 	}
 
-	double Timer::getTimeScaling() const
+	float Timer::getTimeScaling() const
 	{
 		return _scale;
 	}

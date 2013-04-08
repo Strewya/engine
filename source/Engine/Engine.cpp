@@ -99,7 +99,10 @@ namespace Core
 
 		//update logic and draw entities
 		//if there can be only one active context
-		_activeContext->Update();
+		if(_activeContext->Update())
+		{
+			_inputEngine.PurgeEvents();
+		}
 		
 		//if there are more than one active contexts
 		/*
@@ -112,7 +115,7 @@ namespace Core
 		}
 		*/
 
-		_inputEngine.PurgeEvents();
+		
 	}
 
 	void Engine::Shutdown()

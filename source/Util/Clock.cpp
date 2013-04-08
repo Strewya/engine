@@ -29,7 +29,8 @@ namespace Util
 		delta = delta > _maxDeltaAllowed ? _maxDeltaAllowed : delta;
 		for(auto timer : _timers)
 		{
-			if(timer) timer->AdvanceTime(delta);
+			if(timer) 
+				timer->AdvanceTime(delta);
 		}
 	}
 

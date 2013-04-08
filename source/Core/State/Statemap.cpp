@@ -85,17 +85,17 @@ namespace Core
 		return _states.erase(name) != 0;
 	}
 	
-	bool Statemap::Insert(const char* name, IState* state)
+	bool Statemap::Insert(const char* name, State* state)
 	{
-		return Insert(name, std::unique_ptr<IState>(state));
+		return Insert(name, std::unique_ptr<State>(state));
 	}
 
-	bool Statemap::Insert(const String& name, IState* state)
+	bool Statemap::Insert(const String& name, State* state)
 	{
-		return Insert(name.c_str(), std::unique_ptr<IState>(state));
+		return Insert(name.c_str(), std::unique_ptr<State>(state));
 	}
 	
-	bool Statemap::Insert(const char* name, std::unique_ptr<IState> state)
+	bool Statemap::Insert(const char* name, std::unique_ptr<State> state)
 	{
 		auto it = _states.find(name);
 		if(it == _states.end())
@@ -106,12 +106,12 @@ namespace Core
 		return true;
 	}
 	
-	bool Statemap::Insert(const String& name, std::unique_ptr<IState> state)
+	bool Statemap::Insert(const String& name, std::unique_ptr<State> state)
 	{
 		return Insert(name.c_str(), std::move(state));
 	}
 	
-	IState* Statemap::getState(const char* name)
+	State* Statemap::getState(const char* name)
 	{
 		auto it = _states.find(name);
 		if(it == _states.end())
@@ -125,7 +125,7 @@ namespace Core
 		return it->second.get();
 	}
 
-	IState* Statemap::getState(const String& name)
+	State* Statemap::getState(const String& name)
 	{
 		return getState(name.c_str());
 	}

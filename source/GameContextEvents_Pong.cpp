@@ -24,8 +24,10 @@ namespace Pong
 		context.actionMaster.EnqueueActionLogic(Core::Animate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
-		Graphics::Spritesheet& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
-		Graphics::Spritesheet& sheet2 = context.resources.getSpritesheetCache().LoadFromFile("resources/character.sheet");
+		auto& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
+		auto& sheet2 = context.resources.getSpritesheetCache().LoadFromFile("resources/character.sheet");
+		auto guiHandle = context.resources.getTextureCache().getTextureHandle("resources/gui_window.png");
+		auto& gui = context.resources.getTextureCache().getTexture(guiHandle);
 		
 		uint ballHandle = sheet.getSpriteHandle("ball");
 		uint cherryHandle = sheet.getSpriteHandle("cherry");
@@ -39,12 +41,11 @@ namespace Pong
 		frm.setType(Core::FormType::Sprite);
 		frm.setPosition(500,300);
 		frm.setScale(4,4);
-		
-		frm.Insert("Spritesheet", Core::IState::Create<String>(sheet2.getSpritesheetName()));
-		frm.Insert("CurrentSprite", Core::IState::Create(sheet2.getAnimation(animationHandle).getSequenceFrame(0)));
-		frm.Insert("CurrentAnimationFrame", Core::IState::Create<uint>(0));
-		frm.Insert("CurrentAnimation", Core::IState::Create(animationHandle));
-
+		frm.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet2));
+		frm.Insert("CurrentSprite", Core::State::Create(sheet2.getAnimation(animationHandle).getSequenceFrame(0)));
+		frm.Insert("CurrentAnimationFrame", Core::State::Create<uint>(0));
+		frm.Insert("CurrentAnimation", Core::State::Create(animationHandle));
+		frm.Insert("AnimationTimer", Core::State::Create(Util::Timer(0.5f)));
 
 		ent->Insert("Render", Core::Action(Core::Render));
 		assert(ent->getAction("Render").Activate());
@@ -52,6 +53,16 @@ namespace Pong
 		assert(ent->getAction("Animate").Activate());
 		ent->Insert("SIH", Core::Action(Core::SIH));
 		assert(ent->getAction("SIH").Activate());
+
+		ent = context.entities.getNewEntity();
+		auto& frm2 = ent->getForm();
+		frm2.setType(Core::FormType::Texture);
+		frm2.setPosition(0,0);
+
+		frm2.Insert("Texture", Core::State::Create(gui));
+
+		ent->Insert("Render", Core::Action(Core::Render));
+		assert(ent->getAction("Render").Activate());
 
 		return true;
 	}

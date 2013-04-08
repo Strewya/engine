@@ -24,7 +24,7 @@ namespace Core
 	{
 	private:
 
-		typedef std::unordered_map<String, std::unique_ptr<IState>> StateCache;
+		typedef std::unordered_map<String, std::unique_ptr<State>> StateCache;
 		StateCache _states;
 
 		Statemap* _prototype;
@@ -45,13 +45,13 @@ namespace Core
 		bool RemoveState(const char* name);
 		bool RemoveState(const String& name);
 
-		bool Insert(const char* name, IState* state);
-		bool Insert(const String& name, IState* state);
-		bool Insert(const char* name, std::unique_ptr<IState> state);
-		bool Insert(const String& name, std::unique_ptr<IState> state);
+		bool Insert(const char* name, State* state);
+		bool Insert(const String& name, State* state);
+		bool Insert(const char* name, std::unique_ptr<State> state);
+		bool Insert(const String& name, std::unique_ptr<State> state);
 
-		IState* getState(const char* name);
-		IState* getState(const String& name);
+		State* getState(const char* name);
+		State* getState(const String& name);
 
 		
 

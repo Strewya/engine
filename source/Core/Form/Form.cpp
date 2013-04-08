@@ -17,15 +17,22 @@ namespace Core
 		Graphics::IRenderer& gfx = services.getGraphics();
 		for(Form* f : frms)
 		{
+			if(!f->getVisibility())
+			{
+				continue;
+			}
 			switch(f->getType())
 			{
 			case FormType::Font:
 			{
-				if(f->hasState("Text") && f->hasState("Font"))
+				State* s_text = f->getState("Text");
+				State* s_font = f->getState("Font");
+				State* s_area = f->getState("Area");
+				if(s_text && s_font)
 				{
-					auto& text = f->getValue<String>("Text");
-					auto font = f->getValue<uint>("Font");
-					auto& bounds = f->hasState("Area") ? f->getValue<Util::Rect>("Area") : Util::Rect(f->getPosition(),1,1);
+					auto& text = s_text->as<String>();
+					auto font = s_font->as<uint>();
+					auto& bounds = s_area ? s_area->as<Util::Rect>() : Util::Rect(f->getPosition(),1,1);
 					//read these from states!
 					gfx.setFontStyle(false, false, false, false, false, false);
 					gfx.DrawFont(font, text.c_str(), &bounds);
@@ -35,11 +42,12 @@ namespace Core
 			
 			case FormType::Sprite:
 			{
-				if(f->hasState("Spritesheet") && f->hasState("CurrentSprite"))
+				State* s_currentSprite = f->getState("CurrentSprite");
+				State* s_spritesheet = f->getState("Spritesheet");
+				if(s_currentSprite && s_spritesheet)
 				{
-					auto& sheetName = f->getValue<String>("Spritesheet");
-					auto& sheet = resources.getSpritesheetCache().getSpritesheet(sheetName);
-					auto currentFrame = f->getValue<uint>("CurrentSprite");
+					auto& sheet = s_spritesheet->as<Graphics::Spritesheet&>();
+					auto currentFrame = s_currentSprite->as<uint>();
 					Graphics::Texture& texture = resources.getTextureCache().getTexture(sheet.getTextureHandle());
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawSprite(texture, sheet.getSprite(currentFrame));
@@ -49,10 +57,10 @@ namespace Core
 			
 			case FormType::Texture:
 			{
-				if(f->hasState("Texture"))
+				State* s_texture = f->getState("Texture");
+				if(s_texture)
 				{
-					auto textureHandle = f->getValue<uint>("Texture");
-					auto& texture = resources.getTextureCache().getTexture(textureHandle);
+					auto& texture = s_texture->as<Graphics::Texture>();
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawTexture(texture);
 				}
@@ -61,10 +69,12 @@ namespace Core
 
 			case FormType::Line:
 			{
-				if(f->hasState("LineVector"))
+				State* s_line = f->getState("LineVector");
+				State* s_width = f->getState("LineWidth");
+				if(s_line)
 				{
-					auto& line = f->getValue<Util::Vec2>("LineVector");
-					auto lineWidth = f->hasState("LineWidth") ? f->getValue<float>("LineWidth") : 1.0f;
+					auto& line = s_line->as<Util::Vec2>();
+					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
 					gfx.DrawLine(f->getPosition(), f->getPosition()+line, &f->getColor(), lineWidth);
 				}
 			}
@@ -72,10 +82,14 @@ namespace Core
 
 			case FormType::Triangle:
 			{
-				if(f->hasState("Point1") && f->hasState("Point2") && f->hasState("Point3"))
+				State* s_pt1 = f->getState("Point1");
+				State* s_pt2 = f->getState("Point2");
+				State* s_pt3 = f->getState("Point3");
+				State* s_width = f->getState("LineWidth");
+				if(s_pt1 && s_pt2 && s_pt3)
 				{
-					Util::Vec2 pts[] = { f->getValue<Util::Vec2>("Point1"), f->getValue<Util::Vec2>("Point2"), f->getValue<Util::Vec2>("Point3")};
-					float lineWidth = f->hasState("LineWidth") ? f->getValue<float>("LineWidth") : 1.0f;
+					Util::Vec2 pts[] = { s_pt1->as<Util::Vec2>(), s_pt2->as<Util::Vec2>(), s_pt3->as<Util::Vec2>()};
+					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
 					gfx.DrawTriangle(f->getPosition()+pts[0], f->getPosition()+pts[1], f->getPosition()+pts[2], &f->getColor(), lineWidth);
 				}
 			}
@@ -83,10 +97,12 @@ namespace Core
 
 			case FormType::Rectangle:
 			{
-				if(f->hasState("Area"))
+				State* s_area = f->getState("Area");
+				State* s_width = f->getState("LineWidth");
+				if(s_area)
 				{
-					auto& bounds = f->getValue<Util::Rect>("Area");
-					auto lineWidth = f->hasState("LineWidth") ? f->getValue<float>("LineWidth") : 1.0f;
+					auto& bounds = s_area->as<Util::Rect>();
+					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
 					gfx.DrawRectangle(bounds, &f->getColor(), lineWidth);
 				}
 			}
@@ -94,10 +110,12 @@ namespace Core
 
 			case FormType::Circle:
 			{
-				if(f->hasState("Radius"))
+				State* s_radius = f->getState("Radius");
+				State* s_width = f->getState("LineWidth");
+				if(s_radius)
 				{
-					auto radius = f->getValue<float>("Radius");
-					auto lineWidth = f->hasState("LineWidth") ? f->getValue<float>("LineWidth") : 1.0f;
+					auto radius = s_radius->as<float>();
+					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
 					gfx.DrawCircle(f->getPosition(), radius, &f->getColor(), lineWidth);
 				}
 			}
@@ -105,10 +123,13 @@ namespace Core
 
 			case FormType::Elipse:
 			{
-				if(f->hasState("RadiusX") && f->hasState("RadiusY"))
+				State* s_radiusX = f->getState("RadiusX");
+				State* s_radiusY = f->getState("RadiusY");
+				State* s_width = f->getState("LineWidth");
+				if(s_radiusX && s_radiusY)
 				{
-					float radius[] = {f->getValue<float>("RadiusX"), f->getValue<float>("RadiusY")};
-					float lineWidth = f->hasState("LineWidth") ? f->getValue<float>("LineWidth") : 1.0f;
+					float radius[] = {s_radiusX->as<float>(), s_radiusY->as<float>()};
+					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
 					gfx.DrawElipse(f->getPosition(), radius[0], radius[1],&f->getColor(), lineWidth);
 				}
 			}

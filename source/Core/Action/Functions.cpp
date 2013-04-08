@@ -33,16 +33,30 @@ namespace Core
 
 	void Animate(double dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
+		State* s_currentSprite = nullptr;
+		State* s_animationFrame = nullptr;
+		State* s_animation = nullptr;
+		State* s_spritesheet = nullptr;
+		State* s_timer = nullptr;
+
 		for(auto action : actions)
 		{
 			auto& owner = action->getOwner().getForm();
-			if(owner.hasState("CurrentSprite") && owner.hasState("CurrentAnimationFrame") && owner.hasState("CurrentAnimation") && owner.hasState("Spritesheet"))
+			s_spritesheet = owner.getState("Spritesheet");
+			s_animation = owner.getState("CurrentAnimation");
+			s_animationFrame = owner.getState("CurrentAnimationFrame");
+			s_currentSprite = owner.getState("CurrentSprite");
+			s_timer = owner.getState("AnimationTimer");
+			if(s_currentSprite && s_animation && s_animationFrame && s_spritesheet)
 			{
-				IState* states[] = {owner.getState("Spritesheet"), owner.getState("CurrentAnimation"), owner.getState("CurrentAnimationFrame"), owner.getState("CurrentSprite")};
-				auto& spritesheet = context.resources.getSpritesheetCache().getSpritesheet(states[0]->as<String>());
-				auto& animation = spritesheet.getAnimation(states[1]->as<uint>());
-				auto& curFrame = states[2]->as<uint>();
-				auto& curSprite = states[3]->as<uint>();
+				if(s_timer && !s_timer->as<Util::Timer>().HasUpdatePeriodElapsed())
+				{
+					continue;
+				}
+				auto& spritesheet = s_spritesheet->as<Graphics::Spritesheet&>();
+				auto& animation = spritesheet.getAnimation(s_animation->as<uint>());
+				auto& curFrame = s_animationFrame->as<uint>();
+				auto& curSprite = s_currentSprite->as<uint>();
 				curFrame = (++curFrame) % animation.getSequenceSize();
 				curSprite = animation.getSequenceFrame(curFrame);
 			}
@@ -59,15 +73,7 @@ namespace Core
 
 	void Spawner(double dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
-		for(auto action : actions)
-		{
-			auto spawnItem = action->getOwner().getState("SpawnItem");
-			if(spawnItem)
-			{
-				String item = spawnItem->as<String>();
-				
-			}
-		}
+		
 	}
 
 	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions)
@@ -91,6 +97,24 @@ namespace Core
 			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowUp))
 			{
 				entity.getForm().Translate(0, -speed);
+			}
+		}
+
+		Input::Event event;
+		while(context.services.getInput().PollEvent(event))
+		{
+			for(auto action : actions)
+			{
+				switch(event.type)
+				{
+				case Input::EventType::KeyPressed:
+					{
+						if(event.key.code == Input::Keyboard::_Space)
+						{
+							action->getOwner().getForm().setVisibility(!action->getOwner().getForm().getVisibility());
+						}
+					}
+				}
 			}
 		}
 

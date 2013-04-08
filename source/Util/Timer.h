@@ -14,20 +14,24 @@ namespace Util
 	class Timer : public ITimer
 	{
 	private:
-		double _accumulator;
-		double _scale;
-		double _deltaTime;
+		float _accumulator;
+		float _scale;
+		float _updatePeriod;
 
 	public:
+		Timer();
+		Timer(float updatePeriod, float scale = 1);
+
 		void AdvanceTime(float dt);
-		void setTimeScaling(double scale);
+		void setTimeScaling(float scale);
+		void setUpdatePeriod(float updatePeriod);
 		void Reset();
 
-		bool TimeToUpdate(double time);
+		bool HasUpdatePeriodElapsed();
 
-		double getLastTimeDelta() const;
-		double getElapsedTime() const;
-		double getTimeScaling() const;
+		float getElapsedTime() const;
+		float getTimeScaling() const;
+		float getUpdatePeriod() const;
 	};
 }
 

@@ -14,19 +14,19 @@
 
 namespace Core
 {
-	template<typename T> class State;
+	template<typename T> class ValueState;
 
-	class IState
+	class State
 	{
 	protected:
 		const std::type_info& _type;
 	public:
-		IState(const std::type_info& typeInfo) : _type(typeInfo) {};
-		virtual ~IState() {};
+		State(const std::type_info& typeInfo) : _type(typeInfo) {};
+		virtual ~State() {};
 
-		virtual std::unique_ptr<IState> Clone() = 0;
+		virtual std::unique_ptr<State> Clone() = 0;
 		template<typename T> T& as();
-		template<typename T> static std::unique_ptr<State<T>> Create(const T& value);
+		template<typename T> static std::unique_ptr<ValueState<T>> Create(const T& value);
 	};
 
 	/*
@@ -37,24 +37,20 @@ namespace Core
 			A potential method might be to make the constructor private and make a static method that creates the state instance.
 			This change would allow optimizations in the construction of the state instance, as it could use an object or memory pool for the instances.			
 	*/
-	template<typename T> class State : public IState
+	template<typename T> class ValueState : public State
 	{
 	public:
 		T value;
 		
-		State()
-			: IState(typeid(T))
+		ValueState(const T& value)
+			: State(typeid(T)), value(value)
 		{}
 
-		State(const T& value)
-			: IState(typeid(T)), value(value)
+		ValueState(const ValueState& rhs)
+			: State(rhs._type), value(rhs.value)
 		{}
 
-		State(const State& rhs)
-			: IState(rhs._type), value(rhs.value)
-		{}
-
-		State& operator=(const State& rhs)
+		ValueState& operator=(const ValueState& rhs)
 		{
 			if(this != &rhs)
 			{
@@ -63,26 +59,26 @@ namespace Core
 			return *this;
 		}
 
-		~State() {};
+		~ValueState() {};
 
-		std::unique_ptr<IState> Clone()
+		std::unique_ptr<State> Clone()
 		{
-			return std::unique_ptr<State<T>>(new State<T>(*this));
+			return std::unique_ptr<ValueState<T>>(new ValueState<T>(*this));
 		}
 	};
 
-	template<typename T> T& IState::as()
+	template<typename T> T& State::as()
 	{
 		if(typeid(T) == _type)
 		{
-			return static_cast<State<T>*>(this)->value;
+			return static_cast<ValueState<T>*>(this)->value;
 		}
 		throw std::exception("State::as<T>(): Tried to access wrong type!");
 	}
 
-	template<typename T> static std::unique_ptr<State<T>> IState::Create(const T& value)
+	template<typename T> static std::unique_ptr<ValueState<T>> State::Create(const T& value)
 	{
-		return (std::unique_ptr<State<T>>(new State<T>(value)));
+		return (std::unique_ptr<ValueState<T>>(new ValueState<T>(value)));
 	}
 }
 

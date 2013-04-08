@@ -13,6 +13,11 @@ namespace Util
 		_wallClock.RegisterTimer(this);
 	}
 
+	ITimer::ITimer(const ITimer& rhs)
+	{
+		_wallClock.RegisterTimer(this);
+	}
+
 	ITimer::~ITimer()
 	{
 		_wallClock.UnregisterTimer(this);

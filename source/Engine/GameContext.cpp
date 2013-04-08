@@ -9,7 +9,7 @@
 namespace Core
 {
 	GameContext::GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources)
-		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr)
+		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr), timer(gUpdateInterval)
 	{
 		Action::BindActionUpdater(actionMaster);
 
@@ -42,6 +42,7 @@ namespace Core
 	void GameContext::Activate()
 	{
 		Action::BindActionUpdater(actionMaster);
+		timer.Reset();
 
 		if(_onActivate)
 		{
@@ -59,16 +60,17 @@ namespace Core
 
 	bool GameContext::Update()
 	{
-		if(_onUpdate)
+		while(timer.HasUpdatePeriodElapsed())
 		{
-			_onUpdate(*this);
-		}
+			if(_onUpdate)
+			{
+				_onUpdate(*this);
+			}
 
-		while(timer.TimeToUpdate(gUpdateInterval))
-		{
-			actionMaster.Update(gUpdateInterval, *this);
+			actionMaster.Update(timer.getUpdatePeriod(), *this);
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	void GameContext::setContextEventLogic(EventType type, GameContextEvent function)
