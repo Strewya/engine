@@ -43,7 +43,7 @@ namespace Core
 			_pool.emplace_back(nullptr);
 		}
 		InstanceID id = _NewID(index);
-		_pool[index].reset(new Space(id));
+		_pool[index].reset(new Space());
 		return *_pool[index];
 	}
 

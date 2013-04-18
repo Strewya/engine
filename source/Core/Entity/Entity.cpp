@@ -152,18 +152,6 @@ namespace Core
 		return *this;
 	}
 
-	Entity& Entity::setForm(const Form& form)
-	{
-		_form = form;
-		return *this;
-	}
-
-	Entity& Entity::setForm(Form&& form)
-	{
-		_form = std::move(form);
-		return *this;
-	}
-
 	/////////////////////////// INSERT METHODS ///////////////////////////
 
 	bool Entity::Insert(const char* name, const Action& action)

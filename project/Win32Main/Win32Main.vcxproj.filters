@@ -108,6 +108,12 @@
     <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Space\SpacePool.cpp">
+      <Filter>Core/Space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Space\Space.cpp">
+      <Filter>Core/Space</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -237,6 +243,12 @@
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\Space\SpacePool.h">
+      <Filter>Core/Space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Space\Space.h">
+      <Filter>Core/Space</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -271,6 +283,9 @@
     </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Space">
+      <UniqueIdentifier>{e12f3b4d-4607-4113-ac64-6d4422666606}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -78,8 +78,6 @@ namespace Core
 		Entity& setType(const char* type);
 		Entity& setType(const String& type);
 		Entity& setPrototype(Entity& prototype);
-		Entity& setForm(const Form& form);
-		Entity& setForm(Form&& form);
 		
 		//////////// INSERT METHODS ////////////
 

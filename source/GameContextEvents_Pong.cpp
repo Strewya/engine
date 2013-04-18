@@ -36,7 +36,7 @@ namespace Pong
 
 		uint animationHandle = sheet2.getAnimationHandle("walk");
 
-		auto& ent = context.entities.NewEntity();
+		auto& ent = context.entities.NewInstance();
 		auto& frm = ent.getForm();
 		frm.setType(Core::FormType::Sprite);
 		frm.setPosition(500,300);
@@ -54,7 +54,7 @@ namespace Pong
 		ent.Insert("SIH", Core::Action(Core::SIH));
 		assert(ent.getAction("SIH").Activate());
 
-		auto& ent2 = context.entities.NewEntity();
+		auto& ent2 = context.entities.NewInstance();
 		auto& frm2 = ent2.getForm();
 		frm2.setType(Core::FormType::Texture);
 		frm2.setPosition(0,0);

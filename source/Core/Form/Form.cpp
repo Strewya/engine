@@ -139,71 +139,22 @@ namespace Core
 	}
 	
 
-	InstanceID Form::_idCounter = 0;
-
 	Form::Form()
-		: _id(++_idCounter), _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), 
+		: _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), 
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}
 
 	Form::Form(const FormType& type)
-		: _id(++_idCounter), _type(type), _scale(1,1), _rotation(0), _position(0,0), 
+		: _type(type), _scale(1,1), _rotation(0), _position(0,0), 
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}
 
-	Form::Form(const Form& rhs)
-		: _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
-		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
-		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible)
-	{
-	}
-
-	Form::Form(Form&& rhs)
-		: _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
-		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
-		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible)
-	{
-	}
-
-	Form& Form::operator=(Form&& rhs)
-	{
-		if(this != &rhs)
-		{
-			_type = rhs._type;
-			_color = rhs._color;
-			_position = rhs._position;
-			_scalingCenter = rhs._scalingCenter;
-			_scale = rhs._scale;
-			_pivotPoint = rhs._pivotPoint;
-			_rotation = rhs._rotation;
-			_visible = rhs._visible;
-		}
-		return *this;
-	}
-
-	Form& Form::operator=(const Form& rhs)
-	{
-		if(this != &rhs)
-		{
-			_type = rhs._type;
-			_color = rhs._color;
-			_position = rhs._position;
-			_scalingCenter = rhs._scalingCenter;
-			_scale = rhs._scale;
-			_pivotPoint = rhs._pivotPoint;
-			_rotation = rhs._rotation;
-			_visible = rhs._visible;
-		}
-		return *this;
-	}
-
-	
 	/********** GETTERS *****************/
-	InstanceID Form::getID() const
+	Space& Form::getSpace()
 	{
-		return _id;
+		return _space;
 	}
 
 	FormType Form::getType() const

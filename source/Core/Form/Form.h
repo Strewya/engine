@@ -8,6 +8,7 @@
 #include "Engine/Defines.h"
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Core/Space/Space.h"
 #include "Core/State/Statemap.h"
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
@@ -37,9 +38,6 @@ namespace Core
 	class Form
 	{
 	private:
-		static InstanceID _idCounter;
-		
-		const InstanceID _id;
 		FormType _type;
 		Util::Color _color;
 		Util::Vec2 _position;
@@ -50,6 +48,7 @@ namespace Core
 		bool _visible;
 		
 		Statemap _states;
+		Space _space;
 		//perhaps i could save the matrices that DX makes anyway when it draws stuff
 		//then i wouldn't need to make them every time i draw, + they only change when a value changes
 		//but that's really an optimisation issue
@@ -57,16 +56,17 @@ namespace Core
 		//3d stuff, (roll, yaw, pitch):float/matrix, (forward, right, up):vector3
 		//the Vec2 usage above for position, scale and such will be a problem for 3D data
 		
-	public:
-		Form();
-		Form(const FormType& type);
 		Form(const Form& rhs);
 		Form(Form&& rhs);
 		Form& operator=(Form&& rhs);
 		Form& operator=(const Form& rhs);
-		
 
-		InstanceID 			getID() const;
+	public:
+		Form();
+		Form(const FormType& type);
+		
+		
+		Space&				getSpace();
 		FormType			getType() const;
 		float 				getRotation() const;
 		bool 				getVisibility() const;
@@ -75,7 +75,6 @@ namespace Core
 		const Util::Vec2& 	getScalingCenter() const;
 		const Util::Vec2& 	getScale() const;
 		const Util::Vec2& 	getPivotPoint() const;
-		
 		
 		void setType(const FormType& type);
 		void setColor(const Util::Color& color);
