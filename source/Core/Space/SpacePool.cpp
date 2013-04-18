@@ -1,13 +1,14 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "Core/Entity/EntityPool.h"
+#include "Core/Space/SpacePool.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Core/Space/Space.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	EntityPool::EntityPool(uint maxExpectedSize)
+	SpacePool::SpacePool(uint maxExpectedSize)
 		: _idCounter(0), _maxExpectedSize(maxExpectedSize), _indexMask(0), _indexBits(0)
 	{
 		--maxExpectedSize;
@@ -20,7 +21,7 @@ namespace Core
 		}
 	}
 
-	InstanceID EntityPool::_NewID(int index)
+	InstanceID SpacePool::_NewID(int index)
 	{
 		InstanceID id = ++_idCounter;
 		id <<= _indexBits;
@@ -28,7 +29,7 @@ namespace Core
 		return id;
 	}
 
-	Entity& EntityPool::NewInstance()
+	Space& SpacePool::NewInstance()
 	{
 		uint index;
 		if(!_availableSlots.empty())
@@ -42,23 +43,23 @@ namespace Core
 			_pool.emplace_back(nullptr);
 		}
 		InstanceID id = _NewID(index);
-		_pool[index].reset(new Entity(id));
+		_pool[index].reset(new Space(id));
 		return *_pool[index];
 	}
 
-	Entity& EntityPool::Retrieve(InstanceID id) const
+	Space& SpacePool::Retrieve(InstanceID id) const
 	{
 		uint index = id & _indexMask;
 		return *_pool[index];
 	}
 	
-	bool EntityPool::IsAlive(InstanceID id) const
+	bool SpacePool::IsAlive(InstanceID id) const
 	{
 		uint index = id & _indexMask;
 		return (_pool[index] != nullptr && _pool[index]->getID() == id);
 	}
 
-	bool EntityPool::Destroy(InstanceID id)
+	bool SpacePool::Destroy(InstanceID id)
 	{
 		if(IsAlive(id))
 		{
