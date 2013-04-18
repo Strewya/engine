@@ -34,7 +34,7 @@ namespace Core
 		Texture
 	};
 	
-	class Form : public Statemap
+	class Form
 	{
 	private:
 		static InstanceID _idCounter;
@@ -49,6 +49,7 @@ namespace Core
 		float _rotation;
 		bool _visible;
 		
+		Statemap _states;
 		//perhaps i could save the matrices that DX makes anyway when it draws stuff
 		//then i wouldn't need to make them every time i draw, + they only change when a value changes
 		//but that's really an optimisation issue
@@ -95,6 +96,18 @@ namespace Core
 		void Rotate(float rotation);
 		void Translate(const Util::Vec2& translation);
 		void Translate(float x, float y);
+
+		
+
+		void ClearStates();
+		bool RemoveState(const char* name);
+		bool RemoveState(const String& name);
+		bool Insert(const char* name, std::unique_ptr<State> state);
+		bool Insert(const String& name, std::unique_ptr<State> state);
+		State* getState(const char* name);
+		State* getState(const String& name);
+		bool hasState(const char* name, bool recursive = false);
+		bool hasState(const String& name, bool recursive = false);
 	};
 
 	void DrawForms(const std::deque<Form*>& frms, const Core::ServiceLocator& services, const Core::ResourceLocator& resources);

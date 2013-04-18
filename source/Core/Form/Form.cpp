@@ -142,26 +142,26 @@ namespace Core
 	InstanceID Form::_idCounter = 0;
 
 	Form::Form()
-		: Statemap(), _id(++_idCounter), _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), 
+		: _id(++_idCounter), _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), 
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}
 
 	Form::Form(const FormType& type)
-		: Statemap(), _id(++_idCounter), _type(type), _scale(1,1), _rotation(0), _position(0,0), 
+		: _id(++_idCounter), _type(type), _scale(1,1), _rotation(0), _position(0,0), 
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}
 
 	Form::Form(const Form& rhs)
-		: Statemap(rhs), _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
+		: _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
 		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
 		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible)
 	{
 	}
 
 	Form::Form(Form&& rhs)
-		: Statemap(std::move(rhs)), _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
+		: _id(++_idCounter), _type(rhs._type), _scale(rhs._scale), _rotation(rhs._rotation), 
 		_position(rhs._position), _color(rhs._color), _pivotPoint(rhs._pivotPoint), 
 		_scalingCenter(rhs._scalingCenter), _visible(rhs._visible)
 	{
@@ -171,7 +171,6 @@ namespace Core
 	{
 		if(this != &rhs)
 		{
-			Statemap::operator=(std::move(rhs));
 			_type = rhs._type;
 			_color = rhs._color;
 			_position = rhs._position;
@@ -188,7 +187,6 @@ namespace Core
 	{
 		if(this != &rhs)
 		{
-			Statemap::operator=(rhs);
 			_type = rhs._type;
 			_color = rhs._color;
 			_position = rhs._position;
@@ -344,5 +342,50 @@ namespace Core
 	{
 		_position.x += x;
 		_position.y += y;
+	}
+
+	bool Form::Insert(const char* name, std::unique_ptr<State> state)
+	{
+		return _states.Insert(name, std::move(state));
+	}
+
+	bool Form::Insert(const String& name, std::unique_ptr<State> state)
+	{
+		return _states.Insert(name, std::move(state));
+	}
+
+	void Form::ClearStates()
+	{
+		_states.Clear();
+	}
+
+	bool Form::RemoveState(const char* name)
+	{
+		return _states.Remove(name);
+	}
+
+	bool Form::RemoveState(const String& name)
+	{
+		return _states.Remove(name);
+	}
+
+	State* Form::getState(const char* name)
+	{
+		return _states.Retrieve(name);
+	}
+
+	State* Form::getState(const String& name)
+	{
+		return _states.Retrieve(name);
+	}
+
+	bool Form::hasState(const char* name, bool recursive)
+	{
+		return _states.Contains(name);
+	}
+
+	bool Form::hasState(const String& name, bool recursive)
+	{
+		return _states.Contains(name);
 	}
 }

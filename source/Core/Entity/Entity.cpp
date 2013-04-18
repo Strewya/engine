@@ -11,49 +11,6 @@ namespace Core
 		: _id(id)
 	{}
 
-	Entity::Entity(const Entity& rhs)
-		: Statemap(rhs), _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _form(rhs._form), _actions(rhs._actions)
-	{
-	}
-
-	Entity::Entity(Entity&& rhs)
-		: Statemap(rhs), _id(rhs._id), _type(rhs._type), _alias(rhs._alias), _form(rhs._form), _actions(rhs._actions)
-	{
-	}
-
-	Entity& Entity::operator=(const Entity& rhs)
-	{
-		if(this != &rhs)
-		{
-			Statemap::operator=(rhs);
-			_id = rhs._id;
-			_type = rhs._type;
-			_alias = rhs._alias;
-			_form = rhs._form;
-			_actions = rhs._actions;
-		}
-		return *this;
-	}
-
-	Entity& Entity::operator=(Entity&& rhs)
-	{
-		if(this != &rhs)
-		{
-			Statemap::operator=(std::move(rhs));
-			_id = std::move(rhs._id);
-			_type = std::move(rhs._type);
-			_alias = std::move(rhs._alias);
-			_form = std::move(rhs._form);
-			_actions = std::move(rhs._actions);
-
-			rhs._id = -1;
-			rhs._type.clear();
-			rhs._alias.clear();
-			rhs._actions.clear();
-		}
-		return *this;
-	}
-
 	/////////////////////////// EXISTANCE CHECKS ///////////////////////////
 
 	bool Entity::hasAction(const char* name)
@@ -64,6 +21,21 @@ namespace Core
 	bool Entity::hasAction(const String& name)
 	{
 		return _actions.find(name) != _actions.end();
+	}
+
+	bool Entity::hasState(const char* name, bool recursive)
+	{
+		bool found = _states.Contains(name);
+		if(!found && recursive && _prototype != nullptr)
+		{
+			return _prototype->hasState(name, recursive);
+		}
+		return false;
+	}
+
+	bool Entity::hasState(const String& name, bool recursive)
+	{
+		return hasState(name.c_str(), recursive);
 	}
 
 	/////////////////////////// GETTERS ///////////////////////////
@@ -105,6 +77,16 @@ namespace Core
 	{
 		return getAction(name.c_str());
 	}
+
+	State* Entity::getState(const char* name)
+	{
+		return _states.Retrieve(name);
+	}
+
+	State* Entity::getState(const String& name)
+	{
+		return _states.Retrieve(name);
+	}
 	
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
 
@@ -123,6 +105,20 @@ namespace Core
 		return _actions.erase(name) != 0;
 	}
 
+	void Entity::ClearStates()
+	{
+		_states.Clear();
+	}
+
+	bool Entity::RemoveState(const char* name)
+	{
+		return _states.Remove(name);
+	}
+
+	bool Entity::RemoveState(const String& name)
+	{
+		return _states.Remove(name);
+	}
 
 	/////////////////////////// SETTERS ///////////////////////////
 	
@@ -147,6 +143,12 @@ namespace Core
 	Entity& Entity::setType(const String& type)
 	{
 		_type = type;
+		return *this;
+	}
+
+	Entity& Entity::setPrototype(Entity& prototype)
+	{
+		_prototype = &prototype;
 		return *this;
 	}
 
@@ -182,5 +184,15 @@ namespace Core
 	bool Entity::Insert(const String& name, const Action& action)
 	{
 		return Insert(name.c_str(), action);
+	}
+
+	bool Entity::Insert(const char* name, std::unique_ptr<State> state)
+	{
+		return _states.Insert(name, std::move(state));
+	}
+
+	bool Entity::Insert(const String& name, std::unique_ptr<State> state)
+	{
+		return _states.Insert(name, std::move(state));
 	}
 }

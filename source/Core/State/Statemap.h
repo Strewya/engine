@@ -27,8 +27,6 @@ namespace Core
 		typedef std::unordered_map<String, std::unique_ptr<State>> StateCache;
 		StateCache _states;
 
-		Statemap* _prototype;
-
 	public:
 		Statemap();
 		Statemap(const Statemap& rhs);
@@ -36,46 +34,20 @@ namespace Core
 		Statemap& operator=(const Statemap& rhs);
 		Statemap& operator=(Statemap&& rhs);
 
-		void setPrototype(Statemap& prototype);
+		bool Contains(const char* name);
+		bool Contains(const String& name);
 
-		bool hasState(const char* name, bool recursive = false);
-		bool hasState(const String& name, bool recursive = false);
+		void Clear();
+		bool Remove(const char* name);
+		bool Remove(const String& name);
 
-		void ClearStates();
-		bool RemoveState(const char* name);
-		bool RemoveState(const String& name);
-
-		bool Insert(const char* name, State* state);
-		bool Insert(const String& name, State* state);
+		//bool Insert(const char* name, State* state);
+		//bool Insert(const String& name, State* state);
 		bool Insert(const char* name, std::unique_ptr<State> state);
 		bool Insert(const String& name, std::unique_ptr<State> state);
 
-		State* getState(const char* name);
-		State* getState(const String& name);
-
-		
-
-		template<typename T> T& getValue(const char* name)
-		{
-			auto it = _states.find(name);
-			if(it == _states.end())
-			{
-				if(_prototype != nullptr)
-				{
-					return _prototype->getValue<T>(name);
-				}
-				else
-				{
-					throw std::exception(String("Missing state ").append(name).append(" in Statemap::GetValue()").c_str());
-				}
-			}
-			return it->second->as<T>();
-		}
-
-		template<typename T> T& getValue(const String& name)
-		{
-			return getValue<T>(name.c_str());
-		}
+		State* Retrieve(const char* name);
+		State* Retrieve(const String& name);
 	};
 }
 

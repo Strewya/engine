@@ -6,12 +6,10 @@
 namespace Core
 {
 	Statemap::Statemap()
-		: _prototype(nullptr)
 	{
 	}
 
 	Statemap::Statemap(const Statemap& rhs)
-		: _prototype(rhs._prototype)
 	{
 		for(auto& pair : rhs._states)
 		{
@@ -20,7 +18,7 @@ namespace Core
 	}
 
 	Statemap::Statemap(Statemap&& rhs)
-		: _prototype(rhs._prototype), _states(std::move(rhs._states))
+		: _states(std::move(rhs._states))
 	{
 	}
 
@@ -28,7 +26,6 @@ namespace Core
 	{
 		if(this != &rhs)
 		{
-			_prototype = rhs._prototype;
 			for(auto& pair : rhs._states)
 			{
 				Insert(pair.first, pair.second->Clone());
@@ -41,50 +38,38 @@ namespace Core
 	{
 		if(this != &rhs)
 		{
-			_prototype = rhs._prototype;
 			_states = std::move(rhs._states);
 			
-			rhs._prototype = nullptr;
 			rhs._states.clear();
 		}
 		return *this;
 	}
 
-	void Statemap::setPrototype(Statemap& prototype)
+	bool Statemap::Contains(const char* name)
 	{
-		_prototype = &prototype;
+		return _states.find(name) != _states.end();
 	}
 
-	bool Statemap::hasState(const char* name, bool recursive)
+	bool Statemap::Contains(const String& name)
 	{
-		bool found = _states.find(name) != _states.end();
-		if(!found && recursive && _prototype != nullptr)
-		{
-			return _prototype->hasState(name, recursive);
-		}
-		return found;
+		return _states.find(name) != _states.end();
 	}
 
-	bool Statemap::hasState(const String& name, bool recursive)
-	{
-		return hasState(name.c_str());
-	}
-
-	void Statemap::ClearStates()
+	void Statemap::Clear()
 	{
 		_states.clear();
 	}
 
-	bool Statemap::RemoveState(const char* name)
+	bool Statemap::Remove(const char* name)
 	{
 		return _states.erase(name) != 0;
 	}
 
-	bool Statemap::RemoveState(const String& name)
+	bool Statemap::Remove(const String& name)
 	{
 		return _states.erase(name) != 0;
 	}
-	
+	/*
 	bool Statemap::Insert(const char* name, State* state)
 	{
 		return Insert(name, std::unique_ptr<State>(state));
@@ -94,7 +79,7 @@ namespace Core
 	{
 		return Insert(name.c_str(), std::unique_ptr<State>(state));
 	}
-	
+	*/
 	bool Statemap::Insert(const char* name, std::unique_ptr<State> state)
 	{
 		auto it = _states.find(name);
@@ -111,23 +96,19 @@ namespace Core
 		return Insert(name.c_str(), std::move(state));
 	}
 	
-	State* Statemap::getState(const char* name)
+	State* Statemap::Retrieve(const char* name)
 	{
 		auto it = _states.find(name);
 		if(it == _states.end())
 		{
-			if(_prototype)
-			{
-				return _prototype->getState(name);
-			}
 			return nullptr;
 		}
 		return it->second.get();
 	}
 
-	State* Statemap::getState(const String& name)
+	State* Statemap::Retrieve(const String& name)
 	{
-		return getState(name.c_str());
+		return Retrieve(name.c_str());
 	}
 
 	

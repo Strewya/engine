@@ -3,54 +3,70 @@
 #include "Core/Entity/EntityPool.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Entity/Entity.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	EntityPool::EntityPool()
-		: _idCounter(0)
-	{}
-
-	InstanceID EntityPool::_NewID()
+	EntityPool::EntityPool(uint maxExpectedEntities)
+		: _idCounter(0), _maxExpectedEntities(maxExpectedEntities), _indexMask(0), _indexBits(0)
 	{
-		return ++_idCounter;
-	}
-
-	Entity* EntityPool::getEntityByAlias(const String& alias) const
-	{
-		for(auto& entityPtr : _entityList)
+		--maxExpectedEntities;
+		while(maxExpectedEntities > 0)
 		{
-			if(entityPtr->getAlias().compare(alias) == 0)
-			{
-				return entityPtr.get();
-			}
+			++_indexBits;
+			_indexMask <<= 1;
+			_indexMask |= 1;
+			maxExpectedEntities >>= 1;
 		}
-		return nullptr;
 	}
 
-	Entity* EntityPool::getEntityByID(InstanceID id) const
+	InstanceID EntityPool::_NewID(int index)
 	{
-		for(auto& entityPtr : _entityList)
-		{
-			if(entityPtr->getID() == id)
-			{
-				return entityPtr.get();
-			}
-		}
-		return nullptr;
+		InstanceID id = ++_idCounter;
+		id <<= _indexBits;
+		id |= (index & _indexMask);
+		return id;
 	}
 
-	Entity* EntityPool::getNewEntity()
+	Entity& EntityPool::NewEntity()
 	{
+		uint index;
 		if(!_availableSlots.empty())
 		{
-			int index = _availableSlots.front();
+			index = _availableSlots.front();
 			_availableSlots.pop_front();
-			_entityList[index].reset(new Entity(_NewID()));
-			return _entityList[index].get();
 		}
-		_entityList.emplace_back(new Entity(_entityList.size()));
-		return _entityList.back().get();
+		else
+		{
+			index = _entities.size();
+			_entities.emplace_back(nullptr);
+		}
+		InstanceID id = _NewID(index);
+		_entities[index].reset(new Entity(id));
+		return *_entities[index];
+	}
+
+	Entity& EntityPool::GetEntity(InstanceID id) const
+	{
+		uint index = id & _indexMask;
+		return *_entities[index];
+	}
+	
+	bool EntityPool::IsAlive(InstanceID id) const
+	{
+		uint index = id & _indexMask;
+		return (_entities[index] != nullptr && _entities[index]->getID() == id);
+	}
+
+	bool EntityPool::DestroyEntity(InstanceID id)
+	{
+		if(IsAlive(id))
+		{
+			uint index = id & _indexMask;
+			_entities[index].reset(nullptr);
+			_availableSlots.push_back(index);
+			return true;
+		}
+		return false;
 	}
 }
