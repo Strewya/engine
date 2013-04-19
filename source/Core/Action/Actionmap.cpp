@@ -7,46 +7,68 @@
 
 namespace Core
 {
-	Actionmap::Actionmap(Entity& owner)
-		: _owner(owner)
+	Actionmap::Actionmap()
+	{}
+		
+	bool Actionmap::Contains(const char* name)
 	{
+		return _cache.find(name) != _cache.end();
 	}
 
-	Action& Actionmap::Insert(const char* name, const Action& action)
+	bool Actionmap::Contains(const String& name)
+	{
+		return Contains(name.c_str());
+	}
+
+	void Actionmap::Clear()
+	{
+		_cache.clear();
+	}
+
+	bool Actionmap::Remove(const char* name)
+	{
+		auto it = _cache.find(name);
+		if(it != _cache.end())
+		{
+			_cache.erase(it);
+			return true;
+		}
+		return false;
+	}
+
+	bool Actionmap::Remove(const String& name)
+	{
+		return Remove(name.c_str());
+	}
+
+	bool Actionmap::Insert(const char* name, std::unique_ptr<Action> action)
 	{
 		auto it = _cache.find(name);
 		if(it == _cache.end())
 		{
-			it = _cache.emplace(name, action).first;
+			return _cache.emplace(std::make_pair(name, std::move(action))).second;
 		}
-		else
-		{
-			it->second = action;
-		}
-		it->second.setOwner(_owner);
-		return it->second;
+		it->second.swap(action);
+		return true;
 	}
 
-	Action& Actionmap::Insert(const String& name, const Action& action)
+	bool Actionmap::Insert(const String& name, std::unique_ptr<Action> action)
 	{
-		return Insert(name.c_str(), action);
+		return Insert(name.c_str(), std::move(action));
 	}
 
-	Action& Actionmap::Get(const char* name)
+	Action* Actionmap::Retrieve(const char* name)
 	{
 		auto it = _cache.find(name);
 		if(it == _cache.end())
 		{
-			String message = "Actionmap::Get(): Attempted to acquire non-existant Action '";
-			message += name;
-			message += "'.";
-			throw std::exception(message.c_str());
+			return nullptr;
 		}
-		return it->second;
+		return it->second.get();
 	}
 
-	Action& Actionmap::Get(const String& name)
+	Action* Actionmap::Retrieve(const String& name)
 	{
-		return Get(name.c_str());
+		return Retrieve(name.c_str());
 	}
 }

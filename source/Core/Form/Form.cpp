@@ -140,13 +140,13 @@ namespace Core
 	
 
 	Form::Form()
-		: _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), 
+		: _type(FormType::Null), _scale(1,1), _rotation(0), _position(0,0), _states(),
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}
 
 	Form::Form(const FormType& type)
-		: _type(type), _scale(1,1), _rotation(0), _position(0,0), 
+		: _type(type), _scale(1,1), _rotation(0), _position(0,0), _states(),
 		_color(255,255,255), _pivotPoint(0,0), _scalingCenter(0,0), _visible(true)
 	{
 	}

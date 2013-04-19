@@ -8,6 +8,7 @@
 #include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/Action.h"
+#include "Core/Action/Actionmap.h"
 #include "Core/Form/Form.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
@@ -20,15 +21,13 @@ namespace Core
 	class Entity
 	{
 	private:
-		typedef std::unordered_map<String, Action> ActionCache;
-		
 		InstanceID _id;
 		String _type;
 		String _alias;
 
 		Entity* _prototype;
 		
-		ActionCache _actions;
+		Actionmap _actions;
 		Statemap _states;
 		Form _form;
 
@@ -57,8 +56,8 @@ namespace Core
 		const String&	getType() const;
 		const String&	getAlias() const;
 		Form&			getForm();
-		Action&			getAction(const char* name);
-		Action&			getAction(const String& name);
+		Action*			getAction(const char* name);
+		Action*			getAction(const String& name);
 		State*			getState(const char* name);
 		State*			getState(const String& name);
 
@@ -81,8 +80,8 @@ namespace Core
 		
 		//////////// INSERT METHODS ////////////
 
-		bool Insert(const char* name, const Action& action);
-		bool Insert(const String& name, const Action& action);
+		bool Insert(const char* name, std::unique_ptr<Action> action);
+		bool Insert(const String& name, std::unique_ptr<Action> action);
 		bool Insert(const char* name, std::unique_ptr<State> state);
 		bool Insert(const String& name, std::unique_ptr<State> state);
 	};

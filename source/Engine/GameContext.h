@@ -14,6 +14,7 @@
 #include "Engine/ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/EntityPool.h"
+#include "Core/Space/SpacePool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureCache.h"
 #include "Util/Timer.h"
@@ -46,7 +47,8 @@ namespace Core
 
 		Util::Timer timer;
 		ActionUpdater actionMaster;
-		EntityPool entities;
+		EntityPool entityPool;
+		SpacePool spacePool;
 		ServiceLocator services;
 		ResourceLocator resources;
 

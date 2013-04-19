@@ -25,6 +25,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
+#include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/ActionLogic.h"
 	/*** end header inclusion ***/
@@ -46,6 +47,7 @@ namespace Core
 
 	public:
 		static void BindActionUpdater(ActionUpdater& updater);
+		static std::unique_ptr<Action> Create(ActionLogic fn);
 		Action();
 		Action(ActionLogic fn);
 		

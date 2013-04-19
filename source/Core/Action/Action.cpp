@@ -16,6 +16,11 @@ namespace Core
 		_actionUpdater = &updater;
 	}
 
+	std::unique_ptr<Action> Action::Create(ActionLogic fn)
+	{
+		return std::unique_ptr<Action>(new Action(fn));
+	}
+
 	Action::Action()
 		: _actionLogic(nullptr)
 	{}

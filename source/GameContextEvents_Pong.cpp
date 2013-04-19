@@ -36,7 +36,7 @@ namespace Pong
 
 		uint animationHandle = sheet2.getAnimationHandle("walk");
 
-		auto& ent = context.entities.NewInstance();
+		auto& ent = context.entityPool.NewInstance();
 		auto& frm = ent.getForm();
 		frm.setType(Core::FormType::Sprite);
 		frm.setPosition(500,300);
@@ -47,25 +47,25 @@ namespace Pong
 		frm.Insert("CurrentAnimation", Core::State::Create(animationHandle));
 		frm.Insert("AnimationTimer", Core::State::Create(Util::Timer(0.5f)));
 
-		ent.Insert("Render", Core::Action(Core::Render));
-		assert(ent.getAction("Render").Activate());
-		ent.Insert("Animate", Core::Action(Core::Animate));
-		assert(ent.getAction("Animate").Activate());
-		ent.Insert("SIH", Core::Action(Core::SIH));
-		assert(ent.getAction("SIH").Activate());
+		ent.Insert("Render", Core::Action::Create(Core::Render));
+		assert(ent.getAction("Render")->Activate());
+		ent.Insert("Animate", Core::Action::Create(Core::Animate));
+		assert(ent.getAction("Animate")->Activate());
+		ent.Insert("SIH", Core::Action::Create(Core::SIH));
+		assert(ent.getAction("SIH")->Activate());
 
-		auto& ent2 = context.entities.NewInstance();
+		auto& ent2 = context.entityPool.NewInstance();
 		auto& frm2 = ent2.getForm();
 		frm2.setType(Core::FormType::Texture);
 		frm2.setPosition(0,0);
 
 		frm2.Insert("Texture", Core::State::Create(gui));
 
-		ent2.Insert("Render", Core::Action(Core::Render));
-		assert(ent2.getAction("Render").Activate());
+		ent2.Insert("Render", Core::Action::Create(Core::Render));
+		assert(ent2.getAction("Render")->Activate());
 
-		assert(context.entities.IsAlive(ent.getID()));
-		assert(context.entities.IsAlive(ent2.getID()));
+		assert(context.entityPool.IsAlive(ent.getID()));
+		assert(context.entityPool.IsAlive(ent2.getID()));
 
 		return true;
 	}

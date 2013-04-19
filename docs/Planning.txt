@@ -31,3 +31,4 @@ This document contains the list of features that i have to implement.
 	* contains Sound wrappers
 - all of the cache objects should listen to the file changed event, and reload their children in case they changed
 - audio service implementation
+- change all Actions to be heap based

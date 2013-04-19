@@ -15,12 +15,12 @@ namespace Core
 
 	bool Entity::hasAction(const char* name)
 	{
-		return _actions.find(name) != _actions.end();
+		return _actions.Contains(name);
 	}
 
 	bool Entity::hasAction(const String& name)
 	{
-		return _actions.find(name) != _actions.end();
+		return _actions.Contains(name);
 	}
 
 	bool Entity::hasState(const char* name, bool recursive)
@@ -60,22 +60,14 @@ namespace Core
 		return _form;
 	}
 
-	Action& Entity::getAction(const char* name)
+	Action* Entity::getAction(const char* name)
 	{
-		auto it = _actions.find(name);
-		if(it == _actions.end())
-		{
-			String message = "Entity::getAction(): Attempted to acquire non-existant Action '";
-			message += name;
-			message += "'.";
-			throw std::exception(message.c_str());
-		}
-		return it->second;
+		return _actions.Retrieve(name);
 	}
 
-	Action& Entity::getAction(const String& name)
+	Action* Entity::getAction(const String& name)
 	{
-		return getAction(name.c_str());
+		return _actions.Retrieve(name);
 	}
 
 	State* Entity::getState(const char* name)
@@ -92,17 +84,17 @@ namespace Core
 
 	void Entity::ClearActions()
 	{
-		_actions.clear();
+		_actions.Clear();
 	}
 
 	bool Entity::RemoveAction(const char* name)
 	{
-		return _actions.erase(name) != 0;
+		return _actions.Remove(name);
 	}
 
 	bool Entity::RemoveAction(const String& name)
 	{
-		return _actions.erase(name) != 0;
+		return _actions.Remove(name);
 	}
 
 	void Entity::ClearStates()
@@ -154,24 +146,16 @@ namespace Core
 
 	/////////////////////////// INSERT METHODS ///////////////////////////
 
-	bool Entity::Insert(const char* name, const Action& action)
+	bool Entity::Insert(const char* name, std::unique_ptr<Action> action)
 	{
-		auto it = _actions.find(name);
-		if(it == _actions.end())
-		{
-			it = _actions.emplace(name, action).first;
-		}
-		else
-		{
-			return false;
-		}
-		it->second.setOwner(*this);
-		return true;
+		action->setOwner(*this);
+		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::Insert(const String& name, const Action& action)
+	bool Entity::Insert(const String& name, std::unique_ptr<Action> action)
 	{
-		return Insert(name.c_str(), action);
+		action->setOwner(*this);
+		return _actions.Insert(name, std::move(action));
 	}
 
 	bool Entity::Insert(const char* name, std::unique_ptr<State> state)
