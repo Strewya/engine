@@ -54,14 +54,18 @@ namespace Input
 		_eventQueue.clear();
 	}
 
-	bool Engine::isKeyPressed(Keyboard::Keys key) const
+	bool Engine::isPressed(Keyboard::Keys key) const
 	{
-		return _keys[key];
+		if(key>=0 && key<Keyboard::_KeyCount)
+			return _keys[key];
+		return false;
 	}
 
-	bool Engine::isMouseButtonPressed(Mouse::Keys button) const
+	bool Engine::isPressed(Mouse::Keys button) const
 	{
-		return _mouseKeys[button];
+		if(button>=0 && button<Mouse::_KeyCount)
+			return _mouseKeys[button];
+		return false;
 	}
 
 	bool Engine::PollEvent(Event& out)

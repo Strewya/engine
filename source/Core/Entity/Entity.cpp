@@ -23,19 +23,14 @@ namespace Core
 		return _actions.Contains(name);
 	}
 
-	bool Entity::hasState(const char* name, bool recursive)
+	bool Entity::hasState(const char* name)
 	{
-		bool found = _states.Contains(name);
-		if(!found && recursive && _prototype != nullptr)
-		{
-			return _prototype->hasState(name, recursive);
-		}
-		return false;
+		return _states.Contains(name);
 	}
 
-	bool Entity::hasState(const String& name, bool recursive)
+	bool Entity::hasState(const String& name)
 	{
-		return hasState(name.c_str(), recursive);
+		return hasState(name.c_str());
 	}
 
 	/////////////////////////// GETTERS ///////////////////////////
@@ -135,12 +130,6 @@ namespace Core
 	Entity& Entity::setType(const String& type)
 	{
 		_type = type;
-		return *this;
-	}
-
-	Entity& Entity::setPrototype(Entity& prototype)
-	{
-		_prototype = &prototype;
 		return *this;
 	}
 

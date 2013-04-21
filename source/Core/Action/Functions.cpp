@@ -7,6 +7,7 @@
 #include "Engine/Engine.h"
 #include "Core/Action/Action.h"
 #include "Core/Entity/Entity.h"
+#include "Core/Form/Form.h"
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/RenderingQueue.h"
 #include "Subsystems/Input/InputEngine.h"
@@ -71,9 +72,186 @@ namespace Core
 		}
 	}
 
-	void Spawner(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void PongInput(double dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
-		
+		if(context.services.getInput().isPressed(Input::Keyboard::_Escape))
+		{
+			context.services.getEngine().Shutdown();
+		}
+
+		for(auto action : actions)
+		{
+			auto& entity = action->getOwner();
+			auto& form = entity.getForm();
+			Util::Vec2& vel = form.getState("Velocity")->as<Util::Vec2>();
+			auto a_euler = entity.getAction("EulerMovement");
+			auto a_rk4 = entity.getAction("RK4Movement");
+			if(!a_euler || !a_rk4) continue;
+			if(context.services.getInput().isPressed(Input::Keyboard::_ArrowDown))
+			{
+				if(vel.x < 0) vel.x = -vel.x;
+				if(vel.y < 0) vel.y = -vel.y;
+
+				a_euler->Activate();
+			}
+			else if(context.services.getInput().isPressed(Input::Keyboard::_ArrowUp))
+			{
+				if(vel.x > 0) vel.x = -vel.x;
+				if(vel.y > 0) vel.y = -vel.y;
+				a_euler->Activate();
+			}
+			else
+			{
+				a_euler->Deactivate();
+			}
+
+			if(context.services.getInput().isPressed(Input::Keyboard::_S))
+			{
+				if(vel.x < 0) vel.x = -vel.x;
+				if(vel.y < 0) vel.y = -vel.y;
+
+				a_rk4->Activate();
+			}
+			else if(context.services.getInput().isPressed(Input::Keyboard::_W))
+			{
+				if(vel.x > 0) vel.x = -vel.x;
+				if(vel.y > 0) vel.y = -vel.y;
+				a_rk4->Activate();
+			}
+			else
+			{
+				a_rk4->Deactivate();
+			}
+		}
+	}
+
+	void EulerMovement(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	{
+		for(auto action : actions)
+		{
+			auto& form = action->getOwner().getForm();
+			State* s_velocity = form.getState("Velocity");
+			State* s_maxvel = form.getState("MaxVelocity");
+			State* s_force = form.getState("Force");
+			State* s_mass = form.getState("Mass");
+			if(s_velocity && s_force && s_mass)
+			{
+				Util::Vec2& velocity = s_velocity->as<Util::Vec2>();
+				Util::Vec2& maxvel = s_maxvel->as<Util::Vec2>();
+				Util::Vec2& force = s_force->as<Util::Vec2>();
+				float& mass = s_mass->as<float>();
+				Util::Vec2 position = form.getPosition();
+				position += velocity*dt;
+				velocity += dt*force/mass;
+				velocity.Truncate(maxvel.Length());
+				form.Translate(velocity);
+			}
+		}
+	}
+
+	struct physicsState
+	{
+		Util::Vec2 pos;
+		Util::Vec2 vel;
+		Util::Vec2 force;
+	};
+
+	struct physicsDerivative
+	{
+		Util::Vec2 vel;
+		Util::Vec2 acc;
+	};
+
+	Util::Vec2 accelerate(const physicsState& state)
+	{
+		return state.force;
+	}
+
+	physicsDerivative evaluate(const physicsState& initial, float dt, const physicsDerivative& d)
+	{
+		physicsState state;
+        state.pos = initial.pos + d.vel*dt;
+        state.vel = initial.vel + d.acc*dt;
+		state.force = initial.force;
+
+        physicsDerivative output;
+        output.vel = state.vel;
+        output.acc = accelerate(state);
+        return output;
+	}
+
+	void integrate(physicsState& state, float dt)
+	{
+		physicsDerivative a = evaluate(state, 0.0f, physicsDerivative());
+        physicsDerivative b = evaluate(state, dt*0.5f, a);
+        physicsDerivative c = evaluate(state, dt*0.5f, b);
+        physicsDerivative d = evaluate(state, dt, c);
+
+        const Util::Vec2 dxdt = 1.0f/6.0f * (a.vel + 2.0f*(b.vel + c.vel) + d.vel);
+        const Util::Vec2 dvdt = 1.0f/6.0f * (a.acc + 2.0f*(b.acc + c.acc) + d.acc);
+
+        state.pos += dxdt;
+        state.vel += dvdt;
+	}
+
+	void RK4Movement(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	{
+		for(auto action : actions)
+		{
+			auto& form = action->getOwner().getForm();
+			State* s_velocity = form.getState("Velocity");
+			State* s_force = form.getState("Force");
+			State* s_mass = form.getState("Mass");
+			if(s_velocity && s_force && s_mass)
+			{
+				Util::Vec2& vel = s_velocity->as<Util::Vec2>();
+				physicsState state = {form.getPosition(), vel, s_force->as<Util::Vec2>()};
+				integrate(state, dt);
+				vel = state.vel;
+				form.setPosition(state.pos);
+			}
+		}
+	}
+
+	void Collide(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	{
+		Space& space = context.spacePool.NewInstance();
+		for(auto action : actions)
+		{
+			space.AddEntity(action->getOwner().getID());
+		}
+
+		auto entityID = space.begin();
+		auto otherID = space.begin();
+		++otherID;
+		for(; !space.isEnd(entityID); ++entityID)
+		{
+			for(; !space.isEnd(otherID); ++otherID)
+			{
+				auto& entity = context.entityPool.Retrieve(*entityID);
+				auto& other = context.entityPool.Retrieve(*otherID);
+				State* s_entityRect = entity.getForm().getState("CollisionRect");
+				State* s_otherRect = other.getForm().getState("CollisionRect");
+				if(s_entityRect != nullptr && s_otherRect != nullptr)
+				{
+					Util::Rect& entityRect = s_entityRect->as<Util::Rect>();
+					Util::Rect& otherRect = s_otherRect->as<Util::Rect>();
+					if(entityRect.IsIntersected(otherRect))
+					{
+						auto a_entityResponse = entity.getAction("CollisionResponse");
+						auto a_otherResponse = other.getAction("CollisionResponse");
+						if(a_entityResponse != nullptr)
+						{
+							a_entityResponse->Activate();
+						}
+						if(a_otherResponse != nullptr)
+						{
+							a_otherResponse->Activate();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions)
@@ -82,19 +260,19 @@ namespace Core
 		for(auto action : actions)
 		{
 			auto& entity = action->getOwner();
-			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowLeft))
+			if(context.services.getInput().isPressed(Input::Keyboard::_ArrowLeft))
 			{
 				entity.getForm().Translate(-speed, 0);
 			}
-			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowRight))
+			if(context.services.getInput().isPressed(Input::Keyboard::_ArrowRight))
 			{
 				entity.getForm().Translate(speed, 0);
 			}
-			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowDown))
+			if(context.services.getInput().isPressed(Input::Keyboard::_ArrowDown))
 			{
 				entity.getForm().Translate(0, speed);
 			}
-			if(context.services.getInput().isKeyPressed(Input::Keyboard::_ArrowUp))
+			if(context.services.getInput().isPressed(Input::Keyboard::_ArrowUp))
 			{
 				entity.getForm().Translate(0, -speed);
 			}
@@ -118,7 +296,7 @@ namespace Core
 			}
 		}
 
-		if(context.services.getInput().isKeyPressed(Input::Keyboard::_Escape))
+		if(context.services.getInput().isPressed(Input::Keyboard::_Escape))
 		{
 			context.services.getEngine().Shutdown();
 		}

@@ -26,6 +26,7 @@ namespace Core
 
 		virtual std::unique_ptr<State> Clone() = 0;
 		template<typename T> T& as();
+		template<typename T> bool isType();
 		template<typename T> static std::unique_ptr<ValueState<T>> Create(const T& value);
 	};
 
@@ -74,6 +75,11 @@ namespace Core
 			return static_cast<ValueState<T>*>(this)->value;
 		}
 		throw std::exception("State::as<T>(): Tried to access wrong type!");
+	}
+
+	template<typename T> bool State::isType()
+	{
+		return typeid(T) == _type;
 	}
 
 	template<typename T> static std::unique_ptr<ValueState<T>> State::Create(const T& value)

@@ -13,7 +13,11 @@ namespace Core
 	{
 		for(ActionLogic fn : _actionQueue)
 		{
-			fn(dt, context, _activeActions[fn]);
+			auto& list = _activeActions[fn];
+			if(!list.empty())
+			{
+				fn(dt, context, list);
+			}
 		}
 		PurgeActions();
 	}

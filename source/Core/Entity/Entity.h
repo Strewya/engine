@@ -47,8 +47,8 @@ namespace Core
 
 		bool hasAction(const char* name);
 		bool hasAction(const String& name);
-		bool hasState(const char* name, bool recursive = false);
-		bool hasState(const String& name, bool recursive = false);
+		bool hasState(const char* name);
+		bool hasState(const String& name);
 		
 		//////////// GETTERS ////////////
 
@@ -76,7 +76,6 @@ namespace Core
 		Entity& setAlias(const String& alias);
 		Entity& setType(const char* type);
 		Entity& setType(const String& type);
-		Entity& setPrototype(Entity& prototype);
 		
 		//////////// INSERT METHODS ////////////
 

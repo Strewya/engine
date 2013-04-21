@@ -10,6 +10,7 @@
 #include "Core/Entity/Entity.h"
 #include "Core/Form/Form.h"
 #include "Core/State/State.h"
+#include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Script/LuaEngine.h"
@@ -19,54 +20,66 @@ namespace Pong
 {
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
-		context.actionMaster.EnqueueActionLogic(Core::SIH);
+		context.actionMaster.EnqueueActionLogic(Core::PongInput);
+		context.actionMaster.EnqueueActionLogic(Core::EulerMovement);
+		context.actionMaster.EnqueueActionLogic(Core::RK4Movement);
+		context.actionMaster.EnqueueActionLogic(Core::Collide);
 		context.actionMaster.EnqueueActionLogic(Core::Rotate);
 		context.actionMaster.EnqueueActionLogic(Core::Animate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
 		auto& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
-		auto& sheet2 = context.resources.getSpritesheetCache().LoadFromFile("resources/character.sheet");
-		auto guiHandle = context.resources.getTextureCache().getTextureHandle("resources/gui_window.png");
-		auto& gui = context.resources.getTextureCache().getTexture(guiHandle);
 		
 		uint ballHandle = sheet.getSpriteHandle("ball");
-		uint cherryHandle = sheet.getSpriteHandle("cherry");
-		uint cupcakeHandle = sheet.getSpriteHandle("cupcake");
+		auto& ballSprite = sheet.getSprite(ballHandle);
 		uint paddleHandle = sheet.getSpriteHandle("paddle");
+		auto& paddleSprite = sheet.getSprite(paddleHandle);
+		Util::Vec2 windowSize = context.services.getGraphics().getScreenSize();
 
-		uint animationHandle = sheet2.getAnimationHandle("walk");
+		for(int i = 0; i < 2; ++i)
+		{
+			auto& paddle = context.entityPool.NewInstance();
+			auto& paddle_form = paddle.getForm();
+			paddle_form.setType(Core::FormType::Sprite);
+			paddle_form.setScale(1,1);
+			if(i==0)
+			{
+				paddle_form.setPosition(paddleSprite.getSrcRect().GetWidth()*paddle_form.getScale().x, windowSize.y*0.5f);
+				paddle_form.setColor(100, 100, 255);
+				paddle.Insert("InputHandler", Core::Action::Create(Core::PongInput));
+				assert(paddle.getAction("InputHandler")->Activate());
+			}
+			else
+			{
+				paddle_form.setPosition(windowSize.x - (paddleSprite.getSrcRect().GetWidth()*2)*paddle_form.getScale().x, windowSize.y*0.5f);
+				paddle_form.setColor(255, 100, 100);
+			}
+			
+			paddle_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+			paddle_form.Insert("CurrentSprite", Core::State::Create(paddleHandle));
+			paddle_form.Insert("Velocity", Core::State::Create(Util::Vec2(0,10)));
+			paddle_form.Insert("MaxVelocity", Core::State::Create(Util::Vec2(0,10)));
+			paddle_form.Insert("Force", Core::State::Create(Util::Vec2(0,0)));
+			paddle_form.Insert("Mass", Core::State::Create(1.0f));
+			
+			paddle.Insert("EulerMovement", Core::Action::Create(Core::EulerMovement));
+			paddle.Insert("RK4Movement", Core::Action::Create(Core::RK4Movement));
+			paddle.Insert("Render", Core::Action::Create(Core::Render));
+			assert(paddle.getAction("Render")->Activate());
+		}
 
-		auto& ent = context.entityPool.NewInstance();
-		auto& frm = ent.getForm();
-		frm.setType(Core::FormType::Sprite);
-		frm.setPosition(500,300);
-		frm.setScale(4,4);
-		frm.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet2));
-		frm.Insert("CurrentSprite", Core::State::Create(sheet2.getAnimation(animationHandle).getSequenceFrame(0)));
-		frm.Insert("CurrentAnimationFrame", Core::State::Create<uint>(0));
-		frm.Insert("CurrentAnimation", Core::State::Create(animationHandle));
-		frm.Insert("AnimationTimer", Core::State::Create(Util::Timer(0.5f)));
+		auto& ball = context.entityPool.NewInstance();
+		auto& ball_form = ball.getForm();
+		ball_form.setType(Core::FormType::Sprite);
+		ball_form.setPosition(windowSize.x*0.5f, windowSize.y*0.5f);
 
-		ent.Insert("Render", Core::Action::Create(Core::Render));
-		assert(ent.getAction("Render")->Activate());
-		ent.Insert("Animate", Core::Action::Create(Core::Animate));
-		assert(ent.getAction("Animate")->Activate());
-		ent.Insert("SIH", Core::Action::Create(Core::SIH));
-		assert(ent.getAction("SIH")->Activate());
+		ball_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+		ball_form.Insert("CurrentSprite", Core::State::Create(ballHandle));
 
-		auto& ent2 = context.entityPool.NewInstance();
-		auto& frm2 = ent2.getForm();
-		frm2.setType(Core::FormType::Texture);
-		frm2.setPosition(0,0);
+		ball.Insert("Render", Core::Action::Create(Core::Render));
+		assert(ball.getAction("Render")->Activate());
 
-		frm2.Insert("Texture", Core::State::Create(gui));
-
-		ent2.Insert("Render", Core::Action::Create(Core::Render));
-		assert(ent2.getAction("Render")->Activate());
-
-		assert(context.entityPool.IsAlive(ent.getID()));
-		assert(context.entityPool.IsAlive(ent2.getID()));
-
+		
 		return true;
 	}
 }

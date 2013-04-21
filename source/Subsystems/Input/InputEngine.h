@@ -30,8 +30,8 @@ namespace Input
 		void Update();
 		void PurgeEvents();
 
-		bool isKeyPressed(Keyboard::Keys key) const;
-		bool isMouseButtonPressed(Mouse::Keys button) const;
+		bool isPressed(Keyboard::Keys key) const;
+		bool isPressed(Mouse::Keys button) const;
 		bool PollEvent(Event& out);
 	};
 }

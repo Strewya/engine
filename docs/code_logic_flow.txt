@@ -1,0 +1,49 @@
+flow of the main loop:
+1. time is advanced for the wall clock
+	1.1. advance all registered timers (timers check if they are paused)
+2. engine loop is called
+	2.1. input events are updated
+	2.2. context loop is called
+		2.2.1. onUpdate is called
+		2.2.2. actions are called in certain order:
+			- input handlers are called
+				-> they must only invoke registered actions for a specific game event, not implement the logic them selves
+				-> they are plain actions that are executed each frame
+				-> they use the input system
+				-> the input system just provides methods to check the state of the key
+				-> on execution they check the state of keys that are registered to fire specific events
+				-> the key to check has to be registered in the entity the handler is bound to
+					->> this is to allow multiple entities to be controlled on the same device (keyboards mostly)
+				-> if the key is checked, the entity also needs to have an action that executes the event logic
+					->> example: for the event "MoveForward" there has to be two states, "MoveForward_Key" and "MoveForward_Action"
+					->> this could also be grouped into a struct: struct InputData { bool keyboard; uint key; X action; } => X is the name of the action to fire
+				-> the input data has to be located in the entity itself, as form has nothing to do with this
+			- AI update
+				-> this should work exactly like input handlers, only AI decides what actions to invoke instead of checking the input system
+				-> there should be a class that stores AI related data, such as heatmaps, statemachines, etc
+				-> make the AI a subsystem like graphics and such? 0.o
+				-> if no other data is needed, then a simple AI action will suffice (which invokes certain actions)
+			- physics
+				-- premove
+					-> calculate new position based on velocity
+					-> do this for all object that move
+					-> the data needs to be located in Form
+					-> premove only uses the current velocity to change the position, and saves the old position into Form
+					-> should use RK4 movement
+				-- collision detection
+					-> test all moved objects against all other objects in their vicinity
+					-> use quadtree for maximum efficiency
+					-> can be sweeping or fixed
+						->> if velocity is greater than object radius, use sweeping
+						->> else, use fixed
+				-- collision response
+					-> for each object that collided, invoke their collision response
+					-> if object has no registered collision reponse action, invoke a default one (this must be registered in the system)
+				-- finalize movement
+					-> for each object, set current position to the newly calculated one
+			- game logic
+				-> any logic that is specific to the game
+			- animation
+				-> all entities that have animation are updated
+			- rendering
+				-> forms are gathered, sorted, and drawn
