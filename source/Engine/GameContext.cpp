@@ -9,7 +9,7 @@
 namespace Core
 {
 	GameContext::GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources)
-		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr), timer(gUpdateInterval)
+		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr), timer(gUpdateInterval), physicsWorld(b2Vec2(0,0))
 	{
 		Action::BindActionUpdater(actionMaster);
 

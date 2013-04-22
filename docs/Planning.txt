@@ -32,3 +32,15 @@ This document contains the list of features that i have to implement.
 - all of the cache objects should listen to the file changed event, and reload their children in case they changed
 - audio service implementation
 - change all Actions to be heap based
+- Entity factory to be function based
+	* there is a method, bool CreateEntityType(std::string& type, Entity& e) or Entity* CreateEntityType(std::string& type, EntityPool& pool)
+	* the method constructs the entity to be of the type that is parameterized
+	* internally, the factory has a map of <string, function<bool(Entity&)>> or similair
+	* when called, the function bound to the type is called with the entity passed in
+	* if the constructor method does not exist, the method returns false or nullptr
+	* the constructor methods can be registered from outside by the method RegisterConstructor(string& name, function<bool(Entity&)>&)
+	- the methods takes a reference to an entity and fills it's data to be a certain type
+		* states are created and added
+		* must have actions are created and added
+		* outside code must connect actions to any listeners
+	* the methods only create a template of the object, how the object gets used is up to the caller

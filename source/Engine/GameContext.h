@@ -9,6 +9,7 @@
 #include <memory>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Box2D/Box2D.h"
 #include "Engine/GameContextEvent.h"
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
@@ -51,6 +52,7 @@ namespace Core
 		SpacePool spacePool;
 		ServiceLocator services;
 		ResourceLocator resources;
+		b2World physicsWorld;
 
 		GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources);
 		~GameContext();

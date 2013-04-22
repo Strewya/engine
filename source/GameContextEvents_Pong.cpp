@@ -42,6 +42,9 @@ namespace Pong
 			auto& paddle_form = paddle.getForm();
 			paddle_form.setType(Core::FormType::Sprite);
 			paddle_form.setScale(1,1);
+
+			
+
 			if(i==0)
 			{
 				paddle_form.setPosition(paddleSprite.getSrcRect().GetWidth()*paddle_form.getScale().x, windowSize.y*0.5f);

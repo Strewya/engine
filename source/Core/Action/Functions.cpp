@@ -3,6 +3,7 @@
 #include "Core/Action/Functions.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Box2D/Box2D.h"
 #include "Engine/GameContext.h"
 #include "Engine/Engine.h"
 #include "Core/Action/Action.h"
