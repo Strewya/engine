@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_INPUT_KEYCODES_H_
-#define SUBSYSTEMS_INPUT_KEYCODES_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -331,5 +330,3 @@ namespace Input
 		};
 	};
 }
-
-#endif //SUBSYSTEMS_INPUT_KEYCODES_H_

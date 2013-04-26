@@ -1,0 +1,54 @@
+Input::IEngine* _engine = new Input::Engine();
+_engine->CreateContext(0);
+_engine->RegisterCallback(0, );
+_engine->RegisterCallback(1, &SpecificInputHandler);
+Input::Context& defaultContext = _engine->GetContext(0); //calls CreateContext if it doesn't exist
+Input::Event ievent;
+Core::Event cevent;
+
+ievent.type = Input::InputType::KeyPressed;
+ievent.key.code = Input::Keyboard::_A;
+cevent.type = Input::MappedInputType::State;
+cevent.name = "MoveLeft";
+cevent.state.isDown = true;
+defaultContext.AddMapping(ievent, cevent);
+...
+
+_engine->DispatchEvents();
+{
+	list<Core::Event> mappedEvents;
+	for(auto& context : _activeContexts)
+	{
+		context.MapEventsToGameEvent(_eventBuffer, mappedEvents);
+		if(!context.isPassthrough() || _eventBuffer.empty())
+		{
+			break;
+		}
+	}
+	
+	for(auto& rit = _callbacks.rbegin(); rit != _callbacks.rend(); ++rit)
+	{
+		auto& callback = *rit;
+		if(!callback(mappedEvents))
+		{
+			break;
+		}
+	}
+}
+
+bool GenericInputHandler(list<Core::Event>& events)
+{
+	for(auto& ev : events)
+	{
+		if(ev.name.compare("MoveLeft")==0)
+		{
+			_owner
+		}
+	}
+	return true;
+}
+
+bool SpecificInputHandler(list<Core::Event>& events)
+{
+	if(
+}

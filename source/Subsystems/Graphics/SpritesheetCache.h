@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_SPRITESHEETCACHE_H_
-#define SUBSYSTEMS_GRAPHICS_SPRITESHEETCACHE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -51,5 +50,3 @@ namespace Graphics
 
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_SPRITESHEETCACHE_H_

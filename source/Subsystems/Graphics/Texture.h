@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_TEXTURE_H_
-#define SUBSYSTEMS_GRAPHICS_TEXTURE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -44,5 +43,3 @@ namespace Graphics
 		IRenderer* _gfx;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_TEXTURE_H_

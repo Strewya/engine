@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_RENDERERFACTORY_H_
-#define SUBSYSTEMS_GRAPHICS_RENDERERFACTORY_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -33,5 +32,3 @@ namespace Graphics
 		void DestroyInterface();
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_RENDERERFACTORY_H_

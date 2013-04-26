@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_
-#define SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_
+#pragma once
 
 extern "C"
 {
@@ -8,5 +7,3 @@ extern "C"
 #include <lauxlib.h>
 }
 //#include <tolua++.h>
-
-#endif //SUBSYSTEMS_SCRIPT_LUAINCLUDE_H_

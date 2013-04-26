@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_
-#define SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -31,5 +30,3 @@ namespace Graphics
 		Util::Rect _srcRect;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_SPRITEINFO_H_

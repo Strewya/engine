@@ -1,5 +1,4 @@
-#ifndef UTIL_DATASTORE_H_
-#define UTIL_DATASTORE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -140,5 +139,3 @@ namespace Util
 		}
 	};
 }
-
-#endif //UTIL_DATASTORE_H_

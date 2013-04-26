@@ -1,5 +1,4 @@
-#ifndef WIN32_ABSTRACTWINDOW_H_
-#define WIN32_ABSTRACTWINDOW_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -88,5 +87,3 @@ namespace Win32
 
 	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint width, uint height);
 }
-
-#endif //WIN32_ABSTRACTWINDOW_H_

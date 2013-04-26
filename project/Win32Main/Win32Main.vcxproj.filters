@@ -114,6 +114,9 @@
     <ClCompile Include="..\..\source\Core\Space\Space.cpp">
       <Filter>Core/Space</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -248,6 +251,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Space\Space.h">
       <Filter>Core/Space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\FwdDecl.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

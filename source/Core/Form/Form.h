@@ -1,5 +1,4 @@
-#ifndef CORE_FORM_FORM_H_
-#define CORE_FORM_FORM_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -111,5 +110,3 @@ namespace Core
 
 	void DrawForms(const std::deque<Form*>& frms, const Core::ServiceLocator& services, const Core::ResourceLocator& resources);
 }
-
-#endif //CORE_FORM_FORM_H_

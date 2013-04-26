@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_DLL_HEADER_H_
-#define SUBSYSTEMS_GRAPHICS_DLL_HEADER_H_
+#pragma once
 
 #include <windows.h>
 
@@ -10,5 +9,3 @@ int destroyRendererInterface(Graphics::IRenderer** renderer);
 
 typedef int(*CREATE_RENDERER)(HWND hwnd, Graphics::IRenderer** renderer);
 typedef int(*DESTROY_RENDERER)(Graphics::IRenderer** renderer);
-
-#endif //SUBSYSTEMS_GRAPHICS_DLL_HEADER_H_

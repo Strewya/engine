@@ -1,5 +1,4 @@
-#ifndef CORE_STATE_STATE_H_
-#define CORE_STATE_STATE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -87,5 +86,3 @@ namespace Core
 		return (std::unique_ptr<ValueState<T>>(new ValueState<T>(value)));
 	}
 }
-
-#endif //CORE_STATE_STATE_H_

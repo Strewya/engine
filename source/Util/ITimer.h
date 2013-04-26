@@ -1,5 +1,4 @@
-#ifndef UTIL_ITIMER_H_
-#define UTIL_ITIMER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -23,5 +22,3 @@ namespace Util
 		virtual void AdvanceTime(float dt) = 0;
 	};
 }
-
-#endif //UTIL_ITIMER_H_

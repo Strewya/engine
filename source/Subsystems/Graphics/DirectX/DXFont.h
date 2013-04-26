@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_DXFONT_H_
-#define SUBSYSTEMS_GRAPHICS_DXFONT_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -26,5 +25,3 @@ namespace Graphics
 		void Release();
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_DXFONT_H_

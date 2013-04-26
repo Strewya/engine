@@ -1,5 +1,4 @@
-#ifndef DEFINES_H_
-#define DEFINES_H_
+#pragma once
 
 /*		C++ HEADERS	*/
 #include <cassert>
@@ -55,5 +54,3 @@ template <typename T> String ToString(T value)
 
 /*		MY HEADERS	*/
 #include "Util/Logger.h"
-
-#endif //DEFINES_H_

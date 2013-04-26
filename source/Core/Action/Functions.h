@@ -1,5 +1,4 @@
-#ifndef CORE_ACTION_FUNCTIONS_H_
-#define CORE_ACTION_FUNCTIONS_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -23,5 +22,3 @@ namespace Core
 	void RK4Movement(double dt, GameContext& context, std::set<Core::Action*>& actions);
 	void PongInput(double dt, GameContext& context, std::set<Core::Action*>& actions);
 }
-
-#endif //CORE_ACTION_FUNCTIONS_H_

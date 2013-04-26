@@ -1,5 +1,4 @@
-#ifndef CORE_ACTION_ACTIONLOGIC_H_
-#define CORE_ACTION_ACTIONLOGIC_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -17,5 +16,3 @@ namespace Core
 }
 
 typedef void(*ActionLogic)(double dt, Core::GameContext& context, std::set<Core::Action*>& actions);
-
-#endif //CORE_ACTION_ACTIONLOGIC_H_

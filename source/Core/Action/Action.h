@@ -1,5 +1,4 @@
-#ifndef CORE_ACTION_ACTION_H_
-#define CORE_ACTION_ACTION_H_
+#pragma once
 /********************************************
 	class:	Action
 	usage:	Each Entity class has instances of this class contained within.
@@ -64,5 +63,3 @@ namespace Core
 		
 	};
 }
-
-#endif //CORE_ACTION_ACTION_H_

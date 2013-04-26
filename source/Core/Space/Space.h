@@ -1,5 +1,4 @@
-#ifndef CORE_SPACE_SPACE_H_
-#define CORE_SPACE_SPACE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -47,5 +46,3 @@ namespace Core
 		
 	};
 }
-
-#endif //CORE_SPACE_SPACE_H_

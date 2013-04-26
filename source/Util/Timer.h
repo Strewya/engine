@@ -1,5 +1,4 @@
-#ifndef UTIL_TIMER_H_
-#define UTIL_TIMER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -34,5 +33,3 @@ namespace Util
 		float getUpdatePeriod() const;
 	};
 }
-
-#endif //UTIL_TIMER_H_

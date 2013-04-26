@@ -1,5 +1,4 @@
-#ifndef CORE_STATE_STATEMAP_H_
-#define CORE_STATE_STATEMAP_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -50,5 +49,3 @@ namespace Core
 		State* Retrieve(const String& name);
 	};
 }
-
-#endif //CORE_STATE_STATEMAP_H_

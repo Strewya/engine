@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_IRENDERER_H_
-#define SUBSYSTEMS_GRAPHICS_IRENDERER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -74,5 +73,3 @@ namespace Graphics
 		virtual void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_IRENDERER_H_

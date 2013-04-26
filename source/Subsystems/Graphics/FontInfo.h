@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_FONTINFO_H_
-#define SUBSYSTEMS_GRAPHICS_FONTINFO_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -35,5 +34,3 @@ namespace Graphics
 		uint _weight, _size;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_FONTINFO_H_

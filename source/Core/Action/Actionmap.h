@@ -1,5 +1,4 @@
-#ifndef CORE_ACTION_ACTIONMAP_H_
-#define CORE_ACTION_ACTIONMAP_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -39,5 +38,3 @@ namespace Core
 		Action* Retrieve(const String& name);
 	};
 }
-
-#endif //CORE_ACTION_ACTIONMAP_H_

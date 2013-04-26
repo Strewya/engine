@@ -1,5 +1,4 @@
-#ifndef UTIL_CLOCK_H_
-#define UTIL_CLOCK_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -34,5 +33,3 @@ namespace Util
 		void  setMaxDeltaAllowed(float delta);
 	};
 }
-
-#endif //UTIL_CLOCK_H_

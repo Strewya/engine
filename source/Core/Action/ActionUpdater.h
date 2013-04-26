@@ -1,5 +1,4 @@
-#ifndef CORE_ACTION_ACTIONUPDATER_H_
-#define CORE_ACTION_ACTIONUPDATER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -35,5 +34,3 @@ namespace Core
 		bool DeactivateAction(ActionLogic logic, Action* action);
 	};
 }
-
-#endif //CORE_ACTION_ACTIONUPDATER_H_

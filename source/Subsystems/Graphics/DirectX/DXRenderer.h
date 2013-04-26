@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_DXRENDERER_H_
-#define SUBSYSTEMS_GRAPHICS_DXRENDERER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -130,5 +129,3 @@ namespace Graphics
 
 	//Store<DXTexture, TextureDescriptor, DXRenderer> TextureStore;
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_DXRENDERER_H_

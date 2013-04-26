@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_ANIMATION_H_
-#define SUBSYSTEMS_GRAPHICS_ANIMATION_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -44,5 +43,3 @@ namespace Graphics
 		std::deque<int> _sequence;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_ANIMATION_H_

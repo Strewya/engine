@@ -1,5 +1,4 @@
-#ifndef CORE_RESOURCELOCATOR_H_
-#define CORE_RESOURCELOCATOR_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -33,5 +32,3 @@ namespace Core
 		Graphics::SpritesheetCache& getSpritesheetCache() const;
 	};
 }
-
-#endif //CORE_RESOURCELOCATOR_H_

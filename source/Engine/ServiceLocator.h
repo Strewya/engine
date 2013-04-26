@@ -1,5 +1,4 @@
-#ifndef CORE_SERVICELOCATOR_H_
-#define CORE_SERVICELOCATOR_H_
+#pragma once
 /********************************************
 	class:	Services
 	usage:	Wrapper class for all the core services a game
@@ -40,5 +39,3 @@ namespace Core
 		Input::Engine* _input;
 	};
 }
-
-#endif //CORE_SERVICELOCATOR_H_

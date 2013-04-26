@@ -1,5 +1,4 @@
-#ifndef CORE_ENTITY_ENTITYPOOL_H_
-#define CORE_ENTITY_ENTITYPOOL_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -41,5 +40,3 @@ namespace Core
 		bool Destroy(InstanceID id);
 	};
 }
-
-#endif //CORE_ENTITY_ENTITYPOOL_H_

@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_INPUT_EVENT_H_
-#define SUBSYSTEMS_INPUT_EVENT_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -76,5 +75,3 @@ namespace Input
 		};
 	};
 }
-
-#endif //SUBSYSTEMS_INPUT_EVENT_H_

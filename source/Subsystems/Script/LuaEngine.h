@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_SCRIPT_LUAENGINE_H_
-#define SUBSYSTEMS_SCRIPT_LUAENGINE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -94,5 +93,3 @@ namespace Script
 		void HandleError(const char* name, int result);
 	};
 }
-
-#endif //SUBSYSTEMS_SCRIPT_LUAENGINE_H_

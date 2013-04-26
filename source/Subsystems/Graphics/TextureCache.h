@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_
-#define SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -40,5 +39,3 @@ namespace Graphics
 		IRenderer* _gfx;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_TEXTURECACHE_H_

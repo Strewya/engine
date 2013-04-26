@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_
-#define SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -45,5 +44,3 @@ namespace Graphics
 		DXFontCache& operator=(const DXFontCache& rhs);
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_DXFONTCACHE_H_

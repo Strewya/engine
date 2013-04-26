@@ -1,5 +1,4 @@
-#ifndef UTIL_LOGGER_H_
-#define UTIL_LOGGER_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -54,5 +53,3 @@ namespace Util
 		logger << value << Logger::endl;
 	}
 }
-
-#endif //UTIL_LOGGER_H_

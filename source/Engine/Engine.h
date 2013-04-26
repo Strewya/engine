@@ -1,5 +1,4 @@
-#ifndef CORE_ENGINE_H_
-#define CORE_ENGINE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -56,5 +55,3 @@ namespace Core
 		bool PushContext(const String& name);
 	};
 }
-
-#endif //CORE_ENGINE_H_

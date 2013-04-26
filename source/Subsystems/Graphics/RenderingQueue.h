@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_
-#define SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -35,5 +34,3 @@ namespace Graphics
 		FormVector _queue;
 	};
 }
-
-#endif //SUBSYSTEMS_GRAPHICS_RENDERINGQUEUE_H_

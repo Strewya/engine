@@ -1,5 +1,4 @@
-#ifndef WIN32_STANDARDWINDOW_H_
-#define WIN32_STANDARDWINDOW_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -22,5 +21,3 @@ namespace Win32
 		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
 	};
 }
-
-#endif //WIN32_STANDARDWINDOW_H_

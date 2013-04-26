@@ -1,5 +1,4 @@
-#ifndef CORE_GAMECONTEXT_H_
-#define CORE_GAMECONTEXT_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -14,6 +13,7 @@
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
 #include "Core/Action/ActionUpdater.h"
+#include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
@@ -49,6 +49,7 @@ namespace Core
 		Util::Timer timer;
 		ActionUpdater actionMaster;
 		EntityPool entityPool;
+		EntityFactory entityFactory;
 		SpacePool spacePool;
 		ServiceLocator services;
 		ResourceLocator resources;
@@ -62,5 +63,3 @@ namespace Core
 		void setContextEventLogic(EventType type, GameContextEvent function);
 	};
 }
-
-#endif //CORE_GAMECONTEXT_H_

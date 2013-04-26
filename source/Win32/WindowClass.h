@@ -1,5 +1,4 @@
-#ifndef WIN32_WINDOWCLASS_H_
-#define WIN32_WINDOWCLASS_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -28,5 +27,3 @@ namespace Win32
 	};
 
 }
-
-#endif //WIN32_WINDOWCLASS_H_

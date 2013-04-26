@@ -1,5 +1,4 @@
-#ifndef UTIL_COLOR_H_
-#define UTIL_COLOR_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -46,5 +45,3 @@ namespace Util
 
 std::istream& operator>>(std::istream& ss, Util::Color& v);
 std::ostream& operator<<(std::ostream& ss, Util::Color& v);
-
-#endif //UTIL_COLOR_H_

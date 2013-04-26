@@ -1,5 +1,4 @@
-#ifndef WIN32_GAMEWINDOW_H_
-#define WIN32_GAMEWINDOW_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -23,5 +22,3 @@ namespace Win32
 
 	};
 }
-
-#endif //WIN32_GAMEWINDOW_H_

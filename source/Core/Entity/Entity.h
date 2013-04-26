@@ -1,5 +1,4 @@
-#ifndef CORE_ENTITY_ENTITY_H_
-#define CORE_ENTITY_ENTITY_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -85,5 +84,3 @@ namespace Core
 		bool Insert(const String& name, std::unique_ptr<State> state);
 	};
 }
-
-#endif //CORE_ENTITY_ENTITY_H_

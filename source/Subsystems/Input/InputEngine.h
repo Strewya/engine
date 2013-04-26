@@ -1,5 +1,4 @@
-#ifndef SUBSYSTEMS_INPUT_INPUTSYSTEM_H_
-#define SUBSYSTEMS_INPUT_INPUTSYSTEM_H_
+#pragma once
 /********************************************
 	class:	InputSystem
 	usage:	Concrete input system implementation to create input
@@ -35,5 +34,3 @@ namespace Input
 		bool PollEvent(Event& out);
 	};
 }
-
-#endif //SUBSYSTEMS_INPUT_INPUTSYSTEM_H_

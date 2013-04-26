@@ -18,6 +18,48 @@
 
 namespace Pong
 {
+	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
+	{
+		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet");
+		uint paddleSpriteHandle = sheet.getSpriteHandle("paddle");
+
+		auto& form = paddle.getForm();
+		form.setType(Core::FormType::Sprite);
+		form.setScale(1,1);
+
+		form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+		form.Insert("CurrentSprite", Core::State::Create(paddleSpriteHandle));
+		form.Insert("Velocity", Core::State::Create(Util::Vec2(0,10)));
+		form.Insert("MaxVelocity", Core::State::Create(Util::Vec2(0,10)));
+		form.Insert("Force", Core::State::Create(Util::Vec2(0,0)));
+		form.Insert("Mass", Core::State::Create(1.0f));
+
+		paddle.Insert("EulerMovement", Core::Action::Create(Core::EulerMovement));
+		paddle.Insert("RK4Movement", Core::Action::Create(Core::RK4Movement));
+		paddle.Insert("Render", Core::Action::Create(Core::Render));
+		assert(paddle.getAction("Render")->Activate());
+
+		return true;
+	}
+
+	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
+	{
+		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet");
+
+		uint ballSpriteHandle = sheet.getSpriteHandle("ball");
+		
+		auto& ball_form = ball.getForm();
+		ball_form.setType(Core::FormType::Sprite);
+		
+		ball_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+		ball_form.Insert("CurrentSprite", Core::State::Create(ballSpriteHandle));
+
+		ball.Insert("Render", Core::Action::Create(Core::Render));
+		assert(ball.getAction("Render")->Activate());
+
+		return false;
+	}
+
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
 		context.actionMaster.EnqueueActionLogic(Core::PongInput);
@@ -28,22 +70,20 @@ namespace Pong
 		context.actionMaster.EnqueueActionLogic(Core::Animate);
 		context.actionMaster.EnqueueActionLogic(Core::Render);
 
-		auto& sheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
-		
-		uint ballHandle = sheet.getSpriteHandle("ball");
-		auto& ballSprite = sheet.getSprite(ballHandle);
-		uint paddleHandle = sheet.getSpriteHandle("paddle");
-		auto& paddleSprite = sheet.getSprite(paddleHandle);
-		Util::Vec2 windowSize = context.services.getGraphics().getScreenSize();
+		context.entityFactory.RegisterConstructor("paddle", CreatePaddle);
+		context.entityFactory.RegisterConstructor("ball", CreateBall);
+
+		auto windowSize = context.services.getGraphics().getScreenSize();
+		auto& pongSheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
 
 		for(int i = 0; i < 2; ++i)
 		{
 			auto& paddle = context.entityPool.NewInstance();
-			auto& paddle_form = paddle.getForm();
-			paddle_form.setType(Core::FormType::Sprite);
-			paddle_form.setScale(1,1);
 
+			context.entityFactory.CreateEntityType("paddle", paddle);
+			auto& paddle_form = paddle.getForm();
 			
+			auto& paddleSprite = pongSheet.getSprite(paddle_form.getState("CurrentSprite")->as<uint>());
 
 			if(i==0)
 			{
@@ -57,30 +97,12 @@ namespace Pong
 				paddle_form.setPosition(windowSize.x - (paddleSprite.getSrcRect().GetWidth()*2)*paddle_form.getScale().x, windowSize.y*0.5f);
 				paddle_form.setColor(255, 100, 100);
 			}
-			
-			paddle_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
-			paddle_form.Insert("CurrentSprite", Core::State::Create(paddleHandle));
-			paddle_form.Insert("Velocity", Core::State::Create(Util::Vec2(0,10)));
-			paddle_form.Insert("MaxVelocity", Core::State::Create(Util::Vec2(0,10)));
-			paddle_form.Insert("Force", Core::State::Create(Util::Vec2(0,0)));
-			paddle_form.Insert("Mass", Core::State::Create(1.0f));
-			
-			paddle.Insert("EulerMovement", Core::Action::Create(Core::EulerMovement));
-			paddle.Insert("RK4Movement", Core::Action::Create(Core::RK4Movement));
-			paddle.Insert("Render", Core::Action::Create(Core::Render));
-			assert(paddle.getAction("Render")->Activate());
 		}
 
 		auto& ball = context.entityPool.NewInstance();
+		context.entityFactory.CreateEntityType("ball", ball);
 		auto& ball_form = ball.getForm();
-		ball_form.setType(Core::FormType::Sprite);
-		ball_form.setPosition(windowSize.x*0.5f, windowSize.y*0.5f);
-
-		ball_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
-		ball_form.Insert("CurrentSprite", Core::State::Create(ballHandle));
-
-		ball.Insert("Render", Core::Action::Create(Core::Render));
-		assert(ball.getAction("Render")->Activate());
+		ball_form.setPosition(windowSize*0.5f);
 
 		
 		return true;

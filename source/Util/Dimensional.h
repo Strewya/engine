@@ -1,5 +1,4 @@
-#ifndef UTIL_DIMENSIONAL_H_
-#define UTIL_DIMENSIONAL_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
@@ -178,5 +177,3 @@ std::ostream& operator<<(std::ostream& ss, Util::Vec3& v);
 
 std::istream& operator>>(std::istream& ss, Util::Rect& r);
 std::ostream& operator<<(std::ostream& ss, Util::Rect& r);
-
-#endif //UTIL_DIMENSIONAL_H_

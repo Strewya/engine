@@ -1,18 +1,19 @@
-#ifndef CORE_GAMECONTEXTEVENT_PONG_H_
-#define CORE_GAMECONTEXTEVENT_PONG_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
 ********************************************/
 	/*** common header ***/
 #include "Engine/Defines.h"
+#include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
 #include "Engine/GameContextEvent.h"
 	/*** end header inclusion ***/
 
 namespace Pong
 {
+	bool CreatePaddle(Core::GameContext& context, Core::Entity& target);
+	bool CreateBall(Core::GameContext& context, Core::Entity& target);
+
 	bool ContextGameplayCreate(Core::GameContext& context);
 }
-
-#endif //CORE_GAMECONTEXTEVENT_PONG_H_
