@@ -9,7 +9,7 @@
 
 namespace Core
 {
-	void ActionUpdater::Update(double dt, GameContext& context)
+	void ActionUpdater::Update(float dt, GameContext& context)
 	{
 		for(ActionLogic fn : _actionQueue)
 		{

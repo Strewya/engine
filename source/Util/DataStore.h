@@ -51,7 +51,7 @@ namespace Util
 	template<typename T> class DataStore : public IDataStore
 	{
 	private:
-		typedef std::deque<T> TypeCache;
+		typedef std::deque<T*> TypeCache;
 		typedef std::deque<uint> ReferenceCount;
 		typedef std::set<uint> FreeSlots;
 		
@@ -71,6 +71,8 @@ namespace Util
 			return _hash;
 		}
 
+		virtual T* Load(const char* name) = 0;
+
 		uint AcquireDataIndex(int index = NOT_FOUND)
 		{
 			if(index == NOT_FOUND)
@@ -80,12 +82,12 @@ namespace Util
 				{
 					index = *_freeSlots.begin();
 					_freeSlots.erase(_freeSlots.begin());
-					_data[index] = T();
+					_data[index] = Load("");
 				}
 				else
 				{
 					index = _data.size();
-					_data.emplace_back();
+					_data.push_back(Load(""));
 					_refs.push_back(0);
 				}
 			}
@@ -107,7 +109,7 @@ namespace Util
 
 		T& getData(uint index)
 		{
-			return _data[index];
+			return *_data[index];
 		}
 	};
 
@@ -121,6 +123,7 @@ namespace Util
 			The DataStores are created and acquired via a template method.
 			The key for the DataStore pointers is the hash code of that specific type, determined by calling typeid.
 	*/
+	/*
 	class DataStoreRepository
 	{
 	private:
@@ -138,4 +141,5 @@ namespace Util
 			return *static_cast<DataStore<T>*>(it->second.get());
 		}
 	};
+	*/
 }

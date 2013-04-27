@@ -13,21 +13,25 @@
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
+#include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
+
+#include "Util/DataStore.h"
 	/*** end headers ***/
 
 namespace Pong
 {
 	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet");
+		uint hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
+		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
 		uint paddleSpriteHandle = sheet.getSpriteHandle("paddle");
 
 		auto& form = paddle.getForm();
 		form.setType(Core::FormType::Sprite);
 		form.setScale(1,1);
 
-		form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+		form.Insert("Spritesheet", Core::State::Create(hSheet));
 		form.Insert("CurrentSprite", Core::State::Create(paddleSpriteHandle));
 		form.Insert("Velocity", Core::State::Create(Util::Vec2(0,10)));
 		form.Insert("MaxVelocity", Core::State::Create(Util::Vec2(0,10)));
@@ -44,14 +48,15 @@ namespace Pong
 
 	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet");
+		uint hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
+		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
 
 		uint ballSpriteHandle = sheet.getSpriteHandle("ball");
 		
 		auto& ball_form = ball.getForm();
 		ball_form.setType(Core::FormType::Sprite);
 		
-		ball_form.Insert("Spritesheet", Core::State::Create<Graphics::Spritesheet&>(sheet));
+		ball_form.Insert("Spritesheet", Core::State::Create(hSheet));
 		ball_form.Insert("CurrentSprite", Core::State::Create(ballSpriteHandle));
 
 		ball.Insert("Render", Core::Action::Create(Core::Render));
@@ -74,7 +79,8 @@ namespace Pong
 		context.entityFactory.RegisterConstructor("ball", CreateBall);
 
 		auto windowSize = context.services.getGraphics().getScreenSize();
-		auto& pongSheet = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
+		uint pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
+		auto& pongSheet = context.resources.getSpritesheetCache().getSpritesheet(pongSheetHandle);
 
 		for(int i = 0; i < 2; ++i)
 		{

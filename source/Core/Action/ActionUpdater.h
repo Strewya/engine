@@ -27,7 +27,7 @@ namespace Core
 		void PurgeActions();
 
 	public:
-		void Update(double dt, GameContext& context);
+		void Update(float dt, GameContext& context);
 
 		bool EnqueueActionLogic(ActionLogic logic);
 		bool ActivateAction(ActionLogic logic, Action* action);

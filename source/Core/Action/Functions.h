@@ -13,12 +13,12 @@
 
 namespace Core
 {
-	void Render(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Animate(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Rotate(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Collide(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void EulerMovement(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void RK4Movement(double dt, GameContext& context, std::set<Core::Action*>& actions);
-	void PongInput(double dt, GameContext& context, std::set<Core::Action*>& actions);
+	void Render(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void Animate(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void Rotate(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void SIH(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void Collide(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void EulerMovement(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void RK4Movement(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	void PongInput(float dt, GameContext& context, std::set<Core::Action*>& actions);
 }

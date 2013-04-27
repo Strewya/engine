@@ -31,14 +31,18 @@ namespace Graphics
 	public:
 		SpritesheetCache();
 
-		Spritesheet& getSpritesheet(const char* sheetName);
-		Spritesheet& getSpritesheet(const String& sheetName);
-		Spritesheet& CreateEmpty(const char* sheetName);
-		Spritesheet& CreateEmpty(const String& sheetName);
-		Spritesheet& LoadFromFile(const char* filename);
-		Spritesheet& LoadFromFile(const String& filename);
-		bool Exists(const char* sheetName);
-		bool Exists(const String& sheetName);
+		Spritesheet& getSpritesheet(uint handle);
+
+		uint getSpritesheetHandle(const char* sheetName);
+		uint getSpritesheetHandle(const String& sheetName);
+		
+		uint CreateEmpty(const char* sheetName);
+		uint CreateEmpty(const String& sheetName);
+
+		uint LoadFromFile(const char* filename);
+		uint LoadFromFile(const String& filename);
+		
+		bool Exists(uint handle);
 		
 		void setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services);
 		

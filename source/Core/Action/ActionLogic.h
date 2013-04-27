@@ -15,4 +15,4 @@ namespace Core
 	class GameContext;
 }
 
-typedef void(*ActionLogic)(double dt, Core::GameContext& context, std::set<Core::Action*>& actions);
+typedef void(*ActionLogic)(float dt, Core::GameContext& context, std::set<Core::Action*>& actions);

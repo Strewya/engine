@@ -16,7 +16,7 @@
 
 namespace Core
 {
-	void Render(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void Render(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		Graphics::RenderingQueue alphaQueue;
 		for(auto action : actions)
@@ -33,7 +33,7 @@ namespace Core
 		context.services.getGraphics().EndScene();
 	}
 
-	void Animate(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void Animate(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		State* s_currentSprite = nullptr;
 		State* s_animationFrame = nullptr;
@@ -55,7 +55,8 @@ namespace Core
 				{
 					continue;
 				}
-				auto& spritesheet = s_spritesheet->as<Graphics::Spritesheet&>();
+				uint hSheet = s_spritesheet->as<uint>();
+				auto& spritesheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
 				auto& animation = spritesheet.getAnimation(s_animation->as<uint>());
 				auto& curFrame = s_animationFrame->as<uint>();
 				auto& curSprite = s_currentSprite->as<uint>();
@@ -65,7 +66,7 @@ namespace Core
 		}
 	}
 
-	void Rotate(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void Rotate(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		for(auto action : actions)
 		{
@@ -73,7 +74,7 @@ namespace Core
 		}
 	}
 
-	void PongInput(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void PongInput(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		if(context.services.getInput().isPressed(Input::Keyboard::_Escape))
 		{
@@ -126,7 +127,7 @@ namespace Core
 		}
 	}
 
-	void EulerMovement(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void EulerMovement(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		for(auto action : actions)
 		{
@@ -195,7 +196,7 @@ namespace Core
         state.vel += dvdt;
 	}
 
-	void RK4Movement(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void RK4Movement(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		for(auto action : actions)
 		{
@@ -214,7 +215,7 @@ namespace Core
 		}
 	}
 
-	void Collide(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void Collide(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		Space& space = context.spacePool.NewInstance();
 		for(auto action : actions)
@@ -255,7 +256,7 @@ namespace Core
 		}
 	}
 
-	void SIH(double dt, GameContext& context, std::set<Core::Action*>& actions)
+	void SIH(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
 		float speed = 5;
 		for(auto action : actions)

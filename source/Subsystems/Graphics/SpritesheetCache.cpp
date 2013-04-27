@@ -33,44 +33,61 @@ namespace Graphics
 		});
 	}
 
-	Spritesheet& SpritesheetCache::getSpritesheet(const char* sheetName)
+
+
+	Spritesheet& SpritesheetCache::getSpritesheet(uint handle)
 	{
-		auto it = _Find(sheetName);
-		if(it != _cache.end())
+		if(Exists(handle))
 		{
-			return *it;
+			return _cache[handle];
 		}
 		throw std::exception("Attempted to get inexisting sheet!");
 	}
 
-	Spritesheet& SpritesheetCache::getSpritesheet(const String& sheetName)
+
+
+	uint SpritesheetCache::getSpritesheetHandle(const String& name)
 	{
-		return getSpritesheet(sheetName.c_str());
+		return getSpritesheetHandle(name.c_str());
 	}
 
-	Spritesheet& SpritesheetCache::CreateEmpty(const char* sheetName)
+	uint SpritesheetCache::getSpritesheetHandle(const char* name)
+	{
+		auto it = _Find(name);
+		if(it != _cache.end())
+		{
+			return it-_cache.begin();
+		}
+		return NOT_FOUND;
+	}
+
+
+
+	uint SpritesheetCache::CreateEmpty(const char* sheetName)
 	{
 		auto it = _Find(sheetName);
 		if(it == _cache.end())
 		{
 			_cache.emplace_back();
 			_cache.back().setSpritesheetName(sheetName);
-			return _cache.back();
+			return _cache.size()-1;
 		}
-		return *it;
+		return it-_cache.begin();
 	}
 
-	Spritesheet& SpritesheetCache::CreateEmpty(const String& sheetName)
+	uint SpritesheetCache::CreateEmpty(const String& sheetName)
 	{
 		return CreateEmpty(sheetName.c_str());
 	}
 
-	Spritesheet& SpritesheetCache::LoadFromFile(const String& filename)
+
+
+	uint SpritesheetCache::LoadFromFile(const String& filename)
 	{
 		return LoadFromFile(filename.c_str());
 	}
 
-	Spritesheet& SpritesheetCache::LoadFromFile(const char* filename)
+	uint SpritesheetCache::LoadFromFile(const char* filename)
 	{
 		if(!_script->DoFile(filename))
 			throw std::exception("Spritesheet definition has failed to parse, see the log file for reasons.");
@@ -78,7 +95,8 @@ namespace Graphics
 		String name;
 		_script->GetField("name", -1);
 		_script->Pop(name);
-		Spritesheet& sheet = CreateEmpty(name);
+		uint sheetHandle = CreateEmpty(name);
+		Spritesheet& sheet = getSpritesheet(sheetHandle);
 
 		_script->GetField("texture", -1);
 		_script->Pop(name);
@@ -143,16 +161,13 @@ namespace Graphics
 		}
 
 		_script->Pop();
-		return sheet;
+		return sheetHandle;
 	}
 
-	bool SpritesheetCache::Exists(const char* sheetName)
-	{
-		return _Find(sheetName) != _cache.end();
-	}
 
-	bool SpritesheetCache::Exists(const String& sheetName)
+
+	bool SpritesheetCache::Exists(uint handle)
 	{
-		return Exists(sheetName.c_str());
+		return handle < _cache.size();
 	}
 }

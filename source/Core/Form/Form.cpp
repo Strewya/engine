@@ -46,8 +46,9 @@ namespace Core
 				State* s_spritesheet = f->getState("Spritesheet");
 				if(s_currentSprite && s_spritesheet)
 				{
-					auto& sheet = s_spritesheet->as<Graphics::Spritesheet&>();
+					uint hSheet = s_spritesheet->as<uint>();
 					auto currentFrame = s_currentSprite->as<uint>();
+					auto& sheet = resources.getSpritesheetCache().getSpritesheet(hSheet);
 					Graphics::Texture& texture = resources.getTextureCache().getTexture(sheet.getTextureHandle());
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawSprite(texture, sheet.getSprite(currentFrame));
@@ -60,7 +61,8 @@ namespace Core
 				State* s_texture = f->getState("Texture");
 				if(s_texture)
 				{
-					auto& texture = s_texture->as<Graphics::Texture>();
+					uint hTexture = s_texture->as<uint>();
+					auto& texture = resources.getTextureCache().getTexture(hTexture);
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawTexture(texture);
 				}

@@ -41,10 +41,6 @@ namespace Input
 			case EventType::MouseButtonReleased:
 				_mouseKeys[event.mouseButton.button] = false;
 			break;
-
-			default:
-				Util::GetDefaultLogger() << "Input::Engine::Update() - Undefined event type encoutered in eventQueue: " << (int)event.type << Util::Logger::endl;
-				continue;
 			}
 		}
 	}
