@@ -170,9 +170,6 @@
     <ClInclude Include="..\..\source\Core\State\Statemap.h">
       <Filter>Core/State</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Util\DataStore.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\Entity.h">
       <Filter>Core/Entity</Filter>
     </ClInclude>
@@ -257,6 +254,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\FwdDecl.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\AssetStorage.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

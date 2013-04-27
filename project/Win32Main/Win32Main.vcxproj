@@ -160,8 +160,8 @@
     <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h" />
     <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h" />
+    <ClInclude Include="..\..\source\Util\AssetStorage.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
-    <ClInclude Include="..\..\source\Util\DataStore.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\ITimer.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />

@@ -18,14 +18,13 @@ namespace Graphics
 		{
 			throw std::exception("DirectX graphics subsystem has failed to load.");
 		}
+
+		_textures.SetD3DDevice(_d3ddev);
 	}
 
 	DXRenderer::~DXRenderer()
 	{
-		for(auto tex : _textures)
-		{
-			tex.texture->Release();
-		}
+		_textures.Clear();
 
 		if(_line != nullptr)
 		{
@@ -104,10 +103,9 @@ namespace Graphics
 			return false;
 		//create a default texture to use when another texture fails to load
 		//should be embedded into the DLL if possible
-		_textures.emplace_back();
-		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_textures.back().texture)))
+		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_defaultTexture)))
 			return false;
-		_textures.back().refs = 1;
+
 		return true;
 	}
 
@@ -233,71 +231,26 @@ namespace Graphics
 
 	Texture DXRenderer::LoadTexture(const char* filename)
 	{
-		//the struct for reading bitmap file info
-		D3DXIMAGE_INFO info;
-		HRESULT result;
-		LPDIRECT3DTEXTURE9 texture = nullptr;
-
-		//create the new texture by loading a bitmap image file
-		result = D3DXGetImageInfoFromFile(filename, &info);
-		if(SUCCEEDED(result))
+		TextureLoadArgs args = {_transparentColor};
+		InstanceID id;
+		auto* texture = _textures.Acquire(filename, id, &args);
+		if(texture != nullptr)
 		{
-			result = D3DXCreateTextureFromFileEx(
-				_d3ddev,					//direct3D device object
-				filename,					//the image filename
-				info.Width,					//the image width
-				info.Height,				//the image height
-				1,							//mip-map levels (1 for no chain)
-				D3DPOOL_DEFAULT,			//the type of surface (default)
-				D3DFMT_UNKNOWN,				//texture format
-				D3DPOOL_MANAGED,			//memory class for the image
-				D3DX_DEFAULT,				//image filter
-				D3DX_DEFAULT,				//mip filter
-				_transparentColor,			//color key for transparency
-				&info,						//bitmap file info (from loaded file)
-				nullptr,					//color palette
-				&texture);					//destination texture
-
-			if(SUCCEEDED(result))
-			{
-				int handle;
-				if(_freeTextureSlots.empty())
-				{
-					handle = _textures.size();
-					_textures.push_back(dxtexture());
-				}
-				else
-				{
-					handle = *_freeTextureSlots.begin();
-					_freeTextureSlots.erase(_freeTextureSlots.begin());
-				}
-				_textures[handle].texture = texture;
-				_textures[handle].refs = 1;
-				return Texture(filename, info.Width, info.Height, this, handle);
-			}
+			D3DSURFACE_DESC info;
+			texture->GetLevelDesc(0, &info);
+			return Texture(filename, info.Width, info.Height, id);
 		}
-		Util::Logger& log = Util::GetDefaultLogger();
-		log << "Failed to load texture " << filename << "." << Util::Logger::endl;
-		return Texture(filename, info.Width, info.Height);
+		return Texture(filename, 0, 0, NOT_FOUND);
 	}
 
-	void DXRenderer::LoadTexture(uint index)
+	bool DXRenderer::DestroyTexture(InstanceID handle)
 	{
-		++_textures[index].refs;
+		return _textures.Delete(handle);
 	}
 
-	void DXRenderer::ReleaseTexture(uint handle)
+	void DXRenderer::ClearTextures()
 	{
-		if(0 < handle && handle < _textures.size() && _textures[handle].texture != nullptr)
-		{
-			--_textures[handle].refs;
-			if(_textures[handle].refs == 0)
-			{
-				_textures[handle].texture->Release();
-				_textures[handle].texture = nullptr;
-				_freeTextureSlots.insert(handle);
-			}
-		}
+		_textures.Clear();
 	}
 
 	DXFont DXRenderer::LoadFont(const char* name, uint size, uint weight, bool italic) const
@@ -541,27 +494,27 @@ namespace Graphics
 	
 	void DXRenderer::DrawTexture(const Texture& texture)
 	{
-		uint textureIndex = texture.getDataHandle();
-		if(textureIndex <= 0 || _textures.size() <= textureIndex)
+		auto* lptexture = _textures.CheckLoaded(texture.getDataHandle());
+		if(lptexture == nullptr)
 		{
 			return;
 		}
 		Util::Rect source(0,0,float(texture.getWidth()), float(texture.getHeight()));
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(_textures[textureIndex].texture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(lptexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
 	void DXRenderer::DrawSprite(const Texture& texture, const SpriteInfo& sprite)
 	{
-		uint textureIndex = texture.getDataHandle();
-		if(textureIndex <= 0 || _textures.size() <= textureIndex)
+		auto* lptexture = _textures.CheckLoaded(texture.getDataHandle());
+		if(lptexture == nullptr)
 		{
 			return;
 		}
 		Util::Rect source = sprite.getSrcRect();
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(_textures[textureIndex].texture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(lptexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	

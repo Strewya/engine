@@ -19,27 +19,17 @@ namespace Graphics
 	{
 	public:
 		Texture();
-		Texture(const char* filename, uint width, uint height, IRenderer* gfx = nullptr, uint dataHandle = 0);
-		Texture(const String& filename, uint width, uint height, IRenderer* gfx = nullptr, uint dataHandle = 0);
-		Texture(const Texture& rhs);
-		Texture& operator=(const Texture& rhs);
-		~Texture();
-
+		Texture(const char* filename, uint width, uint height, InstanceID dataHandle = 0);
+		Texture(const String& filename, uint width, uint height, InstanceID dataHandle = 0);
+		
 		const String& getFilename() const;
 		uint getWidth() const;
 		uint getHeight() const;
-		uint getDataHandle() const;
-
-		void setFilename(const char* filename);
-		void setFilename(const String& filename);
-		void setWidth(uint w);
-		void setHeight(uint h);
-		void setSize(uint width, uint height);
+		InstanceID getDataHandle() const;
 
 	private:
 		String _filename;
 		uint _width, _height;
-		uint _dataHandle;
-		IRenderer* _gfx;
+		InstanceID _dataHandle;
 	};
 }

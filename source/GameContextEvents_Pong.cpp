@@ -15,8 +15,6 @@
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
-
-#include "Util/DataStore.h"
 	/*** end headers ***/
 
 namespace Pong

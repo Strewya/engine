@@ -37,6 +37,12 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.h">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\AssetStorage.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Util\Color.cpp">
@@ -68,6 +74,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp">
       <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.cpp">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,11 +15,13 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.h" />
     <ClInclude Include="..\..\source\subsystems\graphics\directx\DXInclude.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\FontInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h" />
+    <ClInclude Include="..\..\source\Util\AssetStorage.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />
@@ -28,6 +30,7 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFont.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\dll_source.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\FontInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />

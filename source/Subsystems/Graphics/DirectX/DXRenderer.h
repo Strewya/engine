@@ -11,6 +11,7 @@
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/DirectX/DXFontCache.h"
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
+#include "Subsystems/Graphics/DirectX/DXTextureAsset.h"
 #include "Util/Dimensional.h"
 #include "Util/Color.h"
 	/*** end header inclusion ***/
@@ -26,11 +27,6 @@ namespace Graphics
 		bool InitDevices();
 		bool ResetDevices();
 		
-		RECT MakeRECT(const Util::Rect& in) const;
-		D3DXVECTOR2 MakeVECTOR(const Util::Vec2& in) const;
-		D3DXVECTOR3 MakeVECTOR(const Util::Vec3& in) const;
-		D3DCOLOR MakeCOLOR(const Util::Color& in) const;
-
 		HWND _hwnd;
 		LPDIRECT3D9 _d3d;
 		LPDIRECT3DDEVICE9 _d3ddev;
@@ -40,12 +36,8 @@ namespace Graphics
 		
 		D3DPRESENT_PARAMETERS _d3dpp;
 		
-		struct dxtexture
-		{
-			LPDIRECT3DTEXTURE9 texture;
-			uint refs;
-		};
-		std::deque<dxtexture> _textures;
+		DXTextureAsset _textures;
+		LPDIRECT3DTEXTURE9 _defaultTexture;
 		std::set<uint> _freeTextureSlots;
 		DXFontCache _fonts;
 
@@ -77,8 +69,8 @@ namespace Graphics
 		DXFont LoadFont(const char* name, uint size, uint weight, bool italic) const;
 
 		Texture LoadTexture(const char* filename);
-		void LoadTexture(uint index);
-		void ReleaseTexture(uint handle);
+		bool DestroyTexture(InstanceID handle);
+		void ClearTextures();
 
 		uint MakeFont(const char* name, uint size, uint weight, bool italic);
 		uint getFontHandle(const char* filename);
@@ -103,27 +95,6 @@ namespace Graphics
 		void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth);
 		void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth);
 	};
-
-	inline RECT DXRenderer::MakeRECT(const Util::Rect& in) const
-	{
-		RECT out = {(int)in.Left(), (int)in.Top(), (int)in.Right(), (int)in.Bottom()} ;
-		return out;
-	}
-
-	inline D3DXVECTOR2 DXRenderer::MakeVECTOR(const Util::Vec2& in) const
-	{
-		return D3DXVECTOR2(in.x, in.y);
-	}
-
-	inline D3DXVECTOR3 DXRenderer::MakeVECTOR(const Util::Vec3& in) const
-	{
-		return D3DXVECTOR3(in.x, in.y, in.z);
-	}
-
-	inline D3DCOLOR DXRenderer::MakeCOLOR(const Util::Color& in) const
-	{
-		return D3DCOLOR_ARGB(in.alpha, in.red, in.green, in.blue);
-	}
 
 
 

@@ -8,7 +8,7 @@
 /*		TYPEDEFS	*/
 typedef std::string String;
 typedef unsigned int uint;
-typedef long InstanceID;
+typedef unsigned long InstanceID;
 typedef unsigned long DWORD;
 typedef unsigned long ulong;
 
