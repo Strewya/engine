@@ -32,8 +32,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		//start main loop
 		while(gameWindow.Update())
 		{	
-			Util::Clock::WallClock().AdvanceTime();
-			
 			engine.Loop();
 		}
 

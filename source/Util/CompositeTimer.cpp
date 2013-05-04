@@ -1,25 +1,22 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** personal header ***/
-#include "Util/Clock.h"
+#include "Util/CompositeTimer.h"
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "Util/ITimer.h"
+#include "Engine/Defines.h"
 	/*** end headers ***/
 
 namespace Util
 {
-	Clock::Clock()
-		: _maxDeltaAllowed(0.25), _lastUpdate(std::chrono::high_resolution_clock::now())
-	{}
-
-	void Clock::AdvanceTime()
+	void CompositeTimer::AdvanceTime(float delta)
 	{
-		std::chrono::time_point<std::chrono::high_resolution_clock> now = std::chrono::high_resolution_clock::now();
-		auto delta = std::chrono::duration_cast<std::chrono::duration<float>>(now-_lastUpdate).count();
-		_lastUpdate = now;
-		delta = delta > _maxDeltaAllowed ? _maxDeltaAllowed : delta;
-		for(auto timer : _timers)
+		if(isPaused)
+		{
+			return;
+		}
+
+		for(auto* timer : _timers)
 		{
 			if(timer)
 			{
@@ -28,7 +25,7 @@ namespace Util
 		}
 	}
 
-	uint Clock::FindFirstFreeSlot()
+	uint CompositeTimer::FindFirstFreeSlot()
 	{
 		for(auto it = _timers.begin(); it != _timers.end(); ++it)
 		{
@@ -41,21 +38,15 @@ namespace Util
 		return _timers.size()-1;
 	}
 
-	void Clock::RegisterTimer(ITimer& timer)
+	void CompositeTimer::RegisterTimer(ITimer& timer)
 	{
 		timer.id = FindFirstFreeSlot();
 		_timers[timer.id] = &timer;
 		timer.composer = this;
 	}
 
-	void Clock::UnregisterTimer(ITimer& timer)
+	void CompositeTimer::UnregisterTimer(ITimer& timer)
 	{
-		/*
-		if(_timers.empty())
-		{
-			return;
-		}*/
-
 		if(_timers[timer.id] == &timer)
 		{
 			_timers[timer.id] = nullptr;
@@ -72,15 +63,5 @@ namespace Util
 				timer.composer = nullptr;
 			}
 		}
-	}
-
-	float Clock::getMaxDeltaAllowed() const
-	{
-		return _maxDeltaAllowed;
-	}
-
-	void Clock::setMaxDeltaAllowed(float delta)
-	{
-		_maxDeltaAllowed = delta;
 	}
 }

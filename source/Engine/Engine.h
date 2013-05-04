@@ -15,6 +15,7 @@
 #include "Subsystems/Graphics/TextureCache.h"
 #include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
+#include "Util/Clock.h"
 	/*** end header inclusion ***/
 
 namespace Win32
@@ -46,9 +47,11 @@ namespace Core
 		*/
 		GameContext* _activeContext; 
 		
+		Util::Clock _mainClock;
 	
 	public:
 		Engine(Win32::AbstractWindow& window);
+		~Engine();
 		void Loop();
 		void Shutdown();
 

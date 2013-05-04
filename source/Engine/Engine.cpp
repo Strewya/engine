@@ -87,12 +87,19 @@ namespace Core
 		*/
 	}
 
+	Engine::~Engine()
+	{
+		_gameContexts.clear();
+	}
+
 	void Engine::Loop()
 	{
 		if(!_activeContext)
 		{
 			Shutdown();
 		}
+
+		_mainClock.AdvanceTime();
 
 		//update input
 		_inputEngine.Update();
@@ -145,6 +152,7 @@ namespace Core
 		{
 			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, _services, _resources))).first;
 			it->second->Create();
+			_mainClock.RegisterTimer(it->second->timer);
 		}
 		return *it->second;
 	}

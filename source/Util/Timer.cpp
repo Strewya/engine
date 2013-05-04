@@ -18,6 +18,11 @@ namespace Util
 
 	void Timer::AdvanceTime(float dt)
 	{
+		if(isPaused)
+		{
+			return;
+		}
+
 		_accumulator += (dt*_scale);
 	}
 

@@ -12,6 +12,7 @@
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/RenderingQueue.h"
 #include "Subsystems/Input/InputEngine.h"
+#include "Util/Timer.h"
 	/*** end headers ***/
 
 namespace Core

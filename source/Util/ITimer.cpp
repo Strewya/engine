@@ -9,17 +9,24 @@
 namespace Util
 {
 	ITimer::ITimer()
-	{
-		_wallClock.RegisterTimer(this);
-	}
+		: id(NOT_FOUND), composer(nullptr), isPaused(false)
+	{}
 
 	ITimer::ITimer(const ITimer& rhs)
+		: id(NOT_FOUND), composer(nullptr), isPaused(false)
 	{
-		_wallClock.RegisterTimer(this);
+	}
+
+	ITimer& ITimer::operator=(const ITimer& rhs)
+	{
+		return *this;
 	}
 
 	ITimer::~ITimer()
 	{
-		_wallClock.UnregisterTimer(this);
+		if(composer != nullptr && id != NOT_FOUND)
+		{
+			composer->UnregisterTimer(*this);
+		}
 	}
 }

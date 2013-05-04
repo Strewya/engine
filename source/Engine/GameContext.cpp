@@ -10,7 +10,7 @@ namespace Core
 {
 	GameContext::GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources)
 		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
-		timer(gUpdateInterval), physicsWorld(b2Vec2(0,0)), entityFactory(*this)
+		timer(), physicsWorld(b2Vec2(0,0)), entityFactory(*this)
 	{
 		Action::BindActionUpdater(actionMaster);
 
@@ -51,7 +51,7 @@ namespace Core
 	void GameContext::Activate()
 	{
 		Action::BindActionUpdater(actionMaster);
-		timer.Reset();
+		timer.isPaused = false;
 
 		if(_onActivate)
 		{
@@ -61,6 +61,8 @@ namespace Core
 
 	void GameContext::Deactivate()
 	{
+		timer.isPaused = true;
+
 		if(_onDeactivate)
 		{
 			_onDeactivate(*this);
@@ -69,14 +71,14 @@ namespace Core
 
 	bool GameContext::Update()
 	{
-		while(timer.HasUpdatePeriodElapsed())
+		if(!timer.isPaused)
 		{
 			if(_onUpdate)
 			{
 				_onUpdate(*this);
 			}
 
-			actionMaster.Update(timer.getUpdatePeriod(), *this);
+			actionMaster.Update(gUpdateInterval, *this);
 			return true;
 		}
 		return false;

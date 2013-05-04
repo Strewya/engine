@@ -9,20 +9,12 @@
 
 namespace Util
 {
-	class ITimerComposer;
+	class ITimer;
 
-	class ITimer
+	class ITimerComposer
 	{
 	public:
-		unsigned int id;
-		ITimerComposer* composer;
-		bool isPaused;
-
-		ITimer();
-		ITimer(const ITimer& rhs);
-		ITimer& operator=(const ITimer& rhs);
-		virtual ~ITimer();
-
-		virtual void AdvanceTime(float dt) = 0;
+		virtual void RegisterTimer(ITimer& t) = 0;
+		virtual void UnregisterTimer(ITimer& t) = 0;
 	};
 }

@@ -112,6 +112,7 @@
     <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
+    <ClCompile Include="..\..\source\Util\CompositeTimer.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
     <ClCompile Include="..\..\source\Util\Logger.cpp" />
     <ClCompile Include="..\..\source\Util\Clock.cpp" />
@@ -164,9 +165,11 @@
     <ClInclude Include="..\..\source\Util\Color.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\ITimer.h" />
+    <ClInclude Include="..\..\source\Util\ITimerComposer.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />
     <ClInclude Include="..\..\source\Util\Clock.h" />
     <ClInclude Include="..\..\source\Util\Timer.h" />
+    <ClInclude Include="..\..\source\Util\CompositeTimer.h" />
     <ClInclude Include="..\..\source\Win32\GameWindow.h" />
     <ClInclude Include="..\..\source\Win32\StandardWindow.h" />
     <ClInclude Include="..\..\source\Win32\WindowClass.h" />

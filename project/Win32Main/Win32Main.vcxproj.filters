@@ -117,6 +117,9 @@
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Util\CompositeTimer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -256,6 +259,12 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\AssetStorage.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\ITimerComposer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\CompositeTimer.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>

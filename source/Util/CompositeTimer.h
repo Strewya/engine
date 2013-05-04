@@ -4,32 +4,26 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
-#include <chrono>
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Util/ITimer.h"
 #include "Util/ITimerComposer.h"
 	/*** end header inclusion ***/
 
 namespace Util
 {
-	class ITimer;
-	
-	class Clock : public ITimerComposer
+	class CompositeTimer : public ITimer, public ITimerComposer
 	{
 	private:
 		std::deque<ITimer*> _timers;
-		std::chrono::time_point<std::chrono::high_resolution_clock> _lastUpdate;
-		float _maxDeltaAllowed;
 
-		uint FindFirstFreeSlot();
+		unsigned int FindFirstFreeSlot();
+
 	public:
-		Clock();
-		void AdvanceTime();
+		void AdvanceTime(float delta);
+
 		void RegisterTimer(ITimer& timer);
 		void UnregisterTimer(ITimer& timer);
 
-		float getMaxDeltaAllowed() const;
-		void  setMaxDeltaAllowed(float delta);
 	};
 }

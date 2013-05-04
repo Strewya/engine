@@ -18,7 +18,7 @@
 #include "Core/Space/SpacePool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Graphics/TextureCache.h"
-#include "Util/Timer.h"
+#include "Util/CompositeTimer.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -46,7 +46,7 @@ namespace Core
 			OnUpdate
 		};
 
-		Util::Timer timer;
+		Util::CompositeTimer timer;
 		ActionUpdater actionMaster;
 		EntityPool entityPool;
 		EntityFactory entityFactory;
