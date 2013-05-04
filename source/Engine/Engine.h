@@ -40,15 +40,18 @@ namespace Core
 		ResourceLocator _resources;
 
 		std::unordered_map<String, std::unique_ptr<GameContext>> _gameContexts;
-		GameContext* _activeContext;
+		/*
+			replace with std::list<GameContext*> if more than one Context can be active
+			requires PopContext() and PopContext(name) methods
+		*/
+		GameContext* _activeContext; 
+		
 	
 	public:
 		Engine(Win32::AbstractWindow& window);
 		void Loop();
 		void Shutdown();
 
-		//GameContext& CreateContext(const char* name, GameContextEvent onCreate);
-		//GameContext& CreateContext(const String& name, GameContextEvent onCreate);
 		GameContext& getContext(const char* name, GameContextEvent onCreate = nullptr);
 		GameContext& getContext(const String& name, GameContextEvent onCreate = nullptr);
 		bool PushContext(const char* name);

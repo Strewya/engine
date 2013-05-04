@@ -25,14 +25,22 @@ namespace Core
 		_textureCache.setReferences(this->resources, this->services);
 		_spritesheetCache.setReferences(this->resources, this->services);
 		//...
+	}
 
+	GameContext::~GameContext()
+	{
+		Destroy();
+	}
+
+	void GameContext::Create()
+	{
 		if(_onCreate)
 		{
 			_onCreate(*this);
 		}
 	}
 
-	GameContext::~GameContext()
+	void GameContext::Destroy()
 	{
 		if(_onDestroy)
 		{

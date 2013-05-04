@@ -19,11 +19,20 @@ namespace Util
 	};
 
 	template<typename T, typename DEF = void> class AssetStore
-	{
+	{	
 	public:
+		typedef T AssetType;
+		typedef DEF LoadArgs;
+
 		AssetStore()
-			: _idCounter(0)
-		{}
+			: _idCounter(0), indexMask(0xFFF), maskBits(0)
+		{
+			uint tempMask = indexMask;
+			for(; tempMask; ++maskBits)
+			{
+				tempMask &= tempMask-1;
+			}
+		}
 
 		virtual ~AssetStore()
 		{
@@ -35,28 +44,25 @@ namespace Util
 			typename Storage_t::iterator it = _assets.begin();
 			for(; it != _assets.end(); ++it)
 			{
-				AssetHolder<T>& asset = *it;
-				AssetUnloader(asset);
+				AssetUnloader(*it);
 			}
 		}
 
-		T* CheckLoaded(const char* filename)
+		AssetType* CheckLoaded(const char* filename)
 		{
 			typename Storage_t::iterator it = _assets.begin();
 			for(; it != _assets.end(); ++it)
 			{
-				AssetHolder<T>& asset = *it;
-				if(asset.filename.compare(filename)==0)
+				if(it->filename.compare(filename)==0)
 				{
-					return asset.dataPtr;
+					return it->dataPtr;
 				}
 			}
 			return nullptr;
 		}
 
-		T* CheckLoaded(InstanceID id)
+		AssetType* CheckLoaded(InstanceID id)
 		{
-			uint indexMask = 0xFFF;
 			uint index = id & indexMask;
 			if(index < _assets.size() && _assets[index].id == id)
 			{
@@ -65,22 +71,22 @@ namespace Util
 			return nullptr;
 		}
 
-		T* Acquire(const char* filename, DEF* loadArgs = nullptr)
+		AssetType* Acquire(const char* filename, LoadArgs* loadArgs = nullptr)
 		{
-			InstanceID id;
-			return Acquire(filename, id, loadArgs);
+			//InstanceID id;
+			return Acquire(filename, InstanceID(), loadArgs);
 		}
 
-		T* Acquire(const char* filename, InstanceID& outID, DEF* loadArgs = nullptr)
+		AssetType* Acquire(const char* filename, InstanceID& outID, LoadArgs* loadArgs = nullptr)
 		{
-			T* check = CheckLoaded(filename);
+			AssetType* check = CheckLoaded(filename);
 			if(check != nullptr)
 			{
 				return check;
 			}
 			
 			uint index = FindFirstFreeIndex();
-			AssetHolder<T>& asset = _assets[index];
+			AssetHolder<AssetType>& asset = _assets[index];
 			asset.dataPtr = Load(filename, loadArgs);
 			if(asset.dataPtr == nullptr)
 			{
@@ -96,7 +102,6 @@ namespace Util
 		
 		bool Delete(InstanceID id)
 		{
-			uint indexMask = 0xFFF;
 			uint index = id & indexMask;
 			if(index < _assets.size() && _assets[index].id == id)
 			{
@@ -105,15 +110,14 @@ namespace Util
 			return false;
 		}
 
-		bool Delete(T* ptr)
+		bool Delete(AssetType* ptr)
 		{
 			typename Storage_t::iterator it = _assets.begin();
 			for(; it != _assets.end(); ++it)
 			{
-				AssetHolder<T>& asset = *it;
-				if(asset.dataPtr == ptr)
+				if(it->dataPtr == ptr)
 				{
-					return AssetUnloader(asset);
+					return AssetUnloader(*it);
 				}
 			}
 			return false;
@@ -124,23 +128,19 @@ namespace Util
 			typename Storage_t::iterator it = _assets.begin();
 			for(; it != _assets.end(); ++it)
 			{
-				AssetHolder<T>& asset = *it;
-				if(asset.filename.compare(filename)==0)
+				if(it->filename.compare(filename)==0)
 				{
-					return AssetUnloader(asset);
+					return AssetUnloader(*it);
 				}
 			}
 			return false;
 		}
 
 	protected:
-		typedef T AssetType;
-		typedef DEF LoadArgs;
-
 		virtual AssetType* Load(const char* filename, const LoadArgs* loadArgs) = 0;
 		virtual bool Unload(AssetType*& assetPtr) = 0;
 		
-		bool DeleteUnload(T*& asset)
+		bool DeleteUnload(AssetType*& asset)
 		{
 			delete asset;
 			asset = nullptr;
@@ -148,20 +148,21 @@ namespace Util
 		}
 
 	private:
-		typedef std::deque<AssetHolder<T>> Storage_t;
+		typedef std::deque<AssetHolder<AssetType>> Storage_t;
 		Storage_t _assets;
 		InstanceID _idCounter;
+		uint indexMask;
+		uint maskBits;
 
 		InstanceID _GenerateID(uint index)
 		{
-			uint indexMask = 0xFFF;
 			InstanceID id = _idCounter++;
-			id <<= 12;
+			id <<= maskBits;
 			id = id | (index&indexMask);
 			return id;
 		}
 
-		bool AssetUnloader(AssetHolder<T>& asset)
+		bool AssetUnloader(AssetHolder<AssetType>& asset)
 		{
 			bool result = Unload(asset.dataPtr);
 			if(result)
@@ -180,7 +181,7 @@ namespace Util
 			{
 				if(it->dataPtr == nullptr)
 				{
-					return it - _assets.end();
+					return it - _assets.begin();
 				}
 			}
 			_assets.emplace_back();

@@ -144,6 +144,7 @@ namespace Core
 		if(it == _gameContexts.end())
 		{
 			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, _services, _resources))).first;
+			it->second->Create();
 		}
 		return *it->second;
 	}

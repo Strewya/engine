@@ -57,6 +57,9 @@ namespace Core
 
 		GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources);
 		~GameContext();
+
+		void Create();
+		void Destroy();
 		void Activate();
 		void Deactivate();
 		bool Update();
