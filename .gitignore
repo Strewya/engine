@@ -22,4 +22,5 @@ docs/
 *.log
 *.dll
 !lib/*.dll
+lib/Box2D*
 *.exe
