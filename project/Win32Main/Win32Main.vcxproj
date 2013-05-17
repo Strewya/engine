@@ -146,6 +146,7 @@
     <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
+    <ClInclude Include="..\..\source\StateTest.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />

@@ -267,6 +267,9 @@
     <ClInclude Include="..\..\source\Util\CompositeTimer.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\StateTest.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">

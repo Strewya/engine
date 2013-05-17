@@ -2,6 +2,7 @@
 	/*** personal header ***/
 #include "GameContextEvents_Pong.h"
 	/*** C++ headers ***/
+#include <map>
 #include <memory>
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
@@ -15,6 +16,8 @@
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
+
+#include "StateTest.h"
 	/*** end headers ***/
 
 namespace Pong
@@ -65,6 +68,25 @@ namespace Pong
 
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
+		Core::StateTest::Position pos;
+		pos.value.x = 10;
+		
+		
+		std::map<size_t, Core::StateTest::BaseState*> test;
+		test.insert(std::make_pair(pos.hash, &pos));
+		
+
+		Core::StateTest::Position* p = test[Core::StateTest::Position::hash]->downcast<Core::StateTest::Position>();
+		
+
+
+
+
+
+
+
+
+
 		context.actionMaster.EnqueueActionLogic(Core::PongInput);
 		context.actionMaster.EnqueueActionLogic(Core::EulerMovement);
 		context.actionMaster.EnqueueActionLogic(Core::RK4Movement);
