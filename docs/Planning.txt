@@ -1,6 +1,18 @@
 This document contains the list of features that i have to implement.
 
 - expose classes to Lua
+- Spritesheet object that contains
+	* name
+	* number of frames defined on it
+	* list of all frames (a vector should do fine)
+	* list of animations that the frames define (if any)
+	* a texture that it's bound to
+	- Image object should contain
+		* name
+		* rectangle of it's definition (position and dimensions)
+	- Animation object should contain
+		* name
+		* list of images that define it (any linear array container)
 - SpriteAtlas object
 	* similair to Spritesheet, but it contains other spritesheets instead of images and animations
 	* defines a texture which it is bound to
@@ -19,3 +31,5 @@ This document contains the list of features that i have to implement.
 	* contains Sound wrappers
 - all of the cache objects should listen to the file changed event, and reload their children in case they changed
 - audio service implementation
+- change all Actions to be heap based
+

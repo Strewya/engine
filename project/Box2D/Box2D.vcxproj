@@ -63,7 +63,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)$(Configuration)\$(ProjectName).lib $(ENGINE)\lib\Box2D_d.lib /Y</Command>
+      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).lib $(SGPROJECT)\lib\Box2D_d.lib /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,7 +91,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)$(Configuration)\$(ProjectName).lib $(ENGINE)\lib\Box2D_r.lib /Y</Command>
+      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).lib $(SGPROJECT)\lib\Box2D_r.lib /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
