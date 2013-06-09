@@ -42,7 +42,8 @@ namespace Pong
 		paddle.Insert("EulerMovement", Core::Action::Create(Core::EulerMovement));
 		paddle.Insert("RK4Movement", Core::Action::Create(Core::RK4Movement));
 		paddle.Insert("Render", Core::Action::Create(Core::Render));
-		assert(paddle.getAction("Render")->Activate());
+		bool activated = paddle.getAction("Render")->Activate();
+		assert(activated);
 
 		return true;
 	}
@@ -61,7 +62,8 @@ namespace Pong
 		ball_form.Insert("CurrentSprite", Core::State::Create(ballSpriteHandle));
 
 		ball.Insert("Render", Core::Action::Create(Core::Render));
-		assert(ball.getAction("Render")->Activate());
+		bool activated = ball.getAction("Render")->Activate();
+		assert(activated);
 
 		return false;
 	}
@@ -116,7 +118,8 @@ namespace Pong
 				paddle_form.setPosition(paddleSprite.getSrcRect().GetWidth()*paddle_form.getScale().x, windowSize.y*0.5f);
 				paddle_form.setColor(100, 100, 255);
 				paddle.Insert("InputHandler", Core::Action::Create(Core::PongInput));
-				assert(paddle.getAction("InputHandler")->Activate());
+				bool activated = paddle.getAction("InputHandler")->Activate();
+				assert(activated);
 			}
 			else
 			{

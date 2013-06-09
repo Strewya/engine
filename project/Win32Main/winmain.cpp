@@ -26,7 +26,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	{
 		Core::Engine engine(gameWindow);
 		engine.getContext("main", Pong::ContextGameplayCreate);
-		assert(engine.PushContext("main"));
+		bool pushed = engine.PushContext("main");
+		assert(pushed);
 		assert(!engine.PushContext("main"));
 		
 		//start main loop
