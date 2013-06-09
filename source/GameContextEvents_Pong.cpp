@@ -99,7 +99,7 @@ namespace Pong
 		context.entityFactory.RegisterConstructor("ball", CreateBall);
 
 		auto windowSize = context.services.getGraphics().getScreenSize();
-		uint pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("resources/pong.sheet");
+		uint pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("../resources/pong.sheet");
 		auto& pongSheet = context.resources.getSpritesheetCache().getSpritesheet(pongSheetHandle);
 
 		for(int i = 0; i < 2; ++i)

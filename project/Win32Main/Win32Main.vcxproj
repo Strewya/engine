@@ -62,6 +62,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <PostBuildEvent>
+      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$TargetFileName) /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -80,6 +83,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>lua5.1.lib;lua51.lib;Box2D_r.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$TargetFileName) /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
@@ -177,18 +183,18 @@
     <ClInclude Include="..\..\source\Win32\AbstractWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\resources\character.sheet" />
+    <None Include="..\..\resources\pong.sheet" />
     <None Include="config.lua" />
     <None Include="logger.log" />
-    <None Include="resources\character.sheet" />
-    <None Include="resources\pong.sheet" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\character.png" />
-    <Image Include="resources\gui_window.png" />
-    <Image Include="resources\pong.png" />
+    <Image Include="..\..\resources\character.png" />
+    <Image Include="..\..\resources\gui_window.png" />
+    <Image Include="..\..\resources\pong.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

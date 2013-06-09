@@ -299,38 +299,38 @@
     <Filter Include="Subsystems/Input">
       <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{af13eb68-4100-43be-bdff-4fcdc5921d7e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core/Space">
       <UniqueIdentifier>{e12f3b4d-4607-4113-ac64-6d4422666606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{dd566029-3832-413b-b283-bb95cac542b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="config.lua" />
     <None Include="logger.log" />
-    <None Include="resources\character.sheet">
-      <Filter>Resources</Filter>
+    <None Include="..\..\resources\character.sheet">
+      <Filter>resources</Filter>
     </None>
-    <None Include="resources\pong.sheet">
-      <Filter>Resources</Filter>
+    <None Include="..\..\resources\pong.sheet">
+      <Filter>resources</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\docs\Planning.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\character.png">
-      <Filter>Resources</Filter>
+    <Image Include="..\..\resources\character.png">
+      <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\gui_window.png">
-      <Filter>Resources</Filter>
+    <Image Include="..\..\resources\gui_window.png">
+      <Filter>resources</Filter>
     </Image>
-    <Image Include="resources\pong.png">
-      <Filter>Resources</Filter>
+    <Image Include="..\..\resources\pong.png">
+      <Filter>resources</Filter>
     </Image>
   </ItemGroup>
 </Project>

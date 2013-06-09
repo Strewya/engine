@@ -97,7 +97,7 @@
       <ModuleDefinitionFile>DX_Renderer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).dll $(SolutionDir)\Win32Main\ /Y</Command>
+      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).dll $(SGPROJECT)\$(Configuration)\ /Y</Command>
     </PostBuildEvent>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -122,7 +122,7 @@
       <AdditionalDependencies>d3d9.lib;d3dx9.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).dll $(SolutionDir)\Win32Main\ /Y</Command>
+      <Command>copy $(SolutionDir)$(Configuration)\$(ProjectName).dll $(SGPROJECT)\$(Configuration)\ /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
