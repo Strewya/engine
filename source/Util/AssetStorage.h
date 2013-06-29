@@ -57,6 +57,12 @@ namespace Util
 	};
 
 
+
+	//****************************************************************************************
+	//			ASSET STORE IMPLEMENTATION
+	//****************************************************************************************
+
+
 	template<typename T, typename DEF> AssetStore<T, DEF>::AssetStore()
 		: _idCounter(0), indexMask(0xFFF), maskBits(0)
 	{

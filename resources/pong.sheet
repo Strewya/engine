@@ -1,6 +1,6 @@
 return {
 	name = "pong.sheet",
-	texture = "resources/pong.png",
+	texture = "../resources/pong.png",
 	frames = {
 		{name="ball", 		rect={x=33, y=0,  w=32, h=32}},
 		{name="rectangle", 	rect={x=33, y=33, w=32, h=32}},
