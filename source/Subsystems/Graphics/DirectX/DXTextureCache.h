@@ -27,6 +27,7 @@ namespace Graphics
 	class DXTextureCache : public Util::AssetStore<DXTexture, TextureLoadArgs>, public ITextureCache
 	{
 	public:
+		DXTextureCache();
 		void SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev);
 		
 		InstanceID LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr);

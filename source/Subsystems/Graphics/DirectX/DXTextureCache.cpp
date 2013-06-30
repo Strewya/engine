@@ -7,6 +7,10 @@
 
 namespace Graphics
 {
+	DXTextureCache::DXTextureCache()
+		: _d3ddev(nullptr)
+	{}
+
 	void DXTextureCache::SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev)
 	{
 		_d3ddev = d3ddev;

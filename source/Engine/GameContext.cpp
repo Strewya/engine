@@ -8,21 +8,11 @@
 
 namespace Core
 {
-	GameContext::GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources)
-		: services(services), _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
-		timer(), physicsWorld(b2Vec2(0,0)), entityFactory(*this)
+	GameContext::GameContext(GameContextEvent onCreate, ServiceLocator& services, ResourceLocator& resources)
+		: _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
+		timer(), physicsWorld(b2Vec2(0,0)), entityFactory(*this), services(services), resources(resources)
 	{
 		Action::BindActionUpdater(actionMaster);
-
-		this->resources.Register(_spritesheetCache);
-		this->resources.Register(resources.getTextureCache());
-		//...
-
-		_spritesheetCache.setReferences(resources, services);
-		//...
-
-		_spritesheetCache.setReferences(this->resources, this->services);
-		//...
 	}
 
 	GameContext::~GameContext()

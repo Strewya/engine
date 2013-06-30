@@ -57,8 +57,8 @@ namespace Core
 					continue;
 				}
 				uint32_t hSheet = s_spritesheet->as<uint32_t>();
-				auto& spritesheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
-				auto& animation = spritesheet.getAnimation(s_animation->as<uint32_t>());
+				auto* spritesheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
+				auto& animation = spritesheet->getAnimation(s_animation->as<uint32_t>());
 				auto& curFrame = s_animationFrame->as<uint32_t>();
 				auto& curSprite = s_currentSprite->as<uint32_t>();
 				curFrame = (++curFrame) % animation.getSequenceSize();

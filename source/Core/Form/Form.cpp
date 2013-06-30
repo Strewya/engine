@@ -48,10 +48,10 @@ namespace Core
 				{
 					uint32_t hSheet = s_spritesheet->as<uint32_t>();
 					auto currentFrame = s_currentSprite->as<uint32_t>();
-					auto& sheet = resources.getSpritesheetCache().getSpritesheet(hSheet);
-					Graphics::TextureData* texture = resources.getTextureCache().getTexture(sheet.getTextureHandle());
+					auto* sheet = resources.getSpritesheetCache().getSpritesheet(hSheet);
+					Graphics::TextureData* texture = resources.getTextureCache().getTexture(sheet->getTextureHandle());
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawSprite(*texture, sheet.getSprite(currentFrame));
+					gfx.DrawSprite(*texture, sheet->getSprite(currentFrame));
 				}
 			}
 			break;

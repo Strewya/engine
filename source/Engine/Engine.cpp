@@ -9,7 +9,7 @@
 
 namespace Core
 {
-	Engine::Engine(Win32::AbstractWindow& window) 
+	Engine::Engine(Win32::AbstractWindow& window)
 		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr), _inputEngine(window)
 	{
 		SYSTEMTIME st;
@@ -65,6 +65,8 @@ namespace Core
 			* TODO: strings
 		*/
 		_resources.Register(_services.getGraphics().getTextureCache());
+		_spritesheets.setTextureCache(_resources.getTextureCache());
+		_resources.Register(_spritesheets);
 
 		/*
 			load the game configuration script and execute it

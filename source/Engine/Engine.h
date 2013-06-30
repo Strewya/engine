@@ -37,6 +37,7 @@ namespace Core
 		ServiceLocator _services;
 
 		ResourceLocator _resources;
+		Graphics::SpritesheetCache _spritesheets;
 
 		std::unordered_map<String, std::unique_ptr<GameContext>> _gameContexts;
 		/*

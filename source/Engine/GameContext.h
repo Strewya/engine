@@ -28,8 +28,6 @@ namespace Core
 	class GameContext
 	{
 	private:
-		Graphics::SpritesheetCache _spritesheetCache;
-		
 		GameContextEvent _onActivate;
 		GameContextEvent _onDeactivate;
 		GameContextEvent _onCreate;
@@ -50,11 +48,11 @@ namespace Core
 		EntityPool entityPool;
 		EntityFactory entityFactory;
 		SpacePool spacePool;
-		ServiceLocator services;
-		ResourceLocator resources;
+		ServiceLocator& services;
+		ResourceLocator& resources;
 		b2World physicsWorld;
 
-		GameContext(GameContextEvent onCreate, const ServiceLocator& services, const ResourceLocator& resources);
+		GameContext(GameContextEvent onCreate, ServiceLocator& services, ResourceLocator& resources);
 		~GameContext();
 
 		void Create();

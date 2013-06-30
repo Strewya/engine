@@ -8,6 +8,7 @@
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/Spritesheet.h"
+#include "Util/AssetStorage.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -19,38 +20,31 @@ namespace Graphics
 {
 	class ITextureCache;
 }
+/*
 namespace Script
 {
 	class Engine;
 }
+*/
 
 namespace Graphics
 {
-	class SpritesheetCache
+	class SpritesheetCache : public Util::AssetStore<Spritesheet>
 	{
 	public:
-		SpritesheetCache();
+		void setTextureCache(ITextureCache& _textureCache);
 
-		Spritesheet& getSpritesheet(uint32_t handle);
+		InstanceID LoadSpritesheet(const char* name, Spritesheet** outPtr);
+		Spritesheet* getSpritesheet(uint32_t handle);
+		InstanceID getSpritesheet(const char* name, Spritesheet** outPtr);
 
-		uint32_t getSpritesheetHandle(const char* sheetName);
-		uint32_t getSpritesheetHandle(const String& sheetName);
-		
-		uint32_t CreateEmpty(const char* sheetName);
-		uint32_t CreateEmpty(const String& sheetName);
-
-		uint32_t LoadFromFile(const char* filename);
-		uint32_t LoadFromFile(const String& filename);
-		
-		bool Exists(uint32_t handle);
-		
-		void setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services);
+	protected:
+		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
+		bool Unload(AssetPtr& asset);
 		
 	private:
-		std::deque<Spritesheet> _cache;
-		std::deque<Spritesheet>::iterator _Find(const char* sheetName);
 		ITextureCache* _textureCache;
-		Script::Engine* _script;
+		//Script::Engine* _script;
 
 	};
 }

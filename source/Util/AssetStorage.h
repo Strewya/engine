@@ -5,9 +5,9 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
-	/*** extra headers if needed (alphabetically ordered) ***/
 #include <deque>
 #include <memory>
+	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
 namespace Util
@@ -106,7 +106,7 @@ namespace Util
 		return nullptr;
 	}
 
-	template<typename T, typename DEF> auto AssetStore<T, DEF>::Acquire(const char* filename, LoadArgs* loadArgs = nullptr) -> Asset*
+	template<typename T, typename DEF> auto AssetStore<T, DEF>::Acquire(const char* filename, LoadArgs* loadArgs) -> Asset*
 	{
 		Asset* check = CheckLoaded(filename);
 		if(check != nullptr)

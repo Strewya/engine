@@ -25,9 +25,10 @@ namespace Pong
 {
 	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
-		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
-		uint32_t paddleSpriteHandle = sheet.getSpriteHandle("paddle");
+		Graphics::Spritesheet* sheet = nullptr;
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet", &sheet);
+		
+		uint32_t paddleSpriteHandle = sheet->getSpriteHandle("paddle");
 
 		auto& form = paddle.getForm();
 		form.setType(Core::FormType::Sprite);
@@ -51,10 +52,10 @@ namespace Pong
 
 	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
-		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
+		Graphics::Spritesheet* sheet = nullptr;
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet", &sheet);
 
-		uint32_t ballSpriteHandle = sheet.getSpriteHandle("ball");
+		uint32_t ballSpriteHandle = sheet->getSpriteHandle("ball");
 		
 		auto& ball_form = ball.getForm();
 		ball_form.setType(Core::FormType::Sprite);
@@ -101,8 +102,9 @@ namespace Pong
 		context.entityFactory.RegisterConstructor("ball", CreateBall);
 
 		auto windowSize = context.services.getGraphics().getScreenSize();
-		uint32_t pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("../resources/pong.sheet");
-		auto& pongSheet = context.resources.getSpritesheetCache().getSpritesheet(pongSheetHandle);
+		Graphics::Spritesheet* pongSheet = nullptr;
+		uint32_t pongSheetHandle = context.resources.getSpritesheetCache().LoadSpritesheet("../resources/pong.sheet", &pongSheet);
+		
 
 		for(int i = 0; i < 2; ++i)
 		{
@@ -111,7 +113,7 @@ namespace Pong
 			context.entityFactory.CreateEntityType("paddle", paddle);
 			auto& paddle_form = paddle.getForm();
 			
-			auto& paddleSprite = pongSheet.getSprite(paddle_form.getState("CurrentSprite")->as<uint32_t>());
+			auto& paddleSprite = pongSheet->getSprite(paddle_form.getState("CurrentSprite")->as<uint32_t>());
 
 			if(i==0)
 			{

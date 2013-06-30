@@ -4,8 +4,6 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "Engine/ResourceLocator.h"
-#include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/ITextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Dimensional.h"
@@ -13,162 +11,135 @@
 
 namespace Graphics
 {
-	SpritesheetCache::SpritesheetCache()
-		: _textureCache(nullptr), _script(nullptr)
+	void SpritesheetCache::setTextureCache(ITextureCache& cache)
 	{
+		_textureCache = &cache;
 	}
 
-	void SpritesheetCache::setReferences(const Core::ResourceLocator& resources, const Core::ServiceLocator& services)
+	InstanceID SpritesheetCache::LoadSpritesheet(const char* name, Spritesheet** outPtr)
 	{
-		_textureCache = &resources.getTextureCache();
-		_script = &services.getScript();
-	}
-
-	std::deque<Spritesheet>::iterator SpritesheetCache::_Find(const char* sheetName)
-	{
-		return std::find_if(_cache.begin(), _cache.end(),
-			[&sheetName](const Spritesheet& sheet)
+		InstanceID id = NOT_FOUND;
+		auto* asset = Acquire(name);
+		if(asset != nullptr)
+		{
+			id = asset->id;
+			if(outPtr != nullptr)
 			{
-				return sheet.getSpritesheetName().compare(sheetName) == 0;
-		});
-	}
-
-
-
-	Spritesheet& SpritesheetCache::getSpritesheet(uint32_t handle)
-	{
-		if(Exists(handle))
-		{
-			return _cache[handle];
+				*outPtr = asset->dataPtr.get();
+			}
 		}
-		throw std::exception("Attempted to get inexisting sheet!");
+		return id;
 	}
 
-
-
-	uint32_t SpritesheetCache::getSpritesheetHandle(const String& name)
+	Spritesheet* SpritesheetCache::getSpritesheet(uint32_t handle)
 	{
-		return getSpritesheetHandle(name.c_str());
+		auto* asset = CheckLoaded(handle);
+		return (asset != nullptr ? asset->dataPtr.get() : nullptr);
 	}
-
-	uint32_t SpritesheetCache::getSpritesheetHandle(const char* name)
+		
+	InstanceID SpritesheetCache::getSpritesheet(const char* name, Spritesheet** outPtr)
 	{
-		auto it = _Find(name);
-		if(it != _cache.end())
+		InstanceID id = NOT_FOUND;
+		auto* asset = CheckLoaded(name);
+		if(asset != nullptr)
 		{
-			return it-_cache.begin();
+			id = asset->id;
+			if(outPtr != nullptr)
+			{
+				*outPtr = asset->dataPtr.get();
+			}
 		}
-		return NOT_FOUND;
+		return id;
 	}
 
-
-
-	uint32_t SpritesheetCache::CreateEmpty(const char* sheetName)
+	bool SpritesheetCache::Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset)
 	{
-		auto it = _Find(sheetName);
-		if(it == _cache.end())
+		Script::Engine script;
+		if(!script.DoFile(filename))
 		{
-			_cache.emplace_back();
-			_cache.back().setSpritesheetName(sheetName);
-			return _cache.size()-1;
+			return false;
 		}
-		return it-_cache.begin();
-	}
-
-	uint32_t SpritesheetCache::CreateEmpty(const String& sheetName)
-	{
-		return CreateEmpty(sheetName.c_str());
-	}
-
-
-
-	uint32_t SpritesheetCache::LoadFromFile(const String& filename)
-	{
-		return LoadFromFile(filename.c_str());
-	}
-
-	uint32_t SpritesheetCache::LoadFromFile(const char* filename)
-	{
-		if(!_script->DoFile(filename))
-			throw std::exception("Spritesheet definition has failed to parse, see the log file for reasons.");
 		
 		String name;
-		_script->GetField("name", -1);
-		_script->Pop(name);
-		uint32_t sheetHandle = CreateEmpty(name);
-		Spritesheet& sheet = getSpritesheet(sheetHandle);
+		script.GetField("name", -1);
+		script.Pop(name);
+		asset.reset(new Spritesheet(name));
+		Spritesheet& sheet = *asset;
 
-		_script->GetField("texture", -1);
-		_script->Pop(name);
+		script.GetField("texture", -1);
+		script.Pop(name);
 		sheet.setTextureName(name);
 		InstanceID texID = _textureCache->getTexture(name.c_str(), nullptr);
 		sheet.setTexture(texID);
 
 		int frameCount;
 
-		if(_script->GetField("frames", -1) && _script->GetObjLength(frameCount))
+		if(script.GetField("frames", -1) && script.GetObjLength(frameCount))
 		{
 			for(int i=1; i<=frameCount; ++i)
 			{
 				Util::Rect rect;
-				_script->Push(i);
-				_script->GetField(-2);
+				script.Push(i);
+				script.GetField(-2);
 			
-				_script->GetField("name", -1);
-				_script->Pop(name);
-				_script->GetField("rect", -1);
-				_script->Pop(rect);
-				_script->Pop();
+				script.GetField("name", -1);
+				script.Pop(name);
+				script.GetField("rect", -1);
+				script.Pop(rect);
+				script.Pop();
 
 				SpriteInfo si;
 				si.setName(name);
 				si.setSrcRect(rect);
 				sheet.Insert(si);
 			}
-			_script->Pop();
+			script.Pop();
 		
 			int animCount;
-			if(_script->GetField("animations", -1) && _script->GetObjLength(animCount))
+			if(script.GetField("animations", -1) && script.GetObjLength(animCount))
 			{
 				for(int anim=1; anim<=animCount; ++anim)
 				{
 					AnimationInfo animation;
 
-					_script->Push(anim);
-					_script->GetField(-2);
+					script.Push(anim);
+					script.GetField(-2);
 			
-					_script->GetField("name", -1);
-					_script->Pop(name);
+					script.GetField("name", -1);
+					script.Pop(name);
 					animation.setName(name);
 
-					_script->GetField("sequence", -1);
-					_script->GetObjLength(frameCount);
+					script.GetField("sequence", -1);
+					script.GetObjLength(frameCount);
 					for(int frame=1; frame<=frameCount; ++frame)
 					{
-						_script->Push(frame);
-						_script->GetField(-2);
-						_script->Pop(name);
+						script.Push(frame);
+						script.GetField(-2);
+						script.Pop(name);
 
 						animation.AddToSequence(sheet.getSpriteHandle(name));
 					}
-					_script->Pop();
+					script.Pop();
 
-					_script->Pop();
+					script.Pop();
 
 					sheet.Insert(animation);
 				}
-				_script->Pop();
+				script.Pop();
 			}
 		}
 
-		_script->Pop();
-		return sheetHandle;
+		script.Pop();
+		return true;
 	}
 
-
-
-	bool SpritesheetCache::Exists(uint32_t handle)
+	bool SpritesheetCache::Unload(AssetPtr& asset)
 	{
-		return handle < _cache.size();
+		if(asset == nullptr)
+		{
+			return false;
+		}
+		asset.reset(nullptr);
+		return true;
 	}
 }
