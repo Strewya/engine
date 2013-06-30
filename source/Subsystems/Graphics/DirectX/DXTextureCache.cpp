@@ -55,17 +55,6 @@ namespace Graphics
 		return SUCCEEDED(result);
 	}
 
-	bool DXTextureCache::Unload(AssetPtr& assetPtr)
-	{
-		if(assetPtr == nullptr)
-		{
-			return false;
-		}
-		assetPtr->lpd3dTexture->Release();
-		assetPtr.reset(nullptr);
-		return true;
-	}
-
 	InstanceID DXTextureCache::LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr)
 	{
 		TextureLoadArgs args = {MakeCOLOR(transparentKey)};

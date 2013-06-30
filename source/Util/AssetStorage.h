@@ -44,7 +44,6 @@ namespace Util
 
 	protected:
 		virtual bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset) = 0;
-		virtual bool Unload(AssetPtr& assetPtr) = 0;
 		
 		bool DeleteUnload(AssetPtr& asset);
 
@@ -174,6 +173,10 @@ namespace Util
 
 	template<typename T, typename DEF> bool AssetStore<T, DEF>::DeleteUnload(AssetPtr& asset)
 	{
+		if(asset == nullptr)
+		{
+			return false;
+		}
 		asset.reset(nullptr);
 		return true;
 	}
@@ -188,7 +191,7 @@ namespace Util
 
 	template<typename T, typename DEF> bool AssetStore<T, DEF>::AssetUnloader(Asset& asset)
 	{
-		bool result = Unload(asset.dataPtr);
+		bool result = DeleteUnload(asset.dataPtr);
 		if(result)
 		{
 			asset.dataPtr.reset(nullptr);

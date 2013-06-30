@@ -32,6 +32,7 @@ namespace Graphics
 	class SpritesheetCache : public Util::AssetStore<Spritesheet>
 	{
 	public:
+		~SpritesheetCache();
 		void setTextureCache(ITextureCache& _textureCache);
 
 		InstanceID LoadSpritesheet(const char* name, Spritesheet** outPtr);
@@ -40,7 +41,6 @@ namespace Graphics
 
 	protected:
 		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
-		bool Unload(AssetPtr& asset);
 		
 	private:
 		ITextureCache* _textureCache;

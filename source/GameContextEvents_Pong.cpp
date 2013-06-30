@@ -26,7 +26,7 @@ namespace Pong
 	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
 		Graphics::Spritesheet* sheet = nullptr;
-		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet", &sheet);
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("../resources/pong.sheet", &sheet);
 		
 		uint32_t paddleSpriteHandle = sheet->getSpriteHandle("paddle");
 
@@ -53,7 +53,7 @@ namespace Pong
 	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
 	{
 		Graphics::Spritesheet* sheet = nullptr;
-		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("pong.sheet", &sheet);
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheet("../resources/pong.sheet", &sheet);
 
 		uint32_t ballSpriteHandle = sheet->getSpriteHandle("ball");
 		

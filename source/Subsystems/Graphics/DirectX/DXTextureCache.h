@@ -36,7 +36,6 @@ namespace Graphics
 
 	protected:
 		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
-		bool Unload(AssetPtr& assetPtr);
 
 	private:
 		LPDIRECT3DDEVICE9 _d3ddev;

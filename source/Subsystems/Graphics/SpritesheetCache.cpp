@@ -11,6 +11,11 @@
 
 namespace Graphics
 {
+	SpritesheetCache::~SpritesheetCache()
+	{
+		Clear();
+	}
+
 	void SpritesheetCache::setTextureCache(ITextureCache& cache)
 	{
 		_textureCache = &cache;
@@ -130,16 +135,6 @@ namespace Graphics
 		}
 
 		script.Pop();
-		return true;
-	}
-
-	bool SpritesheetCache::Unload(AssetPtr& asset)
-	{
-		if(asset == nullptr)
-		{
-			return false;
-		}
-		asset.reset(nullptr);
 		return true;
 	}
 }
