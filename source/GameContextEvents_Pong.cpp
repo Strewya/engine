@@ -12,6 +12,7 @@
 #include "Core/Form/Form.h"
 #include "Core/State/State.h"
 #include "Subsystems/Graphics/IRenderer.h"
+#include "Subsystems/Graphics/ITextureCache.h"
 #include "Subsystems/Graphics/Spritesheet.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Input/InputEngine.h"
@@ -70,6 +71,7 @@ namespace Pong
 
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
+		Util::Color defaultTransparency(255,0,255);
 		Core::StateTest::Position pos;
 		pos.value.x = 10;
 		
@@ -80,7 +82,9 @@ namespace Pong
 
 		Core::StateTest::Position* p = test[Core::StateTest::Position::hash]->downcast<Core::StateTest::Position>();
 		
-
+		Graphics::TextureData* texture = nullptr;
+		InstanceID texid = context.resources.getTextureCache().LoadTexture("../resources/pong.png", defaultTransparency, &texture);
+		
 
 
 

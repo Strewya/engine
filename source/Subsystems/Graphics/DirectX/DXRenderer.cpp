@@ -473,29 +473,29 @@ namespace Graphics
 		_line->Draw(&circle[0], numVertex*4+1, c);
 	}
 	
-	void DXRenderer::DrawTexture(const Texture& texture)
+	void DXRenderer::DrawTexture(const TextureData& texture)
 	{
-		auto* lptexture = _textures.CheckLoaded(texture.getDataHandle());
-		if(lptexture == nullptr)
+		const DXTexture& dxtexture = static_cast<const DXTexture&>(texture);
+		if(dxtexture.lpd3dTexture == nullptr)
 		{
 			return;
 		}
-		Util::Rect source(0,0,float(texture.getWidth()), float(texture.getHeight()));
+		Util::Rect source(0,0,float(texture.width), float(texture.height));
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(lptexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(dxtexture.lpd3dTexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
-	void DXRenderer::DrawSprite(const Texture& texture, const SpriteInfo& sprite)
+	void DXRenderer::DrawSprite(const TextureData& texture, const SpriteInfo& sprite)
 	{
-		auto* lptexture = _textures.CheckLoaded(texture.getDataHandle());
-		if(lptexture == nullptr)
+		const DXTexture& dxtexture = static_cast<const DXTexture&>(texture);
+		if(dxtexture.lpd3dTexture == nullptr)
 		{
 			return;
 		}
 		Util::Rect source = sprite.getSrcRect();
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(lptexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(dxtexture.lpd3dTexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	

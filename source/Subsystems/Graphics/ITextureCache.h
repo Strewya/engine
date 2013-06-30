@@ -24,8 +24,8 @@ namespace Graphics
 	public:
 		virtual ~ITextureCache() {}
 
-		virtual TextureData* LoadTexture(const char* name, const Util::Color& transparentKey) = 0;
-		virtual TextureData* LoadTexture(const String& name, const Util::Color& transparentKey) = 0;
+		virtual InstanceID LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr) = 0;
 		virtual TextureData* getTexture(uint32_t handle) = 0;
+		virtual InstanceID getTexture(const char* name, TextureData** outPtr) = 0;
 	};
 }

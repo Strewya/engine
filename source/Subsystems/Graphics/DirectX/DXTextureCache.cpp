@@ -12,13 +12,13 @@ namespace Graphics
 		_d3ddev = d3ddev;
 	}
 
-	auto DXTextureCache::Load(const char* filename, const LoadArgs* loadArgs) -> AssetType*
+	bool DXTextureCache::Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& outAsset)
 	{
 		//the struct for reading bitmap file info
 		D3DXIMAGE_INFO info;
 		HRESULT result;
 		TextureLoadArgs args;
-		if(loadArgs == nullptr)
+		if(loadArgs != nullptr)
 		{
 			args = *loadArgs;
 		}
@@ -27,7 +27,7 @@ namespace Graphics
 		result = D3DXGetImageInfoFromFile(filename, &info);
 		if(SUCCEEDED(result))
 		{
-			AssetType* assetPtr = nullptr;
+			LPDIRECT3DTEXTURE9 lpTexture = nullptr;
 			result = D3DXCreateTextureFromFileEx(
 				_d3ddev,					//direct3D device object
 				filename,					//the image filename
@@ -42,41 +42,65 @@ namespace Graphics
 				args._transparency,			//color key for transparency
 				&info,						//bitmap file info (from loaded file)
 				nullptr,					//color palette
-				&assetPtr);					//destination texture
+				&lpTexture);				//destination texture
 			if(SUCCEEDED(result))
 			{
-				return assetPtr;
+				outAsset.reset(new DXTexture(info.Width, info.Height, lpTexture));
 			}
 		}
-		return nullptr;
+		return SUCCEEDED(result);
 	}
 
-	bool DXTextureCache::Unload(AssetType*& assetPtr)
+	bool DXTextureCache::Unload(AssetPtr& assetPtr)
 	{
 		if(assetPtr == nullptr)
 		{
 			return false;
 		}
-		assetPtr->Release();
-		assetPtr = nullptr;
+		assetPtr->lpd3dTexture->Release();
+		assetPtr.reset(nullptr);
 		return true;
 	}
 
-	TextureData* DXTextureCache::LoadTexture(const char* name, const Util::Color& transparentKey)
+	InstanceID DXTextureCache::LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr)
 	{
 		TextureLoadArgs args = {MakeCOLOR(transparentKey)};
-		InstanceID id;
-		auto* texture = Acquire(name, id, &args);
+		InstanceID id = NOT_FOUND;
+		auto* asset = Acquire(name, &args);
+		if(asset != nullptr)
+		{
+			id = asset->id;
+			if(outPtr != nullptr)
+			{
+				*outPtr = asset->dataPtr.get();
+			}
+		}
+		return id;
+	}
 		
-	}
-
-	TextureData* DXTextureCache::LoadTexture(const String& name, const Util::Color& transparentKey)
-	{
-		return LoadTexture(name.c_str(), transparentKey);
-	}
-
 	TextureData* DXTextureCache::getTexture(uint32_t handle)
 	{
+		auto* asset = CheckLoaded(handle);
+		TextureData* data = nullptr;
+		if(asset != nullptr)
+		{
+			data = asset->dataPtr.get();
+		}
+		return data;
+	}
 
+	InstanceID DXTextureCache::getTexture(const char* name, TextureData** outPtr)
+	{
+		auto* asset = CheckLoaded(name);
+		InstanceID id = NOT_FOUND;
+		if(asset != nullptr)
+		{
+			id = asset->id;
+			if(outPtr != nullptr)
+			{
+				*outPtr = asset->dataPtr.get();
+			}
+		}
+		return id;
 	}
 }

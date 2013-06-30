@@ -14,15 +14,13 @@ namespace Core
 	{
 		Action::BindActionUpdater(actionMaster);
 
-		this->resources.Register(_textureCache);
 		this->resources.Register(_spritesheetCache);
+		this->resources.Register(resources.getTextureCache());
 		//...
 
-		_textureCache.setReferences(resources, services);
 		_spritesheetCache.setReferences(resources, services);
 		//...
 
-		_textureCache.setReferences(this->resources, this->services);
 		_spritesheetCache.setReferences(this->resources, this->services);
 		//...
 	}

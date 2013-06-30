@@ -6,7 +6,7 @@
 	/*** extra headers ***/
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
-#include "Subsystems/Graphics/TextureCache.h"
+#include "Subsystems/Graphics/ITextureCache.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Dimensional.h"
 	/*** end headers ***/
@@ -101,7 +101,8 @@ namespace Graphics
 		_script->GetField("texture", -1);
 		_script->Pop(name);
 		sheet.setTextureName(name);
-		sheet.setTexture(_textureCache->getTextureHandle(name));
+		InstanceID texID = _textureCache->getTexture(name.c_str(), nullptr);
+		sheet.setTexture(texID);
 
 		int frameCount;
 

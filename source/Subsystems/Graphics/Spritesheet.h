@@ -9,7 +9,7 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Subsystems/Graphics/AnimationInfo.h"
 #include "Subsystems/Graphics/SpriteInfo.h"
-#include "Subsystems/Graphics/Texture.h"
+#include "Subsystems/Graphics/TextureData.h"
 	/*** end header inclusion ***/
 
 namespace Graphics

@@ -14,6 +14,7 @@ namespace Graphics
 	{
 	public:
 		TextureData();
+		TextureData(uint32_t w, uint32_t h);
 		
 		uint32_t width;
 		uint32_t height;

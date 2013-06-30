@@ -8,7 +8,11 @@
 namespace Graphics
 {
 	DXTexture::DXTexture()
-		: d3dData(nullptr)
+		: lpd3dTexture(nullptr)
+	{}
+
+	DXTexture::DXTexture(uint32_t w, uint32_t h, LPDIRECT3DTEXTURE9 lpTexture)
+		: TextureData(w,h), lpd3dTexture(lpTexture)
 	{}
 
 	DXTexture::~DXTexture()
@@ -18,10 +22,10 @@ namespace Graphics
 
 	void DXTexture::Release()
 	{
-		if(d3dData)
+		if(lpd3dTexture)
 		{
-			d3dData->Release();
-			d3dData = nullptr;
+			lpd3dTexture->Release();
+			lpd3dTexture = nullptr;
 		}
 	}
 }

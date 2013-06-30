@@ -70,11 +70,7 @@ namespace Graphics
 
 		
 		DXFont LoadFont(const char* name, uint32_t size, uint32_t weight, bool italic) const;
-		/*
-		Texture LoadTexture(const char* filename);
-		bool DestroyTexture(InstanceID handle);
-		void ClearTextures();
-		*/
+
 		uint32_t MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic);
 		uint32_t getFontHandle(const char* filename);
 		const FontInfo& getFontInfo(uint32_t handle) const;

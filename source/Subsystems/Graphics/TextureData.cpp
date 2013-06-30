@@ -10,4 +10,8 @@ namespace Graphics
 	TextureData::TextureData()
 		: width(0), height(0)
 	{}
+
+	TextureData::TextureData(uint32_t w, uint32_t h)
+		: width(w), height(h)
+	{}
 }

@@ -17,7 +17,7 @@ namespace Core
 }
 namespace Graphics
 {
-	class TextureCache;
+	class ITextureCache;
 }
 namespace Script
 {
@@ -49,7 +49,7 @@ namespace Graphics
 	private:
 		std::deque<Spritesheet> _cache;
 		std::deque<Spritesheet>::iterator _Find(const char* sheetName);
-		TextureCache* _textureCache;
+		ITextureCache* _textureCache;
 		Script::Engine* _script;
 
 	};

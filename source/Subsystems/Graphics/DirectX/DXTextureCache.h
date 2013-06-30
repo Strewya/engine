@@ -28,13 +28,14 @@ namespace Graphics
 	{
 	public:
 		void SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev);
-		TextureData* LoadTexture(const char* name, const Util::Color& transparentKey);
-		TextureData* LoadTexture(const String& name, const Util::Color& transparentKey);
+		
+		InstanceID LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr);
 		TextureData* getTexture(uint32_t handle);
+		InstanceID getTexture(const char* name, TextureData** outPtr);
 
 	protected:
-		AssetType* Load(const char* filename, const LoadArgs* loadArgs);
-		bool Unload(AssetType*& assetPtr);
+		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
+		bool Unload(AssetPtr& assetPtr);
 
 	private:
 		LPDIRECT3DDEVICE9 _d3ddev;

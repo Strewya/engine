@@ -16,9 +16,10 @@ namespace Graphics
 	{
 	public:
 		DXTexture();
+		DXTexture(uint32_t w, uint32_t h, LPDIRECT3DTEXTURE9 lpTexture);
 		~DXTexture();
 		
-		LPDIRECT3DTEXTURE9 d3dData;
+		LPDIRECT3DTEXTURE9 lpd3dTexture;
 
 		void Release();
 	};

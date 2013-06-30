@@ -17,7 +17,7 @@
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
 #include "Subsystems/Graphics/SpritesheetCache.h"
-#include "Subsystems/Graphics/TextureCache.h"
+#include "Subsystems/Graphics/ITextureCache.h"
 #include "Util/CompositeTimer.h"
 	/*** end header inclusion ***/
 
@@ -28,7 +28,6 @@ namespace Core
 	class GameContext
 	{
 	private:
-		Graphics::TextureCache _textureCache;
 		Graphics::SpritesheetCache _spritesheetCache;
 		
 		GameContextEvent _onActivate;
