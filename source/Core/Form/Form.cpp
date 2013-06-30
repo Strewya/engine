@@ -31,7 +31,7 @@ namespace Core
 				if(s_text && s_font)
 				{
 					auto& text = s_text->as<String>();
-					auto font = s_font->as<uint>();
+					auto font = s_font->as<uint32_t>();
 					auto& bounds = s_area ? s_area->as<Util::Rect>() : Util::Rect(f->getPosition(),1,1);
 					//read these from states!
 					gfx.setFontStyle(false, false, false, false, false, false);
@@ -46,8 +46,8 @@ namespace Core
 				State* s_spritesheet = f->getState("Spritesheet");
 				if(s_currentSprite && s_spritesheet)
 				{
-					uint hSheet = s_spritesheet->as<uint>();
-					auto currentFrame = s_currentSprite->as<uint>();
+					uint32_t hSheet = s_spritesheet->as<uint32_t>();
+					auto currentFrame = s_currentSprite->as<uint32_t>();
 					auto& sheet = resources.getSpritesheetCache().getSpritesheet(hSheet);
 					Graphics::Texture& texture = resources.getTextureCache().getTexture(sheet.getTextureHandle());
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
@@ -61,7 +61,7 @@ namespace Core
 				State* s_texture = f->getState("Texture");
 				if(s_texture)
 				{
-					uint hTexture = s_texture->as<uint>();
+					uint32_t hTexture = s_texture->as<uint32_t>();
 					auto& texture = resources.getTextureCache().getTexture(hTexture);
 					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
 					gfx.DrawTexture(texture);
@@ -210,7 +210,7 @@ namespace Core
 		_color = color;
 	}
 
-	void Form::setColor(uint r, uint g, uint b, uint a)
+	void Form::setColor(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
 	{
 		_color.setChannels(r, g, b, a);
 	}

@@ -7,93 +7,76 @@
 
 namespace Graphics
 {
-	DXTextureCache::DXTextureCache()
+	void DXTextureCache::SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev)
 	{
-		_cache.reserve(16);
+		_d3ddev = d3ddev;
 	}
 
-	DXTextureCache::~DXTextureCache()
+	auto DXTextureCache::Load(const char* filename, const LoadArgs* loadArgs) -> AssetType*
 	{
-		DestroyAll();
-	}
-
-	bool DXTextureCache::Valid(uint index) const
-	{
-		return (0 <= index && index < _cache.size() && _cache[index].valid);
-	}
-		
-	int DXTextureCache::getHandle(const char* filename) const
-	{
-		for(auto it = _cache.begin(); it != _cache.end(); ++it)
+		//the struct for reading bitmap file info
+		D3DXIMAGE_INFO info;
+		HRESULT result;
+		TextureLoadArgs args;
+		if(loadArgs == nullptr)
 		{
-			if(it->texture.info.getFilename().compare(filename) == 0)
+			args = *loadArgs;
+		}
+
+		//create the new texture by loading a bitmap image file
+		result = D3DXGetImageInfoFromFile(filename, &info);
+		if(SUCCEEDED(result))
+		{
+			AssetType* assetPtr = nullptr;
+			result = D3DXCreateTextureFromFileEx(
+				_d3ddev,					//direct3D device object
+				filename,					//the image filename
+				info.Width,					//the image width
+				info.Height,				//the image height
+				1,							//mip-map levels (1 for no chain)
+				D3DPOOL_DEFAULT,			//the type of surface (default)
+				D3DFMT_UNKNOWN,				//texture format
+				D3DPOOL_MANAGED,			//memory class for the image
+				D3DX_DEFAULT,				//image filter
+				D3DX_DEFAULT,				//mip filter
+				args._transparency,			//color key for transparency
+				&info,						//bitmap file info (from loaded file)
+				nullptr,					//color palette
+				&assetPtr);					//destination texture
+			if(SUCCEEDED(result))
 			{
-				return it->id;
+				return assetPtr;
 			}
 		}
-		return NOT_FOUND;
+		return nullptr;
 	}
 
-	int DXTextureCache::getHandle(const String& filename) const
+	bool DXTextureCache::Unload(AssetType*& assetPtr)
 	{
-		return getHandle(filename.c_str());
+		if(assetPtr == nullptr)
+		{
+			return false;
+		}
+		assetPtr->Release();
+		assetPtr = nullptr;
+		return true;
 	}
+
+	TextureData* DXTextureCache::LoadTexture(const char* name, const Util::Color& transparentKey)
+	{
+		TextureLoadArgs args = {MakeCOLOR(transparentKey)};
+		InstanceID id;
+		auto* texture = Acquire(name, id, &args);
 		
-	uint DXTextureCache::Insert(const DXTexture& texture)
-	{
-		int index = getHandle(texture.info.getFilename().c_str());
-		if(index != NOT_FOUND)
-		{
-			return index;
-		}
-		if(_freeSlots.empty())
-		{
-			DataWrapper data;
-			data.id = _cache.size();
-			data.texture = texture;
-			data.valid = true;
-			_cache.push_back(data);
-			return data.id;
-		}
-		else
-		{
-			index = _freeSlots.top();
-			_freeSlots.pop();
-			_cache[index].texture = texture;
-			_cache[index].valid = true;
-			return index;
-		}
 	}
 
-	const DXTexture& DXTextureCache::getTexture(uint index) const
+	TextureData* DXTextureCache::LoadTexture(const String& name, const Util::Color& transparentKey)
 	{
-		if(Valid(index))
-		{
-			return _cache[index].texture;
-		}
-		throw std::exception("Attempted to dereference inexisting texture");
+		return LoadTexture(name.c_str(), transparentKey);
 	}
 
-	void DXTextureCache::Destroy(uint index)
+	TextureData* DXTextureCache::getTexture(uint32_t handle)
 	{
-		if(Valid(index))
-		{
-			_cache[index].texture.Release();
-			_cache[index].valid = false;
-			_freeSlots.push(index);
-		}
-	}
 
-	void DXTextureCache::DestroyAll()
-	{
-		for(auto it = _cache.begin(); it != _cache.end(); ++it)
-		{
-			it->texture.Release();
-			it->valid = false;
-		}
-		while(!_freeSlots.empty())
-		{
-			_freeSlots.pop();
-		}
 	}
 }

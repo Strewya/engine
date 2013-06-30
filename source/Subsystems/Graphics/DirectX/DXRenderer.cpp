@@ -4,7 +4,7 @@
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "Subsystems/Graphics/Texture.h"
+#include "Subsystems/Graphics/TextureData.h"
 #include "Util/Logger.h"
 	/*** end headers ***/
 
@@ -120,7 +120,7 @@ namespace Graphics
 			return false;
 		_spriteHandler->OnResetDevice();
 		_line->OnResetDevice();
-		ulong style, exStyle;
+		uint32_t style, exStyle;
 		if(!_d3dpp.Windowed)
 		{
 			style = WS_EX_TOPMOST | WS_VISIBLE | WS_POPUP;
@@ -139,6 +139,11 @@ namespace Graphics
 		return true;
 	}
 
+	ITextureCache& DXRenderer::getTextureCache()
+	{
+		return _textures;
+	}
+
 	Util::Vec2 DXRenderer::getScreenSize() const
 	{
 		return Util::Vec2((float)_d3dpp.BackBufferWidth, (float)_d3dpp.BackBufferHeight);
@@ -146,10 +151,10 @@ namespace Graphics
 
 	void DXRenderer::setScreenSize(const Util::Vec2& size)
 	{
-		setScreenSize((uint)size.x, (uint)size.y);
+		setScreenSize((uint32_t)size.x, (uint32_t)size.y);
 	}
 
-	void DXRenderer::setScreenSize(uint width, uint height)
+	void DXRenderer::setScreenSize(uint32_t width, uint32_t height)
 	{
 		_d3dpp.BackBufferWidth = width;
 		_d3dpp.BackBufferHeight = height;
@@ -168,7 +173,7 @@ namespace Graphics
 		_transparentColor = MakeCOLOR(c);
 	}
 
-	void DXRenderer::setTransparentColor(uint red, uint green, uint blue)
+	void DXRenderer::setTransparentColor(uint32_t red, uint32_t green, uint32_t blue)
 	{
 		setTransparentColor(Util::Color(red, green, blue, 255));
 	}
@@ -185,7 +190,7 @@ namespace Graphics
 		_backgroundFillColor = MakeCOLOR(c);
 	}
 
-	void DXRenderer::setBackgroundFillColor(uint red, uint green, uint blue)
+	void DXRenderer::setBackgroundFillColor(uint32_t red, uint32_t green, uint32_t blue)
 	{
 		setBackgroundFillColor(Util::Color(red, green, blue, 255));
 	}
@@ -204,7 +209,7 @@ namespace Graphics
 		}
 	}
 
-	uint DXRenderer::MakeFont(const char* name, uint size, uint weight, bool italic)
+	uint32_t DXRenderer::MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic)
 	{
 		int index = _fonts.getHandle(name);
 		if(index != NOT_FOUND)
@@ -219,41 +224,17 @@ namespace Graphics
 		return _fonts.Insert(LoadFont(name, size, weight, italic));
 	}
 
-	uint DXRenderer::getFontHandle(const char* name)
+	uint32_t DXRenderer::getFontHandle(const char* name)
 	{
 		return _fonts.getHandle(name);
 	}
 
-	const FontInfo& DXRenderer::getFontInfo(uint handle) const
+	const FontInfo& DXRenderer::getFontInfo(uint32_t handle) const
 	{
 		return _fonts.getFont(handle).info;
 	}
 
-	Texture DXRenderer::LoadTexture(const char* filename)
-	{
-		TextureLoadArgs args = {_transparentColor};
-		InstanceID id;
-		auto* texture = _textures.Acquire(filename, id, &args);
-		if(texture != nullptr)
-		{
-			D3DSURFACE_DESC info;
-			texture->GetLevelDesc(0, &info);
-			return Texture(filename, info.Width, info.Height, id);
-		}
-		return Texture(filename, 0, 0, NOT_FOUND);
-	}
-
-	bool DXRenderer::DestroyTexture(InstanceID handle)
-	{
-		return _textures.Delete(handle);
-	}
-
-	void DXRenderer::ClearTextures()
-	{
-		_textures.Clear();
-	}
-
-	DXFont DXRenderer::LoadFont(const char* name, uint size, uint weight, bool italic) const
+	DXFont DXRenderer::LoadFont(const char* name, uint32_t size, uint32_t weight, bool italic) const
 	{
 		LPD3DXFONT font = nullptr;
 		HRESULT result = D3DXCreateFont(_d3ddev, size, 0, weight, 1, italic, DEFAULT_CHARSET,
@@ -302,7 +283,7 @@ namespace Graphics
 				{
 					String alias, font;
 					bool italic;
-					uint size, weight;
+					uint32_t size, weight;
 					
 					resource->GetText(&font);
 					resource->GetAttributeOrDefault("alias", &alias, font);
@@ -401,7 +382,7 @@ namespace Graphics
 		_line->Draw(pts, 4, c);
 	}
 
-	void DXRenderer::DrawRectangle(const Util::Vec2& pos, uint hwidth, uint hheight, const Util::Color* color, float lineWidth)
+	void DXRenderer::DrawRectangle(const Util::Vec2& pos, uint32_t hwidth, uint32_t hheight, const Util::Color* color, float lineWidth)
 	{
 		Util::Vec2 ul = Util::Vec2(float(hwidth), float(hheight));
 		Util::Vec2 bl = Util::Vec2(float(hwidth), -float(hheight));
@@ -518,7 +499,7 @@ namespace Graphics
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	
-	void DXRenderer::DrawFont(uint hFont, const char* text, const Util::Rect* bounds)
+	void DXRenderer::DrawFont(uint32_t hFont, const char* text, const Util::Rect* bounds)
 	{
 		if(!_fonts.Valid(hFont))
 		{
@@ -533,7 +514,7 @@ namespace Graphics
 	}
 
 	/*
-	bool DXRenderer::LoadFont(const String& font, const uint size, const uint weight, const bool italic, const String& alias)
+	bool DXRenderer::LoadFont(const String& font, const uint32_t size, const uint32_t weight, const bool italic, const String& alias)
 	{
 		String fontAlias = alias.empty() ? font : alias;
 		if(!_fonts.Find(fontAlias))
@@ -556,7 +537,7 @@ namespace Graphics
 		return false;
 	}
 
-	bool DXRenderer::Create(const String& name, const uint size, const uint weight, const bool italic, FontStore::TypePtr& out)
+	bool DXRenderer::Create(const String& name, const uint32_t size, const uint32_t weight, const bool italic, FontStore::TypePtr& out)
 	{
 		shared_ptr<DXFont> font(new DXFont(name));
 		HRESULT result = D3DXCreateFont(_d3ddev, size, 0, weight, 1, italic, DEFAULT_CHARSET,

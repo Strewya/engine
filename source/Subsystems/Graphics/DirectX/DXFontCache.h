@@ -19,26 +19,26 @@ namespace Graphics
 		DXFontCache();
 		~DXFontCache();
 
-		bool Valid(uint index) const;
+		bool Valid(uint32_t index) const;
 		
-		uint Insert(const DXFont& font);
+		uint32_t Insert(const DXFont& font);
 		int getHandle(const char* name) const;
 		int getHandle(const String& name) const;
-		const DXFont& getFont(uint index) const;
+		const DXFont& getFont(uint32_t index) const;
 
-		void Destroy(uint index);
+		void Destroy(uint32_t index);
 		void DestroyAll();
 
 	private:
 		struct DataWrapper
 		{
-			uint id;
+			uint32_t id;
 			bool valid;
 			DXFont font;
 		};
 
 		std::vector<DataWrapper> _cache;
-		std::stack<uint> _freeSlots;
+		std::stack<uint32_t> _freeSlots;
 		
 		DXFontCache(const DXFontCache& rhs);
 		DXFontCache& operator=(const DXFontCache& rhs);

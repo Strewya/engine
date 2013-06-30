@@ -35,7 +35,7 @@ namespace Graphics
 
 
 
-	Spritesheet& SpritesheetCache::getSpritesheet(uint handle)
+	Spritesheet& SpritesheetCache::getSpritesheet(uint32_t handle)
 	{
 		if(Exists(handle))
 		{
@@ -46,12 +46,12 @@ namespace Graphics
 
 
 
-	uint SpritesheetCache::getSpritesheetHandle(const String& name)
+	uint32_t SpritesheetCache::getSpritesheetHandle(const String& name)
 	{
 		return getSpritesheetHandle(name.c_str());
 	}
 
-	uint SpritesheetCache::getSpritesheetHandle(const char* name)
+	uint32_t SpritesheetCache::getSpritesheetHandle(const char* name)
 	{
 		auto it = _Find(name);
 		if(it != _cache.end())
@@ -63,7 +63,7 @@ namespace Graphics
 
 
 
-	uint SpritesheetCache::CreateEmpty(const char* sheetName)
+	uint32_t SpritesheetCache::CreateEmpty(const char* sheetName)
 	{
 		auto it = _Find(sheetName);
 		if(it == _cache.end())
@@ -75,19 +75,19 @@ namespace Graphics
 		return it-_cache.begin();
 	}
 
-	uint SpritesheetCache::CreateEmpty(const String& sheetName)
+	uint32_t SpritesheetCache::CreateEmpty(const String& sheetName)
 	{
 		return CreateEmpty(sheetName.c_str());
 	}
 
 
 
-	uint SpritesheetCache::LoadFromFile(const String& filename)
+	uint32_t SpritesheetCache::LoadFromFile(const String& filename)
 	{
 		return LoadFromFile(filename.c_str());
 	}
 
-	uint SpritesheetCache::LoadFromFile(const char* filename)
+	uint32_t SpritesheetCache::LoadFromFile(const char* filename)
 	{
 		if(!_script->DoFile(filename))
 			throw std::exception("Spritesheet definition has failed to parse, see the log file for reasons.");
@@ -95,7 +95,7 @@ namespace Graphics
 		String name;
 		_script->GetField("name", -1);
 		_script->Pop(name);
-		uint sheetHandle = CreateEmpty(name);
+		uint32_t sheetHandle = CreateEmpty(name);
 		Spritesheet& sheet = getSpritesheet(sheetHandle);
 
 		_script->GetField("texture", -1);
@@ -166,7 +166,7 @@ namespace Graphics
 
 
 
-	bool SpritesheetCache::Exists(uint handle)
+	bool SpritesheetCache::Exists(uint32_t handle)
 	{
 		return handle < _cache.size();
 	}

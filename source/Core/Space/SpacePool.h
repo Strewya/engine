@@ -19,15 +19,15 @@ namespace Core
 	{
 	private:
 		std::deque<std::unique_ptr<Space>> _pool;
-		std::list<uint> _availableSlots;
-		uint _maxExpectedSize;
-		uint _indexBits;
-		uint _indexMask;
+		std::list<uint32_t> _availableSlots;
+		uint32_t _maxExpectedSize;
+		uint32_t _indexBits;
+		uint32_t _indexMask;
 		InstanceID _idCounter;
 		InstanceID _NewID(int index);
 
 	public:
-		SpacePool(uint maxExpectedSize = 4096);
+		SpacePool(uint32_t maxExpectedSize = 4096);
 		
 		Space& NewInstance();
 		Space& Retrieve(InstanceID id) const;

@@ -127,7 +127,7 @@ namespace Core
 		if(_active) Done();
 	}
 
-	Action& Action::Update(ulong dt)
+	Action& Action::Update(uint32_t dt)
 	{
 		if(_active)
 			OnUpdate(dt);
@@ -175,7 +175,7 @@ namespace Core
 		return true;
 	}
 
-	bool Action::Time(ulong dt)
+	bool Action::Time(uint32_t dt)
 	{
 		_current += dt;
 		if(_current < _total)
@@ -217,7 +217,7 @@ namespace Core
 		return *this;
 	}
 	
-	Action& Action::setTotal(const ulong& total)
+	Action& Action::setTotal(const uint32_t& total)
 	{
 		_total = total;
 		return *this;
@@ -247,7 +247,7 @@ namespace Core
 		return *this;
 	}
 
-	Action& Action::setPriority(const uint& priority)
+	Action& Action::setPriority(const uint32_t& priority)
 	{
 		_priority = priority;
 		return *this;
@@ -297,7 +297,7 @@ namespace Core
 		return _alias;
 	}
 
-	uint Action::getPriority() const
+	uint32_t Action::getPriority() const
 	{
 		return _priority;
 	}

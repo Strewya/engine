@@ -17,7 +17,7 @@ namespace Graphics
 		DestroyAll();
 	}
 
-	bool DXFontCache::Valid(uint index) const
+	bool DXFontCache::Valid(uint32_t index) const
 	{
 		return (0 <= index && index < _cache.size() && _cache[index].valid);
 	}
@@ -39,7 +39,7 @@ namespace Graphics
 		return getHandle(name.c_str());
 	}
 		
-	uint DXFontCache::Insert(const DXFont& font)
+	uint32_t DXFontCache::Insert(const DXFont& font)
 	{
 		int index = getHandle(font.info.getName().c_str());
 		if(index != NOT_FOUND)
@@ -65,7 +65,7 @@ namespace Graphics
 		}
 	}
 
-	const DXFont& DXFontCache::getFont(uint index) const
+	const DXFont& DXFontCache::getFont(uint32_t index) const
 	{
 		if(Valid(index))
 		{
@@ -74,7 +74,7 @@ namespace Graphics
 		throw std::exception("Attempted to dereference inexisting font");
 	}
 
-	void DXFontCache::Destroy(uint index)
+	void DXFontCache::Destroy(uint32_t index)
 	{
 		if(Valid(index))
 		{

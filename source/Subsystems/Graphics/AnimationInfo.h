@@ -31,7 +31,7 @@ namespace Graphics
 		RepeatMode getRepeatMode() const;
 		*/
 		void AddToSequence(int id);
-		uint getSequenceFrame(uint index) const;
+		uint32_t getSequenceFrame(uint32_t index) const;
 		size_t getSequenceSize() const;
 		const std::deque<int>& getSequence() const;
 

@@ -75,7 +75,7 @@ namespace Script
 		return true;
 	}
 
-	bool Engine::Push(const uint& in)
+	bool Engine::Push(const uint32_t& in)
 	{
 		lua_pushinteger(_lua, in);
 		return true;
@@ -189,7 +189,7 @@ namespace Script
 		return false;
 	}
 
-	bool Engine::Pop(uint& out, int index)
+	bool Engine::Pop(uint32_t& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isnumber(_lua, index))
 		{
@@ -197,6 +197,7 @@ namespace Script
 			lua_remove(_lua, index);
 			return true;
 		}
+		uint32_t* p = &out;
 		return false;
 	}
 

@@ -18,24 +18,24 @@ namespace Win32
 	class AbstractWindow
 	{
 	public:
-		static LRESULT CALLBACK MessageRouter(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK MessageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
 		AbstractWindow();
 		virtual ~AbstractWindow() {};
 
-		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)=0;
+		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)=0;
 		virtual bool Create();
 		virtual void Show();
 		virtual bool Update();
 		void Shutdown();
 
 		void setFullscreen(bool fs);
-		void setExtendedStyle(ulong style);
+		void setExtendedStyle(uint32_t style);
 		void setClass(const String& name);
 		void setClass(const char* name);
 		void setTitle(const String& name);
 		void setTitle(const char* name);
-		void setStyle(ulong style);
+		void setStyle(uint32_t style);
 		void setPosition(int x, int y);
 		void setSize(int x, int y);
 		void setParent(HWND parent);
@@ -47,10 +47,10 @@ namespace Win32
 
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
-		ulong getExtendedStyle() const;
+		uint32_t getExtendedStyle() const;
 		const String& getClass() const;
 		const String& getTitle() const;
-		ulong getStyle() const;
+		uint32_t getStyle() const;
 		int getPositionX() const;
 		int getPositionY() const;
 		int getSizeX() const;
@@ -70,10 +70,10 @@ namespace Win32
 		bool _fullscreen;
 		int _exitCode;
 
-		ulong _extendedStyle;
+		uint32_t _extendedStyle;
 		String _class;
 		String _title;
-		ulong _style;
+		uint32_t _style;
 		int _xPos;
 		int _yPos;
 		int _xSize;
@@ -85,5 +85,5 @@ namespace Win32
 		std::list<Input::Event>* _queue;
 	};
 
-	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint width, uint height);
+	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint32_t width, uint32_t height);
 }

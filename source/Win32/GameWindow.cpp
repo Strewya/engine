@@ -26,7 +26,7 @@ namespace Win32
 		setUseWaitMessage(false);
 	}
 
-	LRESULT WINAPI GameWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT WINAPI GameWindow::WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 		if(_queue == nullptr)
 		{
@@ -151,7 +151,7 @@ namespace Win32
 		//----------------------- XMB -----------------------
 		case WM_XBUTTONDOWN:
 		{
-			uint btn = GET_XBUTTON_WPARAM(wParam);
+			uint32_t btn = GET_XBUTTON_WPARAM(wParam);
 			Input::Event e;
 			e.type = Input::EventType::MouseButtonPressed;
 			if(btn == XBUTTON1)
@@ -169,7 +169,7 @@ namespace Win32
 
 		case WM_XBUTTONUP:
 		{
-			uint btn = GET_XBUTTON_WPARAM(wParam);
+			uint32_t btn = GET_XBUTTON_WPARAM(wParam);
 			Input::Event e;
 			e.type = Input::EventType::MouseButtonReleased;
 			if(btn == XBUTTON1)

@@ -14,23 +14,23 @@ namespace Graphics
 	{
 	public:
 		FontInfo();
-		FontInfo(const char* name, uint size, bool italic, uint weight);
-		FontInfo(const String& name, uint size, bool italic, uint weight);
+		FontInfo(const char* name, uint32_t size, bool italic, uint32_t weight);
+		FontInfo(const String& name, uint32_t size, bool italic, uint32_t weight);
 		
 		const String& getName() const;
 		bool getItalic() const;
-		uint getWeight() const;
-		uint getSize() const;
+		uint32_t getWeight() const;
+		uint32_t getSize() const;
 
 		void setName(const char* name);
 		void setName(const String& name);
 		void setItalic(bool italicness);
-		void setWeight(uint weight);
-		void setSize(uint size);
+		void setWeight(uint32_t weight);
+		void setSize(uint32_t size);
 
 	private:
 		String _name;
 		bool _italic;
-		uint _weight, _size;
+		uint32_t _weight, _size;
 	};
 }

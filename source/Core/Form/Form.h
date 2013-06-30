@@ -77,7 +77,7 @@ namespace Core
 		
 		void setType(const FormType& type);
 		void setColor(const Util::Color& color);
-		void setColor(uint r, uint g, uint b, uint a=255);
+		void setColor(uint32_t r, uint32_t g, uint32_t b, uint32_t a=255);
 		void setPosition(const Util::Vec2& position);
 		void setPosition(float x, float y);
 		void setScalingCenter(const Util::Vec2& scaleCenter);

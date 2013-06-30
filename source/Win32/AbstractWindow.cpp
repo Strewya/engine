@@ -89,7 +89,7 @@ namespace Win32
 		return true;
 	}
 
-	LRESULT CALLBACK AbstractWindow::MessageRouter(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK AbstractWindow::MessageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 		AbstractWindow* window = nullptr;
 
@@ -130,12 +130,12 @@ namespace Win32
 		}
 	}
 
-	void AbstractWindow::setExtendedStyle(ulong style) { _extendedStyle = style; }
+	void AbstractWindow::setExtendedStyle(uint32_t style) { _extendedStyle = style; }
 	void AbstractWindow::setClass(const String& name) { _class = name; }
 	void AbstractWindow::setTitle(const String& name) { _title = name; }
 	void AbstractWindow::setClass(const char* name) { _class = name; }
 	void AbstractWindow::setTitle(const char* name) { _title = name; }
-	void AbstractWindow::setStyle(ulong style) { _style = style; }
+	void AbstractWindow::setStyle(uint32_t style) { _style = style; }
 	void AbstractWindow::setPosition(int x, int y) { _xPos = x; _yPos = y; }
 	void AbstractWindow::setSize(int x, int y) { _xSize = x; _ySize = y; }
 	void AbstractWindow::setParent(HWND parent) { _hwndParent = parent; }
@@ -147,10 +147,10 @@ namespace Win32
 
 	HWND			AbstractWindow::getWindowHandle() const { return _hwnd; }
 	bool			AbstractWindow::getFullscreen() const { return _fullscreen; }
-	ulong			AbstractWindow::getExtendedStyle() const { return _extendedStyle; }
+	uint32_t		AbstractWindow::getExtendedStyle() const { return _extendedStyle; }
 	const String&	AbstractWindow::getClass() const { return _class; }
 	const String&	AbstractWindow::getTitle() const { return _title; }
-	ulong			AbstractWindow::getStyle() const { return _style; }
+	uint32_t		AbstractWindow::getStyle() const { return _style; }
 	int				AbstractWindow::getPositionX() const { return _xPos; }
 	int				AbstractWindow::getPositionY() const { return _yPos; }
 	int				AbstractWindow::getSizeX() const { return _xSize; }
@@ -163,7 +163,7 @@ namespace Win32
 	int				AbstractWindow::getExitCode() const { return _exitCode; }
 
 
-	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint width, uint height)
+	int InitializeWindow(AbstractWindow& window, bool fullscreen, uint32_t width, uint32_t height)
 	{
 		WindowClass wndClass(window.getClass());
 	

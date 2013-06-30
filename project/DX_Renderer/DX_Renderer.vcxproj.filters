@@ -31,17 +31,23 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.h">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Util\AssetStorage.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.h">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.h">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -72,10 +78,16 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.cpp">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp">
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureAsset.cpp">
+    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.cpp">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.cpp">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClCompile>
   </ItemGroup>

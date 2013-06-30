@@ -1,49 +1,42 @@
-#ifndef GRAPHICS_DXTEXTURECACHE_H_
-#define GRAPHICS_DXTEXTURECACHE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
-#include <stack>
-#include <vector>
+#include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Subsystems/Graphics/DirectX/DXInclude.h"
+#include "Util/AssetStorage.h"
+#include "Subsystems/Graphics/ITextureCache.h"
 #include "Subsystems/Graphics/DirectX/DXTexture.h"
 	/*** end header inclusion ***/
 
-namespace Graphics
+namespace Util
 {
-	class DXTextureCache
-	{
-	public:
-		DXTextureCache();
-		~DXTextureCache();
-
-		bool Valid(uint index) const;
-		
-		uint Insert(const DXTexture& texture);
-		int getHandle(const char* filename) const;
-		int getHandle(const String& filename) const;
-		const DXTexture& getTexture(uint index) const;
-
-		void Destroy(uint index);
-		void DestroyAll();
-
-	private:
-		struct DataWrapper
-		{
-			uint id;
-			bool valid;
-			DXTexture texture;
-		};
-
-		std::vector<DataWrapper> _cache;
-		std::stack<uint> _freeSlots;
-		
-		DXTextureCache(const DXTextureCache& rhs);
-		DXTextureCache& operator=(const DXTextureCache& rhs);
-	};
+	class Color;
 }
 
-#endif //GRAPHICS_TEXTURECACHE_H_
+namespace Graphics
+{
+	struct TextureLoadArgs
+	{
+		D3DCOLOR _transparency;
+	};
+
+	class DXTextureCache : public Util::AssetStore<DXTexture, TextureLoadArgs>, public ITextureCache
+	{
+	public:
+		void SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev);
+		TextureData* LoadTexture(const char* name, const Util::Color& transparentKey);
+		TextureData* LoadTexture(const String& name, const Util::Color& transparentKey);
+		TextureData* getTexture(uint32_t handle);
+
+	protected:
+		AssetType* Load(const char* filename, const LoadArgs* loadArgs);
+		bool Unload(AssetType*& assetPtr);
+
+	private:
+		LPDIRECT3DDEVICE9 _d3ddev;
+	};
+}

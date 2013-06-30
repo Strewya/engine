@@ -24,12 +24,12 @@ namespace Graphics
 	Spritesheet::~Spritesheet()
 	{}
 
-	bool Spritesheet::SpriteValid(uint index) const
+	bool Spritesheet::SpriteValid(uint32_t index) const
 	{
 		return (0 <= index && index < _sprites.size());
 	}
 
-	bool Spritesheet::AnimationValid(uint index) const
+	bool Spritesheet::AnimationValid(uint32_t index) const
 	{
 		return (0 <= index && index < _animations.size());
 	}
@@ -68,7 +68,7 @@ namespace Graphics
 		return getAnimationHandle(name.c_str());
 	}
 
-	const SpriteInfo& Spritesheet::getSprite(uint index) const
+	const SpriteInfo& Spritesheet::getSprite(uint32_t index) const
 	{
 		if(SpriteValid(index))
 		{
@@ -77,7 +77,7 @@ namespace Graphics
 		throw std::exception("Spritesheet::getSprite(): Attempted to get inexisting sprite.");
 	}
 
-	const AnimationInfo& Spritesheet::getAnimation(uint index) const
+	const AnimationInfo& Spritesheet::getAnimation(uint32_t index) const
 	{
 		if(AnimationValid(index))
 		{
@@ -86,7 +86,7 @@ namespace Graphics
 		throw std::exception("Spritesheet::getAnimation(): Attempted to get inexisting animation");
 	}
 
-	uint Spritesheet::Insert(const SpriteInfo& sprite)
+	uint32_t Spritesheet::Insert(const SpriteInfo& sprite)
 	{
 		if(sprite.getName().empty())
 		{
@@ -102,7 +102,7 @@ namespace Graphics
 		return index;
 	}
 
-	uint Spritesheet::Insert(const AnimationInfo& animation)
+	uint32_t Spritesheet::Insert(const AnimationInfo& animation)
 	{
 		if(animation.getName().empty())
 		{
@@ -118,7 +118,7 @@ namespace Graphics
 		return index;
 	}
 
-	uint Spritesheet::getTextureHandle() const
+	uint32_t Spritesheet::getTextureHandle() const
 	{
 		return _textureHandle;
 	}
@@ -143,7 +143,7 @@ namespace Graphics
 		_textureName = name;
 	}
 
-	void Spritesheet::setTexture(uint texture)
+	void Spritesheet::setTexture(uint32_t texture)
 	{
 		_textureHandle = texture;
 	}

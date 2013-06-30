@@ -68,12 +68,6 @@
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
@@ -119,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Util\CompositeTimer.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
+      <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,12 +197,6 @@
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
       <Filter>Core/Entity</Filter>
     </ClInclude>
@@ -269,6 +263,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\StateTest.h">
       <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
+      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

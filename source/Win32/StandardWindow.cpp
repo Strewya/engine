@@ -19,7 +19,7 @@ namespace Win32
 		setClass(className);
 	}
 
-	LRESULT WINAPI StandardWindow::WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+	LRESULT WINAPI StandardWindow::WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 		return ::DefWindowProcA(hwnd, msg, wParam, lParam);
 	}

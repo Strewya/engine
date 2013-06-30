@@ -22,7 +22,7 @@ namespace Util
 		_alpha = c.alpha;
 	}
 
-	Color::Color(uint r, uint g, uint b, uint a)
+	Color::Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
 		: red(_red), blue(_blue), green(_green), alpha(_alpha)
 	{
 		setRed(r);
@@ -55,27 +55,27 @@ namespace Util
 		return *this;
 	}
 
-	void Color::setRed(uint r)
+	void Color::setRed(uint32_t r)
 	{
 		_red = r > 255 ? 255 : ( r < 0 ? 0 : r );
 	}
 
-	void Color::setGreen(uint g)
+	void Color::setGreen(uint32_t g)
 	{
 		_green = g > 255 ? 255 : ( g < 0 ? 0 : g );
 	}
 
-	void Color::setBlue(uint b)
+	void Color::setBlue(uint32_t b)
 	{
 		_blue = b > 255 ? 255 : ( b < 0 ? 0 : b );
 	}
 
-	void Color::setAlpha(uint a)
+	void Color::setAlpha(uint32_t a)
 	{
 		_alpha = a > 255 ? 255 : ( a < 0 ? 0 : a);
 	}
 
-	void Color::setChannels(uint r, uint g, uint b, uint a)
+	void Color::setChannels(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
 	{
 		_red = r > 255 ? 255 : ( r < 0 ? 0 : r );
 		_green = g > 255 ? 255 : ( g < 0 ? 0 : g );
@@ -86,7 +86,7 @@ namespace Util
 
 std::istream& operator>>(std::istream& ss, Util::Color& c)
 {
-	uint r, g, b, a;
+	uint32_t r, g, b, a;
 	ss >> r >> g >> b >> a;
 	c.setAlpha(a);
 	c.setBlue(b);

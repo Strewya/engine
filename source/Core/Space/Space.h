@@ -40,7 +40,7 @@ namespace Core
 
 		bool AddEntity(InstanceID id);
 		bool RemoveEntity(InstanceID id);
-		uint FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
+		uint32_t FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
 		Iterator begin() const;
 		bool isEnd(const Iterator& it) const;
 		

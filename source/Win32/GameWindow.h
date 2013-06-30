@@ -18,7 +18,7 @@ namespace Win32
 		GameWindow(const char* title);
 		GameWindow(const String& title);
 
-		LRESULT WINAPI WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+		LRESULT WINAPI WindowProc(HWND hwnd, uint32_t message, WPARAM wParam, LPARAM lParam);
 
 	};
 }

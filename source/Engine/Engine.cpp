@@ -56,17 +56,6 @@ namespace Core
 		_services.Register(&_inputEngine);
 
 		/*
-			initialize the resource caches
-			* textures - done
-			* spritesheets
-			* meshes
-			* sounds
-			* scripts
-			* TODO: strings
-		*/
-		_textureCache.setReferences(_resources, _services);
-
-		/*
 			register the resource caches
 			* textures - done
 			* spritesheets
@@ -75,7 +64,7 @@ namespace Core
 			* scripts
 			* TODO: strings
 		*/
-		_resources.Register(_textureCache);
+		_resources.Register(_services.getGraphics().getTextureCache());
 
 		/*
 			load the game configuration script and execute it

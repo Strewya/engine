@@ -28,7 +28,7 @@ namespace Util
 		}
 	}
 
-	uint Clock::FindFirstFreeSlot()
+	uint32_t Clock::FindFirstFreeSlot()
 	{
 		for(auto it = _timers.begin(); it != _timers.end(); ++it)
 		{

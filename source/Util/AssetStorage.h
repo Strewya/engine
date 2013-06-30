@@ -13,9 +13,9 @@ namespace Util
 {
 	template<typename T> struct AssetHolder
 	{
-		T* dataPtr;
-		String filename;
 		InstanceID id;
+		String filename;
+		T* dataPtr;
 	};
 
 	template<typename T, typename DEF = void> class AssetStore
@@ -48,12 +48,12 @@ namespace Util
 		typedef std::deque<AssetHolder<AssetType>> Storage_t;
 		Storage_t _assets;
 		InstanceID _idCounter;
-		uint indexMask;
-		uint maskBits;
+		uint32_t indexMask;
+		uint32_t maskBits;
 
-		InstanceID _GenerateID(uint index);
+		InstanceID _GenerateID(uint32_t index);
 		bool AssetUnloader(AssetHolder<AssetType>& asset);
-		uint FindFirstFreeIndex();
+		uint32_t FindFirstFreeIndex();
 	};
 
 
@@ -66,7 +66,7 @@ namespace Util
 	template<typename T, typename DEF> AssetStore<T, DEF>::AssetStore()
 		: _idCounter(0), indexMask(0xFFF), maskBits(0)
 	{
-		uint tempMask = indexMask;
+		uint32_t tempMask = indexMask;
 		for(; tempMask; ++maskBits)
 		{
 			tempMask &= tempMask-1;
@@ -93,7 +93,7 @@ namespace Util
 
 	template<typename T, typename DEF> auto AssetStore<T, DEF>::CheckLoaded(InstanceID id) -> AssetType*
 	{
-		uint index = id & indexMask;
+		uint32_t index = id & indexMask;
 		if(index < _assets.size() && _assets[index].id == id)
 		{
 			return _assets[index].dataPtr;
@@ -115,7 +115,7 @@ namespace Util
 			return check;
 		}
 			
-		uint index = FindFirstFreeIndex();
+		uint32_t index = FindFirstFreeIndex();
 		AssetHolder<AssetType>& asset = _assets[index];
 		asset.dataPtr = Load(filename, loadArgs);
 		if(asset.dataPtr == nullptr)
@@ -141,7 +141,7 @@ namespace Util
 
 	template<typename T, typename DEF> bool AssetStore<T, DEF>::Delete(InstanceID id)
 	{
-		uint index = id & indexMask;
+		uint32_t index = id & indexMask;
 		if(index < _assets.size() && _assets[index].id == id)
 		{
 			return AssetUnloader(_assets[index]);
@@ -182,7 +182,7 @@ namespace Util
 		return true;
 	}
 
-	template<typename T, typename DEF> InstanceID AssetStore<T, DEF>::_GenerateID(uint index)
+	template<typename T, typename DEF> InstanceID AssetStore<T, DEF>::_GenerateID(uint32_t index)
 	{
 		InstanceID id = _idCounter++;
 		id <<= maskBits;
@@ -202,7 +202,7 @@ namespace Util
 		return result;
 	}
 
-	template<typename T, typename DEF> uint AssetStore<T, DEF>::FindFirstFreeIndex()
+	template<typename T, typename DEF> uint32_t AssetStore<T, DEF>::FindFirstFreeIndex()
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)

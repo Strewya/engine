@@ -25,7 +25,7 @@ namespace Util
 		}
 	}
 
-	uint CompositeTimer::FindFirstFreeSlot()
+	uint32_t CompositeTimer::FindFirstFreeSlot()
 	{
 		for(auto it = _timers.begin(); it != _timers.end(); ++it)
 		{

@@ -16,8 +16,8 @@ namespace Graphics
 	{
 	public:
 		DXFont();
-		DXFont(const char* name, uint size, bool italic, uint weight, LPD3DXFONT f);
-		DXFont(const String& name, uint size, bool italic, uint weight, LPD3DXFONT f);
+		DXFont(const char* name, uint32_t size, bool italic, uint32_t weight, LPD3DXFONT f);
+		DXFont(const String& name, uint32_t size, bool italic, uint32_t weight, LPD3DXFONT f);
 
 		FontInfo info;
 		LPD3DXFONT data;

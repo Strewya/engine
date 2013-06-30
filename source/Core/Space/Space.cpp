@@ -57,9 +57,9 @@ namespace Core
 		return _entities.erase(id) != 0;
 	}
 
-	uint Space::FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
+	uint32_t Space::FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
 	{
-		uint count = 0;
+		uint32_t count = 0;
 		for(auto& id : _entities)
 		{
 			if(filter(pool.Retrieve(id)))

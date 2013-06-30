@@ -112,8 +112,8 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Graphics\Texture.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureCache.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Input\InputEngine.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp" />
@@ -161,8 +161,8 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Texture.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureCache.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\Event.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h" />

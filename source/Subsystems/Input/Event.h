@@ -26,7 +26,7 @@ namespace Input
 
 	struct KeyEvent
 	{
-		uint code;
+		uint32_t code;
 		bool alt;
 		bool control;
 		bool shift;
@@ -39,13 +39,13 @@ namespace Input
 
 	struct MouseMoveEvent
 	{
-		uint x;
-		uint y;
+		uint32_t x;
+		uint32_t y;
 	};
 
 	struct MouseButtonEvent
 	{
-		uint button;
+		uint32_t button;
 	};
 
 	struct MouseWheelEvent
@@ -55,8 +55,8 @@ namespace Input
 
 	struct ResizeEvent
 	{
-		uint width;
-		uint height;
+		uint32_t width;
+		uint32_t height;
 	};
 
 	class Event

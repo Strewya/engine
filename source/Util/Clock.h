@@ -22,7 +22,7 @@ namespace Util
 		std::chrono::time_point<std::chrono::high_resolution_clock> _lastUpdate;
 		float _maxDeltaAllowed;
 
-		uint FindFirstFreeSlot();
+		uint32_t FindFirstFreeSlot();
 	public:
 		Clock();
 		void AdvanceTime();

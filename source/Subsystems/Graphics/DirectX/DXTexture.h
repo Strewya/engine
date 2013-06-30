@@ -1,31 +1,25 @@
-#ifndef GRAPHICS_DXTEXTURE_H_
-#define GRAPHICS_DXTEXTURE_H_
+#pragma once
 /********************************************
 	class:	
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Defines.h"
+#include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Subsystems/Graphics/TextureInfo.h"
+#include "Subsystems/Graphics/TextureData.h"
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
 	/*** end header inclusion ***/
 
 namespace Graphics
 {
-	class DXTexture
+	class DXTexture : public TextureData
 	{
-		
 	public:
 		DXTexture();
-		DXTexture(const char* filename, uint w, uint h, LPDIRECT3DTEXTURE9 data);
-		DXTexture(const String& filename, uint w, uint h, LPDIRECT3DTEXTURE9 data);
+		~DXTexture();
 		
-		TextureInfo info;
-		LPDIRECT3DTEXTURE9 data;
+		LPDIRECT3DTEXTURE9 d3dData;
 
 		void Release();
 	};
 }
-
-#endif //GRAPHICS_DXTEXTURE_H_

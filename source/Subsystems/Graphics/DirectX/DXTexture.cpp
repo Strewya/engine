@@ -8,23 +8,20 @@
 namespace Graphics
 {
 	DXTexture::DXTexture()
-		: info(), data(nullptr)
+		: d3dData(nullptr)
 	{}
 
-	DXTexture::DXTexture(const char* filename, uint w, uint h, LPDIRECT3DTEXTURE9 data)
-		: info(filename, w, h), data(data)
-	{}
-
-	DXTexture::DXTexture(const String& filename, uint w, uint h, LPDIRECT3DTEXTURE9 data)
-		: info(filename, w, h), data(data)
-	{}
+	DXTexture::~DXTexture()
+	{
+		Release();
+	}
 
 	void DXTexture::Release()
 	{
-		if(data)
+		if(d3dData)
 		{
-			data->Release();
-			data = nullptr;
+			d3dData->Release();
+			d3dData = nullptr;
 		}
 	}
 }

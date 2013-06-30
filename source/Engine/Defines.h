@@ -1,16 +1,15 @@
 #pragma once
 
 /*		C++ HEADERS	*/
+#include <cstdint>
 #include <cassert>
 #include <string>
 #include <sstream>
 
 /*		TYPEDEFS	*/
 typedef std::string String;
-typedef unsigned int uint;
 typedef unsigned long InstanceID;
 typedef unsigned long DWORD;
-typedef unsigned long ulong;
 
 /*		CONTANTS	*/
 const double PI_D = 3.141592653589793238462;

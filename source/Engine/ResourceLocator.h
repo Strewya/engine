@@ -11,7 +11,7 @@
 namespace Graphics
 {
 	class SpritesheetCache;
-	class TextureCache;
+	class ITextureCache;
 }
 
 namespace Core
@@ -19,14 +19,14 @@ namespace Core
 	class ResourceLocator
 	{
 	private:
-		Graphics::TextureCache* _textureCache;
+		Graphics::ITextureCache* _textureCache;
 		Graphics::SpritesheetCache* _spritesheetCache;
 
 	public:
 		ResourceLocator();
 		
-		void Register(Graphics::TextureCache& cache);
-		Graphics::TextureCache& getTextureCache() const;
+		void Register(Graphics::ITextureCache& cache);
+		Graphics::ITextureCache& getTextureCache() const;
 
 		void Register(Graphics::SpritesheetCache& cache);
 		Graphics::SpritesheetCache& getSpritesheetCache() const;

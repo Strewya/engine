@@ -11,11 +11,11 @@ namespace Graphics
 		: _name(), _italic(false), _size(10), _weight(400)
     {}
 
-	FontInfo::FontInfo(const char* name, uint size, bool italic, uint weight)
+	FontInfo::FontInfo(const char* name, uint32_t size, bool italic, uint32_t weight)
 		: _name(name), _italic(italic), _size(size), _weight(weight)
     {}
 	
-	FontInfo::FontInfo(const String& name, uint size, bool italic, uint weight)
+	FontInfo::FontInfo(const String& name, uint32_t size, bool italic, uint32_t weight)
 		: _name(name), _italic(italic), _size(size), _weight(weight)
     {}
 
@@ -27,11 +27,11 @@ namespace Graphics
 	{
 		return _italic;
 	}
-	uint FontInfo::getWeight() const
+	uint32_t FontInfo::getWeight() const
 	{
 		return _weight;
 	}
-	uint FontInfo::getSize() const
+	uint32_t FontInfo::getSize() const
 	{
 		return _size;
 	}
@@ -51,12 +51,12 @@ namespace Graphics
 		_italic = italic;
 	}
 
-	void FontInfo::setWeight(uint weight)
+	void FontInfo::setWeight(uint32_t weight)
 	{
 		_weight = weight;
 	}
 
-	void FontInfo::setSize(uint size)
+	void FontInfo::setSize(uint32_t size)
 	{
 		_size = size;
 	}

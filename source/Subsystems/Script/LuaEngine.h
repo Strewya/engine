@@ -39,7 +39,7 @@ namespace Script
 		bool GetField(int tableIndex);
 		
 		bool Push(const int& in);
-		bool Push(const uint& in);
+		bool Push(const uint32_t& in);
 		bool Push(const String& in);
 		bool Push(const char* in);
 		bool Push(const bool& in);
@@ -51,7 +51,7 @@ namespace Script
 		bool Push(const Util::Color& in);
 
 		bool Pop(int& out, int index = -1);
-		bool Pop(uint& out, int index = -1);
+		bool Pop(uint32_t& out, int index = -1);
 		bool Pop(bool& out, int index = -1);
 		bool Pop(String& out, int index = -1);
 		bool Pop(double& out, int index = -1);

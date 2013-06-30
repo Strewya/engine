@@ -18,6 +18,6 @@ namespace Win32
 		StandardWindow(const char* title, const char* className);
 		StandardWindow(const String& title, const String& className);
 
-		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam);
+		virtual LRESULT CALLBACK WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 	};
 }

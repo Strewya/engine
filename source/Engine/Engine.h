@@ -12,7 +12,7 @@
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
 #include "Subsystems/Graphics/RendererFactory.h"
-#include "Subsystems/Graphics/TextureCache.h"
+#include "Subsystems/Graphics/ITextureCache.h"
 #include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
 #include "Util/Clock.h"
@@ -35,8 +35,6 @@ namespace Core
 		Input::Engine _inputEngine;
 		//Network::CommEngine _commEngine;
 		ServiceLocator _services;
-
-		Graphics::TextureCache _textureCache;
 
 		ResourceLocator _resources;
 

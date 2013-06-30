@@ -24,9 +24,9 @@ namespace Pong
 {
 	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		uint hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
 		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
-		uint paddleSpriteHandle = sheet.getSpriteHandle("paddle");
+		uint32_t paddleSpriteHandle = sheet.getSpriteHandle("paddle");
 
 		auto& form = paddle.getForm();
 		form.setType(Core::FormType::Sprite);
@@ -50,10 +50,10 @@ namespace Pong
 
 	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		uint hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
+		uint32_t hSheet = context.resources.getSpritesheetCache().getSpritesheetHandle("pong.sheet");
 		auto& sheet = context.resources.getSpritesheetCache().getSpritesheet(hSheet);
 
-		uint ballSpriteHandle = sheet.getSpriteHandle("ball");
+		uint32_t ballSpriteHandle = sheet.getSpriteHandle("ball");
 		
 		auto& ball_form = ball.getForm();
 		ball_form.setType(Core::FormType::Sprite);
@@ -85,10 +85,6 @@ namespace Pong
 
 
 
-
-
-
-
 		context.actionMaster.EnqueueActionLogic(Core::PongInput);
 		context.actionMaster.EnqueueActionLogic(Core::EulerMovement);
 		context.actionMaster.EnqueueActionLogic(Core::RK4Movement);
@@ -101,7 +97,7 @@ namespace Pong
 		context.entityFactory.RegisterConstructor("ball", CreateBall);
 
 		auto windowSize = context.services.getGraphics().getScreenSize();
-		uint pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("../resources/pong.sheet");
+		uint32_t pongSheetHandle = context.resources.getSpritesheetCache().LoadFromFile("../resources/pong.sheet");
 		auto& pongSheet = context.resources.getSpritesheetCache().getSpritesheet(pongSheetHandle);
 
 		for(int i = 0; i < 2; ++i)
@@ -111,7 +107,7 @@ namespace Pong
 			context.entityFactory.CreateEntityType("paddle", paddle);
 			auto& paddle_form = paddle.getForm();
 			
-			auto& paddleSprite = pongSheet.getSprite(paddle_form.getState("CurrentSprite")->as<uint>());
+			auto& paddleSprite = pongSheet.getSprite(paddle_form.getState("CurrentSprite")->as<uint32_t>());
 
 			if(i==0)
 			{

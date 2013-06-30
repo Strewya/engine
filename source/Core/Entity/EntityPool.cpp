@@ -7,7 +7,7 @@
 
 namespace Core
 {
-	EntityPool::EntityPool(uint maxExpectedSize)
+	EntityPool::EntityPool(uint32_t maxExpectedSize)
 		: _idCounter(0), _maxExpectedSize(maxExpectedSize), _indexMask(0), _indexBits(0)
 	{
 		--maxExpectedSize;
@@ -30,7 +30,7 @@ namespace Core
 
 	Entity& EntityPool::NewInstance()
 	{
-		uint index;
+		uint32_t index;
 		if(!_availableSlots.empty())
 		{
 			index = _availableSlots.front();
@@ -48,13 +48,13 @@ namespace Core
 
 	Entity& EntityPool::Retrieve(InstanceID id) const
 	{
-		uint index = id & _indexMask;
+		uint32_t index = id & _indexMask;
 		return *_pool[index];
 	}
 	
 	bool EntityPool::IsAlive(InstanceID id) const
 	{
-		uint index = id & _indexMask;
+		uint32_t index = id & _indexMask;
 		return (_pool[index] != nullptr && _pool[index]->getID() == id);
 	}
 
@@ -62,7 +62,7 @@ namespace Core
 	{
 		if(IsAlive(id))
 		{
-			uint index = id & _indexMask;
+			uint32_t index = id & _indexMask;
 			_pool[index].reset(nullptr);
 			_availableSlots.push_back(index);
 			return true;
