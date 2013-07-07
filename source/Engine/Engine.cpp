@@ -81,6 +81,7 @@ namespace Core
 	Engine::~Engine()
 	{
 		_gameContexts.clear();
+		_spritesheets.clear();
 	}
 
 	void Engine::Loop()

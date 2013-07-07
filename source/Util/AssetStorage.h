@@ -32,20 +32,20 @@ namespace Util
 		AssetStore();
 		virtual ~AssetStore();
 
-		Asset* CheckLoaded(const char* filename);
-		Asset* CheckLoaded(InstanceID id);
+		Asset* checkLoaded(const char* filename);
+		Asset* checkLoaded(InstanceID id);
 		
-		Asset* Acquire(const char* filename, LoadArgs* loadArgs = nullptr);
+		Asset* acquire(const char* filename, LoadArgs* loadArgs = nullptr);
 		
-		void Clear();
-		bool Delete(InstanceID id);
-		//bool Delete(AssetType* ptr);
-		bool Delete(const char* filename);
+		void clear();
+		bool destroy(InstanceID id);
+		//bool destroy(AssetType* ptr);
+		bool destroy(const char* filename);
 
 	protected:
-		virtual bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset) = 0;
+		virtual bool loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset) = 0;
 		
-		bool DeleteUnload(AssetPtr& asset);
+		bool deleteUnload(AssetPtr& asset);
 
 	private:
 		typedef std::deque<Asset> Storage_t;
@@ -54,9 +54,9 @@ namespace Util
 		uint32_t indexMask;
 		uint32_t maskBits;
 
-		InstanceID _GenerateID(uint32_t index);
-		bool AssetUnloader(Asset& asset);
-		uint32_t FindFirstFreeIndex();
+		InstanceID _generateID(uint32_t index);
+		bool assetUnloader(Asset& asset);
+		uint32_t findFirstFreeIndex();
 	};
 
 
@@ -78,24 +78,24 @@ namespace Util
 
 	template<typename T, typename DEF> AssetStore<T, DEF>::~AssetStore()
 	{
-		Clear();
+		clear();
 	}
 
-	template<typename T, typename DEF> auto AssetStore<T, DEF>::CheckLoaded(const char* filename) -> Asset*
+	template<typename T, typename DEF> auto AssetStore<T, DEF>::checkLoaded(const char* filename) -> Asset*
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)
 		{
-			Asset& ast = *it;
-			if(ast.filename.compare(filename)==0)
+			Asset& asset = *it;
+			if(asset.filename.compare(filename)==0)
 			{
-				return &ast;
+				return &asset;
 			}
 		}
 		return nullptr;
 	}
-	//
-	template<typename T, typename DEF> auto AssetStore<T, DEF>::CheckLoaded(InstanceID id) -> Asset*
+	
+	template<typename T, typename DEF> auto AssetStore<T, DEF>::checkLoaded(InstanceID id) -> Asset*
 	{
 		uint32_t index = id & indexMask;
 		if(index < _assets.size() && _assets[index].id == id)
@@ -105,73 +105,73 @@ namespace Util
 		return nullptr;
 	}
 
-	template<typename T, typename DEF> auto AssetStore<T, DEF>::Acquire(const char* filename, LoadArgs* loadArgs) -> Asset*
+	template<typename T, typename DEF> auto AssetStore<T, DEF>::acquire(const char* filename, LoadArgs* loadArgs) -> Asset*
 	{
-		Asset* check = CheckLoaded(filename);
+		Asset* check = checkLoaded(filename);
 		if(check != nullptr)
 		{
 			return check;
 		}
 			
-		uint32_t index = FindFirstFreeIndex();
+		uint32_t index = findFirstFreeIndex();
 		Asset& asset = _assets[index];
-		if(!Load(filename, loadArgs, asset.dataPtr))
+		if(!loadAsset(filename, loadArgs, asset.dataPtr))
 		{
 			Util::GetDefaultLogger() << "Failed to load asset " << filename << Util::Logger::endl;
 			return nullptr;
 		}
-		asset.id = _GenerateID(index);
+		asset.id = _generateID(index);
 		asset.filename.assign(filename);
 		Util::GetDefaultLogger() << "Loaded asset " << filename << Util::Logger::endl;
 		return &asset;
 	}
 
-	template<typename T, typename DEF> void AssetStore<T, DEF>::Clear()
+	template<typename T, typename DEF> void AssetStore<T, DEF>::clear()
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)
 		{
-			AssetUnloader(*it);
+			assetUnloader(*it);
 		}
 	}
 
-	template<typename T, typename DEF> bool AssetStore<T, DEF>::Delete(InstanceID id)
+	template<typename T, typename DEF> bool AssetStore<T, DEF>::destroy(InstanceID id)
 	{
 		uint32_t index = id & indexMask;
 		if(index < _assets.size() && _assets[index].id == id)
 		{
-			return AssetUnloader(_assets[index]);
+			return assetUnloader(_assets[index]);
 		}
 		return false;
 	}
 	/*
-	template<typename T, typename DEF> bool AssetStore<T, DEF>::Delete(AssetType* ptr)
+	template<typename T, typename DEF> bool AssetStore<T, DEF>::destroy(AssetType* ptr)
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)
 		{
 			if(it->dataPtr == ptr)
 			{
-				return AssetUnloader(*it);
+				return assetUnloader(*it);
 			}
 		}
 		return false;
 	}
 	*/
-	template<typename T, typename DEF> bool AssetStore<T, DEF>::Delete(const char* filename)
+	template<typename T, typename DEF> bool AssetStore<T, DEF>::destroy(const char* filename)
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)
 		{
 			if(it->filename.compare(filename)==0)
 			{
-				return AssetUnloader(*it);
+				return assetUnloader(*it);
 			}
 		}
 		return false;
 	}
 
-	template<typename T, typename DEF> bool AssetStore<T, DEF>::DeleteUnload(AssetPtr& asset)
+	template<typename T, typename DEF> bool AssetStore<T, DEF>::deleteUnload(AssetPtr& asset)
 	{
 		if(asset == nullptr)
 		{
@@ -181,7 +181,7 @@ namespace Util
 		return true;
 	}
 
-	template<typename T, typename DEF> InstanceID AssetStore<T, DEF>::_GenerateID(uint32_t index)
+	template<typename T, typename DEF> InstanceID AssetStore<T, DEF>::_generateID(uint32_t index)
 	{
 		InstanceID id = _idCounter++;
 		id <<= maskBits;
@@ -189,9 +189,9 @@ namespace Util
 		return id;
 	}
 
-	template<typename T, typename DEF> bool AssetStore<T, DEF>::AssetUnloader(Asset& asset)
+	template<typename T, typename DEF> bool AssetStore<T, DEF>::assetUnloader(Asset& asset)
 	{
-		bool result = DeleteUnload(asset.dataPtr);
+		bool result = deleteUnload(asset.dataPtr);
 		if(result)
 		{
 			asset.dataPtr.reset(nullptr);
@@ -201,7 +201,7 @@ namespace Util
 		return result;
 	}
 
-	template<typename T, typename DEF> uint32_t AssetStore<T, DEF>::FindFirstFreeIndex()
+	template<typename T, typename DEF> uint32_t AssetStore<T, DEF>::findFirstFreeIndex()
 	{
 		typename Storage_t::iterator it = _assets.begin();
 		for(; it != _assets.end(); ++it)

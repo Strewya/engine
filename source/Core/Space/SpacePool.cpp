@@ -21,7 +21,7 @@ namespace Core
 		}
 	}
 
-	InstanceID SpacePool::_NewID(int index)
+	InstanceID SpacePool::_newID(int index)
 	{
 		InstanceID id = ++_idCounter;
 		id <<= _indexBits;
@@ -29,7 +29,7 @@ namespace Core
 		return id;
 	}
 
-	Space& SpacePool::NewInstance()
+	InstanceID SpacePool::getNewInstance(Space** outSpace)
 	{
 		uint32_t index;
 		if(!_availableSlots.empty())
@@ -42,30 +42,95 @@ namespace Core
 			index = _pool.size();
 			_pool.emplace_back(nullptr);
 		}
-		InstanceID id = _NewID(index);
-		_pool[index].reset(new Space());
-		return *_pool[index];
+		InstanceID id = _newID(index);
+		_pool[index].reset(new Space(id));
+		if(outSpace != nullptr)
+		{
+			*outSpace = _pool[index].get();
+		}
+		return id;
 	}
 
-	Space& SpacePool::Retrieve(InstanceID id) const
+	InstanceID SpacePool::getNamedInstance(const char* name, Space** outSpace)
+	{
+		InstanceID id = NOT_FOUND;
+		auto it = _names.find(name);
+		if(it == _names.end())
+		{
+			id = getNewInstance(outSpace);
+			_names.emplace(std::make_pair(name, id));
+		}
+		else
+		{
+			id = it->second;
+		}
+		return id;
+	}
+
+	Space* SpacePool::getInstance(InstanceID id) const
 	{
 		uint32_t index = id & _indexMask;
-		return *_pool[index];
+		return (index < _pool.size() ? _pool[index].get() : nullptr);
 	}
 	
-	bool SpacePool::IsAlive(InstanceID id) const
+	Space* SpacePool::getInstance(const char* name) const
+	{
+		auto it = _names.find(name);
+		return (it != _names.end() ? _pool[it->second].get() : nullptr);
+	}
+
+	bool SpacePool::isAlive(InstanceID id) const
 	{
 		uint32_t index = id & _indexMask;
 		return (_pool[index] != nullptr && _pool[index]->getID() == id);
 	}
 
-	bool SpacePool::Destroy(InstanceID id)
+	bool SpacePool::isNameInUse(const char* name) const
 	{
-		if(IsAlive(id))
+		return _names.find(name) != _names.end();
+	}
+
+	bool SpacePool::destroy(InstanceID id)
+	{
+		if(isAlive(id))
 		{
 			uint32_t index = id & _indexMask;
 			_pool[index].reset(nullptr);
 			_availableSlots.push_back(index);
+			return true;
+		}
+		return false;
+	}
+
+	bool SpacePool::destroy(const char* name)
+	{
+		auto it = _names.find(name);
+		if(it != _names.end())
+		{
+			destroy(it->second);
+			_names.erase(it);
+			return true;
+		}
+		return false;
+	}
+
+	bool SpacePool::attachName(const char* name, InstanceID id)
+	{
+		auto it = _names.find(name);
+		if(it == _names.end() && isAlive(id))
+		{
+			_names.emplace(std::make_pair(name, id));
+			return true;
+		}
+		return false;
+	}
+
+	bool SpacePool::detachName(const char* name, InstanceID id)
+	{
+		auto it = _names.find(name);
+		if(it != _names.end() && it->second == id)
+		{
+			_names.erase(it);
 			return true;
 		}
 		return false;

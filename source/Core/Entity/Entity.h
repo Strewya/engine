@@ -57,8 +57,8 @@ namespace Core
 		Form&			getForm();
 		Action*			getAction(const char* name);
 		Action*			getAction(const String& name);
-		State*			getState(const char* name);
-		State*			getState(const String& name);
+		StateRptr		getState(const char* name);
+		StateRptr		getState(const String& name);
 
 		//////////// REMOVAL METHODS ////////////
 
@@ -80,7 +80,7 @@ namespace Core
 
 		bool Insert(const char* name, std::unique_ptr<Action> action);
 		bool Insert(const String& name, std::unique_ptr<Action> action);
-		bool Insert(const char* name, std::unique_ptr<State> state);
-		bool Insert(const String& name, std::unique_ptr<State> state);
+		bool Insert(const char* name, StateUptr state);
+		bool Insert(const String& name, StateUptr state);
 	};
 }

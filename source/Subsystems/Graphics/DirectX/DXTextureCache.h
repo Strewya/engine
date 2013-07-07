@@ -28,14 +28,16 @@ namespace Graphics
 	{
 	public:
 		DXTextureCache();
-		void SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev);
+		void setD3DDevice(LPDIRECT3DDEVICE9 d3ddev);
 		
-		InstanceID LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr);
-		TextureData* getTexture(uint32_t handle);
+		InstanceID loadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr);
+		TextureData* getTexture(InstanceID handle);
 		InstanceID getTexture(const char* name, TextureData** outPtr);
+		void clearTextures();
+		bool destroyTexture(InstanceID handle);
 
 	protected:
-		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
+		bool loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
 
 	private:
 		LPDIRECT3DDEVICE9 _d3ddev;

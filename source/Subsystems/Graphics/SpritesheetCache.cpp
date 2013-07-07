@@ -11,53 +11,16 @@
 
 namespace Graphics
 {
-	SpritesheetCache::~SpritesheetCache()
-	{
-		Clear();
-	}
+	SpritesheetCache::SpritesheetCache()
+		: _textureCache(nullptr)
+	{}
 
 	void SpritesheetCache::setTextureCache(ITextureCache& cache)
 	{
 		_textureCache = &cache;
 	}
 
-	InstanceID SpritesheetCache::LoadSpritesheet(const char* name, Spritesheet** outPtr)
-	{
-		InstanceID id = NOT_FOUND;
-		auto* asset = Acquire(name);
-		if(asset != nullptr)
-		{
-			id = asset->id;
-			if(outPtr != nullptr)
-			{
-				*outPtr = asset->dataPtr.get();
-			}
-		}
-		return id;
-	}
-
-	Spritesheet* SpritesheetCache::getSpritesheet(uint32_t handle)
-	{
-		auto* asset = CheckLoaded(handle);
-		return (asset != nullptr ? asset->dataPtr.get() : nullptr);
-	}
-		
-	InstanceID SpritesheetCache::getSpritesheet(const char* name, Spritesheet** outPtr)
-	{
-		InstanceID id = NOT_FOUND;
-		auto* asset = CheckLoaded(name);
-		if(asset != nullptr)
-		{
-			id = asset->id;
-			if(outPtr != nullptr)
-			{
-				*outPtr = asset->dataPtr.get();
-			}
-		}
-		return id;
-	}
-
-	bool SpritesheetCache::Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset)
+	bool SpritesheetCache::loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset)
 	{
 		Script::Engine script;
 		if(!script.DoFile(filename))
@@ -136,5 +99,51 @@ namespace Graphics
 
 		script.Pop();
 		return true;
+	}
+
+	InstanceID SpritesheetCache::loadSpritesheet(const char* name, Spritesheet** outPtr)
+	{
+		InstanceID id = NOT_FOUND;
+		auto* asset = acquire(name);
+		if(asset != nullptr)
+		{
+			id = asset->id;
+			if(outPtr != nullptr)
+			{
+				*outPtr = asset->dataPtr.get();
+			}
+		}
+		return id;
+	}
+
+	Spritesheet* SpritesheetCache::getSpritesheet(InstanceID handle)
+	{
+		auto* asset = checkLoaded(handle);
+		return (asset != nullptr ? asset->dataPtr.get() : nullptr);
+	}
+		
+	InstanceID SpritesheetCache::getSpritesheet(const char* name, Spritesheet** outPtr)
+	{
+		InstanceID id = NOT_FOUND;
+		auto* asset = checkLoaded(name);
+		if(asset != nullptr)
+		{
+			id = asset->id;
+			if(outPtr != nullptr)
+			{
+				*outPtr = asset->dataPtr.get();
+			}
+		}
+		return id;
+	}
+
+	void SpritesheetCache::clearSpritesheets()
+	{
+		clear();
+	}
+
+	bool SpritesheetCache::destroySpritesheet(InstanceID handle)
+	{
+		return destroy(handle);
 	}
 }

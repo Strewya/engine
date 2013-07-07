@@ -20,31 +20,25 @@ namespace Graphics
 {
 	class ITextureCache;
 }
-/*
-namespace Script
-{
-	class Engine;
-}
-*/
 
 namespace Graphics
 {
 	class SpritesheetCache : public Util::AssetStore<Spritesheet>
 	{
 	public:
-		~SpritesheetCache();
+		SpritesheetCache();
 		void setTextureCache(ITextureCache& _textureCache);
 
-		InstanceID LoadSpritesheet(const char* name, Spritesheet** outPtr);
-		Spritesheet* getSpritesheet(uint32_t handle);
+		InstanceID loadSpritesheet(const char* name, Spritesheet** outPtr);
+		Spritesheet* getSpritesheet(InstanceID handle);
 		InstanceID getSpritesheet(const char* name, Spritesheet** outPtr);
+		void clearSpritesheets();
+		bool destroySpritesheet(InstanceID handle);
 
 	protected:
-		bool Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
+		bool loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset);
 		
 	private:
 		ITextureCache* _textureCache;
-		//Script::Engine* _script;
-
 	};
 }

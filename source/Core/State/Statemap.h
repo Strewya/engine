@@ -9,7 +9,7 @@
 #include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "State.h"
+#include "Core/State/State.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -23,7 +23,7 @@ namespace Core
 	{
 	private:
 
-		typedef std::unordered_map<String, std::unique_ptr<State>> StateCache;
+		typedef std::unordered_map<String, StateUptr> StateCache;
 		StateCache _states;
 
 	public:
@@ -33,19 +33,17 @@ namespace Core
 		Statemap& operator=(const Statemap& rhs);
 		Statemap& operator=(Statemap&& rhs);
 
-		bool Contains(const char* name);
-		bool Contains(const String& name);
+		bool contains(const char* name);
+		bool contains(const String& name);
 
-		void Clear();
-		bool Remove(const char* name);
-		bool Remove(const String& name);
+		void clear();
+		bool destroy(const char* name);
+		bool destroy(const String& name);
 
-		//bool Insert(const char* name, State* state);
-		//bool Insert(const String& name, State* state);
-		bool Insert(const char* name, std::unique_ptr<State> state);
-		bool Insert(const String& name, std::unique_ptr<State> state);
+		bool insert(const char* name, StateUptr state);
+		bool insert(const String& name, StateUptr state);
 
-		State* Retrieve(const char* name);
-		State* Retrieve(const String& name);
+		StateRptr retrieve(const char* name);
+		StateRptr retrieve(const String& name);
 	};
 }

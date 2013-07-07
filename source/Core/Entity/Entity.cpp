@@ -25,7 +25,7 @@ namespace Core
 
 	bool Entity::hasState(const char* name)
 	{
-		return _states.Contains(name);
+		return _states.contains(name);
 	}
 
 	bool Entity::hasState(const String& name)
@@ -65,14 +65,14 @@ namespace Core
 		return _actions.Retrieve(name);
 	}
 
-	State* Entity::getState(const char* name)
+	StateRptr Entity::getState(const char* name)
 	{
-		return _states.Retrieve(name);
+		return _states.retrieve(name);
 	}
 
-	State* Entity::getState(const String& name)
+	StateRptr Entity::getState(const String& name)
 	{
-		return _states.Retrieve(name);
+		return _states.retrieve(name);
 	}
 	
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
@@ -94,17 +94,17 @@ namespace Core
 
 	void Entity::ClearStates()
 	{
-		_states.Clear();
+		_states.clear();
 	}
 
 	bool Entity::RemoveState(const char* name)
 	{
-		return _states.Remove(name);
+		return _states.destroy(name);
 	}
 
 	bool Entity::RemoveState(const String& name)
 	{
-		return _states.Remove(name);
+		return _states.destroy(name);
 	}
 
 	/////////////////////////// SETTERS ///////////////////////////
@@ -147,13 +147,13 @@ namespace Core
 		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::Insert(const char* name, std::unique_ptr<State> state)
+	bool Entity::Insert(const char* name, StateUptr state)
 	{
-		return _states.Insert(name, std::move(state));
+		return _states.insert(name, std::move(state));
 	}
 
-	bool Entity::Insert(const String& name, std::unique_ptr<State> state)
+	bool Entity::Insert(const String& name, StateUptr state)
 	{
-		return _states.Insert(name, std::move(state));
+		return _states.insert(name, std::move(state));
 	}
 }

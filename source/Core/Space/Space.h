@@ -21,16 +21,13 @@ namespace Core
 	{
 	public:
 		typedef std::unordered_set<InstanceID> EntityContainer;
-		typedef EntityContainer::iterator Iterator;
-	private:
-		EntityContainer _entities;
-		Util::Rect _bounds;
-		InstanceID _id;
+		typedef EntityContainer::iterator iterator;
+	
 
 	public:
-		Space();
-		Space(const Util::Vec2& pos, const Util::Vec2& size);
-		Space(const Util::Rect& bounds);
+		Space(InstanceID id);
+		Space(InstanceID id, const Util::Vec2& pos, const Util::Vec2& size);
+		Space(InstanceID id, const Util::Rect& bounds);
 		~Space();
 
 		InstanceID getID() const;
@@ -40,9 +37,13 @@ namespace Core
 
 		bool AddEntity(InstanceID id);
 		bool RemoveEntity(InstanceID id);
-		uint32_t FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
-		Iterator begin() const;
-		bool isEnd(const Iterator& it) const;
-		
+		bool FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
+		iterator begin() const;
+		iterator end() const;
+	
+	private:
+		InstanceID _id;
+		Util::Rect _bounds;
+		EntityContainer _entities;
 	};
 }

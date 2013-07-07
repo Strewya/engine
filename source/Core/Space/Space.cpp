@@ -8,18 +8,18 @@
 
 namespace Core
 {
-	Space::Space()
-		: _bounds()
+	Space::Space(InstanceID id)
+		: _id(id), _bounds()
 	{
 	}
 
-	Space::Space(const Util::Rect& bounds)
-		: _bounds(bounds)
+	Space::Space(InstanceID id, const Util::Rect& bounds)
+		: _id(id), _bounds(bounds)
 	{
 	}
 
-	Space::Space(const Util::Vec2& pos, const Util::Vec2& size)
-		: _bounds(pos, size)
+	Space::Space(InstanceID id, const Util::Vec2& pos, const Util::Vec2& size)
+		: _id(id), _bounds(pos, size)
 	{
 	}
 
@@ -57,27 +57,28 @@ namespace Core
 		return _entities.erase(id) != 0;
 	}
 
-	uint32_t Space::FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
+	bool Space::FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
 	{
-		uint32_t count = 0;
-		for(auto& id : _entities)
+		for(auto id : _entities)
 		{
-			if(filter(pool.Retrieve(id)))
+			if(pool.IsAlive(id))
 			{
-				container.push_back(id);
-				++count;
+				if(filter(pool.Retrieve(id)))
+				{
+					container.push_back(id);
+				}
 			}
 		}
-		return count;
+		return container.size() > 0;
 	}
 	
-	Space::Iterator Space::begin() const
+	Space::iterator Space::begin() const
 	{
 		return _entities.begin();
 	}
 	
-	bool Space::isEnd(const Iterator& it) const
+	Space::iterator Space::end() const
 	{
-		return it == _entities.end();
+		return _entities.end();
 	}
 }

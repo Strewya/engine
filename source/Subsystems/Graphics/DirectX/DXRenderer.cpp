@@ -19,12 +19,12 @@ namespace Graphics
 			throw std::exception("DirectX graphics subsystem has failed to load.");
 		}
 
-		_textures.SetD3DDevice(_d3ddev);
+		_textures.setD3DDevice(_d3ddev);
 	}
 
 	DXRenderer::~DXRenderer()
 	{
-		_textures.Clear();
+		_textures.clear();
 
 		if(_line != nullptr)
 		{

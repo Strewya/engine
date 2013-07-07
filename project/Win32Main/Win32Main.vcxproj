@@ -98,7 +98,8 @@
     <ClCompile Include="..\..\source\Core\Form\Form.cpp" />
     <ClCompile Include="..\..\source\Core\Space\Space.cpp" />
     <ClCompile Include="..\..\source\Core\Space\SpacePool.cpp" />
-    <ClCompile Include="..\..\source\Core\State\State.cpp" />
+    <ClCompile Include="..\..\source\Core\State\State3.cpp" />
+    <ClCompile Include="..\..\source\Core\State\State4.cpp" />
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
     <ClCompile Include="..\..\source\Engine\Defines.cpp" />
     <ClCompile Include="..\..\source\Engine\Engine.cpp" />
@@ -143,6 +144,9 @@
     <ClInclude Include="..\..\source\Core\Space\Space.h" />
     <ClInclude Include="..\..\source\Core\Space\SpacePool.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
+    <ClInclude Include="..\..\source\Core\State\State3.h" />
+    <ClInclude Include="..\..\source\Core\State\State4.h" />
+    <ClInclude Include="..\..\source\Core\State\StateComponents.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Engine\Defines.h" />
     <ClInclude Include="..\..\source\Engine\Engine.h" />
@@ -152,7 +156,6 @@
     <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
-    <ClInclude Include="..\..\source\StateTest.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />

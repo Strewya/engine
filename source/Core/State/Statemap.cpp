@@ -13,7 +13,7 @@ namespace Core
 	{
 		for(auto& pair : rhs._states)
 		{
-			Insert(pair.first, pair.second->Clone());
+			insert(pair.first, pair.second->clone());
 		}
 	}
 
@@ -28,7 +28,7 @@ namespace Core
 		{
 			for(auto& pair : rhs._states)
 			{
-				Insert(pair.first, pair.second->Clone());
+				insert(pair.first, pair.second->clone());
 			}
 		}
 		return *this;
@@ -45,42 +45,32 @@ namespace Core
 		return *this;
 	}
 
-	bool Statemap::Contains(const char* name)
+	bool Statemap::contains(const char* name)
 	{
 		return _states.find(name) != _states.end();
 	}
 
-	bool Statemap::Contains(const String& name)
+	bool Statemap::contains(const String& name)
 	{
 		return _states.find(name) != _states.end();
 	}
 
-	void Statemap::Clear()
+	void Statemap::clear()
 	{
 		_states.clear();
 	}
 
-	bool Statemap::Remove(const char* name)
+	bool Statemap::destroy(const char* name)
 	{
 		return _states.erase(name) != 0;
 	}
 
-	bool Statemap::Remove(const String& name)
+	bool Statemap::destroy(const String& name)
 	{
 		return _states.erase(name) != 0;
 	}
-	/*
-	bool Statemap::Insert(const char* name, State* state)
-	{
-		return Insert(name, std::unique_ptr<State>(state));
-	}
-
-	bool Statemap::Insert(const String& name, State* state)
-	{
-		return Insert(name.c_str(), std::unique_ptr<State>(state));
-	}
-	*/
-	bool Statemap::Insert(const char* name, std::unique_ptr<State> state)
+	
+	bool Statemap::insert(const char* name, StateUptr state)
 	{
 		auto it = _states.find(name);
 		if(it == _states.end())
@@ -91,12 +81,12 @@ namespace Core
 		return true;
 	}
 	
-	bool Statemap::Insert(const String& name, std::unique_ptr<State> state)
+	bool Statemap::insert(const String& name, StateUptr state)
 	{
-		return Insert(name.c_str(), std::move(state));
+		return insert(name.c_str(), std::move(state));
 	}
 	
-	State* Statemap::Retrieve(const char* name)
+	StateRptr Statemap::retrieve(const char* name)
 	{
 		auto it = _states.find(name);
 		if(it == _states.end())
@@ -106,9 +96,9 @@ namespace Core
 		return it->second.get();
 	}
 
-	State* Statemap::Retrieve(const String& name)
+	StateRptr Statemap::retrieve(const String& name)
 	{
-		return Retrieve(name.c_str());
+		return retrieve(name.c_str());
 	}
 
 	

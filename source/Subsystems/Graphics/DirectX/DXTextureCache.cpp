@@ -11,12 +11,12 @@ namespace Graphics
 		: _d3ddev(nullptr)
 	{}
 
-	void DXTextureCache::SetD3DDevice(LPDIRECT3DDEVICE9 d3ddev)
+	void DXTextureCache::setD3DDevice(LPDIRECT3DDEVICE9 d3ddev)
 	{
 		_d3ddev = d3ddev;
 	}
 
-	bool DXTextureCache::Load(const char* filename, const LoadArgs* loadArgs, AssetPtr& outAsset)
+	bool DXTextureCache::loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& outAsset)
 	{
 		//the struct for reading bitmap file info
 		D3DXIMAGE_INFO info;
@@ -55,11 +55,11 @@ namespace Graphics
 		return SUCCEEDED(result);
 	}
 
-	InstanceID DXTextureCache::LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr)
+	InstanceID DXTextureCache::loadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr)
 	{
 		TextureLoadArgs args = {MakeCOLOR(transparentKey)};
 		InstanceID id = NOT_FOUND;
-		auto* asset = Acquire(name, &args);
+		auto* asset = acquire(name, &args);
 		if(asset != nullptr)
 		{
 			id = asset->id;
@@ -71,9 +71,9 @@ namespace Graphics
 		return id;
 	}
 		
-	TextureData* DXTextureCache::getTexture(uint32_t handle)
+	TextureData* DXTextureCache::getTexture(InstanceID handle)
 	{
-		auto* asset = CheckLoaded(handle);
+		auto* asset = checkLoaded(handle);
 		TextureData* data = nullptr;
 		if(asset != nullptr)
 		{
@@ -84,7 +84,7 @@ namespace Graphics
 
 	InstanceID DXTextureCache::getTexture(const char* name, TextureData** outPtr)
 	{
-		auto* asset = CheckLoaded(name);
+		auto* asset = checkLoaded(name);
 		InstanceID id = NOT_FOUND;
 		if(asset != nullptr)
 		{
@@ -95,5 +95,15 @@ namespace Graphics
 			}
 		}
 		return id;
+	}
+
+	void DXTextureCache::clearTextures()
+	{
+		clear();
+	}
+
+	bool DXTextureCache::destroyTexture(InstanceID handle)
+	{
+		return destroy(handle);
 	}
 }

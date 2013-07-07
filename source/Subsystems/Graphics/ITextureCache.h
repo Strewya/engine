@@ -24,8 +24,10 @@ namespace Graphics
 	public:
 		virtual ~ITextureCache() {}
 
-		virtual InstanceID LoadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr) = 0;
-		virtual TextureData* getTexture(uint32_t handle) = 0;
+		virtual InstanceID loadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr) = 0;
+		virtual TextureData* getTexture(InstanceID handle) = 0;
 		virtual InstanceID getTexture(const char* name, TextureData** outPtr) = 0;
+		virtual void clearTextures() = 0;
+		virtual bool destroyTexture(InstanceID handle) = 0;
 	};
 }

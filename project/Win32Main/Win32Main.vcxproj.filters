@@ -44,9 +44,6 @@
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp">
       <Filter>Core/State</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\State\State.cpp">
-      <Filter>Core/State</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
@@ -120,6 +117,12 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\State\State3.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\State\State4.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -166,9 +169,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Clock.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\State.h">
-      <Filter>Core/State</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\State\Statemap.h">
       <Filter>Core/State</Filter>
@@ -261,14 +261,23 @@
     <ClInclude Include="..\..\source\Util\CompositeTimer.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\StateTest.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
       <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\StateComponents.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State3.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State4.h">
+      <Filter>Core/State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

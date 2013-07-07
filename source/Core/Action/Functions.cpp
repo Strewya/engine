@@ -36,11 +36,11 @@ namespace Core
 
 	void Animate(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
-		State* s_currentSprite = nullptr;
-		State* s_animationFrame = nullptr;
-		State* s_animation = nullptr;
-		State* s_spritesheet = nullptr;
-		State* s_timer = nullptr;
+		StateRptr s_currentSprite = nullptr;
+		StateRptr s_animationFrame = nullptr;
+		StateRptr s_animation = nullptr;
+		StateRptr s_spritesheet = nullptr;
+		StateRptr s_timer = nullptr;
 
 		for(auto action : actions)
 		{
@@ -52,6 +52,7 @@ namespace Core
 			s_timer = owner.getState("AnimationTimer");
 			if(s_currentSprite && s_animation && s_animationFrame && s_spritesheet)
 			{
+				/*
 				if(s_timer && !s_timer->as<Util::Timer>().HasUpdatePeriodElapsed())
 				{
 					continue;
@@ -63,6 +64,7 @@ namespace Core
 				auto& curSprite = s_currentSprite->as<uint32_t>();
 				curFrame = (++curFrame) % animation.getSequenceSize();
 				curSprite = animation.getSequenceFrame(curFrame);
+				*/
 			}
 		}
 	}
@@ -84,6 +86,7 @@ namespace Core
 
 		for(auto action : actions)
 		{
+			/*
 			auto& entity = action->getOwner();
 			auto& form = entity.getForm();
 			Util::Vec2& vel = form.getState("Velocity")->as<Util::Vec2>();
@@ -125,6 +128,7 @@ namespace Core
 			{
 				a_rk4->Deactivate();
 			}
+			*/
 		}
 	}
 
@@ -133,12 +137,13 @@ namespace Core
 		for(auto action : actions)
 		{
 			auto& form = action->getOwner().getForm();
-			State* s_velocity = form.getState("Velocity");
-			State* s_maxvel = form.getState("MaxVelocity");
-			State* s_force = form.getState("Force");
-			State* s_mass = form.getState("Mass");
+			StateRptr s_velocity = form.getState("Velocity");
+			StateRptr s_maxvel = form.getState("MaxVelocity");
+			StateRptr s_force = form.getState("Force");
+			StateRptr s_mass = form.getState("Mass");
 			if(s_velocity && s_force && s_mass)
 			{
+				/*
 				Util::Vec2& velocity = s_velocity->as<Util::Vec2>();
 				Util::Vec2& maxvel = s_maxvel->as<Util::Vec2>();
 				Util::Vec2& force = s_force->as<Util::Vec2>();
@@ -148,6 +153,7 @@ namespace Core
 				velocity += dt*force/mass;
 				velocity.Truncate(maxvel.Length());
 				form.Translate(velocity);
+				*/
 			}
 		}
 	}
@@ -202,55 +208,61 @@ namespace Core
 		for(auto action : actions)
 		{
 			auto& form = action->getOwner().getForm();
-			State* s_velocity = form.getState("Velocity");
-			State* s_force = form.getState("Force");
-			State* s_mass = form.getState("Mass");
+			StateRptr s_velocity = form.getState("Velocity");
+			StateRptr s_force = form.getState("Force");
+			StateRptr s_mass = form.getState("Mass");
 			if(s_velocity && s_force && s_mass)
 			{
+				/*
 				Util::Vec2& vel = s_velocity->as<Util::Vec2>();
 				physicsState state = {form.getPosition(), vel, s_force->as<Util::Vec2>()};
 				integrate(state, dt);
 				vel = state.vel;
 				form.setPosition(state.pos);
+				*/
 			}
 		}
 	}
 
 	void Collide(float dt, GameContext& context, std::set<Core::Action*>& actions)
 	{
-		Space& space = context.spacePool.NewInstance();
+		Space* space;
+		InstanceID spaceID = context.spacePool.getNewInstance(&space);
 		for(auto action : actions)
 		{
-			space.AddEntity(action->getOwner().getID());
+			space->AddEntity(action->getOwner().getID());
 		}
 
-		auto entityID = space.begin();
-		auto otherID = space.begin();
-		++otherID;
-		for(; !space.isEnd(entityID); ++entityID)
+		auto entityID = space->begin();
+		for(; entityID != space->end(); ++entityID)
 		{
-			for(; !space.isEnd(otherID); ++otherID)
+			for(auto otherID = entityID; otherID != space->end(); ++otherID)
 			{
-				auto& entity = context.entityPool.Retrieve(*entityID);
-				auto& other = context.entityPool.Retrieve(*otherID);
-				State* s_entityRect = entity.getForm().getState("CollisionRect");
-				State* s_otherRect = other.getForm().getState("CollisionRect");
-				if(s_entityRect != nullptr && s_otherRect != nullptr)
+				if(*entityID != *otherID)
 				{
-					Util::Rect& entityRect = s_entityRect->as<Util::Rect>();
-					Util::Rect& otherRect = s_otherRect->as<Util::Rect>();
-					if(entityRect.IsIntersected(otherRect))
+					auto& entity = context.entityPool.Retrieve(*entityID);
+					auto& other = context.entityPool.Retrieve(*otherID);
+					StateRptr s_entityRect = entity.getForm().getState("CollisionRect");
+					StateRptr s_otherRect = other.getForm().getState("CollisionRect");
+					if(s_entityRect != nullptr && s_otherRect != nullptr)
 					{
-						auto a_entityResponse = entity.getAction("CollisionResponse");
-						auto a_otherResponse = other.getAction("CollisionResponse");
-						if(a_entityResponse != nullptr)
+						/*
+						Util::Rect& entityRect = s_entityRect->as<Util::Rect>();
+						Util::Rect& otherRect = s_otherRect->as<Util::Rect>();
+						if(entityRect.IsIntersected(otherRect))
 						{
-							a_entityResponse->Activate();
+							auto a_entityResponse = entity.getAction("CollisionResponse");
+							auto a_otherResponse = other.getAction("CollisionResponse");
+							if(a_entityResponse != nullptr)
+							{
+								a_entityResponse->Activate();
+							}
+							if(a_otherResponse != nullptr)
+							{
+								a_otherResponse->Activate();
+							}
 						}
-						if(a_otherResponse != nullptr)
-						{
-							a_otherResponse->Activate();
-						}
+						*/
 					}
 				}
 			}

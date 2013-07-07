@@ -17,8 +17,6 @@
 #include "Subsystems/Graphics/SpritesheetCache.h"
 #include "Subsystems/Input/InputEngine.h"
 #include "Subsystems/Script/LuaEngine.h"
-
-#include "StateTest.h"
 	/*** end headers ***/
 
 namespace Pong
@@ -34,13 +32,16 @@ namespace Pong
 		form.setType(Core::FormType::Sprite);
 		form.setScale(1,1);
 
+		
+
+		/*
 		form.Insert("Spritesheet", Core::State::Create(hSheet));
 		form.Insert("CurrentSprite", Core::State::Create(paddleSpriteHandle));
 		form.Insert("Velocity", Core::State::Create(Util::Vec2(0,10)));
 		form.Insert("MaxVelocity", Core::State::Create(Util::Vec2(0,10)));
 		form.Insert("Force", Core::State::Create(Util::Vec2(0,0)));
 		form.Insert("Mass", Core::State::Create(1.0f));
-
+		*/
 		paddle.Insert("EulerMovement", Core::Action::Create(Core::EulerMovement));
 		paddle.Insert("RK4Movement", Core::Action::Create(Core::RK4Movement));
 		paddle.Insert("Render", Core::Action::Create(Core::Render));
@@ -59,10 +60,10 @@ namespace Pong
 		
 		auto& ball_form = ball.getForm();
 		ball_form.setType(Core::FormType::Sprite);
-		
+		/*
 		ball_form.Insert("Spritesheet", Core::State::Create(hSheet));
 		ball_form.Insert("CurrentSprite", Core::State::Create(ballSpriteHandle));
-
+		*/
 		ball.Insert("Render", Core::Action::Create(Core::Render));
 		bool activated = ball.getAction("Render")->Activate();
 		assert(activated);
@@ -72,24 +73,23 @@ namespace Pong
 
 	bool ContextGameplayCreate(Core::GameContext& context)
 	{
+		
+		
+
+
+
+
+
+
+
+
+
+
+		/*
 		Util::Color defaultTransparency(255,0,255);
-		Core::StateTest::Position pos;
-		pos.value.x = 10;
-		
-		
-		std::map<size_t, Core::StateTest::BaseState*> test;
-		test.insert(std::make_pair(pos.hash, &pos));
-		
-
-		Core::StateTest::Position* p = test[Core::StateTest::Position::hash]->downcast<Core::StateTest::Position>();
-		
 		Graphics::TextureData* texture = nullptr;
-		InstanceID texid = context.resources.getTextureCache().LoadTexture("../resources/pong.png", defaultTransparency, &texture);
+		InstanceID texid = context.resources.getTextureCache().loadTexture("../resources/pong.png", defaultTransparency, &texture);
 		
-
-
-
-
 		context.actionMaster.EnqueueActionLogic(Core::PongInput);
 		context.actionMaster.EnqueueActionLogic(Core::EulerMovement);
 		context.actionMaster.EnqueueActionLogic(Core::RK4Movement);
@@ -103,7 +103,7 @@ namespace Pong
 
 		auto windowSize = context.services.getGraphics().getScreenSize();
 		Graphics::Spritesheet* pongSheet = nullptr;
-		uint32_t pongSheetHandle = context.resources.getSpritesheetCache().LoadSpritesheet("../resources/pong.sheet", &pongSheet);
+		uint32_t pongSheetHandle = context.resources.getSpritesheetCache().loadSpritesheet("../resources/pong.sheet", &pongSheet);
 		
 
 		for(int i = 0; i < 2; ++i)
@@ -134,7 +134,7 @@ namespace Pong
 		context.entityFactory.CreateEntityType("ball", ball);
 		auto& ball_form = ball.getForm();
 		ball_form.setPosition(windowSize*0.5f);
-
+		*/
 		
 		return true;
 	}
