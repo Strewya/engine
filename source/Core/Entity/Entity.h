@@ -46,8 +46,7 @@ namespace Core
 
 		bool hasAction(const char* name);
 		bool hasAction(const String& name);
-		bool hasState(const char* name);
-		bool hasState(const String& name);
+		bool hasState(InstanceID id);
 		
 		//////////// GETTERS ////////////
 
@@ -57,8 +56,8 @@ namespace Core
 		Form&			getForm();
 		Action*			getAction(const char* name);
 		Action*			getAction(const String& name);
-		StateRptr		getState(const char* name);
-		StateRptr		getState(const String& name);
+		StateRptr		getState(InstanceID id);
+		template<typename T> T* getState();
 
 		//////////// REMOVAL METHODS ////////////
 
@@ -66,8 +65,7 @@ namespace Core
 		bool RemoveAction(const char* name);
 		bool RemoveAction(const String& name);
 		void ClearStates();
-		bool RemoveState(const char* name);
-		bool RemoveState(const String& name);
+		bool RemoveState(InstanceID id);
 
 		//////////// SETTERS ////////////
 
@@ -80,7 +78,15 @@ namespace Core
 
 		bool Insert(const char* name, std::unique_ptr<Action> action);
 		bool Insert(const String& name, std::unique_ptr<Action> action);
-		bool Insert(const char* name, StateUptr state);
-		bool Insert(const String& name, StateUptr state);
+		bool Insert(StateUptr state);
+
 	};
+
+
+
+
+	template<typename T> T* Entity::getState()
+	{
+		return _states.get<T>();
+	}
 }

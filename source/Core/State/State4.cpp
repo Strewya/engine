@@ -7,7 +7,7 @@
 
 namespace Core
 {
-	BaseState::BaseState(size_t uid)
+	BaseState::BaseState(InstanceID uid)
 		: uid(uid)
 	{}
 

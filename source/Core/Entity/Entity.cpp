@@ -23,14 +23,9 @@ namespace Core
 		return _actions.Contains(name);
 	}
 
-	bool Entity::hasState(const char* name)
+	bool Entity::hasState(InstanceID id)
 	{
-		return _states.contains(name);
-	}
-
-	bool Entity::hasState(const String& name)
-	{
-		return hasState(name.c_str());
+		return _states.contains(id);
 	}
 
 	/////////////////////////// GETTERS ///////////////////////////
@@ -65,14 +60,9 @@ namespace Core
 		return _actions.Retrieve(name);
 	}
 
-	StateRptr Entity::getState(const char* name)
+	StateRptr Entity::getState(InstanceID id)
 	{
-		return _states.retrieve(name);
-	}
-
-	StateRptr Entity::getState(const String& name)
-	{
-		return _states.retrieve(name);
+		return _states.retrieve(id);
 	}
 	
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
@@ -97,14 +87,9 @@ namespace Core
 		_states.clear();
 	}
 
-	bool Entity::RemoveState(const char* name)
+	bool Entity::RemoveState(InstanceID id)
 	{
-		return _states.destroy(name);
-	}
-
-	bool Entity::RemoveState(const String& name)
-	{
-		return _states.destroy(name);
+		return _states.destroy(id);
 	}
 
 	/////////////////////////// SETTERS ///////////////////////////
@@ -147,13 +132,8 @@ namespace Core
 		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::Insert(const char* name, StateUptr state)
+	bool Entity::Insert(StateUptr state)
 	{
-		return _states.insert(name, std::move(state));
-	}
-
-	bool Entity::Insert(const String& name, StateUptr state)
-	{
-		return _states.insert(name, std::move(state));
+		return _states.insert(std::move(state));
 	}
 }

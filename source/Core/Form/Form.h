@@ -98,14 +98,11 @@ namespace Core
 		
 
 		void ClearStates();
-		bool RemoveState(const char* name);
-		bool RemoveState(const String& name);
-		bool Insert(const char* name, StateUptr state);
-		bool Insert(const String& name, StateUptr state);
-		StateRptr getState(const char* name);
-		StateRptr getState(const String& name);
-		bool hasState(const char* name, bool recursive = false);
-		bool hasState(const String& name, bool recursive = false);
+		bool RemoveState(InstanceID id);
+		bool Insert(StateUptr state);
+		StateRptr getState(InstanceID id);
+		bool hasState(InstanceID id, bool recursive = false);
+
 	};
 
 	void DrawForms(const std::deque<Form*>& frms, const Core::ServiceLocator& services, const Core::ResourceLocator& resources);

@@ -13,7 +13,7 @@ namespace Core
 	{
 		for(auto& pair : rhs._states)
 		{
-			insert(pair.first, pair.second->clone());
+			insert(pair.second->clone());
 		}
 	}
 
@@ -28,7 +28,7 @@ namespace Core
 		{
 			for(auto& pair : rhs._states)
 			{
-				insert(pair.first, pair.second->clone());
+				insert(pair.second->clone());
 			}
 		}
 		return *this;
@@ -45,14 +45,9 @@ namespace Core
 		return *this;
 	}
 
-	bool Statemap::contains(const char* name)
+	bool Statemap::contains(InstanceID id)
 	{
-		return _states.find(name) != _states.end();
-	}
-
-	bool Statemap::contains(const String& name)
-	{
-		return _states.find(name) != _states.end();
+		return _states.find(id) != _states.end();
 	}
 
 	void Statemap::clear()
@@ -60,46 +55,29 @@ namespace Core
 		_states.clear();
 	}
 
-	bool Statemap::destroy(const char* name)
+	bool Statemap::destroy(InstanceID id)
 	{
-		return _states.erase(name) != 0;
-	}
-
-	bool Statemap::destroy(const String& name)
-	{
-		return _states.erase(name) != 0;
+		return _states.erase(id) != 0;
 	}
 	
-	bool Statemap::insert(const char* name, StateUptr state)
+	bool Statemap::insert(StateUptr state)
 	{
-		auto it = _states.find(name);
+		auto it = _states.find(state->uid);
 		if(it == _states.end())
 		{
-			return _states.emplace(std::make_pair(name, std::move(state))).second;
+			return _states.emplace(std::make_pair(state->uid, std::move(state))).second;
 		}
 		it->second.swap(state);
 		return true;
 	}
 	
-	bool Statemap::insert(const String& name, StateUptr state)
+	StateRptr Statemap::retrieve(InstanceID id)
 	{
-		return insert(name.c_str(), std::move(state));
-	}
-	
-	StateRptr Statemap::retrieve(const char* name)
-	{
-		auto it = _states.find(name);
+		auto it = _states.find(id);
 		if(it == _states.end())
 		{
 			return nullptr;
 		}
 		return it->second.get();
 	}
-
-	StateRptr Statemap::retrieve(const String& name)
-	{
-		return retrieve(name.c_str());
-	}
-
-	
 }

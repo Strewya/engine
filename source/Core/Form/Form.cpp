@@ -25,131 +25,49 @@ namespace Core
 			{
 			case FormType::Font:
 			{
-				StateRptr s_text = f->getState("Text");
-				StateRptr s_font = f->getState("Font");
-				StateRptr s_area = f->getState("Area");
-				if(s_text && s_font)
-				{
-					/*
-					auto& text = s_text->cast<String>();
-					auto font = s_font->cast<uint32_t>();
-					auto& bounds = s_area ? s_area->as<Util::Rect>() : Util::Rect(f->getPosition(),1,1);
-					//read these from states!
-					gfx.setFontStyle(false, false, false, false, false, false);
-					gfx.DrawFont(font, text.c_str(), &bounds);
-					*/
-				}
+				
 			}
 			break;
 			
 			case FormType::Sprite:
 			{
-				StateRptr s_currentSprite = f->getState("CurrentSprite");
-				StateRptr s_spritesheet = f->getState("Spritesheet");
-				if(s_currentSprite && s_spritesheet)
-				{
-					/*
-					uint32_t hSheet = s_spritesheet->as<uint32_t>();
-					auto currentFrame = s_currentSprite->as<uint32_t>();
-					auto* sheet = resources.getSpritesheetCache().getSpritesheet(hSheet);
-					Graphics::TextureData* texture = resources.getTextureCache().getTexture(sheet->getTextureHandle());
-					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawSprite(*texture, sheet->getSprite(currentFrame));
-					*/
-				}
+				
 			}
 			break;
 			
 			case FormType::Texture:
 			{
-				StateRptr s_texture = f->getState("Texture");
-				if(s_texture)
-				{
-					/*
-					uint32_t hTexture = s_texture->as<uint32_t>();
-					auto* texture = resources.getTextureCache().getTexture(hTexture);
-					gfx.setTransform2D(&f->getPosition(), &f->getScalingCenter(), &f->getScale(), &f->getPivotPoint(), Deg2Rad(f->getRotation()), &f->getColor());
-					gfx.DrawTexture(*texture);
-					*/
-				}
+				
 			}
 			break;
 
 			case FormType::Line:
 			{
-				StateRptr s_line = f->getState("LineVector");
-				StateRptr s_width = f->getState("LineWidth");
-				if(s_line)
-				{
-					/*
-					auto& line = s_line->as<Util::Vec2>();
-					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
-					gfx.DrawLine(f->getPosition(), f->getPosition()+line, &f->getColor(), lineWidth);
-					*/
-				}
+				
 			}
 			break;
 
 			case FormType::Triangle:
 			{
-				StateRptr s_pt1 = f->getState("Point1");
-				StateRptr s_pt2 = f->getState("Point2");
-				StateRptr s_pt3 = f->getState("Point3");
-				StateRptr s_width = f->getState("LineWidth");
-				if(s_pt1 && s_pt2 && s_pt3)
-				{
-					/*
-					Util::Vec2 pts[] = { s_pt1->as<Util::Vec2>(), s_pt2->as<Util::Vec2>(), s_pt3->as<Util::Vec2>()};
-					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
-					gfx.DrawTriangle(f->getPosition()+pts[0], f->getPosition()+pts[1], f->getPosition()+pts[2], &f->getColor(), lineWidth);
-					*/
-				}
+				
 			}
 			break;
 
 			case FormType::Rectangle:
 			{
-				StateRptr s_area = f->getState("Area");
-				StateRptr s_width = f->getState("LineWidth");
-				if(s_area)
-				{
-					/*
-					auto& bounds = s_area->as<Util::Rect>();
-					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
-					gfx.DrawRectangle(bounds, &f->getColor(), lineWidth);
-					*/
-				}
+				
 			}
 			break;
 
 			case FormType::Circle:
 			{
-				StateRptr s_radius = f->getState("Radius");
-				StateRptr s_width = f->getState("LineWidth");
-				if(s_radius)
-				{
-					/*
-					auto radius = s_radius->as<float>();
-					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
-					gfx.DrawCircle(f->getPosition(), radius, &f->getColor(), lineWidth);
-					*/
-				}
+				
 			}
 			break;
 
 			case FormType::Elipse:
 			{
-				StateRptr s_radiusX = f->getState("RadiusX");
-				StateRptr s_radiusY = f->getState("RadiusY");
-				StateRptr s_width = f->getState("LineWidth");
-				if(s_radiusX && s_radiusY)
-				{
-					/*
-					float radius[] = {s_radiusX->as<float>(), s_radiusY->as<float>()};
-					auto lineWidth = s_width ? s_width->as<float>() : 1.0f;
-					gfx.DrawElipse(f->getPosition(), radius[0], radius[1],&f->getColor(), lineWidth);
-					*/
-				}
+				
 			}
 			break;
 			}
@@ -313,14 +231,9 @@ namespace Core
 		_position.y += y;
 	}
 
-	bool Form::Insert(const char* name, std::unique_ptr<BaseState> state)
+	bool Form::Insert(StateUptr state)
 	{
-		return _states.insert(name, std::move(state));
-	}
-
-	bool Form::Insert(const String& name, std::unique_ptr<BaseState> state)
-	{
-		return _states.insert(name, std::move(state));
+		return _states.insert(std::move(state));
 	}
 
 	void Form::ClearStates()
@@ -328,33 +241,18 @@ namespace Core
 		_states.clear();
 	}
 
-	bool Form::RemoveState(const char* name)
+	bool Form::RemoveState(InstanceID id)
 	{
-		return _states.destroy(name);
+		return _states.destroy(id);
 	}
 
-	bool Form::RemoveState(const String& name)
+	BaseState* Form::getState(InstanceID id)
 	{
-		return _states.destroy(name);
+		return _states.retrieve(id);
 	}
 
-	BaseState* Form::getState(const char* name)
+	bool Form::hasState(InstanceID id, bool recursive)
 	{
-		return _states.retrieve(name);
-	}
-
-	BaseState* Form::getState(const String& name)
-	{
-		return _states.retrieve(name);
-	}
-
-	bool Form::hasState(const char* name, bool recursive)
-	{
-		return _states.contains(name);
-	}
-
-	bool Form::hasState(const String& name, bool recursive)
-	{
-		return _states.contains(name);
+		return _states.contains(id);
 	}
 }

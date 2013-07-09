@@ -23,7 +23,7 @@ namespace Core
 	{
 	private:
 
-		typedef std::unordered_map<String, StateUptr> StateCache;
+		typedef std::unordered_map<InstanceID, StateUptr> StateCache;
 		StateCache _states;
 
 	public:
@@ -33,17 +33,32 @@ namespace Core
 		Statemap& operator=(const Statemap& rhs);
 		Statemap& operator=(Statemap&& rhs);
 
-		bool contains(const char* name);
-		bool contains(const String& name);
+		bool contains(InstanceID id);
 
 		void clear();
-		bool destroy(const char* name);
-		bool destroy(const String& name);
+		bool destroy(InstanceID id);
 
-		bool insert(const char* name, StateUptr state);
-		bool insert(const String& name, StateUptr state);
+		bool insert(StateUptr state);
 
-		StateRptr retrieve(const char* name);
-		StateRptr retrieve(const String& name);
+		StateRptr retrieve(InstanceID id);
+
+		template<typename T> T* get();
 	};
+
+
+
+
+
+
+
+	//***************************************************
+	//			TEMPLATE IMPLEMENTATION
+	//***************************************************
+
+	template<typename T> T* Statemap::get()
+	{
+		auto* ptr = retrieve(T::Type);
+		return (ptr != nullptr ? ptr->cast<T>() : nullptr);
+	}
+
 }

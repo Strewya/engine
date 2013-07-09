@@ -18,14 +18,16 @@ namespace Core
 	class BaseState
 	{
 	public:
-		const size_t uid;
+		const InstanceID uid;
 	
-		BaseState(const size_t uid);
+		BaseState(InstanceID uid);
 		virtual ~BaseState();
 
 		virtual std::unique_ptr<BaseState> clone() const = 0;
 		template<typename T> const T* cast() const;
+		template<typename T> T* cast();
 		template<typename T> bool cast(const T** outState) const;
+		template<typename T> bool cast(T** outState);
 	};
 
 
@@ -35,7 +37,7 @@ namespace Core
 	{
 		typedef DATA Data_t;
 		typedef CRTP Derived_t;
-		static size_t Type;
+		static const InstanceID Type;
 
 		Data_t value;
 
@@ -48,7 +50,7 @@ namespace Core
 
 
 
-	template<typename DATA, typename CRTP> size_t State<DATA,CRTP>::Type = typeid(CRTP).hash_code();
+	template<typename DATA, typename CRTP> const InstanceID State<DATA,CRTP>::Type = typeid(CRTP).hash_code();
 
 
 	template<typename T> const T* BaseState::cast() const
@@ -61,6 +63,21 @@ namespace Core
 		if(outState != nullptr && T::Type == uid)
 		{
 			*outState = static_cast<const T*>(this);
+			return true;
+		}
+		return false;
+	}
+
+	template<typename T> T* BaseState::cast()
+	{
+		return static_cast<T*>(this);
+	}
+	
+	template<typename T> bool BaseState::cast(T** outState)
+	{
+		if(outState != nullptr && T::Type == uid)
+		{
+			*outState = static_cast<T*>(this);
 			return true;
 		}
 		return false;
