@@ -8,7 +8,6 @@
 #include <memory>
 #include <typeinfo>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Util/Dimensional.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -33,36 +32,55 @@ namespace Core
 
 
 
-	template<typename DATA, typename CRTP> struct State : public BaseState
+	template<typename T> struct State : public BaseState
 	{
-		typedef DATA Data_t;
-		typedef CRTP Derived_t;
+		typedef T Derived_t;
+		typedef std::unique_ptr<T> Uptr;
+		typedef T* Rptr;
+		typedef T& Ref;
+
 		static const InstanceID Type;
 
-		Data_t value;
+		static std::unique_ptr<Derived_t> create()
+		{
+			return std::unique_ptr<Derived_t>(new Derived_t());
+		}
 
+		std::unique_ptr<BaseState> clone() const 
+		{
+			return typeClone();
+		}
+
+		std::unique_ptr<Derived_t> typeClone() const
+		{
+			return std::unique_ptr<Derived_t>(new Derived_t(*this->cast<Derived_t>()));
+		}
+
+	protected:
 		State() : BaseState(Type) {}
-		State(const Data_t& val) : BaseState(Type), value(val) {}
-		std::unique_ptr<BaseState> clone() const;
 	};
 
 
 
 
 
-	template<typename DATA, typename CRTP> const InstanceID State<DATA,CRTP>::Type = typeid(CRTP).hash_code();
+	template<typename T> const InstanceID State<T>::Type = typeid(T).hash_code();
 
 
 	template<typename T> const T* BaseState::cast() const
 	{
+		if(T::Type != this->uid)
+		{
+			return nullptr;
+		}
 		return static_cast<const T*>(this);
 	}
 	
 	template<typename T> bool BaseState::cast(const T** outState) const
 	{
-		if(outState != nullptr && T::Type == uid)
+		if(outState != nullptr)
 		{
-			*outState = static_cast<const T*>(this);
+			*outState = this->cast<T>();
 			return true;
 		}
 		return false;
@@ -70,32 +88,21 @@ namespace Core
 
 	template<typename T> T* BaseState::cast()
 	{
+		if(T::Type != this->uid)
+		{
+			return nullptr;
+		}
 		return static_cast<T*>(this);
 	}
 	
 	template<typename T> bool BaseState::cast(T** outState)
 	{
-		if(outState != nullptr && T::Type == uid)
+		if(outState != nullptr)
 		{
-			*outState = static_cast<T*>(this);
+			*outState = this->cast<T>();
 			return true;
 		}
 		return false;
 	}
-
-	template<typename DATA, typename CRTP> std::unique_ptr<BaseState> State<DATA,CRTP>::clone() const
-	{
-		return std::unique_ptr<CRTP>(new CRTP(value));
-	}
-
-
-
-	template<typename T, typename D> std::unique_ptr<T> create(const D& data)
-	{
-		return std::unique_ptr<T>(new T(data));
-	}
-
-
-
 }
 //}

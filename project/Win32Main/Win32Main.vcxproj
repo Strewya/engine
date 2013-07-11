@@ -95,7 +95,6 @@
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp" />
-    <ClCompile Include="..\..\source\Core\Form\Form.cpp" />
     <ClCompile Include="..\..\source\Core\Space\Space.cpp" />
     <ClCompile Include="..\..\source\Core\Space\SpacePool.cpp" />
     <ClCompile Include="..\..\source\Core\State\State3.cpp" />
@@ -140,7 +139,6 @@
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h" />
-    <ClInclude Include="..\..\source\Core\Form\Form.h" />
     <ClInclude Include="..\..\source\Core\Space\Space.h" />
     <ClInclude Include="..\..\source\Core\Space\SpacePool.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />

@@ -41,24 +41,5 @@ namespace Core
 		bool insert(StateUptr state);
 
 		StateRptr retrieve(InstanceID id);
-
-		template<typename T> T* get();
 	};
-
-
-
-
-
-
-
-	//***************************************************
-	//			TEMPLATE IMPLEMENTATION
-	//***************************************************
-
-	template<typename T> T* Statemap::get()
-	{
-		auto* ptr = retrieve(T::Type);
-		return (ptr != nullptr ? ptr->cast<T>() : nullptr);
-	}
-
 }

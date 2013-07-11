@@ -61,9 +61,9 @@ namespace Core
 	{
 		for(auto id : _entities)
 		{
-			if(pool.IsAlive(id))
+			if(pool.isAlive(id))
 			{
-				if(filter(pool.Retrieve(id)))
+				if(filter(*pool.getInstance(id)))
 				{
 					container.push_back(id);
 				}

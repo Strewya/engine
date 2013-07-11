@@ -3,17 +3,16 @@
 #include "Subsystems/Graphics/RenderingQueue.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Form/Form.h"
 	/*** end headers ***/
 
 namespace Graphics
 {
-	void RenderingQueue::Add(Core::Form& f)
+	void RenderingQueue::Add(Core::Entity& f)
     {
 		_queue.push_back(&f);
     }
 
-	void RenderingQueue::Add(Core::Form* f)
+	void RenderingQueue::Add(Core::Entity* f)
     {
 		_queue.push_back(f);
     }
@@ -25,6 +24,6 @@ namespace Graphics
     
 	void RenderingQueue::Render(const Core::ServiceLocator& services, const Core::ResourceLocator& resources) const
 	{
-		Core::DrawForms(_queue, services, resources);
+		
 	}
 }

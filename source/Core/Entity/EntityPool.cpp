@@ -20,7 +20,7 @@ namespace Core
 		}
 	}
 
-	InstanceID EntityPool::_NewID(int index)
+	InstanceID EntityPool::_newID(int index)
 	{
 		InstanceID id = ++_idCounter;
 		id <<= _indexBits;
@@ -28,7 +28,7 @@ namespace Core
 		return id;
 	}
 
-	Entity& EntityPool::NewInstance()
+	InstanceID EntityPool::getNewInstance(Entity** outEntity)
 	{
 		uint32_t index;
 		if(!_availableSlots.empty())
@@ -41,26 +41,30 @@ namespace Core
 			index = _pool.size();
 			_pool.emplace_back(nullptr);
 		}
-		InstanceID id = _NewID(index);
+		InstanceID id = _newID(index);
 		_pool[index].reset(new Entity(id));
-		return *_pool[index];
+		if(outEntity != nullptr)
+		{
+			*outEntity = _pool[index].get();
+		}
+		return id;
 	}
 
-	Entity& EntityPool::Retrieve(InstanceID id) const
+	Entity* EntityPool::getInstance(InstanceID id) const
 	{
 		uint32_t index = id & _indexMask;
-		return *_pool[index];
+		return (index < _pool.size() ? _pool[index].get() : nullptr);
 	}
 	
-	bool EntityPool::IsAlive(InstanceID id) const
+	bool EntityPool::isAlive(InstanceID id) const
 	{
 		uint32_t index = id & _indexMask;
 		return (_pool[index] != nullptr && _pool[index]->getID() == id);
 	}
 
-	bool EntityPool::Destroy(InstanceID id)
+	bool EntityPool::destroy(InstanceID id)
 	{
-		if(IsAlive(id))
+		if(isAlive(id))
 		{
 			uint32_t index = id & _indexMask;
 			_pool[index].reset(nullptr);

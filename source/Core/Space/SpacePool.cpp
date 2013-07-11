@@ -3,7 +3,6 @@
 #include "Core/Space/SpacePool.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Space/Space.h"
 	/*** end headers ***/
 
 namespace Core

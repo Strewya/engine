@@ -22,6 +22,14 @@ namespace Core
 	*/
 	class EntityPool
 	{
+	public:
+		EntityPool(uint32_t maxExpectedSize = 4096);
+		
+		InstanceID getNewInstance(Entity** outEntity = nullptr);
+		Entity* getInstance(InstanceID id) const;
+		bool isAlive(InstanceID id) const;
+		bool destroy(InstanceID id);
+		
 	private:
 		std::deque<std::unique_ptr<Entity>> _pool;
 		std::list<uint32_t> _availableSlots;
@@ -29,14 +37,6 @@ namespace Core
 		uint32_t _indexBits;
 		uint32_t _indexMask;
 		InstanceID _idCounter;
-		InstanceID _NewID(int index);
-
-	public:
-		EntityPool(uint32_t maxExpectedSize = 4096);
-		
-		Entity& NewInstance();
-		Entity& Retrieve(InstanceID id) const;
-		bool IsAlive(InstanceID id) const;
-		bool Destroy(InstanceID id);
+		InstanceID _newID(int index);
 	};
 }

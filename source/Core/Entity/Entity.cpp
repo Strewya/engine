@@ -45,11 +45,6 @@ namespace Core
 		return _alias;
 	}
 	
-	Form& Entity::getForm()
-	{
-		return _form;
-	}
-
 	Action* Entity::getAction(const char* name)
 	{
 		return _actions.Retrieve(name);
@@ -67,27 +62,27 @@ namespace Core
 	
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
 
-	void Entity::ClearActions()
+	void Entity::clearActions()
 	{
 		_actions.Clear();
 	}
 
-	bool Entity::RemoveAction(const char* name)
+	bool Entity::removeAction(const char* name)
 	{
 		return _actions.Remove(name);
 	}
 
-	bool Entity::RemoveAction(const String& name)
+	bool Entity::removeAction(const String& name)
 	{
 		return _actions.Remove(name);
 	}
 
-	void Entity::ClearStates()
+	void Entity::clearStates()
 	{
 		_states.clear();
 	}
 
-	bool Entity::RemoveState(InstanceID id)
+	bool Entity::removeState(InstanceID id)
 	{
 		return _states.destroy(id);
 	}
@@ -120,19 +115,19 @@ namespace Core
 
 	/////////////////////////// INSERT METHODS ///////////////////////////
 
-	bool Entity::Insert(const char* name, std::unique_ptr<Action> action)
+	bool Entity::insert(const char* name, std::unique_ptr<Action> action)
 	{
 		action->setOwner(*this);
 		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::Insert(const String& name, std::unique_ptr<Action> action)
+	bool Entity::insert(const String& name, std::unique_ptr<Action> action)
 	{
 		action->setOwner(*this);
 		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::Insert(StateUptr state)
+	bool Entity::insert(StateUptr state)
 	{
 		return _states.insert(std::move(state));
 	}

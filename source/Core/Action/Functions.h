@@ -5,20 +5,30 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
-#include <memory>
-#include <set>
+#include <list>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "ActionLogic.h"
+#include "Subsystems/Graphics/RenderingQueue.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	void Render(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Animate(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Rotate(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void SIH(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void Collide(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void EulerMovement(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void RK4Movement(float dt, GameContext& context, std::set<Core::Action*>& actions);
-	void PongInput(float dt, GameContext& context, std::set<Core::Action*>& actions);
+	class Entity;
+	class GameContext;
+	
+
+	class ARender
+	{
+	public:
+		bool Update(float dt, GameContext& context);
+
+		bool AddEntity(Entity& e);
+		bool AddEntity(InstanceID id);
+
+		bool RemoveEntity(Entity& e);
+		bool RemoveEntity(InstanceID id);
+
+	private:
+		Graphics::RenderingQueue _queue;
+		std::list<InstanceID> _entities;
+	};
 }

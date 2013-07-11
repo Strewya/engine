@@ -10,19 +10,18 @@
 #include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Core/Space/Space.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	class Space;
-
 	class SpacePool
 	{
 	public:
 		SpacePool(uint32_t maxExpectedSize = 4096);
 		
-		InstanceID getNewInstance(Space** outSpace);
-		InstanceID getNamedInstance(const char* name, Space** outSpace);
+		InstanceID getNewInstance(Space** outSpace = nullptr);
+		InstanceID getNamedInstance(const char* name, Space** outSpace = nullptr);
 		Space* getInstance(InstanceID id) const;
 		Space* getInstance(const char* name) const;
 

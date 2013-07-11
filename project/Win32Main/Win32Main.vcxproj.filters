@@ -47,9 +47,6 @@
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Form\Form.cpp">
-      <Filter>Core/Form</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
@@ -57,9 +54,6 @@
       <Filter>Core/Action</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
-      <Filter>Core/Action</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
@@ -123,6 +117,9 @@
     <ClCompile Include="..\..\source\Core\State\State4.cpp">
       <Filter>Core/State</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
+      <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -176,9 +173,6 @@
     <ClInclude Include="..\..\source\Core\Entity\Entity.h">
       <Filter>Core/Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Form\Form.h">
-      <Filter>Core/Form</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
@@ -186,9 +180,6 @@
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
-      <Filter>Core/Action</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Functions.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h">
@@ -279,6 +270,9 @@
     <ClInclude Include="..\..\source\Core\State\State4.h">
       <Filter>Core/State</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Functions.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -289,9 +283,6 @@
     </Filter>
     <Filter Include="Subsystems/Graphics">
       <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core/Form">
-      <UniqueIdentifier>{1996716f-160d-4d8a-9227-63ed5eab7da2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core/State">
       <UniqueIdentifier>{523c40e5-7ff9-41c9-8cf9-142a86564af9}</UniqueIdentifier>
@@ -316,6 +307,9 @@
     </Filter>
     <Filter Include="resources">
       <UniqueIdentifier>{dd566029-3832-413b-b283-bb95cac542b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Action/Impl">
+      <UniqueIdentifier>{6bfc5868-93c7-464f-8404-b6841350c96d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -13,27 +13,45 @@
 
 namespace Core
 {
-
-#define DeclareState(Name, datatype) struct Name : public State<datatype, Name>\
-	{\
-	Name() {}\
-	Name(const datatype& v) : State(v) {}\
-	}
-	
-
-	struct defTriangle
+	/********************* Triangle *********************/
+	struct Triangle : public Core::State<Triangle>
 	{
 		Util::Vec2 a;
 		Util::Vec2 b;
 		Util::Vec2 c;
-
-		defTriangle() {}
-		defTriangle(const Util::Vec2& a, const Util::Vec2& b, const Util::Vec2& c) : a(a), b(b), c(c) {}
+	
+		Triangle() {}
+		Triangle(const Util::Vec2& a, const Util::Vec2& b, const Util::Vec2& c) : a(a), b(b), c(c) {}
+		using State<Triangle>::create;
+		static Uptr create(const Util::Vec2& a, const Util::Vec2& b, const Util::Vec2& c)
+		{ return Uptr(new Triangle(a,b,c)); }
 	};
-	DeclareState(Triangle, defTriangle);
-
-	DeclareState(TextureHandle, InstanceID);
 	
 
+	/********************* TextureHandle *********************/
+	struct TextureHandle : public Core::State<TextureHandle>
+	{
+		InstanceID handle;
+	
+		TextureHandle() {}
+		TextureHandle(InstanceID handle) : handle(handle) {}
+		using State<TextureHandle>::create;
+		static Uptr create(InstanceID handle)
+		{ return Uptr(new TextureHandle(handle)); }
+	};
+	
+
+	/********************* Circle *********************/
+	struct Circle : public Core::State<Circle>
+	{
+		float radius;
+		float width;
+		
+		Circle() {}
+		Circle(float radius, float width) : radius(radius), width(width) {}
+		using State<Circle>::create;
+		static Uptr create(float radius, float width)
+		{ return Uptr(new Circle(radius, width)); }
+	};
 	
 }

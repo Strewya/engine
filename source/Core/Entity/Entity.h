@@ -8,7 +8,6 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/Action.h"
 #include "Core/Action/Actionmap.h"
-#include "Core/Form/Form.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
 
@@ -28,7 +27,6 @@ namespace Core
 		
 		Actionmap _actions;
 		Statemap _states;
-		Form _form;
 
 		//////////// PRIVATE NO IMPLEMENTATION CONSTRUCTORS ////////////
 
@@ -53,7 +51,6 @@ namespace Core
 		InstanceID		getID() const;
 		const String&	getType() const;
 		const String&	getAlias() const;
-		Form&			getForm();
 		Action*			getAction(const char* name);
 		Action*			getAction(const String& name);
 		StateRptr		getState(InstanceID id);
@@ -61,11 +58,11 @@ namespace Core
 
 		//////////// REMOVAL METHODS ////////////
 
-		void ClearActions();
-		bool RemoveAction(const char* name);
-		bool RemoveAction(const String& name);
-		void ClearStates();
-		bool RemoveState(InstanceID id);
+		void clearActions();
+		bool removeAction(const char* name);
+		bool removeAction(const String& name);
+		void clearStates();
+		bool removeState(InstanceID id);
 
 		//////////// SETTERS ////////////
 
@@ -76,17 +73,21 @@ namespace Core
 		
 		//////////// INSERT METHODS ////////////
 
-		bool Insert(const char* name, std::unique_ptr<Action> action);
-		bool Insert(const String& name, std::unique_ptr<Action> action);
-		bool Insert(StateUptr state);
+		bool insert(const char* name, std::unique_ptr<Action> action);
+		bool insert(const String& name, std::unique_ptr<Action> action);
+		bool insert(StateUptr state);
 
 	};
 
 
 
-
 	template<typename T> T* Entity::getState()
 	{
-		return _states.get<T>();
+		auto* ptr = _states.retrieve(T::Type);
+		if(ptr != nullptr)
+		{
+			return ptr->cast<T>();
+		}
+		return nullptr;
 	}
 }
