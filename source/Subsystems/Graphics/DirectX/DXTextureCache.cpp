@@ -57,7 +57,7 @@ namespace Graphics
 
 	InstanceID DXTextureCache::loadTexture(const char* name, const Util::Color& transparentKey, TextureData** outPtr)
 	{
-		TextureLoadArgs args = {MakeCOLOR(transparentKey)};
+		TextureLoadArgs args = {transparentKey.getARGB()};
 		InstanceID id = NOT_FOUND;
 		auto* asset = acquire(name, &args);
 		if(asset != nullptr)

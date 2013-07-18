@@ -12,7 +12,6 @@ namespace Core
 		: _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
 		timer(), physicsWorld(b2Vec2(0,0)), entityFactory(*this), services(services), resources(resources)
 	{
-		Action::BindActionUpdater(actionMaster);
 	}
 
 	GameContext::~GameContext()
@@ -38,7 +37,6 @@ namespace Core
 
 	void GameContext::Activate()
 	{
-		Action::BindActionUpdater(actionMaster);
 		timer.isPaused = false;
 
 		if(_onActivate)

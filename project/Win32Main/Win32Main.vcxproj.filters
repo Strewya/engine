@@ -117,7 +117,10 @@
     <ClCompile Include="..\..\source\Core\State\State4.cpp">
       <Filter>Core/State</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Functions.cpp">
+    <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\ARender.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -270,8 +273,14 @@
     <ClInclude Include="..\..\source\Core\State\State4.h">
       <Filter>Core/State</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Functions.h">
+    <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\ARender.h">
       <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h">
+      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

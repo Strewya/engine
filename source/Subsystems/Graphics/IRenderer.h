@@ -23,6 +23,7 @@ namespace Graphics
 	class Spritesheet;
 	class TextureData;
 	class ITextureCache;
+	struct Vertex;
 }
 
 namespace Graphics
@@ -38,19 +39,15 @@ namespace Graphics
 		
 		virtual Util::Color getTransparentColor() const = 0;
 		virtual void setTransparentColor(const Util::Color& color) = 0;
-		virtual void setTransparentColor(uint32_t red, uint32_t green, uint32_t blue) = 0;
+		virtual void setTransparentColor(uint8_t red, uint8_t green, uint8_t blue) = 0;
 		
 		virtual Util::Color getBackgroundFillColor() const = 0;
 		virtual void setBackgroundFillColor(const Util::Color& color) = 0;
-		virtual void setBackgroundFillColor(uint32_t red, uint32_t green, uint32_t blue) = 0;
+		virtual void setBackgroundFillColor(uint8_t red, uint8_t green, uint8_t blue) = 0;
 
 		virtual bool getFullscreenState() const = 0;
 		virtual void setFullscreenState(bool state) = 0;
-		/*
-		virtual Texture LoadTexture(const char* filename) = 0;
-		virtual bool DestroyTexture(InstanceID id) = 0;
-		virtual void ClearTextures() = 0;
-		*/
+		
 		virtual uint32_t MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic) = 0;
 		virtual uint32_t getFontHandle(const char* filename) = 0;
 		virtual const FontInfo& getFontInfo(uint32_t handle) const = 0;
@@ -61,6 +58,7 @@ namespace Graphics
 		virtual void EndSpriteBatch() = 0;
 
 		virtual void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint) = 0;
+		virtual void setTransform3D(const Util::Vec3* translation, const Util::Vec3* scalingCenter, const Util::Vec3* scale, const Util::Vec3* rotationPivot, const Util::Vec3* rotationRadians, const Util::Color* colorTint) = 0;
 		virtual void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom) = 0;
 		
 		virtual void DrawTexture(const TextureData& texture) = 0;
@@ -74,5 +72,13 @@ namespace Graphics
 		virtual void DrawRectangle(const Util::Rect& rect, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
+
+		virtual void DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives) = 0;
+		virtual uint32_t PointList() const = 0;
+		virtual uint32_t LineList() const = 0;
+		virtual uint32_t LineStrip() const = 0;
+		virtual uint32_t TriangleList() const = 0;
+		virtual uint32_t TriangleStrip() const = 0;
+		virtual uint32_t TriangleFan() const = 0;
 	};
 }

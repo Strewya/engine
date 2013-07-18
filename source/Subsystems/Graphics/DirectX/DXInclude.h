@@ -21,8 +21,3 @@ inline D3DXVECTOR3 MakeVECTOR(const Util::Vec3& in)
 {
 	return D3DXVECTOR3(in.x, in.y, in.z);
 }
-
-inline D3DCOLOR MakeCOLOR(const Util::Color& in)
-{
-	return D3DCOLOR_ARGB(in.alpha, in.red, in.green, in.blue);
-}

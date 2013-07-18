@@ -43,6 +43,7 @@ namespace Graphics
 
 		D3DXMATRIX _transformMatrix;
 		DWORD _fontStyle;
+		DWORD _vertexFormat;
 		D3DCOLOR _tintColor;
 		D3DCOLOR _transparentColor;
 		D3DCOLOR _backgroundFillColor;
@@ -59,11 +60,11 @@ namespace Graphics
 
 		Util::Color getTransparentColor() const;
 		void setTransparentColor(const Util::Color& color);
-		void setTransparentColor(uint32_t red, uint32_t green, uint32_t blue);
+		void setTransparentColor(uint8_t red, uint8_t green, uint8_t blue);
 		
 		Util::Color getBackgroundFillColor() const;
 		void setBackgroundFillColor(const Util::Color& color);
-		void setBackgroundFillColor(uint32_t red, uint32_t green, uint32_t blue);
+		void setBackgroundFillColor(uint8_t red, uint8_t green, uint8_t blue);
 
 		bool getFullscreenState() const;
 		void setFullscreenState(bool state);
@@ -81,6 +82,7 @@ namespace Graphics
 		void EndSpriteBatch();
 		
 		void setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint);
+		void setTransform3D(const Util::Vec3* translation, const Util::Vec3* scalingCenter, const Util::Vec3* scale, const Util::Vec3* rotationPivot, const Util::Vec3* rotationRadians, const Util::Color* colorTint);
 		void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom);
 
 		void DrawTexture(const TextureData& texture);
@@ -93,6 +95,15 @@ namespace Graphics
 		void DrawRectangle(const Util::Rect& rect, const Util::Color* color, float lineWidth);
 		void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth);
 		void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth);
+
+		void DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives);
+
+		uint32_t PointList() const;
+		uint32_t LineList() const;
+		uint32_t LineStrip() const;
+		uint32_t TriangleList() const;
+		uint32_t TriangleStrip() const;
+		uint32_t TriangleFan() const;
 	};
 
 

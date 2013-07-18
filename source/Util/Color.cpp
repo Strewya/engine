@@ -8,22 +8,17 @@
 namespace Util
 {
 	Color::Color()
-		: red(_red), blue(_blue), green(_green), alpha(_alpha)
+		: _colorARGB(0xffffffff)
 	{
-		_red = _green = _blue = _alpha = 255;
 	}
 
-	Color::Color(const Color &c)
-		: red(_red), blue(_blue), green(_green), alpha(_alpha)
+	Color::Color(const Color &rhs)
+		: _colorARGB(rhs._colorARGB)
 	{
-		_red = c.red;
-		_green = c.green;
-		_blue = c.blue;
-		_alpha = c.alpha;
 	}
 
-	Color::Color(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
-		: red(_red), blue(_blue), green(_green), alpha(_alpha)
+	Color::Color(uint8_t a, uint8_t r, uint8_t g, uint8_t b)
+		: _colorARGB(0xffffffff)
 	{
 		setRed(r);
 		setGreen(g);
@@ -31,62 +26,95 @@ namespace Util
 		setAlpha(a);
 	}
 
+	Color::Color(uint8_t r, uint8_t g, uint8_t b)
+		: _colorARGB(0xffffffff)
+	{
+		setRed(r);
+		setGreen(g);
+		setBlue(b);
+		setAlpha(255);
+	}
+
+	Color::Color(uint32_t colorARGB)
+		: _colorARGB(colorARGB)
+	{
+	}
+
 	Color::~Color() {};
 
-	Color& Color::operator=(const Color &c)
+	Color& Color::operator=(const Color &rhs)
 	{
-		return Assign(c);
+		return Assign(rhs);
 	}
 
-	bool Color::operator==(const Color& rhs)
+	bool Color::operator==(const Color& rhs) const
 	{
-		return ((red == rhs.red) && (green == rhs.green) && (blue == rhs.blue) && (alpha == rhs.alpha));
+		return (_colorARGB == rhs._colorARGB);
 	}
 
-	Color& Color::Assign(const Color &c)
+	Color& Color::Assign(const Color &rhs)
 	{
-		if(this != &c)
-		{
-			setRed(c.red);
-			setGreen(c.green);
-			setBlue(c.blue);
-			setAlpha(c.alpha);
-		}
+		_colorARGB = rhs._colorARGB;
 		return *this;
 	}
 
-	void Color::setRed(uint32_t r)
+	void Color::setRed(uint8_t r)
 	{
-		_red = r > 255 ? 255 : ( r < 0 ? 0 : r );
+		_colorARGB = (_colorARGB&0xff00ffff)|(r<<16);
 	}
 
-	void Color::setGreen(uint32_t g)
+	void Color::setGreen(uint8_t g)
 	{
-		_green = g > 255 ? 255 : ( g < 0 ? 0 : g );
+		_colorARGB = (_colorARGB&0xffff00ff)|(g<<8);
 	}
 
-	void Color::setBlue(uint32_t b)
+	void Color::setBlue(uint8_t b)
 	{
-		_blue = b > 255 ? 255 : ( b < 0 ? 0 : b );
+		_colorARGB = (_colorARGB&0xffffff00)|(b);
 	}
 
-	void Color::setAlpha(uint32_t a)
+	void Color::setAlpha(uint8_t a)
 	{
-		_alpha = a > 255 ? 255 : ( a < 0 ? 0 : a);
+		_colorARGB = (_colorARGB&0x00ffffff)|(a<<24);
 	}
 
-	void Color::setChannels(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
+	void Color::setChannels(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	{
-		_red = r > 255 ? 255 : ( r < 0 ? 0 : r );
-		_green = g > 255 ? 255 : ( g < 0 ? 0 : g );
-		_blue = b > 255 ? 255 : ( b < 0 ? 0 : b );
-		_alpha = a > 255 ? 255 : ( a < 0 ? 0 : a);
+		setRed(r);
+		setGreen(g);
+		setBlue(b);
+		setAlpha(a);
+	}
+
+	uint8_t Color::getAlpha() const
+	{
+		return (_colorARGB&0xff000000)>>24;
+	}
+
+	uint8_t Color::getRed() const
+	{
+		return (_colorARGB&0x00ff0000)>>16;
+	}
+
+	uint8_t Color::getGreen() const
+	{
+		return (_colorARGB&0x0000ff00)>>8;
+	}
+
+	uint8_t Color::getBlue() const
+	{
+		return (_colorARGB&0x000000ff);
+	}
+
+	uint32_t Color::getARGB() const
+	{
+		return _colorARGB;
 	}
 }
 
 std::istream& operator>>(std::istream& ss, Util::Color& c)
 {
-	uint32_t r, g, b, a;
+	uint8_t r, g, b, a;
 	ss >> r >> g >> b >> a;
 	c.setAlpha(a);
 	c.setBlue(b);
@@ -97,6 +125,6 @@ std::istream& operator>>(std::istream& ss, Util::Color& c)
 
 std::ostream& operator<<(std::ostream& ss, Util::Color& c)
 {
-	ss  << c.red << " " << c.green << " " << c.blue << " " << c.alpha;
+	ss  << c.getRed() << " " << c.getGreen() << " " << c.getBlue() << " " << c.getAlpha();
 	return ss;
 }

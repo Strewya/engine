@@ -117,13 +117,11 @@ namespace Core
 
 	bool Entity::insert(const char* name, std::unique_ptr<Action> action)
 	{
-		action->setOwner(*this);
 		return _actions.Insert(name, std::move(action));
 	}
 
 	bool Entity::insert(const String& name, std::unique_ptr<Action> action)
 	{
-		action->setOwner(*this);
 		return _actions.Insert(name, std::move(action));
 	}
 

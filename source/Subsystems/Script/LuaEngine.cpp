@@ -164,16 +164,16 @@ namespace Script
 		lua_newtable(_lua);
 		int table = GetStackSize();
 		Push("r");
-		Push(in.red);
+		Push(in.getRed());
 		lua_settable(_lua, table);
 		Push("g");
-		Push(in.green);
+		Push(in.getGreen());
 		lua_settable(_lua, table);
 		Push("b");
-		Push(in.blue);
+		Push(in.getBlue());
 		lua_settable(_lua, table);
 		Push("a");
-		Push(in.alpha);
+		Push(in.getAlpha());
 		lua_settable(_lua, table);
 		return true;
 	}

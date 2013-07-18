@@ -5,6 +5,7 @@
 #include <algorithm>
 	/*** extra headers ***/
 #include "Subsystems/Graphics/TextureData.h"
+#include "Subsystems/Graphics/Vertex.h"
 #include "Util/Logger.h"
 	/*** end headers ***/
 
@@ -12,7 +13,7 @@ namespace Graphics
 {
 	DXRenderer::DXRenderer(HWND hwnd)
 		: _transparentColor(D3DCOLOR_XRGB(255,0,255)), _backgroundFillColor(D3DCOLOR_XRGB(0,0,0)), _hwnd(hwnd), _d3d(nullptr), _d3ddev(nullptr), _backbuffer(nullptr),
-		_spriteHandler(nullptr), _line(nullptr)
+		_spriteHandler(nullptr), _line(nullptr), _vertexFormat(D3DFVF_XYZ | D3DFVF_DIFFUSE)
 	{
 		if(!InitDevices())
 		{
@@ -57,6 +58,9 @@ namespace Graphics
 		}
 	}
 
+	//*****************************************************************
+	//		INIT DEVICES
+	//*****************************************************************
 	bool DXRenderer::InitDevices()
 	{
 		_d3d = Direct3DCreate9(D3D_SDK_VERSION);
@@ -73,7 +77,7 @@ namespace Graphics
 		_d3dpp.BackBufferWidth			= 1024;//_settings.GetWidth();
 		_d3dpp.BackBufferHeight			= 768;//_settings.GetHeight();
 		_d3dpp.hDeviceWindow			= _hwnd;
-		_d3dpp.EnableAutoDepthStencil	= false; //true;
+		_d3dpp.EnableAutoDepthStencil	= true;
 		_d3dpp.AutoDepthStencilFormat	= D3DFMT_D16;
 		_d3dpp.PresentationInterval		= D3DPRESENT_INTERVAL_DEFAULT; //_IMMEDIATE
 		_d3dpp.MultiSampleQuality		= 0;
@@ -109,6 +113,9 @@ namespace Graphics
 		return true;
 	}
 
+	//*****************************************************************
+	//					RESET DEVICES
+	//*****************************************************************
 	bool DXRenderer::ResetDevices()
 	{
 		_spriteHandler->OnLostDevice();
@@ -139,16 +146,25 @@ namespace Graphics
 		return true;
 	}
 
+	//*****************************************************************
+	//					GET TEXTURE CACHE
+	//*****************************************************************
 	ITextureCache& DXRenderer::getTextureCache()
 	{
 		return _textures;
 	}
 
+	//*****************************************************************
+	//					GET SCREEN SIZE
+	//*****************************************************************
 	Util::Vec2 DXRenderer::getScreenSize() const
 	{
 		return Util::Vec2((float)_d3dpp.BackBufferWidth, (float)_d3dpp.BackBufferHeight);
 	}
 
+	//*****************************************************************
+	//					SET  SCREEN SIZE
+	//*****************************************************************
 	void DXRenderer::setScreenSize(const Util::Vec2& size)
 	{
 		setScreenSize((uint32_t)size.x, (uint32_t)size.y);
@@ -161,45 +177,63 @@ namespace Graphics
 		ResetDevices();
 	}
 
+	//*****************************************************************
+	//					GET TRANSPARENT COLOR
+	//*****************************************************************
 	Util::Color DXRenderer::getTransparentColor() const
 	{
-		return Util::Color(_transparentColor&0x00ff0000>>16, _transparentColor&0x0000ff00>>8, _transparentColor&0x000000ff, _transparentColor&0xff000000>>24);
+		return Util::Color(_transparentColor);
 	}
 
+	//*****************************************************************
+	//					SET TRANSPARENT COLOR
+	//*****************************************************************
 	void DXRenderer::setTransparentColor(const Util::Color& color)
 	{
 		Util::Color c = color;
 		c.setAlpha(255);
-		_transparentColor = MakeCOLOR(c);
+		_transparentColor = c.getARGB();
 	}
 
-	void DXRenderer::setTransparentColor(uint32_t red, uint32_t green, uint32_t blue)
+	void DXRenderer::setTransparentColor(uint8_t red, uint8_t green, uint8_t blue)
 	{
-		setTransparentColor(Util::Color(red, green, blue, 255));
+		setTransparentColor(Util::Color(red, green, blue));
 	}
 
+	//*****************************************************************
+	//					GET BACKGROUND COLOR
+	//*****************************************************************
 	Util::Color DXRenderer::getBackgroundFillColor() const
 	{
-		return Util::Color(_backgroundFillColor&0x00ff0000>>16, _backgroundFillColor&0x0000ff00>>8, _backgroundFillColor&0x000000ff, _backgroundFillColor&0xff000000>>24);
+		return Util::Color(_backgroundFillColor);
 	}
 
+	//*****************************************************************
+	//					SET BACKGROUND COLOR
+	//*****************************************************************
 	void DXRenderer::setBackgroundFillColor(const Util::Color& color)
 	{
 		Util::Color c = color;
 		c.setAlpha(255);
-		_backgroundFillColor = MakeCOLOR(c);
+		_backgroundFillColor = c.getARGB();
 	}
 
-	void DXRenderer::setBackgroundFillColor(uint32_t red, uint32_t green, uint32_t blue)
+	void DXRenderer::setBackgroundFillColor(uint8_t red, uint8_t green, uint8_t blue)
 	{
-		setBackgroundFillColor(Util::Color(red, green, blue, 255));
+		setBackgroundFillColor(Util::Color(red, green, blue));
 	}
 
+	//*****************************************************************
+	//					GET FULLSCREEN STATE
+	//*****************************************************************
 	bool DXRenderer::getFullscreenState() const 
 	{
 		return !_d3dpp.Windowed;
 	}
 
+	//*****************************************************************
+	//					SET FULLSCREEN STATE
+	//*****************************************************************
 	void DXRenderer::setFullscreenState(bool state)
 	{
 		if(_d3dpp.Windowed != (BOOL)state)
@@ -209,6 +243,9 @@ namespace Graphics
 		}
 	}
 
+	//*****************************************************************
+	//					MAKE FONT
+	//*****************************************************************
 	uint32_t DXRenderer::MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic)
 	{
 		int index = _fonts.getHandle(name);
@@ -224,16 +261,25 @@ namespace Graphics
 		return _fonts.Insert(LoadFont(name, size, weight, italic));
 	}
 
+	//*****************************************************************
+	//					GET FONT HANDLE
+	//*****************************************************************
 	uint32_t DXRenderer::getFontHandle(const char* name)
 	{
 		return _fonts.getHandle(name);
 	}
 
+	//*****************************************************************
+	//					GET FONT INFO
+	//*****************************************************************
 	const FontInfo& DXRenderer::getFontInfo(uint32_t handle) const
 	{
 		return _fonts.getFont(handle).info;
 	}
 
+	//*****************************************************************
+	//					LOAD FONT
+	//*****************************************************************
 	DXFont DXRenderer::LoadFont(const char* name, uint32_t size, uint32_t weight, bool italic) const
 	{
 		LPD3DXFONT font = nullptr;
@@ -248,58 +294,9 @@ namespace Graphics
 		return DXFont(name, size, italic, weight, font);
 	}
 
-
-	
-	/*
-	void DXRenderer::LoadGraphics(const String& resourceFile)
-	{
-		if(resourceFile.empty())
-			return;
-		//tiny xml loading
-		ticpp::Document doc(resourceFile);
-		try
-		{
-			doc.LoadFile();
-
-			ticpp::Iterator< ticpp::Element > resource;
-			for( resource = resource.begin( doc.FirstChildElement() ); resource != resource.end(); ++resource )
-			{
-				String resourceType;
-				resource->GetValue(&resourceType);
-				if(resourceType == "File")
-				{
-					String path;
-					resource->GetText(&path);
-					LoadGraphics(path);
-				}
-				else if(resourceType == "TextureResource")
-				{
-					String filename, alias;
-					resource->GetText(&filename);
-					resource->GetAttributeOrDefault("alias", &alias, filename);
-					LoadTexture(filename, alias);
-				}
-				else if(resourceType == "FontResource")
-				{
-					String alias, font;
-					bool italic;
-					uint32_t size, weight;
-					
-					resource->GetText(&font);
-					resource->GetAttributeOrDefault("alias", &alias, font);
-					resource->GetAttribute("weight", &weight);
-					resource->GetAttribute("italic", &italic);
-					resource->GetAttribute("size", &size);
-					LoadFont(font, size, weight, italic, alias);
-				}
-			}
-		}
-		catch(ticpp::Exception& e)
-		{
-			Logger() << e.what() << Logger::endline;
-		}
-	}
-	*/
+	//*****************************************************************
+	//					BEGIN SCENE
+	//*****************************************************************
 	bool DXRenderer::BeginScene()
 	{
 		HRESULT result = _d3ddev->TestCooperativeLevel();
@@ -312,32 +309,46 @@ namespace Graphics
 		}
 		if(SUCCEEDED(result) && SUCCEEDED(_d3ddev->BeginScene()))
 		{
-			_d3ddev->ColorFill(_backbuffer, nullptr, _backgroundFillColor);
+			//_d3ddev->ColorFill(_backbuffer, nullptr, _backgroundFillColor);
+			_d3ddev->Clear(0, nullptr, D3DCLEAR_TARGET, _backgroundFillColor, 1.0f, 0);
+			_d3ddev->Clear(0, nullptr, D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(0,0,0), 1.0f, 0);
 			return true;
 		}
 		return false;
 	}
 	
+	//*****************************************************************
+	//					END SCENE
+	//*****************************************************************
 	void DXRenderer::EndScene()
 	{
 		_d3ddev->EndScene();
 		_d3ddev->Present(nullptr, nullptr, nullptr, nullptr);
 	}
 
+	//*****************************************************************
+	//					BEGIN SPRITE BATCH
+	//*****************************************************************
 	bool DXRenderer::BeginSpriteBatch(bool alphablend)
 	{
 		HRESULT result = _spriteHandler->Begin(alphablend ? D3DXSPRITE_ALPHABLEND : 0);
 		return SUCCEEDED(result);
 	}
 
+	//*****************************************************************
+	//					END SPRITE BATCH
+	//*****************************************************************
 	void DXRenderer::EndSpriteBatch()
 	{
 		_spriteHandler->End();
 	}
 
+	//*****************************************************************
+	//					SET TRANSFORM 2D
+	//*****************************************************************
 	void DXRenderer::setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint)
 	{
-		_tintColor = colorTint ? MakeCOLOR(*colorTint) : D3DCOLOR_XRGB(255,255,255);
+		_tintColor = colorTint ? colorTint->getARGB() : D3DCOLOR_XRGB(255,255,255);
 
 		D3DXMatrixTransformation2D(&_transformMatrix,
 			scalingCenter ? &MakeVECTOR(*scalingCenter) : nullptr,
@@ -347,7 +358,18 @@ namespace Graphics
 			rotationRadians,
 			translation ? &MakeVECTOR(*translation) : nullptr);
 	}
+
+	//*****************************************************************
+	//					SET TRANSFORM 3D
+	//*****************************************************************
+	void DXRenderer::setTransform3D(const Util::Vec3* translation, const Util::Vec3* scalingCenter, const Util::Vec3* scale, const Util::Vec3* rotationPivot, const Util::Vec3* rotRad, const Util::Color* colorTint)
+	{
+		
+	}
 	
+	//*****************************************************************
+	//					SET FONT STYLE
+	//*****************************************************************
 	void DXRenderer::setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom)
 	{
 		_fontStyle =	noClip	   ? DT_NOCLIP	: 0 |
@@ -358,121 +380,135 @@ namespace Graphics
 						singleLine ? DT_SINGLELINE : DT_WORDBREAK;
 	}
 
+	//*****************************************************************
+	//					DRAW POINT
+	//*****************************************************************
 	void DXRenderer::DrawPoint(const Util::Vec2& pos, const Util::Color* color, float lineWidth)
 	{
-		D3DXVECTOR2 pts[] = { MakeVECTOR(pos), MakeVECTOR(pos+1) };
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->SetWidth(lineWidth);
-		_line->Draw(pts, 2, c);
+		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
+		Vertex vertices[] = {
+			{pos.x, pos.y, 1.0f, rgb}
+		};
+		DrawVertexBuffer(vertices, 1, D3DPT_POINTLIST, 1);
 	}
 
+	//*****************************************************************
+	//					DRAW LINE
+	//*****************************************************************
 	void DXRenderer::DrawLine(const Util::Vec2& start, const Util::Vec2& finish, const Util::Color* color, float lineWidth)
 	{
-		D3DXVECTOR2 pts[] = { MakeVECTOR(start), MakeVECTOR(finish) };
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->SetWidth(lineWidth);
-		_line->Draw(pts, 2, c);
+		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
+		Vertex vertices[] = {
+			{start.x, start.y, 1.0f, rgb},
+			{finish.x, finish.y, 1.0f, rgb}
+		};
+		DrawVertexBuffer(vertices, 2, D3DPT_LINELIST, 1);
 	}
 
-	void DXRenderer::DrawTriangle(const Util::Vec2& p1, const Util::Vec2& p2, const Util::Vec2& p3, const Util::Color* color, float lineWidth)
+	//*****************************************************************
+	//					DRAW TRIANGLE
+	//*****************************************************************
+	void DXRenderer::DrawTriangle(const Util::Vec2& a, const Util::Vec2& b, const Util::Vec2& c, const Util::Color* color, float lineWidth)
 	{
-		D3DXVECTOR2 pts[] = { MakeVECTOR(p1), MakeVECTOR(p2), MakeVECTOR(p3), MakeVECTOR(p1) };
-		_line->SetWidth(lineWidth);
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->Draw(pts, 4, c);
+		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
+		Vertex vertices[] = {
+			{a.x, a.y, 1.0f, rgb},
+			{b.x, b.y, 1.0f, rgb},
+			{c.x, c.y, 1.0f, rgb}
+		};
+		DrawVertexBuffer(vertices, 3, D3DPT_TRIANGLELIST, 1);
 	}
 
-	void DXRenderer::DrawRectangle(const Util::Vec2& pos, uint32_t hwidth, uint32_t hheight, const Util::Color* color, float lineWidth)
+	//*****************************************************************
+	//					DRAW RECTANGLE
+	//*****************************************************************
+	void DXRenderer::DrawRectangle(const Util::Vec2& pos, uint32_t hw, uint32_t hh, const Util::Color* color, float lineWidth)
 	{
-		Util::Vec2 ul = Util::Vec2(float(hwidth), float(hheight));
-		Util::Vec2 bl = Util::Vec2(float(hwidth), -float(hheight));
-		D3DXVECTOR2 pts[] = { MakeVECTOR(pos - ul), MakeVECTOR(pos + bl),
-							MakeVECTOR(pos + ul), MakeVECTOR(pos - bl),
-							MakeVECTOR(pos - ul) };
-		
-		_line->SetWidth(lineWidth);
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->Draw(pts, 5, c);
-
+		DrawRectangle(Util::Rect(pos, (float)hw*2, (float)hh*2), color, lineWidth);
 	}
 
 	void DXRenderer::DrawRectangle(const Util::Rect& rect, const Util::Color* color, float lineWidth)
 	{
-		D3DXVECTOR2 pts[] = {	D3DXVECTOR2(rect.Left(), rect.Top()),
-								D3DXVECTOR2(rect.Right(), rect.Top()),
-								D3DXVECTOR2(rect.Right(), rect.Bottom()),
-								D3DXVECTOR2(rect.Left(), rect.Bottom()),
-								D3DXVECTOR2(rect.Left(), rect.Top())
-							};
-		_line->SetWidth(lineWidth);
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-		_line->Draw(pts, 5, c);
+		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
+		Vertex vertices[] = {
+			{rect.Left(), rect.Top(), 1.0f, rgb},
+			{rect.Right(), rect.Top(), 1.0f, rgb},
+			{rect.Left(), rect.Bottom(), 1.0f, rgb},
+			{rect.Right(), rect.Bottom(), 1.0f, rgb}
+		};
+		DrawVertexBuffer(vertices, 4, D3DPT_TRIANGLESTRIP, 2);
 	}
 
+	//*****************************************************************
+	//					DRAW CIRCLE
+	//*****************************************************************
 	void DXRenderer::DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth)
 	{
-		const int numVertex = (int) (max(36*0.25, std::ceil((radius*0.5)*0.25)  ));
-		std::vector<D3DXVECTOR2> circle;
-		std::vector<D3DXVECTOR2> quarterCircle;
-		circle.reserve(numVertex*4 + 1);
-		quarterCircle.reserve(numVertex);
-		float angle = 360.0f/(numVertex*4);
-		for(int i = 0; i < numVertex; ++i)
-		{
-			quarterCircle.push_back(D3DXVECTOR2((radius*std::cos(D3DXToRadian(angle*i))), (radius*std::sin(D3DXToRadian(angle*i)))));
-			circle.push_back(D3DXVECTOR2(pos.x + quarterCircle[i].x, pos.y + quarterCircle[i].y));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x - quarterCircle[i].y, pos.y + quarterCircle[i].x));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x - quarterCircle[i].x, pos.y - quarterCircle[i].y));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x + quarterCircle[i].y, pos.y - quarterCircle[i].x));
-		}
-		circle.push_back(circle.front());
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
-
-		_line->SetWidth(lineWidth);
-		_line->Draw(&circle[0], numVertex*4+1, c);
+		DrawElipse(pos, radius, radius, color, lineWidth);
 	}
 
+	//*****************************************************************
+	//					DRAW ELIPSE
+	//*****************************************************************
 	void DXRenderer::DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth)
 	{
-		const int numVertex = (int) (max(36*0.25, std::ceil((min(xRadius, yRadius)*0.5)*0.25)  ));
-		std::vector<D3DXVECTOR2> circle;
-		std::vector<D3DXVECTOR2> quarterCircle;
-		circle.reserve(numVertex*4 + 1);
-		quarterCircle.reserve(numVertex);
-		float angle = 360.0f/(numVertex*4);
-		for(int i = 0; i < numVertex; ++i)
-		{
-			quarterCircle.push_back(D3DXVECTOR2((std::cos(D3DXToRadian(angle*i))), (std::sin(D3DXToRadian(angle*i)))));
-			circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].x, pos.y + yRadius*quarterCircle[i].y));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].y, pos.y + yRadius*quarterCircle[i].x));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].x, pos.y - yRadius*quarterCircle[i].y));
-		}
-		for(int i = 0; i < numVertex; ++i)
-		{
-			circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].y, pos.y - yRadius*quarterCircle[i].x));
-		}
-		circle.push_back(circle.front());
-		D3DXCOLOR c = color == nullptr ? D3DCOLOR_XRGB(255,255,255) : MakeCOLOR(*color);
+		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
+		const int numVertices = (int) (max(36*0.25, std::ceil((min(xRadius, yRadius)*0.5)*0.25)  ));
+		std::vector<Vertex> elipse;
+		std::vector<D3DXVECTOR2> quarterElipse;
+		elipse.reserve(numVertices*4 + 1);
+		quarterElipse.reserve(numVertices);
+		float angle = 360.0f/(numVertices*4);
 
-		_line->SetWidth(lineWidth);
-		_line->Draw(&circle[0], numVertex*4+1, c);
+		//center of the elipse
+		Vertex vertex = {pos.x, pos.y, 1.0f, rgb};
+		//elipse.push_back(vertex); 
+
+		//get the upper right quarter of the elipse
+		for(int i = 0; i < numVertices; ++i)
+		{
+			quarterElipse.push_back(D3DXVECTOR2((std::cos(D3DXToRadian(angle*i))), (std::sin(D3DXToRadian(angle*i)))));
+
+			vertex.x = pos.x + xRadius*quarterElipse.back().x;
+			vertex.y = pos.y + yRadius*quarterElipse.back().y;
+			elipse.push_back(vertex);
+
+			//circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].x, pos.y + yRadius*quarterCircle[i].y));
+		}
+
+		//get the upper left quarter of the circle
+		for(int i = 0; i < numVertices; ++i)
+		{
+			vertex.x = pos.x - xRadius*quarterElipse[i].y;
+			vertex.y = pos.y + yRadius*quarterElipse[i].x;
+			elipse.push_back(vertex);
+			//circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].y, pos.y + yRadius*quarterCircle[i].x));
+		}
+		
+		//get the lower left quarter of the circle
+		for(int i = 0; i < numVertices; ++i)
+		{
+			vertex.x = pos.x - xRadius*quarterElipse[i].x;
+			vertex.y = pos.y - yRadius*quarterElipse[i].y;
+			elipse.push_back(vertex);
+			//circle.push_back(D3DXVECTOR2(pos.x - xRadius*quarterCircle[i].x, pos.y - yRadius*quarterCircle[i].y));
+		}
+
+		//get the lower right quarter of the circle
+		for(int i = 0; i < numVertices; ++i)
+		{
+			vertex.x = pos.x + xRadius*quarterElipse[i].y;
+			vertex.y = pos.y - yRadius*quarterElipse[i].x;
+			elipse.push_back(vertex);
+			//circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].y, pos.y - yRadius*quarterCircle[i].x));
+		}
+		
+		DrawVertexBuffer(&elipse[0], elipse.size(), D3DPT_TRIANGLEFAN, elipse.size()-1);
 	}
 	
+	//*****************************************************************
+	//					DRAW TEXTURE
+	//*****************************************************************
 	void DXRenderer::DrawTexture(const TextureData& texture)
 	{
 		const DXTexture& dxtexture = static_cast<const DXTexture&>(texture);
@@ -486,6 +522,9 @@ namespace Graphics
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
+	//*****************************************************************
+	//					DRAW SPRITE
+	//*****************************************************************
 	void DXRenderer::DrawSprite(const TextureData& texture, const SpriteInfo& sprite)
 	{
 		const DXTexture& dxtexture = static_cast<const DXTexture&>(texture);
@@ -499,6 +538,9 @@ namespace Graphics
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	
+	//*****************************************************************
+	//					DRAW FONT
+	//*****************************************************************
 	void DXRenderer::DrawFont(uint32_t hFont, const char* text, const Util::Rect* bounds)
 	{
 		if(!_fonts.Valid(hFont))
@@ -513,30 +555,129 @@ namespace Graphics
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
-	/*
-	bool DXRenderer::LoadFont(const String& font, const uint32_t size, const uint32_t weight, const bool italic, const String& alias)
+	//*****************************************************************
+	//					DRAW VERTEX BUFFER
+	//*****************************************************************
+	void DXRenderer::DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives)
 	{
-		String fontAlias = alias.empty() ? font : alias;
-		if(!_fonts.Find(fontAlias))
+		LPDIRECT3DVERTEXBUFFER9 vbuffer;
+		_d3ddev->CreateVertexBuffer(numVertices*sizeof(Vertex), 0, _vertexFormat, D3DPOOL_MANAGED, &vbuffer, nullptr);
+		
+		
+		VOID* pvoid = nullptr;
+		vbuffer->Lock(0, 0, &pvoid, 0);
+		memcpy(pvoid, buffer, sizeof(Vertex)*numVertices);
+		vbuffer->Unlock();
+		
+		_d3ddev->SetFVF(_vertexFormat);
+		_d3ddev->SetStreamSource(0, vbuffer, 0, sizeof(Vertex));
+		
+		short indices[] =
 		{
-			FontStore::TypePtr fnt;
-			if(Create(font, size, weight, italic, fnt))
-			{
-				_fonts.Insert(fontAlias, fnt);
-				return true;
-			}
-			else
-			{
-				Logger() << "Failed to load font " << alias+"/"+font << "." << Logger::endline;
-			}
-		}
-		else
-		{
-			Logger() << "Font " << alias << " already loaded." << Logger::endline;
-		}
-		return false;
+			0, 1, 2,    // side 1
+			2, 1, 3,
+			4, 0, 6,    // side 2
+			6, 0, 2,
+			7, 5, 6,    // side 3
+			6, 5, 4,
+			3, 1, 7,    // side 4
+			7, 1, 5,
+			4, 5, 0,    // side 5
+			0, 5, 1,
+			3, 7, 2,    // side 6
+			2, 7, 6,
+		};
+		LPDIRECT3DINDEXBUFFER9 i_buffer;
+		_d3ddev->CreateIndexBuffer(36*sizeof(short), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &i_buffer, nullptr);
+
+		i_buffer->Lock(0, sizeof(indices), &pvoid, 0);
+		memcpy(pvoid, indices, sizeof(indices));
+		i_buffer->Unlock();
+		_d3ddev->SetIndices(i_buffer);
+
+		D3DXVECTOR3 vy[] = {
+			D3DXVECTOR3(3,3,3),
+			D3DXVECTOR3(3,3,-3),
+			D3DXVECTOR3(3,-3,-3),
+			D3DXVECTOR3(3,-3,3),
+			D3DXVECTOR3(-3,-3,3),
+			D3DXVECTOR3(-3,3,3),
+			D3DXVECTOR3(-3,3,-3),
+			D3DXVECTOR3(-3,-3,-3),
+			D3DXVECTOR3(-3,-3,3),
+			D3DXVECTOR3(3,-3,3),
+			D3DXVECTOR3(3,3,3),
+			D3DXVECTOR3(-3,3,3),
+			D3DXVECTOR3(-3,3,-3),
+			D3DXVECTOR3(3,3,-3),
+			D3DXVECTOR3(3,-3,-3),
+			D3DXVECTOR3(-3,-3,-3),
+		};
+
+		
+		
+
+
+		static float i = 0.0f;
+		i += 0.01f;
+		D3DXMATRIX roty;
+		D3DXMatrixRotationY(&roty, i);
+		_d3ddev->SetTransform(D3DTS_WORLD, &(roty));
+		
+
+		D3DXMATRIX matView;
+		D3DXMatrixLookAtLH(&matView, &D3DXVECTOR3(10,10,-10), &D3DXVECTOR3(0,0,0), &D3DXVECTOR3(0,1,0));
+		_d3ddev->SetTransform(D3DTS_VIEW, &matView);
+
+		D3DXMATRIX matProj;
+		auto screen = getScreenSize();
+		D3DXMatrixPerspectiveFovLH(&matProj, D3DXToRadian(45), screen.x/screen.y, 1.0f, 100.0f);
+		_d3ddev->SetTransform(D3DTS_PROJECTION, &matProj);
+		
+
+		_d3ddev->SetRenderState(D3DRS_LIGHTING, false);
+		_d3ddev->SetRenderState(D3DRS_ZENABLE, true);
+		_d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+		_d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		
+
+		_d3ddev->DrawIndexedPrimitive((D3DPRIMITIVETYPE)type, 0, 0, numVertices, 0, numPrimitives);
+
+		
+		vbuffer->Release();
+		i_buffer->Release();
+
+		D3DXMATRIX ln;
+		D3DXMatrixIdentity(&ln);
+
+		_line->SetWidth(2);
+		_line->Begin();
+		
+		_line->DrawTransform(vy, sizeof(vy)/sizeof(D3DXVECTOR3), &(roty*matView*matProj), 0xffffffff);
+		_line->End();
+		
 	}
 
+	uint32_t DXRenderer::PointList() const
+	{return D3DPT_POINTLIST;}
+
+	uint32_t DXRenderer::LineList() const
+	{return D3DPT_LINELIST;}
+
+	uint32_t DXRenderer::LineStrip() const
+	{return D3DPT_LINESTRIP;}
+
+	uint32_t DXRenderer::TriangleList() const
+	{return D3DPT_TRIANGLELIST;}
+
+	uint32_t DXRenderer::TriangleStrip() const
+	{return D3DPT_TRIANGLESTRIP;}
+
+	uint32_t DXRenderer::TriangleFan() const
+	{return D3DPT_TRIANGLEFAN;}
+
+
+	/*
 	bool DXRenderer::Create(const String& name, const uint32_t size, const uint32_t weight, const bool italic, FontStore::TypePtr& out)
 	{
 		shared_ptr<DXFont> font(new DXFont(name));
@@ -552,14 +693,6 @@ namespace Graphics
 		return true;
 	}
 
-	Font::sptr DXRenderer::GetFont(const String& alias)
-	{
-		FontStore::TypePtr f;
-		if(_fonts.Find(alias, f))
-			return f;
-		return nullptr;
-	}
-	
 	bool DXRenderer::Create(const String& filename, TextureStore::TypePtr& out)
 	{
 		shared_ptr<DXTexture> texture(new DXTexture(filename));
@@ -625,52 +758,53 @@ namespace Graphics
 		out = texture;
 		return true;
 	}
-	
-	Texture::sptr DXRenderer::GetTexture(const String& alias)
-	{
-		TextureStore::TypePtr t;
-		if(_textures.Find(alias, t))
-			return t;
-		return nullptr;
-	}
 
-	void DXRenderer::ReloadTexture(const String& alias)
+	void DXRenderer::LoadGraphics(const String& resourceFile)
 	{
-		TextureStore::TypePtr out;
-		if(_textures.Find(alias, out))
+		if(resourceFile.empty())
+			return;
+		//tiny xml loading
+		ticpp::Document doc(resourceFile);
+		try
 		{
-			out->Release();
-			Create(out->filename, out);
+			doc.LoadFile();
+
+			ticpp::Iterator< ticpp::Element > resource;
+			for( resource = resource.begin( doc.FirstChildElement() ); resource != resource.end(); ++resource )
+			{
+				String resourceType;
+				resource->GetValue(&resourceType);
+				if(resourceType == "File")
+				{
+					String path;
+					resource->GetText(&path);
+					LoadGraphics(path);
+				}
+				else if(resourceType == "TextureResource")
+				{
+					String filename, alias;
+					resource->GetText(&filename);
+					resource->GetAttributeOrDefault("alias", &alias, filename);
+					LoadTexture(filename, alias);
+				}
+				else if(resourceType == "FontResource")
+				{
+					String alias, font;
+					bool italic;
+					uint32_t size, weight;
+					
+					resource->GetText(&font);
+					resource->GetAttributeOrDefault("alias", &alias, font);
+					resource->GetAttribute("weight", &weight);
+					resource->GetAttribute("italic", &italic);
+					resource->GetAttribute("size", &size);
+					LoadFont(font, size, weight, italic, alias);
+				}
+			}
 		}
-	}
-
-	void DXRenderer::ReloadAllTextures()
-	{
-		TextureStore::Store::iterator it = _textures.data.begin();
-		for(; it != _textures.data.end(); ++it)
+		catch(ticpp::Exception& e)
 		{
-			it->second->Release();
-			Create(it->second->filename, it->second);
-		}
-	}
-
-	void DXRenderer::ReloadFont(const String& alias)
-	{
-		FontStore::TypePtr out;
-		if(_fonts.Find(alias, out))
-		{
-			out->Release();
-			Create(out->name, out->size, out->weight, out->italic, out);
-		}
-	}
-
-	void DXRenderer::ReloadAllFonts()
-	{
-		FontStore::Store::iterator it = _fonts.data.begin();
-		for(; it != _fonts.data.end(); ++it)
-		{
-			it->second->Release();
-			Create(it->second->name, it->second->size, it->second->weight, it->second->italic, it->second);
+			Logger() << e.what() << Logger::endline;
 		}
 	}
 	*/

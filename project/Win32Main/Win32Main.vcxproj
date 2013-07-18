@@ -90,8 +90,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\Functions.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\ARender.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp" />
@@ -107,6 +107,7 @@
     <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp" />
     <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp" />
+    <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp" />
@@ -134,8 +135,8 @@
     <ClInclude Include="..\..\source\Core\Action\Action.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
-    <ClInclude Include="..\..\source\Core\Action\Functions.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\ARender.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\Event.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h" />
