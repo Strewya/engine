@@ -96,17 +96,26 @@ namespace Graphics
 		void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color, float lineWidth);
 		void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth);
 
-		void DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives);
+		void DrawPrimitive(const Vertex* buffer, uint32_t numVertices, DP_Type type, uint32_t numPrimitives);
+		void DrawIndexedPrimitive(const Vertex* vertexBuffer, uint32_t numVertices, const uint16_t* indexBuffer, uint32_t numIndices, DP_Type drawType, uint32_t numPrimitives);
 
-		uint32_t PointList() const;
-		uint32_t LineList() const;
-		uint32_t LineStrip() const;
-		uint32_t TriangleList() const;
-		uint32_t TriangleStrip() const;
-		uint32_t TriangleFan() const;
+
+
+
+		//new code, remove the old code after everything works
+		bool setTranslation(const Util::Vec3& translation);
+		bool setScaling(const Util::Vec3& scale);
+		bool setRotation(const Util::Vec3& rotation);
+		bool setWorldTransformMatrix();
+		bool setProjectionMatrix(float vertFovDeg, float nearViewPlane, float farViewPlane, float screenAspectRatio);
+		bool setViewMatrix(const Util::Vec3& cameraPosition, const Util::Vec3& cameraLookAt, const Util::Vec3& cameraUpVector);
+		bool appendFVF(FVF_Type format);
+		bool clearFVF();
+		bool applyFVF(uint32_t format);
+		uint32_t getFVF() const;
+		bool setRenderStateLighting(bool enabled);
+		bool setRenderStateZBuffer(bool enabled);
+		bool setRenderStateCulling(RS_Culling cullmode);
+		bool setRenderStateFillmode(RS_Fillmode fillmode);
 	};
-
-
-
-	//Store<DXTexture, TextureDescriptor, DXRenderer> TextureStore;
 }

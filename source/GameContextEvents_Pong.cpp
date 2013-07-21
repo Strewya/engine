@@ -54,9 +54,43 @@ namespace Pong
 			{ 3.0f, -3.0f, 3.0f, Util::Color(127, 0, 255, 255).getARGB(), },
 		};
 
+		uint16_t indices[] =
+		{
+			0, 1, 2,    // side 1
+			2, 1, 3,
+			4, 0, 6,    // side 2
+			6, 0, 2,
+			7, 5, 6,    // side 3
+			6, 5, 4,
+			3, 1, 7,    // side 4
+			7, 1, 5,
+			4, 5, 0,    // side 5
+			0, 5, 1,
+			3, 7, 2,    // side 6
+			2, 7, 6,
+		};
+
+		static Util::Vec3 rot;
+		rot.y += 0.01f;
+
+
 		gfx.BeginScene();
 
-		gfx.DrawVertexBuffer(vbuffer, 8, gfx.TriangleList(), 12);
+		gfx.appendFVF(Graphics::FVF_Type::XYZ);
+		gfx.appendFVF(Graphics::FVF_Type::DIFFUSE);
+		gfx.applyFVF(0);
+
+		gfx.setRotation(rot);
+		gfx.setWorldTransformMatrix();
+		gfx.setViewMatrix(Util::Vec3(10,10,-10), Util::Vec3(0,0,0), Util::Vec3(0,1,0));
+		gfx.setProjectionMatrix(45.0f, 1.0f, 100.0f, 0);
+		gfx.setRenderStateLighting(false);
+		gfx.setRenderStateZBuffer(true);
+		gfx.setRenderStateFillmode(Graphics::RS_Fillmode::Wireframe);
+		gfx.setRenderStateCulling(Graphics::RS_Culling::None);
+		
+
+		gfx.DrawIndexedPrimitive(vbuffer, 8, indices, 36, Graphics::DP_Type::TriangleList, 12);
 
 
 		//gfx.DrawPoint(Util::Vec2(0,0), &Util::Color(0,255,0));

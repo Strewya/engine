@@ -28,6 +28,48 @@ namespace Graphics
 
 namespace Graphics
 {
+	enum class RS_Culling
+	{
+		None,
+		Clockwise,
+		CounterClockwise,
+	};
+
+	enum class RS_Fillmode
+	{
+		Point,
+		Wireframe,
+		Solid,
+	};
+
+	enum class DP_Type
+	{
+		PointList,
+		LineList,
+		LineStrip,
+		TriangleList,
+		TriangleStrip,
+		TriangleFan,
+	};
+
+	enum class FVF_Type
+	{
+		XYZ,
+		XYZRHW,
+		NORMAL,
+		DIFFUSE,
+		SPECULAR,
+		TEX0,
+		TEX1,
+		TEX2,
+		TEX3,
+		TEX4,
+		TEX5,
+		TEX6,
+		TEX7,
+		TEX8,
+	};
+
 	class IRenderer
 	{
 	public:
@@ -48,10 +90,6 @@ namespace Graphics
 		virtual bool getFullscreenState() const = 0;
 		virtual void setFullscreenState(bool state) = 0;
 		
-		virtual uint32_t MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic) = 0;
-		virtual uint32_t getFontHandle(const char* filename) = 0;
-		virtual const FontInfo& getFontInfo(uint32_t handle) const = 0;
-
 		virtual bool BeginScene() = 0;
 		virtual void EndScene() = 0;
 		virtual bool BeginSpriteBatch(bool alphablend) = 0;
@@ -61,6 +99,11 @@ namespace Graphics
 		virtual void setTransform3D(const Util::Vec3* translation, const Util::Vec3* scalingCenter, const Util::Vec3* scale, const Util::Vec3* rotationPivot, const Util::Vec3* rotationRadians, const Util::Color* colorTint) = 0;
 		virtual void setFontStyle(bool noClip, bool singleLine, bool hCenter, bool right, bool vCenter, bool bottom) = 0;
 		
+		virtual uint32_t MakeFont(const char* name, uint32_t size, uint32_t weight, bool italic) = 0;
+		virtual uint32_t getFontHandle(const char* filename) = 0;
+		virtual const FontInfo& getFontInfo(uint32_t handle) const = 0;
+
+
 		virtual void DrawTexture(const TextureData& texture) = 0;
 		virtual void DrawSprite(const TextureData& texture, const SpriteInfo& sprite) = 0;
 		virtual void DrawFont(uint32_t hFont, const char* text, const Util::Rect* bounds) = 0;
@@ -73,12 +116,23 @@ namespace Graphics
 		virtual void DrawCircle(const Util::Vec2& pos, float radius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 		virtual void DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color = nullptr, float lineWidth = 1) = 0;
 
-		virtual void DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives) = 0;
-		virtual uint32_t PointList() const = 0;
-		virtual uint32_t LineList() const = 0;
-		virtual uint32_t LineStrip() const = 0;
-		virtual uint32_t TriangleList() const = 0;
-		virtual uint32_t TriangleStrip() const = 0;
-		virtual uint32_t TriangleFan() const = 0;
+		virtual void DrawPrimitive(const Vertex* buffer, uint32_t numVertices, DP_Type type, uint32_t numPrimitives) = 0;
+		virtual void DrawIndexedPrimitive(const Vertex* vertexBuffer, uint32_t numVertices, const uint16_t* indexBuffer, uint32_t numIndices, DP_Type drawType, uint32_t numPrimitives) = 0;
+		
+		virtual bool setTranslation(const Util::Vec3& translation) = 0;
+		virtual bool setScaling(const Util::Vec3& scale) = 0;
+		virtual bool setRotation(const Util::Vec3& rotation) = 0;
+		virtual bool setWorldTransformMatrix() = 0;
+		virtual bool setProjectionMatrix(float vertFovDeg, float nearViewPlane, float farViewPlane, float screenAspectRatio) = 0;
+		virtual bool setViewMatrix(const Util::Vec3& cameraPosition, const Util::Vec3& cameraLookAt, const Util::Vec3& cameraUpVector) = 0;
+		virtual bool appendFVF(FVF_Type format) = 0;
+		virtual bool clearFVF() = 0;
+		virtual bool applyFVF(uint32_t format) = 0;
+		virtual uint32_t getFVF() const = 0;
+		virtual bool setRenderStateLighting(bool enabled) = 0;
+		virtual bool setRenderStateZBuffer(bool enabled) = 0;
+		virtual bool setRenderStateCulling(RS_Culling cullmode) = 0;
+		virtual bool setRenderStateFillmode(RS_Fillmode fillmode) = 0;
+
 	};
 }

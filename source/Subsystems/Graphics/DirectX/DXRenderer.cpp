@@ -13,7 +13,7 @@ namespace Graphics
 {
 	DXRenderer::DXRenderer(HWND hwnd)
 		: _transparentColor(D3DCOLOR_XRGB(255,0,255)), _backgroundFillColor(D3DCOLOR_XRGB(0,0,0)), _hwnd(hwnd), _d3d(nullptr), _d3ddev(nullptr), _backbuffer(nullptr),
-		_spriteHandler(nullptr), _line(nullptr), _vertexFormat(D3DFVF_XYZ | D3DFVF_DIFFUSE)
+		_spriteHandler(nullptr), _line(nullptr), _vertexFormat(0)
 	{
 		if(!InitDevices())
 		{
@@ -110,6 +110,7 @@ namespace Graphics
 		if(FAILED(D3DXCreateTexture(_d3ddev, 1, 1, 0, D3DPOOL_DEFAULT, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, &_defaultTexture)))
 			return false;
 
+		D3DXMatrixIdentity(&_transformMatrix);
 		return true;
 	}
 
@@ -389,7 +390,7 @@ namespace Graphics
 		Vertex vertices[] = {
 			{pos.x, pos.y, 1.0f, rgb}
 		};
-		DrawVertexBuffer(vertices, 1, D3DPT_POINTLIST, 1);
+		DrawPrimitive(vertices, 1, DP_Type::LineList, 1);
 	}
 
 	//*****************************************************************
@@ -402,7 +403,7 @@ namespace Graphics
 			{start.x, start.y, 1.0f, rgb},
 			{finish.x, finish.y, 1.0f, rgb}
 		};
-		DrawVertexBuffer(vertices, 2, D3DPT_LINELIST, 1);
+		DrawPrimitive(vertices, 2, DP_Type::LineList, 1);
 	}
 
 	//*****************************************************************
@@ -416,7 +417,8 @@ namespace Graphics
 			{b.x, b.y, 1.0f, rgb},
 			{c.x, c.y, 1.0f, rgb}
 		};
-		DrawVertexBuffer(vertices, 3, D3DPT_TRIANGLELIST, 1);
+		_vertexFormat = D3DFVF_DIFFUSE|D3DFVF_XYZ;
+		DrawPrimitive(vertices, 3, DP_Type::TriangleList, 1);
 	}
 
 	//*****************************************************************
@@ -436,7 +438,7 @@ namespace Graphics
 			{rect.Left(), rect.Bottom(), 1.0f, rgb},
 			{rect.Right(), rect.Bottom(), 1.0f, rgb}
 		};
-		DrawVertexBuffer(vertices, 4, D3DPT_TRIANGLESTRIP, 2);
+		DrawPrimitive(vertices, 4, DP_Type::TriangleStrip, 2);
 	}
 
 	//*****************************************************************
@@ -503,7 +505,7 @@ namespace Graphics
 			//circle.push_back(D3DXVECTOR2(pos.x + xRadius*quarterCircle[i].y, pos.y - yRadius*quarterCircle[i].x));
 		}
 		
-		DrawVertexBuffer(&elipse[0], elipse.size(), D3DPT_TRIANGLEFAN, elipse.size()-1);
+		DrawPrimitive(&elipse[0], elipse.size(), DP_Type::TriangleFan, elipse.size()-1);
 	}
 	
 	//*****************************************************************
@@ -558,11 +560,10 @@ namespace Graphics
 	//*****************************************************************
 	//					DRAW VERTEX BUFFER
 	//*****************************************************************
-	void DXRenderer::DrawVertexBuffer(const Vertex* buffer, uint32_t numVertices, uint32_t type, uint32_t numPrimitives)
+	void DXRenderer::DrawPrimitive(const Vertex* buffer, uint32_t numVertices, DP_Type type, uint32_t numPrimitives)
 	{
 		LPDIRECT3DVERTEXBUFFER9 vbuffer;
 		_d3ddev->CreateVertexBuffer(numVertices*sizeof(Vertex), 0, _vertexFormat, D3DPOOL_MANAGED, &vbuffer, nullptr);
-		
 		
 		VOID* pvoid = nullptr;
 		vbuffer->Lock(0, 0, &pvoid, 0);
@@ -572,109 +573,38 @@ namespace Graphics
 		_d3ddev->SetFVF(_vertexFormat);
 		_d3ddev->SetStreamSource(0, vbuffer, 0, sizeof(Vertex));
 		
-		short indices[] =
-		{
-			0, 1, 2,    // side 1
-			2, 1, 3,
-			4, 0, 6,    // side 2
-			6, 0, 2,
-			7, 5, 6,    // side 3
-			6, 5, 4,
-			3, 1, 7,    // side 4
-			7, 1, 5,
-			4, 5, 0,    // side 5
-			0, 5, 1,
-			3, 7, 2,    // side 6
-			2, 7, 6,
-		};
-		LPDIRECT3DINDEXBUFFER9 i_buffer;
-		_d3ddev->CreateIndexBuffer(36*sizeof(short), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &i_buffer, nullptr);
-
-		i_buffer->Lock(0, sizeof(indices), &pvoid, 0);
-		memcpy(pvoid, indices, sizeof(indices));
-		i_buffer->Unlock();
-		_d3ddev->SetIndices(i_buffer);
-
-		D3DXVECTOR3 vy[] = {
-			D3DXVECTOR3(3,3,3),
-			D3DXVECTOR3(3,3,-3),
-			D3DXVECTOR3(3,-3,-3),
-			D3DXVECTOR3(3,-3,3),
-			D3DXVECTOR3(-3,-3,3),
-			D3DXVECTOR3(-3,3,3),
-			D3DXVECTOR3(-3,3,-3),
-			D3DXVECTOR3(-3,-3,-3),
-			D3DXVECTOR3(-3,-3,3),
-			D3DXVECTOR3(3,-3,3),
-			D3DXVECTOR3(3,3,3),
-			D3DXVECTOR3(-3,3,3),
-			D3DXVECTOR3(-3,3,-3),
-			D3DXVECTOR3(3,3,-3),
-			D3DXVECTOR3(3,-3,-3),
-			D3DXVECTOR3(-3,-3,-3),
-		};
-
-		
-		
-
-
-		static float i = 0.0f;
-		i += 0.01f;
-		D3DXMATRIX roty;
-		D3DXMatrixRotationY(&roty, i);
-		_d3ddev->SetTransform(D3DTS_WORLD, &(roty));
-		
-
-		D3DXMATRIX matView;
-		D3DXMatrixLookAtLH(&matView, &D3DXVECTOR3(10,10,-10), &D3DXVECTOR3(0,0,0), &D3DXVECTOR3(0,1,0));
-		_d3ddev->SetTransform(D3DTS_VIEW, &matView);
-
-		D3DXMATRIX matProj;
-		auto screen = getScreenSize();
-		D3DXMatrixPerspectiveFovLH(&matProj, D3DXToRadian(45), screen.x/screen.y, 1.0f, 100.0f);
-		_d3ddev->SetTransform(D3DTS_PROJECTION, &matProj);
-		
-
-		_d3ddev->SetRenderState(D3DRS_LIGHTING, false);
-		_d3ddev->SetRenderState(D3DRS_ZENABLE, true);
-		_d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		_d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-		
-
-		_d3ddev->DrawIndexedPrimitive((D3DPRIMITIVETYPE)type, 0, 0, numVertices, 0, numPrimitives);
-
+		D3DPRIMITIVETYPE types[] = {D3DPT_POINTLIST, D3DPT_LINELIST, D3DPT_LINESTRIP, D3DPT_TRIANGLELIST, D3DPT_TRIANGLESTRIP, D3DPT_TRIANGLEFAN};
+		_d3ddev->DrawPrimitive(types[(int)type], 0, numPrimitives);
+		D3DXMatrixIdentity(&_transformMatrix);
 		
 		vbuffer->Release();
-		i_buffer->Release();
-
-		D3DXMATRIX ln;
-		D3DXMatrixIdentity(&ln);
-
-		_line->SetWidth(2);
-		_line->Begin();
-		
-		_line->DrawTransform(vy, sizeof(vy)/sizeof(D3DXVECTOR3), &(roty*matView*matProj), 0xffffffff);
-		_line->End();
 		
 	}
 
-	uint32_t DXRenderer::PointList() const
-	{return D3DPT_POINTLIST;}
+	void DXRenderer::DrawIndexedPrimitive(const Vertex* vertexBuffer, uint32_t numVertices, const uint16_t* indexBuffer, uint32_t numIndices, DP_Type drawType, uint32_t numPrimitives)
+	{
+		LPDIRECT3DVERTEXBUFFER9 vbuffer;
+		_d3ddev->CreateVertexBuffer(numVertices*sizeof(Vertex), 0, _vertexFormat, D3DPOOL_MANAGED, &vbuffer, nullptr);
+		VOID* pvoid = nullptr;
+		vbuffer->Lock(0, 0, &pvoid, 0);
+		memcpy(pvoid, vertexBuffer, sizeof(Vertex)*numVertices);
+		vbuffer->Unlock();
+		_d3ddev->SetStreamSource(0, vbuffer, 0, sizeof(Vertex));
+		
+		LPDIRECT3DINDEXBUFFER9 ibuffer;
+		_d3ddev->CreateIndexBuffer(numIndices*sizeof(uint16_t), 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &ibuffer, nullptr);
+		ibuffer->Lock(0, 0, &pvoid, 0);
+		memcpy(pvoid, indexBuffer, sizeof(uint16_t)*numIndices);
+		ibuffer->Unlock();
+		_d3ddev->SetIndices(ibuffer);
 
-	uint32_t DXRenderer::LineList() const
-	{return D3DPT_LINELIST;}
+		D3DPRIMITIVETYPE types[] = {D3DPT_POINTLIST, D3DPT_LINELIST, D3DPT_LINESTRIP, D3DPT_TRIANGLELIST, D3DPT_TRIANGLESTRIP, D3DPT_TRIANGLEFAN};
+		_d3ddev->DrawIndexedPrimitive(types[(int)drawType], 0, 0, numVertices, 0, numPrimitives);
+		D3DXMatrixIdentity(&_transformMatrix);
 
-	uint32_t DXRenderer::LineStrip() const
-	{return D3DPT_LINESTRIP;}
-
-	uint32_t DXRenderer::TriangleList() const
-	{return D3DPT_TRIANGLELIST;}
-
-	uint32_t DXRenderer::TriangleStrip() const
-	{return D3DPT_TRIANGLESTRIP;}
-
-	uint32_t DXRenderer::TriangleFan() const
-	{return D3DPT_TRIANGLEFAN;}
+		vbuffer->Release();
+		ibuffer->Release();
+	}
 
 
 	/*
@@ -808,4 +738,98 @@ namespace Graphics
 		}
 	}
 	*/
+
+	bool DXRenderer::setTranslation(const Util::Vec3& translation)
+	{
+		D3DXMATRIX mat;
+		D3DXMatrixTranslation(&mat, translation.x, translation.y, translation.z);
+		_transformMatrix *= mat;
+		return true;
+	}
+
+	bool DXRenderer::setScaling(const Util::Vec3& scale)
+	{
+		D3DXMATRIX mat;
+		D3DXMatrixScaling(&mat, scale.x, scale.y, scale.z);
+		_transformMatrix *= mat;
+		return true;
+	}
+
+	bool DXRenderer::setRotation(const Util::Vec3& rotation)
+	{
+		D3DXMATRIX mat;
+		D3DXMatrixRotationYawPitchRoll(&mat, rotation.y, rotation.x, rotation.z);
+		_transformMatrix *= mat;
+		return true;
+	}
+
+	bool DXRenderer::setProjectionMatrix(float vertFovDeg, float nearViewPlane, float farViewPlane, float screenAspectRatio)
+	{
+		D3DXMATRIX mat;
+		if(screenAspectRatio < 0.1f)
+		{
+			auto screen = getScreenSize();
+			screenAspectRatio = screen.x/screen.y;
+		}
+		D3DXMatrixPerspectiveFovLH(&mat, D3DXToRadian(vertFovDeg), screenAspectRatio, nearViewPlane, farViewPlane);
+		return SUCCEEDED(_d3ddev->SetTransform(D3DTS_PROJECTION, &mat));
+	}
+
+	bool DXRenderer::setViewMatrix(const Util::Vec3& cameraPosition, const Util::Vec3& cameraLookAt, const Util::Vec3& cameraUpVector)
+	{
+		D3DXMATRIX mat;
+		D3DXMatrixLookAtLH(&mat, &MakeVECTOR(cameraPosition), &MakeVECTOR(cameraLookAt), &MakeVECTOR(cameraUpVector));
+		return SUCCEEDED(_d3ddev->SetTransform(D3DTS_VIEW, &mat));
+	}
+
+	bool DXRenderer::setWorldTransformMatrix()
+	{
+		return SUCCEEDED(_d3ddev->SetTransform(D3DTS_WORLD, &_transformMatrix));
+	}
+
+	bool DXRenderer::appendFVF(FVF_Type format)
+	{
+		uint32_t fvfs[] = { D3DFVF_XYZ, D3DFVF_XYZRHW, D3DFVF_NORMAL, D3DFVF_DIFFUSE, D3DFVF_SPECULAR, D3DFVF_TEX0, D3DFVF_TEX1, D3DFVF_TEX2, D3DFVF_TEX3, D3DFVF_TEX4, D3DFVF_TEX5, D3DFVF_TEX6, D3DFVF_TEX7, D3DFVF_TEX8 };
+		_vertexFormat |= fvfs[(uint32_t)format];
+		return true;
+	}
+
+	bool DXRenderer::clearFVF()
+	{
+		_vertexFormat = 0;
+		return true;
+	}
+
+	bool DXRenderer::applyFVF(uint32_t format)
+	{
+		return SUCCEEDED(_d3ddev->SetFVF(format == 0 ? _vertexFormat : format));
+	}
+
+	uint32_t DXRenderer::getFVF() const
+	{
+		return _vertexFormat;
+	}
+
+	bool DXRenderer::setRenderStateLighting(bool enabled)
+	{
+		return SUCCEEDED(_d3ddev->SetRenderState(D3DRS_LIGHTING, enabled));
+	}
+
+	bool DXRenderer::setRenderStateZBuffer(bool enabled)
+	{
+		return SUCCEEDED(_d3ddev->SetRenderState(D3DRS_ZENABLE, enabled));
+	}
+
+	bool DXRenderer::setRenderStateCulling(RS_Culling cullmode)
+	{
+		DWORD modes[] = {D3DCULL_NONE, D3DCULL_CW, D3DCULL_CCW};
+		return SUCCEEDED(_d3ddev->SetRenderState(D3DRS_CULLMODE, modes[(int)cullmode]));
+	}
+
+	bool DXRenderer::setRenderStateFillmode(RS_Fillmode fillmode)
+	{
+		DWORD modes[] = {D3DFILL_POINT, D3DFILL_WIREFRAME, D3DFILL_SOLID};
+		return SUCCEEDED(_d3ddev->SetRenderState(D3DRS_FILLMODE, modes[(int)fillmode]));
+	}
+
 }
