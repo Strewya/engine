@@ -5,15 +5,6 @@
     <ClCompile Include="..\..\source\Win32\WindowClass.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Win32\StandardWindow.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Win32\GameWindow.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Win32\AbstractWindow.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -120,21 +111,15 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\ARender.cpp">
+    <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp">
       <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\Window.cpp">
+      <Filter>Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
-      <Filter>Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Win32\StandardWindow.h">
-      <Filter>Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Win32\GameWindow.h">
-      <Filter>Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Win32\AbstractWindow.h">
       <Filter>Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Logger.h">
@@ -276,11 +261,14 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\ARender.h">
-      <Filter>Core/Action/Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h">
       <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\Window.h">
+      <Filter>Win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

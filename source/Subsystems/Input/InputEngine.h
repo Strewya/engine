@@ -11,7 +11,7 @@
 #include "Subsystems/Input/Event.h"
 	/*** end header inclusion ***/
 
-namespace Win32 { class AbstractWindow; }
+namespace Win32 { class Window; }
 
 namespace Input
 {
@@ -24,7 +24,7 @@ namespace Input
 		std::list<Event> _eventQueue;
 		
 	public:
-		Engine(Win32::AbstractWindow& window);
+		Engine(Win32::Window& window);
 		
 		void Update();
 		void PurgeEvents();

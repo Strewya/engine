@@ -20,7 +20,7 @@
 
 namespace Win32
 {
-	class AbstractWindow;
+	class Window;
 }
 
 namespace Core
@@ -28,7 +28,7 @@ namespace Core
 	class Engine
 	{
 	private:
-		Win32::AbstractWindow& _window;
+		Win32::Window& _window;
 		Graphics::RendererFactory _rendererFactory;
 		//Audio::AudioFactory _audioFactory;
 		Script::Engine _scriptEngine;
@@ -49,7 +49,7 @@ namespace Core
 		Util::Clock _mainClock;
 	
 	public:
-		Engine(Win32::AbstractWindow& window);
+		Engine(Win32::Window& window);
 		~Engine();
 		void Loop();
 		void Shutdown();

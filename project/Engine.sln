@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX_Renderer", "DX_Renderer\DX_Renderer.vcxproj", "{7B9A5BD8-92C6-439E-BD40-1FE283AF42A5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Win32Main", "Win32Main\Win32Main.vcxproj", "{2A561F25-7E4A-4EEC-BBF8-C0C262EDA3A5}"

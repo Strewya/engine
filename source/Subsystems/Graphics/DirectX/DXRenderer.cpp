@@ -598,10 +598,12 @@ namespace Graphics
 		ibuffer->Unlock();
 		_d3ddev->SetIndices(ibuffer);
 
+		_d3ddev->SetFVF(_vertexFormat);
+
 		D3DPRIMITIVETYPE types[] = {D3DPT_POINTLIST, D3DPT_LINELIST, D3DPT_LINESTRIP, D3DPT_TRIANGLELIST, D3DPT_TRIANGLESTRIP, D3DPT_TRIANGLEFAN};
 		_d3ddev->DrawIndexedPrimitive(types[(int)drawType], 0, 0, numVertices, 0, numPrimitives);
 		D3DXMatrixIdentity(&_transformMatrix);
-
+		
 		vbuffer->Release();
 		ibuffer->Release();
 	}

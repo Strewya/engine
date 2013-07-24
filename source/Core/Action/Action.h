@@ -16,15 +16,17 @@ namespace Core
 	class Action
 	{
 	public:
-		Action();
+		Action(uint32_t priority);
 
 		virtual bool update(float dt, GameContext& context) = 0;
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
+		uint32_t getPriority() const;
 
 	protected:
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t _entities;
+		uint32_t _priority;
 	};
 }

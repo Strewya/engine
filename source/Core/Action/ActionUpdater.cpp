@@ -4,70 +4,28 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
-#include "Core/Action/Action.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	void ActionUpdater::Update(float dt, GameContext& context)
+	ActionUpdater::ActionUpdater()
+	{}
+	
+	void ActionUpdater::update(float dt, GameContext& context)
 	{
-		for(ActionLogic fn : _actionQueue)
+		for(auto& pair : _priorityQueue)
 		{
-			auto& list = _activeActions[fn];
-			if(!list.empty())
-			{
-				fn(dt, context, list);
-			}
+			auto& action = *pair.second;
+			action.update(dt, context);
 		}
-		PurgeActions();
 	}
 
-	bool ActionUpdater::EnqueueActionLogic(ActionLogic logic)
+	bool ActionUpdater::addAction(std::unique_ptr<Action>& action)
 	{
-		auto it = std::find(_actionQueue.begin(), _actionQueue.end(), logic);
-		if(it != _actionQueue.end())
+		if(_priorityQueue.find(action->getPriority()) == _priorityQueue.end())
 		{
-			return false;
-		}
-		_actionQueue.push_back(logic);
-		return true;
-	}
-
-	bool ActionUpdater::ActivateAction(ActionLogic logic, Action* action)
-	{
-		auto& allActions = _activeActions[logic];
-		auto it = allActions.find(action);
-		if(it == allActions.end())
-		{
-			allActions.insert(action);
-			return true;
+			return _priorityQueue.emplace(std::make_pair(action->getPriority(), std::move(action))).second;
 		}
 		return false;
-	}
-
-	bool ActionUpdater::DeactivateAction(ActionLogic logic, Action* action)
-	{
-		auto& allActions = _activeActions[logic];
-		auto it = allActions.find(action);
-		if(it != allActions.end())
-		{
-			_actionsForDeletion.push_back(std::make_pair(logic, action));
-			return true;
-		}
-		return false;
-	}
-
-	void ActionUpdater::PurgeActions()
-	{
-		for(auto& pair : _actionsForDeletion)
-		{
-			auto& allActions = _activeActions[pair.first];
-			auto it = allActions.find(pair.second);
-			if(it != allActions.end())
-			{
-				allActions.erase(it);
-			}
-		}
-		_actionsForDeletion.clear();
 	}
 }

@@ -4,13 +4,13 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Subsystems/Graphics/IRenderer.h"
-#include "Win32/AbstractWindow.h"
+#include "Win32/Window.h"
 	/*** end headers ***/
 
 namespace Core
 {
-	Engine::Engine(Win32::AbstractWindow& window)
-		: _window(window), _rendererFactory(window.getInstance(), window.getWindowHandle()), _activeContext(nullptr), _inputEngine(window)
+	Engine::Engine(Win32::Window& window)
+		: _window(window), _rendererFactory(window), _activeContext(nullptr), _inputEngine(window)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -97,46 +97,18 @@ namespace Core
 		_inputEngine.Update();
 
 		//update logic and draw entities
-		//if there can be only one active context
+		//only one context can be active
 		if(_activeContext->Update())
 		{
 			_inputEngine.PurgeEvents();
 		}
-		
-		//if there are more than one active contexts
-		/*
-		for(auto context : _activeContexts)
-		{
-			if(context->Update())
-			{
-				break;
-			}
-		}
-		*/
-
-		
 	}
 
 	void Engine::Shutdown()
 	{
 		_window.Shutdown();
 	}
-	/*
-	GameContext& Engine::CreateContext(const char* name, GameContextEvent onCreate)
-	{
-		auto it = _gameContexts.find(name);
-		if(it == _gameContexts.end())
-		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, *this, _services, _resources))).first;
-		}
-		return *it->second;
-	}
-
-	GameContext& Engine::CreateContext(const String& name, GameContextEvent onCreate)
-	{
-		return CreateContext(name.c_str(), onCreate);
-	}
-	*/
+	
 	GameContext& Engine::getContext(const char* name, GameContextEvent onCreate)
 	{
 		auto it = _gameContexts.find(name);

@@ -5,32 +5,30 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
-#include <list>
-#include <set>
+#include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Action/ActionLogic.h"
+//#include "Core/Action/Action.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
 	class Action;
-	class ServiceLocator;
+	class GameContext;
 
 	class ActionUpdater
 	{
-	private:
-		std::unordered_map<ActionLogic, std::set<Action*>> _activeActions;
-		std::list<std::pair<ActionLogic, Action*>> _actionsForDeletion;
-		std::vector<ActionLogic> _actionQueue;
-
-		void PurgeActions();
-
 	public:
-		void Update(float dt, GameContext& context);
+		ActionUpdater();
+		void update(float dt, GameContext& context);
+	
+		bool addAction(std::unique_ptr<Action>& action);
+	
+	
+	private:
+		ActionUpdater(const ActionUpdater&);
+		ActionUpdater& operator=(const ActionUpdater&);
 
-		bool EnqueueActionLogic(ActionLogic logic);
-		bool ActivateAction(ActionLogic logic, Action* action);
-		bool DeactivateAction(ActionLogic logic, Action* action);
+		std::unordered_map<uint32_t, std::unique_ptr<Action>> _priorityQueue;
 	};
 }

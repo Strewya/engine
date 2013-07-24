@@ -9,6 +9,8 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
+namespace Win32 { class Window; }
+
 namespace Graphics
 {
 	class IRenderer;
@@ -23,7 +25,7 @@ namespace Graphics
 
 	public:
 
-		RendererFactory(HINSTANCE hInst, HWND hwnd);
+		RendererFactory(Win32::Window& window);
 		~RendererFactory();
 
 		void InitInterface(const char* name);

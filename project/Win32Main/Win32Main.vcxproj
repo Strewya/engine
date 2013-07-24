@@ -91,7 +91,7 @@
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\Impl\ARender.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp" />
@@ -125,10 +125,8 @@
     <ClCompile Include="..\..\source\Util\Clock.cpp" />
     <ClCompile Include="..\..\source\Util\ITimer.cpp" />
     <ClCompile Include="..\..\source\Util\Timer.cpp" />
-    <ClCompile Include="..\..\source\Win32\GameWindow.cpp" />
-    <ClCompile Include="..\..\source\Win32\StandardWindow.cpp" />
     <ClCompile Include="..\..\source\Win32\WindowClass.cpp" />
-    <ClCompile Include="..\..\source\Win32\AbstractWindow.cpp" />
+    <ClCompile Include="..\..\source\Win32\Window.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -136,7 +134,7 @@
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
-    <ClInclude Include="..\..\source\Core\Action\Impl\ARender.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\Render.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h" />
@@ -181,10 +179,8 @@
     <ClInclude Include="..\..\source\Util\Clock.h" />
     <ClInclude Include="..\..\source\Util\Timer.h" />
     <ClInclude Include="..\..\source\Util\CompositeTimer.h" />
-    <ClInclude Include="..\..\source\Win32\GameWindow.h" />
-    <ClInclude Include="..\..\source\Win32\StandardWindow.h" />
     <ClInclude Include="..\..\source\Win32\WindowClass.h" />
-    <ClInclude Include="..\..\source\Win32\AbstractWindow.h" />
+    <ClInclude Include="..\..\source\Win32\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resources\character.sheet" />

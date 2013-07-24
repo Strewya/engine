@@ -8,7 +8,8 @@
 
 namespace Core
 {
-	Action::Action()
+	Action::Action(uint32_t priority)
+		: _priority(priority)
 	{}
 
 	bool Action::registerEntity(InstanceID id)
@@ -19,5 +20,10 @@ namespace Core
 	bool Action::unregisterEntity(InstanceID id)
 	{
 		return _entities.erase(id) > 0;
+	}
+
+	uint32_t Action::getPriority() const
+	{
+		return _priority;
 	}
 }

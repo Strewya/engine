@@ -5,12 +5,13 @@
 	/*** extra headers ***/
 #include "Subsystems/Graphics/dll_header.h"
 #include "Subsystems/Graphics/IRenderer.h"
+#include "Win32/Window.h"
 	/*** end headers ***/
 
 namespace Graphics
 {
-	RendererFactory::RendererFactory(HINSTANCE hInst, HWND hwnd)
-		: _hInst(hInst), _renderer(NULL), _dll(NULL), _hwnd(hwnd)
+	RendererFactory::RendererFactory(Win32::Window& window)
+		: _hInst(window.getInstance()), _renderer(NULL), _dll(NULL), _hwnd(window.getWindowHandle())
 	{}
 
 	RendererFactory::~RendererFactory()

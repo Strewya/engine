@@ -9,14 +9,14 @@
 #include "Engine/Engine.h"
 #include "GameContextEvents_Pong.h"
 #include "Util/Clock.h"
-#include "Win32/GameWindow.h"
+#include "Win32/Window.h"
 #include "Win32/WindowClass.h"
 	/*** end headers ***/
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-	Win32::GameWindow gameWindow("Snake");
-	int result = InitializeWindow(gameWindow, false, gameWindow.getSizeX()-120, gameWindow.getSizeY()-120);
+	Win32::Window window("Snake");
+	int result = InitializeWindow(window, false, window.getSizeX()-120, window.getSizeY()-120);
 	if(result != ErrorCode::OK)
 	{
 		return result;
@@ -24,23 +24,23 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
 	try
 	{
-		Core::Engine engine(gameWindow);
+		Core::Engine engine(window);
 		engine.getContext("main", Pong::ContextGameplayCreate);
 		bool pushed = engine.PushContext("main");
 		assert(pushed);
 		assert(!engine.PushContext("main"));
 		
 		//start main loop
-		while(gameWindow.Update())
+		while(window.Update())
 		{	
 			engine.Loop();
 		}
 
-		return gameWindow.getExitCode();
+		return window.getExitCode();
 	}
 	catch(std::exception& ex)
 	{
-		MessageBox(gameWindow.getWindowHandle(), ex.what(), "Exception error", MB_OK);
+		MessageBox(window.getWindowHandle(), ex.what(), "Exception error", MB_OK);
 		return ErrorCode::ExceptionThrown;
 	}
 }

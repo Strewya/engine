@@ -8,7 +8,7 @@
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
 #include "Core/Action/Action.h"
-#include "Core/Action/Impl/ARender.h"
+#include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Core/State/State.h"
 #include "Subsystems/Graphics/IRenderer.h"
@@ -44,14 +44,14 @@ namespace Pong
 
 
 		Graphics::Vertex vbuffer[] = {
-			{ -3.0f, 3.0f, -3.0f, Util::Color(127, 0, 0, 255).getARGB(), },    // vertex 0
-			{ 3.0f, 3.0f, -3.0f, Util::Color(127, 0, 255, 0).getARGB(), },     // vertex 1
-			{ -3.0f, -3.0f, -3.0f, Util::Color(127, 255, 0, 0).getARGB(), },   // 2
-			{ 3.0f, -3.0f, -3.0f, Util::Color(127, 0, 255, 255).getARGB(), },  // 3
-			{ -3.0f, 3.0f, 3.0f, Util::Color(127, 0, 0, 255).getARGB(), },     // ...
-			{ 3.0f, 3.0f, 3.0f, Util::Color(127, 255, 0, 0).getARGB(), },
-			{ -3.0f, -3.0f, 3.0f, Util::Color(127, 0, 255, 0).getARGB(), },
-			{ 3.0f, -3.0f, 3.0f, Util::Color(127, 0, 255, 255).getARGB(), },
+			{ -3.0f, 3.0f, -3.0f, Util::Color(0, 0, 255).getARGB(), },		// 0 -+-
+			{ 3.0f, 3.0f, -3.0f, Util::Color(0, 255, 0).getARGB(), },		// 1 ++-
+			{ -3.0f, -3.0f, -3.0f, Util::Color(255, 0, 0).getARGB(), },		// 2 ---
+			{ 3.0f, -3.0f, -3.0f, Util::Color(0, 255, 255).getARGB(), },	// 3 +--
+			{ -3.0f, 3.0f, 3.0f, Util::Color(0, 255, 255).getARGB(), },		// 4 -++
+			{ 3.0f, 3.0f, 3.0f, Util::Color(255, 0, 0).getARGB(), },		// 5 +++
+			{ -3.0f, -3.0f, 3.0f, Util::Color(0, 255, 0).getARGB(), },		// 6 --+
+			{ 3.0f, -3.0f, 3.0f, Util::Color(0, 0, 255).getARGB(), },		// 7 +-+
 		};
 
 		uint16_t indices[] =
@@ -70,24 +70,39 @@ namespace Pong
 			2, 7, 6,
 		};
 
-		static Util::Vec3 rot;
-		rot.y += 0.01f;
+		uint16_t edges[] =
+		{
+			0,1, 1,3, 3,2, 2,0,
+			4,5, 5,7, 7,6, 6,4,
+			0,4, 1,5, 3,7, 2,6,
+		};
 
+		static Util::Vec3 rotl(1,0,0), rotr(1,0,0);
+		rotl.y += 0.01f;
+		rotr.y -= 0.01f;
 
 		gfx.BeginScene();
 
-		gfx.appendFVF(Graphics::FVF_Type::XYZ);
-		gfx.appendFVF(Graphics::FVF_Type::DIFFUSE);
-		gfx.applyFVF(0);
-
-		gfx.setRotation(rot);
-		gfx.setWorldTransformMatrix();
-		gfx.setViewMatrix(Util::Vec3(10,10,-10), Util::Vec3(0,0,0), Util::Vec3(0,1,0));
-		gfx.setProjectionMatrix(45.0f, 1.0f, 100.0f, 0);
 		gfx.setRenderStateLighting(false);
 		gfx.setRenderStateZBuffer(true);
-		gfx.setRenderStateFillmode(Graphics::RS_Fillmode::Wireframe);
-		gfx.setRenderStateCulling(Graphics::RS_Culling::None);
+		gfx.appendFVF(Graphics::FVF_Type::XYZ);
+		gfx.appendFVF(Graphics::FVF_Type::DIFFUSE);
+
+		gfx.setScaling(Util::Vec3(2,1.5,1));
+		gfx.setRotation(rotl);
+		gfx.setWorldTransformMatrix();
+		gfx.setViewMatrix(Util::Vec3(0,0,-30), Util::Vec3(0,0,0), Util::Vec3(0,1,0));
+		gfx.setProjectionMatrix(45.0f, 1.0f, 100.0f, 0);
+		
+		//gfx.DrawIndexedPrimitive(vbuffer, 8, indices, 36, Graphics::DP_Type::TriangleList, 12);
+		gfx.DrawIndexedPrimitive(vbuffer, 8, edges, 24, Graphics::DP_Type::LineList, 12);
+
+
+		gfx.setRotation(rotr);
+		gfx.setTranslation(Util::Vec3(-10,0,10));
+		gfx.setWorldTransformMatrix();
+		gfx.setViewMatrix(Util::Vec3(0,0,-30), Util::Vec3(0,0,0), Util::Vec3(0,1,0));
+		gfx.setProjectionMatrix(45.0f, 1.0f, 100.0f, 0);
 		
 
 		gfx.DrawIndexedPrimitive(vbuffer, 8, indices, 36, Graphics::DP_Type::TriangleList, 12);
@@ -110,7 +125,10 @@ namespace Pong
 	{
 		context.setContextEventLogic(Core::GameContext::OnUpdate, onUpdate);
 
-		context.services.getGraphics().setBackgroundFillColor(0,0,127);
+		context.services.getGraphics().setBackgroundFillColor(127,127,127);
+
+
+		context.actionMaster.addAction(std::unique_ptr<Core::Action>(new Core::ARender()));
 
 		return true;
 	}

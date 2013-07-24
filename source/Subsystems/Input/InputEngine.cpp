@@ -3,12 +3,12 @@
 #include "Subsystems/Input/InputEngine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Win32/AbstractWindow.h"
+#include "Win32/Window.h"
 	/*** end headers ***/
 
 namespace Input
 {
-	Engine::Engine(Win32::AbstractWindow& window)
+	Engine::Engine(Win32::Window& window)
 		: _keys(Keyboard::_KeyCount, false), _mouseKeys(Mouse::_KeyCount, false)
 	{
 		window.setEventQueue(_eventQueue);

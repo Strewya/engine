@@ -64,7 +64,7 @@ namespace Core
 				_onUpdate(*this);
 			}
 
-			actionMaster.Update(gUpdateInterval, *this);
+			actionMaster.update(gUpdateInterval, *this);
 			return true;
 		}
 		return false;

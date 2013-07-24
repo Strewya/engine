@@ -20,6 +20,7 @@ namespace Core
 	class ARender : public Action
 	{
 	public:
+		ARender();
 		bool update(float dt, GameContext& context);
 
 	private:

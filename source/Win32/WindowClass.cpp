@@ -4,7 +4,7 @@
 	/*** C++ headers ***/
 #include <cstring>
 	/*** extra headers ***/
-#include "Win32/AbstractWindow.h"
+#include "Win32/Window.h"
 	/*** end headers ***/
 
 namespace Win32
@@ -42,7 +42,7 @@ namespace Win32
 		this->cbSize = sizeof(WNDCLASSEX);
 		//fill the structure with info
 		this->style			= CS_HREDRAW | CS_VREDRAW;
-		this->lpfnWndProc	= (WNDPROC)AbstractWindow::MessageRouter;
+		this->lpfnWndProc	= (WNDPROC)Window::MessageRouter;
 		this->cbClsExtra	= 0;
 		this->cbWndExtra	= 0;
 		this->hIcon			= LoadIcon(this->hInstance, IDI_APPLICATION);
