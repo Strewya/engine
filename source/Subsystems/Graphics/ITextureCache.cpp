@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Subsystems/Graphics/ITextureCache.h"
 	/*** C++ headers ***/

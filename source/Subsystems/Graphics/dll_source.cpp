@@ -1,3 +1,5 @@
+	/*** precompiled header ***/
+#include "stdafx.h"
 
 #include "dll_header.h"
 #include "Subsystems/Graphics/IRenderer.h"
@@ -5,7 +7,7 @@
 
 int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 {
-	if(!*renderer)
+	if(renderer != nullptr && *renderer == nullptr)
 	{
 		try
 		{
@@ -22,7 +24,7 @@ int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 
 int destroyRendererInterface(Graphics::IRenderer** renderer)
 {
-	if(!*renderer)
+	if(renderer != nullptr && *renderer == nullptr)
 	{
 		return 0;
 	}

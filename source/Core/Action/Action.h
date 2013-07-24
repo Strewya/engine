@@ -5,8 +5,10 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
+#include <memory>
 #include <unordered_set>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include "Util/Timer.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -16,17 +18,38 @@ namespace Core
 	class Action
 	{
 	public:
-		Action(uint32_t priority);
+		Action(InstanceID type);
 
 		virtual bool update(float dt, GameContext& context) = 0;
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
-		uint32_t getPriority() const;
-
+		
+		const InstanceID uid;
 	protected:
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t _entities;
-		uint32_t _priority;
+		Util::Timer _timer;
 	};
+
+
+	template<typename T> struct ActionType : public Action
+	{
+		typedef T Derived_t;
+		typedef std::unique_ptr<Derived_t> Uptr;
+		typedef Derived_t* Rptr;
+		typedef Derived_t& Ref;
+
+		static const InstanceID Type;
+
+		static std::unique_ptr<Derived_t> create()
+		{
+			return std::unique_ptr<Derived_t>(new Derived_t());
+		}
+
+	protected:
+		ActionType() : Action(Type) {}
+	};
+
+	template<typename T> const InstanceID ActionType<T>::Type = typeid(T).hash_code();
 }

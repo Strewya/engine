@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Win32/Window.h"
 	/*** C++ headers ***/
@@ -13,26 +15,26 @@ namespace Win32
 	Window::Window()
 		: _extendedStyle(0), _class("Window"), _title("Window"), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
 		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
-		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(false), _useWaitMessage(false), _exitCode(0),
+		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
 		_queue(nullptr)
 	{
 		setFullscreen(false);
 	}
 
 	Window::Window(const char* title)
+		: _extendedStyle(0), _class(title), _title(title), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
+		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
+		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
+		_queue(nullptr)
 	{
-		setTitle(title);
-		setClass(title);
-		setUsePeekMessage(true);
-		setUseWaitMessage(false);
 	}
 
 	Window::Window(const String& title)
+		: _extendedStyle(0), _class(title), _title(title), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
+		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
+		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
+		_queue(nullptr)
 	{
-		setTitle(title);
-		setClass(title);
-		setUsePeekMessage(true);
-		setUseWaitMessage(false);
 	}
 
 	Window::~Window()
@@ -150,6 +152,11 @@ namespace Win32
 			setStyle(WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX);
 			setExtendedStyle(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE);
 		}
+	}
+
+	void Window::showMessagebox(const char* title, const char* text)
+	{
+		MessageBox(_hwnd, text, title, MB_OK);
 	}
 
 	void Window::setExtendedStyle(uint32_t style) { _extendedStyle = style; }

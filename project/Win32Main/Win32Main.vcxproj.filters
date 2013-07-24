@@ -117,6 +117,10 @@
     <ClCompile Include="..\..\source\Win32\Window.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -270,6 +274,10 @@
     <ClInclude Include="..\..\source\Win32\Window.h">
       <Filter>Win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionIndex.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">

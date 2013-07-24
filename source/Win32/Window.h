@@ -30,6 +30,7 @@ namespace Win32
 		virtual void Show();
 		virtual bool Update();
 		void Shutdown();
+		void showMessagebox(const char* title, const char* text);
 
 		void setFullscreen(bool fs);
 		void setExtendedStyle(uint32_t style);

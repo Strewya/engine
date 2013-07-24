@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** C++ headers ***/
 #define WIN32_LEAN_AND_MEAN 1
 #include <cassert>
@@ -25,15 +27,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	try
 	{
 		Core::Engine engine(window);
-		engine.getContext("main", Pong::ContextGameplayCreate);
-		bool pushed = engine.PushContext("main");
-		assert(pushed);
-		assert(!engine.PushContext("main"));
+		engine.initializeGame(Pong::initPong);
 		
 		//start main loop
 		while(window.Update())
 		{	
-			engine.Loop();
+			engine.loop();
 		}
 
 		return window.getExitCode();

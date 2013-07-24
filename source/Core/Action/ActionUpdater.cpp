@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Core/Action/ActionUpdater.h"
 	/*** C++ headers ***/
@@ -8,24 +10,17 @@
 
 namespace Core
 {
-	ActionUpdater::ActionUpdater()
-	{}
-	
 	void ActionUpdater::update(float dt, GameContext& context)
 	{
-		for(auto& pair : _priorityQueue)
+		for(auto& action : _priorityQueue)
 		{
-			auto& action = *pair.second;
-			action.update(dt, context);
+			
+			action->update(dt, context);
 		}
 	}
 
-	bool ActionUpdater::addAction(std::unique_ptr<Action>& action)
+	void ActionUpdater::addAction(ActionRef action)
 	{
-		if(_priorityQueue.find(action->getPriority()) == _priorityQueue.end())
-		{
-			return _priorityQueue.emplace(std::make_pair(action->getPriority(), std::move(action))).second;
-		}
-		return false;
+		return _priorityQueue.emplace_back(&action);
 	}
 }

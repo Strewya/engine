@@ -1,11 +1,24 @@
 #pragma once
 
+#include <memory>
+
 namespace Core
 {
-
-
-	class Entity;
+	
+	class Engine;
+	
 	class EntityFactory;
 	class EntityPool;
+	class GameContext;
 
+
+	class Action;
+	typedef Action& ActionRef;
+	typedef Action* ActionRptr;
+	typedef std::unique_ptr<Action> ActionUptr;
+	class Entity;
+	class State;
+	typedef State& StateRef;
+	typedef State* StateRptr;
+	typedef std::unique_ptr<State> StateUptr;
 }

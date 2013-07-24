@@ -5,24 +5,21 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
-#include <list>
+#include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Action/Action.h"
-#include "Subsystems/Graphics/RenderingQueue.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	class Entity;
-	class GameContext;
-	
-
-	class ARender : public ActionType<ARender>
+	class ActionIndex
 	{
 	public:
-		bool update(float dt, GameContext& context);
+		ActionRef addActionToIndex(ActionUptr action);
+		ActionRef getActionFromIndex(InstanceID actionId);
 
+	protected:
 	private:
-		Graphics::RenderingQueue _queue;
+		typedef std::unordered_map<InstanceID , ActionUptr> ActionStorage_t;
+		ActionStorage_t _actions;
 	};
 }

@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Engine/Engine.h"
 	/*** C++ headers ***/
@@ -84,11 +86,13 @@ namespace Core
 		_spritesheets.clear();
 	}
 
-	void Engine::Loop()
+	void Engine::loop()
 	{
 		if(!_activeContext)
 		{
-			Shutdown();
+			_window.showMessagebox("Error", "No game context active, exiting!");
+			shutdown();
+			return;
 		}
 
 		_mainClock.AdvanceTime();
@@ -104,29 +108,33 @@ namespace Core
 		}
 	}
 
-	void Engine::Shutdown()
+	void Engine::shutdown()
 	{
 		_window.Shutdown();
 	}
+
+	void Engine::initializeGame(GameInitLogic init)
+	{
+		init(*this);
+	}
 	
-	GameContext& Engine::getContext(const char* name, GameContextEvent onCreate)
+	GameContext& Engine::getContext(const char* name)
 	{
 		auto it = _gameContexts.find(name);
 		if(it == _gameContexts.end())
 		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(onCreate, _services, _resources))).first;
-			it->second->Create();
+			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(_services, _resources))).first;
 			_mainClock.RegisterTimer(it->second->timer);
 		}
 		return *it->second;
 	}
 
-	GameContext& Engine::getContext(const String& name, GameContextEvent onCreate)
+	GameContext& Engine::getContext(const String& name)
 	{
-		return getContext(name.c_str(), onCreate);
+		return getContext(name.c_str());
 	}
 
-	bool Engine::PushContext(const char* name)
+	bool Engine::pushContext(const char* name)
 	{
 		auto it = _gameContexts.find(name);
 		if(it != _gameContexts.end() && it->second.get() != _activeContext)
@@ -142,8 +150,8 @@ namespace Core
 		return false;
 	}
 
-	bool Engine::PushContext(const String& name)
+	bool Engine::pushContext(const String& name)
 	{
-		return PushContext(name.c_str());
+		return pushContext(name.c_str());
 	}
 }

@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Core/State/State4.h"
 	/*** C++ headers ***/
@@ -7,10 +9,10 @@
 
 namespace Core
 {
-	BaseState::BaseState(InstanceID uid)
+	State::State(InstanceID uid)
 		: uid(uid)
 	{}
 
-	BaseState::~BaseState()
+	State::~State()
 	{}
 }

@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Core/Action/Impl/Render.h"
 	/*** C++ headers ***/
@@ -11,10 +13,6 @@
 
 namespace Core
 {
-	ARender::ARender()
-		: Action(10)
-	{}
-
 	bool ARender::update(float dt, GameContext& context)
 	{
 		for(auto id : _entities)

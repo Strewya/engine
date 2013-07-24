@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Engine/GameContext.h"
 	/*** C++ headers ***/
@@ -8,23 +10,15 @@
 
 namespace Core
 {
-	GameContext::GameContext(GameContextEvent onCreate, ServiceLocator& services, ResourceLocator& resources)
-		: _onCreate(onCreate), _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
-		timer(), physicsWorld(b2Vec2(0,0)), entityFactory(*this), services(services), resources(resources)
+	GameContext::GameContext(ServiceLocator& services, ResourceLocator& resources)
+		: _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
+		physicsWorld(b2Vec2(0,0)), entityFactory(*this), services(services), resources(resources)
 	{
 	}
 
 	GameContext::~GameContext()
 	{
 		Destroy();
-	}
-
-	void GameContext::Create()
-	{
-		if(_onCreate)
-		{
-			_onCreate(*this);
-		}
 	}
 
 	void GameContext::Destroy()
@@ -64,7 +58,7 @@ namespace Core
 				_onUpdate(*this);
 			}
 
-			actionMaster.update(gUpdateInterval, *this);
+			actionQueue.update(gUpdateInterval, *this);
 			return true;
 		}
 		return false;

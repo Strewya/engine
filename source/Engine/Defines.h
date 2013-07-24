@@ -53,3 +53,4 @@ template <typename T> String ToString(T value)
 
 /*		MY HEADERS	*/
 #include "Util/Logger.h"
+#include "Engine/FwdDecl.h"

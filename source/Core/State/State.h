@@ -12,7 +12,4 @@
 
 namespace Core
 {
-	typedef std::unique_ptr<BaseState> StateUptr;
-	typedef BaseState* StateRptr;
-	typedef BaseState& StateRef;
 }

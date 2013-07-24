@@ -1,4 +1,6 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Core/Action/Action.h"
 	/*** C++ headers ***/
@@ -8,8 +10,8 @@
 
 namespace Core
 {
-	Action::Action(uint32_t priority)
-		: _priority(priority)
+	Action::Action(InstanceID type)
+		: uid(type)
 	{}
 
 	bool Action::registerEntity(InstanceID id)
@@ -20,10 +22,5 @@ namespace Core
 	bool Action::unregisterEntity(InstanceID id)
 	{
 		return _entities.erase(id) > 0;
-	}
-
-	uint32_t Action::getPriority() const
-	{
-		return _priority;
 	}
 }

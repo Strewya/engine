@@ -49,6 +49,7 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.h">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Util\Color.cpp">
@@ -90,6 +91,7 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.cpp">
       <Filter>Subsystems/Graphics/DirectX</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DX_Renderer.def" />

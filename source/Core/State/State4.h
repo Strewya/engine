@@ -12,17 +12,15 @@
 
 namespace Core
 {
-//namespace StateTest
-//{
-	class BaseState
+	class State
 	{
 	public:
 		const InstanceID uid;
 	
-		BaseState(InstanceID uid);
-		virtual ~BaseState();
+		State(InstanceID uid);
+		virtual ~State();
 
-		virtual std::unique_ptr<BaseState> clone() const = 0;
+		virtual std::unique_ptr<State> clone() const = 0;
 		template<typename T> const T* cast() const;
 		template<typename T> T* cast();
 		template<typename T> bool cast(const T** outState) const;
@@ -32,7 +30,7 @@ namespace Core
 
 
 
-	template<typename T> struct State : public BaseState
+	template<typename T> struct StateType : public State
 	{
 		typedef T Derived_t;
 		typedef std::unique_ptr<T> Uptr;
@@ -46,7 +44,7 @@ namespace Core
 			return std::unique_ptr<Derived_t>(new Derived_t());
 		}
 
-		std::unique_ptr<BaseState> clone() const 
+		std::unique_ptr<State> clone() const 
 		{
 			return typeClone();
 		}
@@ -57,17 +55,17 @@ namespace Core
 		}
 
 	protected:
-		State() : BaseState(Type) {}
+		StateType() : State(Type) {}
 	};
 
 
 
 
 
-	template<typename T> const InstanceID State<T>::Type = typeid(T).hash_code();
+	template<typename T> const InstanceID StateType<T>::Type = typeid(T).hash_code();
 
 
-	template<typename T> const T* BaseState::cast() const
+	template<typename T> const T* State::cast() const
 	{
 		if(T::Type != this->uid)
 		{
@@ -76,7 +74,7 @@ namespace Core
 		return static_cast<const T*>(this);
 	}
 	
-	template<typename T> bool BaseState::cast(const T** outState) const
+	template<typename T> bool State::cast(const T** outState) const
 	{
 		if(outState != nullptr)
 		{
@@ -86,7 +84,7 @@ namespace Core
 		return false;
 	}
 
-	template<typename T> T* BaseState::cast()
+	template<typename T> T* State::cast()
 	{
 		if(T::Type != this->uid)
 		{
@@ -95,7 +93,7 @@ namespace Core
 		return static_cast<T*>(this);
 	}
 	
-	template<typename T> bool BaseState::cast(T** outState)
+	template<typename T> bool State::cast(T** outState)
 	{
 		if(outState != nullptr)
 		{
@@ -105,4 +103,3 @@ namespace Core
 		return false;
 	}
 }
-//}

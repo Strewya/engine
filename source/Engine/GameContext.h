@@ -12,6 +12,7 @@
 #include "Engine/GameContextEvent.h"
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
+#include "Core/Action/ActionIndex.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
@@ -30,7 +31,6 @@ namespace Core
 	private:
 		GameContextEvent _onActivate;
 		GameContextEvent _onDeactivate;
-		GameContextEvent _onCreate;
 		GameContextEvent _onDestroy;
 		GameContextEvent _onUpdate;
 	
@@ -44,7 +44,8 @@ namespace Core
 		};
 
 		Util::CompositeTimer timer;
-		ActionUpdater actionMaster;
+		ActionIndex actionIndex;
+		ActionUpdater actionQueue;
 		EntityPool entityPool;
 		EntityFactory entityFactory;
 		SpacePool spacePool;
@@ -52,10 +53,9 @@ namespace Core
 		ResourceLocator& resources;
 		b2World physicsWorld;
 
-		GameContext(GameContextEvent onCreate, ServiceLocator& services, ResourceLocator& resources);
+		GameContext(ServiceLocator& services, ResourceLocator& resources);
 		~GameContext();
 
-		void Create();
 		void Destroy();
 		void Activate();
 		void Deactivate();

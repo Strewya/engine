@@ -27,6 +27,19 @@ namespace Core
 {
 	class Engine
 	{
+	public:
+		typedef std::function<void(Engine&)> GameInitLogic;
+		Engine(Win32::Window& window);
+		~Engine();
+		void loop();
+		void shutdown();
+
+		void initializeGame(GameInitLogic init);
+		GameContext& getContext(const char* name);
+		GameContext& getContext(const String& name);
+		bool pushContext(const char* name);
+		bool pushContext(const String& name);
+	
 	private:
 		Win32::Window& _window;
 		Graphics::RendererFactory _rendererFactory;
@@ -40,23 +53,8 @@ namespace Core
 		Graphics::SpritesheetCache _spritesheets;
 
 		std::unordered_map<String, std::unique_ptr<GameContext>> _gameContexts;
-		/*
-			replace with std::list<GameContext*> if more than one Context can be active
-			requires PopContext() and PopContext(name) methods
-		*/
 		GameContext* _activeContext; 
 		
 		Util::Clock _mainClock;
-	
-	public:
-		Engine(Win32::Window& window);
-		~Engine();
-		void Loop();
-		void Shutdown();
-
-		GameContext& getContext(const char* name, GameContextEvent onCreate = nullptr);
-		GameContext& getContext(const String& name, GameContextEvent onCreate = nullptr);
-		bool PushContext(const char* name);
-		bool PushContext(const String& name);
 	};
 }

@@ -1,3 +1,5 @@
+	/*** precompiled header ***/
+#include "stdafx.h"
 	/*** personal header ***/
 #include "Core/Entity/EntityFactory.h"
 	/*** extra headers ***/

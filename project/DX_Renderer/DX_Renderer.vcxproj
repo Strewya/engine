@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFont.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.h" />
@@ -29,6 +30,9 @@
     <ClInclude Include="..\..\source\Util\Logger.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFont.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.cpp" />
     <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.cpp" />
@@ -87,8 +91,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DX_RENDERER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -110,8 +113,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
