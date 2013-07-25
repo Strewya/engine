@@ -22,7 +22,7 @@ namespace Core
 		GameContext& _ownerContext;
 	public:
 		EntityFactory(GameContext& owningContext);
-		bool CreateEntityType(const String& type, Entity& target) const;
-		bool RegisterConstructor(const String& typeName, const std::function<bool(GameContext&, Entity&)>& creator);
+		bool createEntityType(const String& type, Entity& target) const;
+		bool registerConstructor(const String& typeName, const std::function<bool(GameContext&, Entity&)>& creator);
 	};
 }

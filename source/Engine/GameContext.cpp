@@ -18,10 +18,10 @@ namespace Core
 
 	GameContext::~GameContext()
 	{
-		Destroy();
+		destroy();
 	}
 
-	void GameContext::Destroy()
+	void GameContext::destroy()
 	{
 		if(_onDestroy)
 		{
@@ -29,7 +29,7 @@ namespace Core
 		}
 	}
 
-	void GameContext::Activate()
+	void GameContext::activate()
 	{
 		timer.isPaused = false;
 
@@ -39,7 +39,7 @@ namespace Core
 		}
 	}
 
-	void GameContext::Deactivate()
+	void GameContext::deactivate()
 	{
 		timer.isPaused = true;
 
@@ -49,7 +49,7 @@ namespace Core
 		}
 	}
 
-	bool GameContext::Update()
+	bool GameContext::update()
 	{
 		if(!timer.isPaused)
 		{

@@ -10,7 +10,6 @@
 #include "Engine/Defines.h"
 #include "Engine/Engine.h"
 #include "GameContextEvents_Pong.h"
-#include "Util/Clock.h"
 #include "Win32/Window.h"
 #include "Win32/WindowClass.h"
 	/*** end headers ***/

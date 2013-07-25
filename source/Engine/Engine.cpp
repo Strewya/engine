@@ -102,7 +102,7 @@ namespace Core
 
 		//update logic and draw entities
 		//only one context can be active
-		if(_activeContext->Update())
+		if(_activeContext->update())
 		{
 			_inputEngine.PurgeEvents();
 		}
@@ -141,10 +141,10 @@ namespace Core
 		{
 			if(_activeContext != nullptr)
 			{
-				_activeContext->Deactivate();
+				_activeContext->deactivate();
 			}
 			_activeContext = it->second.get();
-			_activeContext->Activate();
+			_activeContext->activate();
 			return true;
 		}
 		return false;
@@ -153,5 +153,19 @@ namespace Core
 	bool Engine::pushContext(const String& name)
 	{
 		return pushContext(name.c_str());
+	}
+
+	bool Engine::pushContext(GameContext& context)
+	{
+		//make sure it's not temporary before setting it as active
+		for(auto& it : _gameContexts)
+		{
+			if(it.second.get() == &context)
+			{
+				_activeContext = &context;
+				return true;
+			}
+		}
+		return false;
 	}
 }

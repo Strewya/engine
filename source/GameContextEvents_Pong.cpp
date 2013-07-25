@@ -28,35 +28,40 @@
 
 namespace Pong
 {
-	bool CreatePaddle(Core::GameContext& context, Core::Entity& paddle)
+	bool createPaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
 		
 		return false;
 	}
 
-	bool CreateBall(Core::GameContext& context, Core::Entity& ball)
+	bool createBall(Core::GameContext& context, Core::Entity& ball)
 	{
 		
 		return false;
 	}
 
-
-	bool onUpdate(Core::GameContext& context)
+	void registerActionsToIndex(Core::GameContext& context)
 	{
-		
-		return true;
+		context.actionIndex.addActionToIndex(Core::ARender::create());
+	}
+
+	void setupActionQueue(Core::GameContext& context)
+	{
+		context.actionQueue.addAction(context.actionIndex.getActionFromIndex(Core::ARender::Type));
 	}
 
 	void initPong(Core::Engine& engine)
 	{
 		Core::GameContext& context = engine.getContext("main");
-		context.setContextEventLogic(Core::GameContext::OnUpdate, onUpdate);
+		engine.pushContext(context);
 
+		registerActionsToIndex(context);
+		setupActionQueue(context);
+		
 		context.services.getGraphics().setBackgroundFillColor(127,127,127);
 
-
-		auto& render = context.actionIndex.addActionToIndex(Core::ARender::create());
-		context.actionQueue.addAction(render);
+		context.entityFactory.registerConstructor("paddle", createPaddle);
+		context.entityFactory.registerConstructor("ball", createBall);
 
 	}
 }

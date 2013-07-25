@@ -39,6 +39,7 @@ namespace Core
 		GameContext& getContext(const String& name);
 		bool pushContext(const char* name);
 		bool pushContext(const String& name);
+		bool pushContext(GameContext& context);
 	
 	private:
 		Win32::Window& _window;

@@ -56,10 +56,10 @@ namespace Core
 		GameContext(ServiceLocator& services, ResourceLocator& resources);
 		~GameContext();
 
-		void Destroy();
-		void Activate();
-		void Deactivate();
-		bool Update();
+		void destroy();
+		void activate();
+		void deactivate();
+		bool update();
 		void setContextEventLogic(EventType type, GameContextEvent function);
 	};
 }

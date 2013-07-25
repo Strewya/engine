@@ -24,7 +24,6 @@ namespace Core
 			//get entity
 				Entity* ent = context.entityPool.getInstance(id);
 			//get required components:
-				auto renderData = ent->getState<TextureHandle>();
 			//	RenderData
 			//	Position
 			//	..

@@ -11,17 +11,7 @@
 namespace Core
 {
 	Space::Space(InstanceID id)
-		: _id(id), _bounds()
-	{
-	}
-
-	Space::Space(InstanceID id, const Util::Rect& bounds)
-		: _id(id), _bounds(bounds)
-	{
-	}
-
-	Space::Space(InstanceID id, const Util::Vec2& pos, const Util::Vec2& size)
-		: _id(id), _bounds(pos, size)
+		: _id(id)
 	{
 	}
 
@@ -32,21 +22,6 @@ namespace Core
 	InstanceID Space::getID() const
 	{
 		return _id;
-	}
-
-	const Util::Rect& Space::getBounds() const
-	{
-		return _bounds;
-	}
-
-	void Space::setBounds(const Util::Rect& bounds)
-	{
-		_bounds = bounds;
-	}
-
-	void Space::setBounds(const Util::Vec2& pos, const Util::Vec2& size)
-	{
-		_bounds = Util::Rect(pos, size);
 	}
 
 	bool Space::AddEntity(InstanceID id)
