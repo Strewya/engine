@@ -7,7 +7,7 @@
 #include "Engine/Defines.h"
 #include <list>
 #include <string>
-#include <windows.h>
+#include "Win32/myWindows.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
@@ -47,6 +47,7 @@ namespace Win32
 		void setUsePeekMessage(bool peek);
 		void setUseWaitMessage(bool wait);
 		void setEventQueue(std::list<Input::Event>& queue);
+		void setCursorShow(bool isShown);
 
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
@@ -64,6 +65,7 @@ namespace Win32
 		bool getUsePeekMessage() const;
 		bool getUseWaitMessage() const;
 		int getExitCode() const;
+		bool isCursorShown() const;
 
 	protected:
 		HWND _hwnd;
@@ -84,6 +86,7 @@ namespace Win32
 		HWND _hwndParent;
 		HMENU _hMenu;
 		HINSTANCE _hInstance;
+		bool _showCursor;
 
 		std::list<Input::Event>* _queue;
 	};

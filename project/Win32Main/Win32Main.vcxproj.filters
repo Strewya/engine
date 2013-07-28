@@ -68,7 +68,6 @@
     <ClCompile Include="..\..\source\Util\Timer.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp" />
     <ClCompile Include="..\..\source\Engine\Defines.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -102,12 +101,6 @@
     <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\State\State3.cpp">
-      <Filter>Core/State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\State\State4.cpp">
-      <Filter>Core/State</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp">
       <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
@@ -121,6 +114,18 @@
       <Filter>Core/Action</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\stdafx.cpp" />
+    <ClCompile Include="..\..\source\Core\State\State.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -204,7 +209,6 @@
     <ClInclude Include="..\..\source\Util\Timer.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
     <ClInclude Include="..\..\source\Engine\Defines.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -250,18 +254,6 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\State.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\StateComponents.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\State3.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\State4.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
@@ -278,6 +270,27 @@
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\stdafx.h" />
+    <ClInclude Include="..\..\source\Win32\myWindows.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\SharedComponents.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\GameInit.h">
+      <Filter>GameSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Components.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -315,6 +328,12 @@
     </Filter>
     <Filter Include="Core/Action/Impl">
       <UniqueIdentifier>{6bfc5868-93c7-464f-8404-b6841350c96d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSpecific">
+      <UniqueIdentifier>{57c33a48-2ebd-4cf5-91c1-c02d7d69f1b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSpecific\Pong">
+      <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

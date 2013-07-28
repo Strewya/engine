@@ -172,6 +172,13 @@ namespace Util
 		return *this;
 	}
 
+	Vec2& Vec2::Assign(float x, float y)
+	{
+		this->x = x;
+		this->y = y;
+		return *this;
+	}
+
 	float Vec2::Dot(const Vec2& v) const
 	{
 		return x*v.x + y*v.y;
@@ -446,6 +453,14 @@ namespace Util
 			y = v.y;
 			z = v.z;
 		}
+		return *this;
+	}
+
+	Vec3& Vec3::Assign(float x, float y, float z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
 		return *this;
 	}
 

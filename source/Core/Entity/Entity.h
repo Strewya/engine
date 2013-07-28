@@ -75,7 +75,8 @@ namespace Core
 
 		bool insert(const char* name, std::unique_ptr<Action> action);
 		bool insert(const String& name, std::unique_ptr<Action> action);
-		bool insert(StateUptr state);
+		template<typename T> typename T::Ref insert(std::unique_ptr<T> state);
+		
 
 	};
 
@@ -90,4 +91,11 @@ namespace Core
 		}
 		return nullptr;
 	}
+
+	template<typename T> typename T::Ref Entity::insert(std::unique_ptr<T> state)
+	{
+		auto& ref = *state;
+		_states.insert(std::move(state));
+		return ref;
+	}	
 }

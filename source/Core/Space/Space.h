@@ -30,9 +30,9 @@ namespace Core
 
 		InstanceID getID() const;
 		
-		bool AddEntity(InstanceID id);
-		bool RemoveEntity(InstanceID id);
-		bool FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
+		bool addEntity(InstanceID id);
+		bool removeEntity(InstanceID id);
+		bool findEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
 		iterator begin() const;
 		iterator end() const;
 	

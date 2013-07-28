@@ -6,21 +6,17 @@
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/State/State4.h"
-#include "Util/Dimensional.h"
+#include "Core/State/SharedComponents.h"
 	/*** end header inclusion ***/
 
-#define Component(Name) struct Name : public StateType<Name>
-namespace Core
+namespace Pong
 {
-	Component(Position2d)
-	{
-		Util::Vec2 position;
-	};
+	/**
+		RULES FOR WRITING COMPONENTS:
+		1. If the component has only one property in it, the name of the property must be 'value'
+		2. Do NOT use Components inside other Components
+		...
 
-	Component(Position3d)
-	{
-		Util::Vec3 position;
-	};
-
+	*/
+	
 }

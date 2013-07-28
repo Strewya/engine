@@ -10,11 +10,14 @@
 
 namespace Core
 {
-	GameContext::GameContext(ServiceLocator& services, ResourceLocator& resources)
-		: _onActivate(nullptr), _onDeactivate(nullptr), _onDestroy(nullptr), _onUpdate(nullptr),
-		physicsWorld(b2Vec2(0,0)), entityFactory(*this), services(services), resources(resources)
-	{
-	}
+	GameContext::GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources)
+		: Type(type),
+		physicsWorld(b2Vec2(0,0)), //not sure if this should be here or in the Physics Action/Behaviour/System
+		entityFactory(*this), //not sure if this should be here or more globally, like the Engine object
+		services(services), //for ease of access to services
+		resources(resources), //for ease of access to resources
+		activeEntities(0) //the currently active entities in the context
+	{}
 
 	GameContext::~GameContext()
 	{
@@ -22,64 +25,18 @@ namespace Core
 	}
 
 	void GameContext::destroy()
-	{
-		if(_onDestroy)
-		{
-			_onDestroy(*this);
-		}
-	}
-
-	void GameContext::activate()
-	{
-		timer.isPaused = false;
-
-		if(_onActivate)
-		{
-			_onActivate(*this);
-		}
-	}
-
-	void GameContext::deactivate()
-	{
-		timer.isPaused = true;
-
-		if(_onDeactivate)
-		{
-			_onDeactivate(*this);
-		}
-	}
+	{}
 
 	bool GameContext::update()
 	{
 		if(!timer.isPaused)
 		{
-			if(_onUpdate)
-			{
-				_onUpdate(*this);
-			}
-
 			actionQueue.update(gUpdateInterval, *this);
 			return true;
 		}
 		return false;
 	}
 
-	void GameContext::setContextEventLogic(EventType type, GameContextEvent function)
-	{
-		switch(type)
-		{
-		case OnActivate:
-			_onActivate = function;
-			break;
-		case OnDeactivate:
-			_onDeactivate = function;
-			break;
-		case OnUpdate:
-			_onUpdate = function;
-			break;
-		case OnDestroy:
-			_onDestroy = function;
-			break;
-		}
-	}
+	void GameContext::onUpdate()
+	{}
 }

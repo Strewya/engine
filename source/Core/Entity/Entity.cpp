@@ -126,9 +126,4 @@ namespace Core
 	{
 		return _actions.Insert(name, std::move(action));
 	}
-
-	bool Entity::insert(StateUptr state)
-	{
-		return _states.insert(std::move(state));
-	}
 }

@@ -10,6 +10,8 @@ namespace Core
 	class EntityFactory;
 	class EntityPool;
 	class GameContext;
+	class ServiceLocator;
+	class ResourceLocator;
 
 
 	class Action;

@@ -30,7 +30,12 @@ namespace Core
 		return id;
 	}
 
-	InstanceID EntityPool::getNewInstance(Entity** outEntity)
+	InstanceID EntityPool::getNewInstanceID()
+	{
+		return getNewInstanceRef().getID();
+	}
+
+	Entity& EntityPool::getNewInstanceRef()
 	{
 		uint32_t index;
 		if(!_availableSlots.empty())
@@ -45,17 +50,23 @@ namespace Core
 		}
 		InstanceID id = _newID(index);
 		_pool[index].reset(new Entity(id));
-		if(outEntity != nullptr)
-		{
-			*outEntity = _pool[index].get();
-		}
-		return id;
+		return *_pool[index];
 	}
 
-	Entity* EntityPool::getInstance(InstanceID id) const
+	Entity* EntityPool::getInstancePtr(InstanceID id) const
 	{
 		uint32_t index = id & _indexMask;
 		return (index < _pool.size() ? _pool[index].get() : nullptr);
+	}
+
+	Entity& EntityPool::getInstanceRef(InstanceID id) const
+	{
+		uint32_t index = id & _indexMask;
+		if(index >= _pool.size())
+		{
+			throw std::exception("Attempt to get invalid Entity ID");
+		}
+		return *_pool[index];
 	}
 	
 	bool EntityPool::isAlive(InstanceID id) const

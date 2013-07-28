@@ -24,25 +24,16 @@
 
 namespace Core
 {
-	class Engine;
+	enum class ContextType
+	{
+		MENU,
+		GAMEPLAY,
+	};
 
 	class GameContext
 	{
-	private:
-		GameContextEvent _onActivate;
-		GameContextEvent _onDeactivate;
-		GameContextEvent _onDestroy;
-		GameContextEvent _onUpdate;
-	
 	public:
-		enum EventType
-		{
-			OnActivate,
-			OnDeactivate,
-			OnDestroy,
-			OnUpdate
-		};
-
+		const ContextType Type;
 		Util::CompositeTimer timer;
 		ActionIndex actionIndex;
 		ActionUpdater actionQueue;
@@ -52,14 +43,18 @@ namespace Core
 		ServiceLocator& services;
 		ResourceLocator& resources;
 		b2World physicsWorld;
+		Space activeEntities;
 
-		GameContext(ServiceLocator& services, ResourceLocator& resources);
+		GameContext(ContextType Type, ServiceLocator& services, ResourceLocator& resources);
 		~GameContext();
 
-		void destroy();
-		void activate();
-		void deactivate();
 		bool update();
-		void setContextEventLogic(EventType type, GameContextEvent function);
+
+		virtual void destroy();
+		virtual void onUpdate();
+		virtual void activate() = 0;
+		virtual void deactivate() = 0;
+		virtual void registerActions() = 0;
+		virtual void setupActionQueue() = 0;
 	};
 }

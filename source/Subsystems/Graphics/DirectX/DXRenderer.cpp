@@ -457,7 +457,7 @@ namespace Graphics
 	void DXRenderer::DrawElipse(const Util::Vec2& pos, float xRadius, float yRadius, const Util::Color* color, float lineWidth)
 	{
 		auto rgb = color ? color->getARGB() : D3DCOLOR_ARGB(255,255,255,255);
-		const int numVertices = (int) (max(36*0.25, std::ceil((min(xRadius, yRadius)*0.5)*0.25)  ));
+		const int numVertices = (int) (std::max(36*0.25, std::ceil((std::min(xRadius, yRadius)*0.5)*0.25)));
 		std::vector<Vertex> elipse;
 		std::vector<D3DXVECTOR2> quarterElipse;
 		elipse.reserve(numVertices*4 + 1);

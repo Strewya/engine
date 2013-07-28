@@ -113,58 +113,75 @@ namespace Core
 		_window.Shutdown();
 	}
 
+	ServiceLocator& Engine::getServices()
+	{
+		return _services;
+	}
+
+	ResourceLocator& Engine::getResources()
+	{
+		return _resources;
+	}
+
 	void Engine::initializeGame(GameInitLogic init)
 	{
 		init(*this);
 	}
 	
-	GameContext& Engine::getContext(const char* name)
+	GameContext& Engine::registerContext(GameContext* context)
 	{
-		auto it = _gameContexts.find(name);
+		return registerContext(std::unique_ptr<GameContext>(context));
+	}
+
+	GameContext& Engine::registerContext(std::unique_ptr<GameContext> context)
+	{
+		auto it = _gameContexts.find(context->Type);
 		if(it == _gameContexts.end())
 		{
-			it = _gameContexts.emplace(name, std::unique_ptr<GameContext>(new GameContext(_services, _resources))).first;
-			_mainClock.RegisterTimer(it->second->timer);
+			it = _gameContexts.emplace(context->Type, std::move(context)).first;
+		}
+		else
+		{
+			it->second.swap(context);
+		}
+		_mainClock.RegisterTimer(it->second->timer);
+		return *it->second;
+	}
+
+	GameContext& Engine::getContext(ContextType id)
+	{
+		auto it = _gameContexts.find(id);
+		if(it == _gameContexts.end())
+		{
+			_window.showMessagebox("Error", "Attempt to get invalid context ID, shutting down.");
+			shutdown();
+			throw std::exception();
 		}
 		return *it->second;
 	}
 
-	GameContext& Engine::getContext(const String& name)
+	bool Engine::setActiveContext(ContextType id)
 	{
-		return getContext(name.c_str());
+		auto it = _gameContexts.find(id);
+		if(it != _gameContexts.end())
+		{
+			return setActiveContext(*it->second);
+		}
+		return false;
 	}
-
-	bool Engine::pushContext(const char* name)
+	
+	bool Engine::setActiveContext(GameContext& context)
 	{
-		auto it = _gameContexts.find(name);
-		if(it != _gameContexts.end() && it->second.get() != _activeContext)
+
+		if(_activeContext != &context)
 		{
 			if(_activeContext != nullptr)
 			{
 				_activeContext->deactivate();
 			}
-			_activeContext = it->second.get();
+			_activeContext = &context;
 			_activeContext->activate();
 			return true;
-		}
-		return false;
-	}
-
-	bool Engine::pushContext(const String& name)
-	{
-		return pushContext(name.c_str());
-	}
-
-	bool Engine::pushContext(GameContext& context)
-	{
-		//make sure it's not temporary before setting it as active
-		for(auto& it : _gameContexts)
-		{
-			if(it.second.get() == &context)
-			{
-				_activeContext = &context;
-				return true;
-			}
 		}
 		return false;
 	}

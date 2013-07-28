@@ -173,6 +173,7 @@ namespace Win32
 	void Window::setUsePeekMessage(bool peek) { _usePeekMessage = peek; }
 	void Window::setUseWaitMessage(bool wait) { _useWaitMessage = wait; }
 	void Window::setEventQueue(std::list<Input::Event>& queue) { _queue = &queue; }
+	void Window::setCursorShow(bool isShown) { _showCursor = isShown; }
 
 	HWND			Window::getWindowHandle() const { return _hwnd; }
 	bool			Window::getFullscreen() const { return _fullscreen; }
@@ -190,6 +191,7 @@ namespace Win32
 	bool			Window::getUsePeekMessage() const { return _usePeekMessage; }
 	bool			Window::getUseWaitMessage() const { return _useWaitMessage; }
 	int				Window::getExitCode() const { return _exitCode; }
+	bool			Window::isCursorShown() const { return _showCursor; }
 
 
 	int InitializeWindow(Window& window, bool fullscreen, uint32_t width, uint32_t height)
@@ -397,20 +399,20 @@ namespace Win32
 			return 0;
 		}
 		break;
-		/*
+		//----------------------- SETCURSOR -----------------------
 		case WM_SETCURSOR:
 			POINT cur;
 			GetCursorPos(&cur);
 			RECT rc;
 			GetClientRect(_hwnd, &rc);
 			ScreenToClient(_hwnd, &cur);
-			if(cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
+			if(!_showCursor && cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
 			{
-				SetCursor( nullptrptr );
+				SetCursor( nullptr );
 				return true;
 			}
 		break;
-		*/
+		
 		}
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}

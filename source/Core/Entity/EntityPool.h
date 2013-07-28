@@ -25,8 +25,10 @@ namespace Core
 	public:
 		EntityPool(uint32_t maxExpectedSize = 4096);
 		
-		InstanceID getNewInstance(Entity** outEntity = nullptr);
-		Entity* getInstance(InstanceID id) const;
+		InstanceID getNewInstanceID();
+		Entity& getNewInstanceRef();
+		Entity* getInstancePtr(InstanceID id) const;
+		Entity& getInstanceRef(InstanceID id) const;
 		bool isAlive(InstanceID id) const;
 		bool destroy(InstanceID id);
 		

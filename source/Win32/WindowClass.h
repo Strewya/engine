@@ -5,7 +5,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
-#include <windows.h>
+#include "Win32/myWindows.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 

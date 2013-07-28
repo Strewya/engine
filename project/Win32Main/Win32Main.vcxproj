@@ -53,7 +53,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <ShowIncludes>true</ShowIncludes>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,15 +99,16 @@
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp" />
     <ClCompile Include="..\..\source\Core\Space\Space.cpp" />
     <ClCompile Include="..\..\source\Core\Space\SpacePool.cpp" />
-    <ClCompile Include="..\..\source\Core\State\State3.cpp" />
-    <ClCompile Include="..\..\source\Core\State\State4.cpp" />
+    <ClCompile Include="..\..\source\Core\State\State.cpp" />
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
     <ClCompile Include="..\..\source\Engine\Defines.cpp" />
     <ClCompile Include="..\..\source\Engine\Engine.cpp" />
     <ClCompile Include="..\..\source\Engine\GameContext.cpp" />
-    <ClCompile Include="..\..\source\GameContextEvents_Pong.cpp" />
     <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp" />
     <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp" />
+    <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
+    <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
+    <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
     <ClCompile Include="..\..\source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -148,18 +149,19 @@
     <ClInclude Include="..\..\source\Core\Space\Space.h" />
     <ClInclude Include="..\..\source\Core\Space\SpacePool.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
-    <ClInclude Include="..\..\source\Core\State\State3.h" />
-    <ClInclude Include="..\..\source\Core\State\State4.h" />
-    <ClInclude Include="..\..\source\Core\State\StateComponents.h" />
+    <ClInclude Include="..\..\source\Core\State\SharedComponents.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Engine\Defines.h" />
     <ClInclude Include="..\..\source\Engine\Engine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
     <ClInclude Include="..\..\source\Engine\GameContextEvent.h" />
-    <ClInclude Include="..\..\source\GameContextEvents_Pong.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
+    <ClInclude Include="..\..\source\Games\GameInit.h" />
+    <ClInclude Include="..\..\source\Games\Pong\Components.h" />
+    <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
+    <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h" />
@@ -187,6 +189,7 @@
     <ClInclude Include="..\..\source\Util\Clock.h" />
     <ClInclude Include="..\..\source\Util\Timer.h" />
     <ClInclude Include="..\..\source\Util\CompositeTimer.h" />
+    <ClInclude Include="..\..\source\Win32\myWindows.h" />
     <ClInclude Include="..\..\source\Win32\WindowClass.h" />
     <ClInclude Include="..\..\source\Win32\Window.h" />
   </ItemGroup>

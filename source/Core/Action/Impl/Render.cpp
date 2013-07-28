@@ -22,7 +22,7 @@ namespace Core
 			{
 			//[exists]
 			//get entity
-				Entity* ent = context.entityPool.getInstance(id);
+				Entity* ent = context.entityPool.getInstancePtr(id);
 			//get required components:
 			//	RenderData
 			//	Position

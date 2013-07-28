@@ -47,8 +47,8 @@ namespace Win32
 		this->lpfnWndProc	= (WNDPROC)Window::MessageRouter;
 		this->cbClsExtra	= 0;
 		this->cbWndExtra	= 0;
-		this->hIcon			= LoadIcon(this->hInstance, IDI_APPLICATION);
-		this->hCursor		= LoadCursor(this->hInstance, IDC_ARROW);
+		this->hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
+		this->hCursor		= LoadCursor(nullptr, IDC_ARROW);
 		this->hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
 		this->lpszMenuName	= nullptr;
 		this->hIconSm		= nullptr;

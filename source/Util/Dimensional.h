@@ -38,6 +38,7 @@ namespace Util
 		bool operator!=(const Vec2& v) const;
 		Vec2& operator=(const Vec2& v);
 		Vec2& Assign(const Vec2& r);
+		Vec2& Assign(float x, float y);
 
 		float Dot(const Vec2& v) const;
 		Vec2 ProjectOn(const Vec2& target) const;
@@ -96,6 +97,7 @@ namespace Util
 		bool operator!=(const Vec3& v) const;
 		Vec3& operator=(const Vec3& v);
 		Vec3& Assign(const Vec3& r);
+		Vec3& Assign(float x, float y, float z);
 
 		float Dot(const Vec3& v) const;
 		//Vec3 ProjectOn(const Vec3& target) const;

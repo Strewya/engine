@@ -24,23 +24,23 @@ namespace Core
 		return _id;
 	}
 
-	bool Space::AddEntity(InstanceID id)
+	bool Space::addEntity(InstanceID id)
 	{
 		return _entities.insert(id).second;
 	}
 
-	bool Space::RemoveEntity(InstanceID id)
+	bool Space::removeEntity(InstanceID id)
 	{
 		return _entities.erase(id) != 0;
 	}
 
-	bool Space::FindEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
+	bool Space::findEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
 	{
 		for(auto id : _entities)
 		{
 			if(pool.isAlive(id))
 			{
-				if(filter(*pool.getInstance(id)))
+				if(filter(pool.getInstanceRef(id)))
 				{
 					container.push_back(id);
 				}

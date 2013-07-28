@@ -2,14 +2,13 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** C++ headers ***/
-#define WIN32_LEAN_AND_MEAN 1
 #include <cassert>
 #include <string>
-#include <windows.h>
+#include "Win32/myWindows.h"
 	/*** extra headers ***/
 #include "Engine/Defines.h"
 #include "Engine/Engine.h"
-#include "GameContextEvents_Pong.h"
+#include "Games/GameInit.h"
 #include "Win32/Window.h"
 #include "Win32/WindowClass.h"
 	/*** end headers ***/
@@ -26,7 +25,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	try
 	{
 		Core::Engine engine(window);
-		engine.initializeGame(Pong::initPong);
+		engine.initializeGame(Game::init);
 		
 		//start main loop
 		while(window.Update())
@@ -38,7 +37,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	}
 	catch(std::exception& ex)
 	{
-		MessageBox(window.getWindowHandle(), ex.what(), "Exception error", MB_OK);
+		if(strcmp(ex.what(), "") != 0)
+		{
+			window.showMessagebox("Exception error", ex.what());
+		}
 		return ErrorCode::ExceptionThrown;
 	}
 }
