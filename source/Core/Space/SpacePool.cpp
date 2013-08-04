@@ -10,7 +10,7 @@
 namespace Core
 {
 	SpacePool::SpacePool(uint32_t maxExpectedSize)
-		: _idCounter(0), _maxExpectedSize(maxExpectedSize), _indexMask(0), _indexBits(0)
+		: _maxExpectedSize(maxExpectedSize), _indexBits(0), _indexMask(0), _idCounter(0)
 	{
 		--maxExpectedSize;
 		while(maxExpectedSize > 0)

@@ -24,7 +24,7 @@
 
 namespace Core
 {
-	enum class ContextType
+	enum ContextType
 	{
 		MENU,
 		GAMEPLAY,
@@ -45,8 +45,8 @@ namespace Core
 		b2World physicsWorld;
 		Space activeEntities;
 
-		GameContext(ContextType Type, ServiceLocator& services, ResourceLocator& resources);
-		~GameContext();
+		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources);
+		virtual ~GameContext();
 
 		bool update();
 

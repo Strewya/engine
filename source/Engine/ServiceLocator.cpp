@@ -4,13 +4,14 @@
 	/*** personal header ***/
 #include "Engine/ServiceLocator.h"
 	/*** C++ headers ***/
+#include <cassert>
 	/*** extra headers ***/
 	/*** end headers ***/
 
 namespace Core
 {
 	ServiceLocator::ServiceLocator()
-		: _graphics(nullptr), _engine(nullptr), _input(nullptr), _script(nullptr)
+		: _engine(nullptr), _graphics(nullptr), _input(nullptr), _script(nullptr)
 	{
 	}
 

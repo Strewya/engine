@@ -13,29 +13,33 @@
 namespace Win32
 {
 	Window::Window()
-		: _extendedStyle(0), _class("Window"), _title("Window"), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
-		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
-		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
-		_queue(nullptr)
+		: _hwnd(nullptr), _hwndParent(nullptr), _hMenu(nullptr), _hInstance(nullptr),
+		  _usePeekMessage(true), _useWaitMessage(false), _fullscreen(false), _showCursor(false),
+		  _exitCode(0), _style(0), _extendedStyle(0),
+		  _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT), _xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)),
+		  _class("Window"), _title("Window"),
+		  _queue(nullptr)
 	{
-		setFullscreen(false);
+		setFullscreen(_fullscreen);
 	}
 
 	Window::Window(const char* title)
-		: _extendedStyle(0), _class(title), _title(title), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
-		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
-		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
-		_queue(nullptr)
-	{
-	}
+		: _hwnd(nullptr), _hwndParent(nullptr), _hMenu(nullptr), _hInstance(nullptr),
+		  _usePeekMessage(true), _useWaitMessage(false), _fullscreen(false), _showCursor(false),
+		  _exitCode(0), _style(0), _extendedStyle(0),
+		  _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT), _xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)),
+		  _class(title), _title(title),
+		  _queue(nullptr)
+	{}
 
 	Window::Window(const String& title)
-		: _extendedStyle(0), _class(title), _title(title), _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT),
-		_xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)), _hwndParent(nullptr),
-		_hInstance(nullptr), _hMenu(nullptr), _style(0), _usePeekMessage(true), _useWaitMessage(false), _exitCode(0),
-		_queue(nullptr)
-	{
-	}
+		: _hwnd(nullptr), _hwndParent(nullptr), _hMenu(nullptr), _hInstance(nullptr),
+		  _usePeekMessage(true), _useWaitMessage(false), _fullscreen(false), _showCursor(false),
+		  _exitCode(0), _style(0), _extendedStyle(0),
+		  _xPos(CW_USEDEFAULT), _yPos(CW_USEDEFAULT), _xSize(GetSystemMetrics(SM_CXSCREEN)), _ySize(GetSystemMetrics(SM_CYSCREEN)),
+		  _class(title), _title(title),
+		  _queue(nullptr)
+	{}
 
 	Window::~Window()
 	{

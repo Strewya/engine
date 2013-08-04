@@ -10,6 +10,7 @@
 namespace Graphics
 {
 	Spritesheet::Spritesheet()
+		: _textureHandle(NOT_FOUND)
 	{
 	}
 
@@ -72,20 +73,21 @@ namespace Graphics
 
 	const SpriteInfo& Spritesheet::getSprite(uint32_t index) const
 	{
-		if(SpriteValid(index))
+		if(!SpriteValid(index))
 		{
-			return _sprites[index];
+			throw std::runtime_error("Spritesheet::getSprite(): Attempted to get inexisting sprite.");
 		}
-		throw std::exception("Spritesheet::getSprite(): Attempted to get inexisting sprite.");
+		return _sprites[index];
 	}
 
 	const AnimationInfo& Spritesheet::getAnimation(uint32_t index) const
 	{
-		if(AnimationValid(index))
+		if(!AnimationValid(index))
 		{
-			return _animations[index];
+			throw std::runtime_error("Spritesheet::getAnimation(): Attempted to get inexisting animation");
 		}
-		throw std::exception("Spritesheet::getAnimation(): Attempted to get inexisting animation");
+		return _animations[index];
+
 	}
 
 	uint32_t Spritesheet::Insert(const SpriteInfo& sprite)

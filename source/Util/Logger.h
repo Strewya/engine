@@ -19,7 +19,7 @@ namespace Util
 		Logger(const char* file);
 		~Logger();
 
-		static const char endl = '\n';
+		static const char endl;
 
 		void Open(const String& file);
 		void Open(const char* file);

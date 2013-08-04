@@ -50,7 +50,7 @@ namespace Graphics
 		
 	public:
 		DXRenderer(HWND hwnd);
-		~DXRenderer();
+		virtual ~DXRenderer();
 
 		ITextureCache& getTextureCache();
 

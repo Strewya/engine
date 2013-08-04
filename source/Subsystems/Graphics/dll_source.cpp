@@ -4,8 +4,9 @@
 #include "dll_header.h"
 #include "Subsystems/Graphics/IRenderer.h"
 #include "Subsystems/Graphics/DirectX/DXRenderer.h"
+#include "Util/Logger.h"
 
-int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
+EXPORT int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 {
 	if(renderer != nullptr && *renderer == nullptr)
 	{
@@ -16,13 +17,13 @@ int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 		}
 		catch(std::exception& ex)
 		{
-			ex;
+			Util::GetDefaultLogger() << ex.what() << Util::Logger::endl;
 		}
 	}
 	return 0;
 }
 
-int destroyRendererInterface(Graphics::IRenderer** renderer)
+EXPORT int destroyRendererInterface(Graphics::IRenderer** renderer)
 {
 	if(renderer != nullptr && *renderer == nullptr)
 	{

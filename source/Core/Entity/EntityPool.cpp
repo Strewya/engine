@@ -10,7 +10,7 @@
 namespace Core
 {
 	EntityPool::EntityPool(uint32_t maxExpectedSize)
-		: _idCounter(0), _maxExpectedSize(maxExpectedSize), _indexMask(0), _indexBits(0)
+		: _maxExpectedSize(maxExpectedSize), _indexBits(0), _indexMask(0), _idCounter(0)
 	{
 		--maxExpectedSize;
 		while(maxExpectedSize > 0)
@@ -64,7 +64,7 @@ namespace Core
 		uint32_t index = id & _indexMask;
 		if(index >= _pool.size())
 		{
-			throw std::exception("Attempt to get invalid Entity ID");
+			throw std::runtime_error("Attempt to get invalid Entity ID");
 		}
 		return *_pool[index];
 	}

@@ -11,11 +11,11 @@
 namespace Util
 {
 	ITimer::ITimer()
-		: id(NOT_FOUND), composer(nullptr), isPaused(false)
+		: id((uint32_t)NOT_FOUND), composer(nullptr), isPaused(false)
 	{}
 
 	ITimer::ITimer(const ITimer& rhs)
-		: id(NOT_FOUND), composer(nullptr), isPaused(false)
+		: id((uint32_t)NOT_FOUND), composer(nullptr), isPaused(false)
 	{
 	}
 
@@ -26,7 +26,7 @@ namespace Util
 
 	ITimer::~ITimer()
 	{
-		if(composer != nullptr && id != NOT_FOUND)
+		if(composer != nullptr && id != (uint32_t)NOT_FOUND)
 		{
 			composer->UnregisterTimer(*this);
 		}

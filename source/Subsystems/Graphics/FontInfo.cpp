@@ -10,15 +10,15 @@
 namespace Graphics
 {
 	FontInfo::FontInfo()
-		: _name(), _italic(false), _size(10), _weight(400)
+		: _name(), _italic(false), _weight(400), _size(10)
     {}
 
 	FontInfo::FontInfo(const char* name, uint32_t size, bool italic, uint32_t weight)
-		: _name(name), _italic(italic), _size(size), _weight(weight)
+		: _name(name), _italic(italic), _weight(weight), _size(size)
     {}
 	
 	FontInfo::FontInfo(const String& name, uint32_t size, bool italic, uint32_t weight)
-		: _name(name), _italic(italic), _size(size), _weight(weight)
+		: _name(name), _italic(italic), _weight(weight), _size(size)
     {}
 
 	const String& FontInfo::getName() const

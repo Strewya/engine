@@ -13,7 +13,7 @@ namespace Core
 
 	bool EntityFactory::createEntityType(const String& type, Entity& target) const
 	{
-		auto& it = _creators.find(type);
+		auto it = _creators.find(type);
 		if(it == _creators.end())
 		{
 			return false;

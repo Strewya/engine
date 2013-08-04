@@ -5,6 +5,7 @@
 #include "Subsystems/Graphics/DirectX/DXRenderer.h"
 	/*** C++ headers ***/
 #include <algorithm>
+#include <stdexcept>
 	/*** extra headers ***/
 #include "Subsystems/Graphics/TextureData.h"
 #include "Subsystems/Graphics/Vertex.h"
@@ -14,12 +15,12 @@
 namespace Graphics
 {
 	DXRenderer::DXRenderer(HWND hwnd)
-		: _transparentColor(D3DCOLOR_XRGB(255,0,255)), _backgroundFillColor(D3DCOLOR_XRGB(0,0,0)), _hwnd(hwnd), _d3d(nullptr), _d3ddev(nullptr), _backbuffer(nullptr),
-		_spriteHandler(nullptr), _line(nullptr), _vertexFormat(0)
+		: _hwnd(hwnd), _d3d(nullptr), _d3ddev(nullptr), _backbuffer(nullptr), _spriteHandler(nullptr), _line(nullptr),
+		_vertexFormat(0), _transparentColor(D3DCOLOR_XRGB(255,0,255)), _backgroundFillColor(D3DCOLOR_XRGB(0,0,0))
 	{
 		if(!InitDevices())
 		{
-			throw std::exception("DirectX graphics subsystem has failed to load.");
+			throw std::runtime_error("DirectX graphics subsystem has failed to load.");
 		}
 
 		_textures.setD3DDevice(_d3ddev);
@@ -141,7 +142,7 @@ namespace Graphics
 			style = WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX;
 			exStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 		}
-		RECT rc = {0,0, _d3dpp.BackBufferWidth, _d3dpp.BackBufferHeight };
+		RECT rc = {0,0, (LONG)_d3dpp.BackBufferWidth, (LONG)_d3dpp.BackBufferHeight };
 		AdjustWindowRectEx(&rc, style, false, exStyle);
 		SetWindowLong(_d3dpp.hDeviceWindow, GWL_STYLE, style);
 		SetWindowLong(_d3dpp.hDeviceWindow, GWL_EXSTYLE, exStyle);
@@ -291,7 +292,9 @@ namespace Graphics
 
 		if(FAILED(result))
 		{
-			throw std::exception((String("Failed to create font '") + name + "'!").c_str());
+			//std::exception((String("Failed to create font '") + name + "'!").c_str())
+			std::exception e;
+			throw e;
 		}
 		
 		return DXFont(name, size, italic, weight, font);
@@ -352,14 +355,18 @@ namespace Graphics
 	void DXRenderer::setTransform2D(const Util::Vec2* translation, const Util::Vec2* scalingCenter, const Util::Vec2* scale, const Util::Vec2* rotationPivot, float rotationRadians, const Util::Color* colorTint)
 	{
 		_tintColor = colorTint ? colorTint->getARGB() : D3DCOLOR_XRGB(255,255,255);
+		auto sc = MakeVECTOR(*scalingCenter);
+		auto s = MakeVECTOR(*scale);
+		auto rp = MakeVECTOR(*rotationPivot);
+		auto t = MakeVECTOR(*translation);
 
 		D3DXMatrixTransformation2D(&_transformMatrix,
-			scalingCenter ? &MakeVECTOR(*scalingCenter) : nullptr,
+			scalingCenter ? &sc : nullptr,
 			0,
-			scale ? &MakeVECTOR(*scale) : nullptr,
-			rotationPivot ? &MakeVECTOR(*rotationPivot) : nullptr,
+			scale ? &s : nullptr,
+			rotationPivot ? &rp : nullptr,
 			rotationRadians,
-			translation ? &MakeVECTOR(*translation) : nullptr);
+			translation ? &t : nullptr);
 	}
 
 	//*****************************************************************
@@ -520,9 +527,9 @@ namespace Graphics
 		{
 			return;
 		}
-		Util::Rect source(0,0,float(texture.width), float(texture.height));
+		auto source = MakeRECT(Util::Rect(0,0,float(texture.width), float(texture.height)));
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(dxtexture.lpd3dTexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(dxtexture.lpd3dTexture, &source, nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
@@ -536,9 +543,10 @@ namespace Graphics
 		{
 			return;
 		}
-		Util::Rect source = sprite.getSrcRect();
+
+		auto source = MakeRECT(sprite.getSrcRect());
 		_spriteHandler->SetTransform(&_transformMatrix);
-		_spriteHandler->Draw(dxtexture.lpd3dTexture, &MakeRECT(source), nullptr, nullptr, _tintColor);
+		_spriteHandler->Draw(dxtexture.lpd3dTexture, &source, nullptr, nullptr, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 	
@@ -553,9 +561,9 @@ namespace Graphics
 			return;
 		}
 		const DXFont& font = _fonts.getFont(hFont);
-		
+		auto rect = MakeRECT(*bounds);
 		_spriteHandler->SetTransform(&_transformMatrix);
-		font.data->DrawText(_spriteHandler, text, -1, bounds == nullptr ? nullptr : &MakeRECT(*bounds), _fontStyle, _tintColor);
+		font.data->DrawText(_spriteHandler, text, -1, bounds == nullptr ? nullptr : &rect, _fontStyle, _tintColor);
 		_spriteHandler->SetTransform(D3DXMatrixIdentity(&_transformMatrix));
 	}
 
@@ -782,7 +790,10 @@ namespace Graphics
 	bool DXRenderer::setViewMatrix(const Util::Vec3& cameraPosition, const Util::Vec3& cameraLookAt, const Util::Vec3& cameraUpVector)
 	{
 		D3DXMATRIX mat;
-		D3DXMatrixLookAtLH(&mat, &MakeVECTOR(cameraPosition), &MakeVECTOR(cameraLookAt), &MakeVECTOR(cameraUpVector));
+		auto cp = MakeVECTOR(cameraPosition);
+		auto cla = MakeVECTOR(cameraLookAt);
+		auto cuv = MakeVECTOR(cameraUpVector);
+		D3DXMatrixLookAtLH(&mat, &cp, &cla, &cuv);
 		return SUCCEEDED(_d3ddev->SetTransform(D3DTS_VIEW, &mat));
 	}
 

@@ -13,7 +13,7 @@
 namespace Graphics
 {
 	RendererFactory::RendererFactory(Win32::Window& window)
-		: _hInst(window.getInstance()), _renderer(NULL), _dll(NULL), _hwnd(window.getWindowHandle())
+		: _hwnd(window.getWindowHandle()), _hInst(window.getInstance()), _dll(NULL), _renderer(NULL)
 	{}
 
 	RendererFactory::~RendererFactory()
@@ -27,35 +27,43 @@ namespace Graphics
 		return _renderer;
 	}
 
-	void RendererFactory::InitInterface(const char* name)
+	bool RendererFactory::InitInterface(const char* name)
 	{
 		if(strcmp(name, "dx") == 0)
 		{
-			_dll = LoadLibraryEx("DX_Renderer.dll", NULL, 0);
+			_dll = LoadLibraryA("DX_Renderer.dll");
 			if(!_dll)
 			{
+				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
 				MessageBox(_hwnd, "Error loading up DX_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
-				throw std::exception("Error loading up DX_Renderer.dll");
+				return false;
 			}
 		}
 		else if(strcmp(name, "ogl") == 0)
 		{
-			_dll = LoadLibraryEx("OGL_Renderer.dll", NULL, 0);
+			_dll = LoadLibraryA("OGL_Renderer.dll");
 			if(!_dll)
 			{
+				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
 				MessageBox(_hwnd, "Error loading up OGL_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
-				throw std::exception("Error loading up OGL_Renderer.dll");
+				return false;
 			}
 		}
-
-		CREATE_RENDERER create = NULL;
-		create = (CREATE_RENDERER)GetProcAddress(_dll, "createRendererInterface");
-		if(create && !create(_hwnd, &_renderer))
+		else
 		{
+			return false;
+		}
+
+		CREATE_RENDERER create = nullptr;
+		create = (CREATE_RENDERER)GetProcAddress(_dll, "createRendererInterface");
+		if(!create || !create(_hwnd, &_renderer))
+		{
+			Util::GetDefaultLogger() << "Error with creating IRenderer, errCode: " << GetLastError() << Util::Logger::endl;
 			FreeLibrary(_dll);
 			MessageBox(_hwnd, "Error creating the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
-			throw std::exception("Error creating the rendering interface");
+			return false;
 		}
+		return true;
 	}
 
 	void RendererFactory::DestroyInterface()
@@ -67,7 +75,6 @@ namespace Graphics
 		{
 			FreeLibrary(_dll);
 			MessageBox(_hwnd, "Error destroying the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
-			throw std::exception();
 		}
 		_renderer = NULL;
 	}

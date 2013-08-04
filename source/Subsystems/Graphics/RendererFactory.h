@@ -18,18 +18,19 @@ namespace Graphics
 	class RendererFactory
 	{
 	protected:
+		HWND _hwnd;
 		HINSTANCE _hInst;
 		HMODULE _dll;
 		IRenderer* _renderer;
-		HWND _hwnd;
+
 
 	public:
 
 		RendererFactory(Win32::Window& window);
 		~RendererFactory();
 
-		void InitInterface(const char* name);
-		void InitInterface(const String& name) { InitInterface(name.c_str()); };
+		bool InitInterface(const char* name);
+		bool InitInterface(const String& name) { return InitInterface(name.c_str()); };
 		IRenderer* getInterface();
 		void DestroyInterface();
 	};

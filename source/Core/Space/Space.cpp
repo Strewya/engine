@@ -49,12 +49,22 @@ namespace Core
 		return container.size() > 0;
 	}
 	
-	Space::iterator Space::begin() const
+	Space::const_iterator Space::begin() const
+	{
+		return _entities.begin();
+	}
+
+	Space::const_iterator Space::end() const
+	{
+		return _entities.end();
+	}
+
+	Space::iterator Space::begin()
 	{
 		return _entities.begin();
 	}
 	
-	Space::iterator Space::end() const
+	Space::iterator Space::end()
 	{
 		return _entities.end();
 	}

@@ -22,8 +22,9 @@ namespace Core
 			{
 			//[exists]
 			//get entity
-				Entity* ent = context.entityPool.getInstancePtr(id);
+				//Entity* ent = context.entityPool.getInstancePtr(id);
 			//get required components:
+
 			//	RenderData
 			//	Position
 			//	..
@@ -83,7 +84,6 @@ namespace Core
 			s_timer = owner.getState("AnimationTimer");
 			if(s_currentSprite && s_animation && s_animationFrame && s_spritesheet)
 			{
-				/*
 				if(s_timer && !s_timer->as<Util::Timer>().HasUpdatePeriodElapsed())
 				{
 					continue;

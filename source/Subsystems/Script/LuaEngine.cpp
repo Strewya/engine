@@ -199,7 +199,6 @@ namespace Script
 			lua_remove(_lua, index);
 			return true;
 		}
-		uint32_t* p = &out;
 		return false;
 	}
 
@@ -334,7 +333,7 @@ namespace Script
 	bool Engine::GetField(const char* name, int tableIndex)
 	{
 		String value = name;
-		int pos = value.find('.');
+		uint32_t pos = value.find('.');
 		if(pos == value.npos)
 		{
 			lua_getfield(_lua, tableIndex, name);

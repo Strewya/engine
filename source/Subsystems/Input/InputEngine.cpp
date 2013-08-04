@@ -5,15 +5,13 @@
 #include "Subsystems/Input/InputEngine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Win32/Window.h"
 	/*** end headers ***/
 
 namespace Input
 {
-	Engine::Engine(Win32::Window& window)
+	Engine::Engine()
 		: _keys(Keyboard::_KeyCount, false), _mouseKeys(Mouse::_KeyCount, false)
 	{
-		window.setEventQueue(_eventQueue);
 	}
 
 	void Engine::Update()
@@ -43,6 +41,9 @@ namespace Input
 			case EventType::MouseButtonReleased:
 				_mouseKeys[event.mouseButton.button] = false;
 			break;
+
+			default:
+			break;
 			}
 		}
 	}
@@ -50,6 +51,11 @@ namespace Input
 	void Engine::PurgeEvents()
 	{
 		_eventQueue.clear();
+	}
+
+	std::list<Event>& Engine::getEventQueue()
+	{
+		return _eventQueue;
 	}
 
 	bool Engine::isPressed(Keyboard::Keys key) const

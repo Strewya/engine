@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cassert>
 #include <chrono>
-#include <cstdint>
+#include <stdint.h>
 #include <functional>
 #include <list>
 #include <map>
@@ -15,6 +15,7 @@
 #include <random>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>

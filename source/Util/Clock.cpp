@@ -12,7 +12,7 @@
 namespace Util
 {
 	Clock::Clock()
-		: _maxDeltaAllowed(0.25), _lastUpdate(std::chrono::high_resolution_clock::now())
+		: _lastUpdate(std::chrono::high_resolution_clock::now()), _maxDeltaAllowed(0.25)
 	{}
 
 	void Clock::AdvanceTime()

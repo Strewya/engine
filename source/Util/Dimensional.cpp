@@ -224,7 +224,7 @@ namespace Util
 
 	float Vec2::Length() const
 	{
-		return std::sqrtf(LengthSq());
+		return sqrtf(LengthSq());
 	}
 
 	float Vec2::LengthSq() const
@@ -495,7 +495,7 @@ namespace Util
 
 	float Vec3::Length() const
 	{
-		return std::sqrtf(LengthSq());
+		return sqrtf(LengthSq());
 	}
 
 	float Vec3::LengthSq() const
@@ -566,7 +566,7 @@ namespace Util
 	{
 		return Rect(left * r.left, top * r.top, right * r.right, bottom * r.bottom);
 	}
-	/*
+
 	Rect& Rect::operator*=(const Rect &r)
 	{
 		left *= r.left;

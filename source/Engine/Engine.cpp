@@ -12,7 +12,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::Window& window)
-		: _window(window), _rendererFactory(window), _activeContext(nullptr), _inputEngine(window)
+		: _window(window), _rendererFactory(window), _activeContext(nullptr)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -41,8 +41,13 @@ namespace Core
 			* communications
 			* persistence
 		*/
-		_rendererFactory.InitInterface(renderer);
+		if(!_rendererFactory.InitInterface(renderer))
+		{
+			throw;
+		}
 		_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
+
+		_window.setEventQueue(_inputEngine.getEventQueue());
 		/*
 			register all of the initialized subsystems
 			* display - done
@@ -172,7 +177,6 @@ namespace Core
 	
 	bool Engine::setActiveContext(GameContext& context)
 	{
-
 		if(_activeContext != &context)
 		{
 			if(_activeContext != nullptr)

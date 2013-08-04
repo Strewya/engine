@@ -69,24 +69,26 @@ namespace Win32
 
 	protected:
 		HWND _hwnd;
+		HWND _hwndParent;
+		HMENU _hMenu;
+		HINSTANCE _hInstance;
 
 		bool _usePeekMessage;
 		bool _useWaitMessage;
 		bool _fullscreen;
-		int _exitCode;
+		bool _showCursor;
 
+		uint32_t _exitCode;
+		uint32_t _style;
 		uint32_t _extendedStyle;
+
+		int32_t _xPos;
+		int32_t _yPos;
+		int32_t _xSize;
+		int32_t _ySize;
+
 		String _class;
 		String _title;
-		uint32_t _style;
-		int _xPos;
-		int _yPos;
-		int _xSize;
-		int _ySize;
-		HWND _hwndParent;
-		HMENU _hMenu;
-		HINSTANCE _hInstance;
-		bool _showCursor;
 
 		std::list<Input::Event>* _queue;
 	};

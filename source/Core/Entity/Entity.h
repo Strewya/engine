@@ -8,6 +8,7 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/Action.h"
 #include "Core/Action/Actionmap.h"
+#include "Core/State/State.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
 
@@ -84,7 +85,7 @@ namespace Core
 
 	template<typename T> T* Entity::getState()
 	{
-		auto* ptr = _states.retrieve(T::Type);
+		StateRptr ptr = _states.retrieve(T::Type);
 		if(ptr != nullptr)
 		{
 			return ptr->cast<T>();
@@ -94,7 +95,7 @@ namespace Core
 
 	template<typename T> typename T::Ref Entity::insert(std::unique_ptr<T> state)
 	{
-		auto& ref = *state;
+		typename T::Ref ref = *state;
 		_states.insert(std::move(state));
 		return ref;
 	}	

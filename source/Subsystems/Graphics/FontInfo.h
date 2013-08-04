@@ -31,6 +31,7 @@ namespace Graphics
 	private:
 		String _name;
 		bool _italic;
-		uint32_t _weight, _size;
+		uint32_t _weight;
+		uint32_t _size;
 	};
 }

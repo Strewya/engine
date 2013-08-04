@@ -9,6 +9,8 @@
 
 namespace Util
 {
+	const char Logger::endl = '\n';
+
 	Logger::Logger()
 	{
 		Open("logger.log");

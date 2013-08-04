@@ -67,7 +67,9 @@ namespace Core
 		ResourceLocator _resources;
 		Graphics::SpritesheetCache _spritesheets;
 
-		std::unordered_map<ContextType, std::unique_ptr<GameContext>> _gameContexts;
+		typedef std::unordered_map<ContextType, std::unique_ptr<GameContext>, std::hash<int>> ContextStorage_t;
+
+		ContextStorage_t _gameContexts;
 		GameContext* _activeContext; 
 		
 		Util::Clock _mainClock;

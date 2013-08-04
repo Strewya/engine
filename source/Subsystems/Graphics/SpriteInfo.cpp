@@ -10,15 +10,15 @@
 namespace Graphics
 {
 	SpriteInfo::SpriteInfo()
-		: _srcRect(), _name()
+		: _name(), _srcRect()
     {}
 
 	SpriteInfo::SpriteInfo(const char* name, const Util::Rect& srcRect)
-		: _srcRect(srcRect), _name(name)
+		: _name(name), _srcRect(srcRect)
     {}
 
 	SpriteInfo::SpriteInfo(const String& name, const Util::Rect& srcRect)
-		: _srcRect(srcRect), _name(name)
+		: _name(name), _srcRect(srcRect)
     {}
 
 	const String& SpriteInfo::getName() const

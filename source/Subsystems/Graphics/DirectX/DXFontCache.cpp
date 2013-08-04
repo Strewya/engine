@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Subsystems/Graphics/DirectX/DXFontCache.h"
 	/*** C++ headers ***/
+#include <stdexcept>
 	/*** extra headers ***/
 	/*** end headers ***/
 
@@ -69,11 +70,11 @@ namespace Graphics
 
 	const DXFont& DXFontCache::getFont(uint32_t index) const
 	{
-		if(Valid(index))
+		if(!Valid(index))
 		{
-			return _cache[index].font;
+			throw std::runtime_error("Attempted to dereference inexisting font");
 		}
-		throw std::exception("Attempted to dereference inexisting font");
+		return _cache[index].font;
 	}
 
 	void DXFontCache::Destroy(uint32_t index)

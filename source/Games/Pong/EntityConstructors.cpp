@@ -12,9 +12,8 @@ namespace Pong
 {
 	bool createPaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		auto screen = context.services.getGraphics().getScreenSize();
-		auto& pos = paddle.insert(Core::Position2d::create());
-		
+		paddle.insert(Core::Position2d::create());
+
 
 		return false;
 	}

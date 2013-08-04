@@ -73,6 +73,8 @@ namespace Graphics
 	class IRenderer
 	{
 	public:
+		virtual ~IRenderer() {}
+
 		virtual ITextureCache& getTextureCache() = 0;
 
 		virtual Util::Vec2 getScreenSize() const = 0;

@@ -1,8 +1,7 @@
 #pragma once
 
 /*		C++ HEADERS	*/
-#include <cstdint>
-#include <cassert>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 

@@ -1,0 +1,363 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\source\Win32\WindowClass.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Logger.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp">
+      <Filter>Subsystems/Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Dimensional.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Color.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Clock.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\State\Statemap.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Action.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Input\InputEngine.cpp">
+      <Filter>Subsystems/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\ITimer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Timer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\Defines.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\Engine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\GameContext.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Space\SpacePool.cpp">
+      <Filter>Core/Space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Space\Space.cpp">
+      <Filter>Core/Space</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
+      <Filter>Core/Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\CompositeTimer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp">
+      <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\Window.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp">
+      <Filter>Core/Action</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\stdafx.cpp" />
+    <ClCompile Include="..\..\source\Core\State\State.cpp">
+      <Filter>Core/State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Win32\winmain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\Win32\WindowClass.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Logger.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h">
+      <Filter>Subsystems/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h">
+      <Filter>Subsystems/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Dimensional.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Color.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Clock.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\Statemap.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\Entity.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Action.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionLogic.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\Event.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h">
+      <Filter>Subsystems/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\ITimer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Timer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\Defines.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\Engine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GameContext.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GameContextEvent.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\ResourceLocator.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\ServiceLocator.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Space\SpacePool.h">
+      <Filter>Core/Space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Space\Space.h">
+      <Filter>Core/Space</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h">
+      <Filter>Core/Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\FwdDecl.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\AssetStorage.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\ITimerComposer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\CompositeTimer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h">
+      <Filter>Subsystems/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\Window.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionIndex.h">
+      <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\stdafx.h" />
+    <ClInclude Include="..\..\source\Win32\myWindows.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\SharedComponents.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\State.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\GameInit.h">
+      <Filter>GameSpecific</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Components.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Util">
+      <UniqueIdentifier>{9e70d6ad-322f-4aa3-b68e-30148a2152b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystems/Script">
+      <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystems/Graphics">
+      <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/State">
+      <UniqueIdentifier>{523c40e5-7ff9-41c9-8cf9-142a86564af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Entity">
+      <UniqueIdentifier>{36ed7cd0-141f-4d27-b32b-91b421708503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Action">
+      <UniqueIdentifier>{8b8ca550-38c1-4bc3-9433-33fed5d1c035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win32">
+      <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystems/Input">
+      <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Space">
+      <UniqueIdentifier>{e12f3b4d-4607-4113-ac64-6d4422666606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{dd566029-3832-413b-b283-bb95cac542b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/Action/Impl">
+      <UniqueIdentifier>{6bfc5868-93c7-464f-8404-b6841350c96d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSpecific">
+      <UniqueIdentifier>{57c33a48-2ebd-4cf5-91c1-c02d7d69f1b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSpecific\Pong">
+      <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="logger.log" />
+    <None Include="..\..\resources\character.sheet">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\resources\pong.sheet">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\source\Win32\config.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\docs\Planning.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\resources\character.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="..\..\resources\gui_window.png">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="..\..\resources\pong.png">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

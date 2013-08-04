@@ -4,6 +4,8 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
+#include <Engine/Defines.h>
+#include <stdint.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
@@ -14,7 +16,7 @@ namespace Util
 	class ITimer
 	{
 	public:
-		unsigned int id;
+		uint32_t id;
 		ITimerComposer* composer;
 		bool isPaused;
 
