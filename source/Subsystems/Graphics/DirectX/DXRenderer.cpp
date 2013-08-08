@@ -7,13 +7,309 @@
 #include <algorithm>
 #include <stdexcept>
 	/*** extra headers ***/
-#include "Subsystems/Graphics/TextureData.h"
-#include "Subsystems/Graphics/Vertex.h"
-#include "Util/Logger.h"
+#include "Subsystems/Graphics/DirectX/Vertex.h"
 	/*** end headers ***/
 
 namespace Graphics
 {
+#define TEST_SUCCESS(result) if(FAILED(result)) return false
+	DXRenderer::DXRenderer(HWND hwnd)
+		: _hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _backbuffer(nullptr),
+		_pixelShader(nullptr), _vertexShader(nullptr), _vertexBuffer(nullptr),
+		_backgroundColor(0,0,0,1)
+	{
+		if(!init())
+		{
+			throw std::logic_error("Error creating D3D device and swap chain");
+		}
+
+		if(!initPipeline())
+		{
+			throw std::logic_error("Error initializing pipeline");
+		}
+	}
+
+	DXRenderer::~DXRenderer()
+	{
+		close();
+	}
+
+	//*****************************************************************
+	//					INITIALIZATION
+	//*****************************************************************
+	bool DXRenderer::init()
+	{
+		DXGI_SWAP_CHAIN_DESC scd;
+		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
+		scd.BufferCount			= 1;
+		scd.BufferDesc.Format	= DXGI_FORMAT_R8G8B8A8_UNORM;
+		scd.BufferDesc.Width	= 1024;
+		scd.BufferDesc.Height	= 768;
+		scd.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		scd.Flags				= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		scd.OutputWindow		= _hwnd;
+		scd.SampleDesc.Count	= 4;
+		scd.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
+		scd.Windowed			= true;
+
+		HRESULT result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &scd, &_swapchain, &_dev, nullptr, &_devcon);
+		TEST_SUCCESS(result);
+		
+		ID3D11Texture2D* bbTexture = nullptr;
+		result = _swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
+		TEST_SUCCESS(result);
+		
+		result = _dev->CreateRenderTargetView(bbTexture, nullptr, &_backbuffer);
+		TEST_SUCCESS(result);
+
+		result = bbTexture->Release();
+		_devcon->OMSetRenderTargets(1, &_backbuffer, nullptr);
+
+		D3D11_VIEWPORT vp;
+		ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		vp.Width = 800;
+		vp.Height = 600;
+
+		_devcon->RSSetViewports(1, &vp);
+
+		return true;
+	}
+
+	bool DXRenderer::initPipeline()
+	{
+		HRESULT result = 0;
+		ID3D10Blob* vblob = nullptr;
+		String shaderPath = "D:/engine/source/Subsystems/Graphics/Shaders/shader.hlsl";
+		//shaderPath = "shader.hlsl";
+		result = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_5_0", 0, 0, nullptr, &vblob, nullptr, nullptr);
+		TEST_SUCCESS(result);
+
+		result = _dev->CreateVertexShader(vblob->GetBufferPointer(), vblob->GetBufferSize(), nullptr, &_vertexShader);
+		TEST_SUCCESS(result);
+
+		ID3D10Blob* pblob = nullptr;
+		result = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_5_0", 0, 0, nullptr, &pblob, nullptr, nullptr);
+		TEST_SUCCESS(result);
+
+		result = _dev->CreatePixelShader(pblob->GetBufferPointer(), pblob->GetBufferSize(), nullptr, &_pixelShader);
+		TEST_SUCCESS(result);
+		
+		_devcon->VSSetShader(_vertexShader, nullptr, 0);
+		_devcon->PSSetShader(_pixelShader, nullptr, 0);
+
+		D3D11_INPUT_ELEMENT_DESC ied[] =
+		{
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+
+		_dev->CreateInputLayout(ied, 2, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
+		_devcon->IASetInputLayout(_inputLayout);
+		
+		return true;
+	}
+
+	//*****************************************************************
+	//					RESETTING
+	//*****************************************************************
+	bool DXRenderer::reset()
+	{
+		return true;
+	}
+
+	//*****************************************************************
+	//					SHUTTING DOWN
+	//*****************************************************************
+	void DXRenderer::close()
+	{
+		if(_pixelShader != nullptr)
+		{
+			_pixelShader->Release();
+			_pixelShader = nullptr;
+		}
+
+		if(_vertexShader != nullptr)
+		{
+			_vertexShader->Release();
+			_vertexShader = nullptr;
+		}
+
+		if(_backbuffer != nullptr)
+		{
+			_backbuffer->Release();
+			_backbuffer = nullptr;
+		}
+
+		if(_swapchain != nullptr)
+		{
+			_swapchain->SetFullscreenState(false, nullptr);
+			_swapchain->Release();
+			_swapchain = nullptr;
+		}
+
+		if(_devcon != nullptr)
+		{
+			_devcon->Release();
+			_devcon = nullptr;
+		}
+		
+		if(_dev != nullptr)
+		{
+			_dev->Release();
+			_dev = nullptr;
+		}
+	}
+
+	//*****************************************************************
+	//					BEGIN SCENE
+	//*****************************************************************
+	bool DXRenderer::BeginScene()
+	{
+		_devcon->ClearRenderTargetView(_backbuffer, _backgroundColor);
+		return true;
+	}
+	
+	//*****************************************************************
+	//					END SCENE
+	//*****************************************************************
+	void DXRenderer::EndScene()
+	{
+		_swapchain->Present(0, 0);
+	}
+	
+	
+	
+	
+	
+	//*****************************************************************
+	//					TEST DRAW
+	//*****************************************************************
+	void DXRenderer::testDraw()
+	{
+		VERTEX OurVertices[] =
+		{
+
+			{0.0f, 0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f)},
+			{0.45f, -0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)},
+			{-0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f)}
+		};
+
+		D3D11_BUFFER_DESC bd;
+		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bd.ByteWidth = sizeof(VERTEX) * 3;
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//		bd.MiscFlags;
+//		bd.StructureByteStride;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
+
+		_dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
+
+		D3D11_MAPPED_SUBRESOURCE ms;
+		_devcon->Map(_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		memcpy(ms.pData, OurVertices, sizeof(OurVertices));
+		_devcon->Unmap(_vertexBuffer, 0);
+
+
+		uint32_t stride = sizeof(VERTEX);
+		uint32_t offset = 0;
+		_devcon->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
+		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_devcon->Draw(3, 0);
+
+
+		_vertexBuffer->Release();
+		_vertexBuffer = nullptr;
+	}
+
+
+
+
+
+
+	//*****************************************************************
+	//					GET SCREEN SIZE
+	//*****************************************************************
+	Util::Vec2 DXRenderer::getScreenSize() const
+	{
+		
+		return Util::Vec2();
+	}
+
+	//*****************************************************************
+	//					SET  SCREEN SIZE
+	//*****************************************************************
+	void DXRenderer::setScreenSize(const Util::Vec2& size)
+	{
+		setScreenSize((uint32_t)size.x, (uint32_t)size.y);
+	}
+
+	void DXRenderer::setScreenSize(uint32_t width, uint32_t height)
+	{
+		
+		reset();
+	}
+
+	//*****************************************************************
+	//					GET BACKGROUND COLOR
+	//*****************************************************************
+	Util::Color DXRenderer::getBackgroundColor() const
+	{
+		return Util::Color(_backgroundColor);
+	}
+
+	//*****************************************************************
+	//					SET BACKGROUND COLOR
+	//*****************************************************************
+	void DXRenderer::setBackgroundColor(const Util::Color& color)
+	{
+		Util::Color c = color;
+		c.setAlpha(255);
+		_backgroundColor = c.getARGB();
+	}
+
+	void DXRenderer::setBackgroundColor(uint8_t red, uint8_t green, uint8_t blue)
+	{
+		setBackgroundColor(Util::Color(red, green, blue));
+	}
+
+	void DXRenderer::setBackgroundColor(float red, float green, float blue)
+	{
+		_backgroundColor = D3DXCOLOR(red, green, blue, 1);
+	}
+	
+	//*****************************************************************
+	//					GET FULLSCREEN STATE
+	//*****************************************************************
+	bool DXRenderer::getFullscreenState() const 
+	{
+		BOOL fs = false;
+		_swapchain->GetFullscreenState(&fs, nullptr);
+		return fs == TRUE;
+	}
+
+	//*****************************************************************
+	//					SET FULLSCREEN STATE
+	//*****************************************************************
+	void DXRenderer::setFullscreenState(bool state)
+	{
+		if(getFullscreenState() != state)
+		{
+			_swapchain->SetFullscreenState(state, nullptr);
+		}
+	}
+
+	
+
+	
+
+
+
+
+
+	/*
 	DXRenderer::DXRenderer(HWND hwnd)
 		: _hwnd(hwnd), _d3d(nullptr), _d3ddev(nullptr), _backbuffer(nullptr), _spriteHandler(nullptr), _line(nullptr),
 		_vertexFormat(0), _transparentColor(D3DCOLOR_XRGB(255,0,255)), _backgroundFillColor(D3DCOLOR_XRGB(0,0,0))
@@ -749,7 +1045,7 @@ namespace Graphics
 			Logger() << e.what() << Logger::endline;
 		}
 	}
-	*/
+
 
 	bool DXRenderer::setTranslation(const Util::Vec3& translation)
 	{
@@ -846,5 +1142,5 @@ namespace Graphics
 		DWORD modes[] = {D3DFILL_POINT, D3DFILL_WIREFRAME, D3DFILL_SOLID};
 		return SUCCEEDED(_d3ddev->SetRenderState(D3DRS_FILLMODE, modes[(int)fillmode]));
 	}
-
+*/
 }

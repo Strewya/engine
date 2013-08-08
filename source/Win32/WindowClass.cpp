@@ -41,17 +41,18 @@ namespace Win32
 
 	void WindowClass::FillDefaultData()
 	{
-		this->cbSize = sizeof(WNDCLASSEX);
-		//fill the structure with info
-		this->style			= CS_HREDRAW | CS_VREDRAW;
-		this->lpfnWndProc	= (WNDPROC)Window::MessageRouter;
 		this->cbClsExtra	= 0;
+		this->cbSize		= sizeof(WNDCLASSEX);
 		this->cbWndExtra	= 0;
-		this->hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
+		this->hbrBackground	= 0; //(HBRUSH)GetStockObject(BLACK_BRUSH);
 		this->hCursor		= LoadCursor(nullptr, IDC_ARROW);
-		this->hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
-		this->lpszMenuName	= nullptr;
+		this->hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		this->hIconSm		= nullptr;
+//		this->hInstance		= nullptr; //this is set in ctor
+		this->lpfnWndProc	= (WNDPROC)Window::MessageRouter;
+//		this->lpszClassName = nullptr; //this is set in ctor
+		this->lpszMenuName	= nullptr;
+		this->style			= CS_HREDRAW | CS_VREDRAW;
 	}
 
 	ATOM WindowClass::Register()

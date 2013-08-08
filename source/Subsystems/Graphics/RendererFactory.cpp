@@ -13,7 +13,7 @@
 namespace Graphics
 {
 	RendererFactory::RendererFactory(Win32::Window& window)
-		: _hwnd(window.getWindowHandle()), _hInst(window.getInstance()), _dll(NULL), _renderer(NULL)
+		: _hwnd(window.getWindowHandle()), _hInst(window.getInstance()), _dll(nullptr), _renderer(nullptr)
 	{}
 
 	RendererFactory::~RendererFactory()
@@ -68,14 +68,14 @@ namespace Graphics
 
 	void RendererFactory::DestroyInterface()
 	{
-		DESTROY_RENDERER destroy = NULL;
+		DESTROY_RENDERER destroy = nullptr;
 
 		destroy = (DESTROY_RENDERER)GetProcAddress(_dll, "destroyRendererInterface");
-		if(!destroy(&_renderer))
+		if(!destroy(_renderer))
 		{
 			FreeLibrary(_dll);
 			MessageBox(_hwnd, "Error destroying the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
 		}
-		_renderer = NULL;
+		_renderer = nullptr;
 	}
 }

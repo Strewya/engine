@@ -1,8 +1,10 @@
 #pragma once
 
-#include <d3d9.h>				//directx
-#include <d3dx9.h>				//directx
-#include <d3dx9math.h>			//directx
+#include <dxgi.h>
+#include <d3d11.h>				//directx
+#include <d3dx11.h>				//directx
+#include <d3dx10.h>				//directx
+
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
 

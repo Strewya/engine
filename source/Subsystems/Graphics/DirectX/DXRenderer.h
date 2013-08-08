@@ -7,25 +7,66 @@
 #include <deque>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Subsystems/Graphics/SpriteInfo.h"
 #include "Subsystems/Graphics/IRenderer.h"
-#include "Subsystems/Graphics/DirectX/DXFontCache.h"
 #include "Subsystems/Graphics/DirectX/DXInclude.h"
-#include "Subsystems/Graphics/DirectX/DXTextureCache.h"
-#include "Util/Dimensional.h"
-#include "Util/Color.h"
 	/*** end header inclusion ***/
 
 namespace Graphics
 {
 	class DXRenderer : public IRenderer
 	{
+	public: //list all public methods which need to be exposed through the interface
+		DXRenderer(HWND hwnd);
+		~DXRenderer();
+
+		bool BeginScene();
+		void EndScene();
+
+		void testDraw();
+
+		Util::Vec2 getScreenSize() const;
+		void setScreenSize(const Util::Vec2& size);
+		void setScreenSize(uint32_t width, uint32_t height);
+
+		Util::Color getBackgroundColor() const;
+		void setBackgroundColor(const Util::Color& color);
+		void setBackgroundColor(uint8_t red, uint8_t green, uint8_t blue);
+		void setBackgroundColor(float red, float green, float blue);
+		
+		bool getFullscreenState() const;
+		void setFullscreenState(bool state);
+		
+	protected: //list all methods that need not be exposed outward, NOTE this is just for code readability purposes
+		bool init();
+		bool initPipeline();
+		bool reset();
+		void close();
+
+	private: //all private members that must not be accessible from the outside
+		HWND _hwnd;
+		ID3D11Device* _dev;
+		ID3D11DeviceContext* _devcon;
+		IDXGISwapChain* _swapchain;
+		ID3D11RenderTargetView* _backbuffer;
+		ID3D11PixelShader* _pixelShader;
+		ID3D11VertexShader* _vertexShader;
+		ID3D11Buffer* _vertexBuffer;
+		ID3D11InputLayout* _inputLayout;
+		
+		D3DXCOLOR _backgroundColor;
+
+		bool _fullscreen;
+
+
+
+
+
+		/*
 	private:
 		DXRenderer(DXRenderer& dxg);
 		DXRenderer& operator=(DXRenderer& dxg);
 
-		bool InitDevices();
-		bool ResetDevices();
+		
 		
 		HWND _hwnd;
 		LPDIRECT3D9 _d3d;
@@ -54,20 +95,15 @@ namespace Graphics
 
 		ITextureCache& getTextureCache();
 
-		Util::Vec2 getScreenSize() const;
-		void setScreenSize(const Util::Vec2& size);
-		void setScreenSize(uint32_t width, uint32_t height);
+		
 
 		Util::Color getTransparentColor() const;
 		void setTransparentColor(const Util::Color& color);
 		void setTransparentColor(uint8_t red, uint8_t green, uint8_t blue);
 		
-		Util::Color getBackgroundFillColor() const;
-		void setBackgroundFillColor(const Util::Color& color);
-		void setBackgroundFillColor(uint8_t red, uint8_t green, uint8_t blue);
+		
 
-		bool getFullscreenState() const;
-		void setFullscreenState(bool state);
+		
 
 		
 		DXFont LoadFont(const char* name, uint32_t size, uint32_t weight, bool italic) const;
@@ -76,8 +112,6 @@ namespace Graphics
 		uint32_t getFontHandle(const char* filename);
 		const FontInfo& getFontInfo(uint32_t handle) const;
 
-		bool BeginScene();
-		void EndScene();
 		bool BeginSpriteBatch(bool alphablend);
 		void EndSpriteBatch();
 		
@@ -117,5 +151,7 @@ namespace Graphics
 		bool setRenderStateZBuffer(bool enabled);
 		bool setRenderStateCulling(RS_Culling cullmode);
 		bool setRenderStateFillmode(RS_Fillmode fillmode);
+		*/
+
 	};
 }

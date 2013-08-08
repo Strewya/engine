@@ -19,37 +19,13 @@
     <ClInclude Include="..\..\source\Util\Logger.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\FontInfo.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFont.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Util\AssetStorage.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.h">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\stdafx.h" />
+    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\Vertex.h">
+      <Filter>Subsystems/Graphics/DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Util\Color.cpp">
@@ -67,30 +43,6 @@
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\FontInfo.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFont.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXFontCache.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTextureCache.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXTexture.cpp">
-      <Filter>Subsystems/Graphics/DirectX</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +54,9 @@
     </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{495a4580-eea8-4311-aa03-2c7bc9e05793}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{df67c29c-3163-4898-ab1b-24a104ab0235}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

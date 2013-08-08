@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Core/Entity/EntityPool.h"
 	/*** C++ headers ***/
+#include <stdexcept>
 	/*** extra headers ***/
 	/*** end headers ***/
 

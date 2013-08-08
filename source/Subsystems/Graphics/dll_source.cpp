@@ -23,13 +23,12 @@ EXPORT int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer)
 	return 0;
 }
 
-EXPORT int destroyRendererInterface(Graphics::IRenderer** renderer)
+EXPORT int destroyRendererInterface(Graphics::IRenderer* renderer)
 {
-	if(renderer != nullptr && *renderer == nullptr)
+	if(renderer == nullptr)
 	{
 		return 0;
 	}
-	delete *renderer;
-	*renderer = NULL;
+	delete renderer;
 	return 1;
 }

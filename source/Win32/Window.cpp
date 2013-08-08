@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Win32/Window.h"
 	/*** C++ headers ***/
+#include "windef.h"
 	/*** extra headers ***/
 #include "Subsystems/Input/Event.h"
 #include "Subsystems/Input/KeyCodes.h"
@@ -344,6 +345,7 @@ namespace Win32
 		}
 		break;
 		//----------------------- XMB -----------------------
+
 		case WM_XBUTTONDOWN:
 		{
 			uint32_t btn = GET_XBUTTON_WPARAM(wParam);
@@ -379,6 +381,7 @@ namespace Win32
 			return TRUE;
 		}
 		break;
+
 		//----------------------- WHEEL -----------------------
 		case WM_MOUSEWHEEL:
 		{

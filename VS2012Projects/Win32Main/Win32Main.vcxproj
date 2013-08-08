@@ -174,7 +174,6 @@
     <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h" />
     <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\Event.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h" />

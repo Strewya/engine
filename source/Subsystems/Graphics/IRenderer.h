@@ -74,26 +74,34 @@ namespace Graphics
 	{
 	public:
 		virtual ~IRenderer() {}
+		
+		virtual bool BeginScene() = 0;
+		virtual void EndScene() = 0;
 
-		virtual ITextureCache& getTextureCache() = 0;
+		virtual void testDraw() = 0;
 
 		virtual Util::Vec2 getScreenSize() const = 0;
 		virtual void setScreenSize(const Util::Vec2& size) = 0;
 		virtual void setScreenSize(uint32_t width, uint32_t height) = 0;
+
+		virtual Util::Color getBackgroundColor() const = 0;
+		virtual void setBackgroundColor(const Util::Color& color) = 0;
+		virtual void setBackgroundColor(uint8_t red, uint8_t green, uint8_t blue) = 0;
+		virtual void setBackgroundColor(float red, float green, float blue) = 0;
 		
+		virtual bool getFullscreenState() const = 0;
+		virtual void setFullscreenState(bool state) = 0;
+		
+		/*
+		virtual ITextureCache& getTextureCache() = 0;
+
 		virtual Util::Color getTransparentColor() const = 0;
 		virtual void setTransparentColor(const Util::Color& color) = 0;
 		virtual void setTransparentColor(uint8_t red, uint8_t green, uint8_t blue) = 0;
 		
-		virtual Util::Color getBackgroundFillColor() const = 0;
-		virtual void setBackgroundFillColor(const Util::Color& color) = 0;
-		virtual void setBackgroundFillColor(uint8_t red, uint8_t green, uint8_t blue) = 0;
-
-		virtual bool getFullscreenState() const = 0;
-		virtual void setFullscreenState(bool state) = 0;
 		
-		virtual bool BeginScene() = 0;
-		virtual void EndScene() = 0;
+		
+		
 		virtual bool BeginSpriteBatch(bool alphablend) = 0;
 		virtual void EndSpriteBatch() = 0;
 
@@ -135,6 +143,6 @@ namespace Graphics
 		virtual bool setRenderStateZBuffer(bool enabled) = 0;
 		virtual bool setRenderStateCulling(RS_Culling cullmode) = 0;
 		virtual bool setRenderStateFillmode(RS_Fillmode fillmode) = 0;
-
+*/
 	};
 }

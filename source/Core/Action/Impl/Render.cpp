@@ -37,12 +37,14 @@ namespace Core
 		//delete entities that are no longer valid
 
 		context.services.getGraphics().BeginScene();
-		context.services.getGraphics().BeginSpriteBatch(true);
+//		context.services.getGraphics().BeginSpriteBatch(true);
 		
-		_queue.Render(context.services, context.resources);
+//		_queue.Render(context.services, context.resources);
+		context.services.getGraphics().testDraw();
 
-		context.services.getGraphics().EndSpriteBatch();
+//		context.services.getGraphics().EndSpriteBatch();
 		context.services.getGraphics().EndScene();
+
 		return true;
 	}
 

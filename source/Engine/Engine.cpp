@@ -43,9 +43,9 @@ namespace Core
 		*/
 		if(!_rendererFactory.InitInterface(renderer))
 		{
-			throw;
+			throw std::logic_error("Unable to initialize renderer");
 		}
-		_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
+		//_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
 
 		_window.setEventQueue(_inputEngine.getEventQueue());
 		/*
@@ -71,7 +71,7 @@ namespace Core
 			* scripts
 			* TODO: strings
 		*/
-		_resources.Register(_services.getGraphics().getTextureCache());
+		//_resources.Register(_services.getGraphics().getTextureCache());
 		_spritesheets.setTextureCache(_resources.getTextureCache());
 		_resources.Register(_spritesheets);
 
@@ -89,6 +89,7 @@ namespace Core
 	{
 		_gameContexts.clear();
 		_spritesheets.clear();
+		_rendererFactory.DestroyInterface();
 	}
 
 	void Engine::loop()

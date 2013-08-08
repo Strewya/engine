@@ -4,16 +4,15 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Util/Color.h"
+#include "Subsystems/Graphics/DirectX/DXInclude.h"
 	/*** end header inclusion ***/
 
 namespace Graphics
 {
-	struct Vertex
+	struct VERTEX
 	{
-		float x,y,z;
-		DWORD diffuse;
+		FLOAT X, Y, Z;
+		D3DXCOLOR COLOR;
 	};
 }

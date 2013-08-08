@@ -20,7 +20,7 @@ namespace Pong
 
 	bool createBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		auto screen = context.services.getGraphics().getScreenSize();
+		auto screen = Util::Vec2(800,600); //context.services.getGraphics().getScreenSize();
 		auto& pos = ball.insert(Core::Position2d::create());
 		pos.value.Assign(screen.x/2, screen.y/2);
 		

@@ -12,6 +12,7 @@
 	/*** end header inclusion ***/
 
 #define Component(Name) struct Name : public StateType<Name>
+
 namespace Core
 {
 	/**

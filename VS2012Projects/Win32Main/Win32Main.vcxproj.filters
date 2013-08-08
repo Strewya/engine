@@ -125,7 +125,9 @@
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp">
       <Filter>GameSpecific\Pong</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Win32\winmain.cpp" />
+    <ClCompile Include="..\..\source\Win32\winmain.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -255,9 +257,6 @@
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Vertex.h">
       <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">

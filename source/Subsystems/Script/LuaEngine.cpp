@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Subsystems/Script/LuaEngine.h"
 	/*** C++ headers ***/
+#include <cstdlib>
 	/*** extra headers ***/
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
@@ -311,7 +312,7 @@ namespace Script
 
 	bool Engine::RemoveElement(int index)
 	{
-		if(lua_gettop(_lua) == 0 || GetStackSize() < std::abs(index))
+		if(lua_gettop(_lua) == 0 || GetStackSize() < abs(index))
 		{
 			return false;
 		}

@@ -37,12 +37,10 @@ namespace Pong
 
 	void Gameplay::activate()
 	{
-		/**
-			This function is called every time the context goes from being inactive to being the active context.
-			It should create all of the entities that it needs to work properly.
-		*/
-		services.getGraphics().setBackgroundFillColor(127,127,127);
-
+		services.getGraphics().setBackgroundColor((uint8_t)127,127,127);
+		auto c = services.getGraphics().getBackgroundColor();
+		assert(c.getRed() == 127 && c.getGreen() == 127 && c.getBlue() == 127);
+		
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = entityPool.getNewInstanceRef();
@@ -69,12 +67,7 @@ namespace Pong
 
 	void Gameplay::deactivate()
 	{
-		/**
-			This function is called every time the context goes from being the active one to being inactive.
-			It should destroy all objects that are created in the ACTIVATE function.
-			NOTE: Think of a way to keep entities beyond the inactivity boundary. 
-				  The onActivate function should take this into consideration when creating that particular entity to check whether it already exists.
-		*/
+
 		for(auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
 		{
 			entityPool.destroy(*it);
@@ -84,19 +77,21 @@ namespace Pong
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
+		//auto screen = Util::Vec2();
 		auto screen = services.getGraphics().getScreenSize();
 
-		auto* pos = paddle.getState<Core::Position2d>();
-		pos->value.Assign(10, screen.y/2);
+		auto* position = paddle.getState<Core::Position2d>();
+		position->value.y = screen.y/2;
 	}
 
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
+		//auto screen = Util::Vec2();
 		auto screen = services.getGraphics().getScreenSize();
 
-		auto* pos = paddle.getState<Core::Position2d>();
-		pos->value.Assign(screen.x-10, screen.y/2);
+		auto* position = paddle.getState<Core::Position2d>();
+		position->value.y = screen.y/2;
 	}
 
 

@@ -446,11 +446,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/source/Subsystems/Graphics/FontInfo.h</locationURI>
 		</link>
 		<link>
-			<name>Subsystems/Graphics/Graphics.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/source/Subsystems/Graphics/Graphics.h</locationURI>
-		</link>
-		<link>
 			<name>Subsystems/Graphics/IRenderer.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/source/Subsystems/Graphics/IRenderer.h</locationURI>

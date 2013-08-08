@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Subsystems/Graphics/Spritesheet.h"
 	/*** C++ headers ***/
+#include <stdexcept>
 	/*** extra headers ***/
 	/*** end headers ***/
 
