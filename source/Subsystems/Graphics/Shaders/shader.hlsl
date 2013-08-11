@@ -15,7 +15,7 @@ VOut VShader(float4 position : POSITION, float4 color : COLOR)
 }
 
 
-float4 PShader(float4 position : SV_POSITION, float4 color : COLOR) : SV_TARGET
+float4 PShader(VOut input) : SV_TARGET
 {
-    return color;
+    return input.color;
 }

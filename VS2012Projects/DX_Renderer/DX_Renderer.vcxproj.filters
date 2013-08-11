@@ -59,4 +59,9 @@
       <UniqueIdentifier>{df67c29c-3163-4898-ab1b-24a104ab0235}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\source\Subsystems\Graphics\Shaders\shader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

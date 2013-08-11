@@ -1,9 +1,10 @@
 #pragma once
 
-#include <dxgi.h>
+
 #include <d3d11.h>				//directx
 #include <d3dx11.h>				//directx
 #include <d3dx10.h>				//directx
+#include <xnamath.h>
 
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
@@ -14,12 +15,12 @@ inline RECT MakeRECT(const Util::Rect& in)
 	return out;
 }
 
-inline D3DXVECTOR2 MakeVECTOR(const Util::Vec2& in)
+inline XMFLOAT2 MakeVECTOR(const Util::Vec2& in)
 {
-	return D3DXVECTOR2(in.x, in.y);
+	return XMFLOAT2(in.x, in.y);
 }
 
-inline D3DXVECTOR3 MakeVECTOR(const Util::Vec3& in)
+inline XMFLOAT3 MakeVECTOR(const Util::Vec3& in)
 {
-	return D3DXVECTOR3(in.x, in.y, in.z);
+	return XMFLOAT3(in.x, in.y, in.z);
 }

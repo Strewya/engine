@@ -38,20 +38,32 @@ namespace Graphics
 		
 	protected: //list all methods that need not be exposed outward, NOTE this is just for code readability purposes
 		bool init();
+		void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd);
 		bool initPipeline();
 		bool reset();
 		void close();
 
 	private: //all private members that must not be accessible from the outside
+		//configuration
+		uint32_t _screenW;
+		uint32_t _screenH;
+		DXGI_SWAP_CHAIN_DESC _swapChainDesc;
+
+		//members
 		HWND _hwnd;
 		ID3D11Device* _dev;
 		ID3D11DeviceContext* _devcon;
 		IDXGISwapChain* _swapchain;
 		ID3D11RenderTargetView* _backbuffer;
-		ID3D11PixelShader* _pixelShader;
+		ID3D10Blob* _vertexShaderBlob;
 		ID3D11VertexShader* _vertexShader;
-		ID3D11Buffer* _vertexBuffer;
+		ID3D10Blob* _pixelShaderBlob;
+		ID3D11PixelShader* _pixelShader;
+		ID3D11RasterizerState* _rasterizerState;
 		ID3D11InputLayout* _inputLayout;
+		ID3D11Buffer* _vertexBuffer;
+		ID3D11Buffer* _indexBuffer;
+		
 		
 		D3DXCOLOR _backgroundColor;
 

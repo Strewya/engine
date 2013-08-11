@@ -14,8 +14,11 @@ namespace Graphics
 {
 #define TEST_SUCCESS(result) if(FAILED(result)) return false
 	DXRenderer::DXRenderer(HWND hwnd)
-		: _hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _backbuffer(nullptr),
-		_pixelShader(nullptr), _vertexShader(nullptr), _vertexBuffer(nullptr),
+		: _screenW(1024), _screenH(768),
+		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _backbuffer(nullptr),
+		_vertexShaderBlob(nullptr), _vertexShader(nullptr), _pixelShaderBlob(nullptr), _pixelShader(nullptr),
+		_rasterizerState(nullptr),
+		_inputLayout(nullptr), _vertexBuffer(nullptr), _indexBuffer(nullptr),
 		_backgroundColor(0,0,0,1)
 	{
 		if(!init())
@@ -39,75 +42,127 @@ namespace Graphics
 	//*****************************************************************
 	bool DXRenderer::init()
 	{
-		DXGI_SWAP_CHAIN_DESC scd;
-		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
-		scd.BufferCount			= 1;
-		scd.BufferDesc.Format	= DXGI_FORMAT_R8G8B8A8_UNORM;
-		scd.BufferDesc.Width	= 1024;
-		scd.BufferDesc.Height	= 768;
-		scd.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		scd.Flags				= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		scd.OutputWindow		= _hwnd;
-		scd.SampleDesc.Count	= 4;
-		scd.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;
-		scd.Windowed			= true;
+		fillSwapChainDesc(_swapChainDesc);
 
-		HRESULT result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &scd, &_swapchain, &_dev, nullptr, &_devcon);
-		TEST_SUCCESS(result);
+		auto driverType = D3D_DRIVER_TYPE_HARDWARE;
+		HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, driverType, nullptr, D3D11_CREATE_DEVICE_DEBUG, nullptr, 0, D3D11_SDK_VERSION, &_swapChainDesc, &_swapchain, &_dev, nullptr, &_devcon);
+		TEST_SUCCESS(hr);
 		
 		ID3D11Texture2D* bbTexture = nullptr;
-		result = _swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
-		TEST_SUCCESS(result);
+		hr = _swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
+		TEST_SUCCESS(hr);
 		
-		result = _dev->CreateRenderTargetView(bbTexture, nullptr, &_backbuffer);
-		TEST_SUCCESS(result);
+		hr = _dev->CreateRenderTargetView(bbTexture, nullptr, &_backbuffer);
+		TEST_SUCCESS(hr);
 
-		result = bbTexture->Release();
+		hr = bbTexture->Release();
 		_devcon->OMSetRenderTargets(1, &_backbuffer, nullptr);
 
 		D3D11_VIEWPORT vp;
 		ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-		vp.Width = 800;
-		vp.Height = 600;
+		vp.Width = (float)_screenW;
+		vp.Height = (float)_screenH;
 
 		_devcon->RSSetViewports(1, &vp);
 
 		return true;
 	}
 
+	void DXRenderer::fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd)
+	{
+		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));		
+		scd.BufferCount		= 1;
+		scd.BufferUsage		= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		scd.Flags			= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		scd.OutputWindow	= _hwnd;
+		scd.SwapEffect		= DXGI_SWAP_EFFECT_DISCARD;
+		scd.Windowed		= true;
+
+		DXGI_MODE_DESC& bd = scd.BufferDesc;
+		bd.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;
+		bd.Width					= _screenW;
+		bd.Height					= _screenH;
+		bd.RefreshRate.Denominator	= 1;
+		bd.RefreshRate.Numerator	= 60;
+		bd.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		bd.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+
+		DXGI_SAMPLE_DESC& sd = scd.SampleDesc;
+		sd.Count	= 1;
+		sd.Quality	= 0;
+	}
+
 	bool DXRenderer::initPipeline()
 	{
-		HRESULT result = 0;
+		HRESULT hr = 0;
 		ID3D10Blob* vblob = nullptr;
 		String shaderPath = "D:/engine/source/Subsystems/Graphics/Shaders/shader.hlsl";
 		//shaderPath = "shader.hlsl";
-		result = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_5_0", 0, 0, nullptr, &vblob, nullptr, nullptr);
-		TEST_SUCCESS(result);
+		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_5_0", 0, 0, nullptr, &vblob, nullptr, nullptr);
+		TEST_SUCCESS(hr);
 
-		result = _dev->CreateVertexShader(vblob->GetBufferPointer(), vblob->GetBufferSize(), nullptr, &_vertexShader);
-		TEST_SUCCESS(result);
+		hr = _dev->CreateVertexShader(vblob->GetBufferPointer(), vblob->GetBufferSize(), nullptr, &_vertexShader);
+		TEST_SUCCESS(hr);
 
 		ID3D10Blob* pblob = nullptr;
-		result = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_5_0", 0, 0, nullptr, &pblob, nullptr, nullptr);
-		TEST_SUCCESS(result);
+		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_5_0", 0, 0, nullptr, &pblob, nullptr, nullptr);
+		TEST_SUCCESS(hr);
 
-		result = _dev->CreatePixelShader(pblob->GetBufferPointer(), pblob->GetBufferSize(), nullptr, &_pixelShader);
-		TEST_SUCCESS(result);
+		hr = _dev->CreatePixelShader(pblob->GetBufferPointer(), pblob->GetBufferSize(), nullptr, &_pixelShader);
+		TEST_SUCCESS(hr);
 		
 		_devcon->VSSetShader(_vertexShader, nullptr, 0);
 		_devcon->PSSetShader(_pixelShader, nullptr, 0);
 
 		D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0,							 D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR",	 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
+		uint32_t iedElems = ARRAYSIZE(ied);
 
-		_dev->CreateInputLayout(ied, 2, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
+		hr = _dev->CreateInputLayout(ied, iedElems, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
+		TEST_SUCCESS(hr);
 		_devcon->IASetInputLayout(_inputLayout);
+
+		vblob->Release();
+		pblob->Release();
+
+		D3D11_BUFFER_DESC bd;
+		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bd.ByteWidth = sizeof(VERTEX) * 30;
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags = 0;
+//		bd.StructureByteStride;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
 		
+		hr = _dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
+		TEST_SUCCESS(hr);
+
+		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bd.ByteWidth = sizeof(uint32_t) * 60;
+		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags = 0;
+//		bd.StructureByteStride;
+		bd.Usage = D3D11_USAGE_DYNAMIC;
+
+		hr = _dev->CreateBuffer(&bd, nullptr, &_indexBuffer);
+		TEST_SUCCESS(hr);
+
+		D3D11_RASTERIZER_DESC rd;
+		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+		rd.FillMode = D3D11_FILL_SOLID;
+		rd.CullMode = D3D11_CULL_BACK;
+
+		hr = _dev->CreateRasterizerState(&rd, &_rasterizerState);
+		TEST_SUCCESS(hr);
+
+		_devcon->RSSetState(_rasterizerState);
+
 		return true;
 	}
 
@@ -116,52 +171,36 @@ namespace Graphics
 	//*****************************************************************
 	bool DXRenderer::reset()
 	{
+		
 		return true;
 	}
 
 	//*****************************************************************
 	//					SHUTTING DOWN
 	//*****************************************************************
+#define SAFE_RELEASE(ptr) if(ptr != nullptr) { ptr->Release(); ptr = nullptr; }
 	void DXRenderer::close()
 	{
-		if(_pixelShader != nullptr)
-		{
-			_pixelShader->Release();
-			_pixelShader = nullptr;
-		}
-
-		if(_vertexShader != nullptr)
-		{
-			_vertexShader->Release();
-			_vertexShader = nullptr;
-		}
-
-		if(_backbuffer != nullptr)
-		{
-			_backbuffer->Release();
-			_backbuffer = nullptr;
-		}
-
 		if(_swapchain != nullptr)
 		{
 			_swapchain->SetFullscreenState(false, nullptr);
-			_swapchain->Release();
-			_swapchain = nullptr;
 		}
 
-		if(_devcon != nullptr)
-		{
-			_devcon->Release();
-			_devcon = nullptr;
-		}
-		
-		if(_dev != nullptr)
-		{
-			_dev->Release();
-			_dev = nullptr;
-		}
+		SAFE_RELEASE(_indexBuffer);
+		SAFE_RELEASE(_vertexBuffer);
+		SAFE_RELEASE(_inputLayout);
+		SAFE_RELEASE(_rasterizerState);
+		SAFE_RELEASE(_pixelShader);
+		SAFE_RELEASE(_pixelShaderBlob);
+		SAFE_RELEASE(_vertexShader);
+		SAFE_RELEASE(_vertexShaderBlob);
+		SAFE_RELEASE(_backbuffer);
+		SAFE_RELEASE(_swapchain);
+		SAFE_RELEASE(_devcon);
+		SAFE_RELEASE(_dev);
+		_hwnd = 0;
 	}
-
+#undef SAFE_RELEASE
 	//*****************************************************************
 	//					BEGIN SCENE
 	//*****************************************************************
@@ -188,43 +227,44 @@ namespace Graphics
 	//*****************************************************************
 	void DXRenderer::testDraw()
 	{
-		VERTEX OurVertices[] =
+		VERTEX vertices[] =
 		{
-
-			{0.0f, 0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f)},
-			{0.45f, -0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f)},
-			{-0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f)}
+			//		x		 y		 z		 r		 g		 b		 a
+			VERTEX(-0.50f,	 0.50f,	 0.00f,	 1.00f,	 0.00f,	 1.00f,	 1.00f),
+			VERTEX( 0.50f,	 0.50f,	 0.00f,	 1.00f,	 0.00f,	 0.00f,	 1.00f),
+			VERTEX(-0.50f,	-0.50f,	 0.00f,	 0.00f,	 0.00f,	 1.00f,	 1.00f),
+			VERTEX( 0.50f,	-0.50f,	 0.00f,	 0.00f,	 1.00f,	 0.00f,	 1.00f),
 		};
 
-		D3D11_BUFFER_DESC bd;
-		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd.ByteWidth = sizeof(VERTEX) * 3;
-		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-//		bd.MiscFlags;
-//		bd.StructureByteStride;
-		bd.Usage = D3D11_USAGE_DYNAMIC;
+		uint32_t indices[] =
+		{
+			0,1,2,
+			1,3,2,
+		};
 
-		_dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
+		
 
 		D3D11_MAPPED_SUBRESOURCE ms;
 		_devcon->Map(_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		memcpy(ms.pData, OurVertices, sizeof(OurVertices));
+		memcpy(ms.pData, vertices, sizeof(vertices));
 		_devcon->Unmap(_vertexBuffer, 0);
+
+		_devcon->Map(_indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		memcpy(ms.pData, indices, sizeof(indices));
+		_devcon->Unmap(_indexBuffer, 0);
 
 
 		uint32_t stride = sizeof(VERTEX);
 		uint32_t offset = 0;
 		_devcon->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
-		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_devcon->Draw(3, 0);
+		_devcon->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-
-		_vertexBuffer->Release();
-		_vertexBuffer = nullptr;
+		_devcon->DrawIndexed(6, 0, 0);
+		
 	}
 
-
+	
 
 
 

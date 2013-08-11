@@ -31,6 +31,7 @@ namespace Core
 			* display engine (directx by default)
 			* audio engine (fmod by default)
 		*/
+		_window.setCursorShow(true);
 		String renderer = "dx";
 		/*
 			initialize the subsystems:
