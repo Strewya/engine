@@ -54,7 +54,7 @@ namespace Graphics
 		ID3D11Device* _dev;
 		ID3D11DeviceContext* _devcon;
 		IDXGISwapChain* _swapchain;
-		ID3D11RenderTargetView* _backbuffer;
+		ID3D11RenderTargetView* _renderTarget;
 		ID3D10Blob* _vertexShaderBlob;
 		ID3D11VertexShader* _vertexShader;
 		ID3D10Blob* _pixelShaderBlob;
@@ -63,11 +63,19 @@ namespace Graphics
 		ID3D11InputLayout* _inputLayout;
 		ID3D11Buffer* _vertexBuffer;
 		ID3D11Buffer* _indexBuffer;
-		
+		ID3D11DepthStencilView* _depthStencilView;
+		ID3D11Texture2D* _depthStencilBuffer;
+		ID3D11Buffer* _cbPerObjectBuffer;
+		ID3D11ShaderResourceView* _shaderResourceView;
+		ID3D11SamplerState* _samplerState;
 		
 		D3DXCOLOR _backgroundColor;
-
-		bool _fullscreen;
+		
+		XMMATRIX _camView;
+		XMMATRIX _camProjection;
+		XMVECTOR _camPosition;
+		XMVECTOR _camLookAt;
+		XMVECTOR _camUp;
 
 
 

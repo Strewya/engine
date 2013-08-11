@@ -13,12 +13,22 @@
 namespace Graphics
 {
 #define TEST_SUCCESS(result) if(FAILED(result)) return false
+
+	struct cbPerObject
+	{
+		XMMATRIX WVP;
+	};
+
+
 	DXRenderer::DXRenderer(HWND hwnd)
 		: _screenW(1024), _screenH(768),
-		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _backbuffer(nullptr),
+		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _renderTarget(nullptr),
 		_vertexShaderBlob(nullptr), _vertexShader(nullptr), _pixelShaderBlob(nullptr), _pixelShader(nullptr),
 		_rasterizerState(nullptr),
 		_inputLayout(nullptr), _vertexBuffer(nullptr), _indexBuffer(nullptr),
+		_depthStencilView(nullptr), _depthStencilBuffer(nullptr),
+		_cbPerObjectBuffer(nullptr),
+		_shaderResourceView(nullptr), _samplerState(nullptr),
 		_backgroundColor(0,0,0,1)
 	{
 		if(!init())
@@ -52,11 +62,11 @@ namespace Graphics
 		hr = _swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
 		TEST_SUCCESS(hr);
 		
-		hr = _dev->CreateRenderTargetView(bbTexture, nullptr, &_backbuffer);
+		hr = _dev->CreateRenderTargetView(bbTexture, nullptr, &_renderTarget);
 		TEST_SUCCESS(hr);
 
 		hr = bbTexture->Release();
-		_devcon->OMSetRenderTargets(1, &_backbuffer, nullptr);
+		
 
 		D3D11_VIEWPORT vp;
 		ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
@@ -64,6 +74,8 @@ namespace Graphics
 		vp.TopLeftY = 0;
 		vp.Width = (float)_screenW;
 		vp.Height = (float)_screenH;
+		vp.MinDepth = 0;
+		vp.MaxDepth = 1;
 
 		_devcon->RSSetViewports(1, &vp);
 
@@ -116,14 +128,10 @@ namespace Graphics
 		_devcon->VSSetShader(_vertexShader, nullptr, 0);
 		_devcon->PSSetShader(_pixelShader, nullptr, 0);
 
-		D3D11_INPUT_ELEMENT_DESC ied[] =
-		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 0,							 D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOR",	 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		};
-		uint32_t iedElems = ARRAYSIZE(ied);
+		
+		uint32_t iedElems = ARRAYSIZE(VERTEX_DESC);
 
-		hr = _dev->CreateInputLayout(ied, iedElems, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
+		hr = _dev->CreateInputLayout(VERTEX_DESC, iedElems, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
 		TEST_SUCCESS(hr);
 		_devcon->IASetInputLayout(_inputLayout);
 
@@ -132,36 +140,78 @@ namespace Graphics
 
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd.ByteWidth = sizeof(VERTEX) * 30;
-		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bd.MiscFlags = 0;
-//		bd.StructureByteStride;
-		bd.Usage = D3D11_USAGE_DYNAMIC;
+		bd.BindFlags		= D3D11_BIND_VERTEX_BUFFER;
+		bd.ByteWidth		= sizeof(VERTEX) * 30;
+		bd.CPUAccessFlags	= D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags		= 0;
+		bd.Usage			= D3D11_USAGE_DYNAMIC;
 		
 		hr = _dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
 		TEST_SUCCESS(hr);
 
 		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bd.ByteWidth = sizeof(uint32_t) * 60;
-		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bd.MiscFlags = 0;
-//		bd.StructureByteStride;
-		bd.Usage = D3D11_USAGE_DYNAMIC;
+		bd.BindFlags		= D3D11_BIND_INDEX_BUFFER;
+		bd.ByteWidth		= sizeof(uint32_t) * 60;
+		bd.CPUAccessFlags	= D3D11_CPU_ACCESS_WRITE;
+		bd.MiscFlags		= 0;
+		bd.Usage			= D3D11_USAGE_DYNAMIC;
 
 		hr = _dev->CreateBuffer(&bd, nullptr, &_indexBuffer);
 		TEST_SUCCESS(hr);
 
 		D3D11_RASTERIZER_DESC rd;
 		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-		rd.FillMode = D3D11_FILL_SOLID;
-		rd.CullMode = D3D11_CULL_BACK;
-
+		rd.FillMode = D3D11_FILL_WIREFRAME;
+		rd.CullMode = D3D11_CULL_FRONT;
+		rd.FrontCounterClockwise = true;
+		
 		hr = _dev->CreateRasterizerState(&rd, &_rasterizerState);
 		TEST_SUCCESS(hr);
 
 		_devcon->RSSetState(_rasterizerState);
+
+		D3D11_TEXTURE2D_DESC dsd;
+		ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
+
+		dsd.Width			= _screenW;
+		dsd.Height			= _screenH;
+		dsd.MipLevels		= 1;
+		dsd.ArraySize		= 1;
+		dsd.Format			= DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsd.Usage			= D3D11_USAGE_DEFAULT;
+		dsd.BindFlags		= D3D11_BIND_DEPTH_STENCIL;
+		dsd.CPUAccessFlags	= 0;
+		dsd.MiscFlags		= 0;
+
+		DXGI_SAMPLE_DESC& sd = dsd.SampleDesc;
+		sd.Count	= 1;
+		sd.Quality	= 0;
+
+		hr = _dev->CreateTexture2D(&dsd, nullptr, &_depthStencilBuffer);
+		TEST_SUCCESS(hr);
+
+		hr = _dev->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
+
+		_devcon->OMSetRenderTargets(1, &_renderTarget, _depthStencilView);
+
+		
+
+		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+		bd.Usage			= D3D11_USAGE_DEFAULT;
+		bd.ByteWidth		= sizeof(cbPerObject);
+		bd.BindFlags		= D3D11_BIND_CONSTANT_BUFFER;
+		bd.CPUAccessFlags	= 0;
+		bd.MiscFlags		= 0;
+		
+		hr = _dev->CreateBuffer(&bd, nullptr, &_cbPerObjectBuffer);
+		TEST_SUCCESS(hr);
+
+		_camPosition = XMVectorSet(0.0f, 5.0f, -18.0f, 0.0f);
+		_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		_camView = XMMatrixLookAtLH(_camPosition, _camLookAt, _camUp);
+		_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)_screenW/_screenH, 1.0f, 100.0f);
 
 		return true;
 	}
@@ -186,6 +236,11 @@ namespace Graphics
 			_swapchain->SetFullscreenState(false, nullptr);
 		}
 
+		SAFE_RELEASE(_samplerState);
+		SAFE_RELEASE(_shaderResourceView);
+		SAFE_RELEASE(_cbPerObjectBuffer);
+		SAFE_RELEASE(_depthStencilBuffer);
+		SAFE_RELEASE(_depthStencilView);
 		SAFE_RELEASE(_indexBuffer);
 		SAFE_RELEASE(_vertexBuffer);
 		SAFE_RELEASE(_inputLayout);
@@ -194,7 +249,7 @@ namespace Graphics
 		SAFE_RELEASE(_pixelShaderBlob);
 		SAFE_RELEASE(_vertexShader);
 		SAFE_RELEASE(_vertexShaderBlob);
-		SAFE_RELEASE(_backbuffer);
+		SAFE_RELEASE(_renderTarget);
 		SAFE_RELEASE(_swapchain);
 		SAFE_RELEASE(_devcon);
 		SAFE_RELEASE(_dev);
@@ -206,7 +261,8 @@ namespace Graphics
 	//*****************************************************************
 	bool DXRenderer::BeginScene()
 	{
-		_devcon->ClearRenderTargetView(_backbuffer, _backgroundColor);
+		_devcon->ClearRenderTargetView(_renderTarget, _backgroundColor);
+		_devcon->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1, 0);
 		return true;
 	}
 	
@@ -221,7 +277,7 @@ namespace Graphics
 	
 	
 	
-	
+	static float g_rot = 0.0f;
 	//*****************************************************************
 	//					TEST DRAW
 	//*****************************************************************
@@ -229,20 +285,27 @@ namespace Graphics
 	{
 		VERTEX vertices[] =
 		{
-			//		x		 y		 z		 r		 g		 b		 a
-			VERTEX(-0.50f,	 0.50f,	 0.00f,	 1.00f,	 0.00f,	 1.00f,	 1.00f),
-			VERTEX( 0.50f,	 0.50f,	 0.00f,	 1.00f,	 0.00f,	 0.00f,	 1.00f),
-			VERTEX(-0.50f,	-0.50f,	 0.00f,	 0.00f,	 0.00f,	 1.00f,	 1.00f),
-			VERTEX( 0.50f,	-0.50f,	 0.00f,	 0.00f,	 1.00f,	 0.00f,	 1.00f),
+			//		x		y		z		r		g		b		a
+			VERTEX(-1.00f,  1.00f, -1.00f,  0.00f,  0.00f,  0.00f,  1.00f), //-+-
+			VERTEX( 1.00f,  1.00f, -1.00f,  0.00f,  0.00f,  1.00f,  1.00f), //++-
+			VERTEX( 1.00f,  1.00f,  1.00f,  0.00f,  1.00f,  0.00f,  1.00f), //+++
+			VERTEX(-1.00f,  1.00f,  1.00f,  0.00f,  1.00f,  1.00f,  1.00f), //-++
+			VERTEX(-1.00f, -1.00f, -1.00f,  1.00f,  0.00f,  0.00f,  1.00f), //---
+			VERTEX( 1.00f, -1.00f, -1.00f,  1.00f,  0.00f,  1.00f,  1.00f), //+--
+			VERTEX( 1.00f, -1.00f,  1.00f,  1.00f,  1.00f,  0.00f,  1.00f), //+-+
+			VERTEX(-1.00f, -1.00f,  1.00f,  1.00f,  1.00f,  1.00f,  1.00f), //--+
 		};
 
 		uint32_t indices[] =
 		{
-			0,1,2,
-			1,3,2,
-		};
+			0,1,2,0,2,3,	//top
+			7,6,5,7,5,4,	//bottom
+			3,2,6,3,6,7,	//front
+			1,0,4,1,4,5,	//back
+			2,1,5,2,5,6,	//right
+			0,3,7,0,7,4,	//left
 
-		
+		};
 
 		D3D11_MAPPED_SUBRESOURCE ms;
 		_devcon->Map(_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
@@ -258,9 +321,42 @@ namespace Graphics
 		uint32_t offset = 0;
 		_devcon->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
 		_devcon->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		_devcon->DrawIndexed(6, 0, 0);
+		XMMATRIX world;
+		cbPerObject cbperobjinst;
+		XMMATRIX WVP;
+
+		g_rot += 0.05f;
+		
+		
+		//cube1
+		world = XMMatrixIdentity();
+		world *= XMMatrixScaling(1.5f, 1.5f, 1.5f);
+		world *= XMMatrixRotationZ(XMConvertToRadians(g_rot));
+		world *= XMMatrixRotationY(XMConvertToRadians(g_rot));
+		WVP = world * _camView * _camProjection;
+		cbperobjinst.WVP = XMMatrixTranspose(WVP);
+
+		_devcon->UpdateSubresource(_cbPerObjectBuffer, 0, nullptr, &cbperobjinst, 0, 0);
+		_devcon->VSSetConstantBuffers(0, 1, &_cbPerObjectBuffer);
+
+		_devcon->DrawIndexed(36, 0, 0);
+
+
+
+		//cube2
+		world = XMMatrixIdentity();
+		world *= XMMatrixRotationY(XMConvertToRadians(-g_rot*2));
+		world *= XMMatrixTranslation(4, 0, 0);
+		world *= XMMatrixRotationY(g_rot*0.01f);
+
+		WVP = world * _camView * _camProjection;
+		cbperobjinst.WVP = XMMatrixTranspose(WVP);
+
+		_devcon->UpdateSubresource(_cbPerObjectBuffer, 0, nullptr, &cbperobjinst, 0, 0);
+		_devcon->VSSetConstantBuffers(0, 1, &_cbPerObjectBuffer);
+		_devcon->DrawIndexed(36, 0, 0);
 		
 	}
 

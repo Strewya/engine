@@ -1,5 +1,8 @@
 #pragma once
 
+#ifdef _DEBUG
+#define _XM_NO_INTRINSICS_
+#endif
 
 #include <d3d11.h>				//directx
 #include <d3dx11.h>				//directx

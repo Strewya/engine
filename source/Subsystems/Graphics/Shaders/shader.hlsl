@@ -4,11 +4,16 @@ struct VOut
     float4 color : COLOR;
 };
 
+cbuffer cbPerObject
+{
+	float4x4 WVP;
+};
+
 VOut VShader(float4 position : POSITION, float4 color : COLOR)
 {
     VOut output;
 
-    output.position = position;
+    output.position = mul(position, WVP);
     output.color = color;
 
     return output;
