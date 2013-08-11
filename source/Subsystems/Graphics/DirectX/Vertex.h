@@ -58,6 +58,6 @@ namespace Graphics
 
 
 
-#define VERTEX vertex_pos_diffuse
-#define VERTEX_DESC vertex_pos_diffuse_desc
+#define VERTEX vertex_pos_texture
+#define VERTEX_DESC vertex_pos_texture_desc
 }

@@ -108,16 +108,17 @@ namespace Graphics
 
 	bool DXRenderer::initPipeline()
 	{
+		//********************************** VERTEX SHADER
 		HRESULT hr = 0;
 		ID3D10Blob* vblob = nullptr;
 		String shaderPath = "D:/engine/source/Subsystems/Graphics/Shaders/shader.hlsl";
-		//shaderPath = "shader.hlsl";
 		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_5_0", 0, 0, nullptr, &vblob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
 
 		hr = _dev->CreateVertexShader(vblob->GetBufferPointer(), vblob->GetBufferSize(), nullptr, &_vertexShader);
 		TEST_SUCCESS(hr);
 
+		//********************************** PIXEL SHADER
 		ID3D10Blob* pblob = nullptr;
 		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_5_0", 0, 0, nullptr, &pblob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
@@ -128,7 +129,7 @@ namespace Graphics
 		_devcon->VSSetShader(_vertexShader, nullptr, 0);
 		_devcon->PSSetShader(_pixelShader, nullptr, 0);
 
-		
+		//********************************** INPUT LAYOUT
 		uint32_t iedElems = ARRAYSIZE(VERTEX_DESC);
 
 		hr = _dev->CreateInputLayout(VERTEX_DESC, iedElems, vblob->GetBufferPointer(), vblob->GetBufferSize(), &_inputLayout);
@@ -138,6 +139,7 @@ namespace Graphics
 		vblob->Release();
 		pblob->Release();
 
+		//********************************** VERTEX BUFFER
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
 		bd.BindFlags		= D3D11_BIND_VERTEX_BUFFER;
@@ -149,6 +151,7 @@ namespace Graphics
 		hr = _dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
 		TEST_SUCCESS(hr);
 
+		//********************************** INDEX BUFFER
 		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
 		bd.BindFlags		= D3D11_BIND_INDEX_BUFFER;
 		bd.ByteWidth		= sizeof(uint32_t) * 60;
@@ -159,17 +162,19 @@ namespace Graphics
 		hr = _dev->CreateBuffer(&bd, nullptr, &_indexBuffer);
 		TEST_SUCCESS(hr);
 
+		//********************************** RASTERIZER STATE
 		D3D11_RASTERIZER_DESC rd;
 		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-		rd.FillMode = D3D11_FILL_WIREFRAME;
-		rd.CullMode = D3D11_CULL_FRONT;
-		rd.FrontCounterClockwise = true;
+		rd.FillMode = D3D11_FILL_SOLID;
+		rd.CullMode = D3D11_CULL_BACK;
+		
 		
 		hr = _dev->CreateRasterizerState(&rd, &_rasterizerState);
 		TEST_SUCCESS(hr);
 
 		_devcon->RSSetState(_rasterizerState);
 
+		//********************************** DEPTH STENCIL
 		D3D11_TEXTURE2D_DESC dsd;
 		ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
 
@@ -195,7 +200,7 @@ namespace Graphics
 		_devcon->OMSetRenderTargets(1, &_renderTarget, _depthStencilView);
 
 		
-
+		//********************************** CONSTANT BUFFER FOR MATRICES
 		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
 		bd.Usage			= D3D11_USAGE_DEFAULT;
 		bd.ByteWidth		= sizeof(cbPerObject);
@@ -212,6 +217,24 @@ namespace Graphics
 
 		_camView = XMMatrixLookAtLH(_camPosition, _camLookAt, _camUp);
 		_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)_screenW/_screenH, 1.0f, 100.0f);
+
+
+		//********************************** CONSTANT BUFFER FOR MATRICES
+		hr = D3DX11CreateShaderResourceViewFromFile(_dev, "../resources/character.png", nullptr, nullptr, &_shaderResourceView, nullptr);
+		TEST_SUCCESS(hr);
+
+		D3D11_SAMPLER_DESC sampd;
+		ZeroMemory(&sampd, sizeof(D3D11_SAMPLER_DESC));
+		sampd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sampd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sampd.MinLOD = 0;
+		sampd.MaxLOD = D3D11_FLOAT32_MAX;
+
+		hr = _dev->CreateSamplerState(&sampd, &_samplerState);
+		TEST_SUCCESS(hr);
 
 		return true;
 	}
@@ -285,25 +308,68 @@ namespace Graphics
 	{
 		VERTEX vertices[] =
 		{
-			//		x		y		z		r		g		b		a
-			VERTEX(-1.00f,  1.00f, -1.00f,  0.00f,  0.00f,  0.00f,  1.00f), //-+-
-			VERTEX( 1.00f,  1.00f, -1.00f,  0.00f,  0.00f,  1.00f,  1.00f), //++-
-			VERTEX( 1.00f,  1.00f,  1.00f,  0.00f,  1.00f,  0.00f,  1.00f), //+++
-			VERTEX(-1.00f,  1.00f,  1.00f,  0.00f,  1.00f,  1.00f,  1.00f), //-++
-			VERTEX(-1.00f, -1.00f, -1.00f,  1.00f,  0.00f,  0.00f,  1.00f), //---
-			VERTEX( 1.00f, -1.00f, -1.00f,  1.00f,  0.00f,  1.00f,  1.00f), //+--
-			VERTEX( 1.00f, -1.00f,  1.00f,  1.00f,  1.00f,  0.00f,  1.00f), //+-+
-			VERTEX(-1.00f, -1.00f,  1.00f,  1.00f,  1.00f,  1.00f,  1.00f), //--+
+			// Front Face
+			VERTEX(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+			VERTEX(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
+			VERTEX( 1.0f,  1.0f, -1.0f, 0.25f, 0.0f),
+			VERTEX( 1.0f, -1.0f, -1.0f, 0.25f, 1.0f),
+
+			// Back Face
+			VERTEX(-1.0f, -1.0f, 1.0f, 0.25f, 1.0f),
+			VERTEX( 1.0f, -1.0f, 1.0f, 0.0f, 1.0f),
+			VERTEX( 1.0f,  1.0f, 1.0f, 0.0f, 0.0f),
+			VERTEX(-1.0f,  1.0f, 1.0f, 0.25f, 0.0f),
+
+			// Top Face
+			VERTEX(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f),
+			VERTEX(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f),
+			VERTEX( 1.0f, 1.0f,  1.0f, 0.25f, 0.0f),
+			VERTEX( 1.0f, 1.0f, -1.0f, 0.25f, 1.0f),
+
+			// Bottom Face
+			VERTEX(-1.0f, -1.0f, -1.0f, 0.25f, 1.0f),
+			VERTEX( 1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+			VERTEX( 1.0f, -1.0f,  1.0f, 0.0f, 0.0f),
+			VERTEX(-1.0f, -1.0f,  1.0f, 0.25f, 0.0f),
+
+			// Left Face
+			VERTEX(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f),
+			VERTEX(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f),
+			VERTEX(-1.0f,  1.0f, -1.0f, 0.25f, 0.0f),
+			VERTEX(-1.0f, -1.0f, -1.0f, 0.25f, 1.0f),
+
+			// Right Face
+			VERTEX( 1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+			VERTEX( 1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
+			VERTEX( 1.0f,  1.0f,  1.0f, 0.25f, 0.0f),
+			VERTEX( 1.0f, -1.0f,  1.0f, 0.25f, 1.0f),
 		};
 
 		uint32_t indices[] =
 		{
-			0,1,2,0,2,3,	//top
-			7,6,5,7,5,4,	//bottom
-			3,2,6,3,6,7,	//front
-			1,0,4,1,4,5,	//back
-			2,1,5,2,5,6,	//right
-			0,3,7,0,7,4,	//left
+			// Front Face
+			0,  1,  2,
+			0,  2,  3,
+
+			// Back Face
+			4,  5,  6,
+			4,  6,  7,
+
+			// Top Face
+			8,  9, 10,
+			8, 10, 11,
+
+			// Bottom Face
+			12, 13, 14,
+			12, 14, 15,
+
+			// Left Face
+			16, 17, 18,
+			16, 18, 19,
+
+			// Right Face
+			20, 21, 22,
+			20, 22, 23
 
 		};
 
@@ -329,6 +395,8 @@ namespace Graphics
 
 		g_rot += 0.05f;
 		
+		_devcon->PSSetShaderResources(0, 1, &_shaderResourceView);
+		_devcon->PSSetSamplers(0, 1, &_samplerState);
 		
 		//cube1
 		world = XMMatrixIdentity();
