@@ -59,7 +59,9 @@ namespace Graphics
 		ID3D11VertexShader* _vertexShader;
 		ID3D10Blob* _pixelShaderBlob;
 		ID3D11PixelShader* _pixelShader;
-		ID3D11RasterizerState* _rasterizerState;
+		ID3D11RasterizerState* _cwCulling;
+		ID3D11RasterizerState* _ccwCulling;
+		ID3D11RasterizerState* _noCulling;
 		ID3D11InputLayout* _inputLayout;
 		ID3D11Buffer* _vertexBuffer;
 		ID3D11Buffer* _indexBuffer;
@@ -68,6 +70,7 @@ namespace Graphics
 		ID3D11Buffer* _cbPerObjectBuffer;
 		ID3D11ShaderResourceView* _shaderResourceView;
 		ID3D11SamplerState* _samplerState;
+		ID3D11BlendState* _blendState;
 		
 		D3DXCOLOR _backgroundColor;
 		

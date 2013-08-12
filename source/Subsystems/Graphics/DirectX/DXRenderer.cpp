@@ -24,7 +24,7 @@ namespace Graphics
 		: _screenW(1024), _screenH(768),
 		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _renderTarget(nullptr),
 		_vertexShaderBlob(nullptr), _vertexShader(nullptr), _pixelShaderBlob(nullptr), _pixelShader(nullptr),
-		_rasterizerState(nullptr),
+		_cwCulling(nullptr), _ccwCulling(nullptr), _noCulling(nullptr),
 		_inputLayout(nullptr), _vertexBuffer(nullptr), _indexBuffer(nullptr),
 		_depthStencilView(nullptr), _depthStencilBuffer(nullptr),
 		_cbPerObjectBuffer(nullptr),
@@ -168,11 +168,36 @@ namespace Graphics
 		rd.FillMode = D3D11_FILL_SOLID;
 		rd.CullMode = D3D11_CULL_BACK;
 		
-		
-		hr = _dev->CreateRasterizerState(&rd, &_rasterizerState);
+		rd.FrontCounterClockwise = true;
+		hr = _dev->CreateRasterizerState(&rd, &_ccwCulling);
 		TEST_SUCCESS(hr);
 
-		_devcon->RSSetState(_rasterizerState);
+		rd.FrontCounterClockwise = false;
+		hr = _dev->CreateRasterizerState(&rd, &_cwCulling);
+		TEST_SUCCESS(hr);
+		
+		rd.CullMode = D3D11_CULL_NONE;
+		hr = _dev->CreateRasterizerState(&rd, &_noCulling);
+		TEST_SUCCESS(hr);
+		
+		//********************************** BLENDING
+		D3D11_BLEND_DESC bld;
+		ZeroMemory(&bld, sizeof(D3D11_BLEND_DESC));
+
+		bld.AlphaToCoverageEnable = false;
+
+		D3D11_RENDER_TARGET_BLEND_DESC& rtbd = bld.RenderTarget[0];
+		rtbd.BlendEnable = true;
+		rtbd.SrcBlend = D3D11_BLEND_SRC_COLOR;
+		rtbd.DestBlend = D3D11_BLEND_BLEND_FACTOR;
+		rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+		rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+		rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+		rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+
+		hr = _dev->CreateBlendState(&bld, &_blendState);
+		TEST_SUCCESS(hr);
 
 		//********************************** DEPTH STENCIL
 		D3D11_TEXTURE2D_DESC dsd;
@@ -217,10 +242,11 @@ namespace Graphics
 
 		_camView = XMMatrixLookAtLH(_camPosition, _camLookAt, _camUp);
 		_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)_screenW/_screenH, 1.0f, 100.0f);
+		//_camProjection = XMMatrixOrthographicLH((float)_screenW, (float)_screenH, 1.0f, 100.0f);
 
 
 		//********************************** CONSTANT BUFFER FOR MATRICES
-		hr = D3DX11CreateShaderResourceViewFromFile(_dev, "../resources/character.png", nullptr, nullptr, &_shaderResourceView, nullptr);
+		hr = D3DX11CreateShaderResourceViewFromFile(_dev, "../resources/character_t.png", nullptr, nullptr, &_shaderResourceView, nullptr);
 		TEST_SUCCESS(hr);
 
 		D3D11_SAMPLER_DESC sampd;
@@ -267,7 +293,9 @@ namespace Graphics
 		SAFE_RELEASE(_indexBuffer);
 		SAFE_RELEASE(_vertexBuffer);
 		SAFE_RELEASE(_inputLayout);
-		SAFE_RELEASE(_rasterizerState);
+		SAFE_RELEASE(_noCulling);
+		SAFE_RELEASE(_cwCulling);
+		SAFE_RELEASE(_ccwCulling);
 		SAFE_RELEASE(_pixelShader);
 		SAFE_RELEASE(_pixelShaderBlob);
 		SAFE_RELEASE(_vertexShader);
@@ -373,6 +401,8 @@ namespace Graphics
 
 		};
 
+		float blendFactor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
 		D3D11_MAPPED_SUBRESOURCE ms;
 		_devcon->Map(_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		memcpy(ms.pData, vertices, sizeof(vertices));
@@ -388,8 +418,13 @@ namespace Graphics
 		_devcon->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
 		_devcon->IASetIndexBuffer(_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		
+		//opaque
+		//_devcon->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
+		//transparent
+		//_devcon->OMSetBlendState(_blendState, blendFactor, 0xFFFFFFFF);
 
-		XMMATRIX world;
+		XMMATRIX world1, world2;
 		cbPerObject cbperobjinst;
 		XMMATRIX WVP;
 
@@ -399,31 +434,66 @@ namespace Graphics
 		_devcon->PSSetSamplers(0, 1, &_samplerState);
 		
 		//cube1
-		world = XMMatrixIdentity();
-		world *= XMMatrixScaling(1.5f, 1.5f, 1.5f);
-		world *= XMMatrixRotationZ(XMConvertToRadians(g_rot));
-		world *= XMMatrixRotationY(XMConvertToRadians(g_rot));
-		WVP = world * _camView * _camProjection;
+		world1 = XMMatrixIdentity();
+		world1 *= XMMatrixScaling(1.5f, 1.5f, 1.5f);
+		world1 *= XMMatrixRotationZ(XMConvertToRadians(g_rot));
+		world1 *= XMMatrixRotationY(XMConvertToRadians(g_rot));
+		
+		//cube2
+		world2 = XMMatrixIdentity();
+		world2 *= XMMatrixRotationY(XMConvertToRadians(-g_rot*2));
+		world2 *= XMMatrixTranslation(4, 0, 0);
+		world2 *= XMMatrixRotationY(g_rot*0.01f);
+		
+		XMVECTOR cubePos = XMVector3TransformCoord(XMVectorZero(), world1);
+		
+		float dx = XMVectorGetX(cubePos) - XMVectorGetX(_camPosition);
+		float dy = XMVectorGetY(cubePos) - XMVectorGetY(_camPosition);
+		float dz = XMVectorGetZ(cubePos) - XMVectorGetZ(_camPosition);
+		
+		float cube1Dist = dx*dx + dy*dy + dz*dz;
+		
+		cubePos = XMVector3TransformCoord(XMVectorZero(), world2);
+		
+		dx = XMVectorGetX(cubePos) - XMVectorGetX(_camPosition);
+		dy = XMVectorGetY(cubePos) - XMVectorGetY(_camPosition);
+		dz = XMVectorGetZ(cubePos) - XMVectorGetZ(_camPosition);
+		
+		float cube2Dist = dx*dx + dy*dy + dz*dz;
+		/*
+		if(cube1Dist < cube2Dist)
+		{
+			XMMATRIX old_world1 = world1;
+			world1 = world2;
+			world2 = old_world1;
+		}
+		*/
+		_devcon->RSSetState(_noCulling);
+
+
+		
+		
+		WVP = world1 * _camView * _camProjection;
 		cbperobjinst.WVP = XMMatrixTranspose(WVP);
 
 		_devcon->UpdateSubresource(_cbPerObjectBuffer, 0, nullptr, &cbperobjinst, 0, 0);
 		_devcon->VSSetConstantBuffers(0, 1, &_cbPerObjectBuffer);
 
+		
 		_devcon->DrawIndexed(36, 0, 0);
 
 
 
-		//cube2
-		world = XMMatrixIdentity();
-		world *= XMMatrixRotationY(XMConvertToRadians(-g_rot*2));
-		world *= XMMatrixTranslation(4, 0, 0);
-		world *= XMMatrixRotationY(g_rot*0.01f);
 
-		WVP = world * _camView * _camProjection;
+		
+
+		WVP = world2 * _camView * _camProjection;
 		cbperobjinst.WVP = XMMatrixTranspose(WVP);
 
 		_devcon->UpdateSubresource(_cbPerObjectBuffer, 0, nullptr, &cbperobjinst, 0, 0);
 		_devcon->VSSetConstantBuffers(0, 1, &_cbPerObjectBuffer);
+		
+		
 		_devcon->DrawIndexed(36, 0, 0);
 		
 	}
