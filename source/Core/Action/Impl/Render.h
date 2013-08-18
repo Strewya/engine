@@ -8,7 +8,7 @@
 #include <list>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/Action/Action.h"
-#include "Subsystems/Graphics/RenderingQueue.h"
+#include "Services/Graphics/RenderingQueue.h"
 	/*** end header inclusion ***/
 
 namespace Core

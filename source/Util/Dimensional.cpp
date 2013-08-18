@@ -159,10 +159,15 @@ namespace Util
 
 	Vec2& Vec2::operator=(const Vec2 &v)
 	{
-		return Assign(v);
+		return set(v);
 	}
 
-	Vec2& Vec2::Assign(const Vec2& v)
+	Vec3 toVec3(const Vec2& vec)
+	{
+		return Util::Vec3(vec.x, vec.y, 0);
+	}
+
+	Vec2& Vec2::set(const Vec2& v)
 	{
 		if(this != &v)
 		{
@@ -172,7 +177,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec2& Vec2::Assign(float x, float y)
+	Vec2& Vec2::set(float x, float y)
 	{
 		this->x = x;
 		this->y = y;
@@ -442,10 +447,15 @@ namespace Util
 
 	Vec3& Vec3::operator=(const Vec3 &v)
 	{
-		return Assign(v);
+		return set(v);
 	}
 
-	Vec3& Vec3::Assign(const Vec3& v)
+	Vec2 toVec2(const Vec3& vec)
+	{
+		return Vec2(vec.x, vec.y);
+	}
+
+	Vec3& Vec3::set(const Vec3& v)
 	{
 		if(this != &v)
 		{
@@ -456,7 +466,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec3& Vec3::Assign(float x, float y, float z)
+	Vec3& Vec3::set(float x, float y, float z)
 	{
 		this->x = x;
 		this->y = y;

@@ -11,12 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\Services\Graphics\IIndexBuffer.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.h" />
-    <ClInclude Include="..\..\source\subsystems\graphics\directx\DXInclude.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\DirectX\Vertex.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h" />
-    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\D3D11\DXRenderer.h" />
+    <ClInclude Include="..\..\source\Services\graphics\D3D11\DXInclude.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\D3D11\IndexBuffer.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\D3D11\Vertex.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\D3D11\VertexBuffer.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\dll_header.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\Graphics.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\IRenderer.h" />
+    <ClInclude Include="..\..\source\Services\Graphics\IVertexBuffer.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />
@@ -26,14 +31,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\DirectX\DXRenderer.cpp" />
-    <ClCompile Include="..\..\source\Subsystems\Graphics\dll_source.cpp" />
+    <ClCompile Include="..\..\source\Services\Graphics\D3D11\DXRenderer.cpp" />
+    <ClCompile Include="..\..\source\Services\Graphics\D3D11\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\source\Services\Graphics\D3D11\Vertex.cpp" />
+    <ClCompile Include="..\..\source\Services\Graphics\D3D11\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\source\Services\Graphics\dll_source.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
     <ClCompile Include="..\..\source\Util\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\source\Subsystems\Graphics\Shaders\shader.hlsl">
+    <FxCompile Include="..\..\source\Services\Graphics\Shaders\shader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>

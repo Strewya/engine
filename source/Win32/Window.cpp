@@ -6,8 +6,8 @@
 	/*** C++ headers ***/
 #include "windef.h"
 	/*** extra headers ***/
-#include "Subsystems/Input/Event.h"
-#include "Subsystems/Input/KeyCodes.h"
+#include "Services/Input/Event.h"
+#include "Services/Input/KeyCodes.h"
 #include "Win32/WindowClass.h"
 	/*** end headers ***/
 

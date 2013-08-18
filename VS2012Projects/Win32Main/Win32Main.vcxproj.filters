@@ -7,26 +7,11 @@
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Script\LuaEngine.cpp">
-      <Filter>Subsystems/Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\RendererFactory.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Util\Dimensional.cpp">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Color.cpp">
       <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\SpriteInfo.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\Spritesheet.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\SpritesheetCache.cpp">
-      <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Clock.cpp">
       <Filter>Util</Filter>
@@ -36,9 +21,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp">
       <Filter>Core/Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\RenderingQueue.cpp">
-      <Filter>Subsystems/Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp">
       <Filter>Core/Action</Filter>
@@ -51,15 +33,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\AnimationInfo.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Input\KeyCodes.cpp">
-      <Filter>Subsystems/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Input\InputEngine.cpp">
-      <Filter>Subsystems/Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\ITimer.cpp">
       <Filter>Util</Filter>
@@ -94,15 +67,6 @@
     <ClCompile Include="..\..\source\Util\CompositeTimer.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\ITextureCache.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\TextureData.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Subsystems\Graphics\b2DebugDraw.cpp">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
@@ -128,6 +92,45 @@
     <ClCompile Include="..\..\source\Win32\winmain.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\AnimationInfo.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\b2DebugDraw.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\ITextureCache.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\KeyCodes.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Script\LuaEngine.cpp">
+      <Filter>Services/Script</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\Polygon.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\RendererFactory.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\RenderingQueue.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\SpriteInfo.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\Spritesheet.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\SpritesheetCache.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Graphics\TextureData.cpp">
+      <Filter>Services/Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -136,32 +139,11 @@
     <ClInclude Include="..\..\source\Util\Logger.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Script\LuaEngine.h">
-      <Filter>Subsystems/Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Script\LuaInclude.h">
-      <Filter>Subsystems/Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\RendererFactory.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\dll_header.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Util\Dimensional.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Color.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\SpriteInfo.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\Spritesheet.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\SpritesheetCache.h">
-      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Clock.h">
       <Filter>Util</Filter>
@@ -171,9 +153,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\Entity.h">
       <Filter>Core/Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\RenderingQueue.h">
-      <Filter>Subsystems/Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Action.h">
       <Filter>Core/Action</Filter>
@@ -189,21 +168,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
       <Filter>Core/Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\IRenderer.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\AnimationInfo.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Input\KeyCodes.h">
-      <Filter>Subsystems/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Input\Event.h">
-      <Filter>Subsystems/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Input\InputEngine.h">
-      <Filter>Subsystems/Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\ITimer.h">
       <Filter>Util</Filter>
@@ -250,15 +214,6 @@
     <ClInclude Include="..\..\source\Util\CompositeTimer.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\ITextureCache.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\TextureData.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Subsystems\Graphics\b2DebugDraw.h">
-      <Filter>Subsystems/Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">
       <Filter>Core/Action/Impl</Filter>
     </ClInclude>
@@ -290,16 +245,61 @@
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
       <Filter>GameSpecific\Pong</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\b2DebugDraw.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\dll_header.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\Event.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\IRenderer.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\ITextureCache.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\KeyCodes.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Script\LuaEngine.h">
+      <Filter>Services/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Script\LuaInclude.h">
+      <Filter>Services/Script</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\Polygon.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\RendererFactory.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\RenderingQueue.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\SpriteInfo.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\Spritesheet.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\SpritesheetCache.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Graphics\TextureData.h">
+      <Filter>Services/Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
       <UniqueIdentifier>{9e70d6ad-322f-4aa3-b68e-30148a2152b1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Subsystems/Script">
-      <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Subsystems/Graphics">
-      <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
     </Filter>
     <Filter Include="Core/State">
       <UniqueIdentifier>{523c40e5-7ff9-41c9-8cf9-142a86564af9}</UniqueIdentifier>
@@ -312,9 +312,6 @@
     </Filter>
     <Filter Include="Win32">
       <UniqueIdentifier>{0bbfd117-01ee-4223-8cbd-18b746697cd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Subsystems/Input">
-      <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{0623db72-840b-4e76-a292-bdf2840d4dc1}</UniqueIdentifier>
@@ -333,6 +330,15 @@
     </Filter>
     <Filter Include="GameSpecific\Pong">
       <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services/Graphics">
+      <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services/Input">
+      <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services/Script">
+      <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

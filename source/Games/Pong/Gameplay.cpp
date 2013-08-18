@@ -13,15 +13,17 @@
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
-#include "Subsystems/Graphics/IRenderer.h"
+#include "Services/Graphics/IRenderer.h"
 #include "Util/Color.h"
 	/*** end headers ***/
 
 namespace Pong
 {
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
-		: GameContext(Core::ContextType::GAMEPLAY, services, resources)
-	{}
+		: GameContext(Core::ContextType::GAMEPLAY, services, resources), debug(services.getGraphics())
+	{
+		physicsWorld.SetGravity(b2Vec2(0, -9.81f));
+	}
 
 	void Gameplay::registerActions()
 	{
@@ -34,12 +36,24 @@ namespace Pong
 		actionQueue.addAction(actionIndex.getActionFromIndex(Core::ARender::Type));
 	}
 
+	static b2Body* dyno = nullptr;
+	static b2Body* floor = nullptr;
 
 	void Gameplay::activate()
 	{
-		services.getGraphics().setBackgroundColor((uint8_t)127,127,127);
+		physicsWorld.SetDebugDraw(&debug);
+		uint32_t flags = 0;
+		flags += Graphics::b2DebugDraw::e_shapeBit;
+		flags += Graphics::b2DebugDraw::e_centerOfMassBit;
+		flags += Graphics::b2DebugDraw::e_jointBit;
+		flags += Graphics::b2DebugDraw::e_pairBit;
+		//flags += Graphics::b2DebugDraw::e_aabbBit;
+		debug.SetFlags(flags);
+		debug.setLengthScale(10);
+
+		services.getGraphics().setBackgroundColor(0.5f,0.5f,0.5f);
 		auto c = services.getGraphics().getBackgroundColor();
-		assert(c.getRed() == 127 && c.getGreen() == 127 && c.getBlue() == 127);
+		assert(c.getRed() == 0.5f && c.getGreen() == 0.5f && c.getBlue() == 0.5f);
 		
 		for(int i=0; i<2; ++i)
 		{
@@ -62,17 +76,64 @@ namespace Pong
 		activeEntities.addEntity(ball.getID());
 		
 		setupBall(ball);
+
+		timer.RegisterTimer(myTimer);
+		myTimer.setUpdatePeriod(1.0f/60.0f);
+
+		if(dyno == nullptr && floor == nullptr)
+		{
+			b2BodyDef bodyDef;
+			bodyDef.type = b2_dynamicBody;
+			bodyDef.position = b2Vec2(0,20);
+			bodyDef.angle = 0;
+			//...
+			dyno = physicsWorld.CreateBody(&bodyDef);
+
+			b2PolygonShape shape;
+			shape.SetAsBox(1,1);
+
+			b2FixtureDef fixtureDef;
+			fixtureDef.shape = &shape;
+			fixtureDef.density = 1;
+			fixtureDef.restitution = 0.8f;
+			dyno->CreateFixture(&fixtureDef);
+
+
+			//floor
+
+			bodyDef.type = b2_staticBody;
+			bodyDef.position = b2Vec2(0,0);
+			floor = physicsWorld.CreateBody(&bodyDef);
+
+			shape.SetAsBox(3,0.5f);
+			fixtureDef.shape = &shape;
+			floor->CreateFixture(&fixtureDef);
+		}
 	}
 
 
 	void Gameplay::deactivate()
 	{
-
 		for(auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
 		{
 			entityPool.destroy(*it);
 		}
+
+		if(dyno != nullptr && floor != nullptr)
+		{
+			physicsWorld.DestroyBody(dyno);
+			physicsWorld.DestroyBody(floor);
+		}
 	}
+
+	void Gameplay::onUpdate(float dt)
+	{
+		while(myTimer.HasUpdatePeriodElapsed())
+		{
+			physicsWorld.Step(myTimer.getUpdatePeriod(), 8, 3);
+		}
+	}
+
 
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)

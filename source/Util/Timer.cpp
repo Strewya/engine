@@ -33,6 +33,11 @@ namespace Util
 		return _updatePeriod;
 	}
 
+	void Timer::setUpdatePeriod(float dt)
+	{
+		_updatePeriod = dt;
+	}
+
 	void Timer::Reset()
 	{
 		_accumulator = 0.0;

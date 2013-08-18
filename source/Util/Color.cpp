@@ -10,35 +10,22 @@
 namespace Util
 {
 	Color::Color()
-		: _colorARGB(0xffffffff)
+		: r()
 	{
 	}
 
 	Color::Color(const Color &rhs)
-		: _colorARGB(rhs._colorARGB)
+		: r(rhs.r), g(rhs.g), b(rhs.b), a(rhs.a)
 	{
 	}
 
-	Color::Color(uint8_t a, uint8_t r, uint8_t g, uint8_t b)
-		: _colorARGB(0xffffffff)
+	Color::Color(float r, float g, float b, float a)
+		: r(r), g(g), b(b), a(a)
 	{
-		setRed(r);
-		setGreen(g);
-		setBlue(b);
-		setAlpha(a);
 	}
 
-	Color::Color(uint8_t r, uint8_t g, uint8_t b)
-		: _colorARGB(0xffffffff)
-	{
-		setRed(r);
-		setGreen(g);
-		setBlue(b);
-		setAlpha(255);
-	}
-
-	Color::Color(uint32_t colorARGB)
-		: _colorARGB(colorARGB)
+	Color::Color(const float* RGBA)
+		: r(RGBA[0]), g(RGBA[1]), b(RGBA[2]), a(RGBA[3])
 	{
 	}
 
@@ -46,41 +33,48 @@ namespace Util
 
 	Color& Color::operator=(const Color &rhs)
 	{
-		return Assign(rhs);
+		return set(rhs);
 	}
 
 	bool Color::operator==(const Color& rhs) const
 	{
-		return (_colorARGB == rhs._colorARGB);
+		if((uint32_t)(r*255) != (uint32_t)(rhs.r*255)) return false;
+		if((uint32_t)(g*255) != (uint32_t)(rhs.g*255)) return false;
+		if((uint32_t)(b*255) != (uint32_t)(rhs.b*255)) return false;
+		if((uint32_t)(a*255) != (uint32_t)(rhs.a*255)) return false;
+		return true;
 	}
 
-	Color& Color::Assign(const Color &rhs)
+	Color& Color::set(const Color &rhs)
 	{
-		_colorARGB = rhs._colorARGB;
+		r = rhs.r;
+		g = rhs.g;
+		b = rhs.b;
+		a = rhs.a;
 		return *this;
 	}
 
-	void Color::setRed(uint8_t r)
+	void Color::setRed(float r)
 	{
-		_colorARGB = (_colorARGB&0xff00ffff)|(r<<16);
+		this->r = r;
 	}
 
-	void Color::setGreen(uint8_t g)
+	void Color::setGreen(float g)
 	{
-		_colorARGB = (_colorARGB&0xffff00ff)|(g<<8);
+		this->g = g;
 	}
 
-	void Color::setBlue(uint8_t b)
+	void Color::setBlue(float b)
 	{
-		_colorARGB = (_colorARGB&0xffffff00)|(b);
+		this->b = b;
 	}
 
-	void Color::setAlpha(uint8_t a)
+	void Color::setAlpha(float a)
 	{
-		_colorARGB = (_colorARGB&0x00ffffff)|(a<<24);
+		this->a = a;
 	}
 
-	void Color::setChannels(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	void Color::setRGBA(float r, float g, float b, float a)
 	{
 		setRed(r);
 		setGreen(g);
@@ -88,40 +82,37 @@ namespace Util
 		setAlpha(a);
 	}
 
-	uint8_t Color::getAlpha() const
+	float Color::getAlpha() const
 	{
-		return (_colorARGB&0xff000000)>>24;
+		return a;
 	}
 
-	uint8_t Color::getRed() const
+	float Color::getRed() const
 	{
-		return (_colorARGB&0x00ff0000)>>16;
+		return r;
 	}
 
-	uint8_t Color::getGreen() const
+	float Color::getGreen() const
 	{
-		return (_colorARGB&0x0000ff00)>>8;
+		return g;
 	}
 
-	uint8_t Color::getBlue() const
+	float Color::getBlue() const
 	{
-		return (_colorARGB&0x000000ff);
+		return b;
 	}
 
-	uint32_t Color::getARGB() const
+	const float *const Color::getRGBA() const
 	{
-		return _colorARGB;
+		return &r;
 	}
 }
 
 std::istream& operator>>(std::istream& ss, Util::Color& c)
 {
-	uint8_t r, g, b, a;
+	float r, g, b, a;
 	ss >> r >> g >> b >> a;
-	c.setAlpha(a);
-	c.setBlue(b);
-	c.setGreen(g);
-	c.setRed(r);
+	c.setRGBA(r,g,b,a);
 	return ss;
 }
 

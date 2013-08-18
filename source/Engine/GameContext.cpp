@@ -31,12 +31,15 @@ namespace Core
 	{
 		if(!timer.isPaused)
 		{
+			onUpdate(gUpdateInterval);
+
 			actionQueue.update(gUpdateInterval, *this);
+			
 			return true;
 		}
 		return false;
 	}
 
-	void GameContext::onUpdate()
+	void GameContext::onUpdate(float dt)
 	{}
 }

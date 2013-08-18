@@ -5,7 +5,7 @@
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
 #include "Games/Pong/Components.h"
-#include "Subsystems/Graphics/IRenderer.h"
+#include "Services/Graphics/IRenderer.h"
 	/*** end headers ***/
 
 namespace Pong
@@ -22,7 +22,7 @@ namespace Pong
 	{
 		auto screen = Util::Vec2(800,600); //context.services.getGraphics().getScreenSize();
 		auto& pos = ball.insert(Core::Position2d::create());
-		pos.value.Assign(screen.x/2, screen.y/2);
+		pos.value.set(screen.x/2, screen.y/2);
 		
 		return false;
 	}

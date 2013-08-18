@@ -11,10 +11,10 @@
 #include "Engine/GameContext.h"
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
-#include "Subsystems/Graphics/RendererFactory.h"
-#include "Subsystems/Graphics/ITextureCache.h"
-#include "Subsystems/Input/InputEngine.h"
-#include "Subsystems/Script/LuaEngine.h"
+#include "Services/Graphics/RendererFactory.h"
+#include "Services/Graphics/ITextureCache.h"
+#include "Services/Input/InputEngine.h"
+#include "Services/Script/LuaEngine.h"
 #include "Util/Clock.h"
 	/*** end header inclusion ***/
 

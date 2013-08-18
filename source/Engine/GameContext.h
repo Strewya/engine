@@ -17,8 +17,8 @@
 #include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
-#include "Subsystems/Graphics/SpritesheetCache.h"
-#include "Subsystems/Graphics/ITextureCache.h"
+#include "Services/Graphics/SpritesheetCache.h"
+#include "Services/Graphics/ITextureCache.h"
 #include "Util/CompositeTimer.h"
 	/*** end header inclusion ***/
 
@@ -51,7 +51,7 @@ namespace Core
 		bool update();
 
 		virtual void destroy();
-		virtual void onUpdate();
+		virtual void onUpdate(float dt);
 		/**
 		 * This function is called every time the context goes from being inactive to being the active context.
 		 * It should create all of the entities that it needs to work properly.

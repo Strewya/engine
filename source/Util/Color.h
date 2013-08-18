@@ -16,29 +16,28 @@ namespace Util
 	public:
 		Color();
 		Color(const Color &c);
-		Color(uint8_t a, uint8_t r, uint8_t g, uint8_t b);
-		Color(uint8_t r, uint8_t g, uint8_t b);
-		Color(uint32_t colorARGB);
+		Color(float r, float g, float b, float a = 1.0f);
+		Color(const float* RGBA);
 		~Color();
 
 		Color& operator=(const Color& c);
 		bool operator==(const Color& rhs) const;
-		Color& Assign(const Color& c);
+		Color& set(const Color& c);
 
-		void setRed(uint8_t value);
-		void setGreen(uint8_t value);
-		void setBlue(uint8_t value);
-		void setAlpha(uint8_t value);
-		void setChannels(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
+		void setRed(float value);
+		void setGreen(float value);
+		void setBlue(float value);
+		void setAlpha(float value);
+		void setRGBA(float r, float g, float b, float a = 1.0f);
 
-		uint8_t getRed() const;
-		uint8_t getGreen() const;
-		uint8_t getBlue() const;
-		uint8_t getAlpha() const;
-		uint32_t getARGB() const;
+		float getRed() const;
+		float getGreen() const;
+		float getBlue() const;
+		float getAlpha() const;
+		const float *const getRGBA() const;
 
 	private:
-		uint32_t _colorARGB;
+		float r, g, b, a;
 	};
 }
 

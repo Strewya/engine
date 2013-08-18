@@ -8,7 +8,8 @@
 #include "Core/Entity/Entity.h"
 #include "Engine/GameContext.h"
 #include "Engine/ServiceLocator.h"
-#include "Subsystems/Graphics/IRenderer.h"
+#include "Services/Graphics/IRenderer.h"
+#include "Services/Graphics/Polygon.h"
 	/*** end headers ***/
 
 namespace Core
@@ -36,11 +37,23 @@ namespace Core
 		}
 		//delete entities that are no longer valid
 
+		Graphics::Polygon poly;
+		poly.setColor(Util::Color(1, 1, 1));
+		poly.setSolid(false);
+
+		//poly.setAsQuad(0.35f, 0.2f);
+		//poly.setAsCircle(Util::Vec2(0,0), 0.35f, 33);
+		//poly.setAsLine(Util::Vec2(-0.3f, -0.3f), Util::Vec2(-0.5f, -0.5f));
+		//poly.setAsTriangle(Util::Vec2(0.3f, 0.3f), Util::Vec2(0.5f, 0.5f), Util::Vec2(0.5f, 0.3f));
+		//poly.setAsQuad(35, 20);
+
 		context.services.getGraphics().BeginScene();
 //		context.services.getGraphics().BeginSpriteBatch(true);
 		
 //		_queue.Render(context.services, context.resources);
-		context.services.getGraphics().testDraw();
+		//context.services.getGraphics().testDraw();
+		context.physicsWorld.DrawDebugData();
+		//poly.draw(context.services.getGraphics());
 
 //		context.services.getGraphics().EndSpriteBatch();
 		context.services.getGraphics().EndScene();
