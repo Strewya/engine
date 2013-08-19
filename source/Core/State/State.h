@@ -103,3 +103,5 @@ namespace Core
 		return false;
 	}
 }
+
+#define COMPONENT(Name) struct Name : public StateType<Name>

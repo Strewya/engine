@@ -77,9 +77,7 @@ namespace Pong
 		
 		setupBall(ball);
 
-		timer.RegisterTimer(myTimer);
-		myTimer.setUpdatePeriod(1.0f/60.0f);
-
+		
 		if(dyno == nullptr && floor == nullptr)
 		{
 			b2BodyDef bodyDef;
@@ -128,9 +126,9 @@ namespace Pong
 
 	void Gameplay::onUpdate(float dt)
 	{
-		while(myTimer.HasUpdatePeriodElapsed())
+		
 		{
-			physicsWorld.Step(myTimer.getUpdatePeriod(), 8, 3);
+			physicsWorld.Step(dt, 8, 3);
 		}
 	}
 
@@ -142,7 +140,7 @@ namespace Pong
 		auto screen = services.getGraphics().getScreenSize();
 
 		auto* position = paddle.getState<Core::Position2d>();
-		position->value.y = screen.y/2;
+		position->data.y = screen.y/2;
 	}
 
 
@@ -152,11 +150,27 @@ namespace Pong
 		auto screen = services.getGraphics().getScreenSize();
 
 		auto* position = paddle.getState<Core::Position2d>();
-		position->value.y = screen.y/2;
+		position->data.y = screen.y/2;
 	}
 
 
 	void Gameplay::setupBall(Core::Entity& ball)
+	{
+	}
+
+	void Gameplay::setupTopWall(Core::Entity& wall)
+	{
+	}
+
+	void Gameplay::setupBottomWall(Core::Entity& wall)
+	{
+	}
+
+	void Gameplay::setupLeftGoal(Core::Entity& wall)
+	{
+	}
+
+	void Gameplay::setupRightGoal(Core::Entity& wall)
 	{
 	}
 }

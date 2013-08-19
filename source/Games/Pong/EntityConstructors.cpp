@@ -22,8 +22,18 @@ namespace Pong
 	{
 		auto screen = Util::Vec2(800,600); //context.services.getGraphics().getScreenSize();
 		auto& pos = ball.insert(Core::Position2d::create());
-		pos.value.set(screen.x/2, screen.y/2);
+		pos.data.set(screen.x/2, screen.y/2);
 		
+		return false;
+	}
+
+	bool createWall(Core::GameContext& context, Core::Entity& wall)
+	{
+		return false;
+	}
+
+	bool createGoal(Core::GameContext& context, Core::Entity& goal)
+	{
 		return false;
 	}
 }

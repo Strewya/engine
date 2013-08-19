@@ -14,6 +14,15 @@ namespace Core
 		: uid(type)
 	{}
 
+	bool Action::update(float dt, GameContext& context)
+	{
+		if(!_timer.isPaused && _timer.hasUpdatePeriodElapsed())
+		{
+			return onUpdate(dt, context);
+		}
+		return false;
+	}
+
 	bool Action::registerEntity(InstanceID id)
 	{
 		return _entities.insert(id).second;

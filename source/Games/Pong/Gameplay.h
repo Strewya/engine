@@ -28,9 +28,12 @@ namespace Pong
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);
 		void setupBall(Core::Entity& ball);
+		void setupTopWall(Core::Entity& wall);
+		void setupBottomWall(Core::Entity& wall);
+		void setupLeftGoal(Core::Entity& wall);
+		void setupRightGoal(Core::Entity& wall);
 
 	private:
 		Graphics::b2DebugDraw debug;
-		Util::Timer myTimer;
 	};
 }

@@ -20,13 +20,15 @@ namespace Core
 	public:
 		Action(InstanceID type);
 
-		virtual bool update(float dt, GameContext& context) = 0;
+		bool update(float dt, GameContext& context);
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
 		
 		const InstanceID uid;
 	protected:
+		virtual bool onUpdate(float dt, GameContext& context) = 0;
+
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t _entities;
 		Util::Timer _timer;
@@ -53,3 +55,5 @@ namespace Core
 
 	template<typename T> const InstanceID ActionType<T>::Type = typeid(T).hash_code();
 }
+
+#define SYSTEM(Name) class Name : public ActionType<Name>

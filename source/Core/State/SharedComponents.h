@@ -11,26 +11,27 @@
 #include "Util/Dimensional.h"
 	/*** end header inclusion ***/
 
-#define Component(Name) struct Name : public StateType<Name>
-
 namespace Core
 {
 	/**
 		RULES FOR WRITING COMPONENTS:
-		1. If the component has only one property in it, the name of the property must be 'value'
+		1. If the component has only one property in it, the name of the property must be 'data'
 		2. Do NOT use Components inside other Components
 		...
 
 	*/
-	Component(Position2d)
+	COMPONENT(Position2d)
 	{
-		Util::Vec2 value;
+		Util::Vec2 data;
 	};
 
-	Component(Position3d)
+	COMPONENT(Position3d)
 	{
-		Util::Vec3 value;
+		Util::Vec3 data;
 	};
 
-	
+	COMPONENT(PhysicalBody)
+	{
+		b2Body* data;
+	};
 }

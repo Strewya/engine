@@ -26,7 +26,7 @@ namespace Util
 		void setUpdatePeriod(float updatePeriod);
 		void Reset();
 
-		bool HasUpdatePeriodElapsed();
+		bool hasUpdatePeriodElapsed();
 
 		float getElapsedTime() const;
 		float getTimeScaling() const;

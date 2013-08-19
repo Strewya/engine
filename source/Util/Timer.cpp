@@ -43,7 +43,7 @@ namespace Util
 		_accumulator = 0.0;
 	}
 
-	bool Timer::HasUpdatePeriodElapsed()
+	bool Timer::hasUpdatePeriodElapsed()
 	{
 		if(_accumulator >= _updatePeriod)
 		{

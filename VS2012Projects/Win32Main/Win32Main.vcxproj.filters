@@ -131,6 +131,9 @@
     <ClCompile Include="..\..\source\Services\Graphics\TextureData.cpp">
       <Filter>Services/Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp">
+      <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Services\Graphics\TextureData.h">
       <Filter>Services/Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h">
+      <Filter>Core/Action/Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

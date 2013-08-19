@@ -93,6 +93,7 @@
     <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
     <ClInclude Include="..\..\source\Core\Entity\EntityFactory.h" />

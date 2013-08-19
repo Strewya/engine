@@ -14,7 +14,7 @@
 
 namespace Core
 {
-	bool ARender::update(float dt, GameContext& context)
+	bool ARender::onUpdate(float dt, GameContext& context)
 	{
 		for(auto id : _entities)
 		{
@@ -35,27 +35,13 @@ namespace Core
 			//add entity to _queue
 			}
 		}
-		//delete entities that are no longer valid
-
-		Graphics::Polygon poly;
-		poly.setColor(Util::Color(1, 1, 1));
-		poly.setSolid(false);
-
-		//poly.setAsQuad(0.35f, 0.2f);
-		//poly.setAsCircle(Util::Vec2(0,0), 0.35f, 33);
-		//poly.setAsLine(Util::Vec2(-0.3f, -0.3f), Util::Vec2(-0.5f, -0.5f));
-		//poly.setAsTriangle(Util::Vec2(0.3f, 0.3f), Util::Vec2(0.5f, 0.5f), Util::Vec2(0.5f, 0.3f));
-		//poly.setAsQuad(35, 20);
+		//remove entities that are no longer valid from the list
 
 		context.services.getGraphics().BeginScene();
-//		context.services.getGraphics().BeginSpriteBatch(true);
 		
 //		_queue.Render(context.services, context.resources);
-		//context.services.getGraphics().testDraw();
 		context.physicsWorld.DrawDebugData();
-		//poly.draw(context.services.getGraphics());
 
-//		context.services.getGraphics().EndSpriteBatch();
 		context.services.getGraphics().EndScene();
 
 		return true;
