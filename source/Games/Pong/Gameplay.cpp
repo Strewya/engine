@@ -49,7 +49,7 @@ namespace Pong
 		flags += Graphics::b2DebugDraw::e_pairBit;
 		//flags += Graphics::b2DebugDraw::e_aabbBit;
 		debug.SetFlags(flags);
-		debug.setLengthScale(10);
+		debug.setLengthScale(30);
 
 		services.getGraphics().setBackgroundColor(0.5f,0.5f,0.5f);
 		auto c = services.getGraphics().getBackgroundColor();

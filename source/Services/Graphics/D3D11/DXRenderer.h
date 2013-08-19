@@ -18,7 +18,7 @@ namespace Graphics
 	class DXRenderer : public IRenderer
 	{
 	public: //list all public methods which need to be exposed through the interface
-		DXRenderer(HWND hwnd);
+		DXRenderer(HWND hwnd, uint32_t screenW, uint32_t screenH);
 		~DXRenderer();
 
 		bool BeginScene();

@@ -18,8 +18,7 @@ namespace Graphics
 	class RendererFactory
 	{
 	protected:
-		HWND _hwnd;
-		HINSTANCE _hInst;
+		Win32::Window& _window;
 		HMODULE _dll;
 		IRenderer* _renderer;
 

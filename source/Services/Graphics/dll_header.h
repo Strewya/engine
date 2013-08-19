@@ -10,8 +10,8 @@
 
 namespace Graphics { class IRenderer; }
 
-EXPORT int createRendererInterface(HWND hwnd, Graphics::IRenderer** renderer);
+EXPORT int createRendererInterface(HWND hwnd, uint32_t screenW, uint32_t screenH,  Graphics::IRenderer** renderer);
 EXPORT int destroyRendererInterface(Graphics::IRenderer* renderer);
 
-typedef int(*CREATE_RENDERER)(HWND hwnd, Graphics::IRenderer** renderer);
+typedef int(*CREATE_RENDERER)(HWND hwnd, uint32_t screenW, uint32_t screenH, Graphics::IRenderer** renderer);
 typedef int(*DESTROY_RENDERER)(Graphics::IRenderer* renderer);

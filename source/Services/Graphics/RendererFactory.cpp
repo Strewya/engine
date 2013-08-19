@@ -13,7 +13,7 @@
 namespace Graphics
 {
 	RendererFactory::RendererFactory(Win32::Window& window)
-		: _hwnd(window.getWindowHandle()), _hInst(window.getInstance()), _dll(nullptr), _renderer(nullptr)
+		: _window(window), _dll(nullptr), _renderer(nullptr)
 	{}
 
 	RendererFactory::~RendererFactory()
@@ -35,7 +35,7 @@ namespace Graphics
 			if(!_dll)
 			{
 				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
-				MessageBox(_hwnd, "Error loading up DX_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
+				MessageBox(_window.getWindowHandle(), "Error loading up DX_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
 				return false;
 			}
 		}
@@ -45,7 +45,7 @@ namespace Graphics
 			if(!_dll)
 			{
 				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
-				MessageBox(_hwnd, "Error loading up OGL_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
+				MessageBox(_window.getWindowHandle(), "Error loading up OGL_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
 				return false;
 			}
 		}
@@ -56,11 +56,11 @@ namespace Graphics
 
 		CREATE_RENDERER create = nullptr;
 		create = (CREATE_RENDERER)GetProcAddress(_dll, "createRendererInterface");
-		if(!create || !create(_hwnd, &_renderer))
+		if(!create || !create(_window.getWindowHandle(), _window.getSizeX(), _window.getSizeY(), &_renderer))
 		{
 			Util::GetDefaultLogger() << "Error with creating IRenderer, errCode: " << GetLastError() << Util::Logger::endl;
 			FreeLibrary(_dll);
-			MessageBox(_hwnd, "Error creating the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
+			MessageBox(_window.getWindowHandle(), "Error creating the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
 			return false;
 		}
 		return true;
@@ -74,7 +74,7 @@ namespace Graphics
 		if(!destroy(_renderer))
 		{
 			FreeLibrary(_dll);
-			MessageBox(_hwnd, "Error destroying the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
+			MessageBox(_window.getWindowHandle(), "Error destroying the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
 		}
 		_renderer = nullptr;
 	}

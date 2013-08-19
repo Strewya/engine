@@ -16,8 +16,8 @@ namespace Graphics
 #define TEST_SUCCESS(result) if(FAILED(result)) return false
 #define SAFE_RELEASE(ptr) if(ptr != nullptr) { ptr->Release(); ptr = nullptr; }
 
-	DXRenderer::DXRenderer(HWND hwnd)
-		: _screenW(1024), _screenH(768),
+	DXRenderer::DXRenderer(HWND hwnd, uint32_t screenW, uint32_t screenH)
+		: _screenW(screenW), _screenH(screenH),
 		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _renderTarget(nullptr),
 		_vertexShaderBlob(nullptr), _vertexShader(nullptr), _pixelShaderBlob(nullptr), _pixelShader(nullptr),
 		_cwCulling(nullptr), _ccwCulling(nullptr), _noCulling(nullptr),
