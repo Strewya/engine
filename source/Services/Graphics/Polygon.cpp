@@ -14,20 +14,25 @@
 	
 namespace Graphics
 {
+	Polygon::Polygon()
+		: m_color(1,1,1,1), m_data(), m_isSolid(false), m_scale(1,1), m_thickness(1)
+	{
+	}
+
 	void Polygon::draw(IRenderer& renderer)
 	{
-		auto vbufferID = renderer.createVertexBuffer(_data.size());
+		auto vbufferID = renderer.createVertexBuffer(m_data.size());
 		auto& vbuffer = renderer.getVertexBuffer(vbufferID);
-		auto ibufferID = renderer.createIndexBuffer(_data.size()+1);
+		auto ibufferID = renderer.createIndexBuffer(m_data.size()+1);
 		auto& ibuffer = renderer.getIndexBuffer(ibufferID);
 
 		std::vector<uint32_t> indices;
 		
-		if(_isSolid)
+		if(m_isSolid)
 		{
 			vbuffer.setTopology(Topology::TriangleStrip);
-			indices.resize(_data.size());
-			for(uint32_t i = 1; i < _data.size(); ++i)
+			indices.resize(m_data.size());
+			for(uint32_t i = 1; i < m_data.size(); ++i)
 			{
 				if(i%2 != 0) //currently, i is odd
 				{
@@ -35,14 +40,14 @@ namespace Graphics
 				}
 				else //i is even
 				{
-					indices[i] = _data.size() - i/2;
+					indices[i] = m_data.size() - i/2;
 				}
 			}
 		}
 		else
 		{
 			vbuffer.setTopology(Topology::LineStrip);
-			indices.resize(_data.size()+1);
+			indices.resize(m_data.size()+1);
 			//set indices
 			for(uint32_t i = 0; i < indices.size()-1; ++i)
 			{
@@ -50,14 +55,14 @@ namespace Graphics
 			}
 		}
 
-		vbuffer.copyData(_data, _color);
+		vbuffer.copyData(m_data, m_color);
 		ibuffer.copyData(indices);
 
 		vbuffer.bind();
 		ibuffer.bind();
 
 		renderer.setIdentity();
-		renderer.setScaling(Util::toVec3(_scale));
+		renderer.setScaling(Util::toVec3(m_scale));
 		renderer.applyTransform();
 
 		ibuffer.draw();
@@ -68,45 +73,45 @@ namespace Graphics
 
 	void Polygon::setSolid(bool isSolid)
 	{
-		_isSolid = isSolid;
+		m_isSolid = isSolid;
 	}
 
 	void Polygon::setEdgeThickness(float thickness)
 	{
-		_thickness = thickness;
+		m_thickness = thickness;
 	}
 
 	void Polygon::setColor(const Util::Color& color)
 	{
-		_color = color;
+		m_color = color;
 	}
 
 	void Polygon::setAsLine(const Util::Vec2& p1, const Util::Vec2& p2)
 	{
-		_data.clear();
-		_data.reserve(2);
-		_data.push_back(p1);
-		_data.push_back(p2);
-		_isSolid = false;
+		m_data.clear();
+		m_data.reserve(2);
+		m_data.push_back(p1);
+		m_data.push_back(p2);
+		m_isSolid = false;
 	}
 
 	void Polygon::setAsTriangle(const Util::Vec2& p1, const Util::Vec2& p2, const Util::Vec2& p3)
 	{
-		_data.clear();
-		_data.reserve(3);
-		_data.push_back(p1);
-		_data.push_back(p2);
-		_data.push_back(p3);
+		m_data.clear();
+		m_data.reserve(3);
+		m_data.push_back(p1);
+		m_data.push_back(p2);
+		m_data.push_back(p3);
 	}
 
 	void Polygon::setAsQuad(float halfWidth, float halfHeight)
 	{
-		_data.clear();
-		_data.reserve(4);
-		_data.push_back(Util::Vec2(-halfWidth, -halfHeight));
-		_data.push_back(Util::Vec2(-halfWidth, halfHeight));
-		_data.push_back(Util::Vec2(halfWidth, halfHeight));
-		_data.push_back(Util::Vec2(halfWidth, -halfHeight));
+		m_data.clear();
+		m_data.reserve(4);
+		m_data.push_back(Util::Vec2(-halfWidth, -halfHeight));
+		m_data.push_back(Util::Vec2(halfWidth, -halfHeight));
+		m_data.push_back(Util::Vec2(halfWidth, halfHeight));
+		m_data.push_back(Util::Vec2(-halfWidth, halfHeight));
 		
 	}
 
@@ -123,22 +128,22 @@ namespace Graphics
 			++numVertices;
 		}
 		
-		_data.clear();
-		_data.resize(numVertices);
+		m_data.clear();
+		m_data.resize(numVertices);
 		
 		float degreesPerVertex = 360.0f / numVertices;
-		_data[0].set(xRadius*Util::Vec2(std::cosf(Deg2Rad(0.0f)), yRadius*std::sinf(Deg2Rad(0.0f))));
-		_data[0] += center;
+		m_data[0].set(xRadius*Util::Vec2(std::cosf(Deg2Rad(0.0f)), yRadius*std::sinf(Deg2Rad(0.0f))));
+		m_data[0] += center;
 		for(uint32_t i = 1; i <= numVertices/2; ++i)
 		{
 			float degree = degreesPerVertex*i;
-			_data[i].set(xRadius*std::cosf(Deg2Rad(-degree)), yRadius*std::sin(Deg2Rad(-degree)));
+			m_data[i].set(xRadius*std::cosf(Deg2Rad(degree)), yRadius*std::sin(Deg2Rad(degree)));
 			if(i != numVertices/2)
 			{
-				_data[_data.size()-i].set(center.x+_data[i].x, center.y-_data[i].y);
-				_data[_data.size()-i] += center;
+				m_data[m_data.size()-i].set(m_data[i].x, -m_data[i].y);
+				m_data[m_data.size()-i] += center;
 			}
-			_data[i] += center;
+			m_data[i] += center;
 		}
 	}
 
@@ -149,16 +154,16 @@ namespace Graphics
 
 	void Polygon::setManual(const Util::Vec2* vertices, uint32_t numVertices)
 	{
-		_data.clear();
-		_data.reserve(numVertices);
+		m_data.clear();
+		m_data.reserve(numVertices);
 		for(uint32_t i=0; i<numVertices; ++i)
 		{
-			_data.push_back(vertices[i]);
+			m_data.push_back(vertices[i]);
 		}
 	}
 
 	void Polygon::setScale(float scale)
 	{
-		_scale.set(scale, scale);
+		m_scale.set(scale, scale);
 	}
 }

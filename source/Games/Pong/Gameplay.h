@@ -23,7 +23,6 @@ namespace Pong
 		void deactivate();
 		void registerActions();
 		void setupActionQueue();
-		void onUpdate(float dt);
 
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);
@@ -34,6 +33,6 @@ namespace Pong
 		void setupRightGoal(Core::Entity& wall);
 
 	private:
-		Graphics::b2DebugDraw debug;
+		Graphics::b2DebugDraw m_debug;
 	};
 }

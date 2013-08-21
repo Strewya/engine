@@ -18,9 +18,12 @@ namespace Core
 	SYSTEM(ARender)
 	{
 	public:
-		bool onUpdate(float dt, GameContext& context);
+		SYSTEM_CTOR(ARender);
+		
+	protected:
+		bool onUpdate(float dt);
 
 	private:
-		Graphics::RenderingQueue _queue;
+		Graphics::RenderingQueue m_queue;
 	};
 }

@@ -6,6 +6,7 @@
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
 #include <deque>
+#include <functional>
 #include <list>
 #include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
@@ -31,14 +32,22 @@ namespace Core
 		Entity& getInstanceRef(InstanceID id) const;
 		bool isAlive(InstanceID id) const;
 		bool destroy(InstanceID id);
+
+		void registerDestructionCallback(std::function<void(Entity&)> callback);
 		
 	private:
-		std::deque<std::unique_ptr<Entity>> _pool;
-		std::list<uint32_t> _availableSlots;
-		uint32_t _maxExpectedSize;
-		uint32_t _indexBits;
-		uint32_t _indexMask;
-		InstanceID _idCounter;
-		InstanceID _newID(int index);
+		InstanceID newID(int index);
+		void dispatchDestruction(Entity& e);
+
+		std::deque<std::unique_ptr<Entity>> m_pool;
+		std::list<uint32_t> m_availableSlots;
+		uint32_t m_maxExpectedSize;
+		uint32_t m_indexBits;
+		uint32_t m_indexMask;
+		InstanceID m_idCounter;
+		std::deque<std::function<void(Entity&)>> m_onDestroyCallbacks;
+		
+
+		
 	};
 }

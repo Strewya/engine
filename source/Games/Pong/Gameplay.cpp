@@ -10,6 +10,7 @@
 	/*** extra headers ***/
 #include "Engine/Engine.h"
 #include "Engine/GameContext.h"
+#include "Core/Action/Impl/Physics.h"
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
@@ -20,19 +21,20 @@
 namespace Pong
 {
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
-		: GameContext(Core::ContextType::GAMEPLAY, services, resources), debug(services.getGraphics())
+		: GameContext(Core::ContextType::GAMEPLAY, services, resources), m_debug(services.getGraphics())
 	{
-		physicsWorld.SetGravity(b2Vec2(0, -9.81f));
 	}
 
 	void Gameplay::registerActions()
 	{
-		actionIndex.addActionToIndex(Core::ARender::create());
+		actionIndex.addActionToIndex(Core::ARender::create(*this));
+		actionIndex.addActionToIndex(Core::APhysics::create(*this));
 	}
 
 
 	void Gameplay::setupActionQueue()
 	{
+		actionQueue.addAction(actionIndex.getActionFromIndex(Core::APhysics::Type));
 		actionQueue.addAction(actionIndex.getActionFromIndex(Core::ARender::Type));
 	}
 
@@ -41,15 +43,15 @@ namespace Pong
 
 	void Gameplay::activate()
 	{
-		physicsWorld.SetDebugDraw(&debug);
+		physicsWorld.SetDebugDraw(&m_debug);
 		uint32_t flags = 0;
 		flags += Graphics::b2DebugDraw::e_shapeBit;
 		flags += Graphics::b2DebugDraw::e_centerOfMassBit;
 		flags += Graphics::b2DebugDraw::e_jointBit;
 		flags += Graphics::b2DebugDraw::e_pairBit;
 		//flags += Graphics::b2DebugDraw::e_aabbBit;
-		debug.SetFlags(flags);
-		debug.setLengthScale(30);
+		m_debug.SetFlags(flags);
+		m_debug.setLengthScale(30);
 
 		services.getGraphics().setBackgroundColor(0.5f,0.5f,0.5f);
 		auto c = services.getGraphics().getBackgroundColor();
@@ -58,55 +60,36 @@ namespace Pong
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = entityPool.getNewInstanceRef();
+			auto& wall = entityPool.getNewInstanceRef();
+			auto& goal = entityPool.getNewInstanceRef();
+
 			entityFactory.createEntityType("paddle", paddle);
+			entityFactory.createEntityType("wall", wall);
+			entityFactory.createEntityType("goal", goal);
+
 			activeEntities.addEntity(paddle.getID());
+			activeEntities.addEntity(wall.getID());
+			activeEntities.addEntity(goal.getID());
 
 			if(i == 0)
 			{
 				setupLeftPaddle(paddle);
+				setupTopWall(wall);
+				setupLeftGoal(goal);
 			}
 			else
 			{
 				setupRightPaddle(paddle);
+				setupBottomWall(wall);
+				setupRightGoal(goal);
 			}
 		}
 		
 		auto& ball = entityPool.getNewInstanceRef();
 		entityFactory.createEntityType("ball", ball);
 		activeEntities.addEntity(ball.getID());
-		
 		setupBall(ball);
 
-		
-		if(dyno == nullptr && floor == nullptr)
-		{
-			b2BodyDef bodyDef;
-			bodyDef.type = b2_dynamicBody;
-			bodyDef.position = b2Vec2(0,20);
-			bodyDef.angle = 0;
-			//...
-			dyno = physicsWorld.CreateBody(&bodyDef);
-
-			b2PolygonShape shape;
-			shape.SetAsBox(1,1);
-
-			b2FixtureDef fixtureDef;
-			fixtureDef.shape = &shape;
-			fixtureDef.density = 1;
-			fixtureDef.restitution = 0.8f;
-			dyno->CreateFixture(&fixtureDef);
-
-
-			//floor
-
-			bodyDef.type = b2_staticBody;
-			bodyDef.position = b2Vec2(0,0);
-			floor = physicsWorld.CreateBody(&bodyDef);
-
-			shape.SetAsBox(3,0.5f);
-			fixtureDef.shape = &shape;
-			floor->CreateFixture(&fixtureDef);
-		}
 	}
 
 
@@ -116,54 +99,34 @@ namespace Pong
 		{
 			entityPool.destroy(*it);
 		}
-
-		if(dyno != nullptr && floor != nullptr)
-		{
-			physicsWorld.DestroyBody(dyno);
-			physicsWorld.DestroyBody(floor);
-		}
 	}
-
-	void Gameplay::onUpdate(float dt)
-	{
-		
-		{
-			physicsWorld.Step(dt, 8, 3);
-		}
-	}
-
 
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
-	{
-		//auto screen = Util::Vec2();
-		auto screen = services.getGraphics().getScreenSize();
-
-		auto* position = paddle.getState<Core::Position2d>();
-		position->data.y = screen.y/2;
+	{	
 	}
 
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
-		//auto screen = Util::Vec2();
-		auto screen = services.getGraphics().getScreenSize();
-
-		auto* position = paddle.getState<Core::Position2d>();
-		position->data.y = screen.y/2;
 	}
 
 
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
+
 	}
 
 	void Gameplay::setupTopWall(Core::Entity& wall)
 	{
+		auto* body = wall.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(0, 20), 0);
 	}
 
 	void Gameplay::setupBottomWall(Core::Entity& wall)
 	{
+		auto* body = wall.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(0, -20), 0);
 	}
 
 	void Gameplay::setupLeftGoal(Core::Entity& wall)

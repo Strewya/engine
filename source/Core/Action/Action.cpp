@@ -5,31 +5,34 @@
 #include "Core/Action/Action.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
+#include "Engine/GameContext.h"
 	/*** end headers ***/
 
 
 namespace Core
 {
-	Action::Action(InstanceID type)
-		: uid(type)
-	{}
-
-	bool Action::update(float dt, GameContext& context)
+	Action::Action(InstanceID type, GameContext& context)
+		: uid(type), m_context(context)
 	{
-		if(!_timer.isPaused && _timer.hasUpdatePeriodElapsed())
+		context.timer.RegisterTimer(m_timer);
+	}
+
+	bool Action::update()
+	{
+		while(!m_timer.isPaused && m_timer.hasUpdatePeriodElapsed())
 		{
-			return onUpdate(dt, context);
+			return onUpdate(m_timer.getUpdatePeriod());
 		}
 		return false;
 	}
 
 	bool Action::registerEntity(InstanceID id)
 	{
-		return _entities.insert(id).second;
+		return m_entities.insert(id).second;
 	}
 
 	bool Action::unregisterEntity(InstanceID id)
 	{
-		return _entities.erase(id) > 0;
+		return m_entities.erase(id) > 0;
 	}
 }

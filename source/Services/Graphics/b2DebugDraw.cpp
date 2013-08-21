@@ -82,7 +82,7 @@ namespace Graphics
 		circle.setEdgeThickness(2);
 		circle.setSolid(true);
 		circle.setScale(_lengthScale);
-		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, (uint32_t)radius * 4);
+		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, (uint32_t)radius * (uint32_t)_lengthScale);
 		circle.draw(_renderer);
 	}
 	

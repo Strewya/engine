@@ -14,12 +14,12 @@
 
 namespace Core
 {
-	bool ARender::onUpdate(float dt, GameContext& context)
+	bool ARender::onUpdate(float dt)
 	{
-		for(auto id : _entities)
+		for(auto id : m_entities)
 		{
 			//check if entity still exists, if not add it to deletion list
-			if(context.entityPool.isAlive(id))
+			if(m_context.entityPool.isAlive(id))
 			{
 			//[exists]
 			//get entity
@@ -36,13 +36,23 @@ namespace Core
 			}
 		}
 		//remove entities that are no longer valid from the list
-
-		context.services.getGraphics().BeginScene();
+		/*
+		Graphics::Polygon p;
+		p.setAsCircle(Util::Vec2(0,0), 30, 30);
+		p.setAsQuad(10,10);
+		p.setSolid(true);
+		p.setColor(Util::Color(1,0,0));
+		p.setScale(10);
+		*/
+		m_context.services.getGraphics().BeginScene();
 		
 //		_queue.Render(context.services, context.resources);
-		context.physicsWorld.DrawDebugData();
+		
+		m_context.physicsWorld.DrawDebugData();
 
-		context.services.getGraphics().EndScene();
+//		p.draw(m_context.services.getGraphics());
+
+		m_context.services.getGraphics().EndScene();
 
 		return true;
 	}

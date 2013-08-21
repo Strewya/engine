@@ -33,7 +33,7 @@ namespace Core
 		{
 			onUpdate(gUpdateInterval);
 
-			actionQueue.update(gUpdateInterval, *this);
+			actionQueue.update();
 			
 			return true;
 		}

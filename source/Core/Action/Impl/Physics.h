@@ -15,9 +15,12 @@ namespace Core
 	SYSTEM(APhysics)
 	{
 	public:
-		APhysics();
+		SYSTEM_CTOR(APhysics);
 
-		bool onUpdate(float dt, GameContext& context);
+	protected:
+		bool onUpdate(float dt);
+		void init();
+
 
 
 	};

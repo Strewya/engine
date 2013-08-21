@@ -27,6 +27,8 @@ namespace Game
 		
 		context.entityFactory.registerConstructor("paddle", createPaddle);
 		context.entityFactory.registerConstructor("ball", createBall);
+		context.entityFactory.registerConstructor("wall", createWall);
+		context.entityFactory.registerConstructor("goal", createGoal);
 
 		//set the context as active
 		engine.setActiveContext(context);

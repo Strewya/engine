@@ -10,17 +10,16 @@
 
 namespace Core
 {
-	void ActionUpdater::update(float dt, GameContext& context)
+	void ActionUpdater::update()
 	{
-		for(auto& action : _priorityQueue)
+		for(auto& action : m_priorityQueue)
 		{
-			
-			action->update(dt, context);
+			action->update();
 		}
 	}
 
 	void ActionUpdater::addAction(ActionRef action)
 	{
-		return _priorityQueue.emplace_back(&action);
+		return m_priorityQueue.emplace_back(&action);
 	}
 }

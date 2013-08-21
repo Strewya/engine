@@ -12,7 +12,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::Window& window)
-		: _window(window), _rendererFactory(window), _activeContext(nullptr)
+		: m_window(window), m_rendererFactory(window), m_activeContext(nullptr)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -22,7 +22,7 @@ namespace Core
 		log << "*********************************************" << log.endl;
 		log	<< "* New program start @ ";
 		log << st.wHour << ":" << st.wMinute << ":" << st.wSecond << " on " << st.wDay << "." << st.wMonth << "." << st.wYear << ".  ";
-		log << "Application: " << _window.getTitle() << log.endl;
+		log << "Application: " << m_window.getTitle() << log.endl;
 		log << "*********************************************" << log.endl << log.endl;
 
 		/*	read the config file for engine configuration, which needs to include the following:
@@ -31,7 +31,7 @@ namespace Core
 			* display engine (directx by default)
 			* audio engine (fmod by default)
 		*/
-		_window.setCursorShow(true);
+		m_window.setCursorShow(true);
 		String renderer = "dx";
 		/*
 			initialize the subsystems:
@@ -42,13 +42,13 @@ namespace Core
 			* communications
 			* persistence
 		*/
-		if(!_rendererFactory.InitInterface(renderer))
+		if(!m_rendererFactory.InitInterface(renderer))
 		{
 			throw std::logic_error("Unable to initialize renderer");
 		}
 		//_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
 
-		_window.setEventQueue(_inputEngine.getEventQueue());
+		m_window.setEventQueue(m_inputEngine.getEventQueue());
 		/*
 			register all of the initialized subsystems
 			* display - done
@@ -58,10 +58,10 @@ namespace Core
 			* comms
 			* persistence
 		*/
-		_services.Register(this);
-		_services.Register(_rendererFactory.getInterface());
-		_services.Register(&_scriptEngine);
-		_services.Register(&_inputEngine);
+		m_services.Register(this);
+		m_services.Register(m_rendererFactory.getInterface());
+		m_services.Register(&m_scriptEngine);
+		m_services.Register(&m_inputEngine);
 
 		/*
 			register the resource caches
@@ -73,8 +73,8 @@ namespace Core
 			* TODO: strings
 		*/
 		//_resources.Register(_services.getGraphics().getTextureCache());
-		_spritesheets.setTextureCache(_resources.getTextureCache());
-		_resources.Register(_spritesheets);
+		m_spritesheets.setTextureCache(m_resources.getTextureCache());
+		m_resources.Register(m_spritesheets);
 
 		/*
 			load the game configuration script and execute it
@@ -88,46 +88,46 @@ namespace Core
 
 	Engine::~Engine()
 	{
-		_gameContexts.clear();
-		_spritesheets.clear();
-		_rendererFactory.DestroyInterface();
+		m_gameContexts.clear();
+		m_spritesheets.clear();
+		m_rendererFactory.DestroyInterface();
 	}
 
 	void Engine::loop()
 	{
-		if(!_activeContext)
+		if(!m_activeContext)
 		{
-			_window.showMessagebox("Error", "No game context active, exiting!");
+			m_window.showMessagebox("Error", "No game context active, exiting!");
 			shutdown();
 			return;
 		}
 
-		_mainClock.AdvanceTime();
+		m_mainClock.AdvanceTime();
 
 		//update input
-		_inputEngine.Update();
+		m_inputEngine.Update();
 
 		//update logic and draw entities
 		//only one context can be active
-		if(_activeContext->update())
+		if(m_activeContext->update())
 		{
-			_inputEngine.PurgeEvents();
+			m_inputEngine.PurgeEvents();
 		}
 	}
 
 	void Engine::shutdown()
 	{
-		_window.Shutdown();
+		m_window.Shutdown();
 	}
 
 	ServiceLocator& Engine::getServices()
 	{
-		return _services;
+		return m_services;
 	}
 
 	ResourceLocator& Engine::getResources()
 	{
-		return _resources;
+		return m_resources;
 	}
 
 	void Engine::initializeGame(GameInitLogic init)
@@ -142,25 +142,25 @@ namespace Core
 
 	GameContext& Engine::registerContext(std::unique_ptr<GameContext> context)
 	{
-		auto it = _gameContexts.find(context->Type);
-		if(it == _gameContexts.end())
+		auto it = m_gameContexts.find(context->Type);
+		if(it == m_gameContexts.end())
 		{
-			it = _gameContexts.emplace(context->Type, std::move(context)).first;
+			it = m_gameContexts.emplace(context->Type, std::move(context)).first;
 		}
 		else
 		{
 			it->second.swap(context);
 		}
-		_mainClock.RegisterTimer(it->second->timer);
+		m_mainClock.RegisterTimer(it->second->timer);
 		return *it->second;
 	}
 
 	GameContext& Engine::getContext(ContextType id)
 	{
-		auto it = _gameContexts.find(id);
-		if(it == _gameContexts.end())
+		auto it = m_gameContexts.find(id);
+		if(it == m_gameContexts.end())
 		{
-			_window.showMessagebox("Error", "Attempt to get invalid context ID, shutting down.");
+			m_window.showMessagebox("Error", "Attempt to get invalid context ID, shutting down.");
 			shutdown();
 			throw std::exception();
 		}
@@ -169,8 +169,8 @@ namespace Core
 
 	bool Engine::setActiveContext(ContextType id)
 	{
-		auto it = _gameContexts.find(id);
-		if(it != _gameContexts.end())
+		auto it = m_gameContexts.find(id);
+		if(it != m_gameContexts.end())
 		{
 			return setActiveContext(*it->second);
 		}
@@ -179,14 +179,14 @@ namespace Core
 	
 	bool Engine::setActiveContext(GameContext& context)
 	{
-		if(_activeContext != &context)
+		if(m_activeContext != &context)
 		{
-			if(_activeContext != nullptr)
+			if(m_activeContext != nullptr)
 			{
-				_activeContext->deactivate();
+				m_activeContext->deactivate();
 			}
-			_activeContext = &context;
-			_activeContext->activate();
+			m_activeContext = &context;
+			m_activeContext->activate();
 			return true;
 		}
 		return false;

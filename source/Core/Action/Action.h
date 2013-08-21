@@ -18,20 +18,22 @@ namespace Core
 	class Action
 	{
 	public:
-		Action(InstanceID type);
+		Action(InstanceID type, GameContext& context);
 
-		bool update(float dt, GameContext& context);
+		bool update();
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
 		
 		const InstanceID uid;
 	protected:
-		virtual bool onUpdate(float dt, GameContext& context) = 0;
+
+		virtual bool onUpdate(float dt) = 0;
 
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
-		EntityStorage_t _entities;
-		Util::Timer _timer;
+		EntityStorage_t m_entities;
+		Util::Timer m_timer;
+		GameContext& m_context;
 	};
 
 
@@ -44,16 +46,18 @@ namespace Core
 
 		static const InstanceID Type;
 
-		static std::unique_ptr<Derived_t> create()
+		static std::unique_ptr<Derived_t> create(GameContext& c)
 		{
-			return std::unique_ptr<Derived_t>(new Derived_t());
+			return std::unique_ptr<Derived_t>(new Derived_t(c));
 		}
 
 	protected:
-		ActionType() : Action(Type) {}
+		ActionType(GameContext& context) : Action(Type, context) {}
+		virtual void init() {}
 	};
 
 	template<typename T> const InstanceID ActionType<T>::Type = typeid(T).hash_code();
 }
 
 #define SYSTEM(Name) class Name : public ActionType<Name>
+#define SYSTEM_CTOR(Name) Name(GameContext& c) : ActionType(c) { init(); }

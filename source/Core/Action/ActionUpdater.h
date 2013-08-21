@@ -15,12 +15,12 @@ namespace Core
 	class ActionUpdater
 	{
 	public:
-		void update(float dt, GameContext& context);
+		void update();
 	
 		void addAction(ActionRef action);
 
 	private:
 		
-		std::list<ActionRptr> _priorityQueue;
+		std::list<ActionRptr> m_priorityQueue;
 	};
 }

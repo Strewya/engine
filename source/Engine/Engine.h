@@ -56,22 +56,22 @@ namespace Core
 		ResourceLocator& getResources();
 	
 	private:
-		Win32::Window& _window;
-		Graphics::RendererFactory _rendererFactory;
+		Win32::Window& m_window;
+		Graphics::RendererFactory m_rendererFactory;
 		//Audio::AudioFactory _audioFactory;
-		Script::Engine _scriptEngine;
-		Input::Engine _inputEngine;
+		Script::Engine m_scriptEngine;
+		Input::Engine m_inputEngine;
 		//Network::CommEngine _commEngine;
-		ServiceLocator _services;
+		ServiceLocator m_services;
 
-		ResourceLocator _resources;
-		Graphics::SpritesheetCache _spritesheets;
+		ResourceLocator m_resources;
+		Graphics::SpritesheetCache m_spritesheets;
 
 		typedef std::unordered_map<ContextType, std::unique_ptr<GameContext>, std::hash<int>> ContextStorage_t;
 
-		ContextStorage_t _gameContexts;
-		GameContext* _activeContext; 
+		ContextStorage_t m_gameContexts;
+		GameContext* m_activeContext; 
 		
-		Util::Clock _mainClock;
+		Util::Clock m_mainClock;
 	};
 }

@@ -23,6 +23,8 @@ namespace Graphics
 	class Polygon
 	{
 	public:
+		Polygon();
+
 		void setAsCircle(const Util::Vec2& center, float radius, uint32_t numVertices);
 		void setAsEllipse(const Util::Vec2& center, float xRadius, float yRadius, uint32_t numVertices);
 		void setAsQuad(float halfWidth, float halfHeight);
@@ -39,10 +41,10 @@ namespace Graphics
 
 	private:
 		
-		bool _isSolid;
-		float _thickness;
-		Util::Color _color;
-		std::vector<Util::Vec2> _data;
-		Util::Vec2 _scale;
+		bool m_isSolid;
+		float m_thickness;
+		Util::Color m_color;
+		std::vector<Util::Vec2> m_data;
+		Util::Vec2 m_scale;
 	};
 }
