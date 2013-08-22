@@ -17,16 +17,16 @@ namespace Graphics
 #define SAFE_RELEASE(ptr) if(ptr != nullptr) { ptr->Release(); ptr = nullptr; }
 
 	DXRenderer::DXRenderer(HWND hwnd, uint32_t screenW, uint32_t screenH)
-		: _screenW(screenW), _screenH(screenH),
-		_hwnd(hwnd), _dev(nullptr), _devcon(nullptr), _swapchain(nullptr), _renderTarget(nullptr),
-		_vertexShaderBlob(nullptr), _vertexShader(nullptr), _pixelShaderBlob(nullptr), _pixelShader(nullptr),
-		_cwCulling(nullptr), _ccwCulling(nullptr), _noCulling(nullptr),
-		_inputLayout(nullptr), _vertexBuffer(nullptr), _indexBuffer(nullptr),
-		_depthStencilView(nullptr), _depthStencilBuffer(nullptr),
-		_cbPerObjectBuffer(nullptr),
-		_shaderResourceView(nullptr), _samplerState(nullptr),
-		_backgroundColor(0,0,0,1),
-		_camProjection(XMMatrixIdentity()), _camView(XMMatrixIdentity())
+		: m_screenW(screenW), m_screenH(screenH),
+		m_hwnd(hwnd), m_dev(nullptr), m_devcon(nullptr), m_swapchain(nullptr), m_renderTarget(nullptr),
+		m_vertexShaderBlob(nullptr), m_vertexShader(nullptr), m_pixelShaderBlob(nullptr), m_pixelShader(nullptr),
+		m_cwCulling(nullptr), m_ccwCulling(nullptr), m_noCulling(nullptr),
+		m_inputLayout(nullptr), m_vertexBuffer(nullptr), m_indexBuffer(nullptr),
+		m_depthStencilView(nullptr), m_depthStencilBuffer(nullptr),
+		m_cbPerObjectBuffer(nullptr),
+		m_shaderResourceView(nullptr), m_samplerState(nullptr),
+		m_backgroundColor(0,0,0,1),
+		m_camProjection(XMMatrixIdentity()), m_camView(XMMatrixIdentity())
 	{
 		if(!init())
 		{
@@ -49,7 +49,7 @@ namespace Graphics
 	//*****************************************************************
 	bool DXRenderer::init()
 	{
-		fillSwapChainDesc(_swapChainDesc);
+		fillSwapChainDesc(m_swapChainDesc);
 
 		auto driverType = D3D_DRIVER_TYPE_HARDWARE;
 		uint32_t flags = 0;
@@ -57,14 +57,14 @@ namespace Graphics
 #ifdef _DEBUG
 		flags = D3D11_CREATE_DEVICE_DEBUG;
 #endif
-		HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &_swapChainDesc, &_swapchain, &_dev, nullptr, &_devcon);
+		HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &m_swapChainDesc, &m_swapchain, &m_dev, nullptr, &m_devcon);
 		TEST_SUCCESS(hr);
 		
 		ID3D11Texture2D* bbTexture = nullptr;
-		hr = _swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
+		hr = m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
 		TEST_SUCCESS(hr);
 		
-		hr = _dev->CreateRenderTargetView(bbTexture, nullptr, &_renderTarget);
+		hr = m_dev->CreateRenderTargetView(bbTexture, nullptr, &m_renderTarget);
 		TEST_SUCCESS(hr);
 
 		hr = bbTexture->Release();
@@ -74,12 +74,12 @@ namespace Graphics
 		ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-		vp.Width = (float)_screenW;
-		vp.Height = (float)_screenH;
+		vp.Width = (float)m_screenW;
+		vp.Height = (float)m_screenH;
 		vp.MinDepth = 0;
 		vp.MaxDepth = 1;
 
-		_devcon->RSSetViewports(1, &vp);
+		m_devcon->RSSetViewports(1, &vp);
 
 		return true;
 	}
@@ -90,14 +90,14 @@ namespace Graphics
 		scd.BufferCount		= 1;
 		scd.BufferUsage		= DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scd.Flags			= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		scd.OutputWindow	= _hwnd;
+		scd.OutputWindow	= m_hwnd;
 		scd.SwapEffect		= DXGI_SWAP_EFFECT_DISCARD;
 		scd.Windowed		= true;
 
 		DXGI_MODE_DESC& bd = scd.BufferDesc;
 		bd.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;
-		bd.Width					= _screenW;
-		bd.Height					= _screenH;
+		bd.Width					= m_screenW;
+		bd.Height					= m_screenH;
 		bd.RefreshRate.Denominator	= 1;
 		bd.RefreshRate.Numerator	= 60;
 		bd.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -113,30 +113,30 @@ namespace Graphics
 		//********************************** VERTEX SHADER
 		HRESULT hr = 0;
 		String shaderPath = "D:/engine/source/Services/Graphics/Shaders/shader.hlsl";
-		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_5_0", 0, 0, nullptr, &_vertexShaderBlob, nullptr, nullptr);
+		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_vertexShaderBlob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
 
-		hr = _dev->CreateVertexShader(_vertexShaderBlob->GetBufferPointer(), _vertexShaderBlob->GetBufferSize(), nullptr, &_vertexShader);
+		hr = m_dev->CreateVertexShader(m_vertexShaderBlob->GetBufferPointer(), m_vertexShaderBlob->GetBufferSize(), nullptr, &m_vertexShader);
 		TEST_SUCCESS(hr);
 
 
 
 		//********************************** PIXEL SHADER
-		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_5_0", 0, 0, nullptr, &_pixelShaderBlob, nullptr, nullptr);
+		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_pixelShaderBlob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
 
-		hr = _dev->CreatePixelShader(_pixelShaderBlob->GetBufferPointer(), _pixelShaderBlob->GetBufferSize(), nullptr, &_pixelShader);
+		hr = m_dev->CreatePixelShader(m_pixelShaderBlob->GetBufferPointer(), m_pixelShaderBlob->GetBufferSize(), nullptr, &m_pixelShader);
 		TEST_SUCCESS(hr);
 		
-		_devcon->VSSetShader(_vertexShader, nullptr, 0);
-		_devcon->PSSetShader(_pixelShader, nullptr, 0);
+		m_devcon->VSSetShader(m_vertexShader, nullptr, 0);
+		m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
 
 		//********************************** INPUT LAYOUT
 		std::vector<D3D11_INPUT_ELEMENT_DESC> ied = Vertex::getDescription();
 
-		hr = _dev->CreateInputLayout(&ied[0], ied.size(), _vertexShaderBlob->GetBufferPointer(), _vertexShaderBlob->GetBufferSize(), &_inputLayout);
+		hr = m_dev->CreateInputLayout(&ied[0], ied.size(), m_vertexShaderBlob->GetBufferPointer(), m_vertexShaderBlob->GetBufferSize(), &m_inputLayout);
 		TEST_SUCCESS(hr);
-		_devcon->IASetInputLayout(_inputLayout);
+		m_devcon->IASetInputLayout(m_inputLayout);
 
 
 		//********************************** VERTEX BUFFER
@@ -148,7 +148,7 @@ namespace Graphics
 		bd.MiscFlags		= 0;
 		bd.Usage			= D3D11_USAGE_DYNAMIC;
 		
-		hr = _dev->CreateBuffer(&bd, nullptr, &_vertexBuffer);
+		hr = m_dev->CreateBuffer(&bd, nullptr, &m_vertexBuffer);
 		TEST_SUCCESS(hr);
 
 		//********************************** INDEX BUFFER
@@ -159,7 +159,7 @@ namespace Graphics
 		bd.MiscFlags		= 0;
 		bd.Usage			= D3D11_USAGE_DYNAMIC;
 
-		hr = _dev->CreateBuffer(&bd, nullptr, &_indexBuffer);
+		hr = m_dev->CreateBuffer(&bd, nullptr, &m_indexBuffer);
 		TEST_SUCCESS(hr);
 
 		//********************************** RASTERIZER STATE
@@ -169,18 +169,18 @@ namespace Graphics
 		rd.CullMode = D3D11_CULL_BACK;
 		
 		rd.FrontCounterClockwise = true;
-		hr = _dev->CreateRasterizerState(&rd, &_ccwCulling);
+		hr = m_dev->CreateRasterizerState(&rd, &m_ccwCulling);
 		TEST_SUCCESS(hr);
 
 		rd.FrontCounterClockwise = false;
-		hr = _dev->CreateRasterizerState(&rd, &_cwCulling);
+		hr = m_dev->CreateRasterizerState(&rd, &m_cwCulling);
 		TEST_SUCCESS(hr);
 		
 		rd.CullMode = D3D11_CULL_NONE;
-		hr = _dev->CreateRasterizerState(&rd, &_noCulling);
+		hr = m_dev->CreateRasterizerState(&rd, &m_noCulling);
 		TEST_SUCCESS(hr);
 
-		_devcon->RSSetState(_ccwCulling);
+		m_devcon->RSSetState(m_ccwCulling);
 		
 		//********************************** BLENDING
 		D3D11_BLEND_DESC bld;
@@ -198,15 +198,15 @@ namespace Graphics
 		rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
 
-		hr = _dev->CreateBlendState(&bld, &_blendState);
+		hr = m_dev->CreateBlendState(&bld, &m_blendState);
 		TEST_SUCCESS(hr);
 
 		//********************************** DEPTH STENCIL
 		D3D11_TEXTURE2D_DESC dsd;
 		ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
 
-		dsd.Width			= _screenW;
-		dsd.Height			= _screenH;
+		dsd.Width			= m_screenW;
+		dsd.Height			= m_screenH;
 		dsd.MipLevels		= 1;
 		dsd.ArraySize		= 1;
 		dsd.Format			= DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -219,12 +219,12 @@ namespace Graphics
 		sd.Count	= 1;
 		sd.Quality	= 0;
 
-		hr = _dev->CreateTexture2D(&dsd, nullptr, &_depthStencilBuffer);
+		hr = m_dev->CreateTexture2D(&dsd, nullptr, &m_depthStencilBuffer);
 		TEST_SUCCESS(hr);
 
-		hr = _dev->CreateDepthStencilView(_depthStencilBuffer, nullptr, &_depthStencilView);
+		hr = m_dev->CreateDepthStencilView(m_depthStencilBuffer, nullptr, &m_depthStencilView);
 
-		_devcon->OMSetRenderTargets(1, &_renderTarget, nullptr);
+		m_devcon->OMSetRenderTargets(1, &m_renderTarget, nullptr);
 
 		
 		//********************************** CONSTANT BUFFER FOR MATRICES
@@ -235,22 +235,22 @@ namespace Graphics
 		bd.CPUAccessFlags	= 0;
 		bd.MiscFlags		= 0;
 		
-		hr = _dev->CreateBuffer(&bd, nullptr, &_cbPerObjectBuffer);
+		hr = m_dev->CreateBuffer(&bd, nullptr, &m_cbPerObjectBuffer);
 		TEST_SUCCESS(hr);
 
-		_camPosition = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-		_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		m_camPosition = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		m_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-		_camView = XMMatrixLookAtLH(_camPosition, _camLookAt, _camUp);
+		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
 		//_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)_screenW/_screenH, 1.0f, 100.0f);
-		_camProjection = XMMatrixOrthographicLH((float)_screenW, (float)_screenH, 1.0f, 100.0f);
+		m_camProjection = XMMatrixOrthographicLH((float)m_screenW, (float)m_screenH, 1.0f, 100.0f);
 		
 
 
 
 		//********************************** CONSTANT BUFFER FOR MATRICES
-		hr = D3DX11CreateShaderResourceViewFromFile(_dev, "../resources/character_t.png", nullptr, nullptr, &_shaderResourceView, nullptr);
+		hr = D3DX11CreateShaderResourceViewFromFile(m_dev, "../resources/character_t.png", nullptr, nullptr, &m_shaderResourceView, nullptr);
 		TEST_SUCCESS(hr);
 
 		D3D11_SAMPLER_DESC sampd;
@@ -263,7 +263,7 @@ namespace Graphics
 		sampd.MinLOD = 0;
 		sampd.MaxLOD = D3D11_FLOAT32_MAX;
 
-		hr = _dev->CreateSamplerState(&sampd, &_samplerState);
+		hr = m_dev->CreateSamplerState(&sampd, &m_samplerState);
 		TEST_SUCCESS(hr);
 
 		return true;
@@ -284,31 +284,31 @@ namespace Graphics
 
 	void DXRenderer::close()
 	{
-		if(_swapchain != nullptr)
+		if(m_swapchain != nullptr)
 		{
-			_swapchain->SetFullscreenState(false, nullptr);
+			m_swapchain->SetFullscreenState(false, nullptr);
 		}
 
-		SAFE_RELEASE(_samplerState);
-		SAFE_RELEASE(_shaderResourceView);
-		SAFE_RELEASE(_cbPerObjectBuffer);
-		SAFE_RELEASE(_depthStencilBuffer);
-		SAFE_RELEASE(_depthStencilView);
-		SAFE_RELEASE(_indexBuffer);
-		SAFE_RELEASE(_vertexBuffer);
-		SAFE_RELEASE(_inputLayout);
-		SAFE_RELEASE(_noCulling);
-		SAFE_RELEASE(_cwCulling);
-		SAFE_RELEASE(_ccwCulling);
-		SAFE_RELEASE(_pixelShader);
-		SAFE_RELEASE(_pixelShaderBlob);
-		SAFE_RELEASE(_vertexShader);
-		SAFE_RELEASE(_vertexShaderBlob);
-		SAFE_RELEASE(_renderTarget);
-		SAFE_RELEASE(_swapchain);
-		SAFE_RELEASE(_devcon);
-		SAFE_RELEASE(_dev);
-		_hwnd = 0;
+		SAFE_RELEASE(m_samplerState);
+		SAFE_RELEASE(m_shaderResourceView);
+		SAFE_RELEASE(m_cbPerObjectBuffer);
+		SAFE_RELEASE(m_depthStencilBuffer);
+		SAFE_RELEASE(m_depthStencilView);
+		SAFE_RELEASE(m_indexBuffer);
+		SAFE_RELEASE(m_vertexBuffer);
+		SAFE_RELEASE(m_inputLayout);
+		SAFE_RELEASE(m_noCulling);
+		SAFE_RELEASE(m_cwCulling);
+		SAFE_RELEASE(m_ccwCulling);
+		SAFE_RELEASE(m_pixelShader);
+		SAFE_RELEASE(m_pixelShaderBlob);
+		SAFE_RELEASE(m_vertexShader);
+		SAFE_RELEASE(m_vertexShaderBlob);
+		SAFE_RELEASE(m_renderTarget);
+		SAFE_RELEASE(m_swapchain);
+		SAFE_RELEASE(m_devcon);
+		SAFE_RELEASE(m_dev);
+		m_hwnd = 0;
 	}
 
 	//*****************************************************************
@@ -316,7 +316,7 @@ namespace Graphics
 	//*****************************************************************
 	bool DXRenderer::BeginScene()
 	{
-		_devcon->ClearRenderTargetView(_renderTarget, _backgroundColor);
+		m_devcon->ClearRenderTargetView(m_renderTarget, m_backgroundColor);
 		//_devcon->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1, 0);
 		return true;
 	}
@@ -326,7 +326,7 @@ namespace Graphics
 	//*****************************************************************
 	void DXRenderer::EndScene()
 	{
-		_swapchain->Present(0, 0);
+		m_swapchain->Present(0, 0);
 	}
 	
 	
@@ -345,18 +345,18 @@ namespace Graphics
 		};
 
 		D3D11_MAPPED_SUBRESOURCE ms;
-		_devcon->Map(_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		m_devcon->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		memcpy(ms.pData, vertices, sizeof(vertices));
-		_devcon->Unmap(_vertexBuffer, 0);
+		m_devcon->Unmap(m_vertexBuffer, 0);
 
 		uint32_t stride = sizeof(Vertex);
 		uint32_t offset = 0;
-		_devcon->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
-		_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_devcon->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		
-		_devcon->PSSetShaderResources(0, 1, &_shaderResourceView);
+		m_devcon->PSSetShaderResources(0, 1, &m_shaderResourceView);
 		
-		_devcon->Draw(3, 0);
+		m_devcon->Draw(3, 0);
 	}
 
 	
@@ -369,8 +369,7 @@ namespace Graphics
 	//*****************************************************************
 	Util::Vec2 DXRenderer::getScreenSize() const
 	{
-		
-		return Util::Vec2();
+		return Util::Vec2((float)m_screenW, (float)m_screenH);
 	}
 
 	//*****************************************************************
@@ -392,7 +391,7 @@ namespace Graphics
 	//*****************************************************************
 	Util::Color DXRenderer::getBackgroundColor() const
 	{
-		return Util::Color((const float*)_backgroundColor);
+		return Util::Color((const float*)m_backgroundColor);
 	}
 
 	//*****************************************************************
@@ -400,13 +399,13 @@ namespace Graphics
 	//*****************************************************************
 	void DXRenderer::setBackgroundColor(const Util::Color& color)
 	{
-		_backgroundColor = color.getRGBA();
-		_backgroundColor.a = 1.0f;
+		m_backgroundColor = color.getRGBA();
+		m_backgroundColor.a = 1.0f;
 	}
 
 	void DXRenderer::setBackgroundColor(float red, float green, float blue)
 	{
-		_backgroundColor = D3DXCOLOR(red, green, blue, 1.0f);
+		m_backgroundColor = D3DXCOLOR(red, green, blue, 1.0f);
 	}
 	
 	//*****************************************************************
@@ -415,7 +414,7 @@ namespace Graphics
 	bool DXRenderer::getFullscreenState() const 
 	{
 		BOOL fs = false;
-		_swapchain->GetFullscreenState(&fs, nullptr);
+		m_swapchain->GetFullscreenState(&fs, nullptr);
 		return fs == TRUE;
 	}
 
@@ -426,7 +425,7 @@ namespace Graphics
 	{
 		if(getFullscreenState() != state)
 		{
-			_swapchain->SetFullscreenState(state, nullptr);
+			m_swapchain->SetFullscreenState(state, nullptr);
 		}
 	}
 
@@ -435,24 +434,24 @@ namespace Graphics
 	//*****************************************************************
 	uint32_t DXRenderer::createVertexBuffer(uint32_t size)
 	{
-		for(auto it = _vertexBuffers.begin(); it != _vertexBuffers.end(); ++it)
+		for(auto it = m_vertexBuffers.begin(); it != m_vertexBuffers.end(); ++it)
 		{
 			if(*it == nullptr)
 			{
 				//make vertex buffer at this location, then return from the method
 				it->reset(new VertexBuffer());
-				(*it)->id = (it - _vertexBuffers.begin());
-				(*it)->buffer = _makeVertexBuffer(size);
-				(*it)->devcon = _devcon;
+				(*it)->id = (it - m_vertexBuffers.begin());
+				(*it)->buffer = makeVertexBuffer(size);
+				(*it)->devcon = m_devcon;
 				return (*it)->id;
 			}
 		}
 		//no slot found
-		_vertexBuffers.push_back(std::unique_ptr<VertexBuffer>(new VertexBuffer()));
-		_vertexBuffers.back()->id = _vertexBuffers.size()-1;
-		_vertexBuffers.back()->buffer = _makeVertexBuffer(size);
-		_vertexBuffers.back()->devcon = _devcon;
-		return _vertexBuffers.back()->id;
+		m_vertexBuffers.push_back(std::unique_ptr<VertexBuffer>(new VertexBuffer()));
+		m_vertexBuffers.back()->id = m_vertexBuffers.size()-1;
+		m_vertexBuffers.back()->buffer = makeVertexBuffer(size);
+		m_vertexBuffers.back()->devcon = m_devcon;
+		return m_vertexBuffers.back()->id;
 	}
 
 	//*****************************************************************
@@ -460,8 +459,8 @@ namespace Graphics
 	//*****************************************************************
 	IVertexBuffer& DXRenderer::getVertexBuffer(uint32_t id)
 	{
-		assert(id < _vertexBuffers.size() && _vertexBuffers[id] != nullptr);
-		return *_vertexBuffers[id];
+		assert(id < m_vertexBuffers.size() && m_vertexBuffers[id] != nullptr);
+		return *m_vertexBuffers[id];
 	}
 
 	//*****************************************************************
@@ -469,17 +468,17 @@ namespace Graphics
 	//*****************************************************************
 	void DXRenderer::destroyVertexBuffer(uint32_t id)
 	{
-		assert(id < _vertexBuffers.size());
-		if(_vertexBuffers[id] != nullptr)
+		assert(id < m_vertexBuffers.size());
+		if(m_vertexBuffers[id] != nullptr)
 		{
-			_vertexBuffers[id].reset(nullptr);
+			m_vertexBuffers[id].reset(nullptr);
 		}
 	}
 
 	//*****************************************************************
 	//					MAKE VERTEX BUFFER INTERNAL
 	//*****************************************************************
-	ID3D11Buffer* DXRenderer::_makeVertexBuffer(uint32_t size)
+	ID3D11Buffer* DXRenderer::makeVertexBuffer(uint32_t size)
 	{
 		assert(size > 0);
 
@@ -492,7 +491,7 @@ namespace Graphics
 		desc.Usage			= D3D11_USAGE_DYNAMIC;
 		
 		ID3D11Buffer* buffer = nullptr;
-		HRESULT hr = _dev->CreateBuffer(&desc, nullptr, &buffer);
+		HRESULT hr = m_dev->CreateBuffer(&desc, nullptr, &buffer);
 		assert(SUCCEEDED(hr));
 		return buffer;
 	}
@@ -502,24 +501,24 @@ namespace Graphics
 	//*****************************************************************
 	uint32_t DXRenderer::createIndexBuffer(uint32_t size)
 	{
-		for(auto it = _indexBuffers.begin(); it != _indexBuffers.end(); ++it)
+		for(auto it = m_indexBuffers.begin(); it != m_indexBuffers.end(); ++it)
 		{
 			if(*it == nullptr)
 			{
 				//make vertex buffer at this location, then return from the method
 				it->reset(new IndexBuffer());
-				(*it)->id = (it - _indexBuffers.begin());
-				(*it)->buffer = _makeIndexBuffer(size);
-				(*it)->devcon = _devcon;
+				(*it)->id = (it - m_indexBuffers.begin());
+				(*it)->buffer = makeIndexBuffer(size);
+				(*it)->devcon = m_devcon;
 				return (*it)->id;
 			}
 		}
 		//no slot found
-		_indexBuffers.push_back(std::unique_ptr<IndexBuffer>(new IndexBuffer()));
-		_indexBuffers.back()->id = _indexBuffers.size()-1;
-		_indexBuffers.back()->buffer = _makeIndexBuffer(size);
-		_indexBuffers.back()->devcon = _devcon;
-		return _indexBuffers.back()->id;
+		m_indexBuffers.push_back(std::unique_ptr<IndexBuffer>(new IndexBuffer()));
+		m_indexBuffers.back()->id = m_indexBuffers.size()-1;
+		m_indexBuffers.back()->buffer = makeIndexBuffer(size);
+		m_indexBuffers.back()->devcon = m_devcon;
+		return m_indexBuffers.back()->id;
 	}
 
 	//*****************************************************************
@@ -527,8 +526,8 @@ namespace Graphics
 	//*****************************************************************
 	IIndexBuffer& DXRenderer::getIndexBuffer(uint32_t id)
 	{
-		assert(id < _indexBuffers.size() && _indexBuffers[id] != nullptr);
-		return *_indexBuffers[id];
+		assert(id < m_indexBuffers.size() && m_indexBuffers[id] != nullptr);
+		return *m_indexBuffers[id];
 	}
 
 	//*****************************************************************
@@ -536,17 +535,17 @@ namespace Graphics
 	//*****************************************************************
 	void DXRenderer::destroyIndexBuffer(uint32_t id)
 	{
-		assert(id < _indexBuffers.size());
-		if(_indexBuffers[id] != nullptr)
+		assert(id < m_indexBuffers.size());
+		if(m_indexBuffers[id] != nullptr)
 		{
-			_indexBuffers[id].reset(nullptr);
+			m_indexBuffers[id].reset(nullptr);
 		}
 	}
 
 	//*****************************************************************
 	//					MAKE INDEX BUFFER INTERNAL
 	//*****************************************************************
-	ID3D11Buffer* DXRenderer::_makeIndexBuffer(uint32_t size)
+	ID3D11Buffer* DXRenderer::makeIndexBuffer(uint32_t size)
 	{
 		assert(size > 0);
 
@@ -559,40 +558,55 @@ namespace Graphics
 		desc.Usage			= D3D11_USAGE_DYNAMIC;
 		
 		ID3D11Buffer* buffer = nullptr;
-		HRESULT hr = _dev->CreateBuffer(&desc, nullptr, &buffer);
+		HRESULT hr = m_dev->CreateBuffer(&desc, nullptr, &buffer);
 		assert(SUCCEEDED(hr));
 		return buffer;
 	}
 
 	void DXRenderer::setIdentity()
 	{
-		_world = XMMatrixIdentity();
+		m_world = XMMatrixIdentity();
 	}
 
 	void DXRenderer::setTranslation(const Util::Vec3& translation)
 	{
-		_world *= XMMatrixTranslation(translation.x, translation.y, translation.z);
+		setTranslation(translation.x, translation.y, translation.z);
 	}
 
 	void DXRenderer::setScaling(const Util::Vec3& scale)
 	{
-		_world *= XMMatrixScaling(scale.x, scale.y, scale.z);
+		setScaling(scale.x, scale.y, scale.z);
 	}
 
 	void DXRenderer::setRotation(const Util::Vec3& rot)
 	{
-		_world *= XMMatrixRotationX(XMConvertToRadians(rot.x));
-		_world *= XMMatrixRotationY(XMConvertToRadians(rot.y));
-		_world *= XMMatrixRotationZ(XMConvertToRadians(rot.z));
+		setRotation(rot.x, rot.y, rot.z);
+	}
+
+	void DXRenderer::setTranslation(float32 translationX,float32 translationY, float32 translationZ)
+	{
+		m_world *= XMMatrixTranslation(translationZ, translationZ, translationZ);
+	}
+
+	void DXRenderer::setScaling(float32 scaleX, float32 scaleY, float32 scaleZ)
+	{
+		m_world *= XMMatrixScaling(scaleX, scaleY, scaleZ);
+	}
+
+	void DXRenderer::setRotation(float32 rotationX, float32 rotationY, float32 rotationZ)
+	{
+		m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(rotationZ));
 	}
 
 	void DXRenderer::applyTransform()
 	{
 		cbPerObject cb;
-		cb.WVP = XMMatrixTranspose(_world * _camView * _camProjection);
+		cb.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
 
-		_devcon->UpdateSubresource(_cbPerObjectBuffer, 0, nullptr, &cb, 0, 0);
-		_devcon->VSSetConstantBuffers(0, 1, &_cbPerObjectBuffer);
+		m_devcon->UpdateSubresource(m_cbPerObjectBuffer, 0, nullptr, &cb, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &m_cbPerObjectBuffer);
 	}
 
 

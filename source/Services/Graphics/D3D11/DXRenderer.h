@@ -49,6 +49,9 @@ namespace Graphics
 		void setTranslation(const Util::Vec3& translation);
 		void setScaling(const Util::Vec3& scale);
 		void setRotation(const Util::Vec3& rotation);
+		void setTranslation(float32 translationX,float32 translationY, float32 translationZ);
+		void setScaling(float32 scaleX, float32 scaleY, float32 scaleZ);
+		void setRotation(float32 rotationX, float32 rotationY, float32 rotationZ);
 		void applyTransform();
 		
 
@@ -59,52 +62,52 @@ namespace Graphics
 		bool reset();
 		void close();
 
-		ID3D11Buffer* _makeVertexBuffer(uint32_t size);
-		ID3D11Buffer* _makeIndexBuffer(uint32_t size);
+		ID3D11Buffer* makeVertexBuffer(uint32_t size);
+		ID3D11Buffer* makeIndexBuffer(uint32_t size);
 
 	private: //all private members that must not be accessible from the outside
 		//configuration
-		uint32_t _screenW;
-		uint32_t _screenH;
-		DXGI_SWAP_CHAIN_DESC _swapChainDesc;
+		uint32_t m_screenW;
+		uint32_t m_screenH;
+		DXGI_SWAP_CHAIN_DESC m_swapChainDesc;
 
 		//members
-		HWND _hwnd;
-		ID3D11Device* _dev;
-		ID3D11DeviceContext* _devcon;
-		IDXGISwapChain* _swapchain;
-		ID3D11RenderTargetView* _renderTarget;
-		ID3D10Blob* _vertexShaderBlob;
-		ID3D11VertexShader* _vertexShader;
-		ID3D10Blob* _pixelShaderBlob;
-		ID3D11PixelShader* _pixelShader;
-		ID3D11RasterizerState* _cwCulling;
-		ID3D11RasterizerState* _ccwCulling;
-		ID3D11RasterizerState* _noCulling;
+		HWND m_hwnd;
+		ID3D11Device* m_dev;
+		ID3D11DeviceContext* m_devcon;
+		IDXGISwapChain* m_swapchain;
+		ID3D11RenderTargetView* m_renderTarget;
+		ID3D10Blob* m_vertexShaderBlob;
+		ID3D11VertexShader* m_vertexShader;
+		ID3D10Blob* m_pixelShaderBlob;
+		ID3D11PixelShader* m_pixelShader;
+		ID3D11RasterizerState* m_cwCulling;
+		ID3D11RasterizerState* m_ccwCulling;
+		ID3D11RasterizerState* m_noCulling;
 		
-		ID3D11Buffer* _vertexBuffer;
-		ID3D11Buffer* _indexBuffer;
-		ID3D11DepthStencilView* _depthStencilView;
-		ID3D11Texture2D* _depthStencilBuffer;
-		ID3D11Buffer* _cbPerObjectBuffer;
-		ID3D11ShaderResourceView* _shaderResourceView;
-		ID3D11SamplerState* _samplerState;
-		ID3D11BlendState* _blendState;
+		ID3D11Buffer* m_vertexBuffer;
+		ID3D11Buffer* m_indexBuffer;
+		ID3D11DepthStencilView* m_depthStencilView;
+		ID3D11Texture2D* m_depthStencilBuffer;
+		ID3D11Buffer* m_cbPerObjectBuffer;
+		ID3D11ShaderResourceView* m_shaderResourceView;
+		ID3D11SamplerState* m_samplerState;
+		ID3D11BlendState* m_blendState;
 
 		
-		D3DXCOLOR _backgroundColor;
+		D3DXCOLOR m_backgroundColor;
 		
-		XMMATRIX _camView;
-		XMMATRIX _camProjection;
-		XMVECTOR _camPosition;
-		XMVECTOR _camLookAt;
-		XMVECTOR _camUp;
-		XMMATRIX _world;
+		XMMATRIX m_camView;
+		XMMATRIX m_camProjection;
+		XMVECTOR m_camPosition;
+		XMVECTOR m_camLookAt;
+		XMVECTOR m_camUp;
+		XMMATRIX m_world;
 
 
-		std::deque<std::unique_ptr<VertexBuffer>> _vertexBuffers;
-		std::deque<std::unique_ptr<IndexBuffer>> _indexBuffers;
-		ID3D11InputLayout* _inputLayout;
+		std::deque<std::unique_ptr<VertexBuffer>> m_vertexBuffers;
+		std::deque<std::unique_ptr<IndexBuffer>> m_indexBuffers;
+		ID3D11InputLayout* m_inputLayout;
 
 
 		/*

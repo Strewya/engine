@@ -12,13 +12,33 @@ namespace Pong
 {
 	bool createPaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		
-		return false;
+		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
+		auto& pos = paddle.insert(Core::Position2d::create());
+		auto& body = paddle.insert(Core::PhysicalBody::create());
+
+
+		b2BodyDef bodyDef;
+		bodyDef.type = b2_kinematicBody;
+		bodyDef.position.Set(0,0);
+		bodyDef.gravityScale = 0;
+		bodyDef.userData = &paddle;
+		body.data = context.physicsWorld.CreateBody(&bodyDef);
+
+		b2PolygonShape shape;
+		shape.SetAsBox(1, screenExtent.y*0.2f);
+
+		b2FixtureDef fixtDef;
+		fixtDef.shape = &shape;
+		fixtDef.density = 1;
+
+		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
+
+		return true;
 	}
 
 	bool createBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		auto screen = context.services.getGraphics().getScreenSize();
+		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
 		auto& pos = ball.insert(Core::Position2d::create());
 		auto& body = ball.insert(Core::PhysicalBody::create());
 
@@ -38,17 +58,17 @@ namespace Pong
 		fixtDef.shape = &shape;
 		fixtDef.density = 1;
 		fixtDef.restitution = 1;
+		fixtDef.friction = 0;
 
 
 		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
 
-		body.data->ApplyForceToCenter(b2Vec2(0,2000));
-		
 		return true;
 	}
 
 	bool createWall(Core::GameContext& context, Core::Entity& wall)
 	{
+		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
 		auto& pos = wall.insert(Core::Position2d::create());
 		auto& body = wall.insert(Core::PhysicalBody::create());
 
@@ -60,7 +80,7 @@ namespace Pong
 		body.data = context.physicsWorld.CreateBody(&bodyDef);
 
 		b2PolygonShape shape;
-		shape.SetAsBox(50, 10);
+		shape.SetAsBox(screenExtent.x, 1);
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
@@ -73,6 +93,26 @@ namespace Pong
 
 	bool createGoal(Core::GameContext& context, Core::Entity& goal)
 	{
-		return false;
+		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
+		auto& pos = goal.insert(Core::Position2d::create());
+		auto& body = goal.insert(Core::PhysicalBody::create());
+
+
+		b2BodyDef bodyDef;
+		bodyDef.type = b2_staticBody;
+		bodyDef.position.Set(0,0);
+		bodyDef.userData = &goal;
+		body.data = context.physicsWorld.CreateBody(&bodyDef);
+
+		b2PolygonShape shape;
+		shape.SetAsBox(1, screenExtent.y);
+
+		b2FixtureDef fixtDef;
+		fixtDef.shape = &shape;
+		fixtDef.density = 1;
+
+		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
+
+		return true;
 	}
 }

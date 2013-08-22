@@ -23,6 +23,7 @@ namespace Pong
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
 		: GameContext(Core::ContextType::GAMEPLAY, services, resources), m_debug(services.getGraphics())
 	{
+		b2ScalingFactor = 10;
 	}
 
 	void Gameplay::registerActions()
@@ -51,7 +52,7 @@ namespace Pong
 		flags += Graphics::b2DebugDraw::e_pairBit;
 		//flags += Graphics::b2DebugDraw::e_aabbBit;
 		m_debug.SetFlags(flags);
-		m_debug.setLengthScale(30);
+		m_debug.setLengthScale(b2ScalingFactor);
 
 		services.getGraphics().setBackgroundColor(0.5f,0.5f,0.5f);
 		auto c = services.getGraphics().getBackgroundColor();
@@ -103,38 +104,59 @@ namespace Pong
 
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
-	{	
+	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		
+		auto* body = paddle.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
 	}
 
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		
+		auto* body = paddle.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
 	}
 
 
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
-
+		auto* body = ball.getState<Core::PhysicalBody>();
+		body->data->ApplyLinearImpulse(b2Vec2(150,200), body->data->GetWorldCenter());
 	}
 
 	void Gameplay::setupTopWall(Core::Entity& wall)
 	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		
 		auto* body = wall.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(0, 20), 0);
+		body->data->SetTransform(b2Vec2(0, screenExtent.y-1), 0);
 	}
 
 	void Gameplay::setupBottomWall(Core::Entity& wall)
 	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		
 		auto* body = wall.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(0, -20), 0);
+		body->data->SetTransform(b2Vec2(0, 1-screenExtent.y), 0);
 	}
 
-	void Gameplay::setupLeftGoal(Core::Entity& wall)
+	void Gameplay::setupLeftGoal(Core::Entity& goal)
 	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+
+		auto* body = goal.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(-screenExtent.x, 0), 0);
 	}
 
-	void Gameplay::setupRightGoal(Core::Entity& wall)
+	void Gameplay::setupRightGoal(Core::Entity& goal)
 	{
+		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+
+		auto* body = goal.getState<Core::PhysicalBody>();
+		body->data->SetTransform(b2Vec2(screenExtent.x, 0), 0);
 	}
 }
 

@@ -43,6 +43,7 @@ namespace Core
 		ServiceLocator& services;
 		ResourceLocator& resources;
 		b2World physicsWorld;
+		float32 b2ScalingFactor;
 		Space activeEntities;
 
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources);

@@ -16,6 +16,7 @@ namespace Core
 		services(services), //for ease of access to services
 		resources(resources), //for ease of access to resources
 		physicsWorld(b2Vec2(0,0)), //not sure if this should be here or in the Physics Action/Behavior/System
+		b2ScalingFactor(1),
 		activeEntities(0) //the currently active entities in the context
 	{}
 

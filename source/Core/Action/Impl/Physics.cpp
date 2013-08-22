@@ -13,7 +13,14 @@ namespace Core
 {
 	bool APhysics::onUpdate(float dt)
 	{
-		m_context.physicsWorld.Step(dt, 6, 3);
+		//do anything required before the step
+
+		
+		int32_t velocityIterations = 8;
+		int32_t positionIterations = 3;
+		m_context.physicsWorld.Step(dt, velocityIterations, positionIterations);
+
+		//do any post step updates, like updating the velocity states an such
 
 		return true;
 	}
