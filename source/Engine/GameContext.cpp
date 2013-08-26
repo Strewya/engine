@@ -6,6 +6,8 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Core/Action/Action.h"
+#include "Engine/Engine.h"
+#include "Services/Input/InputEngine.h"
 	/*** end headers ***/
 
 namespace Core
@@ -25,22 +27,51 @@ namespace Core
 		destroy();
 	}
 
+	void GameContext::update()
+	{
+		//get the amount of time that passed
+		float delta = gUpdateInterval;
+		//while the time passed is an increment of the default time step
+		while(delta >= gUpdateInterval)
+		{
+			delta -= gUpdateInterval;
+		//	input
+			input();
+		//	logic
+			logic();
+		}
+		//after the logic has been updated, render
+		render();
+	}
+
 	void GameContext::destroy()
 	{}
 
-	bool GameContext::update()
+	void GameContext::input()
 	{
-		if(!timer.isPaused)
-		{
-			onUpdate(gUpdateInterval);
-
-			actionQueue.update();
-			
-			return true;
-		}
-		return false;
+		//here i could pass the delta time to collect input, store them locally, and only handle those that happened within the time frame i am updating
+		services.getInput().Update();
+		onInput();
 	}
 
-	void GameContext::onUpdate(float dt)
+	void GameContext::logic()
+	{
+		actionQueue.update();
+		onLogic(gUpdateInterval);
+	}
+
+	void GameContext::render()
+	{
+		if(renderAction != nullptr)
+		{
+			renderAction->update();
+		}
+	}
+	
+
+	void GameContext::onInput()
+	{}
+
+	void GameContext::onLogic(float dt)
 	{}
 }

@@ -20,7 +20,7 @@ namespace Core
 	public:
 		Action(InstanceID type, GameContext& context);
 
-		bool update();
+		void update();
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
@@ -28,7 +28,7 @@ namespace Core
 		const InstanceID uid;
 	protected:
 
-		virtual bool onUpdate(float dt) = 0;
+		virtual void onUpdate(float dt) = 0;
 
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t m_entities;

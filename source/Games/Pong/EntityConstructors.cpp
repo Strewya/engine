@@ -52,7 +52,7 @@ namespace Pong
 
 		b2CircleShape shape;
 		shape.m_p.Set(0,0);
-		shape.m_radius = 1;
+		shape.m_radius = 1.5;
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;

@@ -745,43 +745,44 @@ namespace Util
 		width = height = 0;
 		position.SetZero();
 	}
-}
 
-std::istream& operator>>(std::istream& ss, Util::Vec2& v)
-{
-	ss >> v.x;
-	ss >> v.y;
-	return ss;
-}
 
-std::ostream& operator<<(std::ostream& ss, Util::Vec2& v)
-{
-	ss << v.x << " " << v.y;
-	return ss;
-}
+	std::istream& operator>>(std::istream& ss, Util::Vec2& v)
+	{
+		ss >> v.x;
+		ss >> v.y;
+		return ss;
+	}
 
-std::istream& operator>>(std::istream& ss, Util::Vec3& v)
-{
-	ss >> v.x;
-	ss >> v.y;
-	ss >> v.z;
-	return ss;
-}
+	std::ostream& operator<<(std::ostream& ss, Util::Vec2& v)
+	{
+		ss << v.x << " " << v.y;
+		return ss;
+	}
 
-std::ostream& operator<<(std::ostream& ss, Util::Vec3& v)
-{
-	ss << v.x << " " << v.y << " " << v.z;
-	return ss;
-}
+	std::istream& operator>>(std::istream& ss, Util::Vec3& v)
+	{
+		ss >> v.x;
+		ss >> v.y;
+		ss >> v.z;
+		return ss;
+	}
 
-std::istream& operator>>(std::istream& ss, Util::Rect& r)
-{
-	ss >> r.position.x >> r.position.y >> r.width >> r.height;
-	return ss;
-}
+	std::ostream& operator<<(std::ostream& ss, Util::Vec3& v)
+	{
+		ss << v.x << " " << v.y << " " << v.z;
+		return ss;
+	}
 
-std::ostream& operator<<(std::ostream& ss, Util::Rect& r)
-{
-	ss << r.position.x << " " << r.position.y << " " << r.width << " " << r.height;
-	return ss;
+	std::istream& operator>>(std::istream& ss, Util::Rect& r)
+	{
+		ss >> r.position.x >> r.position.y >> r.width >> r.height;
+		return ss;
+	}
+
+	std::ostream& operator<<(std::ostream& ss, Util::Rect& r)
+	{
+		ss << r.position.x << " " << r.position.y << " " << r.width << " " << r.height;
+		return ss;
+	}
 }

@@ -14,7 +14,7 @@
 
 namespace Core
 {
-	bool ARender::onUpdate(float dt)
+	void ARender::onUpdate(float dt)
 	{
 		for(auto id : m_entities)
 		{
@@ -54,7 +54,6 @@ namespace Core
 
 		m_context.services.getGraphics().EndScene();
 
-		return true;
 	}
 
 

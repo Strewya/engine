@@ -5,23 +5,25 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
+#include <functional>
+#include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Box2D/Box2D.h"
 #include "Core/Action/Action.h"
 	/*** end header inclusion ***/
-	
+
+namespace Input { class Event; }
+
 namespace Core
 {
-	SYSTEM(APhysics)
+	SYSTEM(AInput)
 	{
 	public:
-		SYSTEM_CTOR(APhysics);
+		SYSTEM_CTOR(AInput);
 
 	protected:
 		void onUpdate(float dt);
-		void init();
-
-
-
+		
+	private:
+		
 	};
 }

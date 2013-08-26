@@ -174,13 +174,14 @@ namespace Util
 		Vec2 position;
 		float width, height;
 	};
+
+	
+	std::istream& operator>>(std::istream& ss, Util::Vec2& v);
+	std::ostream& operator<<(std::ostream& ss, Util::Vec2& v);
+
+	std::istream& operator>>(std::istream& ss, Util::Vec3& v);
+	std::ostream& operator<<(std::ostream& ss, Util::Vec3& v);
+
+	std::istream& operator>>(std::istream& ss, Util::Rect& r);
+	std::ostream& operator<<(std::ostream& ss, Util::Rect& r);
 }
-
-std::istream& operator>>(std::istream& ss, Util::Vec2& v);
-std::ostream& operator<<(std::ostream& ss, Util::Vec2& v);
-
-std::istream& operator>>(std::istream& ss, Util::Vec3& v);
-std::ostream& operator<<(std::ostream& ss, Util::Vec3& v);
-
-std::istream& operator>>(std::istream& ss, Util::Rect& r);
-std::ostream& operator<<(std::ostream& ss, Util::Rect& r);

@@ -11,7 +11,7 @@
 	
 namespace Core
 {
-	bool APhysics::onUpdate(float dt)
+	void APhysics::onUpdate(float dt)
 	{
 		//do anything required before the step
 
@@ -22,7 +22,6 @@ namespace Core
 
 		//do any post step updates, like updating the velocity states an such
 
-		return true;
 	}
 
 	void APhysics::init()

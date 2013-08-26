@@ -6,6 +6,7 @@
 ********************************************/
 	/*** common header ***/
 #include "Engine/Defines.h"
+#include <functional>
 #include <list>
 #include <vector>
 	/*** extra headers if needed ***/
@@ -29,13 +30,12 @@ namespace Input
 
 		bool isPressed(Keyboard::Keys key) const;
 		bool isPressed(Mouse::Keys button) const;
-		bool PollEvent(Event& out);
+		bool EatEvent(Event& out);
 
 	private:
 		std::vector<bool> _keys;
 		std::vector<bool> _mouseKeys;
 
 		std::list<Event> _eventQueue;
-
 	};
 }

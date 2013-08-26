@@ -43,16 +43,19 @@ namespace Core
 		ServiceLocator& services;
 		ResourceLocator& resources;
 		b2World physicsWorld;
-		float32 b2ScalingFactor;
+		float b2ScalingFactor;
 		Space activeEntities;
+
+		//this one should stand alone because it needs to be possible to step the logic more than once before rendering
+		ActionRptr renderAction;
 
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources);
 		virtual ~GameContext();
 
-		bool update();
+		void update();
 
 		virtual void destroy();
-		virtual void onUpdate(float dt);
+
 		/**
 		 * This function is called every time the context goes from being inactive to being the active context.
 		 * It should create all of the entities that it needs to work properly.
@@ -73,5 +76,12 @@ namespace Core
 		 * This function should be called only once to setup the order in which the actions will be updated.
 		 */
 		virtual void setupActionQueue() = 0;
+	protected:
+		void input();
+		void logic();
+		void render();
+
+		virtual void onInput();
+		virtual void onLogic(float dt);
 	};
 }

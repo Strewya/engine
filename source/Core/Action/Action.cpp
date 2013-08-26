@@ -17,13 +17,12 @@ namespace Core
 		context.timer.RegisterTimer(m_timer);
 	}
 
-	bool Action::update()
+	void Action::update()
 	{
 		while(!m_timer.isPaused && m_timer.hasUpdatePeriodElapsed())
 		{
-			return onUpdate(m_timer.getUpdatePeriod());
+			onUpdate(m_timer.getUpdatePeriod());
 		}
-		return false;
 	}
 
 	bool Action::registerEntity(InstanceID id)

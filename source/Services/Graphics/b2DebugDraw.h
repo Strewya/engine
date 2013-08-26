@@ -17,8 +17,8 @@ namespace Graphics
 	{
 	public:
 		b2DebugDraw(IRenderer& renderer);
-		void setLengthScale(float32 scale);
-		float32 getLengthScale() const;
+		void setLengthScale(float scale);
+		float getLengthScale() const;
 		
 		/// Draw a closed polygon provided in CCW order.
 		void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
@@ -41,6 +41,6 @@ namespace Graphics
 
 	private:
 		IRenderer& _renderer;
-		float32 _lengthScale;
+		float _lengthScale;
 	};
 }

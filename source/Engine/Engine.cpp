@@ -103,16 +103,10 @@ namespace Core
 		}
 
 		m_mainClock.AdvanceTime();
-
-		//update input
-		m_inputEngine.Update();
-
+		
 		//update logic and draw entities
-		//only one context can be active
-		if(m_activeContext->update())
-		{
-			m_inputEngine.PurgeEvents();
-		}
+		//only one context can be active at a time
+		m_activeContext->update();
 	}
 
 	void Engine::shutdown()

@@ -72,7 +72,7 @@ namespace Input
 		return false;
 	}
 
-	bool Engine::PollEvent(Event& out)
+	bool Engine::EatEvent(Event& out)
 	{
 		if(!_eventQueue.empty())
 		{

@@ -36,7 +36,8 @@ namespace Pong
 	void Gameplay::setupActionQueue()
 	{
 		actionQueue.addAction(actionIndex.getActionFromIndex(Core::APhysics::Type));
-		actionQueue.addAction(actionIndex.getActionFromIndex(Core::ARender::Type));
+		
+		renderAction = &actionIndex.getActionFromIndex(Core::ARender::Type);
 	}
 
 	static b2Body* dyno = nullptr;

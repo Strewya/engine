@@ -583,17 +583,17 @@ namespace Graphics
 		setRotation(rot.x, rot.y, rot.z);
 	}
 
-	void DXRenderer::setTranslation(float32 translationX,float32 translationY, float32 translationZ)
+	void DXRenderer::setTranslation(float translationX,float translationY, float translationZ)
 	{
 		m_world *= XMMatrixTranslation(translationZ, translationZ, translationZ);
 	}
 
-	void DXRenderer::setScaling(float32 scaleX, float32 scaleY, float32 scaleZ)
+	void DXRenderer::setScaling(float scaleX, float scaleY, float scaleZ)
 	{
 		m_world *= XMMatrixScaling(scaleX, scaleY, scaleZ);
 	}
 
-	void DXRenderer::setRotation(float32 rotationX, float32 rotationY, float32 rotationZ)
+	void DXRenderer::setRotation(float rotationX, float rotationY, float rotationZ)
 	{
 		m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
 		m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));

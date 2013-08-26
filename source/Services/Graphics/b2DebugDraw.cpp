@@ -16,12 +16,12 @@ namespace Graphics
 		: _renderer(renderer)
 	{}
 
-	void b2DebugDraw::setLengthScale(float32 scale)
+	void b2DebugDraw::setLengthScale(float scale)
 	{
 		_lengthScale = scale;
 	}
 
-	float32 b2DebugDraw::getLengthScale() const
+	float b2DebugDraw::getLengthScale() const
 	{
 		return _lengthScale;
 	}
@@ -82,7 +82,7 @@ namespace Graphics
 		circle.setEdgeThickness(2);
 		circle.setSolid(true);
 		circle.setScale(_lengthScale);
-		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, (uint32_t)radius * (uint32_t)_lengthScale);
+		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, 36);
 		circle.draw(_renderer);
 	}
 	

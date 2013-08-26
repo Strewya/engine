@@ -93,6 +93,7 @@
     <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\Input.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
@@ -110,6 +111,7 @@
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
     <ClCompile Include="..\..\source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -144,6 +146,7 @@
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\Input.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
@@ -187,7 +190,7 @@
     <ClInclude Include="..\..\source\Util\Color.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\ITimer.h" />
-    <ClInclude Include="..\..\source\Util\ITimerComposer.h" />
+    <ClInclude Include="..\..\source\Util\TimeInterfaces.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />
     <ClInclude Include="..\..\source\Util\Clock.h" />
     <ClInclude Include="..\..\source\Util\Timer.h" />

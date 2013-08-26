@@ -49,9 +49,9 @@ namespace Graphics
 		void setTranslation(const Util::Vec3& translation);
 		void setScaling(const Util::Vec3& scale);
 		void setRotation(const Util::Vec3& rotation);
-		void setTranslation(float32 translationX,float32 translationY, float32 translationZ);
-		void setScaling(float32 scaleX, float32 scaleY, float32 scaleZ);
-		void setRotation(float32 rotationX, float32 rotationY, float32 rotationZ);
+		void setTranslation(float translationX,float translationY, float translationZ);
+		void setScaling(float scaleX, float scaleY, float scaleZ);
+		void setRotation(float rotationX, float rotationY, float rotationZ);
 		void applyTransform();
 		
 

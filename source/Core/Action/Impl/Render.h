@@ -21,7 +21,7 @@ namespace Core
 		SYSTEM_CTOR(ARender);
 		
 	protected:
-		bool onUpdate(float dt);
+		void onUpdate(float dt);
 
 	private:
 		Graphics::RenderingQueue m_queue;

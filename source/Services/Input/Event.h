@@ -63,7 +63,7 @@ namespace Input
 	{
 	public:
 		EventType type;
-
+		//timestamp needed here
 		union
 		{
 			KeyEvent key;
@@ -74,4 +74,6 @@ namespace Input
 			ResizeEvent resize;
 		};
 	};
+
+	bool operator==(const Event& lhs, const Event& rhs);
 }

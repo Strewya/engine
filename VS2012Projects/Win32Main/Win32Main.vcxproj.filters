@@ -134,6 +134,12 @@
     <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\Event.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\Input.cpp">
+      <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -209,9 +215,6 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\AssetStorage.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Util\ITimerComposer.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\CompositeTimer.h">
@@ -301,6 +304,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h">
       <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\Input.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\TimeInterfaces.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
