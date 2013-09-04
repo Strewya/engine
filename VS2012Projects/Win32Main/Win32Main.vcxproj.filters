@@ -13,9 +13,6 @@
     <ClCompile Include="..\..\source\Util\Color.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Util\Clock.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp">
       <Filter>Core/State</Filter>
     </ClCompile>
@@ -33,12 +30,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Util\ITimer.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Util\Timer.cpp">
-      <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Engine\Defines.cpp">
       <Filter>Engine</Filter>
@@ -140,6 +131,12 @@
     <ClCompile Include="..\..\source\Core\Action\Impl\Input.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Util\Random.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Time.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -152,9 +149,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Color.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Util\Clock.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\State\Statemap.h">
@@ -177,12 +171,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
       <Filter>Core/Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Util\ITimer.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Util\Timer.h">
-      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\Defines.h">
       <Filter>Engine</Filter>
@@ -308,7 +296,10 @@
     <ClInclude Include="..\..\source\Core\Action\Impl\Input.h">
       <Filter>Core/Action/Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Util\TimeInterfaces.h">
+    <ClInclude Include="..\..\source\Util\Random.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Time.h">
       <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>

@@ -50,6 +50,12 @@ template <typename T> String ToString(T value)
 	return ss.str();
 }
 
+template<typename T> void clamp(T& value, const T& low, const T& high)
+{
+	if(value < low) value = low;
+	if(value > high) value = high;
+}
+
 /*		MY HEADERS	*/
 #include "Util/Logger.h"
 #include "Engine/FwdDecl.h"

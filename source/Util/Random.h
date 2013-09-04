@@ -4,26 +4,22 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include <stdint.h>
-#include <chrono>
+#include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include <random>
 	/*** end header inclusion ***/
-
+	
 namespace Util
 {
-	class IExternalTimeSource
+	class Random
 	{
 	public:
-		virtual int64_t getCurrentTime() = 0;
-	};
+		Random();
+		Random(uint32_t seed);
 
-	class HighPrecisionTimeSource : public IExternalTimeSource
-	{
-	public:
-		int64_t getCurrentTime()
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			
-		}
+		uint32_t rand(uint32_t lowerBound, uint32_t upperBound);
+		
+	private:
+		std::mt19937 m_randEngine;
 	};
 }

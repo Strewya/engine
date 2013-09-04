@@ -18,7 +18,7 @@ namespace Pong
 
 
 		b2BodyDef bodyDef;
-		bodyDef.type = b2_kinematicBody;
+		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0,0);
 		bodyDef.gravityScale = 0;
 		bodyDef.userData = &paddle;
@@ -29,7 +29,7 @@ namespace Pong
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
-		fixtDef.density = 1;
+		fixtDef.density = 1000;
 
 		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
 
@@ -56,7 +56,7 @@ namespace Pong
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
-		fixtDef.density = 1;
+		fixtDef.density = 0;
 		fixtDef.restitution = 1;
 		fixtDef.friction = 0;
 

@@ -125,7 +125,7 @@ namespace Pong
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
 		auto* body = ball.getState<Core::PhysicalBody>();
-		body->data->ApplyLinearImpulse(b2Vec2(150,200), body->data->GetWorldCenter());
+		body->data->ApplyLinearImpulse(b2Vec2(150,2), body->data->GetWorldCenter());
 	}
 
 	void Gameplay::setupTopWall(Core::Entity& wall)
