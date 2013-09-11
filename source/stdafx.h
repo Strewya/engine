@@ -27,11 +27,9 @@
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
 #include "Box2D/Box2D.h"
-#include "Util/Clock.h"
 #include "Util/Color.h"
 #include "Util/Dimensional.h"
 #include "Util/Logger.h"
-#include "Util/Timer.h"
-#include "Util/CompositeTimer.h"
+#include "Util/Time.h"
 
 #endif

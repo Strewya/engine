@@ -11,7 +11,7 @@
 	
 namespace Core
 {
-	void APhysics::onUpdate(float dt)
+	void Physics::onUpdate(float dt)
 	{
 		//do anything required before the step
 
@@ -24,9 +24,8 @@ namespace Core
 
 	}
 
-	void APhysics::init()
+	void Physics::init()
 	{
-		m_timer.setUpdatePeriod(1.0f/60);
 		m_context.physicsWorld.SetGravity(b2Vec2(0, -9));
 		m_context.physicsWorld.SetAllowSleeping(true);
 

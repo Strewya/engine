@@ -30,7 +30,7 @@ namespace Graphics
 			return false;
 		}
 		
-		String name;
+		std::string name;
 		script.GetField("name", -1);
 		script.Pop(name);
 		asset.reset(new Spritesheet(name));

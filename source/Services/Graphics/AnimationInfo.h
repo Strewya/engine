@@ -24,8 +24,8 @@ namespace Graphics
 		AnimationInfo();
 		~AnimationInfo();
 
-		void setName(const String& name);
-		const String& getName() const;
+		void setName(const std::string& name);
+		const std::string& getName() const;
 		/*
 		void setRepeatMode(RepeatMode mode);
 		RepeatMode getRepeatMode() const;
@@ -39,7 +39,7 @@ namespace Graphics
 		void ClearSequence();
 
 	private:
-		String _name;
+		std::string _name;
 		std::deque<int> _sequence;
 	};
 }

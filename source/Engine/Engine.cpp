@@ -12,7 +12,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::Window& window)
-		: m_window(window), m_rendererFactory(window), m_activeContext(nullptr)
+		: m_window(window), m_rendererFactory(window), m_activeContext(nullptr), m_gameClock(m_timeSource)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -32,7 +32,7 @@ namespace Core
 			* audio engine (fmod by default)
 		*/
 		m_window.setCursorShow(true);
-		String renderer = "dx";
+		std::string renderer = "dx";
 		/*
 			initialize the subsystems:
 			* display - done
@@ -42,7 +42,7 @@ namespace Core
 			* communications
 			* persistence
 		*/
-		if(!m_rendererFactory.InitInterface(renderer))
+		if(!m_rendererFactory.initInterface(renderer))
 		{
 			throw std::logic_error("Unable to initialize renderer");
 		}
@@ -58,10 +58,11 @@ namespace Core
 			* comms
 			* persistence
 		*/
-		m_services.Register(this);
-		m_services.Register(m_rendererFactory.getInterface());
-		m_services.Register(&m_scriptEngine);
-		m_services.Register(&m_inputEngine);
+		m_services.bind(*this);
+		m_services.bind(m_rendererFactory.getInterface());
+		m_services.bind(m_scriptEngine);
+		m_services.bind(m_inputEngine);
+		m_services.bind(m_gameClock);
 
 		/*
 			register the resource caches
@@ -90,7 +91,7 @@ namespace Core
 	{
 		m_gameContexts.clear();
 		m_spritesheets.clear();
-		m_rendererFactory.DestroyInterface();
+		m_rendererFactory.destroyInterface();
 	}
 
 	void Engine::loop()
@@ -102,7 +103,7 @@ namespace Core
 			return;
 		}
 
-		m_mainClock.AdvanceTime();
+		m_gameClock.stepGameTime();
 		
 		//update logic and draw entities
 		//only one context can be active at a time
@@ -145,7 +146,6 @@ namespace Core
 		{
 			it->second.swap(context);
 		}
-		m_mainClock.RegisterTimer(it->second->timer);
 		return *it->second;
 	}
 

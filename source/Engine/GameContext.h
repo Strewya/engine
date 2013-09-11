@@ -9,21 +9,18 @@
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Box2D/Box2D.h"
-#include "Engine/GameContextEvent.h"
-#include "Engine/ResourceLocator.h"
-#include "Engine/ServiceLocator.h"
 #include "Core/Action/ActionIndex.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
-#include "Services/Graphics/SpritesheetCache.h"
-#include "Services/Graphics/ITextureCache.h"
-#include "Util/CompositeTimer.h"
 	/*** end header inclusion ***/
 
 namespace Core
 {
+	class ServiceLocator;
+	class ResourceLocator;
+
 	enum ContextType
 	{
 		MENU,
@@ -34,14 +31,15 @@ namespace Core
 	{
 	public:
 		const ContextType Type;
-		Util::CompositeTimer timer;
+		ServiceLocator& services;
+		ResourceLocator& resources;
+		int32_t m_timerId;
+		bool m_timerExpired;
 		ActionIndex actionIndex;
 		ActionUpdater actionQueue;
 		EntityPool entityPool;
 		EntityFactory entityFactory;
 		SpacePool spacePool;
-		ServiceLocator& services;
-		ResourceLocator& resources;
 		b2World physicsWorld;
 		float b2ScalingFactor;
 		Space activeEntities;
@@ -77,11 +75,11 @@ namespace Core
 		 */
 		virtual void setupActionQueue() = 0;
 	protected:
-		void input();
-		void logic();
+		void input(uint32_t dt);
+		void logic(uint32_t dt);
 		void render();
 
-		virtual void onInput();
-		virtual void onLogic(float dt);
+		virtual void onInput(uint32_t dt);
+		virtual void onLogic(uint32_t dt);
 	};
 }

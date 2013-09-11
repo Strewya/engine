@@ -11,51 +11,62 @@
 namespace Core
 {
 	ServiceLocator::ServiceLocator()
-		: _engine(nullptr), _graphics(nullptr), _input(nullptr), _script(nullptr)
+		: m_engine(nullptr), m_graphics(nullptr), m_input(nullptr), m_script(nullptr), m_clock(nullptr)
 	{
 	}
 
-	void ServiceLocator::Register(Graphics::IRenderer* graphics)
+	void ServiceLocator::bind(Graphics::IRenderer& graphics)
 	{
-		_graphics = graphics;
+		m_graphics = &graphics;
 	}
 	
 	Graphics::IRenderer& ServiceLocator::getGraphics() const
 	{
-		assert(_graphics != nullptr);
-		return *_graphics;
+		assert(m_graphics != nullptr);
+		return *m_graphics;
 	}
 
-	void ServiceLocator::Register(Engine* engine)
+	void ServiceLocator::bind(Engine& engine)
 	{
-		_engine = engine;
+		m_engine = &engine;
 	}
 	
 	Engine& ServiceLocator::getEngine() const
 	{
-		assert(_engine != nullptr);
-		return *_engine;
+		assert(m_engine != nullptr);
+		return *m_engine;
 	}
 
-	void ServiceLocator::Register(Script::Engine* script)
+	void ServiceLocator::bind(Script::Engine& script)
 	{
-		_script = script;
+		m_script = &script;
 	}
 
 	Script::Engine& ServiceLocator::getScript() const
 	{
-		assert(_script != nullptr);
-		return *_script;
+		assert(m_script != nullptr);
+		return *m_script;
 	}
 
-	void ServiceLocator::Register(Input::Engine* input)
+	void ServiceLocator::bind(Input::Engine& input)
 	{
-		_input = input;
+		m_input = &input;
 	}
 
 	Input::Engine& ServiceLocator::getInput() const
 	{
-		assert(_input != nullptr);
-		return *_input;
+		assert(m_input != nullptr);
+		return *m_input;
+	}
+
+	void ServiceLocator::bind(Util::GameClock& clock)
+	{
+		m_clock = &clock;
+	}
+
+	Util::GameClock& ServiceLocator::getClock() const
+	{
+		assert(m_clock != nullptr);
+		return *m_clock;
 	}
 }

@@ -14,7 +14,7 @@
 
 namespace Core
 {
-	void ARender::onUpdate(float dt)
+	void Render::onUpdate(float dt)
 	{
 		for(auto id : m_entities)
 		{
@@ -36,24 +36,14 @@ namespace Core
 			}
 		}
 		//remove entities that are no longer valid from the list
-		/*
-		Graphics::Polygon p;
-		p.setAsCircle(Util::Vec2(0,0), 30, 30);
-		p.setAsQuad(10,10);
-		p.setSolid(true);
-		p.setColor(Util::Color(1,0,0));
-		p.setScale(10);
-		*/
+
 		m_context.services.getGraphics().BeginScene();
 		
 //		_queue.Render(context.services, context.resources);
 		
 		m_context.physicsWorld.DrawDebugData();
 
-//		p.draw(m_context.services.getGraphics());
-
 		m_context.services.getGraphics().EndScene();
-
 	}
 
 

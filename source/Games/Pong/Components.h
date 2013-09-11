@@ -18,5 +18,21 @@ namespace Pong
 		...
 
 	*/
+
+	enum class Intent
+	{
+		LeftMoveUp = 0,
+		LeftMoveDown,
+		RightMoveUp,
+		RightMoveDown,
+		ResetBoard,
+		INTENT_COUNT,
+		NotMapped,
+	};
+
+	COMPONENT(AvailableIntents)
+	{
+		uint32_t value[Intent::INTENT_COUNT];
+	};
 	
 }

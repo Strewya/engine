@@ -6,22 +6,38 @@
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
+#include "Engine/ServiceLocator.h"
+#include "Util/Time.h"
 	/*** end headers ***/
 
 
 namespace Core
 {
 	Action::Action(InstanceID type, GameContext& context)
-		: uid(type), m_context(context)
+		: uid(type), m_context(context), m_timerExpired(false), m_timerId(INVALID_ID)
 	{
-		context.timer.RegisterTimer(m_timer);
+		m_timerId = context.services.getClock().createAccumulator(context.services.getClock().getTimePerFrame(), [&](){m_timerExpired=true;});
+	}
+
+	Action::~Action()
+	{
+		m_context.services.getClock().deleteTimer(m_timerId);
 	}
 
 	void Action::update()
 	{
-		while(!m_timer.isPaused && m_timer.hasUpdatePeriodElapsed())
+		if(m_timerExpired)
 		{
-			onUpdate(m_timer.getUpdatePeriod());
+			auto& timer = m_context.services.getClock().getTimer(m_timerId);
+			if(timer.m_currentTime >= timer.m_targetTime)
+			{
+				timer.m_currentTime -= timer.m_targetTime;
+				onUpdate( static_cast<float>( timer.m_targetTime )/1000.0f );
+			}
+			if(timer.m_currentTime < timer.m_targetTime)
+			{
+				m_timerExpired = false;
+			}
 		}
 	}
 

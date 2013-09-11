@@ -15,13 +15,13 @@ namespace Util
 	{
 	public:
 		Logger();
-		Logger(const String& file);
+		Logger(const std::string& file);
 		Logger(const char* file);
 		~Logger();
 
 		static const char endl;
 
-		void Open(const String& file);
+		void Open(const std::string& file);
 		void Open(const char* file);
 		
 		template <class T>

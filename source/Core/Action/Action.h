@@ -8,7 +8,6 @@
 #include <memory>
 #include <unordered_set>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Util/Timer.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -18,22 +17,25 @@ namespace Core
 	class Action
 	{
 	public:
+		const InstanceID uid;
+
 		Action(InstanceID type, GameContext& context);
+		~Action();
 
 		void update();
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
 		
-		const InstanceID uid;
 	protected:
-
-		virtual void onUpdate(float dt) = 0;
-
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
-		EntityStorage_t m_entities;
-		Util::Timer m_timer;
+
 		GameContext& m_context;
+		bool m_timerExpired;
+		int32_t m_timerId;
+		EntityStorage_t m_entities;
+		
+		virtual void onUpdate(float dt) = 0;
 	};
 
 
@@ -59,5 +61,5 @@ namespace Core
 	template<typename T> const InstanceID ActionType<T>::Type = typeid(T).hash_code();
 }
 
-#define SYSTEM(Name) class Name : public ActionType<Name>
-#define SYSTEM_CTOR(Name) Name(GameContext& c) : ActionType(c) { init(); }
+#define SYSTEM(Name) class Name : public Core::ActionType<Name>
+#define SYSTEM_CTOR(Name) Name(Core::GameContext& c) : ActionType(c) { init(); }

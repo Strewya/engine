@@ -17,7 +17,7 @@ namespace Core
 		return _cache.find(name) != _cache.end();
 	}
 
-	bool Actionmap::Contains(const String& name)
+	bool Actionmap::Contains(const std::string& name)
 	{
 		return Contains(name.c_str());
 	}
@@ -38,7 +38,7 @@ namespace Core
 		return false;
 	}
 
-	bool Actionmap::Remove(const String& name)
+	bool Actionmap::Remove(const std::string& name)
 	{
 		return Remove(name.c_str());
 	}
@@ -54,7 +54,7 @@ namespace Core
 		return true;
 	}
 
-	bool Actionmap::Insert(const String& name, std::unique_ptr<Action> action)
+	bool Actionmap::Insert(const std::string& name, std::unique_ptr<Action> action)
 	{
 		return Insert(name.c_str(), std::move(action));
 	}
@@ -69,7 +69,7 @@ namespace Core
 		return it->second.get();
 	}
 
-	Action* Actionmap::Retrieve(const String& name)
+	Action* Actionmap::Retrieve(const std::string& name)
 	{
 		return Retrieve(name.c_str());
 	}

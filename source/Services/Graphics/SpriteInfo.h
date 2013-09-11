@@ -16,17 +16,17 @@ namespace Graphics
 	public:
 		SpriteInfo();
 		SpriteInfo(const char* name, const Util::Rect& srcRect);
-		SpriteInfo(const String& name, const Util::Rect& srcRect);
+		SpriteInfo(const std::string& name, const Util::Rect& srcRect);
 		
-		const String& getName() const;
+		const std::string& getName() const;
 		const Util::Rect& getSrcRect() const;
 
 		void setName(const char* name);
-		void setName(const String& name);
+		void setName(const std::string& name);
 		void setSrcRect(const Util::Rect& srcRect);
 	
 	private:
-		String _name;
+		std::string _name;
 		Util::Rect _srcRect;
 	};
 }

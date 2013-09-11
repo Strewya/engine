@@ -18,11 +18,11 @@ namespace Core
 	class EntityFactory
 	{
 	private:
-		std::unordered_map<String, std::function<bool(GameContext&, Entity&)>> _creators;
+		std::unordered_map<std::string, std::function<bool(GameContext&, Entity&)>> _creators;
 		GameContext& _ownerContext;
 	public:
 		EntityFactory(GameContext& owningContext);
-		bool createEntityType(const String& type, Entity& target) const;
-		bool registerConstructor(const String& typeName, const std::function<bool(GameContext&, Entity&)>& creator);
+		bool createEntityType(const std::string& type, Entity& target) const;
+		bool registerConstructor(const std::string& typeName, const std::function<bool(GameContext&, Entity&)>& creator);
 	};
 }

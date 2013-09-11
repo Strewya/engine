@@ -17,11 +17,11 @@ namespace Graphics
 		: _name(name), _srcRect(srcRect)
     {}
 
-	SpriteInfo::SpriteInfo(const String& name, const Util::Rect& srcRect)
+	SpriteInfo::SpriteInfo(const std::string& name, const Util::Rect& srcRect)
 		: _name(name), _srcRect(srcRect)
     {}
 
-	const String& SpriteInfo::getName() const
+	const std::string& SpriteInfo::getName() const
 	{
 		return _name;
 	}
@@ -36,7 +36,7 @@ namespace Graphics
 		_name = name;
 	}
 
-	void SpriteInfo::setName(const String& name)
+	void SpriteInfo::setName(const std::string& name)
 	{
 		_name = name;
 	}

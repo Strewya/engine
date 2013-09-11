@@ -8,12 +8,13 @@
 #include <memory>
 #include <vector>
 	/*** extra headers ***/
-#include "Engine/Engine.h"
 #include "Engine/GameContext.h"
+#include "Engine/ServiceLocator.h"
 #include "Core/Action/Impl/Physics.h"
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
+#include "Games/Pong/InputHandler.h"
 #include "Services/Graphics/IRenderer.h"
 #include "Util/Color.h"
 	/*** end headers ***/
@@ -28,20 +29,19 @@ namespace Pong
 
 	void Gameplay::registerActions()
 	{
-		actionIndex.addActionToIndex(Core::ARender::create(*this));
-		actionIndex.addActionToIndex(Core::APhysics::create(*this));
+		actionIndex.addActionToIndex(Core::Render::create(*this));
+		actionIndex.addActionToIndex(Core::Physics::create(*this));
+		actionIndex.addActionToIndex(Pong::InputHandler::create(*this));
 	}
 
 
 	void Gameplay::setupActionQueue()
 	{
-		actionQueue.addAction(actionIndex.getActionFromIndex(Core::APhysics::Type));
+		actionQueue.addAction(actionIndex.getActionFromIndex(Pong::InputHandler::Type));
+		actionQueue.addAction(actionIndex.getActionFromIndex(Core::Physics::Type));
 		
-		renderAction = &actionIndex.getActionFromIndex(Core::ARender::Type);
+		renderAction = &actionIndex.getActionFromIndex(Core::Render::Type);
 	}
-
-	static b2Body* dyno = nullptr;
-	static b2Body* floor = nullptr;
 
 	void Gameplay::activate()
 	{

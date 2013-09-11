@@ -13,6 +13,7 @@ namespace Core { class Engine; }
 namespace Graphics { class IRenderer; }
 namespace Input { class Engine; }
 namespace Script { class Engine; }
+namespace Util { class GameClock; }
 
 namespace Core
 {
@@ -21,22 +22,23 @@ namespace Core
 	public:
 		ServiceLocator();
 
-		void Register(Core::Engine* engine);
-		void Register(Graphics::IRenderer* graphics);
-		void Register(Input::Engine* input);
-		void Register(Script::Engine* script);
-
-
+		void bind(Core::Engine& engine);
+		void bind(Graphics::IRenderer& graphics);
+		void bind(Input::Engine& input);
+		void bind(Script::Engine& script);
+		void bind(Util::GameClock& clock);
 
 		Input::Engine& getInput() const;
 		Script::Engine& getScript() const;
 		Graphics::IRenderer& getGraphics() const;
 		Core::Engine& getEngine() const;
-	private:
-		Engine* _engine;
-		Graphics::IRenderer* _graphics;
-		Input::Engine* _input;
-		Script::Engine* _script;
+		Util::GameClock& getClock() const;
 
+	private:
+		Core::Engine* m_engine;
+		Graphics::IRenderer* m_graphics;
+		Input::Engine* m_input;
+		Script::Engine* m_script;
+		Util::GameClock* m_clock;
 	};
 }

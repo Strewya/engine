@@ -12,10 +12,10 @@
 	
 namespace Core
 {
-	SYSTEM(APhysics)
+	SYSTEM(Physics)
 	{
 	public:
-		SYSTEM_CTOR(APhysics);
+		SYSTEM_CTOR(Physics);
 
 	protected:
 		void onUpdate(float dt);

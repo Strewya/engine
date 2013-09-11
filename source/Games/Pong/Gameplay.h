@@ -9,7 +9,6 @@
 	/*** extra headers if needed ***/
 #include "Engine/GameContext.h"
 #include "Services/Graphics/b2DebugDraw.h"
-#include "Util/Timer.h"
 	/*** end header inclusion ***/
 
 namespace Pong

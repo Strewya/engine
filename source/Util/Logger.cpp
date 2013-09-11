@@ -16,7 +16,7 @@ namespace Util
 		Open("logger.log");
 	}
 
-	Logger::Logger(const String& file)
+	Logger::Logger(const std::string& file)
 	{
 		Open(file.c_str());
 	}
@@ -28,7 +28,7 @@ namespace Util
 
 	Logger::~Logger() { _output.flush(); }
 
-	void Logger::Open(const String& file)
+	void Logger::Open(const std::string& file)
 	{
 		Open(file.c_str());
 	}

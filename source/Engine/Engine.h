@@ -12,10 +12,10 @@
 #include "Engine/ResourceLocator.h"
 #include "Engine/ServiceLocator.h"
 #include "Services/Graphics/RendererFactory.h"
-#include "Services/Graphics/ITextureCache.h"
+#include "Services/Graphics/SpritesheetCache.h"
 #include "Services/Input/InputEngine.h"
 #include "Services/Script/LuaEngine.h"
-#include "Util/Clock.h"
+#include "Util/Time.h"
 	/*** end header inclusion ***/
 
 namespace Win32
@@ -51,10 +51,10 @@ namespace Core
 		GameContext& getContext(ContextType id);
 		bool setActiveContext(ContextType id);
 		bool setActiveContext(GameContext& context);
-		
+
 		ServiceLocator& getServices();
 		ResourceLocator& getResources();
-	
+		
 	private:
 		Win32::Window& m_window;
 		Graphics::RendererFactory m_rendererFactory;
@@ -64,14 +64,16 @@ namespace Core
 		//Network::CommEngine _commEngine;
 		ServiceLocator m_services;
 
-		ResourceLocator m_resources;
+		
 		Graphics::SpritesheetCache m_spritesheets;
+		ResourceLocator m_resources;
 
 		typedef std::unordered_map<ContextType, std::unique_ptr<GameContext>, std::hash<int>> ContextStorage_t;
 
 		ContextStorage_t m_gameContexts;
 		GameContext* m_activeContext; 
 		
-		Util::Clock m_mainClock;
+		Util::HighPrecisionTimeSource m_timeSource;
+		Util::GameClock m_gameClock;
 	};
 }

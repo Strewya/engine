@@ -41,7 +41,9 @@ namespace Core
 
 		static std::unique_ptr<Derived_t> create()
 		{
-			return std::unique_ptr<Derived_t>(new Derived_t());
+			std::unique_ptr<Derived_t> ptr(new Derived_t());
+			//memset(ptr.get(), 0, sizeof(Derived_t));
+			return ptr;
 		}
 
 		std::unique_ptr<State> clone() const 
@@ -104,4 +106,4 @@ namespace Core
 	}
 }
 
-#define COMPONENT(Name) struct Name : public StateType<Name>
+#define COMPONENT(Name) struct Name : public Core::StateType<Name>

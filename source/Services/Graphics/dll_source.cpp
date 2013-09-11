@@ -25,10 +25,9 @@ EXPORT int createRendererInterface(HWND hwnd, uint32_t screenW, uint32_t screenH
 
 EXPORT int destroyRendererInterface(Graphics::IRenderer* renderer)
 {
-	if(renderer == nullptr)
+	if(renderer != nullptr)
 	{
-		return 0;
+		delete renderer;
 	}
-	delete renderer;
 	return 1;
 }

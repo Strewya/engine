@@ -33,7 +33,7 @@ namespace Win32
 		  _queue(nullptr)
 	{}
 
-	Window::Window(const String& title)
+	Window::Window(const std::string& title)
 		: _hwnd(nullptr), _hwndParent(nullptr), _hMenu(nullptr), _hInstance(nullptr),
 		  _usePeekMessage(true), _useWaitMessage(false), _fullscreen(false), _showCursor(false),
 		  _exitCode(0), _style(0), _extendedStyle(0),
@@ -165,8 +165,8 @@ namespace Win32
 	}
 
 	void Window::setExtendedStyle(uint32_t style) { _extendedStyle = style; }
-	void Window::setClass(const String& name) { _class = name; }
-	void Window::setTitle(const String& name) { _title = name; }
+	void Window::setClass(const std::string& name) { _class = name; }
+	void Window::setTitle(const std::string& name) { _title = name; }
 	void Window::setClass(const char* name) { _class = name; }
 	void Window::setTitle(const char* name) { _title = name; }
 	void Window::setStyle(uint32_t style) { _style = style; }
@@ -183,8 +183,8 @@ namespace Win32
 	HWND			Window::getWindowHandle() const { return _hwnd; }
 	bool			Window::getFullscreen() const { return _fullscreen; }
 	uint32_t		Window::getExtendedStyle() const { return _extendedStyle; }
-	const String&	Window::getClass() const { return _class; }
-	const String&	Window::getTitle() const { return _title; }
+	const std::string&	Window::getClass() const { return _class; }
+	const std::string&	Window::getTitle() const { return _title; }
 	uint32_t		Window::getStyle() const { return _style; }
 	int				Window::getPositionX() const { return _xPos; }
 	int				Window::getPositionY() const { return _yPos; }

@@ -8,6 +8,7 @@
 #include "Engine/Defines.h"
 #include <functional>
 #include <list>
+#include <unordered_map>
 #include <vector>
 	/*** extra headers if needed ***/
 #include "Services/Input/Event.h"
@@ -18,24 +19,43 @@ namespace Win32 { class Window; }
 
 namespace Input
 {
+	enum class DeviceType
+	{
+		Keyboard,
+		Mouse,
+		DEVICE_TYPE_COUNT,
+	};
+
 	class Engine
 	{
 	public:
 		Engine();
 		
-		void Update();
-		void PurgeEvents();
+		void update();
+		void purgeEvents();
 
 		std::list<Event>& getEventQueue();
 
 		bool isPressed(Keyboard::Keys key) const;
 		bool isPressed(Mouse::Keys button) const;
-		bool EatEvent(Event& out);
+		bool eatEvent(Event& out);
 
 	private:
-		std::vector<bool> _keys;
-		std::vector<bool> _mouseKeys;
+		// todo:
+		// std::list/map<Device> m_devices;
+		std::vector<bool> m_keys;
+		std::vector<bool> m_mouseKeys;
 
-		std::list<Event> _eventQueue;
+		std::list<Event> m_eventQueue;
+
+
+		//the next set of data should be in a input translator or some such class/concept
+	public:
+		typedef std::function<bool(Event&)> InputTrigger;
+	
+		std::unordered_map<uint32_t, InputTrigger> m_triggers;
+		std::list<uint32_t> m_outboundIntents;
+	
+		void registerTrigger(uint32_t intentCode, DeviceType device, uint32_t key, bool isContinuous);
 	};
 }

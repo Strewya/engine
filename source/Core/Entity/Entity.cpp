@@ -20,7 +20,7 @@ namespace Core
 		return _actions.Contains(name);
 	}
 
-	bool Entity::hasAction(const String& name)
+	bool Entity::hasAction(const std::string& name)
 	{
 		return _actions.Contains(name);
 	}
@@ -37,12 +37,12 @@ namespace Core
 		return _id;
 	}
 
-	const String& Entity::getType() const
+	const std::string& Entity::getType() const
 	{
 		return _type;
 	}
 
-	const String& Entity::getAlias() const
+	const std::string& Entity::getAlias() const
 	{
 		return _alias;
 	}
@@ -52,7 +52,7 @@ namespace Core
 		return _actions.Retrieve(name);
 	}
 
-	Action* Entity::getAction(const String& name)
+	Action* Entity::getAction(const std::string& name)
 	{
 		return _actions.Retrieve(name);
 	}
@@ -74,7 +74,7 @@ namespace Core
 		return _actions.Remove(name);
 	}
 
-	bool Entity::removeAction(const String& name)
+	bool Entity::removeAction(const std::string& name)
 	{
 		return _actions.Remove(name);
 	}
@@ -97,7 +97,7 @@ namespace Core
 		return *this;
 	}
 
-	Entity& Entity::setAlias(const String& alias)
+	Entity& Entity::setAlias(const std::string& alias)
 	{
 		_alias = alias;
 		return *this;
@@ -109,7 +109,7 @@ namespace Core
 		return *this;
 	}
 
-	Entity& Entity::setType(const String& type)
+	Entity& Entity::setType(const std::string& type)
 	{
 		_type = type;
 		return *this;
@@ -122,7 +122,7 @@ namespace Core
 		return _actions.Insert(name, std::move(action));
 	}
 
-	bool Entity::insert(const String& name, std::unique_ptr<Action> action)
+	bool Entity::insert(const std::string& name, std::unique_ptr<Action> action)
 	{
 		return _actions.Insert(name, std::move(action));
 	}

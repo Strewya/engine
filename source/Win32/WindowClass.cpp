@@ -18,14 +18,14 @@ namespace Win32
 		FillDefaultData();
 	}
 
-	WindowClass::WindowClass(const String& className)
+	WindowClass::WindowClass(const std::string& className)
 	{
 		this->hInstance		= ::GetModuleHandle(nullptr);
 		this->lpszClassName = TEXT(className.c_str());
 		FillDefaultData();
 	}
 
-	WindowClass::WindowClass(HINSTANCE hInst, const String& className)
+	WindowClass::WindowClass(HINSTANCE hInst, const std::string& className)
 	{
 		this->hInstance		= hInst;
 		this->lpszClassName = TEXT(className.c_str());

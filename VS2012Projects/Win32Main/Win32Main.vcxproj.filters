@@ -55,9 +55,6 @@
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Util\CompositeTimer.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
@@ -128,14 +125,14 @@
     <ClCompile Include="..\..\source\Services\Input\Event.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\Input.cpp">
-      <Filter>Core/Action/Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Util\Random.cpp">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Time.cpp">
       <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\InputHandler.cpp">
+      <Filter>GameSpecific\Pong</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +178,6 @@
     <ClInclude Include="..\..\source\Engine\GameContext.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine\GameContextEvent.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -203,9 +197,6 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\AssetStorage.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Util\CompositeTimer.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">
@@ -293,14 +284,14 @@
     <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h">
       <Filter>Core/Action/Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\Input.h">
-      <Filter>Core/Action/Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Util\Random.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Time.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\InputHandler.h">
+      <Filter>GameSpecific\Pong</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

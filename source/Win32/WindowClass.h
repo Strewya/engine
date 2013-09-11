@@ -19,8 +19,8 @@ namespace Win32
 	public:
 		WindowClass(const char* className);
 		WindowClass(HINSTANCE hInst, const char* className);
-		WindowClass(const String& className);
-		WindowClass(HINSTANCE hInst, const String& className);
+		WindowClass(const std::string& className);
+		WindowClass(HINSTANCE hInst, const std::string& className);
 
 		ATOM Register();
 		const char* getClassName() const;

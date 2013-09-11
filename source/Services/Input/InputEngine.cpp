@@ -10,76 +10,163 @@
 namespace Input
 {
 	Engine::Engine()
-		: _keys(Keyboard::_KeyCount, false), _mouseKeys(Mouse::_KeyCount, false)
+		: m_keys(Keyboard::_KeyCount, false), m_mouseKeys(Mouse::_KeyCount, false)
 	{
 	}
 
-	void Engine::Update()
+	void Engine::update()
 	{
-		for(auto& event : _eventQueue)
+		for(auto& event : m_eventQueue)
 		{
 			switch(event.type)
 			{
 			case EventType::KeyPressed:
-				_keys[event.key.code] = true;
-				_keys[Keyboard::_Alt] = event.key.alt;
-				_keys[Keyboard::_Control] = event.key.control;
-				_keys[Keyboard::_Shift] = event.key.shift;
+				m_keys[event.key.code] = true;
+				m_keys[Keyboard::_Alt] = event.key.alt;
+				m_keys[Keyboard::_Control] = event.key.control;
+				m_keys[Keyboard::_Shift] = event.key.shift;
 			break;
 
 			case EventType::KeyReleased:
-				_keys[event.key.code] = false;
-				_keys[Keyboard::_Alt] = event.key.alt;
-				_keys[Keyboard::_Control] = event.key.control;
-				_keys[Keyboard::_Shift] = event.key.shift;
+				m_keys[event.key.code] = false;
+				m_keys[Keyboard::_Alt] = event.key.alt;
+				m_keys[Keyboard::_Control] = event.key.control;
+				m_keys[Keyboard::_Shift] = event.key.shift;
 			break;
 
 			case EventType::MouseButtonPressed:
-				_mouseKeys[event.mouseButton.button] = true;
+				m_mouseKeys[event.mouseButton.button] = true;
 			break;
 
 			case EventType::MouseButtonReleased:
-				_mouseKeys[event.mouseButton.button] = false;
+				m_mouseKeys[event.mouseButton.button] = false;
 			break;
 
 			default:
 			break;
 			}
+
+			for(auto trigger : m_triggers)
+			{
+				if(trigger.second(event))
+				{
+					m_outboundIntents.push_back(trigger.first);
+				}
+			}
 		}
 	}
 
-	void Engine::PurgeEvents()
+	void Engine::purgeEvents()
 	{
-		_eventQueue.clear();
+		m_eventQueue.clear();
 	}
 
 	std::list<Event>& Engine::getEventQueue()
 	{
-		return _eventQueue;
+		return m_eventQueue;
 	}
 
 	bool Engine::isPressed(Keyboard::Keys key) const
 	{
 		if(key>=0 && key<Keyboard::_KeyCount)
-			return _keys[key];
+			return m_keys[key];
 		return false;
 	}
 
 	bool Engine::isPressed(Mouse::Keys button) const
 	{
 		if(button>=0 && button<Mouse::_KeyCount)
-			return _mouseKeys[button];
+			return m_mouseKeys[button];
 		return false;
 	}
 
-	bool Engine::EatEvent(Event& out)
+	bool Engine::eatEvent(Event& out)
 	{
-		if(!_eventQueue.empty())
+		if(!m_eventQueue.empty())
 		{
-			out = _eventQueue.front();
-			_eventQueue.pop_front();
+			out = m_eventQueue.front();
+			m_eventQueue.pop_front();
 			return true;
 		}
 		return false;
+	}
+
+
+
+
+	Engine::InputTrigger spawnTriggerKeyboardDown(uint32_t key, bool shift, bool ctrl, bool alt)
+	{
+		return [=](Event& e)
+		{
+			if(e.type == EventType::KeyPressed &&
+				e.key.code == key &&
+				e.key.alt == alt &&
+				e.key.shift == shift &&
+				e.key.control == ctrl)
+			{
+				return true;
+			}
+			return false;
+		};
+	}
+
+	Engine::InputTrigger spawnTriggerKeyboardUp(uint32_t key)
+	{
+		return [=](Event& e)
+		{
+			if(e.type == EventType::KeyPressed &&
+				e.key.code == key)
+			{
+				return true;
+			}
+			return false;
+		};
+	}
+
+	Engine::InputTrigger spawnTriggerMouseDown(uint32_t key)
+	{
+		return [=](Event& e)
+		{
+			if(e.type == EventType::MouseButtonPressed &&
+				e.mouseButton.button == key)
+			{
+				return true;
+			}
+			return false;
+		};
+	}
+
+	Engine::InputTrigger spawnTriggerMouseUp(uint32_t key)
+	{
+		return [=](Event& e)
+		{
+			if(e.type == EventType::MouseButtonReleased &&
+				e.mouseButton.button == key)
+			{
+				return true;
+			}
+			return false;
+		};
+	}
+
+	void Engine::registerTrigger(uint32_t intentCode, DeviceType device, uint32_t key, bool isContinuous)
+	{
+		switch(device)
+		{
+		case DeviceType::Keyboard:
+			m_triggers.insert(std::make_pair(intentCode, spawnTriggerKeyboardDown(key, false, false, false)));
+			if(isContinuous)
+				m_triggers.insert(std::make_pair(intentCode, spawnTriggerKeyboardUp(key)));
+			break;
+
+		case DeviceType::Mouse:
+			m_triggers.insert(std::make_pair(intentCode, spawnTriggerMouseDown(key)));
+			if(isContinuous)
+				m_triggers.insert(std::make_pair(intentCode, spawnTriggerMouseUp(key)));
+			break;
+
+		default:
+			break;
+		}
 	}
 }

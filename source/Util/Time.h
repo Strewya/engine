@@ -22,6 +22,7 @@ namespace Util
 	{
 	public:
 		virtual uint64_t getMiliseconds() = 0;
+		virtual uint64_t getMicroseconds() = 0;
 	};
 
 
@@ -36,6 +37,7 @@ namespace Util
 	{
 	public:
 		uint64_t getMiliseconds();
+		uint64_t getMicroseconds();
 	};
 
 	
@@ -47,23 +49,32 @@ namespace Util
 
 	enum class TimerType
 	{
-		Countdown,
+		Countdown = 0,
 		Stopwatch,
+		Accumulator,
+		TIMER_TYPE_COUNT
 	};
 
 	
 
-	struct TimingData
+	struct TimerData
 	{
 		typedef std::function<void(void)> Callback;
 
-		TimingData() : m_type(TimerType::Stopwatch), m_initialTime(0), m_currentTime(0) {}
+		TimerData();
 		TimerType m_type;
-		uint32_t m_initialTime;
+		uint32_t m_targetTime;
 		uint32_t m_currentTime;
 		bool m_repeating;
 		bool m_done;
-		Callback m_onOccurence;
+		bool m_paused;
+		Callback m_onOccurrence;
+		Callback m_onReset;
+
+		//helper functions
+		void reset();
+		void pause();
+		void resume();
 	};
 
 
@@ -75,32 +86,30 @@ namespace Util
 	class GameClock
 	{
 	public:
-		static void setFramerate(uint32_t framerate);
-		static uint32_t getFramerate();
-		static uint32_t getTimePerFrame();
-		
-
-
 		GameClock(IExternalTimeSource& timeSource);
 		void stepGameTime();
-		uint32_t getCurrentDelta() const;
-		uint32_t getCurrentFrame() const;
 		uint64_t getCurrentGameTime() const;
-
-		uint32_t createCountdownTimer(uint32_t startingTime, TimingData::Callback onOccurence, bool repeats = false);
+		void setFramerate(uint32_t framerate);
+		uint32_t getFramerate() const;
+		uint32_t getTimePerFrame() const;
 		
 
-	private:
-		static uint32_t m_Framerate;
-		static uint32_t m_TimePerFrame;
+		uint32_t createCountdownTimer(uint32_t startingTime, TimerData::Callback onOccurrence);
+		uint32_t createStopwatch();
+		uint32_t createAccumulator(uint32_t timeToFire, TimerData::Callback onOccurrence);
 
+		bool isTimerAlive(uint32_t timerId) const;
+		void deleteTimer(uint32_t timerId);
+		TimerData& getTimer(uint32_t timerId);
+
+	private:
 		IExternalTimeSource& m_timeSource;
-		const uint64_t m_created;
-		uint64_t m_currentTime;
-		uint64_t m_lastUpdate;
-		uint32_t m_frameAccumulator;
-		uint32_t m_currentFrame;
-		std::deque<std::unique_ptr<TimingData>> m_timers;
+		const uint64_t m_createdRealTime;
+		uint32_t m_framerate;
+		uint32_t m_timePerFrame;
+		uint64_t m_currentGameTime;
+		uint64_t m_lastUpdateRealTime;
+		std::deque<std::unique_ptr<TimerData>> m_timers;
 
 		uint32_t createTimingData();
 		void updateTimers(uint32_t delta);

@@ -21,8 +21,8 @@ namespace Core
 	{
 	private:
 		InstanceID _id;
-		String _type;
-		String _alias;
+		std::string _type;
+		std::string _alias;
 
 		Entity* _prototype;
 		
@@ -44,16 +44,16 @@ namespace Core
 		//////////// EXISTANCE CHECKS ////////////
 
 		bool hasAction(const char* name);
-		bool hasAction(const String& name);
+		bool hasAction(const std::string& name);
 		bool hasState(InstanceID id);
 		
 		//////////// GETTERS ////////////
 
 		InstanceID		getID() const;
-		const String&	getType() const;
-		const String&	getAlias() const;
+		const std::string&	getType() const;
+		const std::string&	getAlias() const;
 		Action*			getAction(const char* name);
-		Action*			getAction(const String& name);
+		Action*			getAction(const std::string& name);
 		StateRptr		getState(InstanceID id);
 		template<typename T> T* getState();
 
@@ -61,21 +61,21 @@ namespace Core
 
 		void clearActions();
 		bool removeAction(const char* name);
-		bool removeAction(const String& name);
+		bool removeAction(const std::string& name);
 		void clearStates();
 		bool removeState(InstanceID id);
 
 		//////////// SETTERS ////////////
 
 		Entity& setAlias(const char* alias);
-		Entity& setAlias(const String& alias);
+		Entity& setAlias(const std::string& alias);
 		Entity& setType(const char* type);
-		Entity& setType(const String& type);
+		Entity& setType(const std::string& type);
 		
 		//////////// INSERT METHODS ////////////
 
 		bool insert(const char* name, std::unique_ptr<Action> action);
-		bool insert(const String& name, std::unique_ptr<Action> action);
+		bool insert(const std::string& name, std::unique_ptr<Action> action);
 		template<typename T> typename T::Ref insert(std::unique_ptr<T> state);
 		
 

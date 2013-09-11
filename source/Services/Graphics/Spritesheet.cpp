@@ -20,7 +20,7 @@ namespace Graphics
 	{
 	}
 
-	Spritesheet::Spritesheet(const String& name)
+	Spritesheet::Spritesheet(const std::string& name)
 		: _sheetName(name), _textureHandle(NOT_FOUND)
 	{
 	}
@@ -50,7 +50,7 @@ namespace Graphics
 		return NOT_FOUND;
 	}
 
-	int Spritesheet::getSpriteHandle(const String& name) const
+	int Spritesheet::getSpriteHandle(const std::string& name) const
 	{
 		return getSpriteHandle(name.c_str());
 	}
@@ -67,7 +67,7 @@ namespace Graphics
 		return NOT_FOUND;
 	}
 
-	int Spritesheet::getAnimationHandle(const String& name) const
+	int Spritesheet::getAnimationHandle(const std::string& name) const
 	{
 		return getAnimationHandle(name.c_str());
 	}
@@ -128,12 +128,12 @@ namespace Graphics
 		return _textureHandle;
 	}
 
-	const String& Spritesheet::getTextureName() const
+	const std::string& Spritesheet::getTextureName() const
 	{
 		return _textureName;
 	}
 
-	const String& Spritesheet::getSpritesheetName() const
+	const std::string& Spritesheet::getSpritesheetName() const
 	{
 		return _sheetName;
 	}
@@ -143,7 +143,7 @@ namespace Graphics
 		_textureName = name;
 	}
 
-	void Spritesheet::setTextureName(const String& name)
+	void Spritesheet::setTextureName(const std::string& name)
 	{
 		_textureName = name;
 	}
@@ -158,7 +158,7 @@ namespace Graphics
 		_sheetName = name;
 	}
 
-	void Spritesheet::setSpritesheetName(const String& name)
+	void Spritesheet::setSpritesheetName(const std::string& name)
 	{
 		_sheetName = name;
 	}

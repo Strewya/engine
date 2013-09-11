@@ -112,7 +112,7 @@ namespace Graphics
 	{
 		//********************************** VERTEX SHADER
 		HRESULT hr = 0;
-		String shaderPath = "D:/engine/source/Services/Graphics/Shaders/shader.hlsl";
+		std::string shaderPath = "D:/engine/source/Services/Graphics/Shaders/shader.hlsl";
 		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_vertexShaderBlob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
 
@@ -890,7 +890,7 @@ namespace Graphics
 
 		if(FAILED(result))
 		{
-			//std::exception((String("Failed to create font '") + name + "'!").c_str())
+			//std::exception((std::string("Failed to create font '") + name + "'!").c_str())
 			std::exception e;
 			throw e;
 		}
@@ -1218,7 +1218,7 @@ namespace Graphics
 
 
 	/*
-	bool DXRenderer::Create(const String& name, const uint32_t size, const uint32_t weight, const bool italic, FontStore::TypePtr& out)
+	bool DXRenderer::Create(const std::string& name, const uint32_t size, const uint32_t weight, const bool italic, FontStore::TypePtr& out)
 	{
 		shared_ptr<DXFont> font(new DXFont(name));
 		HRESULT result = D3DXCreateFont(_d3ddev, size, 0, weight, 1, italic, DEFAULT_CHARSET,
@@ -1233,7 +1233,7 @@ namespace Graphics
 		return true;
 	}
 
-	bool DXRenderer::Create(const String& filename, TextureStore::TypePtr& out)
+	bool DXRenderer::Create(const std::string& filename, TextureStore::TypePtr& out)
 	{
 		shared_ptr<DXTexture> texture(new DXTexture(filename));
 		
@@ -1299,7 +1299,7 @@ namespace Graphics
 		return true;
 	}
 
-	void DXRenderer::LoadGraphics(const String& resourceFile)
+	void DXRenderer::LoadGraphics(const std::string& resourceFile)
 	{
 		if(resourceFile.empty())
 			return;
@@ -1312,24 +1312,24 @@ namespace Graphics
 			ticpp::Iterator< ticpp::Element > resource;
 			for( resource = resource.begin( doc.FirstChildElement() ); resource != resource.end(); ++resource )
 			{
-				String resourceType;
+				std::string resourceType;
 				resource->GetValue(&resourceType);
 				if(resourceType == "File")
 				{
-					String path;
+					std::string path;
 					resource->GetText(&path);
 					LoadGraphics(path);
 				}
 				else if(resourceType == "TextureResource")
 				{
-					String filename, alias;
+					std::string filename, alias;
 					resource->GetText(&filename);
 					resource->GetAttributeOrDefault("alias", &alias, filename);
 					LoadTexture(filename, alias);
 				}
 				else if(resourceType == "FontResource")
 				{
-					String alias, font;
+					std::string alias, font;
 					bool italic;
 					uint32_t size, weight;
 					

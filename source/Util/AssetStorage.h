@@ -19,7 +19,7 @@ namespace Util
 
 		InstanceID id;
 		Data dataPtr;
-		String filename;
+		std::string filename;
 	};
 
 	template<typename T, typename DEF = void> class AssetStore

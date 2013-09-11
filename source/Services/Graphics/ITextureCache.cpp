@@ -26,7 +26,7 @@ namespace Graphics
 		_gfx = &services.getGraphics();
 	}
 
-	uint32_t TextureCache::getTextureHandle(const String& name)
+	uint32_t TextureCache::getTextureHandle(const std::string& name)
 	{
 		return getTextureHandle(name.c_str());
 	}
@@ -58,7 +58,7 @@ namespace Graphics
 		return _textures[handle];
 	}
 
-	Texture& TextureCache::getTexture(const String& name)
+	Texture& TextureCache::getTexture(const std::string& name)
 	{
 		return getTexture(name.c_str());
 	}

@@ -38,7 +38,7 @@ namespace Core
 		typedef std::deque<std::unique_ptr<Space>> PoolData;
 		PoolData _pool;
 		std::list<uint32_t> _availableSlots;
-		std::unordered_map<String, InstanceID> _names;
+		std::unordered_map<std::string, InstanceID> _names;
 		uint32_t _maxExpectedSize;
 		uint32_t _indexBits;
 		uint32_t _indexMask;

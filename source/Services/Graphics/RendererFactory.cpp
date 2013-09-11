@@ -13,69 +13,103 @@
 namespace Graphics
 {
 	RendererFactory::RendererFactory(Win32::Window& window)
-		: _window(window), _dll(nullptr), _renderer(nullptr)
+		: m_window(window), m_dll(nullptr), m_renderer(nullptr)
 	{}
 
 	RendererFactory::~RendererFactory()
 	{
-		DestroyInterface();
-		FreeLibrary(_dll);
+		destroyInterface();
+		FreeLibrary(m_dll);
 	}
 
-	IRenderer* RendererFactory::getInterface()
+	IRenderer& RendererFactory::getInterface()
 	{
-		return _renderer;
+		assert(m_renderer != nullptr);
+		return *m_renderer;
 	}
 
-	bool RendererFactory::InitInterface(const char* name)
+	bool RendererFactory::initInterface(const char* name)
 	{
-		if(strcmp(name, "dx") == 0)
+		return loadDll(name) && createInterface();
+	}
+
+	void RendererFactory::destroyInterface()
+	{
+		m_renderer.reset(nullptr);
+	}
+
+	bool RendererFactory::loadDll(const char* dllShortName)
+	{
+		std::string dllName;
+		if(strcmp(dllShortName, "dx") == 0)
 		{
-			_dll = LoadLibraryA("DX_Renderer.dll");
-			if(!_dll)
+			dllName.assign("DX_Renderer.dll");
+		}/*
+		else if(strcmp(dllShortName, "ogl") == 0)
+		{
+			dllName.assign("OGL_Renderer.dll");
+		}*/
+
+
+		bool loaded = false;
+		if(!dllName.empty())
+		{
+			m_dll = LoadLibraryA(dllName.c_str());
+			if(m_dll != nullptr)
 			{
-				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
-				MessageBox(_window.getWindowHandle(), "Error loading up DX_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
-				return false;
+				loaded = true;
 			}
 		}
-		else if(strcmp(name, "ogl") == 0)
+
+		if(!loaded)
 		{
-			_dll = LoadLibraryA("OGL_Renderer.dll");
-			if(!_dll)
+			std::string errMsg("Error loading DLL ");
+			errMsg += dllName;
+			MessageBox(m_window.getWindowHandle(), errMsg.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
+			errMsg += ", errCode: ";
+			errMsg += toString(GetLastError());
+			Util::GetDefaultLogger() << errMsg << Util::Logger::endl;
+		}
+		return loaded;
+	}
+
+	bool RendererFactory::createInterface()
+	{
+		CREATE_RENDERER createFunction = (CREATE_RENDERER)GetProcAddress(m_dll, "createRendererInterface");
+		DESTROY_RENDERER destroyFunction = (DESTROY_RENDERER)GetProcAddress(m_dll, "destroyRendererInterface");
+
+		bool success = false;
+		if(createFunction != nullptr && destroyFunction != nullptr)
+		{
+			IRenderer* render = nullptr;
+			if(createFunction(m_window.getWindowHandle(), m_window.getSizeX(), m_window.getSizeY(), &render))
 			{
-				Util::GetDefaultLogger() << "Error loading DLL, errCode: " << GetLastError() << Util::Logger::endl;
-				MessageBox(_window.getWindowHandle(), "Error loading up OGL_Renderer.dll", "Fatal Error", MB_OK | MB_ICONERROR);
-				return false;
+				m_renderer.reset(render);
+				m_renderer.get_deleter() = [=] (IRenderer* r) { destroyFunction(r); };
+				success = true;
+			}
+			else
+			{
+				std::string errMsg("Error creating IRenderer");
+				MessageBox(m_window.getWindowHandle(), errMsg.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
+				errMsg += ", errCode: ";
+				errMsg += toString(GetLastError());
+				Util::GetDefaultLogger() << errMsg << Util::Logger::endl;
 			}
 		}
 		else
 		{
-			return false;
+			std::string errMsg("Error retrieving function addresses from DLL");
+			MessageBox(m_window.getWindowHandle(), errMsg.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
+			errMsg += ", errCode: ";
+			errMsg += toString(GetLastError());
+			errMsg += ", create|destroy = ";
+			createFunction ? errMsg += "true" : errMsg += "false";
+			errMsg += "|";
+			destroyFunction ? errMsg += "true" : errMsg += "false";
+			Util::GetDefaultLogger() << errMsg << Util::Logger::endl;
 		}
 
-		CREATE_RENDERER create = nullptr;
-		create = (CREATE_RENDERER)GetProcAddress(_dll, "createRendererInterface");
-		if(!create || !create(_window.getWindowHandle(), _window.getSizeX(), _window.getSizeY(), &_renderer))
-		{
-			Util::GetDefaultLogger() << "Error with creating IRenderer, errCode: " << GetLastError() << Util::Logger::endl;
-			FreeLibrary(_dll);
-			MessageBox(_window.getWindowHandle(), "Error creating the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
-			return false;
-		}
-		return true;
-	}
-
-	void RendererFactory::DestroyInterface()
-	{
-		DESTROY_RENDERER destroy = nullptr;
-
-		destroy = (DESTROY_RENDERER)GetProcAddress(_dll, "destroyRendererInterface");
-		if(!destroy(_renderer))
-		{
-			FreeLibrary(_dll);
-			MessageBox(_window.getWindowHandle(), "Error destroying the rendering interface", "Fatal Error", MB_OK | MB_ICONERROR);
-		}
-		_renderer = nullptr;
+		return success;
 	}
 }

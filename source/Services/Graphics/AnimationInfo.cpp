@@ -18,12 +18,12 @@ namespace Graphics
 	{
 	}
 
-	void AnimationInfo::setName(const String& name)
+	void AnimationInfo::setName(const std::string& name)
 	{
 		_name = name;
 	}
 
-	const String& AnimationInfo::getName() const
+	const std::string& AnimationInfo::getName() const
 	{
 		return _name;
 	}

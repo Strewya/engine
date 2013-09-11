@@ -28,25 +28,25 @@ double Rad2Deg(double rad)
 	return rad * RAD2DEG_RATIO_D;
 }
 
-String trim(const String& str, const char* t)
+std::string trim(const std::string& str, const char* t)
 {
-	String s = str;
+	std::string s = str;
 	s.erase(0, s.find_first_not_of(t));
 	s.erase(s.find_last_not_of(t)+1);
 	return s;
 }
 
-String lowercase(const String& s)
+std::string lowercase(const std::string& s)
 {
-	String ret;
+	std::string ret;
 	ret.resize(s.length());
 	std::transform(s.begin(), s.end(), ret.begin(), tolower);
 	return ret;
 }
 
-String uppercase(const String& s)
+std::string uppercase(const std::string& s)
 {
-	String ret;
+	std::string ret;
 	ret.resize(s.length());
 	std::transform(s.begin(), s.end(), ret.begin(), toupper);
 	return ret;

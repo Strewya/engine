@@ -22,7 +22,7 @@ namespace Win32
 
 		Window();
 		Window(const char* title);
-		Window(const String& title);
+		Window(const std::string& title);
 		virtual ~Window();
 
 		LRESULT CALLBACK WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
@@ -34,9 +34,9 @@ namespace Win32
 
 		void setFullscreen(bool fs);
 		void setExtendedStyle(uint32_t style);
-		void setClass(const String& name);
+		void setClass(const std::string& name);
 		void setClass(const char* name);
-		void setTitle(const String& name);
+		void setTitle(const std::string& name);
 		void setTitle(const char* name);
 		void setStyle(uint32_t style);
 		void setPosition(int x, int y);
@@ -52,8 +52,8 @@ namespace Win32
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
 		uint32_t getExtendedStyle() const;
-		const String& getClass() const;
-		const String& getTitle() const;
+		const std::string& getClass() const;
+		const std::string& getTitle() const;
 		uint32_t getStyle() const;
 		int getPositionX() const;
 		int getPositionY() const;
@@ -87,8 +87,8 @@ namespace Win32
 		int32_t _xSize;
 		int32_t _ySize;
 
-		String _class;
-		String _title;
+		std::string _class;
+		std::string _title;
 
 		std::list<Input::Event>* _queue;
 	};

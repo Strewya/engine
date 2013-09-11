@@ -40,7 +40,7 @@ namespace Script
 	}
 
 	//************************************DO FILE*************************************//
-	bool Engine::DoFile(const String& filename)
+	bool Engine::DoFile(const std::string& filename)
 	{
 		return DoFile(filename.c_str());
 	}
@@ -56,7 +56,7 @@ namespace Script
 		return true;
 	}
 	//************************************DO STRING*************************************//
-	bool Engine::DoString(const String& script)
+	bool Engine::DoString(const std::string& script)
 	{
 		return DoString(script.c_str());
 	}
@@ -84,7 +84,7 @@ namespace Script
 		return true;
 	}
 
-	bool Engine::Push(const String& in)
+	bool Engine::Push(const std::string& in)
 	{
 		lua_pushstring(_lua, in.c_str());
 		return true;
@@ -214,7 +214,7 @@ namespace Script
 		return false;
 	}
 
-	bool Engine::Pop(String& out, int index)
+	bool Engine::Pop(std::string& out, int index)
 	{
 		if(lua_gettop(_lua) != 0 && lua_isstring(_lua, index))
 		{
@@ -333,7 +333,7 @@ namespace Script
 	//************************************GET FIELD*************************************//
 	bool Engine::GetField(const char* name, int tableIndex)
 	{
-		String value = name;
+		std::string value = name;
 		uint32_t pos = value.find('.');
 		if(pos == value.npos)
 		{
@@ -438,7 +438,7 @@ end;
 	int number, num2, num3, x, y;
 	bool bul;
 	double pi;
-	String str, name="Josko";
+	std::string str, name="Josko";
 
 	assert(script.DoFile("config.lua"));
 	

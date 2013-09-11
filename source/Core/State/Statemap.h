@@ -17,7 +17,7 @@ namespace Core
 	/*
 		Statemap class
 		Description:
-			Used to map States to a String identifier, as states themselves currently dont have names.
+			Used to map States to a std::string identifier, as states themselves currently dont have names.
 	*/
 	class Statemap
 	{

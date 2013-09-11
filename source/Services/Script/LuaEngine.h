@@ -29,10 +29,10 @@ namespace Script
 		Engine();
 		~Engine();
 
-		bool DoFile(const String& filename);
+		bool DoFile(const std::string& filename);
 		bool DoFile(const char* filename);
 
-		bool DoString(const String& script);
+		bool DoString(const std::string& script);
 		bool DoString(const char* script);
 
 		bool GetField(const char* name, int tableIndex = LUA_GLOBALSINDEX);
@@ -40,7 +40,7 @@ namespace Script
 		
 		bool Push(const int& in);
 		bool Push(const uint32_t& in);
-		bool Push(const String& in);
+		bool Push(const std::string& in);
 		bool Push(const char* in);
 		bool Push(const bool& in);
 		bool Push(const double& in);
@@ -53,7 +53,7 @@ namespace Script
 		bool Pop(int& out, int index = -1);
 		bool Pop(uint32_t& out, int index = -1);
 		bool Pop(bool& out, int index = -1);
-		bool Pop(String& out, int index = -1);
+		bool Pop(std::string& out, int index = -1);
 		bool Pop(double& out, int index = -1);
 		bool Pop(float& out, int index = -1);
 		bool Pop(Util::Rect& in, int index = -1);
@@ -76,7 +76,7 @@ namespace Script
 		}
 
 		template<class T>
-		bool GetValue(const String& name, T& out)
+		bool GetValue(const std::string& name, T& out)
 		{
 			return GetValue(name.c_str(), out);
 		}

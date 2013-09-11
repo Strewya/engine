@@ -15,10 +15,10 @@ namespace Core
 {
 	class GameContext;
 
-	SYSTEM(ARender)
+	SYSTEM(Render)
 	{
 	public:
-		SYSTEM_CTOR(ARender);
+		SYSTEM_CTOR(Render);
 		
 	protected:
 		void onUpdate(float dt);

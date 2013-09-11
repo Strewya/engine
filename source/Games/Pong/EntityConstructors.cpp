@@ -4,6 +4,7 @@
 #include "Games/Pong/EntityConstructors.h"
 	/*** extra headers ***/
 #include "Engine/GameContext.h"
+#include "Engine/ServiceLocator.h"
 #include "Games/Pong/Components.h"
 #include "Services/Graphics/IRenderer.h"
 	/*** end headers ***/
