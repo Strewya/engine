@@ -90,7 +90,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp" />
@@ -140,7 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Action\Action.h" />
-    <ClInclude Include="..\..\source\Core\Action\ActionIndex.h" />
+    <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />

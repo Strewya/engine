@@ -16,6 +16,7 @@ namespace Core
 	{
 	public:
 		SYSTEM_CTOR(Physics);
+		bool validateEntity(InstanceID id);
 
 	protected:
 		void onUpdate(float dt);

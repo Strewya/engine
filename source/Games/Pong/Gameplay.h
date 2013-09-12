@@ -18,10 +18,27 @@ namespace Pong
 	public:
 		Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources);
 
-		void activate();
-		void deactivate();
+	protected:
 		void registerActions();
 		void setupActionQueue();
+		void registerCallbacks();
+		void createEntities();
+
+		//activation sequence
+		void onActivate();
+
+		//update sequence, optional as most of this is done by actions
+		//void input(uint32_t dt);
+		//void logic(uint32_t dt);
+
+		//deactivate sequence
+		void onDeactivate();
+
+		//destroy sequence
+		void destroyEntities();
+
+	private:
+		Graphics::b2DebugDraw m_debug;
 
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);
@@ -30,8 +47,5 @@ namespace Pong
 		void setupBottomWall(Core::Entity& wall);
 		void setupLeftGoal(Core::Entity& wall);
 		void setupRightGoal(Core::Entity& wall);
-
-	private:
-		Graphics::b2DebugDraw m_debug;
 	};
 }

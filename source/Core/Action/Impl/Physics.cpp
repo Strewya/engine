@@ -42,5 +42,15 @@ namespace Core
 
 	}
 
-
+	bool Physics::validateEntity(InstanceID id)
+	{
+		bool isValid = false;
+		if(m_context.entityPool.isAlive(id))
+		{
+			Entity& entity = m_context.entityPool.getInstanceRef(id);
+			isValid = entity.hasState(PhysicalBody::Type) && 
+				entity.hasState(Position2d::Type);
+		}
+		return isValid;
+	}
 }

@@ -50,4 +50,7 @@ namespace Core
 	{
 		return m_entities.erase(id) > 0;
 	}
+
+	void Action::registerCallbacks()
+	{}
 }

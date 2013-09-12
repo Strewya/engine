@@ -11,15 +11,20 @@
 
 namespace Core
 {
-	class ActionIndex
+	class ActionRegistry
 	{
 	public:
-		ActionRef addActionToIndex(ActionUptr action);
-		ActionRef getActionFromIndex(InstanceID actionId);
+		typedef std::unordered_map<InstanceID , ActionUptr> ActionStorage_t;
+
+		ActionRef addAction(ActionUptr action);
+		ActionRef getAction(InstanceID actionId);
+
+		ActionStorage_t::iterator begin();
+		ActionStorage_t::iterator end();
 
 	protected:
 	private:
-		typedef std::unordered_map<InstanceID , ActionUptr> ActionStorage_t;
-		ActionStorage_t _actions;
+		
+		ActionStorage_t m_actions;
 	};
 }

@@ -48,6 +48,7 @@ namespace Core
 		
 		GameContext& registerContext(GameContext* context);
 		GameContext& registerContext(std::unique_ptr<GameContext> context);
+		template<typename T> GameContext& registerContext();
 		GameContext& getContext(ContextType id);
 		bool setActiveContext(ContextType id);
 		bool setActiveContext(GameContext& context);
@@ -76,4 +77,11 @@ namespace Core
 		Util::HighPrecisionTimeSource m_timeSource;
 		Util::GameClock m_gameClock;
 	};
+
+
+
+	template<typename T> GameContext& Engine::registerContext()
+	{
+		return registerContext(std::unique_ptr<GameContext>(new T(m_services, m_resources)));
+	}
 }

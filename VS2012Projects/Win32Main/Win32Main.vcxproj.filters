@@ -61,9 +61,6 @@
     <ClCompile Include="..\..\source\Win32\Window.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\ActionIndex.cpp">
-      <Filter>Core/Action</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\stdafx.cpp" />
     <ClCompile Include="..\..\source\Core\State\State.cpp">
       <Filter>Core/State</Filter>
@@ -133,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\InputHandler.cpp">
       <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
+      <Filter>Core/Action</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +204,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Win32\Window.h">
       <Filter>Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\ActionIndex.h">
-      <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Win32\myWindows.h">
@@ -292,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\InputHandler.h">
       <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
+      <Filter>Core/Action</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

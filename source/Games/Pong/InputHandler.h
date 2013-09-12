@@ -21,6 +21,7 @@ namespace Pong
 	{
 	public:
 		SYSTEM_CTOR(InputHandler);
+		bool validateEntity(InstanceID id);
 
 	protected:
 		void onUpdate(float dt);

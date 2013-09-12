@@ -14,6 +14,7 @@
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
+#include "Games/Pong/EntityConstructors.h"
 #include "Games/Pong/InputHandler.h"
 #include "Services/Graphics/IRenderer.h"
 #include "Util/Color.h"
@@ -25,26 +26,6 @@ namespace Pong
 		: GameContext(Core::ContextType::GAMEPLAY, services, resources), m_debug(services.getGraphics())
 	{
 		b2ScalingFactor = 10;
-	}
-
-	void Gameplay::registerActions()
-	{
-		actionIndex.addActionToIndex(Core::Render::create(*this));
-		actionIndex.addActionToIndex(Core::Physics::create(*this));
-		actionIndex.addActionToIndex(Pong::InputHandler::create(*this));
-	}
-
-
-	void Gameplay::setupActionQueue()
-	{
-		actionQueue.addAction(actionIndex.getActionFromIndex(Pong::InputHandler::Type));
-		actionQueue.addAction(actionIndex.getActionFromIndex(Core::Physics::Type));
-		
-		renderAction = &actionIndex.getActionFromIndex(Core::Render::Type);
-	}
-
-	void Gameplay::activate()
-	{
 		physicsWorld.SetDebugDraw(&m_debug);
 		uint32_t flags = 0;
 		flags += Graphics::b2DebugDraw::e_shapeBit;
@@ -54,11 +35,33 @@ namespace Pong
 		//flags += Graphics::b2DebugDraw::e_aabbBit;
 		m_debug.SetFlags(flags);
 		m_debug.setLengthScale(b2ScalingFactor);
+	}
 
-		services.getGraphics().setBackgroundColor(0.5f,0.5f,0.5f);
-		auto c = services.getGraphics().getBackgroundColor();
-		assert(c.getRed() == 0.5f && c.getGreen() == 0.5f && c.getBlue() == 0.5f);
+	void Gameplay::registerActions()
+	{
+		actionRegistry.addAction(Core::Render::create(*this));
+		actionRegistry.addAction(Core::Physics::create(*this));
+		actionRegistry.addAction(Pong::InputHandler::create(*this));
+	}
+
+	void Gameplay::setupActionQueue()
+	{
+		actionQueue.addAction(actionRegistry.getAction(Pong::InputHandler::Type));
+		actionQueue.addAction(actionRegistry.getAction(Core::Physics::Type));
 		
+		renderAction = &actionRegistry.getAction(Core::Render::Type);
+	}
+
+	void Gameplay::registerCallbacks()
+	{
+		entityFactory.registerConstructor("paddle", createPaddle);
+		entityFactory.registerConstructor("ball", createBall);
+		entityFactory.registerConstructor("wall", createWall);
+		entityFactory.registerConstructor("goal", createGoal);
+	}
+
+	void Gameplay::createEntities()
+	{
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = entityPool.getNewInstanceRef();
@@ -91,17 +94,26 @@ namespace Pong
 		entityFactory.createEntityType("ball", ball);
 		activeEntities.addEntity(ball.getID());
 		setupBall(ball);
-
 	}
 
+	void Gameplay::onActivate()
+	{
+		
+	}
 
-	void Gameplay::deactivate()
+	void Gameplay::onDeactivate()
+	{
+		
+	}
+
+	void Gameplay::destroyEntities()
 	{
 		for(auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
 		{
 			entityPool.destroy(*it);
 		}
 	}
+
 
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)

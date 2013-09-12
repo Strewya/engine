@@ -4,7 +4,6 @@
 #include "Games/GameInit.h"
 	/*** extra headers ***/
 #include "Engine/Engine.h"
-#include "Games/Pong/EntityConstructors.h"
 #include "Games/Pong/Gameplay.h"
 	/*** end headers ***/
 
@@ -15,22 +14,13 @@ namespace Game
 	{
 		/*
 			This function should only do things that should be done once per execution of the program,
-			such as registering objects, callbacks, functions etc.
+			and it should only create the necessary contexts, and have them do the rest of the initialization.
 		*/
 
 		//get the context
-		Core::GameContext& context = engine.registerContext(new Gameplay(engine.getServices(), engine.getResources()));
+		Core::GameContext& gameplay = engine.registerContext<Gameplay>();
 		
-		//initialize basic context data
-		context.registerActions();
-		context.setupActionQueue();
-		
-		context.entityFactory.registerConstructor("paddle", createPaddle);
-		context.entityFactory.registerConstructor("ball", createBall);
-		context.entityFactory.registerConstructor("wall", createWall);
-		context.entityFactory.registerConstructor("goal", createGoal);
-
 		//set the context as active
-		engine.setActiveContext(context);
+		engine.setActiveContext(gameplay);
 	}
 }

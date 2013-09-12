@@ -15,35 +15,21 @@ namespace Pong
 {
 	void InputHandler::onUpdate(float dt)
 	{
+		//i should poll only a dt worth of input events here
 		m_context.services.getInput().update();
 
-		//i should poll only a dt worth of input events here
-		Input::Event event;
-		while(m_context.services.getInput().eatEvent(event))
-		{
-			Intent i = attemptMapping(event);
-			if(i >= Intent::INTENT_COUNT)
-			{
-				continue;
-			}
 
-			for(auto eid : m_entities)
-			{
-				if(m_context.entityPool.isAlive(eid) == true)
-				{
-					auto& entity = m_context.entityPool.getInstanceRef(eid);
-					if(entity.hasState(AvailableIntents::Type) == true)
-					{
-						auto* availInt = entity.getState<AvailableIntents>();
-						uint32_t actionId = availInt->value[(uint32_t)i];
-						if(actionId > 0)
-						{
-							m_context.actionIndex.getActionFromIndex(actionId).registerEntity(eid);
-						}
-					}
-				}
-			}
+	}
+
+	bool InputHandler::validateEntity(InstanceID id)
+	{
+		bool isValid = false;
+		if(m_context.entityPool.isAlive(id))
+		{
+			Core::Entity& entity = m_context.entityPool.getInstanceRef(id);
+			isValid = entity.hasState(AvailableIntents::Type);
 		}
+		return isValid;
 	}
 
 	void InputHandler::init()

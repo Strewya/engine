@@ -34,6 +34,8 @@ namespace Pong
 
 		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
 
+
+
 		return true;
 	}
 

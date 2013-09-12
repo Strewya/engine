@@ -89,6 +89,10 @@ namespace Core
 
 	Engine::~Engine()
 	{
+		for(auto it = m_gameContexts.begin(); it != m_gameContexts.end(); ++it)
+		{
+			it->second->destroy();
+		}
 		m_gameContexts.clear();
 		m_spritesheets.clear();
 		m_rendererFactory.destroyInterface();
@@ -146,6 +150,7 @@ namespace Core
 		{
 			it->second.swap(context);
 		}
+		it->second->init();
 		return *it->second;
 	}
 

@@ -28,7 +28,25 @@ namespace Core
 
 	GameContext::~GameContext()
 	{
-		destroy();
+	}
+
+	// event methods
+	void GameContext::init()
+	{
+		registerActions();
+		setupActionQueue();
+		for(auto it = actionRegistry.begin(); it != actionRegistry.end(); ++it)
+		{
+			it->second->registerCallbacks();
+		}
+		registerCallbacks();
+		createEntities();
+	}
+
+	void GameContext::activate()
+	{
+		services.getClock().getTimer(m_timerId).resume();
+		onActivate();
 	}
 
 	void GameContext::update()
@@ -39,42 +57,40 @@ namespace Core
 			while(timer.m_currentTime >= timer.m_targetTime)
 			{
 				timer.m_currentTime -= timer.m_targetTime;
+
 				input(timer.m_targetTime);
+				//logic
+				actionQueue.update();
 				logic(timer.m_targetTime);
 			}
-			render();
+			//render
+			if(renderAction != nullptr)
+			{
+				renderAction->update();
+			}
 		}
+	}
+
+	void GameContext::deactivate()
+	{
+		services.getClock().getTimer(m_timerId).pause();
+		onDeactivate();
 	}
 
 	void GameContext::destroy()
 	{
+		services.getClock().deleteTimer(m_timerId);
+		destroyEntities();
 	}
+
+
+
 
 	void GameContext::input(uint32_t dt)
-	{
-		//here i could pass the delta time to collect input, store them locally, and only handle those that happened within the time frame i am updating
-		services.getInput().update();
-		onInput(dt);
-	}
+	{}
 
 	void GameContext::logic(uint32_t dt)
-	{
-		actionQueue.update();
-		onLogic(dt);
-	}
-
-	void GameContext::render()
-	{
-		if(renderAction != nullptr)
-		{
-			renderAction->update();
-		}
-	}
+	{}
+		
 	
-
-	void GameContext::onInput(uint32_t dt)
-	{}
-
-	void GameContext::onLogic(uint32_t dt)
-	{}
 }

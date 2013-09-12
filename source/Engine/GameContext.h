@@ -9,7 +9,7 @@
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Box2D/Box2D.h"
-#include "Core/Action/ActionIndex.h"
+#include "Core/Action/ActionRegistry.h"
 #include "Core/Action/ActionUpdater.h"
 #include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
@@ -35,7 +35,7 @@ namespace Core
 		ResourceLocator& resources;
 		int32_t m_timerId;
 		bool m_timerExpired;
-		ActionIndex actionIndex;
+		ActionRegistry actionRegistry;
 		ActionUpdater actionQueue;
 		EntityPool entityPool;
 		EntityFactory entityFactory;
@@ -50,36 +50,33 @@ namespace Core
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources);
 		virtual ~GameContext();
 
+		void init();
+		void activate();
 		void update();
+		void deactivate();
+		void destroy();
 
-		virtual void destroy();
-
-		/**
-		 * This function is called every time the context goes from being inactive to being the active context.
-		 * It should create all of the entities that it needs to work properly.
-		 */
-		virtual void activate() = 0;
-		/**
-		 * This function is called every time the context goes from being the active one to being inactive.
-		 * It should destroy all objects that are created in the ACTIVATE function.
-		 * NOTE: Think of a way to keep entities beyond the inactivity boundary.
-		 * The onActivate function should take this into consideration when creating that particular entity to check whether it already exists.
-		 */
-		virtual void deactivate() = 0;
-		/**
-		 *	This function should be called only once to setup the actions this context is going to use.
-		 */
-		virtual void registerActions() = 0;
-		/**
-		 * This function should be called only once to setup the order in which the actions will be updated.
-		 */
-		virtual void setupActionQueue() = 0;
 	protected:
-		void input(uint32_t dt);
-		void logic(uint32_t dt);
-		void render();
+		//part of the init sequence unique to each game, mjust be overriden
+		virtual void registerActions() = 0;
+		virtual void setupActionQueue() = 0;
+		virtual void registerCallbacks() = 0;
+		virtual void createEntities() = 0;
 
-		virtual void onInput(uint32_t dt);
-		virtual void onLogic(uint32_t dt);
+		//activation sequence
+		virtual void onActivate() = 0;
+
+		//update sequence, optional as most of this is done by actions
+		virtual void input(uint32_t dt);
+		virtual void logic(uint32_t dt);
+		//no need for render
+
+		//deactivate sequence
+		virtual void onDeactivate() = 0;
+
+		//destroy sequence
+		virtual void destroyEntities() = 0;
+		
+	private:
 	};
 }

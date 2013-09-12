@@ -20,12 +20,14 @@ namespace Core
 		const InstanceID uid;
 
 		Action(InstanceID type, GameContext& context);
-		~Action();
+		virtual ~Action();
 
 		void update();
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
+		virtual bool validateEntity(InstanceID id) = 0;
+		virtual void registerCallbacks();
 		
 	protected:
 		typedef std::unordered_set<InstanceID> EntityStorage_t;

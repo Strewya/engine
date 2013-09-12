@@ -112,7 +112,7 @@ namespace Graphics
 	{
 		//********************************** VERTEX SHADER
 		HRESULT hr = 0;
-		std::string shaderPath = "D:/engine/source/Services/Graphics/Shaders/shader.hlsl";
+		std::string shaderPath = "../resources/Shaders/shader.hlsl";
 		hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_vertexShaderBlob, nullptr, nullptr);
 		TEST_SUCCESS(hr);
 
