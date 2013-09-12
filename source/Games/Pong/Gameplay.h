@@ -28,7 +28,7 @@ namespace Pong
 		void onActivate();
 
 		//update sequence, optional as most of this is done by actions
-		//void input(uint32_t dt);
+		void input(uint32_t dt);
 		//void logic(uint32_t dt);
 
 		//deactivate sequence

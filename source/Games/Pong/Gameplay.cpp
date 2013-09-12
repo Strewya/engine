@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 	/*** extra headers ***/
+#include "Engine/Engine.h"
 #include "Engine/GameContext.h"
 #include "Engine/ServiceLocator.h"
 #include "Core/Action/Impl/Physics.h"
@@ -17,6 +18,7 @@
 #include "Games/Pong/EntityConstructors.h"
 #include "Games/Pong/InputHandler.h"
 #include "Services/Graphics/IRenderer.h"
+#include "Services/Input/InputEngine.h"
 #include "Util/Color.h"
 	/*** end headers ***/
 
@@ -98,7 +100,52 @@ namespace Pong
 
 	void Gameplay::onActivate()
 	{
-		
+		std::deque<InstanceID> entities;
+		activeEntities.findEntities(entities, entityPool, [](const Core::Entity& e)
+		{
+			return e.getType() == "ball";
+		});
+		assert(entities.size() == 1);
+		setupBall(entityPool.getInstanceRef(entities[0]));
+	}
+
+	void Gameplay::input(uint32_t dt)
+	{
+		auto& in = services.getInput();
+		Input::Event ev;
+		InstanceID id = *activeEntities.begin();
+		auto& entity = entityPool.getInstanceRef(id);
+		auto state = entity.getState<Core::PhysicalBody>();
+			
+		while(in.eatEvent(ev))
+		{
+			if(ev.type == Input::EventType::KeyPressed)
+			{
+				if(ev.key.code == Input::Keyboard::_W)
+				{
+					state->data->ApplyForceToCenter(b2Vec2(0, 100000));
+				}
+				else if(ev.key.code == Input::Keyboard::_S)
+				{
+					state->data->ApplyForceToCenter(b2Vec2(0, -100000));
+				}
+				else if(ev.key.code == Input::Keyboard::_Escape)
+				{
+					services.getEngine().shutdown();
+				}
+			}
+			else if(ev.type == Input::EventType::KeyReleased)
+			{
+				if(ev.key.code == Input::Keyboard::_W)
+				{
+					//state->data->ApplyForceToCenter(b2Vec2(0, force));
+				}
+				else if(ev.key.code == Input::Keyboard::_S)
+				{
+					//state->data->ApplyForceToCenter(b2Vec2(0, force));
+				}
+			}
+		}
 	}
 
 	void Gameplay::onDeactivate()
@@ -118,6 +165,7 @@ namespace Pong
 
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
+		paddle.setAlias("left");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 		
 		auto* body = paddle.getState<Core::PhysicalBody>();
@@ -127,6 +175,7 @@ namespace Pong
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
+		paddle.setAlias("right");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 		
 		auto* body = paddle.getState<Core::PhysicalBody>();
@@ -158,6 +207,7 @@ namespace Pong
 
 	void Gameplay::setupLeftGoal(Core::Entity& goal)
 	{
+		goal.setAlias("left");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 
 		auto* body = goal.getState<Core::PhysicalBody>();
@@ -166,6 +216,7 @@ namespace Pong
 
 	void Gameplay::setupRightGoal(Core::Entity& goal)
 	{
+		goal.setAlias("right");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 
 		auto* body = goal.getState<Core::PhysicalBody>();

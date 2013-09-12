@@ -29,8 +29,9 @@ namespace Util
 	}
 
 
-	TimerData::TimerData()
-		: m_type(TimerType::Stopwatch), m_targetTime(0), m_currentTime(0),
+	TimerData::TimerData(uint32_t id)
+		: m_type(TimerType::Stopwatch), m_id(id), m_parent(INVALID_ID),
+		m_targetTime(0), m_currentTime(0),
 		m_repeating(false), m_done(false), m_paused(false),
 		m_onOccurrence([](){}), m_onReset([&](){m_currentTime = m_targetTime;})
 	{}
@@ -75,48 +76,45 @@ namespace Util
 		return m_timePerFrame;
 	}
 
-	uint32_t GameClock::createTimingData()
+	TimerData& GameClock::createTimingData()
 	{
 		for(auto it = m_timers.begin(); it != m_timers.end(); ++it)
 		{
 			if(*it == nullptr)
 			{
-				it->reset(new TimerData());
-				return it - m_timers.begin();
+				it->reset(new TimerData(it - m_timers.begin()));
+				return **it;
 			}
 		}
-		m_timers.push_back(std::unique_ptr<TimerData>(new TimerData()));
-		return m_timers.size() - 1;
+		m_timers.push_back(std::unique_ptr<TimerData>(new TimerData(m_timers.size())));
+		return *m_timers.back();
 	}
 
 	uint32_t GameClock::createCountdownTimer(uint32_t initialTime, TimerData::Callback onOccurence)
 	{
-		uint32_t timerId = createTimingData();
-		TimerData& timer = *m_timers[timerId];
+		TimerData& timer = createTimingData();
 		timer.m_type = TimerType::Countdown;
 		timer.m_targetTime = initialTime;
 		timer.m_onOccurrence = onOccurence;
-		return timerId;
+		return timer.m_id;
 	}
 
 	uint32_t GameClock::createStopwatch()
 	{
-		uint32_t timerId = createTimingData();
-		TimerData& timer = *m_timers[timerId];
+		TimerData& timer = createTimingData();
 		timer.m_type = TimerType::Stopwatch;
-		return timerId;
+		return timer.m_id;
 	}
 
 	uint32_t GameClock::createAccumulator(uint32_t timeToFire, TimerData::Callback onOccurrence)
 	{
-		uint32_t timerId = createTimingData();
-		TimerData& timer = *m_timers[timerId];
+		TimerData& timer = createTimingData();
 		timer.m_type = TimerType::Accumulator;
 		timer.m_targetTime = timeToFire;
 		timer.m_onOccurrence = onOccurrence;
 		timer.m_onReset = [](){};
 		timer.m_repeating = true;
-		return timerId;
+		return timer.m_id;
 	}
 
 	bool GameClock::isTimerAlive(uint32_t timerId) const
@@ -166,7 +164,7 @@ namespace Util
 
 		for(auto& uptr : m_timers)
 		{
-			if(uptr != nullptr && !uptr->m_paused)
+			if(uptr != nullptr && isActive(uptr->m_id))
 			{
 				TimerData& timer = *uptr;
 				
@@ -193,6 +191,36 @@ namespace Util
 				timer.reset(nullptr);
 			}
 		}
+	}
+
+	void GameClock::slaveTimers(uint32_t master, uint32_t slave)
+	{
+		if(isTimerAlive(master) && isTimerAlive(slave))
+		{
+			m_timers[slave]->m_parent = master;
+		}
+	}
+
+	void GameClock::unslaveTimer(uint32_t slave)
+	{
+		if(isTimerAlive(slave))
+		{
+			m_timers[slave]->m_parent = INVALID_ID;
+		}
+	}
+
+	bool GameClock::isActive(uint32_t timerId) const
+	{
+		bool active = false;
+		if(isTimerAlive(timerId))
+		{
+			auto& timer = *m_timers[timerId];
+			// first we check if we are paused, and if so, return immediately
+			// if we are not paused, then we check if we have a parent.
+			// if we don't, we return, if we do, we return the parents status
+			active = !timer.m_paused && (timer.m_parent == INVALID_ID || isActive(timer.m_parent));
+		}
+		return active;
 	}
 
 	uint64_t GameClock::getCurrentGameTime() const

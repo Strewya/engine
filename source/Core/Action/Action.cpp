@@ -17,6 +17,7 @@ namespace Core
 		: uid(type), m_context(context), m_timerExpired(false), m_timerId(INVALID_ID)
 	{
 		m_timerId = context.services.getClock().createAccumulator(context.services.getClock().getTimePerFrame(), [&](){m_timerExpired=true;});
+		context.services.getClock().slaveTimers(context.m_timerId, m_timerId);
 	}
 
 	Action::~Action()
@@ -43,7 +44,7 @@ namespace Core
 
 	bool Action::registerEntity(InstanceID id)
 	{
-		return m_entities.insert(id).second;
+		return validateEntity(id) && m_entities.insert(id).second;
 	}
 
 	bool Action::unregisterEntity(InstanceID id)

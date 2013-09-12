@@ -3,27 +3,29 @@
 	/*** personal header ***/
 #include "Core/Entity/EntityFactory.h"
 	/*** extra headers ***/
+#include "Core/Entity/Entity.h"
 	/*** end headers ***/
 
 namespace Core
 {
 	EntityFactory::EntityFactory(GameContext& owner)
-		: _ownerContext(owner)
+		: m_ownerContext(owner)
 	{}
 
 	bool EntityFactory::createEntityType(const std::string& type, Entity& target) const
 	{
-		auto it = _creators.find(type);
-		if(it == _creators.end())
+		bool success = false;
+		auto it = m_creators.find(type);
+		if(it != m_creators.end() && it->second(m_ownerContext, target))
 		{
-			return false;
+			target.setType(type);
+			success = true;
 		}
-
-		return it->second(_ownerContext, target);
+		return success;
 	}
 
-	bool EntityFactory::registerConstructor(const std::string& typeName, const std::function<bool(GameContext&, Entity&)>& creator)
+	bool EntityFactory::registerConstructor(const std::string& typeName, const EntityCreator_t& creator)
 	{
-		return _creators.insert(std::make_pair(typeName, creator)).second;
+		return m_creators.insert(std::make_pair(typeName, creator)).second;
 	}
 }

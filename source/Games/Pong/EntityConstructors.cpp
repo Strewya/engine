@@ -22,6 +22,7 @@ namespace Pong
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0,0);
 		bodyDef.gravityScale = 0;
+		bodyDef.fixedRotation = true;
 		bodyDef.userData = &paddle;
 		body.data = context.physicsWorld.CreateBody(&bodyDef);
 
@@ -30,11 +31,9 @@ namespace Pong
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
-		fixtDef.density = 1000;
+		fixtDef.density = 1;
 
 		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
-
-
 
 		return true;
 	}

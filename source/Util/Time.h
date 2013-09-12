@@ -6,7 +6,7 @@
 	/*** common and C++ headers ***/
 #include <stdint.h>
 #include <chrono>
-#include <deque>
+#include <vector>
 #include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
@@ -61,8 +61,9 @@ namespace Util
 	{
 		typedef std::function<void(void)> Callback;
 
-		TimerData();
 		TimerType m_type;
+		const uint32_t m_id;
+		int32_t m_parent;
 		uint32_t m_targetTime;
 		uint32_t m_currentTime;
 		bool m_repeating;
@@ -72,6 +73,7 @@ namespace Util
 		Callback m_onReset;
 
 		//helper functions
+		TimerData(uint32_t id);
 		void reset();
 		void pause();
 		void resume();
@@ -98,6 +100,9 @@ namespace Util
 		uint32_t createStopwatch();
 		uint32_t createAccumulator(uint32_t timeToFire, TimerData::Callback onOccurrence);
 
+		void slaveTimers(uint32_t master, uint32_t slave);
+		void unslaveTimer(uint32_t slave);
+
 		bool isTimerAlive(uint32_t timerId) const;
 		void deleteTimer(uint32_t timerId);
 		TimerData& getTimer(uint32_t timerId);
@@ -109,10 +114,11 @@ namespace Util
 		uint32_t m_timePerFrame;
 		uint64_t m_currentGameTime;
 		uint64_t m_lastUpdateRealTime;
-		std::deque<std::unique_ptr<TimerData>> m_timers;
+		std::vector<std::unique_ptr<TimerData>> m_timers;
 
-		uint32_t createTimingData();
+		TimerData& createTimingData();
 		void updateTimers(uint32_t delta);
 		void removeFinishedTimers();
+		bool isActive(uint32_t timerId) const;
 	};
 }

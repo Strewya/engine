@@ -42,7 +42,6 @@ namespace Core
 		static std::unique_ptr<Derived_t> create()
 		{
 			std::unique_ptr<Derived_t> ptr(new Derived_t());
-			//memset(ptr.get(), 0, sizeof(Derived_t));
 			return ptr;
 		}
 
