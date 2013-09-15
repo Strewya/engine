@@ -28,7 +28,7 @@ namespace Pong
 		void onActivate();
 
 		//update sequence, optional as most of this is done by actions
-		void input(uint32_t dt);
+		//void input(uint32_t dt);
 		//void logic(uint32_t dt);
 
 		//deactivate sequence
@@ -43,9 +43,6 @@ namespace Pong
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);
 		void setupBall(Core::Entity& ball);
-		void setupTopWall(Core::Entity& wall);
-		void setupBottomWall(Core::Entity& wall);
-		void setupLeftGoal(Core::Entity& wall);
-		void setupRightGoal(Core::Entity& wall);
+		void bindPaddleToField(Core::Entity& paddle, Core::Entity& field);
 	};
 }

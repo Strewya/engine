@@ -9,7 +9,6 @@
 #include <vector>
 	/*** extra headers ***/
 #include "Engine/Engine.h"
-#include "Engine/GameContext.h"
 #include "Engine/ServiceLocator.h"
 #include "Core/Action/Impl/Physics.h"
 #include "Core/Action/Impl/Render.h"
@@ -20,6 +19,7 @@
 #include "Services/Graphics/IRenderer.h"
 #include "Services/Input/InputEngine.h"
 #include "Util/Color.h"
+#include "Util/Random.h"
 	/*** end headers ***/
 
 namespace Pong
@@ -58,38 +58,31 @@ namespace Pong
 	{
 		entityFactory.registerConstructor("paddle", createPaddle);
 		entityFactory.registerConstructor("ball", createBall);
-		entityFactory.registerConstructor("wall", createWall);
-		entityFactory.registerConstructor("goal", createGoal);
+		entityFactory.registerConstructor("field", createField);
 	}
 
 	void Gameplay::createEntities()
 	{
+		auto& field = entityPool.getNewInstanceRef();
+		entityFactory.createEntityType("field", field);
+		activeEntities.addEntity(field.getID());
+
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = entityPool.getNewInstanceRef();
-			auto& wall = entityPool.getNewInstanceRef();
-			auto& goal = entityPool.getNewInstanceRef();
-
 			entityFactory.createEntityType("paddle", paddle);
-			entityFactory.createEntityType("wall", wall);
-			entityFactory.createEntityType("goal", goal);
-
 			activeEntities.addEntity(paddle.getID());
-			activeEntities.addEntity(wall.getID());
-			activeEntities.addEntity(goal.getID());
-
+			
 			if(i == 0)
 			{
 				setupLeftPaddle(paddle);
-				setupTopWall(wall);
-				setupLeftGoal(goal);
 			}
 			else
 			{
 				setupRightPaddle(paddle);
-				setupBottomWall(wall);
-				setupRightGoal(goal);
 			}
+
+			bindPaddleToField(paddle, field);
 		}
 		
 		auto& ball = entityPool.getNewInstanceRef();
@@ -107,45 +100,6 @@ namespace Pong
 		});
 		assert(entities.size() == 1);
 		setupBall(entityPool.getInstanceRef(entities[0]));
-	}
-
-	void Gameplay::input(uint32_t dt)
-	{
-		auto& in = services.getInput();
-		Input::Event ev;
-		InstanceID id = *activeEntities.begin();
-		auto& entity = entityPool.getInstanceRef(id);
-		auto state = entity.getState<Core::PhysicalBody>();
-			
-		while(in.eatEvent(ev))
-		{
-			if(ev.type == Input::EventType::KeyPressed)
-			{
-				if(ev.key.code == Input::Keyboard::_W)
-				{
-					state->data->ApplyForceToCenter(b2Vec2(0, 100000));
-				}
-				else if(ev.key.code == Input::Keyboard::_S)
-				{
-					state->data->ApplyForceToCenter(b2Vec2(0, -100000));
-				}
-				else if(ev.key.code == Input::Keyboard::_Escape)
-				{
-					services.getEngine().shutdown();
-				}
-			}
-			else if(ev.type == Input::EventType::KeyReleased)
-			{
-				if(ev.key.code == Input::Keyboard::_W)
-				{
-					//state->data->ApplyForceToCenter(b2Vec2(0, force));
-				}
-				else if(ev.key.code == Input::Keyboard::_S)
-				{
-					//state->data->ApplyForceToCenter(b2Vec2(0, force));
-				}
-			}
-		}
 	}
 
 	void Gameplay::onDeactivate()
@@ -173,6 +127,7 @@ namespace Pong
 	}
 
 
+
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("right");
@@ -186,41 +141,22 @@ namespace Pong
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
 		auto* body = ball.getState<Core::PhysicalBody>();
-		body->data->ApplyLinearImpulse(b2Vec2(150,2), body->data->GetWorldCenter());
+		Util::Random random;
+		auto y = random.rand(0, 20);
+		auto x = random.rand(y, 50);
+		body->data->ApplyLinearImpulse(b2Vec2((float)x,(float)y), body->data->GetWorldCenter());
 	}
 
-	void Gameplay::setupTopWall(Core::Entity& wall)
+	void Gameplay::bindPaddleToField(Core::Entity& paddle, Core::Entity& field)
 	{
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		auto* paddleBody = paddle.getState<Core::PhysicalBody>();
+		auto* fieldBody = field.getState<Core::PhysicalBody>();
+		b2PrismaticJointDef jointDef;
 		
-		auto* body = wall.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(0, screenExtent.y-1), 0);
-	}
+		jointDef.collideConnected = true;
+		jointDef.Initialize(paddleBody->data, fieldBody->data, paddleBody->data->GetWorldCenter(), b2Vec2(0, 1.0f));
 
-	void Gameplay::setupBottomWall(Core::Entity& wall)
-	{
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
-		
-		auto* body = wall.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(0, 1-screenExtent.y), 0);
-	}
-
-	void Gameplay::setupLeftGoal(Core::Entity& goal)
-	{
-		goal.setAlias("left");
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
-
-		auto* body = goal.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(-screenExtent.x, 0), 0);
-	}
-
-	void Gameplay::setupRightGoal(Core::Entity& goal)
-	{
-		goal.setAlias("right");
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
-
-		auto* body = goal.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(screenExtent.x, 0), 0);
+		physicsWorld.CreateJoint(&jointDef);
 	}
 }
 

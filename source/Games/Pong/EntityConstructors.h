@@ -13,6 +13,5 @@ namespace Pong
 {
 	bool createPaddle(Core::GameContext& context, Core::Entity& paddle);
 	bool createBall(Core::GameContext& context, Core::Entity& ball);
-	bool createWall(Core::GameContext& context, Core::Entity& wall);
-	bool createGoal(Core::GameContext& context, Core::Entity& goal);
+	bool createField(Core::GameContext& context, Core::Entity& goal);
 }

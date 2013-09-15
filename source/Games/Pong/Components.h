@@ -5,6 +5,7 @@
 ********************************************/
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
+#include <functional>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Core/State/SharedComponents.h"
 	/*** end header inclusion ***/
@@ -32,7 +33,7 @@ namespace Pong
 
 	COMPONENT(AvailableIntents)
 	{
-		uint32_t value[Intent::INTENT_COUNT];
+		std::function<void(void)> value[Intent::INTENT_COUNT];
 	};
 	
 }

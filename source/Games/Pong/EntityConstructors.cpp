@@ -54,66 +54,55 @@ namespace Pong
 
 		b2CircleShape shape;
 		shape.m_p.Set(0,0);
-		shape.m_radius = 1.5;
+		shape.m_radius = 1.2f;
 
 		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
-		fixtDef.density = 0;
+		fixtDef.density = 0.5f;
 		fixtDef.restitution = 1;
 		fixtDef.friction = 0;
-
-
+		
 		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
 
 		return true;
 	}
 
-	bool createWall(Core::GameContext& context, Core::Entity& wall)
+	bool createField(Core::GameContext& context, Core::Entity& field)
 	{
 		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
-		auto& pos = wall.insert(Core::Position2d::create());
-		auto& body = wall.insert(Core::PhysicalBody::create());
-
+		auto& body = field.insert(Core::PhysicalBody::create());
 
 		b2BodyDef bodyDef;
 		bodyDef.type = b2_staticBody;
 		bodyDef.position.Set(0,0);
-		bodyDef.userData = &wall;
+		bodyDef.userData = &field;
 		body.data = context.physicsWorld.CreateBody(&bodyDef);
 
+		//the field has 4 fixtures, 2 for the top/bottom walls, and 2 for the goals
 		b2PolygonShape shape;
-		shape.SetAsBox(screenExtent.x, 1);
-
 		b2FixtureDef fixtDef;
-		fixtDef.shape = &shape;
 		fixtDef.density = 1;
-
-		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
-
-		return true;
-	}
-
-	bool createGoal(Core::GameContext& context, Core::Entity& goal)
-	{
-		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
-		auto& pos = goal.insert(Core::Position2d::create());
-		auto& body = goal.insert(Core::PhysicalBody::create());
-
-
-		b2BodyDef bodyDef;
-		bodyDef.type = b2_staticBody;
-		bodyDef.position.Set(0,0);
-		bodyDef.userData = &goal;
-		body.data = context.physicsWorld.CreateBody(&bodyDef);
-
-		b2PolygonShape shape;
-		shape.SetAsBox(1, screenExtent.y);
-
-		b2FixtureDef fixtDef;
 		fixtDef.shape = &shape;
-		fixtDef.density = 1;
 
-		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
+		//left goal
+		shape.SetAsBox(1, screenExtent.y, b2Vec2(-screenExtent.x, 0), 0);
+		b2Fixture* leftGoal = body.data->CreateFixture(&fixtDef);
+
+		//right goal
+		shape.SetAsBox(1, screenExtent.y, b2Vec2(screenExtent.x, 0), 0);
+		b2Fixture* rightGoal = body.data->CreateFixture(&fixtDef);
+
+		//top wall
+		shape.SetAsBox(screenExtent.x, 1, b2Vec2(0, screenExtent.y-1), 0);
+		b2Fixture* topWall = body.data->CreateFixture(&fixtDef);
+
+		//bottom wall
+		shape.SetAsBox(screenExtent.x, 1, b2Vec2(0, 1-screenExtent.y), 0);
+		b2Fixture* bottomWall = body.data->CreateFixture(&fixtDef);
+
+		
+
+		
 
 		return true;
 	}
