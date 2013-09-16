@@ -21,15 +21,9 @@ namespace Pong
 
 	}
 
-	bool InputHandler::validateEntity(InstanceID id)
+	bool InputHandler::validateEntity(Core::Entity& entity)
 	{
-		bool isValid = false;
-		if(m_context.entityPool.isAlive(id))
-		{
-			Core::Entity& entity = m_context.entityPool.getInstanceRef(id);
-			isValid = entity.hasState(AvailableIntents::Type);
-		}
-		return isValid;
+		return entity.hasState(AvailableIntents::Type);
 	}
 
 	void InputHandler::init()

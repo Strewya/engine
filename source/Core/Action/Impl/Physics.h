@@ -16,7 +16,7 @@ namespace Core
 	{
 	public:
 		SYSTEM_CTOR(Physics);
-		bool validateEntity(InstanceID id);
+		bool validateEntity(Entity& id);
 
 	protected:
 		void init();

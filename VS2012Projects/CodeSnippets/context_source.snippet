@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>context_source</Title>
+			<Shortcut>context_source</Shortcut>
+			<Description>Code snippet for Context class source file</Description>
+			<Author>Marko Pipal</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>path</ID>
+					<ToolTip>Path to header file</ToolTip>
+					<Default>path</Default>
+				</Literal>
+				<Literal>
+					<ID>namespace</ID>
+					<ToolTip>Enclosing namespace</ToolTip>
+					<Default>MyNamespace</Default>
+				</Literal>
+				<Literal>
+					<ID>name</ID>
+					<ToolTip>Class name</ToolTip>
+					<Default>MyClass</Default>
+				</Literal>
+				<Literal>
+					<ID>type</ID>
+					<ToolTip>Context type</ToolTip>
+					<Default>MY_TYPE</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="cpp"><![CDATA[//headers should be ordered alphabetically, if not REORDER THEM NOW!
+		/*** precompiled header ***/
+	#include "stdafx.h"
+		/*** personal header ***/
+	#include "$path$"
+		/*** C++ headers ***/
+		/*** extra headers ***/
+		/*** end headers ***/
+
+	namespace $namespace$
+	{
+		$name$::$name$(Core::ServiceLocator& services, Core::ResourceLocator& resources)
+			: GameContext(Core::ContextType::$type$, services, resources)
+		{
+			$end$
+		}
+
+		void $name$::registerActions()
+		{
+			//actionRegistry.addAction(Core::Render::create(*this));
+		}
+
+		void $name$::setupActionQueue()
+		{
+			//actionQueue.addAction(actionRegistry.getAction(namespace::action::Type));
+			//renderAction = &actionRegistry.getAction(Core::Render::Type);
+		}
+
+		void $name$::registerCallbacks()
+		{
+			//entityFactory.registerConstructor("name", function);
+		}
+
+		void $name$::createEntities()
+		{
+		}
+
+		void $name$::onActivate()
+		{
+		}
+
+		void $name$::onDeactivate()
+		{	
+		}
+
+		void $name$::destroyEntities()
+		{
+		}
+	}
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

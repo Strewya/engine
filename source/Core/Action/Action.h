@@ -26,7 +26,7 @@ namespace Core
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
-		virtual bool validateEntity(InstanceID id) = 0;
+		bool validateEntity(InstanceID id);
 		virtual void registerCallbacks();
 		
 	protected:
@@ -37,6 +37,7 @@ namespace Core
 		int32_t m_timerId;
 		EntityStorage_t m_entities;
 		
+		virtual bool validateEntity(Entity& entity) = 0;
 		virtual void onUpdate(float dt) = 0;
 	};
 

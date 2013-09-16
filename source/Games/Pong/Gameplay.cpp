@@ -142,8 +142,8 @@ namespace Pong
 	{
 		auto* body = ball.getState<Core::PhysicalBody>();
 		Util::Random random;
-		auto y = random.rand(0, 20);
-		auto x = random.rand(y, 50);
+		auto y = random.randInt(0, 20);
+		auto x = random.randInt(y, 50);
 		body->data->ApplyLinearImpulse(b2Vec2((float)x,(float)y), body->data->GetWorldCenter());
 	}
 

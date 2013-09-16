@@ -134,6 +134,9 @@
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\InputDevice.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -292,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
       <Filter>Core/Action</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\InputDevice.h">
+      <Filter>Services/Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

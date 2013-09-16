@@ -17,9 +17,16 @@ namespace Util
 		: m_randEngine(seed)
 	{}
 
-	uint32_t Random::rand(uint32_t lowerBound, uint32_t upperBound)
+	int32_t Random::randInt(int32_t lowerBound, int32_t upperBound)
 	{
-		std::uniform_int_distribution<uint32_t> distro(lowerBound, upperBound);
+		std::uniform_int_distribution<int32_t> distro(lowerBound, upperBound);
 		return distro(m_randEngine);
+	}
+
+	float Random::randFloat()
+	{
+		auto max = 1000000;
+		auto rnd = randInt(0, max);
+		return (float)rnd/(float)max;
 	}
 }

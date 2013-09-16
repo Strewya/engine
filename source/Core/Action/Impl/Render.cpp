@@ -46,15 +46,9 @@ namespace Core
 		m_context.services.getGraphics().EndScene();
 	}
 
-	bool Render::validateEntity(InstanceID id)
+	bool Render::validateEntity(Entity& entity)
 	{
-		bool isValid = false;
-		if(m_context.entityPool.isAlive(id))
-		{
-			Entity& entity = m_context.entityPool.getInstanceRef(id);
-			//isValid = entity.hasState(Core::RenderData);
-		}
-		return isValid;
+		return true;
 	}
 
 

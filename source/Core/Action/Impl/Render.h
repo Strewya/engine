@@ -19,7 +19,7 @@ namespace Core
 	{
 	public:
 		SYSTEM_CTOR(Render);
-		bool validateEntity(InstanceID id);
+		bool validateEntity(Entity& id);
 
 	protected:
 		void onUpdate(float dt);

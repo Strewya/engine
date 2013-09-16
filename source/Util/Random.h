@@ -17,7 +17,10 @@ namespace Util
 		Random();
 		Random(uint32_t seed);
 
-		uint32_t rand(uint32_t lowerBound, uint32_t upperBound);
+		//in itnerval between bounds
+		int32_t randInt(int32_t lowerBound, int32_t upperBound);
+		//in interval between 0 and 1
+		float randFloat();
 		
 	private:
 		std::mt19937 m_randEngine;

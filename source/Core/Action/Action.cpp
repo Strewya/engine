@@ -52,6 +52,12 @@ namespace Core
 		return m_entities.erase(id) > 0;
 	}
 
+	bool Action::validateEntity(InstanceID id)
+	{
+		return m_context.entityPool.isAlive(id) && 
+			validateEntity( m_context.entityPool.getInstanceRef(id) );
+	}
+
 	void Action::registerCallbacks()
 	{}
 }
