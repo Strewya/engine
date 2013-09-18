@@ -134,8 +134,11 @@
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\InputDevice.cpp">
+    <ClCompile Include="..\..\source\Services\Input\Mouse.cpp">
       <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Util\Concept.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -296,8 +299,11 @@
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\InputDevice.h">
+    <ClInclude Include="..\..\source\Services\Input\Mouse.h">
       <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Util\Concept.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

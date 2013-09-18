@@ -16,7 +16,7 @@
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
 	Win32::Window window("Snake");
-	int result = InitializeWindow(window, false, window.getSizeX()-120, window.getSizeY()-120);
+	int result = initializeWindow(window, false, window.getSizeX()-120, window.getSizeY()-120);
 	if(result != ErrorCode::OK)
 	{
 		return result;
@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		engine.initializeGame(Game::init);
 		
 		//start main loop
-		while(window.Update())
+		while(window.update())
 		{	
 			engine.loop();
 		}

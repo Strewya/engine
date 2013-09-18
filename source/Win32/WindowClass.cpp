@@ -49,7 +49,7 @@ namespace Win32
 		this->hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		this->hIconSm		= nullptr;
 //		this->hInstance		= nullptr; //this is set in ctor
-		this->lpfnWndProc	= (WNDPROC)Window::MessageRouter;
+		this->lpfnWndProc	= (WNDPROC)Window::messageRouter;
 //		this->lpszClassName = nullptr; //this is set in ctor
 		this->lpszMenuName	= nullptr;
 		this->style			= CS_HREDRAW | CS_VREDRAW;

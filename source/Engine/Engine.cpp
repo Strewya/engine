@@ -12,7 +12,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::Window& window)
-		: m_window(window), m_rendererFactory(window), m_activeContext(nullptr), m_gameClock(m_timeSource)
+		: m_window(window), m_rendererFactory(window), m_inputEngine(window), m_activeContext(nullptr), m_gameClock(m_timeSource)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -48,7 +48,6 @@ namespace Core
 		}
 		//_rendererFactory.getInterface()->setScreenSize(_window.getSizeX(), _window.getSizeY());
 
-		m_window.setEventQueue(m_inputEngine.getEventQueue());
 		/*
 			register all of the initialized subsystems
 			* display - done
@@ -116,7 +115,7 @@ namespace Core
 
 	void Engine::shutdown()
 	{
-		m_window.Shutdown();
+		m_window.shutdown();
 	}
 
 	ServiceLocator& Engine::getServices()

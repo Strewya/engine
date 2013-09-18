@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-	class:	$safeitemrootname$
+	class:	Mouse
 	usage:	
 ********************************************/
 	/*** common header ***/
@@ -11,11 +11,13 @@
 
 namespace Input
 {
-	class Device
+	class Event;
+
+	class MouseDevice
 	{
 	public:
-		Device();
-		
+		MouseDevice();
+		bool handle(uint32_t msg, WPARAM wParam, LPARAM lParam, Event& out);
 
 	private:
 		

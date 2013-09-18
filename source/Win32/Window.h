@@ -18,18 +18,18 @@ namespace Win32
 	class Window
 	{
 	public:
-		static LRESULT CALLBACK MessageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
 		Window();
 		Window(const char* title);
 		Window(const std::string& title);
 		virtual ~Window();
 
-		LRESULT CALLBACK WindowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
-		virtual bool Create();
-		virtual void Show();
-		virtual bool Update();
-		void Shutdown();
+		LRESULT CALLBACK windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
+		virtual bool create();
+		virtual void show();
+		virtual bool update();
+		void shutdown();
 		void showMessagebox(const char* title, const char* text);
 
 		void setFullscreen(bool fs);
@@ -46,8 +46,8 @@ namespace Win32
 		void setInstance(HINSTANCE instance);
 		void setUsePeekMessage(bool peek);
 		void setUseWaitMessage(bool wait);
-		void setEventQueue(std::list<Input::Event>& queue);
 		void setCursorShow(bool isShown);
+		void registerListener(std::function<bool(uint32_t,WPARAM,LPARAM)> listener);
 
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
@@ -68,30 +68,30 @@ namespace Win32
 		bool isCursorShown() const;
 
 	protected:
-		HWND _hwnd;
-		HWND _hwndParent;
-		HMENU _hMenu;
-		HINSTANCE _hInstance;
+		HWND m_hwnd;
+		HWND m_hwndParent;
+		HMENU m_hMenu;
+		HINSTANCE m_hInstance;
 
-		bool _usePeekMessage;
-		bool _useWaitMessage;
-		bool _fullscreen;
-		bool _showCursor;
+		bool m_usePeekMessage;
+		bool m_useWaitMessage;
+		bool m_fullscreen;
+		bool m_showCursor;
 
-		uint32_t _exitCode;
-		uint32_t _style;
-		uint32_t _extendedStyle;
+		uint32_t m_exitCode;
+		uint32_t m_style;
+		uint32_t m_extendedStyle;
 
-		int32_t _xPos;
-		int32_t _yPos;
-		int32_t _xSize;
-		int32_t _ySize;
+		int32_t m_xPos;
+		int32_t m_yPos;
+		int32_t m_xSize;
+		int32_t m_ySize;
 
-		std::string _class;
-		std::string _title;
+		std::string m_class;
+		std::string m_title;
 
-		std::list<Input::Event>* _queue;
+		std::list<std::function<bool(uint32_t,WPARAM,LPARAM)>> m_listeners;
 	};
 
-	int InitializeWindow(Window& window, bool fullscreen, uint32_t width, uint32_t height);
+	int initializeWindow(Window& window, bool fullscreen, uint32_t width, uint32_t height);
 }

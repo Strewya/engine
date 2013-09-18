@@ -2,6 +2,7 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** personal header ***/
+#include "Util/Concept.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

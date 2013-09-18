@@ -39,6 +39,7 @@ namespace Input
 
 	struct MouseMoveEvent
 	{
+		bool relative;
 		uint32_t x;
 		uint32_t y;
 	};
