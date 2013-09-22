@@ -83,9 +83,6 @@
     <ClCompile Include="..\..\source\Services\Graphics\b2DebugDraw.cpp">
       <Filter>Services/Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Services\Graphics\ITextureCache.cpp">
       <Filter>Services/Graphics</Filter>
     </ClCompile>
@@ -137,8 +134,17 @@
     <ClCompile Include="..\..\source\Services\Input\Mouse.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Util\Concept.cpp">
-      <Filter>Util</Filter>
+    <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\IntentGenerator.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\Context.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
+      <Filter>Services/Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -245,9 +251,6 @@
     <ClInclude Include="..\..\source\Services\Input\Event.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Graphics\IRenderer.h">
       <Filter>Services/Graphics</Filter>
     </ClInclude>
@@ -302,8 +305,17 @@
     <ClInclude Include="..\..\source\Services\Input\Mouse.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Util\Concept.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\IntentGenerator.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\Context.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
+      <Filter>Services/Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

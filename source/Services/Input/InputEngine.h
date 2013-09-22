@@ -11,34 +11,27 @@
 #include <unordered_map>
 #include <vector>
 	/*** extra headers if needed ***/
+#include "Services/Input/DeviceConcept.h"
 #include "Services/Input/Event.h"
+#include "Services/Input/IntentGenerator.h"
 #include "Services/Input/KeyCodes.h"
-#include "Util/Concept.h"
 	/*** end header inclusion ***/
 
 namespace Win32 { class Window; }
 
 namespace Input
 {
-	enum class DeviceType
-	{
-		DevKeyboard,
-		DevMouse,
-		DEVICE_TYPE_COUNT,
-	};
-
 	class Engine
 	{
 	public:
 		Engine(Win32::Window& window);
 		
-		void update();
-		bool handle(uint32_t msg, WPARAM wparam, LPARAM lparam);
+		std::vector<uint32_t>&& update();
+		bool handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam);
 
 	private:
-		// todo:
-		std::list<object_t> m_devices;
+		std::list<device_t> m_devices;
 		std::list<Event> m_eventQueue;
-
+		IntentGenerator m_intentGenerator;
 	};
 }

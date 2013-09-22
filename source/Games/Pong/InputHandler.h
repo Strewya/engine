@@ -28,10 +28,5 @@ namespace Pong
 		void init();
 
 	private:
-		typedef std::function<Intent(Input::Event&)> IntentTranslator;
-
-		std::list<IntentTranslator> m_intentTriggers;
-
-		Intent attemptMapping(Input::Event& e);
 	};
 }

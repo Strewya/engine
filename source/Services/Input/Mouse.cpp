@@ -7,6 +7,7 @@
 #include <windowsx.h>
 	/*** extra headers ***/
 #include "Services/Input/Event.h"
+#include "Services/Input/KeyCodes.h"
 	/*** end headers ***/
 
 namespace Input
@@ -15,20 +16,58 @@ namespace Input
 	{
 	}
 
-	bool MouseDevice::handle(uint32_t msg, WPARAM wparam, LPARAM lparam, Event& out)
+	bool MouseDevice::handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam, std::list<Event>& queue)
 	{
-		bool handled = true;
 		switch(msg)
 		{
 		case WM_MOVE:
-			out.type = Input::EventType::MouseMoved;
-			out.mouseMove.x = GET_X_LPARAM(lparam);
-			out.mouseMove.y = GET_Y_LPARAM(lparam);
-			break;
-		default:
-			handled = false;
+		{
+			m_oldx = m_x;
+			m_oldy = m_y;
+			m_x = GET_X_LPARAM(lparam);
+			m_y = GET_Y_LPARAM(lparam);
+			auto dx = m_x - m_oldx;
+			auto dy = m_y - m_oldy;
+			
+			//absolute mouse pos
+			queue.emplace_back();
+			Event& e = queue.back();
+			e.type = EventType::MouseMoved;
+			e.mouseMove.relative = false;
+			e.mouseMove.x = m_x;
+			e.mouseMove.y = m_y;
+
+			//relative movement
+			queue.emplace_back();
+			Event& f = queue.back();
+			f.type = EventType::MouseMoved;
+			f.mouseMove.relative = true;
+			f.mouseMove.x = dx;
+			f.mouseMove.y = dy;
 			break;
 		}
-		return handled;
+
+		case WM_LBUTTONDOWN:
+		{
+			queue.emplace_back();
+			Event& e = queue.back();
+			e.type = EventType::MouseButtonPressed;
+			e.mouseButton.button = Mouse::_LeftButton;
+			break;
+		}
+
+		case WM_LBUTTONUP:
+		{
+			queue.emplace_back();
+			Event& e = queue.back();
+			e.type = EventType::MouseButtonReleased;
+			e.mouseButton.button = Mouse::_LeftButton;
+			break;
+		}
+
+		default:
+			return false;
+		}
+		return true;
 	}
 }

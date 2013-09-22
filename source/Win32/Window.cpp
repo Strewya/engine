@@ -194,7 +194,7 @@ namespace Win32
 	int				Window::getExitCode() const { return m_exitCode; }
 	bool			Window::isCursorShown() const { return m_showCursor; }
 
-	void Window::registerListener(std::function<bool(uint32_t,WPARAM,LPARAM)> listener)
+	void Window::registerListener(Listener listener)
 	{
 		m_listeners.push_back(listener);
 	}
@@ -228,7 +228,7 @@ namespace Win32
 		{
 			for(auto f : m_listeners)
 			{
-				if(f(msg, wParam, lParam))
+				if(f(hwnd, msg, wParam, lParam))
 				{
 					return 0;
 				}

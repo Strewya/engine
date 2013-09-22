@@ -30,6 +30,7 @@ namespace Input
 		bool alt;
 		bool control;
 		bool shift;
+		bool previouslyDown;
 	};
 
 	struct TextEvent
@@ -47,6 +48,7 @@ namespace Input
 	struct MouseButtonEvent
 	{
 		uint32_t button;
+		bool previouslyDown;
 	};
 
 	struct MouseWheelEvent
@@ -75,6 +77,4 @@ namespace Input
 			ResizeEvent resize;
 		};
 	};
-
-	bool operator==(const Event& lhs, const Event& rhs);
 }

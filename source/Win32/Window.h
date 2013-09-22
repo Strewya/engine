@@ -18,6 +18,7 @@ namespace Win32
 	class Window
 	{
 	public:
+		typedef std::function<bool(HWND,uint32_t,WPARAM,LPARAM)> Listener;
 		static LRESULT CALLBACK messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
 		Window();
@@ -47,7 +48,7 @@ namespace Win32
 		void setUsePeekMessage(bool peek);
 		void setUseWaitMessage(bool wait);
 		void setCursorShow(bool isShown);
-		void registerListener(std::function<bool(uint32_t,WPARAM,LPARAM)> listener);
+		void registerListener(Listener listener);
 
 		HWND getWindowHandle() const;
 		bool getFullscreen() const;
@@ -90,7 +91,7 @@ namespace Win32
 		std::string m_class;
 		std::string m_title;
 
-		std::list<std::function<bool(uint32_t,WPARAM,LPARAM)>> m_listeners;
+		std::list<Listener> m_listeners;
 	};
 
 	int initializeWindow(Window& window, bool fullscreen, uint32_t width, uint32_t height);

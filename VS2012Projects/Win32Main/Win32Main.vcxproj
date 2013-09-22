@@ -111,7 +111,11 @@
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\InputHandler.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\IntentGenerator.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Mouse.cpp" />
     <ClCompile Include="..\..\source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -127,11 +131,9 @@
     <ClCompile Include="..\..\source\Services\Graphics\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\source\Services\Graphics\TextureData.cpp" />
     <ClCompile Include="..\..\source\Services\Graphics\ITextureCache.cpp" />
-    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\source\Services\Script\LuaEngine.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
-    <ClCompile Include="..\..\source\Util\Concept.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
     <ClCompile Include="..\..\source\Util\Logger.cpp" />
     <ClCompile Include="..\..\source\Util\Random.cpp" />
@@ -167,6 +169,10 @@
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
     <ClInclude Include="..\..\source\Games\Pong\InputHandler.h" />
+    <ClInclude Include="..\..\source\Services\Input\Context.h" />
+    <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />
+    <ClInclude Include="..\..\source\Services\Input\InputEngine.h" />
+    <ClInclude Include="..\..\source\Services\Input\IntentGenerator.h" />
     <ClInclude Include="..\..\source\Services\Input\Mouse.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h" />
@@ -182,13 +188,11 @@
     <ClInclude Include="..\..\source\Services\Graphics\TextureData.h" />
     <ClInclude Include="..\..\source\Services\Graphics\ITextureCache.h" />
     <ClInclude Include="..\..\source\Services\Input\Event.h" />
-    <ClInclude Include="..\..\source\Services\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Services\Input\KeyCodes.h" />
     <ClInclude Include="..\..\source\Services\Script\LuaInclude.h" />
     <ClInclude Include="..\..\source\Services\Script\LuaEngine.h" />
     <ClInclude Include="..\..\source\Util\AssetStorage.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
-    <ClInclude Include="..\..\source\Util\Concept.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\Random.h" />
     <ClInclude Include="..\..\source\Util\Time.h" />
