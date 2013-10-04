@@ -17,7 +17,9 @@
 #include "Games/Pong/EntityConstructors.h"
 #include "Games/Pong/InputHandler.h"
 #include "Services/Graphics/IRenderer.h"
-#include "Services/Input/InputEngine.h"
+#include "Services/Input/Context.h"
+#include "Services/Input/Engine.h"
+#include "Services/Input/Event.h"
 #include "Util/Color.h"
 #include "Util/Random.h"
 	/*** end headers ***/
@@ -59,6 +61,18 @@ namespace Pong
 		entityFactory.registerConstructor("paddle", createPaddle);
 		entityFactory.registerConstructor("ball", createBall);
 		entityFactory.registerConstructor("field", createField);
+
+		//input
+		Input::Context& main = services.getInput().getContext("main");
+
+		using namespace std::placeholders;
+
+		Input::Event e;
+		e.device = Input::DeviceCode::Keyboard;
+		e.type = Input::EventCode::Button;
+		e.button.code = Input::Keyboard::_S;
+		e.button.down = true;
+
 	}
 
 	void Gameplay::createEntities()

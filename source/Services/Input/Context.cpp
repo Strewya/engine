@@ -10,18 +10,54 @@
 
 namespace Input
 {
-	
 	Context::Context()
+	{}
+
+	void Context::insertCallback(Event& e, ButtonCallback& c)
 	{
+		m_buttonCallbacks.push_back( std::make_pair(e, c) );
 	}
 
-	uint32_t Context::tryMapping(Event& e) const
+	void Context::insertCallback(Event& e, AxisCallback& c)
 	{
-		return 0;
+		m_axisCallbacks.push_back( std::make_pair(e, c) );
 	}
 
-	void Context::addMapping(uint32_t intent, std::function<bool(Event&)> trigger)
+	bool Context::mapEvent(Event& e)
 	{
+		for(auto it : m_buttonCallbacks)
+		{
+			if(equal(e, it.first))
+			{
+				it.second();
+				return true;
+			}
+		}
 
+		for(auto it : m_axisCallbacks)
+		{
+			if(equal(e, it.first))
+			{
+				it.second(e.axis.value);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool equal(Event& e, Event& f)
+	{
+		if(e.device != f.device) return false;
+		if(e.type != f.type) return false;
+		switch(e.type)
+		{
+		case EventCode::Axis:
+			return e.axis.code == f.axis.code;
+
+		case EventCode::Button:
+			return e.button.code == f.button.code && e.button.down == f.button.down;
+		}
+		return false;
 	}
 }

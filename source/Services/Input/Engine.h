@@ -11,9 +11,9 @@
 #include <unordered_map>
 #include <vector>
 	/*** extra headers if needed ***/
+#include "Services/Input/Context.h"
 #include "Services/Input/DeviceConcept.h"
 #include "Services/Input/Event.h"
-#include "Services/Input/IntentGenerator.h"
 #include "Services/Input/KeyCodes.h"
 	/*** end header inclusion ***/
 
@@ -26,12 +26,18 @@ namespace Input
 	public:
 		Engine(Win32::Window& window);
 		
-		std::vector<uint32_t>&& update();
-		bool handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam);
+		void update();
+		Context& getContext(const std::string& name);
+		void pushContext(const std::string& name);
+		void popContext();
 
 	private:
 		std::list<device_t> m_devices;
 		std::list<Event> m_eventQueue;
-		IntentGenerator m_intentGenerator;
+
+		std::unordered_map<std::string, Context> m_contexts;
+		std::list<Context*> m_activeContexts;
+		
+		bool handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam);
 	};
 }

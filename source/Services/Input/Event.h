@@ -10,71 +10,45 @@
 
 namespace Input
 {
-	enum class EventType
+	enum class DeviceCode
 	{
-		KeyPressed,
-		KeyReleased,
-		TextEntered,
-		MouseMoved,
-		MouseWheelMoved,
-		MouseButtonPressed,
-		MouseButtonReleased,
-		LostFocus,
-		GainedFocus,
-		Resized
+		Keyboard,
+		Mouse,
 	};
 
-	struct KeyEvent
+	enum class EventCode
 	{
-		uint32_t code;
-		bool alt;
-		bool control;
-		bool shift;
-		bool previouslyDown;
+		Button,
+		Axis,
+		Text,
 	};
 
-	struct TextEvent
+	enum class AxisCode
 	{
-		char16_t character;
-	};
-
-	struct MouseMoveEvent
-	{
-		bool relative;
-		uint32_t x;
-		uint32_t y;
-	};
-
-	struct MouseButtonEvent
-	{
-		uint32_t button;
-		bool previouslyDown;
-	};
-
-	struct MouseWheelEvent
-	{
-		int delta;
-	};
-
-	struct ResizeEvent
-	{
-		uint32_t width;
-		uint32_t height;
+		X,
+		Y,
+		Z,
 	};
 
 	class Event
 	{
 	public:
-		EventType type;
+		DeviceCode device;
+		EventCode type;
 		//timestamp needed here
 		union
 		{
-			KeyEvent key;
-			TextEvent text;
-			MouseMoveEvent mouseMove;
-			MouseButtonEvent mouseButton;
-			MouseWheelEvent mouseWheel;
-			ResizeEvent resize;
+			struct
+			{
+				uint32_t code;
+				bool down;
+			} button;
+			struct
+			{
+				AxisCode code;
+				float value;
+			} axis;
+			wchar_t text;
 		};
 	};
 }

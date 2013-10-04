@@ -137,14 +137,14 @@
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\IntentGenerator.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\Context.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
+    <ClCompile Include="..\..\source\Services\Input\Engine.cpp">
       <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\IntentSystem.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -308,14 +308,17 @@
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\IntentGenerator.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\Context.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
+    <ClInclude Include="..\..\source\Services\Input\Engine.h">
       <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Intents.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\IntentSystem.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

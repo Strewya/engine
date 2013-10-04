@@ -6,24 +6,30 @@
 	/*** common header ***/
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
-	/*** extra headers if needed ***/
 #include <unordered_map>
+	/*** extra headers if needed ***/
+#include "Services/Input/Event.h"
 	/*** end header inclusion ***/
 
 namespace Input
 {
-	class Event;
-
 	class Context
 	{
 	public:
+		typedef std::function<void(double)> AxisCallback;
+		typedef std::function<void(void)> ButtonCallback;
+
 		Context();
 
-		uint32_t tryMapping(Event& e) const;
-
-		void addMapping(uint32_t intent, std::function<bool(Event&)> trigger);
+		void insertCallback(Event& e, ButtonCallback& c);
+		void insertCallback(Event& e, AxisCallback& c);
+		
+		bool mapEvent(Event& e);
 
 	private:
-		std::unordered_map<uint32_t, std::function<bool(Event&)>> m_triggers;
+		std::list< std::pair<Event, ButtonCallback> > m_buttonCallbacks;
+		std::list< std::pair<Event, AxisCallback>   > m_axisCallbacks;
 	};
+
+	bool equal(Event& e, Event& f);
 }

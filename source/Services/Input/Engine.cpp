@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** personal header ***/
-#include "Services/Input/InputEngine.h"
+#include "Services/Input/Engine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include "Services/Input/Mouse.h"
@@ -19,35 +19,26 @@ namespace Input
 
 		m_devices.push_back(MouseDevice());
 
-		//load some config from file and create the required contexts
-		m_intentGenerator.createContext("main");
-		Context& mainContext = m_intentGenerator.getContext("main");
-		//mainContext.addMapping(1, [](){});
+		m_activeContexts.emplace_back(&m_contexts["main"]);
 	}
 
-	std::vector<uint32_t>&& Engine::update()
+	void Engine::update()
 	{
-		std::vector<uint32_t> generatedIntents;
-		generatedIntents.reserve(m_eventQueue.size());
 		//if an event wasn't mapped to an intent, then we simply discard it
 		//this is why the event is pulled out from the queue
 		while(!m_eventQueue.empty())
 		{
 			Event e = m_eventQueue.front();
 			m_eventQueue.pop_front();
-			/*
-			here we pass the event to the context based intent generator class
-			if and intent is generated, it should return non-zero
-			zero should be reserved to always be "unmapped"
-			*/
-			uint32_t intent = 0;//m_intentGenerator.map(e);
-			if(intent != 0)
+			for(auto it : m_activeContexts)
 			{
-				generatedIntents.push_back(intent);
+				if(it->mapEvent(e))
+				{
+					//what do i do here? o.O
+					break;
+				}
 			}
 		}
-		generatedIntents.swap(generatedIntents);
-		return std::move(generatedIntents);
 	}
 
 	bool Engine::handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam)
@@ -64,4 +55,20 @@ namespace Input
 		}
 		return false;
 	}
+
+	Context& Engine::getContext(const std::string& name)
+	{
+		return m_contexts[name];
+	}
+
+	void Engine::pushContext(const std::string& name)
+	{
+		m_activeContexts.push_back(&m_contexts[name]);
+	}
+
+	void Engine::popContext()
+	{
+		m_activeContexts.pop_back();
+	}
+
 }

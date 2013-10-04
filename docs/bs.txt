@@ -1,0 +1,411 @@
+Intent generators and intent consumers.
+Every action can register itself as an intent consumer. Intent generation needs not be registered.
+An intent carries a target (which can be either one entity or a group of them), and an action.
+IntentSystem has a list of intent consumers, one for each intent.
+For instance, a JUMP intent is bound to a function inside the Physics action that handles jumping.
+Actions have two types of methods, update methods, which update all entities in their list with a specific logic, usually something that needs to happen each frame.
+The other type of method is intent consumer method. This method always receives only the ID of the entity (or the group) on which to execute the intent logic.
+
+The input system has a list of devices.
+Each device has specific knowledge about its keys and axis.
+The device monitors the state of each key.
+There are 3 types of events coming out from the input system: the Action, the State and the Range.
+Actions always carry the device, the key (device specific) and the action type (either key down or key up).
+Range carries the device, the axis name (device specific) and the value of the move amount (should be defined in relative or absolute values).
+State: there needs to be a way to bind the state of a key to the state of an intent, so that when the key goes down, the intent is started, and when the key goes up, the intent is stopped.
+
+
+
+
+
+enum class IntentLogic
+{
+	LeftMoveUp,
+	LeftMoveDown,
+	RightMoveUp,
+	RightMoveDown,
+};
+
+enum class IntentType
+{
+	Action,
+	State,
+	Range,
+};
+
+struct Intent
+{
+	IntentLogic logic;
+	IntentType type;
+	float value; //for states, it's either 1 or 0, for actions it's always 1, and for ranges it's in -1 to 1 normalized range
+};
+
+enum class EventType
+{
+	KeyPressed,
+	KeyReleased,
+	AxisMoved,
+	Text,
+};
+
+struct Event
+{
+	EventType type;
+	union
+	{
+		KeyEventData key;
+		AxisEventData axis;
+		TextEventData text;
+	};
+};
+
+class Context
+{
+	void addIntent(Intent&& i, std::function<bool(const Event&)>&& triggerLogic)
+	{
+		m_triggers.emplace_back(triggerLogic, i);
+	}
+	
+	bool tryMapping(const Event& e, Intent& out)
+	{
+		for(auto& trigger : m_triggers)
+		{
+			if(trigger->first(e))
+			{
+				out = trigger->second;
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
+
+//outside code
+Intent mvdwn = {LeftMoveDown, 1};
+input.getIntentGenerator().getContext("main").addIntent(mvdwn, [](Event& e)
+{ return e.type == EventType::KeyPressed && e.device == DeviceType::Mouse && e.key.keyCode == Mouse::_LeftMouseButton; });
+
+
+std::function<bool(const Event&)>&& makeKeyTrigger(EventType type, Devicetype device, uint32_t key, bool shift, bool ctrl)
+{
+	return [=](const Event& e)
+	{
+		return e.type == type &&
+			e.device == device &&
+			e.key.code == key &&
+			e.key.shift == shift &&
+			e.key.ctrl == ctrl;
+	};
+}
+
+std::function<bool(const Event&)>&& makeAxisTrigger(EventType type, Devicetype device)
+{
+	return [=](const Event& e)
+	{
+		return e.type == type &&
+			e.device == device &&
+			e.key.code == key &&
+			e.key.shift == shift &&
+			e.key.ctrl == ctrl;
+	};
+}
+
+
+void generateState(IntentLogic intent, DeviceType device, uint32_t keyCode, bool ctrl, bool shift)
+{
+	Intent down = {intent, 1};
+	Intent up = {intent, 0};
+	m_triggers.emplace([=](const Event& e)
+	{return e.type == Event::KeyPressed && e.device == device && e.key.code == keyCode && e.shift == shift && e.ctrl == ctrl; }, down);
+	m_triggers.emplace([=](const Event& e)
+	{return e.type == Event::KeyReleased && e.device == device && e.key.code == keyCode && e.shift == shift && e.ctrl == ctrl; }, up);
+}
+
+
+
+
+
+
+the input engine should know nothing about there existing any states or actions, it is only concerned about propagating input.
+when input is received, it is translated into X.
+X is then transformed into an intent.
+Intents know about states, actions and ranges. Intents should be either one of these three, and be always handled that way.
+problem is only translating pure input events into intents.
+
+
+
+OS msg -> engine event ---> [transformation process] ---> intent change -> intent response
+Window -> MouseDevice  ---> InputBindingsToIntents   ---> IntentSystem  -> entity.activateAction(intent.response)
+
+
+InputBindingsToIntents should take a device specific event, like Keyboard.KeyDown.W.shift.no-ctrl, and translate that to RunStart intent.
+
+
+//in IntentSystem
+enum class IntentStates
+{
+	LeftMoveUp,
+	LeftMoveDown,
+	RightMoveUp,
+	RightMoveDown,
+	COUNT
+};
+
+enum class IntentActions
+{
+	COUNT
+};
+
+enum class IntentRanges
+{
+	COUNT
+};
+
+class IntentSystem
+{
+public:
+	std::set<IntentStates> m_states;
+	std::set<IntentActions> m_actions;
+	std::unordered_map<IntentRanges, double> m_ranges;
+	
+	void setState(IntentState intent, bool state)
+	{
+		auto it = m_states.find(intent);
+		bool insert = state && it == m_states.end();
+		if(insert)
+		{
+			m_states.insert(intent);
+		}
+		else
+		{
+			m_states.erase(it);
+		}
+	}
+	
+};
+
+//gameplay
+
+enum class EventType
+{
+	Keyboard_down,
+	Keyboard_up,
+	Mouse,down,
+	Mouse_up,
+	Text,
+	Axis_X,
+	Axis_Y,
+	Axis_Y,
+};
+struct Event
+{
+	EventType type;
+	union
+	{
+		uint32_t key;
+		wchar_t char;
+		float axis;
+	};
+};
+
+std::function<bool(const Event&)> generateKeyboardPressed(uint32_t key)
+{
+	return [=](const Event& e) { return e.type == EventType::Keyboard_down && e.key == key; };
+}
+
+Event e;
+e.type = EventType::Keyboard_down;
+e.key = Keyboard::_W;
+services.getInput().addBinding(std::bind(&IntentSystem::setState, &intentSystem, Run, true), e);
+
+
+std::unordered_map<Event, callback> mapping;
+
+Marko P
+
+
+
+svaki entitet ima u sebi set<uint32_t> sa kodovima akcija koje je sposoban obavljati.
+kada entitet zeli aktivirati logiku neke akcije, salje poruku ActionRegistryju.
+poruka se salje instantno (function call).
+poruka treba sadrzavati id akcije za koju je poruka namijenjena ILI 0 ako poruka treba ici svim akcijama.
+poruka treba sadrzavati id entiteta koji je poruku poslao i koji trazi da se za njega izvrsi logika akcije.
+optional: ako akcija moze imati vise tipova logike u sebi (svaka logika == jedna funkcija), onda treba definirati i za koju logiku se poziva. /optional
+poruka treba sadrzavati i neki identifikator tipa za slucaj da ju moze primiti vise akcija? alternativa je da ako je recepient poruke svaka akcija, da se entitet aktivira za sve akcije? to ne zvuci dobro...
+s druge strane, tip/identifikator poruke moze biti intent?
+a onda opet, mozda je sama akcija intent? mozda nema smisla slati poruku za sve akcije koje postoje.
+s trece strane, mozda da akcije i intenti nisu vezani. neka akcija mozda moze obavljati vise vrsta intentova. tipa physics action moze rjesavati jump intent i run intent.
+intent sustav onda mora moci slati sve poruke sustavima.
+mozda da se sve akcije registriraju u intent sustav kao zainteresirane stranke.
+kada se u intent sustavu nesto promijeni, automatski se salje poruka svim akcijama.
+	alternativa je da se svaka akcija subscribea na neki odredjeni intent.
+	onda bi slanje poruka prvo gledalo ima li poruka definiranog primatelja, i poslala bi se samo njemu.
+	ako je primatelj 0, onda se gledaju subscriberi za taj tip poruke.
+	
+intent sustav treba biti samostalan u odnosu na sve ostalo. ne bi smio imati ovisnosti o drugim objektima.
+intent sustav u sebi ima popis namjera.
+namjere bi trebale biti radnje.
+npr:
+palica u pongu se moze pomicati gore.
+lik u platformeru moze skakati.
+lik u platformeru moze hodati u smjeru gledanja.
+lik u platformeru moze pucati u smjeru gledanja/ciljanja.
+lik u platformeru moze ciljati u svih 360 stupnjeva oko sebe.
+
+ovo sve se translatira u intente:
+state paddle_move_up
+action dude_jump
+state dude_move
+action dude_shoot
+range dude_aim
+
+dakle, intent sustav treba znati sto su states, actions i ranges.
+potrebno je na neki nacin slati podatke o promjeni intentova u intent sustav.
+to se lako sredi sa samo set i get metodama. brisanje mora biti nemoguce, osim u slucaju stateova, ali njih se zapravo postavi na false pri brisanju.
+
+
+
+
+
+input -> ai -> intents -> physics -> action logic -> rendering
+
+
+
+
+
+
+
+
+
+
+
+
+
+each device is able to generate 2 event types: button and axis event.
+button event has a bool if it is down or up.
+axis event has a value with the amount of movement on a specific axis.
+buttons can generate a button down or button up event.
+axis can generate only a "moved" event.
+the button event needs the device, key and event type (up or down).
+the axis event needs the device, axis and value.
+each device monitors the state of all its keys.
+each device monitors the location of a virtual cursor. the device should only poll for delta movements if applicable.
+
+when an input event is generated, it must go through the context based intent generator (fancy name for a key binding system).
+the key binding system/intent generator needs to be contextual so that each key can be bound to multiple intents.
+when a key binding is mapped (there exists a binding that expects a specific event to occur), then the callback to which it is mapped to is invoked.
+each event type has it's own map for callbacks, as each event type has different data that needs to be propagated.
+
+struct Event
+{
+	DeviceCode device; //keyboard, mouse, gamepad, ...
+	EventCode type; //button, axis
+	union
+	{
+		struct
+		{
+			uint32_t code;
+			bool isPressed;
+		} button;
+		struct
+		{
+			AxisCode code;
+			float/uint32_t value;
+		} axis;
+	};
+};
+
+class IntentGenerator
+{
+public:
+	void addCallback(uint32_t priority, Event e, ButtonCallback callback); //maybe change the priority to an enum to have them more clearly defined
+	void addCallback(uint32_t priority, Event e, AxisCallback callback)
+	{
+	// do some checks that the context exists
+		m_contexts[priority].insertCallback(e, callback);
+	}
+	
+	bool generateIntent(Event e)
+	{
+		for(auto it : m_contexts)
+		{
+			if(it.second->mapEventToIntent(e)) return true;
+		}
+		return false;
+	}
+private:
+	std::map<uint32_t, Context> m_contexts;
+};
+
+class Context
+{
+public:
+	void insertCallback(Event e, ButtonCallback c);
+	void insertCallback(Event e, AxisBallback c)
+	{
+		m_axisBinds.push_back(std::make_pair(e,c));
+	}
+	
+	bool mapEventToIntent(Event e)
+	{
+		for(auto it : m_buttonBinds)
+		{
+			if(equal(e, it.first))
+			{
+				it.second();
+				return true;
+			}
+		}
+		
+		for(auto it : m_axisBinds)
+		{
+			if(equal(e, it.first))
+			{
+				it.second(e.axis.value);
+				return true;
+			}
+		}
+		return false;
+	}
+private:
+	std::list< std::pair< Event, ButtonCallback > > m_buttonBinds;
+	std::list< std::pair< Event, AxisCallback > > m_axisBinds;
+};
+
+bool equal(Event& e,  Event& f)
+{
+	if(e.device != f.device) return false;
+	if(e.type != f.type) return false;
+	switch(e.type)
+	{
+	case BUTTON:
+		{
+			return e.button.code == f.button.code &&
+				e.button.isPressed == f.button.isPressed;
+		}
+	case AXIS:
+		{
+			return e.axis.code == f.axis.code;
+		}
+	}
+}
+
+
+
+
+Event e;
+e.device = KEYBOARD;
+e.type = BUTTON;
+e.button.code = Keyboard::_M;
+e.button.isPressed = true;
+input.keyBindings.insertCallback(1, e, std::bind(&IntentSystem::setState, &intentSystem, RUN, true));
+e.button.isPressed = false;
+input.keyBindings.insertCallback(1, e, std::bind(&IntentSystem::setState, &intentSystem, RUN, false));
+e.button.isPressed = true;
+e.button.code = Keyboard::_A;
+input.keyBindings.insertCallback(1, e, std::bind(&IntentSystem::setAction, &intentSystem, FIRE, true));
+e.device = MOUSE;
+e.type = AXIS;
+e.axis.code = X;
+input.keyBindings.insertCallback(1, e, std::bind(&IntentSystem::setAction, &intentSystem, AIM_X, std::placeholders::_1));
