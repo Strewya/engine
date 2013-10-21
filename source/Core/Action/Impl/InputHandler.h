@@ -11,22 +11,15 @@
 #include "Core/Action/Action.h"
 	/*** end header inclusion ***/
 
-namespace Input { class Event; }
-
-namespace Pong
+namespace Core
 {
-	enum class Intent;
-
 	SYSTEM(InputHandler)
 	{
 	public:
 		SYSTEM_CTOR(InputHandler);
-		bool validateEntity(Core::Entity& id);
-
+		
 	protected:
-		void onUpdate(float dt);
-		void init();
-
-	private:
+		void frameUpdate(float dt);
+		bool validateEntity(Entity& id) const;
 	};
 }

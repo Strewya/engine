@@ -16,13 +16,12 @@ namespace Core
 	{
 	public:
 		SYSTEM_CTOR(Physics);
-		bool validateEntity(Entity& id);
+		
 
 	protected:
 		void init();
-		void onUpdate(float dt);
-		
-
+		void frameUpdate(float dt);
+		bool validateEntity(Entity& id) const;
 	};
 
 

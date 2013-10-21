@@ -19,10 +19,10 @@ namespace Core
 	{
 	public:
 		SYSTEM_CTOR(Render);
-		bool validateEntity(Entity& id);
-
+		
 	protected:
-		void onUpdate(float dt);
+		void frameUpdate(float dt);
+		bool validateEntity(Entity& id) const;
 
 	private:
 		Graphics::RenderingQueue m_queue;

@@ -125,9 +125,6 @@
     <ClCompile Include="..\..\source\Util\Time.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Games\Pong\InputHandler.cpp">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
@@ -145,6 +142,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Engine\IntentSystem.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\InputHandler.cpp">
+      <Filter>Core/Action/Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,9 +239,6 @@
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h">
       <Filter>GameSpecific\Pong</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h">
       <Filter>Services/Graphics</Filter>
     </ClInclude>
@@ -296,9 +296,6 @@
     <ClInclude Include="..\..\source\Util\Time.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\InputHandler.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
@@ -314,11 +311,20 @@
     <ClInclude Include="..\..\source\Services\Input\Engine.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\Intents.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\IntentSystem.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\KeyBindings.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\InputHandler.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\Intents.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
+      <Filter>GameSpecific\Pong</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

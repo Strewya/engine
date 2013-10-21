@@ -33,11 +33,25 @@ namespace Core
 			if(timer.m_currentTime >= timer.m_targetTime)
 			{
 				timer.m_currentTime -= timer.m_targetTime;
-				onUpdate( static_cast<float>( timer.m_targetTime )/1000.0f );
+				auto dt = static_cast<float>( timer.m_targetTime )/1000.0f;
+				intentUpdate();
+				frameUpdate( dt );
 			}
 			if(timer.m_currentTime < timer.m_targetTime)
 			{
 				m_timerExpired = false;
+			}
+		}
+	}
+
+	void Action::intentUpdate()
+	{
+		Intent intent;
+		for(auto intentHandler : m_intentHandlers)
+		{
+			while(m_context.intentSystem.consumeIntent(intentHandler.first, intent))
+			{
+				intentHandler.second(m_context, intent);
 			}
 		}
 	}
@@ -52,7 +66,7 @@ namespace Core
 		return m_entities.erase(id) > 0;
 	}
 
-	bool Action::validateEntity(InstanceID id)
+	bool Action::validateEntity(InstanceID id) const
 	{
 		return m_context.entityPool.isAlive(id) && 
 			validateEntity( m_context.entityPool.getInstanceRef(id) );
@@ -60,4 +74,24 @@ namespace Core
 
 	void Action::registerCallbacks()
 	{}
+
+	void Action::registerIntentHandler(uint32_t intentID, const IntentHandler& handler)
+	{
+		m_intentHandlers[intentID] = handler;
+	}
+
+	void Action::restoreDefaultHandler(uint32_t intentID)
+	{
+		auto it = m_defaultHandlers.find(intentID);
+		if(it != m_defaultHandlers.end())
+		{
+			m_intentHandlers[intentID] = it->second;
+		}
+	}
+
+	void Action::registerDefaultHandler(uint32_t intentID, const IntentHandler& handler)
+	{
+		m_defaultHandlers.emplace(intentID, handler);
+		m_intentHandlers.emplace(intentID, handler);
+	}
 }

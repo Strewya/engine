@@ -10,12 +10,12 @@
 	/*** extra headers ***/
 #include "Engine/Engine.h"
 #include "Engine/ServiceLocator.h"
+#include "Core/Action/Impl/InputHandler.h"
 #include "Core/Action/Impl/Physics.h"
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
 #include "Games/Pong/EntityConstructors.h"
-#include "Games/Pong/InputHandler.h"
 #include "Services/Graphics/IRenderer.h"
 #include "Services/Input/Context.h"
 #include "Services/Input/Engine.h"
@@ -45,12 +45,12 @@ namespace Pong
 	{
 		actionRegistry.addAction(Core::Render::create(*this));
 		actionRegistry.addAction(Core::Physics::create(*this));
-		actionRegistry.addAction(Pong::InputHandler::create(*this));
+		actionRegistry.addAction(Core::InputHandler::create(*this));
 	}
 
 	void Gameplay::setupActionQueue()
 	{
-		actionQueue.addAction(actionRegistry.getAction(Pong::InputHandler::Type));
+		actionQueue.addAction(actionRegistry.getAction(Core::InputHandler::Type));
 		actionQueue.addAction(actionRegistry.getAction(Core::Physics::Type));
 		
 		renderAction = &actionRegistry.getAction(Core::Render::Type);
@@ -63,15 +63,8 @@ namespace Pong
 		entityFactory.registerConstructor("field", createField);
 
 		//input
-		Input::Context& main = services.getInput().getContext("main");
-
-		using namespace std::placeholders;
-
-		Input::Event e;
-		e.device = Input::DeviceCode::Keyboard;
-		e.type = Input::EventCode::Button;
-		e.button.code = Input::Keyboard::_S;
-		e.button.down = true;
+		keyBindings.createContext("main");
+		Input::Context& main = keyBindings.getContext("main");
 
 	}
 

@@ -99,6 +99,7 @@
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\InputHandler.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
@@ -117,11 +118,11 @@
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
-    <ClCompile Include="..\..\source\Games\Pong\InputHandler.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Engine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Mouse.cpp" />
     <ClCompile Include="..\..\source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -154,6 +155,7 @@
     <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
     <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\InputHandler.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
@@ -168,6 +170,7 @@
     <ClInclude Include="..\..\source\Engine\Engine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
+    <ClInclude Include="..\..\source\Engine\Intents.h" />
     <ClInclude Include="..\..\source\Engine\IntentSystem.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
@@ -175,11 +178,10 @@
     <ClInclude Include="..\..\source\Games\Pong\Components.h" />
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
-    <ClInclude Include="..\..\source\Games\Pong\InputHandler.h" />
-    <ClInclude Include="..\..\source\Games\Pong\Intents.h" />
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />
     <ClInclude Include="..\..\source\Services\Input\Engine.h" />
+    <ClInclude Include="..\..\source\Services\Input\KeyBindings.h" />
     <ClInclude Include="..\..\source\Services\Input\Mouse.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h" />

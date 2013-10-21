@@ -7,30 +7,39 @@
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
+#include <list>
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	struct IntentData
+	struct Intent
 	{
-		std::set<uint32_t> states;
-		std::set<uint32_t> actions;
-		std::unordered_map<uint32_t, double> ranges;
+		enum class Type
+		{
+			Action,
+			Range,
+			State
+		};
+		uint32_t intentID;
+		InstanceID target;
+		Type type;
+		union
+		{
+			bool state;
+			double range;
+			wchar_t symbol;
+		} extraData;
 	};
 
 	class IntentSystem
 	{
 	public:
-		typedef std::function<void(IntentData& intents)> Callback;
 		IntentSystem();
 		
-		void addState(uint32_t intentCode, bool state);
-		void addAction(uint32_t intentCode);
-		void addRange(uint32_t intentCode, double value);
+		void generateIntent(const Intent& i);
+		bool consumeIntent(uint32_t intentID, Intent& outIntent);
 		
-		void clear();
-		void dispatch();
-
 	private:
+		std::list<Intent> m_intents;
 	};
 }

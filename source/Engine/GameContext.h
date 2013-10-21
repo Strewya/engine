@@ -14,6 +14,8 @@
 #include "Core/Entity/EntityFactory.h"
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
+#include "Engine/IntentSystem.h"
+#include "Services/Input/KeyBindings.h"
 	/*** end header inclusion ***/
 
 namespace Core
@@ -43,6 +45,8 @@ namespace Core
 		b2World physicsWorld;
 		float b2ScalingFactor;
 		Space activeEntities;
+		Input::KeyBindings keyBindings;
+		IntentSystem intentSystem;
 
 		//this one should stand alone because it needs to be possible to step the logic more than once before rendering
 		ActionRptr renderAction;

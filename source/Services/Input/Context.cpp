@@ -5,48 +5,11 @@
 #include "Services/Input/Context.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Services/input/Event.h"
 	/*** end headers ***/
 
 namespace Input
 {
-	Context::Context()
-	{}
-
-	void Context::insertCallback(Event& e, ButtonCallback& c)
-	{
-		m_buttonCallbacks.push_back( std::make_pair(e, c) );
-	}
-
-	void Context::insertCallback(Event& e, AxisCallback& c)
-	{
-		m_axisCallbacks.push_back( std::make_pair(e, c) );
-	}
-
-	bool Context::mapEvent(Event& e)
-	{
-		for(auto it : m_buttonCallbacks)
-		{
-			if(equal(e, it.first))
-			{
-				it.second();
-				return true;
-			}
-		}
-
-		for(auto it : m_axisCallbacks)
-		{
-			if(equal(e, it.first))
-			{
-				it.second(e.axis.value);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool equal(Event& e, Event& f)
+	bool equal(const Event& e, const Event& f)
 	{
 		if(e.device != f.device) return false;
 		if(e.type != f.type) return false;
@@ -59,5 +22,48 @@ namespace Input
 			return e.button.code == f.button.code && e.button.down == f.button.down;
 		}
 		return false;
+	}
+
+	Context::Context()
+	{}
+
+	bool Context::mapEvent(const Event& e, Core::Intent& out) const
+	{
+		for(auto& binding : m_bindings)
+		{
+			if(equal(binding.first, e))
+			{
+				out = binding.second;
+				if(e.type == EventCode::Axis)
+					out.extraData.range = e.axis.value; //this should go through a converter to normalize the values, etc
+				else if(e.type == EventCode::Button)
+					out.extraData.state = e.button.down;
+				else if(e.type == EventCode::Text)
+					out.extraData.symbol = e.text;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void Context::addAction(const Event& e, uint32_t intentID)
+	{
+		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
+		m_bindings.back().second.intentID = intentID;
+		m_bindings.back().second.type = Core::Intent::Type::Action;
+	}
+
+	void Context::addRange(const Event& e, uint32_t intentID)
+	{
+		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
+		m_bindings.back().second.intentID = intentID;
+		m_bindings.back().second.type = Core::Intent::Type::Range;
+	}
+
+	void Context::addState(const Event& e, uint32_t intentID)
+	{
+		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
+		m_bindings.back().second.intentID = intentID;
+		m_bindings.back().second.type = Core::Intent::Type::State;
 	}
 }

@@ -9,7 +9,10 @@
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
-namespace Pong
+namespace Core
 {
-	
+	enum class Intents
+	{
+		M
+	};
 }

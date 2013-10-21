@@ -19,21 +19,4 @@ namespace Pong
 		...
 
 	*/
-
-	enum class Intent
-	{
-		LeftMoveUp = 0,
-		LeftMoveDown,
-		RightMoveUp,
-		RightMoveDown,
-		ResetBoard,
-		INTENT_COUNT,
-		NotMapped,
-	};
-
-	COMPONENT(AvailableIntents)
-	{
-		std::function<void(void)> value[Intent::INTENT_COUNT];
-	};
-	
 }

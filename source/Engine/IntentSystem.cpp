@@ -13,28 +13,22 @@ namespace Core
 	{
 	}
 
-	void IntentSystem::dispatch()
+	void IntentSystem::generateIntent(const Intent& i)
 	{
-		
+		m_intents.push_back(i);
 	}
 
-	void IntentSystem::addState(uint32_t intentCode, bool state)
+	bool IntentSystem::consumeIntent(uint32_t intentID, Intent& outIntent)
 	{
-		
-	}
+		auto it = std::find_if(m_intents.begin(), m_intents.end(),
+			[=](const Intent& i){ return i.intentID == intentID; });
 
-	void IntentSystem::addAction(uint32_t intentCode)
-	{
-		
-	}
-
-	void IntentSystem::addRange(uint32_t intentCode, double value)
-	{
-		
-	}
-
-	void IntentSystem::clear()
-	{
-		
+		if(it != m_intents.end())
+		{
+			outIntent = *it;
+			m_intents.erase(it);
+			return true;
+		}
+		return false;
 	}
 }

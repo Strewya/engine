@@ -6,6 +6,7 @@
 	/*** common header ***/
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
+#include <deque>
 	/*** extra headers if needed ***/
 #include "Services/Input/Event.h"
 	/*** end header inclusion ***/
@@ -18,10 +19,10 @@ namespace Input
 	{
 	public:
 		MouseDevice();
-		bool handle(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam, std::list<Event>& queue);
+		bool handle(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam, std::deque<Event>& queue);
 
 	private:
-		Event& makeEvent(EventCode type, std::list<Event>& queue);
+		Event& makeEvent(EventCode type, std::deque<Event>& queue);
 
 		uint32_t m_x;
 		uint32_t m_y;

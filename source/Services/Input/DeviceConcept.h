@@ -7,11 +7,11 @@
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
-#include <list>
+#include <deque>
 #include <wtypes.h>
 	/*** end header inclusion ***/
 
-#define HANDLE_PARAMS HWND h, uint32_t m, WPARAM w, LPARAM l, std::list<Input::Event>& q
+#define HANDLE_PARAMS HWND h, uint32_t m, WPARAM w, LPARAM l, std::deque<Input::Event>& q
 
 namespace Input
 {

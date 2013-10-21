@@ -11,7 +11,7 @@
 	
 namespace Core
 {
-	void Physics::onUpdate(float dt)
+	void Physics::frameUpdate(float dt)
 	{
 		//do anything required before the step
 
@@ -47,10 +47,10 @@ namespace Core
 			}
 		});
 
-
+		
 	}
 
-	bool Physics::validateEntity(Entity& entity)
+	bool Physics::validateEntity(Entity& entity) const
 	{
 		return
 			entity.hasState(PhysicalBody::Type) &&

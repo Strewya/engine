@@ -16,7 +16,7 @@ namespace Input
 	{
 	}
 
-	Event& MouseDevice::makeEvent(EventCode type, std::list<Event>& queue)
+	Event& MouseDevice::makeEvent(EventCode type, std::deque<Event>& queue)
 	{
 		queue.emplace_back();
 		queue.back().type = type;
@@ -24,7 +24,7 @@ namespace Input
 		return queue.back();
 	}
 
-	bool MouseDevice::handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam, std::list<Event>& queue)
+	bool MouseDevice::handle(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam, std::deque<Event>& queue)
 	{
 		switch(msg)
 		{
