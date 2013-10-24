@@ -9,7 +9,7 @@
 
 namespace Input
 {
-	bool equal(const Event& e, const Event& f)
+	bool equal(const Event& e, const Event& f, bool stateful)
 	{
 		if(e.device != f.device) return false;
 		if(e.type != f.type) return false;
@@ -19,7 +19,7 @@ namespace Input
 			return e.axis.code == f.axis.code;
 
 		case EventCode::Button:
-			return e.button.code == f.button.code && e.button.down == f.button.down;
+			return e.button.code == f.button.code && (stateful ? true : e.button.down == f.button.down);
 		}
 		return false;
 	}
@@ -31,7 +31,7 @@ namespace Input
 	{
 		for(auto& binding : m_bindings)
 		{
-			if(equal(binding.first, e))
+			if(equal(binding.first, e, binding.second.type == Core::Intent::Type::State))
 			{
 				out = binding.second;
 				if(e.type == EventCode::Axis)
@@ -55,15 +55,21 @@ namespace Input
 
 	void Context::addRange(const Event& e, uint32_t intentID)
 	{
-		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
-		m_bindings.back().second.intentID = intentID;
-		m_bindings.back().second.type = Core::Intent::Type::Range;
+		if(e.type == EventCode::Axis)
+		{
+			m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
+			m_bindings.back().second.intentID = intentID;
+			m_bindings.back().second.type = Core::Intent::Type::Range;
+		}
 	}
 
 	void Context::addState(const Event& e, uint32_t intentID)
 	{
-		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
-		m_bindings.back().second.intentID = intentID;
-		m_bindings.back().second.type = Core::Intent::Type::State;
+		if(e.type != EventCode::Axis)
+		{
+			m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
+			m_bindings.back().second.intentID = intentID;
+			m_bindings.back().second.type = Core::Intent::Type::State;
+		}
 	}
 }

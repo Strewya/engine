@@ -16,10 +16,12 @@
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
 #include "Games/Pong/EntityConstructors.h"
+#include "Games/Pong/Intents.h"
 #include "Services/Graphics/IRenderer.h"
 #include "Services/Input/Context.h"
 #include "Services/Input/Engine.h"
 #include "Services/Input/Event.h"
+#include "Services/Input/KeyCodes.h"
 #include "Util/Color.h"
 #include "Util/Random.h"
 	/*** end headers ***/
@@ -41,19 +43,81 @@ namespace Pong
 		m_debug.setLengthScale(b2ScalingFactor);
 	}
 
-	void Gameplay::registerActions()
+	void moveUpHandler(Core::GameContext& m_context, const Core::Intent& intent)
 	{
-		actionRegistry.addAction(Core::Render::create(*this));
-		actionRegistry.addAction(Core::Physics::create(*this));
-		actionRegistry.addAction(Core::InputHandler::create(*this));
+		if(m_context.entityPool.isAlive(intent.target))
+		{
+			Core::Entity& entity = m_context.entityPool.getInstanceRef(intent.target);
+			auto* physicsState = entity.getState<Core::PhysicalBody>();
+			if(physicsState != nullptr)
+			{
+				switch(intent.type)
+				{
+				case Core::Intent::Type::Action:
+					physicsState->data->ApplyLinearImpulse(b2Vec2(0,4), physicsState->data->GetWorldCenter());
+					break;
+
+				case Core::Intent::Type::Range:
+
+					break;
+
+				case Core::Intent::Type::State:
+					if(intent.extraData.state)
+					{
+						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,4));
+					}
+					else
+					{
+						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,-4));
+					}
+					break;
+				}	
+			}
+		}
 	}
 
-	void Gameplay::setupActionQueue()
+	void moveDownHandler(Core::GameContext& m_context, const Core::Intent& intent)
 	{
-		actionQueue.addAction(actionRegistry.getAction(Core::InputHandler::Type));
-		actionQueue.addAction(actionRegistry.getAction(Core::Physics::Type));
+		if(m_context.entityPool.isAlive(intent.target))
+		{
+			Core::Entity& entity = m_context.entityPool.getInstanceRef(intent.target);
+			auto* physicsState = entity.getState<Core::PhysicalBody>();
+			if(physicsState != nullptr)
+			{
+				switch(intent.type)
+				{
+				case Core::Intent::Type::Action:
+					physicsState->data->ApplyLinearImpulse(b2Vec2(0,-4), physicsState->data->GetWorldCenter());
+					break;
+
+				case Core::Intent::Type::Range:
+
+					break;
+
+				case Core::Intent::Type::State:
+					if(intent.extraData.state)
+					{
+
+						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,-4));
+					}
+					else
+					{
+						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,4));
+					}
+					break;
+				}	
+			}
+		}
+	}
+
+	void Gameplay::registerActions()
+	{
+		setupAction(Core::InputHandler::create(*this));
+		Core::ActionRef physics = setupAction(Core::Physics::create(*this));
+		setupRenderAction(Core::Render::create(*this));
 		
-		renderAction = &actionRegistry.getAction(Core::Render::Type);
+		physics.registerIntentHandler(Pong::IntentCodes::MoveUp, moveUpHandler);
+		physics.registerIntentHandler(Pong::IntentCodes::MoveDown, moveDownHandler);
 	}
 
 	void Gameplay::registerCallbacks()
@@ -65,7 +129,10 @@ namespace Pong
 		//input
 		keyBindings.createContext("main");
 		Input::Context& main = keyBindings.getContext("main");
+		keyBindings.pushContext("main", 1);
 
+		main.addState(Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_LeftButton, true), Pong::IntentCodes::MoveUp);
+		main.addState(Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_RightButton, true), Pong::IntentCodes::MoveDown);
 	}
 
 	void Gameplay::createEntities()
@@ -131,6 +198,8 @@ namespace Pong
 		
 		auto* body = paddle.getState<Core::PhysicalBody>();
 		body->data->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
+
+		actionRegistry.getAction(Core::InputHandler::Type).registerEntity(paddle.getID());
 	}
 
 

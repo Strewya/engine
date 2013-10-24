@@ -320,10 +320,10 @@
     <ClInclude Include="..\..\source\Core\Action\Impl\InputHandler.h">
       <Filter>Core/Action/Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine\Intents.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\Intents.h">
       <Filter>GameSpecific\Pong</Filter>
     </ClInclude>
   </ItemGroup>

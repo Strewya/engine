@@ -170,7 +170,6 @@
     <ClInclude Include="..\..\source\Engine\Engine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
-    <ClInclude Include="..\..\source\Engine\Intents.h" />
     <ClInclude Include="..\..\source\Engine\IntentSystem.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
@@ -178,6 +177,7 @@
     <ClInclude Include="..\..\source\Games\Pong\Components.h" />
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
+    <ClInclude Include="..\..\source\Games\Pong\Intents.h" />
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />
     <ClInclude Include="..\..\source\Services\Input\Engine.h" />

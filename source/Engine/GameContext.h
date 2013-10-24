@@ -63,9 +63,11 @@ namespace Core
 	protected:
 		//part of the init sequence unique to each game, mjust be overriden
 		virtual void registerActions() = 0;
-		virtual void setupActionQueue() = 0;
 		virtual void registerCallbacks() = 0;
 		virtual void createEntities() = 0;
+
+		ActionRef setupAction(ActionUptr action);
+		ActionRef setupRenderAction(ActionUptr action);
 
 		//activation sequence
 		virtual void onActivate() = 0;

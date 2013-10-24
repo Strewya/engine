@@ -9,10 +9,11 @@
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
-namespace Core
+namespace Pong
 {
-	enum class Intents
+	enum IntentCodes
 	{
-		M
+		MoveUp,
+		MoveDown
 	};
 }

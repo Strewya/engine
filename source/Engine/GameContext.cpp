@@ -34,13 +34,25 @@ namespace Core
 	void GameContext::init()
 	{
 		registerActions();
-		setupActionQueue();
 		for(auto it = actionRegistry.begin(); it != actionRegistry.end(); ++it)
 		{
 			it->second->registerCallbacks();
 		}
 		registerCallbacks();
 		createEntities();
+	}
+
+	ActionRef GameContext::setupAction(ActionUptr action)
+	{
+		ActionRef a = actionRegistry.addAction(std::move(action));
+		actionQueue.addAction(a);
+		return a;
+	}
+
+	ActionRef GameContext::setupRenderAction(ActionUptr action)
+	{
+		renderAction = &actionRegistry.addAction(std::move(action));
+		return *renderAction;
 	}
 
 	void GameContext::activate()

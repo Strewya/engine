@@ -21,7 +21,6 @@ namespace Pong
 
 	protected:
 		void registerActions();
-		void setupActionQueue();
 		void registerCallbacks();
 		void createEntities();
 

@@ -65,6 +65,22 @@ namespace Input
 			break;
 		}
 
+		case WM_RBUTTONDOWN:
+		{
+			Event& down = makeEvent(EventCode::Button, queue);
+			down.button.code = Mouse::_RightButton;
+			down.button.down = true;
+			break;
+		}
+
+		case WM_RBUTTONUP:
+		{
+			Event& up = makeEvent(EventCode::Button, queue);
+			up.button.code = Mouse::_RightButton;
+			up.button.down = false;
+			break;
+		}
+
 		default:
 			return false;
 		}
