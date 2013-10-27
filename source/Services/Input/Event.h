@@ -33,6 +33,8 @@ namespace Input
 	class Event
 	{
 	public:
+		static const bool DONT_CARE = false;
+
 		Event() {}
 		Event(DeviceCode device, EventCode type, uint32_t buttonCode, bool buttonState)
 			: device(device), type(type)
@@ -46,8 +48,8 @@ namespace Input
 			: device(device), type(type)
 		{ text = symbol; }
 		
-		DeviceCode device;
 		EventCode type;
+		DeviceCode device;
 		//timestamp needed here
 		union
 		{
@@ -59,7 +61,7 @@ namespace Input
 			struct
 			{
 				AxisCode code;
-				float value;
+				double value;
 			} axis;
 			wchar_t text;
 		};

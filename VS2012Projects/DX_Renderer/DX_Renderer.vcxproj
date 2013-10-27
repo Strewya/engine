@@ -92,8 +92,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>DLL_BUILD;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
-      <BrowseInformationFile>$(IntDir)/1/2/%(RelativeDir)</BrowseInformationFile>
-      <ObjectFileName>$(IntDir)/1/2/%(RelativeDir)</ObjectFileName>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,8 +117,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>DLL_BUILD;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BrowseInformationFile>$(IntDir)/1/2/%(RelativeDir)</BrowseInformationFile>
-      <ObjectFileName>$(IntDir)/1/2/%(RelativeDir)</ObjectFileName>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

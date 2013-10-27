@@ -19,9 +19,6 @@ namespace Input
 	class KeyBindings
 	{
 	public:
-		KeyBindings();
-		~KeyBindings();
-
 		void createContext(const std::string& contextName);
 		Context& getContext(const std::string& contextName);
 		void pushContext(const std::string& contextName, uint32_t priority);

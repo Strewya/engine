@@ -5,7 +5,7 @@
 #include "Services/Input/Engine.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Services/Input/Mouse.h"
+#include "Services/Input/MouseDevice.h"
 #include "Win32/Window.h"
 	/*** end headers ***/
 

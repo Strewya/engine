@@ -61,7 +61,7 @@ namespace Core
 		void destroy();
 
 	protected:
-		//part of the init sequence unique to each game, mjust be overriden
+		//part of the init sequence unique to each game, must be overriden
 		virtual void registerActions() = 0;
 		virtual void registerCallbacks() = 0;
 		virtual void createEntities() = 0;

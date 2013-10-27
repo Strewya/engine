@@ -54,7 +54,7 @@ namespace Pong
 				switch(intent.type)
 				{
 				case Core::Intent::Type::Action:
-					physicsState->data->ApplyLinearImpulse(b2Vec2(0,4), physicsState->data->GetWorldCenter());
+					physicsState->m_body->ApplyLinearImpulse(b2Vec2(0,4), physicsState->m_body->GetWorldCenter());
 					break;
 
 				case Core::Intent::Type::Range:
@@ -64,11 +64,11 @@ namespace Pong
 				case Core::Intent::Type::State:
 					if(intent.extraData.state)
 					{
-						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,4));
+						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,4));
 					}
 					else
 					{
-						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,-4));
+						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,-4));
 					}
 					break;
 				}	
@@ -87,7 +87,7 @@ namespace Pong
 				switch(intent.type)
 				{
 				case Core::Intent::Type::Action:
-					physicsState->data->ApplyLinearImpulse(b2Vec2(0,-4), physicsState->data->GetWorldCenter());
+					physicsState->m_body->ApplyLinearImpulse(b2Vec2(0,-4), physicsState->m_body->GetWorldCenter());
 					break;
 
 				case Core::Intent::Type::Range:
@@ -98,11 +98,11 @@ namespace Pong
 					if(intent.extraData.state)
 					{
 
-						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,-4));
+						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,-4));
 					}
 					else
 					{
-						physicsState->data->SetLinearVelocity(physicsState->data->GetLinearVelocity() + b2Vec2(0,4));
+						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,4));
 					}
 					break;
 				}	
@@ -113,7 +113,7 @@ namespace Pong
 	void Gameplay::registerActions()
 	{
 		setupAction(Core::InputHandler::create(*this));
-		Core::ActionRef physics = setupAction(Core::Physics::create(*this));
+		Core::ActionRef physics = setupAction(Core::Physics2d::create(*this));
 		setupRenderAction(Core::Render::create(*this));
 		
 		physics.registerIntentHandler(Pong::IntentCodes::MoveUp, moveUpHandler);
@@ -131,8 +131,8 @@ namespace Pong
 		Input::Context& main = keyBindings.getContext("main");
 		keyBindings.pushContext("main", 1);
 
-		main.addState(Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_LeftButton, true), Pong::IntentCodes::MoveUp);
-		main.addState(Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_RightButton, true), Pong::IntentCodes::MoveDown);
+		main.addState(Pong::IntentCodes::MoveUp, Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_LeftButton, Input::Event::DONT_CARE));
+		main.addState(Pong::IntentCodes::MoveDown, Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_RightButton, Input::Event::DONT_CARE));
 	}
 
 	void Gameplay::createEntities()
@@ -196,8 +196,8 @@ namespace Pong
 		paddle.setAlias("left");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 		
-		auto* body = paddle.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
+		auto* state = paddle.getState<Core::PhysicalBody>();
+		state->m_body->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
 
 		actionRegistry.getAction(Core::InputHandler::Type).registerEntity(paddle.getID());
 	}
@@ -209,18 +209,18 @@ namespace Pong
 		paddle.setAlias("right");
 		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
 		
-		auto* body = paddle.getState<Core::PhysicalBody>();
-		body->data->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
+		auto* state = paddle.getState<Core::PhysicalBody>();
+		state->m_body->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
 	}
 
 
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
-		auto* body = ball.getState<Core::PhysicalBody>();
+		auto* state = ball.getState<Core::PhysicalBody>();
 		Util::Random random;
 		auto y = random.randInt(0, 20);
 		auto x = random.randInt(y, 50);
-		body->data->ApplyLinearImpulse(b2Vec2((float)x,(float)y), body->data->GetWorldCenter());
+		state->m_body->ApplyLinearImpulse(b2Vec2((float)x,(float)y), state->m_body->GetWorldCenter());
 	}
 
 	void Gameplay::bindPaddleToField(Core::Entity& paddle, Core::Entity& field)
@@ -230,7 +230,7 @@ namespace Pong
 		b2PrismaticJointDef jointDef;
 		
 		jointDef.collideConnected = true;
-		jointDef.Initialize(paddleBody->data, fieldBody->data, paddleBody->data->GetWorldCenter(), b2Vec2(0, 1.0f));
+		jointDef.Initialize(paddleBody->m_body, fieldBody->m_body, paddleBody->m_body->GetWorldCenter(), b2Vec2(0, 1.0f));
 
 		physicsWorld.CreateJoint(&jointDef);
 	}

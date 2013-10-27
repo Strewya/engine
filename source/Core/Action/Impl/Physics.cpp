@@ -11,9 +11,23 @@
 	
 namespace Core
 {
-	void Physics::frameUpdate(float dt)
+	void Physics2d::frameUpdate(float dt)
 	{
 		//do anything required before the step
+		for(auto eid : m_entities)
+		{
+			if(m_context.entityPool.isAlive(eid))
+			{
+				Entity& e = m_context.entityPool.getInstanceRef(eid);
+				auto* stateBody = e.getState<PhysicalBody>();
+				auto* stateMove = e.getState<Movement2d>();
+				
+			}
+			else
+			{
+				markDeadEntity(eid);
+			}
+		}
 
 		//step the physics
 		int32_t velocityIterations = 8;
@@ -26,13 +40,14 @@ namespace Core
 			Entity* e = static_cast<Entity*>(body->GetUserData());
 			if(e->hasState(Position2d::Type))
 			{
-				auto* pos = e->getState<Position2d>();
-				pos->data.set(body->GetPosition().x*m_context.b2ScalingFactor, body->GetPosition().y*m_context.b2ScalingFactor);
+				auto* state = e->getState<Position2d>();
+				state->m_position.set(body->GetPosition().x*m_context.b2ScalingFactor, body->GetPosition().y*m_context.b2ScalingFactor);
+				
 			}
 		}
 	}
 
-	void Physics::init()
+	void Physics2d::init()
 	{
 		m_context.physicsWorld.SetGravity(b2Vec2(0, -9));
 		m_context.physicsWorld.SetAllowSleeping(true);
@@ -41,20 +56,46 @@ namespace Core
 		{
 			if(e.hasState(PhysicalBody::Type))
 			{
-				auto* b = e.getState<PhysicalBody>();
-				m_context.physicsWorld.DestroyBody(b->data);
-				b->data = nullptr;
+				auto* state = e.getState<PhysicalBody>();
+				m_context.physicsWorld.DestroyBody(state->m_body);
+				state->m_body = nullptr;
 			}
 		});
 
 		
+		
 	}
 
-	bool Physics::validateEntity(Entity& entity) const
+	bool Physics2d::validateEntity(Entity& entity) const
 	{
 		return
 			entity.hasState(PhysicalBody::Type) &&
+			entity.hasState(Movement2d::Type) &&
 			entity.hasState(Position2d::Type);
+	}
+
+	void Physics2d::doMove(const Intent& intent)
+	{
+		if(isEntityValid(intent.target))
+		{
+			Entity& e = m_context.entityPool.getInstanceRef(intent.target);
+			auto* stateBody = e.getState<PhysicalBody>();
+			auto* stateMove = e.getState<Movement2d>();
+			switch(intent.type)
+			{
+			case Intent::Type::Action:
+				break;
+
+			case Intent::Type::Range:
+				break;
+
+			case Intent::Type::State:
+			{
+				
+				break;
+			}
+			}
+		}
 	}
 
 

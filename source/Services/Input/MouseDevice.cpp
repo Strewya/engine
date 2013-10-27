@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** personal header ***/
-#include "Services/Input/Mouse.h"
+#include "Services/Input/MouseDevice.h"
 	/*** C++ headers ***/
 #include <windowsx.h>
 	/*** extra headers ***/
@@ -12,10 +12,6 @@
 
 namespace Input
 {
-	MouseDevice::MouseDevice()
-	{
-	}
-
 	Event& MouseDevice::makeEvent(EventCode type, std::deque<Event>& queue)
 	{
 		queue.emplace_back();
@@ -39,13 +35,13 @@ namespace Input
 			
 			Event& ex = makeEvent(EventCode::Axis, queue);
 			ex.axis.code = AxisCode::X;
-			ex.axis.value = (float)dx;
+			ex.axis.value = (double)dx;
 
 			Event& ey = makeEvent(EventCode::Axis, queue);
-			ey.axis.code = AxisCode::X;
-			ey.axis.value = (float)dy;
+			ey.axis.code = AxisCode::Y;
+			ey.axis.value = (double)dy;
 
-			SetCursorPos(200,200);
+			//SetCursorPos(200,200);
 			break;
 		}
 
@@ -80,6 +76,32 @@ namespace Input
 			up.button.down = false;
 			break;
 		}
+
+		case WM_MBUTTONDOWN:
+		{
+			Event& down = makeEvent(EventCode::Button, queue);
+			down.button.code = Mouse::_MiddleButton;
+			down.button.down = true;
+			break;
+		}
+
+		case WM_MBUTTONUP:
+		{
+			Event& up = makeEvent(EventCode::Button, queue);
+			up.button.code = Mouse::_MiddleButton;
+			up.button.down = false;
+			break;
+		}
+
+		case WM_MOUSEWHEEL:
+		{
+			Event& wheel = makeEvent(EventCode::Axis, queue);
+			wheel.axis.code = AxisCode::Z;
+			wheel.axis.value = static_cast<double>(GET_WHEEL_DELTA_WPARAM(wparam));
+			break;
+		}
+
+		//missing are mouse 4 and 5			
 
 		default:
 			return false;

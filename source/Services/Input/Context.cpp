@@ -9,7 +9,7 @@
 
 namespace Input
 {
-	bool equal(const Event& e, const Event& f, bool stateful)
+	bool match(const Event& e, const Event& f, const Core::Intent& intent)
 	{
 		if(e.device != f.device) return false;
 		if(e.type != f.type) return false;
@@ -19,7 +19,11 @@ namespace Input
 			return e.axis.code == f.axis.code;
 
 		case EventCode::Button:
-			return e.button.code == f.button.code && (stateful ? true : e.button.down == f.button.down);
+			return (e.button.code == f.button.code) &&
+				(intent.type == Core::Intent::Type::State ? true : e.button.down == f.button.down);
+
+		case EventCode::Text:
+			return true;
 		}
 		return false;
 	}
@@ -31,45 +35,64 @@ namespace Input
 	{
 		for(auto& binding : m_bindings)
 		{
-			if(equal(binding.first, e, binding.second.type == Core::Intent::Type::State))
+			if(match(e, binding.first, binding.second))
 			{
 				out = binding.second;
-				if(e.type == EventCode::Axis)
-					out.extraData.range = e.axis.value; //this should go through a converter to normalize the values, etc
-				else if(e.type == EventCode::Button)
+				switch(e.type)
+				{
+				case EventCode::Axis:
+				{
+					out.extraData.range = e.axis.value;
+					auto it = m_converters.find(out.intentID);
+					if(it != m_converters.end())
+					{
+						out.extraData.range = it->second.convert(out.extraData.range);
+					}
+					break;
+				}
+
+				case EventCode::Button:
 					out.extraData.state = e.button.down;
-				else if(e.type == EventCode::Text)
+					break;
+
+				case EventCode::Text:
 					out.extraData.symbol = e.text;
+					break;
+				}
 				return true;
 			}
 		}
 		return false;
 	}
 
-	void Context::addAction(const Event& e, uint32_t intentID)
+	void Context::addAction(uint32_t intentID, const Event& e)
 	{
-		m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
-		m_bindings.back().second.intentID = intentID;
-		m_bindings.back().second.type = Core::Intent::Type::Action;
+		m_bindings.emplace_back( std::make_pair( e, Core::Intent(intentID, Core::Intent::Type::Action) ) );
 	}
 
-	void Context::addRange(const Event& e, uint32_t intentID)
+	void Context::addRange(uint32_t intentID, const Event& e)
 	{
 		if(e.type == EventCode::Axis)
 		{
-			m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
-			m_bindings.back().second.intentID = intentID;
-			m_bindings.back().second.type = Core::Intent::Type::Range;
+			m_bindings.emplace_back( std::make_pair( e, Core::Intent(intentID, Core::Intent::Type::Range) ) );
 		}
 	}
 
-	void Context::addState(const Event& e, uint32_t intentID)
+	void Context::addState(uint32_t intentID, const Event& e)
 	{
 		if(e.type != EventCode::Axis)
 		{
-			m_bindings.emplace_back( std::make_pair( e, Core::Intent() ) );
-			m_bindings.back().second.intentID = intentID;
-			m_bindings.back().second.type = Core::Intent::Type::State;
+			m_bindings.emplace_back( std::make_pair( e, Core::Intent(intentID, Core::Intent::Type::State) ) );
 		}
+	}
+
+	void Context::addRangeConverter(uint32_t intentID, const Converter& c)
+	{
+		m_converters.emplace(intentID, c);
+	}
+
+	void Context::addRangeConverter(uint32_t intentID, double minIn, double maxIn, double minOut, double maxOut)
+	{
+		m_converters.emplace(intentID, Converter(minIn, maxIn, minOut, maxOut));
 	}
 }

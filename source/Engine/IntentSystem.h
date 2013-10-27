@@ -7,7 +7,7 @@
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
-#include <list>
+#include <deque>
 	/*** end header inclusion ***/
 
 namespace Core
@@ -29,17 +29,19 @@ namespace Core
 			double range;
 			wchar_t symbol;
 		} extraData;
+
+		Intent() {}
+		Intent(uint32_t intentID, Type type) : intentID(intentID), type(type) {}
 	};
 
 	class IntentSystem
 	{
 	public:
-		IntentSystem();
 		
 		void generateIntent(const Intent& i);
 		bool consumeIntent(uint32_t intentID, Intent& outIntent);
 		
 	private:
-		std::list<Intent> m_intents;
+		std::deque<Intent> m_intents;
 	};
 }

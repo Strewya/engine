@@ -35,13 +35,28 @@ namespace Core
 				timer.m_currentTime -= timer.m_targetTime;
 				auto dt = static_cast<float>( timer.m_targetTime )/1000.0f;
 				intentUpdate();
-				frameUpdate( dt );
+				frameUpdate(dt);
+				purgeDeadEntities();
 			}
 			if(timer.m_currentTime < timer.m_targetTime)
 			{
 				m_timerExpired = false;
 			}
 		}
+	}
+
+	void Action::purgeDeadEntities()
+	{
+		for(auto eid : m_deadEntities)
+		{
+			m_entities.erase(eid);
+		}
+		m_deadEntities.clear();
+	}
+
+	void Action::markDeadEntity(InstanceID id)
+	{
+		m_deadEntities.emplace(id);
 	}
 
 	void Action::intentUpdate()
@@ -58,7 +73,7 @@ namespace Core
 
 	bool Action::registerEntity(InstanceID id)
 	{
-		return validateEntity(id) && m_entities.insert(id).second;
+		return isEntityValid(id) && m_entities.insert(id).second;
 	}
 
 	bool Action::unregisterEntity(InstanceID id)
@@ -66,7 +81,7 @@ namespace Core
 		return m_entities.erase(id) > 0;
 	}
 
-	bool Action::validateEntity(InstanceID id) const
+	bool Action::isEntityValid(InstanceID id) const
 	{
 		return m_context.entityPool.isAlive(id) && 
 			validateEntity( m_context.entityPool.getInstanceRef(id) );
@@ -86,6 +101,10 @@ namespace Core
 		if(it != m_defaultHandlers.end())
 		{
 			m_intentHandlers[intentID] = it->second;
+		}
+		else
+		{
+			m_intentHandlers.erase(intentID);
 		}
 	}
 

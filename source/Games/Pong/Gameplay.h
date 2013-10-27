@@ -39,7 +39,6 @@ namespace Pong
 
 	private:
 		Graphics::b2DebugDraw m_debug;
-		Core::IntentSystem m_intents;
 
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);

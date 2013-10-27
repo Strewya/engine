@@ -15,23 +15,24 @@ namespace Core
 {
 	/**
 		RULES FOR WRITING COMPONENTS:
-		1. If the component has only one property in it, the name of the property must be 'data'
-		2. Do NOT use Components inside other Components
-		...
+		1. Do NOT use Components inside other Components
+		
 
 	*/
 	COMPONENT(Position2d)
 	{
-		Util::Vec2 data;
-	};
-
-	COMPONENT(Position3d)
-	{
-		Util::Vec3 data;
+		Util::Vec2 m_position;
 	};
 
 	COMPONENT(PhysicalBody)
 	{
-		b2Body* data;
+		b2Body* m_body;
+	};
+
+	COMPONENT(Movement2d)
+	{
+		Util::Vec2 m_curVelocity;
+		Util::Vec2 m_maxVelocity;
+		Util::Vec2 m_acceleration;
 	};
 }

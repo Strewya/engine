@@ -9,13 +9,6 @@
 
 namespace Input
 {
-	KeyBindings::KeyBindings()
-	{
-	}
-
-	KeyBindings::~KeyBindings()
-	{}
-
 	void KeyBindings::createContext(const std::string& contextName)
 	{
 		if(m_contexts.find(contextName) == m_contexts.end())

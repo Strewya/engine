@@ -12,16 +12,18 @@
 	
 namespace Core
 {
-	SYSTEM(Physics)
+	SYSTEM(Physics2d)
 	{
 	public:
-		SYSTEM_CTOR(Physics);
+		SYSTEM_CTOR(Physics2d);
 		
 
 	protected:
 		void init();
 		void frameUpdate(float dt);
 		bool validateEntity(Entity& id) const;
+
+		void doMove(const Intent& i);
 	};
 
 

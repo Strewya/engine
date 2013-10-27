@@ -128,9 +128,6 @@
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\Mouse.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
@@ -148,6 +145,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\Action\Impl\InputHandler.cpp">
       <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Services\Input\Converter.cpp">
+      <Filter>Services/Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,9 +302,6 @@
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\Mouse.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
@@ -325,6 +325,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\Intents.h">
       <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\MouseDevice.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\Converter.h">
+      <Filter>Services/Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

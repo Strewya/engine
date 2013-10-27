@@ -9,10 +9,6 @@
 
 namespace Core
 {
-	IntentSystem::IntentSystem()
-	{
-	}
-
 	void IntentSystem::generateIntent(const Intent& i)
 	{
 		m_intents.push_back(i);
@@ -26,7 +22,8 @@ namespace Core
 		if(it != m_intents.end())
 		{
 			outIntent = *it;
-			m_intents.erase(it);
+			*it = m_intents.back();
+			m_intents.pop_back();
 			return true;
 		}
 		return false;

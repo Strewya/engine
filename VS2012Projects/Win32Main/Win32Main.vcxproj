@@ -54,10 +54,10 @@
       <BrowseInformation>true</BrowseInformation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ShowIncludes>false</ShowIncludes>
-      <ObjectFileName>$(IntDir)/1/2/%(RelativeDir)</ObjectFileName>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
-      <BrowseInformationFile>$(IntDir)/1/2/%(RelativeDir)</BrowseInformationFile>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -80,8 +80,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <ObjectFileName>$(IntDir)/t/r/%(RelativeDir)</ObjectFileName>
-      <BrowseInformationFile>$(IntDir)/1/2/%(RelativeDir)</BrowseInformationFile>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -119,11 +119,12 @@
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\Converter.cpp" />
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Engine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
     <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp" />
-    <ClCompile Include="..\..\source\Services\Input\Mouse.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp" />
     <ClCompile Include="..\..\source\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -179,10 +180,11 @@
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
     <ClInclude Include="..\..\source\Games\Pong\Intents.h" />
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
+    <ClInclude Include="..\..\source\Services\Input\Converter.h" />
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />
     <ClInclude Include="..\..\source\Services\Input\Engine.h" />
     <ClInclude Include="..\..\source\Services\Input\KeyBindings.h" />
-    <ClInclude Include="..\..\source\Services\Input\Mouse.h" />
+    <ClInclude Include="..\..\source\Services\Input\MouseDevice.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Services\Graphics\b2DebugDraw.h" />

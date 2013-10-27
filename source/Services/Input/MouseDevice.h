@@ -18,7 +18,6 @@ namespace Input
 	class MouseDevice
 	{
 	public:
-		MouseDevice();
 		bool handle(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam, std::deque<Event>& queue);
 
 	private:

@@ -24,7 +24,7 @@ namespace Pong
 		bodyDef.gravityScale = 0;
 		bodyDef.fixedRotation = true;
 		bodyDef.userData = &paddle;
-		body.data = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
 
 		b2PolygonShape shape;
 		shape.SetAsBox(1, screenExtent.y*0.2f);
@@ -33,7 +33,7 @@ namespace Pong
 		fixtDef.shape = &shape;
 		fixtDef.density = 1;
 
-		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
+		b2Fixture* fixture = body.m_body->CreateFixture(&fixtDef);
 
 		return true;
 	}
@@ -50,7 +50,7 @@ namespace Pong
 		bodyDef.position.Set(0,0);
 		bodyDef.gravityScale = 0;
 		bodyDef.userData = &ball;
-		body.data = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
 
 		b2CircleShape shape;
 		shape.m_p.Set(0,0);
@@ -62,7 +62,7 @@ namespace Pong
 		fixtDef.restitution = 1;
 		fixtDef.friction = 0;
 		
-		b2Fixture* fixture = body.data->CreateFixture(&fixtDef);
+		b2Fixture* fixture = body.m_body->CreateFixture(&fixtDef);
 
 		return true;
 	}
@@ -76,7 +76,7 @@ namespace Pong
 		bodyDef.type = b2_staticBody;
 		bodyDef.position.Set(0,0);
 		bodyDef.userData = &field;
-		body.data = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
 
 		//the field has 4 fixtures, 2 for the top/bottom walls, and 2 for the goals
 		b2PolygonShape shape;
@@ -86,19 +86,19 @@ namespace Pong
 
 		//left goal
 		shape.SetAsBox(1, screenExtent.y, b2Vec2(-screenExtent.x, 0), 0);
-		b2Fixture* leftGoal = body.data->CreateFixture(&fixtDef);
+		b2Fixture* leftGoal = body.m_body->CreateFixture(&fixtDef);
 
 		//right goal
 		shape.SetAsBox(1, screenExtent.y, b2Vec2(screenExtent.x, 0), 0);
-		b2Fixture* rightGoal = body.data->CreateFixture(&fixtDef);
+		b2Fixture* rightGoal = body.m_body->CreateFixture(&fixtDef);
 
 		//top wall
 		shape.SetAsBox(screenExtent.x, 1, b2Vec2(0, screenExtent.y-1), 0);
-		b2Fixture* topWall = body.data->CreateFixture(&fixtDef);
+		b2Fixture* topWall = body.m_body->CreateFixture(&fixtDef);
 
 		//bottom wall
 		shape.SetAsBox(screenExtent.x, 1, b2Vec2(0, 1-screenExtent.y), 0);
-		b2Fixture* bottomWall = body.data->CreateFixture(&fixtDef);
+		b2Fixture* bottomWall = body.m_body->CreateFixture(&fixtDef);
 
 		
 

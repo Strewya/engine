@@ -31,7 +31,7 @@ namespace Core
 
 		bool registerEntity(InstanceID id);
 		bool unregisterEntity(InstanceID id);
-		bool validateEntity(InstanceID id) const;
+		bool isEntityValid(InstanceID id) const;
 		
 		virtual void registerCallbacks();
 
@@ -46,11 +46,14 @@ namespace Core
 		bool m_timerExpired;
 		int32_t m_timerId;
 		EntityStorage_t m_entities;
+		EntityStorage_t m_deadEntities;
 		IntentHandlerContainer m_intentHandlers;
 		IntentHandlerContainer m_defaultHandlers;
 		
 		virtual void frameUpdate(float dt) = 0;
 		void intentUpdate();
+		void purgeDeadEntities();
+		void markDeadEntity(InstanceID id);
 
 		virtual bool validateEntity(Entity& entity) const = 0;
 		
