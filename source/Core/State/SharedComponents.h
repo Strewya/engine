@@ -15,10 +15,9 @@ namespace Core
 {
 	/**
 		RULES FOR WRITING COMPONENTS:
-		1. Do NOT use Components inside other Components
 		
-
 	*/
+
 	COMPONENT(Position2d)
 	{
 		Util::Vec2 m_position;
@@ -33,6 +32,11 @@ namespace Core
 	{
 		Util::Vec2 m_curVelocity;
 		Util::Vec2 m_maxVelocity;
-		Util::Vec2 m_acceleration;
+	};
+
+	COMPONENT(Acceleration2d)
+	{
+		Util::Vec2 m_curAcceleration;
+		Util::Vec2 m_maxAcceleration;
 	};
 }

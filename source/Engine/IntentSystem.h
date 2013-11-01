@@ -30,8 +30,8 @@ namespace Core
 			wchar_t symbol;
 		} extraData;
 
-		Intent() {}
-		Intent(uint32_t intentID, Type type) : intentID(intentID), type(type) {}
+		Intent() : intentID(0), target(0) {}
+		Intent(uint32_t intentID, Type type) : intentID(intentID), type(type), target(0) {}
 	};
 
 	class IntentSystem

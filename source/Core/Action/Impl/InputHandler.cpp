@@ -20,15 +20,24 @@ namespace Core
 		Input::Event e;
 		while(m_context.services.getInput().nextEvent(e))
 		{
-			Intent intent;
 			//pass the event to keybindings system
+			Intent intent;
 			if(m_context.keyBindings.findBinding(e, intent))
 			{
-				//if an intent is mapped, iterate over all entities registered, set them as target, and place intent into intent system
-				for(auto eid : m_entities)
+				//if an intent is mapped
+				if(intent.target != 0)
 				{
-					intent.target = eid;
+					//the intent already has a target predetermined, so we do nothing
 					m_context.intentSystem.generateIntent(intent);
+				}
+				else
+				{
+					//iterate over all entities registered, set them as target, and place intent into intent system
+					for(auto eid : m_entities)
+					{
+						intent.target = eid;
+						m_context.intentSystem.generateIntent(intent);
+					}
 				}
 			}
 		}
