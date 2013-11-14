@@ -1,13 +1,12 @@
 #pragma once
 /********************************************
-	class:	IntentGenerator
+	class:	Intent
 	usage:	
 ********************************************/
 	/*** common header ***/
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
-#include <deque>
 	/*** end header inclusion ***/
 
 namespace Core
@@ -20,9 +19,9 @@ namespace Core
 			Range,
 			State
 		};
-		uint32_t intentID;
-		InstanceID target;
+		uint32_t msgId;
 		Type type;
+		InstanceID target;
 		union
 		{
 			bool state;
@@ -30,18 +29,7 @@ namespace Core
 			wchar_t symbol;
 		} extraData;
 
-		Intent() : intentID(0), target(0) {}
-		Intent(uint32_t intentID, Type type) : intentID(intentID), type(type), target(0) {}
-	};
-
-	class IntentSystem
-	{
-	public:
-		
-		void generateIntent(const Intent& i);
-		bool consumeIntent(uint32_t intentID, Intent& outIntent);
-		
-	private:
-		std::deque<Intent> m_intents;
+		Intent() : msgId(0), target(0) {}
+		Intent(uint32_t _msgId, Type _type, InstanceID _target = 0) : msgId(_msgId), type(_type), target(_target) {}
 	};
 }

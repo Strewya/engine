@@ -6,7 +6,7 @@
 #include <sstream>
 
 /*		TYPEDEFS	*/
-typedef unsigned long InstanceID;
+typedef uint32_t InstanceID;
 typedef unsigned long DWORD;
 
 /*		CONTANTS	*/

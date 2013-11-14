@@ -6,8 +6,6 @@
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Action/Action.h"
-#include "Core/Action/Actionmap.h"
 #include "Core/State/State.h"
 #include "Core/State/Statemap.h"
 	/*** end header inclusion ***/
@@ -20,14 +18,13 @@ namespace Core
 	class Entity
 	{
 	private:
-		InstanceID _id;
-		std::string _type;
-		std::string _alias;
+		InstanceID m_id;
+		std::string m_type;
+		std::string m_alias;
 
-		Entity* _prototype;
+		InstanceID m_prototype;
 		
-		Actionmap _actions;
-		Statemap _states;
+		Statemap m_states;
 
 		//////////// PRIVATE NO IMPLEMENTATION CONSTRUCTORS ////////////
 
@@ -43,8 +40,6 @@ namespace Core
 
 		//////////// EXISTANCE CHECKS ////////////
 
-		bool hasAction(const char* name);
-		bool hasAction(const std::string& name);
 		bool hasState(InstanceID id);
 		
 		//////////// GETTERS ////////////
@@ -52,16 +47,12 @@ namespace Core
 		InstanceID		getID() const;
 		const std::string&	getType() const;
 		const std::string&	getAlias() const;
-		Action*			getAction(const char* name);
-		Action*			getAction(const std::string& name);
+		InstanceID		getPrototype() const;
 		StateRptr		getState(InstanceID id);
 		template<typename T> T* getState();
 
 		//////////// REMOVAL METHODS ////////////
 
-		void clearActions();
-		bool removeAction(const char* name);
-		bool removeAction(const std::string& name);
 		void clearStates();
 		bool removeState(InstanceID id);
 
@@ -71,11 +62,10 @@ namespace Core
 		Entity& setAlias(const std::string& alias);
 		Entity& setType(const char* type);
 		Entity& setType(const std::string& type);
+		Entity& setPrototype(InstanceID prototype);
 		
 		//////////// INSERT METHODS ////////////
 
-		bool insert(const char* name, std::unique_ptr<Action> action);
-		bool insert(const std::string& name, std::unique_ptr<Action> action);
 		template<typename T> typename T::Ref insert(std::unique_ptr<T> state);
 		
 
@@ -85,7 +75,7 @@ namespace Core
 
 	template<typename T> T* Entity::getState()
 	{
-		StateRptr ptr = _states.retrieve(T::Type);
+		StateRptr ptr = m_states.retrieve(T::Type);
 		if(ptr != nullptr)
 		{
 			return ptr->cast<T>();
@@ -96,7 +86,7 @@ namespace Core
 	template<typename T> typename T::Ref Entity::insert(std::unique_ptr<T> state)
 	{
 		typename T::Ref ref = *state;
-		_states.insert(std::move(state));
+		m_states.insert(std::move(state));
 		return ref;
 	}	
 }

@@ -11,7 +11,7 @@
 namespace Core
 {
 	ServiceLocator::ServiceLocator()
-		: m_engine(nullptr), m_graphics(nullptr), m_input(nullptr), m_script(nullptr), m_clock(nullptr)
+		: m_engine(nullptr), m_graphics(nullptr), m_input(nullptr), m_script(nullptr)
 	{
 	}
 
@@ -57,16 +57,5 @@ namespace Core
 	{
 		assert(m_input != nullptr);
 		return *m_input;
-	}
-
-	void ServiceLocator::bind(Util::GameClock& clock)
-	{
-		m_clock = &clock;
-	}
-
-	Util::GameClock& ServiceLocator::getClock() const
-	{
-		assert(m_clock != nullptr);
-		return *m_clock;
 	}
 }

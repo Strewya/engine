@@ -11,9 +11,4 @@
 
 namespace Pong
 {
-	enum IntentCodes
-	{
-		MoveUp,
-		MoveDown
-	};
 }

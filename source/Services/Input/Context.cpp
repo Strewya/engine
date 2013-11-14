@@ -43,7 +43,7 @@ namespace Input
 				case EventCode::Axis:
 				{
 					out.extraData.range = e.axis.value;
-					auto it = m_converters.find(out.intentID);
+					auto it = m_converters.find(out.msgId);
 					if(it != m_converters.end())
 					{
 						out.extraData.range = it->second.convert(out.extraData.range);

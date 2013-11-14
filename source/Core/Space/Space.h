@@ -20,9 +20,9 @@ namespace Core
 	class Space
 	{
 	public:
-		typedef std::unordered_set<InstanceID> EntityContainer;
-		typedef EntityContainer::iterator iterator;
-		typedef EntityContainer::const_iterator const_iterator;
+		typedef std::unordered_set<InstanceID> EntityContainer_t;
+		typedef EntityContainer_t::iterator iterator;
+		typedef EntityContainer_t::const_iterator const_iterator;
 	
 
 	public:
@@ -33,14 +33,15 @@ namespace Core
 		
 		bool addEntity(InstanceID id);
 		bool removeEntity(InstanceID id);
-		bool findEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
+		bool findEntities(std::deque<InstanceID>& out, const EntityPool& pool, std::function<bool(const Entity&)> filter) const;
 		const_iterator begin() const;
 		iterator begin();
 		const_iterator end() const;
 		iterator end();
-	
+		void clear();
+
 	private:
-		InstanceID _id;
-		EntityContainer _entities;
+		InstanceID m_id;
+		EntityContainer_t m_entities;
 	};
 }

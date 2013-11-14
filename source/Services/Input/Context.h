@@ -8,7 +8,7 @@
 #include "Engine/FwdDecl.h"
 #include <deque>
 	/*** extra headers if needed ***/
-#include "Engine/IntentSystem.h"
+#include "Engine/Intent.h"
 #include "Services/Input/Converter.h"
 #include "Services/Input/Event.h"
 	/*** end header inclusion ***/

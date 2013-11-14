@@ -22,7 +22,7 @@ namespace Input
 	public:
 		Engine(Win32::Window& window);
 
-		bool nextEvent(Event& e);
+		void getEvents(uint64_t maxTimestamp, std::vector<Event>& outEvents);
 		
 	private:
 		std::deque<device_t> m_devices;

@@ -97,9 +97,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp" />
-    <ClCompile Include="..\..\source\Core\Action\Impl\InputHandler.cpp" />
+    <ClCompile Include="..\..\source\Core\Action\Impl\InputController.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp" />
     <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp" />
     <ClCompile Include="..\..\source\Core\Entity\Entity.cpp" />
@@ -112,12 +110,15 @@
     <ClCompile Include="..\..\source\Engine\Defines.cpp" />
     <ClCompile Include="..\..\source\Engine\Engine.cpp" />
     <ClCompile Include="..\..\source\Engine\GameContext.cpp" />
-    <ClCompile Include="..\..\source\Engine\IntentSystem.cpp" />
+    <ClCompile Include="..\..\source\Engine\GlobalIntents.cpp" />
+    <ClCompile Include="..\..\source\Engine\Intent.cpp" />
     <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp" />
     <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp" />
+    <ClCompile Include="..\..\source\Engine\MessageSystem.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
+    <ClCompile Include="..\..\source\Games\Pong\InputController.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Converter.cpp" />
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
@@ -153,10 +154,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Action\Action.h" />
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h" />
-    <ClInclude Include="..\..\source\Core\Action\ActionLogic.h" />
-    <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h" />
-    <ClInclude Include="..\..\source\Core\Action\Actionmap.h" />
-    <ClInclude Include="..\..\source\Core\Action\Impl\InputHandler.h" />
+    <ClInclude Include="..\..\source\Core\Action\Impl\InputController.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h" />
     <ClInclude Include="..\..\source\Core\Action\Impl\Render.h" />
     <ClInclude Include="..\..\source\Core\Entity\Entity.h" />
@@ -171,13 +169,16 @@
     <ClInclude Include="..\..\source\Engine\Engine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
-    <ClInclude Include="..\..\source\Engine\IntentSystem.h" />
+    <ClInclude Include="..\..\source\Engine\GlobalIntents.h" />
+    <ClInclude Include="..\..\source\Engine\Intent.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
+    <ClInclude Include="..\..\source\Engine\MessageSystem.h" />
     <ClInclude Include="..\..\source\Games\GameInit.h" />
     <ClInclude Include="..\..\source\Games\Pong\Components.h" />
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
+    <ClInclude Include="..\..\source\Games\Pong\InputController.h" />
     <ClInclude Include="..\..\source\Games\Pong\Intents.h" />
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
     <ClInclude Include="..\..\source\Services\Input\Converter.h" />

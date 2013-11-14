@@ -12,7 +12,7 @@
 namespace Core
 {
 	Engine::Engine(Win32::Window& window)
-		: m_window(window), m_rendererFactory(window), m_inputEngine(window), m_activeContext(nullptr), m_gameClock(m_timeSource)
+		: m_window(window), m_rendererFactory(window), m_inputEngine(window), m_activeContext(nullptr)
 	{
 		SYSTEMTIME st;
 		GetSystemTime(&st);
@@ -61,7 +61,6 @@ namespace Core
 		m_services.bind(m_rendererFactory.getInterface());
 		m_services.bind(m_scriptEngine);
 		m_services.bind(m_inputEngine);
-		m_services.bind(m_gameClock);
 
 		/*
 			register the resource caches
@@ -106,11 +105,20 @@ namespace Core
 			return;
 		}
 
-		m_gameClock.stepGameTime();
-		
-		//update logic and draw entities
-		//only one context can be active at a time
-		m_activeContext->update();
+		float ratio = 0;
+		uint64_t unusedTime = 0;
+		uint64_t updateTime = m_activeContext->m_updateTime;
+		uint32_t updateCount = m_mainTimer.getFixedStepUpdateCount(updateTime, ratio, unusedTime);
+
+		while(updateCount-- > 0)
+		{
+			m_mainTimer.updateBy(updateTime, m_activeContext->getTimeScale());
+			m_activeContext->update();
+		}
+
+		uint64_t fullUpdateTime = m_mainTimer.getLastRealTimeMicros() + unusedTime - m_renderTimer.getLastRealTimeMicros();
+		m_renderTimer.updateBy(fullUpdateTime, m_activeContext->getTimeScale());
+        m_activeContext->render(fullUpdateTime);
 	}
 
 	void Engine::shutdown()

@@ -10,120 +10,86 @@ namespace Core
 	/////////////////////////// CONSTRUCTORS ///////////////////////////
 
 	Entity::Entity(InstanceID id)
-		: _id(id)
+		: m_id(id), m_prototype(0)
 	{}
 
 	/////////////////////////// EXISTANCE CHECKS ///////////////////////////
 
-	bool Entity::hasAction(const char* name)
-	{
-		return _actions.Contains(name);
-	}
-
-	bool Entity::hasAction(const std::string& name)
-	{
-		return _actions.Contains(name);
-	}
-
 	bool Entity::hasState(InstanceID id)
 	{
-		return _states.contains(id);
+		return m_states.contains(id);
 	}
 
 	/////////////////////////// GETTERS ///////////////////////////
 
 	InstanceID Entity::getID() const
 	{
-		return _id;
+		return m_id;
+	}
+
+	InstanceID Entity::getPrototype() const
+	{
+		return m_prototype;
 	}
 
 	const std::string& Entity::getType() const
 	{
-		return _type;
+		return m_type;
 	}
 
 	const std::string& Entity::getAlias() const
 	{
-		return _alias;
+		return m_alias;
 	}
 	
-	Action* Entity::getAction(const char* name)
-	{
-		return _actions.Retrieve(name);
-	}
-
-	Action* Entity::getAction(const std::string& name)
-	{
-		return _actions.Retrieve(name);
-	}
-
 	StateRptr Entity::getState(InstanceID id)
 	{
-		return _states.retrieve(id);
+		return m_states.retrieve(id);
 	}
 	
 	/////////////////////////// REMOVAL METHODS ///////////////////////////
 
-	void Entity::clearActions()
-	{
-		_actions.Clear();
-	}
-
-	bool Entity::removeAction(const char* name)
-	{
-		return _actions.Remove(name);
-	}
-
-	bool Entity::removeAction(const std::string& name)
-	{
-		return _actions.Remove(name);
-	}
-
 	void Entity::clearStates()
 	{
-		_states.clear();
+		m_states.clear();
 	}
 
 	bool Entity::removeState(InstanceID id)
 	{
-		return _states.destroy(id);
+		return m_states.destroy(id);
 	}
 
 	/////////////////////////// SETTERS ///////////////////////////
 	
 	Entity& Entity::setAlias(const char* alias)
 	{
-		_alias = alias;
+		m_alias = alias;
 		return *this;
 	}
 
 	Entity& Entity::setAlias(const std::string& alias)
 	{
-		_alias = alias;
+		m_alias = alias;
 		return *this;
 	}
 
 	Entity& Entity::setType(const char* type)
 	{
-		_type = type;
+		m_type = type;
 		return *this;
 	}
 
 	Entity& Entity::setType(const std::string& type)
 	{
-		_type = type;
+		m_type = type;
+		return *this;
+	}
+
+	Entity& Entity::setPrototype(InstanceID prototype)
+	{
+		m_prototype = prototype;
 		return *this;
 	}
 
 	/////////////////////////// INSERT METHODS ///////////////////////////
-
-	bool Entity::insert(const char* name, std::unique_ptr<Action> action)
-	{
-		return _actions.Insert(name, std::move(action));
-	}
-
-	bool Entity::insert(const std::string& name, std::unique_ptr<Action> action)
-	{
-		return _actions.Insert(name, std::move(action));
-	}
 }

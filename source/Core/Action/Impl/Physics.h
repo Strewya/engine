@@ -12,18 +12,13 @@
 	
 namespace Core
 {
-	SYSTEM(Physics2d)
+	class Physics2d : public AtomicAction<Physics2d>
 	{
 	public:
-		SYSTEM_CTOR(Physics2d);
-		
-
-	protected:
-		void init();
-		void frameUpdate(float dt);
-		bool validateEntity(Entity& id) const;
-
-		void doMove(const Intent& i);
+		void init(GameContext& context);
+		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
+		void update(GameContext& context);
+		void render(GameContext& context, uint64_t interpolationTime);
 	};
 
 

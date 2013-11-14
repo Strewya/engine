@@ -13,18 +13,29 @@
 
 namespace Core
 {
-	class GameContext;
-
-	SYSTEM(Render)
+	/**************************************************************************
+	*		RENDER ACTION
+	**************************************************************************/
+	class Render : public AtomicAction<Render>
 	{
 	public:
-		SYSTEM_CTOR(Render);
-		
-	protected:
-		void frameUpdate(float dt);
-		bool validateEntity(Entity& id) const;
+		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
+		void update(GameContext& context);
+		void render(GameContext& context, uint64_t interpolationTime);
 
 	private:
 		Graphics::RenderingQueue m_queue;
 	};
+
+
+	/**************************************************************************
+	*		MAIN RENDER ACTION
+	**************************************************************************/
+	class MainRender : public CompositeAction<MainRender>
+	{
+	public:
+		void update(GameContext& context);
+		void render(GameContext& context, uint64_t interpolationTime);
+	};
+
 }

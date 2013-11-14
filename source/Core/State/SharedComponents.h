@@ -28,7 +28,7 @@ namespace Core
 		b2Body* m_body;
 	};
 
-	COMPONENT(Movement2d)
+	COMPONENT(Velocity2d)
 	{
 		Util::Vec2 m_curVelocity;
 		Util::Vec2 m_maxVelocity;

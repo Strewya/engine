@@ -7,97 +7,59 @@
 	/*** extra headers ***/
 #include "Core/State/SharedComponents.h"
 #include "Engine/GameContext.h"
+#include "Engine/GlobalIntents.h"
 	/*** end headers ***/
 	
 namespace Core
 {
-	void Physics2d::frameUpdate(float dt)
+	Util::Vec2 convert(const b2Vec2& v, float scaling)
 	{
-		//do anything required before the step
-		for(auto eid : m_entities)
-		{
-			if(m_context.entityPool.isAlive(eid))
-			{
-				Entity& e = m_context.entityPool.getInstanceRef(eid);
-				auto* stateBody = e.getState<PhysicalBody>();
-				auto* stateMove = e.getState<Movement2d>();
-				
-			}
-			else
-			{
-				markDeadEntity(eid);
-			}
-		}
-
-		//step the physics
-		int32_t velocityIterations = 8;
-		int32_t positionIterations = 3;
-		m_context.physicsWorld.Step(dt, velocityIterations, positionIterations);
-
-		//do any post step updates, like updating the velocity states an such
-		for(auto body = m_context.physicsWorld.GetBodyList(); body != nullptr; body = body->GetNext())
-		{
-			Entity* e = static_cast<Entity*>(body->GetUserData());
-			if(e->hasState(Position2d::Type))
-			{
-				auto* state = e->getState<Position2d>();
-				state->m_position.set(body->GetPosition().x*m_context.b2ScalingFactor, body->GetPosition().y*m_context.b2ScalingFactor);
-				
-			}
-		}
+		return Util::Vec2(v.x*scaling, v.y*scaling);
 	}
 
-	void Physics2d::init()
+	b2Vec2 convert(const Util::Vec2& v, float scalingInverse)
 	{
-		m_context.physicsWorld.SetGravity(b2Vec2(0, -9));
-		m_context.physicsWorld.SetAllowSleeping(true);
+		return b2Vec2(v.x*scalingInverse, v.y*scalingInverse);
+	}
 
-		m_context.entityPool.registerDestructionCallback([&](Entity& e)
+	void Physics2d::init(GameContext& context)
+	{
+		AtomicAction::init(context);
+		context.m_physicsWorld.SetGravity(b2Vec2(0, -9));
+		context.m_physicsWorld.SetAllowSleeping(true);
+
+		context.m_entityPool.registerDestructionCallback([&](Entity& e)
 		{
 			if(e.hasState(PhysicalBody::Type))
 			{
 				auto* state = e.getState<PhysicalBody>();
-				m_context.physicsWorld.DestroyBody(state->m_body);
+				context.m_physicsWorld.DestroyBody(state->m_body);
 				state->m_body = nullptr;
 			}
 		});
-
-		
-		
 	}
 
-	bool Physics2d::validateEntity(Entity& entity) const
+	void Physics2d::processMessage(GameContext& context, uint32_t msg, InstanceID entity)
 	{
-		return
-			entity.hasState(PhysicalBody::Type) &&
-			entity.hasState(Movement2d::Type) &&
-			entity.hasState(Position2d::Type);
 	}
 
-	void Physics2d::doMove(const Intent& intent)
+	void Physics2d::update(GameContext& context)
 	{
-		if(isEntityValid(intent.target))
-		{
-			Entity& e = m_context.entityPool.getInstanceRef(intent.target);
-			auto* stateBody = e.getState<PhysicalBody>();
-			auto* stateMove = e.getState<Movement2d>();
-			switch(intent.type)
-			{
-			case Intent::Type::Action:
-				break;
+		//do anything required before the step
+		
+		//step the physics
+		const int32_t velocityIterations = 8;
+		const int32_t positionIterations = 3;
+		context.m_physicsWorld.Step(context.m_timer.getDeltaTime(), velocityIterations, positionIterations);
 
-			case Intent::Type::Range:
-				break;
+		//do any post step updates, like updating the velocity states an such
 
-			case Intent::Type::State:
-			{
-				
-				break;
-			}
-			}
-		}
 	}
 
+	void Physics2d::render(GameContext& context, uint64_t interpolationTime)
+	{
+		context.m_physicsWorld.DrawDebugData();
+	}
 
 
 

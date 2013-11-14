@@ -12,23 +12,9 @@ namespace Core
 {
 	ActionRef ActionRegistry::addAction(ActionUptr action)
 	{
-		return *m_actions.emplace(std::make_pair(action->uid, std::move(action))).first->second;
-	}
-
-	ActionRef ActionRegistry::getAction(InstanceID actionId)
-	{
-		//i could search here to find if the action is there and throw an exception straight away,
-		//but this will fail on the line where the thing is used, so it'll be easier to debug.
-		return *m_actions.find(actionId)->second;
-	}
-
-	auto ActionRegistry::begin() -> ActionStorage_t::iterator
-	{
-		return m_actions.begin();
-	}
-
-	auto ActionRegistry::end() -> ActionStorage_t::iterator
-	{
-		return m_actions.end();
+		assert(action->getFamily() == ActionFamily::Composite || m_actions.count(action->getUID()) == 0);
+		ActionRef ref = *action;
+		m_actions.emplace(std::make_pair(action->getUID(), std::move(action)));
+		return ref;
 	}
 }

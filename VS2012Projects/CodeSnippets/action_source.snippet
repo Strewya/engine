@@ -13,11 +13,6 @@
 		<Snippet>
 			<Declarations>
 				<Literal>
-					<ID>path</ID>
-					<ToolTip>Path to header file</ToolTip>
-					<Default>path</Default>
-				</Literal>
-				<Literal>
 					<ID>namespace</ID>
 					<ToolTip>Enclosing namespace</ToolTip>
 					<Default>MyNamespace</Default>
@@ -32,33 +27,21 @@
 		/*** precompiled header ***/
 	#include "stdafx.h"
 		/*** personal header ***/
-	#include "$path$"
+	#include "Core/Action/Impl/$name$"
 		/*** C++ headers ***/
 		/*** extra headers ***/
 		/*** end headers ***/
 
 	namespace $namespace$
 	{
-		void $name$::onUpdate(float dt)
-		{
-			$end$
-		}
+		void $name$::processMessages(GameContext& context)
+		{$end$}
 		
-		bool $name$::validateEntity(Core::Entity& entity)
-		{
-			return true;
-		}
+		void $name$::update(GameContext& context)
+		{}
 		
-		
-		/* optional methods: 
-		void $name$::registerCallbacks()
-		{
-		}
-		
-		void $name$::init()
-		{
-		}
-		*/
+		void $name$::render(GameContext& context, uint64_t interpolationTime)
+		{}
 	}
 ]]>
 			</Code>

@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include "Services/Input/Engine.h"
 	/*** C++ headers ***/
+#include <vector>
 	/*** extra headers ***/
 #include "Services/Input/MouseDevice.h"
 #include "Win32/Window.h"
@@ -26,14 +27,17 @@ namespace Input
 		return std::any_of(m_devices.begin(), m_devices.end(), check);
 	}
 
-	bool Engine::nextEvent(Event& e)
+	void Engine::getEvents(uint64_t maxTimestamp, std::vector<Event>& outEvents)
 	{
-		if(m_eventQueue.empty())
+		outEvents.clear();
+		if(!m_eventQueue.empty())
 		{
-			return false;
+			auto check = [=](const Event& e){ return e.timestamp <= maxTimestamp; };
+			std::copy_if(m_eventQueue.begin(), m_eventQueue.end(), std::back_inserter(outEvents), check);
+			if(!outEvents.empty())
+			{
+				std::remove_if(m_eventQueue.begin(), m_eventQueue.end(), check);
+			}
 		}
-		e = m_eventQueue.front();
-		m_eventQueue.pop_front();
-		return true;
 	}
 }

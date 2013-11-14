@@ -15,7 +15,6 @@
 #include "Services/Graphics/SpritesheetCache.h"
 #include "Services/Input/Engine.h"
 #include "Services/Script/LuaEngine.h"
-#include "Util/Time.h"
 	/*** end header inclusion ***/
 
 namespace Win32
@@ -55,7 +54,7 @@ namespace Core
 
 		ServiceLocator& getServices();
 		ResourceLocator& getResources();
-		
+
 	private:
 		Win32::Window& m_window;
 		Graphics::RendererFactory m_rendererFactory;
@@ -69,13 +68,13 @@ namespace Core
 		Graphics::SpritesheetCache m_spritesheets;
 		ResourceLocator m_resources;
 
-		typedef std::unordered_map<ContextType, std::unique_ptr<GameContext>, std::hash<int>> ContextStorage_t;
+		typedef std::unordered_map<uint32_t, std::unique_ptr<GameContext>> ContextStorage_t;
 
 		ContextStorage_t m_gameContexts;
-		GameContext* m_activeContext; 
-		
-		Util::HighPrecisionTimeSource m_timeSource;
-		Util::GameClock m_gameClock;
+		GameContext* m_activeContext;
+
+		Util::Time m_mainTimer;
+		Util::Time m_renderTimer;
 	};
 
 

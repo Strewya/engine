@@ -10,12 +10,12 @@
 	/*** extra headers ***/
 #include "Engine/Engine.h"
 #include "Engine/ServiceLocator.h"
-#include "Core/Action/Impl/InputHandler.h"
 #include "Core/Action/Impl/Physics.h"
 #include "Core/Action/Impl/Render.h"
 #include "Core/Entity/Entity.h"
 #include "Games/Pong/Components.h"
 #include "Games/Pong/EntityConstructors.h"
+#include "Games/Pong/InputController.h"
 #include "Games/Pong/Intents.h"
 #include "Services/Graphics/IRenderer.h"
 #include "Services/Input/Context.h"
@@ -31,8 +31,8 @@ namespace Pong
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
 		: GameContext(Core::ContextType::GAMEPLAY, services, resources), m_debug(services.getGraphics())
 	{
-		b2ScalingFactor = 10;
-		physicsWorld.SetDebugDraw(&m_debug);
+		m_b2ScalingFactor = 10;
+		m_b2ScalingFactorInv = 1/m_b2ScalingFactor;
 		uint32_t flags = 0;
 		flags += Graphics::b2DebugDraw::e_shapeBit;
 		flags += Graphics::b2DebugDraw::e_centerOfMassBit;
@@ -40,112 +40,43 @@ namespace Pong
 		flags += Graphics::b2DebugDraw::e_pairBit;
 		//flags += Graphics::b2DebugDraw::e_aabbBit;
 		m_debug.SetFlags(flags);
-		m_debug.setLengthScale(b2ScalingFactor);
-	}
-
-	void moveUpHandler(Core::GameContext& m_context, const Core::Intent& intent)
-	{
-		if(m_context.entityPool.isAlive(intent.target))
-		{
-			Core::Entity& entity = m_context.entityPool.getInstanceRef(intent.target);
-			auto* physicsState = entity.getState<Core::PhysicalBody>();
-			if(physicsState != nullptr)
-			{
-				switch(intent.type)
-				{
-				case Core::Intent::Type::Action:
-					physicsState->m_body->ApplyLinearImpulse(b2Vec2(0,4), physicsState->m_body->GetWorldCenter());
-					break;
-
-				case Core::Intent::Type::Range:
-
-					break;
-
-				case Core::Intent::Type::State:
-					if(intent.extraData.state)
-					{
-						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,4));
-					}
-					else
-					{
-						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,-4));
-					}
-					break;
-				}	
-			}
-		}
-	}
-
-	void moveDownHandler(Core::GameContext& m_context, const Core::Intent& intent)
-	{
-		if(m_context.entityPool.isAlive(intent.target))
-		{
-			Core::Entity& entity = m_context.entityPool.getInstanceRef(intent.target);
-			auto* physicsState = entity.getState<Core::PhysicalBody>();
-			if(physicsState != nullptr)
-			{
-				switch(intent.type)
-				{
-				case Core::Intent::Type::Action:
-					physicsState->m_body->ApplyLinearImpulse(b2Vec2(0,-4), physicsState->m_body->GetWorldCenter());
-					break;
-
-				case Core::Intent::Type::Range:
-
-					break;
-
-				case Core::Intent::Type::State:
-					if(intent.extraData.state)
-					{
-
-						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,-4));
-					}
-					else
-					{
-						physicsState->m_body->SetLinearVelocity(physicsState->m_body->GetLinearVelocity() + b2Vec2(0,4));
-					}
-					break;
-				}	
-			}
-		}
+		m_debug.setLengthScale(m_b2ScalingFactor);
+		m_physicsWorld.SetDebugDraw(&m_debug);
+		m_render.reset(Core::MainRender::create(*this).release());
 	}
 
 	void Gameplay::registerActions()
 	{
-		setupAction(Core::InputHandler::create(*this));
-		Core::ActionRef physics = setupAction(Core::Physics2d::create(*this));
-		setupRenderAction(Core::Render::create(*this));
+		setupAction(Core::InputController::create(*this), true, false);
+		setupAction(Core::Physics2d::create(*this), true, true);
+		setupAction(Core::Render::create(*this), false, true);
 		
-		physics.registerIntentHandler(Pong::IntentCodes::MoveUp, moveUpHandler);
-		physics.registerIntentHandler(Pong::IntentCodes::MoveDown, moveDownHandler);
 	}
 
 	void Gameplay::registerCallbacks()
 	{
-		entityFactory.registerConstructor("paddle", createPaddle);
-		entityFactory.registerConstructor("ball", createBall);
-		entityFactory.registerConstructor("field", createField);
+		m_entityFactory.registerConstructor("paddle", createPaddle);
+		m_entityFactory.registerConstructor("ball", createBall);
+		m_entityFactory.registerConstructor("field", createField);
 
 		//input
-		keyBindings.createContext("main");
-		Input::Context& main = keyBindings.getContext("main");
-		keyBindings.pushContext("main", 1);
+		m_keyBindings.createContext("main");
+		Input::Context& main = m_keyBindings.getContext("main");
+		m_keyBindings.pushContext("main", 1);
 
-		main.addState(Pong::IntentCodes::MoveUp, Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_LeftButton, Input::Event::DONT_CARE));
-		main.addState(Pong::IntentCodes::MoveDown, Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::_RightButton, Input::Event::DONT_CARE));
 	}
 
 	void Gameplay::createEntities()
 	{
-		auto& field = entityPool.getNewInstanceRef();
-		entityFactory.createEntityType("field", field);
-		activeEntities.addEntity(field.getID());
+		auto& field = m_entityPool.getNewInstanceRef();
+		m_entityFactory.createEntityType("field", field);
+		m_allEntities.addEntity(field.getID());
 
 		for(int i=0; i<2; ++i)
 		{
-			auto& paddle = entityPool.getNewInstanceRef();
-			entityFactory.createEntityType("paddle", paddle);
-			activeEntities.addEntity(paddle.getID());
+			auto& paddle = m_entityPool.getNewInstanceRef();
+			m_entityFactory.createEntityType("paddle", paddle);
+			m_allEntities.addEntity(paddle.getID());
 			
 			if(i == 0)
 			{
@@ -159,21 +90,21 @@ namespace Pong
 			bindPaddleToField(paddle, field);
 		}
 		
-		auto& ball = entityPool.getNewInstanceRef();
-		entityFactory.createEntityType("ball", ball);
-		activeEntities.addEntity(ball.getID());
+		auto& ball = m_entityPool.getNewInstanceRef();
+		m_entityFactory.createEntityType("ball", ball);
+		m_allEntities.addEntity(ball.getID());
 		setupBall(ball);
 	}
 
 	void Gameplay::onActivate()
 	{
 		std::deque<InstanceID> entities;
-		activeEntities.findEntities(entities, entityPool, [](const Core::Entity& e)
+		m_allEntities.findEntities(entities, m_entityPool, [](const Core::Entity& e)
 		{
 			return e.getType() == "ball";
 		});
 		assert(entities.size() == 1);
-		setupBall(entityPool.getInstanceRef(entities[0]));
+		setupBall(m_entityPool.getInstanceRef(entities[0]));
 	}
 
 	void Gameplay::onDeactivate()
@@ -183,10 +114,11 @@ namespace Pong
 
 	void Gameplay::destroyEntities()
 	{
-		for(auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
+		for(auto eid : m_allEntities)
 		{
-			entityPool.destroy(*it);
+			m_entityPool.destroy(eid);
 		}
+		m_allEntities.clear();
 	}
 
 
@@ -194,12 +126,12 @@ namespace Pong
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("left");
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*m_b2ScalingFactor);
 		
 		auto* state = paddle.getState<Core::PhysicalBody>();
 		state->m_body->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
 
-		actionRegistry.getAction(Core::InputHandler::Type).registerEntity(paddle.getID());
+		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.registerMessage("add_entity"), paddle.getID());
 	}
 
 
@@ -207,7 +139,7 @@ namespace Pong
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("right");
-		auto screenExtent = services.getGraphics().getScreenSize()/(2*b2ScalingFactor);
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*m_b2ScalingFactor);
 		
 		auto* state = paddle.getState<Core::PhysicalBody>();
 		state->m_body->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
@@ -218,8 +150,8 @@ namespace Pong
 	{
 		auto* state = ball.getState<Core::PhysicalBody>();
 		Util::Random random;
-		auto y = random.randInt(0, 20);
-		auto x = random.randInt(y, 50);
+		auto y = random.randInt(0, 10);
+		auto x = random.randInt(y, 25);
 		state->m_body->ApplyLinearImpulse(b2Vec2((float)x,(float)y), state->m_body->GetWorldCenter());
 	}
 
@@ -232,7 +164,7 @@ namespace Pong
 		jointDef.collideConnected = true;
 		jointDef.Initialize(paddleBody->m_body, fieldBody->m_body, paddleBody->m_body->GetWorldCenter(), b2Vec2(0, 1.0f));
 
-		physicsWorld.CreateJoint(&jointDef);
+		m_physicsWorld.CreateJoint(&jointDef);
 	}
 }
 

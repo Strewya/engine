@@ -13,9 +13,12 @@ namespace Pong
 {
 	bool createPaddle(Core::GameContext& context, Core::Entity& paddle)
 	{
-		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
-		auto& pos = paddle.insert(Core::Position2d::create());
+		auto screenExtent = context.m_services.getGraphics().getScreenSize()/(2*context.m_b2ScalingFactor);
+		auto& position = paddle.insert(Core::Position2d::create());
 		auto& body = paddle.insert(Core::PhysicalBody::create());
+		auto& velocity = paddle.insert(Core::Velocity2d::create());
+
+		velocity.m_maxVelocity.set(0, 20);
 
 
 		b2BodyDef bodyDef;
@@ -24,7 +27,8 @@ namespace Pong
 		bodyDef.gravityScale = 0;
 		bodyDef.fixedRotation = true;
 		bodyDef.userData = &paddle;
-		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.m_physicsWorld.CreateBody(&bodyDef);
+		
 
 		b2PolygonShape shape;
 		shape.SetAsBox(1, screenExtent.y*0.2f);
@@ -40,17 +44,17 @@ namespace Pong
 
 	bool createBall(Core::GameContext& context, Core::Entity& ball)
 	{
-		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
-		auto& pos = ball.insert(Core::Position2d::create());
+		auto screenExtent = context.m_services.getGraphics().getScreenSize()/(2*context.m_b2ScalingFactor);
+		auto& position = ball.insert(Core::Position2d::create());
 		auto& body = ball.insert(Core::PhysicalBody::create());
-
+		auto& velocity = ball.insert(Core::Velocity2d::create());
 
 		b2BodyDef bodyDef;
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position.Set(0,0);
 		bodyDef.gravityScale = 0;
 		bodyDef.userData = &ball;
-		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.m_physicsWorld.CreateBody(&bodyDef);
 
 		b2CircleShape shape;
 		shape.m_p.Set(0,0);
@@ -69,14 +73,14 @@ namespace Pong
 
 	bool createField(Core::GameContext& context, Core::Entity& field)
 	{
-		auto screenExtent = context.services.getGraphics().getScreenSize()/(2*context.b2ScalingFactor);
+		auto screenExtent = context.m_services.getGraphics().getScreenSize()/(2*context.m_b2ScalingFactor);
 		auto& body = field.insert(Core::PhysicalBody::create());
 
 		b2BodyDef bodyDef;
 		bodyDef.type = b2_staticBody;
 		bodyDef.position.Set(0,0);
 		bodyDef.userData = &field;
-		body.m_body = context.physicsWorld.CreateBody(&bodyDef);
+		body.m_body = context.m_physicsWorld.CreateBody(&bodyDef);
 
 		//the field has 4 fixtures, 2 for the top/bottom walls, and 2 for the goals
 		b2PolygonShape shape;

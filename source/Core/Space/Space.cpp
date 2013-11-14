@@ -11,7 +11,7 @@
 namespace Core
 {
 	Space::Space(InstanceID id)
-		: _id(id)
+		: m_id(id)
 	{
 	}
 
@@ -21,22 +21,22 @@ namespace Core
 
 	InstanceID Space::getID() const
 	{
-		return _id;
+		return m_id;
 	}
 
 	bool Space::addEntity(InstanceID id)
 	{
-		return _entities.insert(id).second;
+		return m_entities.insert(id).second;
 	}
 
 	bool Space::removeEntity(InstanceID id)
 	{
-		return _entities.erase(id) != 0;
+		return m_entities.erase(id) != 0;
 	}
 
 	bool Space::findEntities(std::deque<InstanceID>& container, const EntityPool& pool, std::function<bool(const Entity&)> filter) const
 	{
-		for(auto id : _entities)
+		for(auto id : m_entities)
 		{
 			if(pool.isAlive(id))
 			{
@@ -51,21 +51,26 @@ namespace Core
 	
 	Space::const_iterator Space::begin() const
 	{
-		return _entities.begin();
+		return m_entities.begin();
 	}
 
 	Space::const_iterator Space::end() const
 	{
-		return _entities.end();
+		return m_entities.end();
 	}
 
 	Space::iterator Space::begin()
 	{
-		return _entities.begin();
+		return m_entities.begin();
 	}
 	
 	Space::iterator Space::end()
 	{
-		return _entities.end();
+		return m_entities.end();
+	}
+
+	void Space::clear()
+	{
+		m_entities.clear();
 	}
 }

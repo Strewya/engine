@@ -14,17 +14,12 @@ namespace Core
 	class ActionRegistry
 	{
 	public:
-		typedef std::unordered_map<InstanceID , ActionUptr> ActionStorage_t;
+		typedef std::unordered_multimap<InstanceID, ActionUptr> ActionStorage_t;
 
 		ActionRef addAction(ActionUptr action);
-		ActionRef getAction(InstanceID actionId);
-
-		ActionStorage_t::iterator begin();
-		ActionStorage_t::iterator end();
-
+		
 	protected:
 	private:
-		
 		ActionStorage_t m_actions;
 	};
 }

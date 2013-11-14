@@ -35,22 +35,22 @@ namespace Input
 	public:
 		static const bool DONT_CARE = false;
 
-		Event() {}
+		Event() : timestamp(0) {}
 		Event(DeviceCode device, EventCode type, uint32_t buttonCode, bool buttonState)
-			: device(device), type(type)
+			: device(device), type(type), timestamp(0)
 		{ button.code = buttonCode; button.down = buttonState; }
 
 		Event(DeviceCode device, EventCode type, AxisCode axisCode, float minTolerance)
-			: device(device), type(type)
+			: device(device), type(type), timestamp(0)
 		{ axis.code = axisCode; axis.value = minTolerance; }
 		
 		Event(DeviceCode device, EventCode type, wchar_t symbol)
-			: device(device), type(type)
+			: device(device), type(type), timestamp(0)
 		{ text = symbol; }
 		
 		EventCode type;
 		DeviceCode device;
-		//timestamp needed here
+		uint64_t timestamp;
 		union
 		{
 			struct

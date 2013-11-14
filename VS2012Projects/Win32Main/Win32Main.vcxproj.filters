@@ -22,12 +22,6 @@
     <ClCompile Include="..\..\source\Core\Action\Action.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Actionmap.cpp">
-      <Filter>Core/Action</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\ActionUpdater.cpp">
-      <Filter>Core/Action</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Entity\EntityPool.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
@@ -137,20 +131,29 @@
     <ClCompile Include="..\..\source\Services\Input\Engine.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Engine\IntentSystem.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp">
       <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\InputHandler.cpp">
-      <Filter>Core/Action/Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\Converter.cpp">
       <Filter>Services/Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\GlobalIntents.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\MessageSystem.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Action\Impl\InputController.cpp">
+      <Filter>Core/Action/Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Games\Pong\InputController.cpp">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Engine\Intent.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,15 +176,6 @@
       <Filter>Core/Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Action\Action.h">
-      <Filter>Core/Action</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Actionmap.h">
-      <Filter>Core/Action</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\ActionLogic.h">
-      <Filter>Core/Action</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\ActionUpdater.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h">
@@ -311,14 +305,8 @@
     <ClInclude Include="..\..\source\Services\Input\Engine.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine\IntentSystem.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\KeyBindings.h">
       <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\InputHandler.h">
-      <Filter>Core/Action/Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
       <Filter>GameSpecific\Pong</Filter>
@@ -331,6 +319,21 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\Converter.h">
       <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GlobalIntents.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\MessageSystem.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Action\Impl\InputController.h">
+      <Filter>Core/Action/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Games\Pong\InputController.h">
+      <Filter>GameSpecific\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\Intent.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

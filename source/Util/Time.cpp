@@ -4,227 +4,147 @@
 	/*** personal header ***/
 #include "Util/Time.h"
 	/*** C++ headers ***/
+#include <chrono>
 	/*** extra headers ***/
 #include "Engine/Defines.h"
 	/*** end headers ***/
 	
 namespace Util
 {
-#ifdef _DEBUG
-	static const uint32_t CLAMP_FRAME_COUNT = 1;
-#else
-	static const uint32_t CLAMP_FRAME_COUNT = 8;
-#endif
-
-	uint64_t HighPrecisionTimeSource::getMiliseconds()
+	/********************************************************
+	*		TIME SOURCES
+	********************************************************/
+	
+	class HighPrecisionTimeSource
 	{
-		auto now = std::chrono::high_resolution_clock::now();
-		return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-	}
-
-	uint64_t HighPrecisionTimeSource::getMicroseconds()
-	{
-		auto now = std::chrono::high_resolution_clock::now();
-		return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
-	}
-
-
-	TimerData::TimerData(uint32_t id)
-		: m_type(TimerType::Stopwatch), m_id(id), m_parent(INVALID_ID),
-		m_targetTime(0), m_currentTime(0),
-		m_repeating(false), m_done(false), m_paused(false),
-		m_onOccurrence([](){}), m_onReset([&](){m_currentTime = m_targetTime;})
-	{}
-
-	void TimerData::reset()
-	{
-		m_done = false;
-		m_onReset();
-	}
-
-	void TimerData::pause()
-	{
-		m_paused = true;
-	}
-
-	void TimerData::resume()
-	{
-		m_paused = false;
-	}
-
-
-
-
-	GameClock::GameClock(IExternalTimeSource& timeSource)
-		: m_timeSource(timeSource), m_createdRealTime(timeSource.getMiliseconds()),
-		m_framerate(60), m_timePerFrame(1000/m_framerate), m_currentGameTime(0), m_lastUpdateRealTime(0)
-	{}
-
-	void GameClock::setFramerate(uint32_t framerate)
-	{
-		m_framerate = framerate;
-		m_timePerFrame = 1000/framerate;
-	}
-
-	uint32_t GameClock::getFramerate() const
-	{
-		return m_framerate;
-	}
-
-	uint32_t GameClock::getTimePerFrame() const
-	{
-		return m_timePerFrame;
-	}
-
-	TimerData& GameClock::createTimingData()
-	{
-		for(auto it = m_timers.begin(); it != m_timers.end(); ++it)
+	public:
+		uint64_t getSystemMiliseconds()
 		{
-			if(*it == nullptr)
-			{
-				it->reset(new TimerData(it - m_timers.begin()));
-				return **it;
-			}
+			auto now = std::chrono::high_resolution_clock::now();
+			return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 		}
-		m_timers.push_back(std::unique_ptr<TimerData>(new TimerData(m_timers.size())));
-		return *m_timers.back();
-	}
-
-	uint32_t GameClock::createCountdownTimer(uint32_t initialTime, TimerData::Callback onOccurence)
-	{
-		TimerData& timer = createTimingData();
-		timer.m_type = TimerType::Countdown;
-		timer.m_targetTime = initialTime;
-		timer.m_onOccurrence = onOccurence;
-		return timer.m_id;
-	}
-
-	uint32_t GameClock::createStopwatch()
-	{
-		TimerData& timer = createTimingData();
-		timer.m_type = TimerType::Stopwatch;
-		return timer.m_id;
-	}
-
-	uint32_t GameClock::createAccumulator(uint32_t timeToFire, TimerData::Callback onOccurrence)
-	{
-		TimerData& timer = createTimingData();
-		timer.m_type = TimerType::Accumulator;
-		timer.m_targetTime = timeToFire;
-		timer.m_onOccurrence = onOccurrence;
-		timer.m_onReset = [](){};
-		timer.m_repeating = true;
-		return timer.m_id;
-	}
-
-	bool GameClock::isTimerAlive(uint32_t timerId) const
-	{
-		return timerId < m_timers.size() && m_timers[timerId] != nullptr;
-	}
-
-	void GameClock::deleteTimer(uint32_t timerId)
-	{
-		if(isTimerAlive(timerId))
+		uint64_t getSystemMicroseconds()
 		{
-			m_timers[timerId].reset(nullptr);
+			auto now = std::chrono::high_resolution_clock::now();
+			return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
+		}
+	};
+
+	class QPCTimeSource
+	{
+	public:
+		QPCTimeSource();
+		uint64_t getSystemMiliseconds()
+		{
+			return 0;
+		}
+		uint64_t getSystemMicroseconds()
+		{
+			return 0;
+		}
+	private:
+
+	};
+
+#define QPCTS QPCTimeSource
+#define HPTS HighPrecisionTimeSource
+#define TIME_SOURCE HPTS
+
+
+
+
+	/********************************************************
+	*		TIME CLASS
+	********************************************************/
+
+	const double Time::STOP_TIME = 0;
+	const double Time::NORMAL_TIME = 1;
+
+	Time::Time()
+		: m_oldRealTime(getRealTimeMicros()),
+		m_lastMicros(0), m_curMicros(0), m_deltaMicros(0), m_deltaTime(0),
+		m_virtLastMicros(0), m_virtCurMicros(0), m_virtDeltaMicros(0), m_virtDeltaTime(0),
+		m_microToSec(static_cast<float>(1.0/1000000.0))
+	{
+	}
+
+	uint64_t Time::getRealTimeMicros() const
+	{
+		TIME_SOURCE source;
+		return source.getSystemMicroseconds();
+	}
+
+	uint64_t Time::getLastRealTimeMicros() const
+	{
+		return m_oldRealTime;
+	}
+
+	void Time::update(double virtualTimeScale)
+	{
+		uint64_t now = getRealTimeMicros();
+		uint64_t delta = now - m_oldRealTime;
+		m_oldRealTime = now;
+
+		updateBy(delta, virtualTimeScale);
+	}
+
+	void Time::updateBy(uint64_t deltaMicros, double virtualTimeScale)
+	{
+		m_lastMicros = m_curMicros;
+		m_curMicros += deltaMicros;
+		m_deltaMicros = m_curMicros - m_lastMicros;
+		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
+
+		if(virtualTimeScale > 0) //zero is full stop, less would mean rewind, which is impossible?
+		{
+			m_virtLastMicros = m_virtCurMicros;
+			m_virtCurMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros) * virtualTimeScale);
+			m_virtDeltaMicros = m_virtCurMicros - m_virtLastMicros;
+			m_virtDeltaTime = static_cast<float>(m_virtDeltaMicros) * m_microToSec;
 		}
 	}
 
-	TimerData& GameClock::getTimer(uint32_t timerId)
+	uint32_t Time::getFixedStepUpdateCount(uint64_t time, float& ratio, uint64_t& remainderTime)
 	{
-		return *m_timers[timerId];
+		uint64_t now = getRealTimeMicros();
+		uint64_t delta = now - m_oldRealTime;
+      
+		uint32_t count = static_cast<uint32_t>(delta / time);
+		uint64_t addMe = count * time;
+		m_oldRealTime += addMe;
+		remainderTime = delta - addMe;
+       
+		ratio = static_cast<float>(static_cast<double>(addMe) / static_cast<double>(time));
+		return count;
 	}
 
-	void GameClock::stepGameTime()
+	uint64_t Time::getCurMicros() const
 	{
-		//get the elapsed real time
-		uint64_t currentRealTime = m_timeSource.getMiliseconds();
-		uint32_t elapsedRealTime = uint32_t(currentRealTime - m_lastUpdateRealTime);
-		m_lastUpdateRealTime = currentRealTime;
-
-		//calculate the game time delta by clamping the real elapsed time to a couple of frames worth of time
-		uint32_t gameDelta = clamp(elapsedRealTime, 0U, m_timePerFrame*CLAMP_FRAME_COUNT);
-
-		m_currentGameTime += gameDelta;
-
-		//first we remove the timers that were finished last frame and then update the remining timers
-		// this is to allow timers that finish this frame to be reset by their owner if they wish
-		removeFinishedTimers();
-		updateTimers(gameDelta);
+		return m_curMicros;
 	}
 
-	void GameClock::updateTimers(uint32_t delta)
+	uint64_t Time::getDeltaMicros() const
 	{
-		static std::function<void(TimerData&, uint32_t)> timingUpdaters[(uint32_t)TimerType::TIMER_TYPE_COUNT] =
-		{
-			[](TimerData& t, uint32_t dt){ t.m_currentTime -= dt; if(t.m_currentTime <= 0) { t.m_done = true; } },
-			[](TimerData& t, uint32_t dt){ t.m_currentTime += dt; },
-			[](TimerData& t, uint32_t dt){ t.m_currentTime += dt; if(t.m_currentTime >= t.m_targetTime) { t.m_done = true; } },
-		};
-
-		for(auto& uptr : m_timers)
-		{
-			if(uptr != nullptr && isActive(uptr->m_id))
-			{
-				TimerData& timer = *uptr;
-				
-				timingUpdaters[(uint32_t)timer.m_type](timer, delta);
-				
-				if(timer.m_done)
-				{
-					timer.m_onOccurrence();
-					if(timer.m_repeating)
-					{
-						timer.reset();
-					}
-				}
-			}
-		}
+		return m_deltaMicros;
 	}
 
-	void GameClock::removeFinishedTimers()
+	float Time::getDeltaTime() const
 	{
-		for(auto& timer : m_timers)
-		{
-			if(timer != nullptr && timer->m_done)
-			{
-				timer.reset(nullptr);
-			}
-		}
+		return m_deltaTime;
 	}
 
-	void GameClock::slaveTimers(uint32_t master, uint32_t slave)
+	uint64_t Time::getVirtCurMicros() const
 	{
-		if(isTimerAlive(master) && isTimerAlive(slave))
-		{
-			m_timers[slave]->m_parent = master;
-		}
+		return m_virtCurMicros;
 	}
 
-	void GameClock::unslaveTimer(uint32_t slave)
+	uint64_t Time::getVirtDeltaMicros() const
 	{
-		if(isTimerAlive(slave))
-		{
-			m_timers[slave]->m_parent = INVALID_ID;
-		}
+		return m_virtDeltaMicros;
 	}
 
-	bool GameClock::isActive(uint32_t timerId) const
+	float Time::getVirtDeltaTime() const
 	{
-		bool active = false;
-		if(isTimerAlive(timerId))
-		{
-			auto& timer = *m_timers[timerId];
-			// first we check if we are paused, and if so, return immediately
-			// if we are not paused, then we check if we have a parent.
-			// if we don't, we return, if we do, we return the parents status
-			active = !timer.m_paused && (timer.m_parent == INVALID_ID || isActive(timer.m_parent));
-		}
-		return active;
-	}
-
-	uint64_t GameClock::getCurrentGameTime() const
-	{
-		return m_currentGameTime;
+		return m_virtDeltaTime;
 	}
 }

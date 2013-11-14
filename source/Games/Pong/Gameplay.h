@@ -8,8 +8,6 @@
 #include "Engine/FwdDecl.h"
 	/*** extra headers if needed ***/
 #include "Engine/GameContext.h"
-#include "Services/Graphics/b2DebugDraw.h"
-#include "Engine/IntentSystem.h"
 	/*** end header inclusion ***/
 
 namespace Pong
