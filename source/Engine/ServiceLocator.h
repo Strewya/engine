@@ -6,7 +6,7 @@
 			persistence, communication, (scripting??) etc
 ********************************************/
 	/*** common header ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 namespace Core { class Engine; }

@@ -1,11 +1,11 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Action/ActionRegistry.h"
+#include <Core/Action/ActionRegistry.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Action/Action.h"
+#include <Core/Action/Action.h>
 	/*** end headers ***/
 
 namespace Core

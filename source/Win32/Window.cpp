@@ -1,14 +1,14 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Win32/Window.h"
+#include <Win32/Window.h>
 	/*** C++ headers ***/
-#include "windef.h"
+#include <windef.h>
 	/*** extra headers ***/
-#include "Services/Input/Event.h"
-#include "Services/Input/KeyCodes.h"
-#include "Win32/WindowClass.h"
+#include <Services/Input/Event.h>
+#include <Services/Input/KeyCodes.h>
+#include <Win32/WindowClass.h>
 	/*** end headers ***/
 
 namespace Win32

@@ -4,13 +4,13 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <deque>
 #include <list>
 #include <memory>
 #include <unordered_map>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Space/Space.h"
+#include <Core/Space/Space.h>
 	/*** end header inclusion ***/
 
 namespace Core

@@ -1,9 +1,9 @@
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Entity/EntityFactory.h"
+#include <Core/Entity/EntityFactory.h>
 	/*** extra headers ***/
-#include "Core/Entity/Entity.h"
+#include <Core/Entity/Entity.h>
 	/*** end headers ***/
 
 namespace Core

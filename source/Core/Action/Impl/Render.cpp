@@ -1,14 +1,14 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Action/Impl/Render.h"
+#include <Core/Action/Impl/Render.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Entity/Entity.h"
-#include "Engine/GameContext.h"
-#include "Engine/ServiceLocator.h"
-#include "Services/Graphics/IRenderer.h"
+#include <Core/Entity/Entity.h>
+#include <Engine/GameContext.h>
+#include <Engine/ServiceLocator.h>
+#include <Services/Graphics/IRenderer.h>
 	/*** end headers ***/
 
 namespace Core

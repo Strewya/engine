@@ -1,15 +1,15 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Services/Graphics/Polygon.h"
+#include <Services/Graphics/Polygon.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Services/Graphics/Graphics.h"
-#include "Services/Graphics/IRenderer.h"
-#include "Services/Graphics/IIndexBuffer.h"
-#include "Services/Graphics/IVertexBuffer.h"
-#include "Util/Color.h"
+#include <Services/Graphics/Graphics.h>
+#include <Services/Graphics/IRenderer.h>
+#include <Services/Graphics/IIndexBuffer.h>
+#include <Services/Graphics/IVertexBuffer.h>
+#include <Util/Color.h>
 	/*** end headers ***/
 	
 namespace Graphics

@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Services/Graphics/Spritesheet.h"
+#include <Services/Graphics/Spritesheet.h>
 	/*** C++ headers ***/
 #include <stdexcept>
 	/*** extra headers ***/

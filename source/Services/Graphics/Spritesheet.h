@@ -4,12 +4,12 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Services/Graphics/AnimationInfo.h"
-#include "Services/Graphics/SpriteInfo.h"
-#include "Services/Graphics/TextureData.h"
+#include <Services/Graphics/AnimationInfo.h>
+#include <Services/Graphics/SpriteInfo.h>
+#include <Services/Graphics/TextureData.h>
 	/*** end header inclusion ***/
 
 namespace Graphics

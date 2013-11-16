@@ -1,11 +1,11 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Space/Space.h"
+#include <Core/Space/Space.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/Entity/EntityPool.h"
+#include <Core/Entity/EntityPool.h>
 	/*** end headers ***/
 
 namespace Core

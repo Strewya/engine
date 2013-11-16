@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Engine/ResourceLocator.h"
+#include <Engine/ResourceLocator.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

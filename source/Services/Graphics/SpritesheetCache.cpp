@@ -1,14 +1,14 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Services/Graphics/SpritesheetCache.h"
+#include <Services/Graphics/SpritesheetCache.h>
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include "Services/Graphics/ITextureCache.h"
-#include "Services/Script/LuaEngine.h"
-#include "Util/Dimensional.h"
+#include <Services/Graphics/ITextureCache.h>
+#include <Services/Script/LuaEngine.h>
+#include <Util/Dimensional.h>
 	/*** end headers ***/
 
 namespace Graphics

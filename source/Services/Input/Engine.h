@@ -5,12 +5,12 @@
 			events based on injected data
 ********************************************/
 	/*** common header ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <deque>
 	/*** extra headers if needed ***/
-#include "Services/Input/KeyBindings.h"
-#include "Services/Input/DeviceConcept.h"
-#include "Services/Input/Event.h"
+#include <Services/Input/KeyBindings.h>
+#include <Services/Input/DeviceConcept.h>
+#include <Services/Input/Event.h>
 	/*** end header inclusion ***/
 
 namespace Win32 { class Window; }

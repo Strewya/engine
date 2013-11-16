@@ -1,10 +1,10 @@
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Games/GameInit.h"
+#include <Games/GameInit.h>
 	/*** extra headers ***/
-#include "Engine/Engine.h"
-#include "Games/Pong/Gameplay.h"
+#include <Engine/Engine.h>
+#include <Games/Pong/Gameplay.h>
 	/*** end headers ***/
 
 namespace Game

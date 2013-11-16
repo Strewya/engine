@@ -1,13 +1,13 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Action/Impl/Physics.h"
+#include <Core/Action/Impl/Physics.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include "Core/State/SharedComponents.h"
-#include "Engine/GameContext.h"
-#include "Engine/ServiceLocator.h"
+#include <Core/State/SharedComponents.h>
+#include <Engine/GameContext.h>
+#include <Engine/ServiceLocator.h>
 	/*** end headers ***/
 	
 namespace Core

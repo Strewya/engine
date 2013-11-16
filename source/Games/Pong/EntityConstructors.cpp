@@ -1,13 +1,13 @@
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Games/Pong/EntityConstructors.h"
+#include <Games/Pong/EntityConstructors.h>
 	/*** extra headers ***/
-#include "Core/Action/Impl/Physics.h"
-#include "Engine/GameContext.h"
-#include "Engine/ServiceLocator.h"
-#include "Games/Pong/Components.h"
-#include "Services/Graphics/IRenderer.h"
+#include <Core/Action/Impl/Physics.h>
+#include <Engine/GameContext.h>
+#include <Engine/ServiceLocator.h>
+#include <Games/Pong/Components.h>
+#include <Services/Graphics/IRenderer.h>
 	/*** end headers ***/
 
 namespace Pong

@@ -4,10 +4,10 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <functional>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/State/SharedComponents.h"
+#include <Core/State/SharedComponents.h>
 	/*** end header inclusion ***/
 
 namespace Pong

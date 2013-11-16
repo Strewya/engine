@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Services/Input/KeyBindings.h"
+#include <Services/Input/KeyBindings.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

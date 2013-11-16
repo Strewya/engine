@@ -1,16 +1,16 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** C++ headers ***/
 #include <cassert>
 #include <string>
-#include "Win32/myWindows.h"
+#include <Win32/myWindows.h>
 	/*** extra headers ***/
-#include "Engine/Defines.h"
-#include "Engine/Engine.h"
-#include "Games/GameInit.h"
-#include "Win32/Window.h"
-#include "Win32/WindowClass.h"
+#include <Engine/Defines.h>
+#include <Engine/Engine.h>
+#include <Games/GameInit.h>
+#include <Win32/Window.h>
+#include <Win32/WindowClass.h>
 	/*** end headers ***/
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)

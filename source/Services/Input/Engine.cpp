@@ -1,13 +1,13 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Services/Input/Engine.h"
+#include <Services/Input/Engine.h>
 	/*** C++ headers ***/
 #include <vector>
 	/*** extra headers ***/
-#include "Services/Input/MouseDevice.h"
-#include "Win32/Window.h"
+#include <Services/Input/MouseDevice.h>
+#include <Win32/Window.h>
 	/*** end headers ***/
 
 namespace Input

@@ -1,29 +1,29 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Games/Pong/Gameplay.h"
+#include <Games/Pong/Gameplay.h>
 	/*** C++ headers ***/
 #include <map>
 #include <memory>
 #include <vector>
 	/*** extra headers ***/
-#include "Engine/Engine.h"
-#include "Engine/ServiceLocator.h"
-#include "Core/Action/Impl/Physics.h"
-#include "Core/Action/Impl/Render.h"
-#include "Core/Entity/Entity.h"
-#include "Games/Pong/Components.h"
-#include "Games/Pong/EntityConstructors.h"
-#include "Games/Pong/InputController.h"
-#include "Games/Pong/Intents.h"
-#include "Services/Graphics/IRenderer.h"
-#include "Services/Input/Context.h"
-#include "Services/Input/Engine.h"
-#include "Services/Input/Event.h"
-#include "Services/Input/KeyCodes.h"
-#include "Util/Color.h"
-#include "Util/Random.h"
+#include <Engine/Engine.h>
+#include <Engine/ServiceLocator.h>
+#include <Core/Action/Impl/Physics.h>
+#include <Core/Action/Impl/Render.h>
+#include <Core/Entity/Entity.h>
+#include <Games/Pong/Components.h>
+#include <Games/Pong/EntityConstructors.h>
+#include <Games/Pong/InputController.h>
+#include <Games/Pong/Intents.h>
+#include <Services/Graphics/IRenderer.h>
+#include <Services/Input/Context.h>
+#include <Services/Input/Engine.h>
+#include <Services/Input/Event.h>
+#include <Services/Input/KeyCodes.h>
+#include <Util/Color.h>
+#include <Util/Random.h>
 	/*** end headers ***/
 
 namespace Pong

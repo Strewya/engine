@@ -1,7 +1,7 @@
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/State/Statemap.h"
+#include <Core/State/Statemap.h>
 	/*** extra headers ***/
 	/*** end headers ***/
 

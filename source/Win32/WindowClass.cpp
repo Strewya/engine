@@ -1,12 +1,12 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Win32/WindowClass.h"
+#include <Win32/WindowClass.h>
 	/*** C++ headers ***/
 #include <cstring>
 	/*** extra headers ***/
-#include "Win32/Window.h"
+#include <Win32/Window.h>
 	/*** end headers ***/
 
 namespace Win32

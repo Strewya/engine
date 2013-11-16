@@ -4,8 +4,8 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
-#include "Win32/myWindows.h"
+#include <Engine/Defines.h>
+#include <Win32/myWindows.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 

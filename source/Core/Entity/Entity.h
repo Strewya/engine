@@ -4,10 +4,10 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/State/State.h"
-#include "Core/State/Statemap.h"
+#include <Core/State/State.h>
+#include <Core/State/Statemap.h>
 	/*** end header inclusion ***/
 
 namespace Core

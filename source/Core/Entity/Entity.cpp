@@ -1,7 +1,7 @@
 	/*** precompiled header ***/
-#include "stdafx.h"
+#include <stdafx.h>
 	/*** personal header ***/
-#include "Core/Entity/Entity.h"
+#include <Core/Entity/Entity.h>
 	/*** extra headers ***/
 	/*** end headers ***/
 

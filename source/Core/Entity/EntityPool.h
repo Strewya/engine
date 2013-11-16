@@ -4,13 +4,13 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <deque>
 #include <functional>
 #include <list>
 #include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Core/Entity/Entity.h"
+#include <Core/Entity/Entity.h>
 	/*** end header inclusion ***/
 
 namespace Core
