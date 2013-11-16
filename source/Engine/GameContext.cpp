@@ -18,14 +18,11 @@ namespace Core
 		m_resources(resources), //for ease of access to resources
 		m_updateTime(updateTime), //the updateTime for this context, defaults to 30 FPS if not redefined by the derived context class
 		m_entityFactory(*this), //not sure if this should be here or more globally, like the Engine object
-		m_physicsWorld(b2Vec2(0,0)), //not sure if this should be here or in the Physics Action/Behavior/System
-		m_b2ScalingFactor(1),
-		m_b2ScalingFactorInv(1/m_b2ScalingFactor),
 		m_allEntities(NO_ID), //the currently active entities in the context,
-		m_timeScaling(1),
-		m_unpausedTimeScaling(1),
 		m_logic(new Multiaction),
-		m_render(new Multiaction)
+		m_render(new Multiaction),
+		m_unpausedTimeScaling(1),
+		m_currentTimeScaling(m_unpausedTimeScaling)
 	{
 	}
 
@@ -61,35 +58,48 @@ namespace Core
 
 	void GameContext::resume()
 	{
-		m_timeScaling = m_unpausedTimeScaling;
+		m_currentTimeScaling = m_unpausedTimeScaling;
 	}
 
 	void GameContext::setTimeScale(double scale)
 	{
-		m_timeScaling = scale;
+		m_unpausedTimeScaling = scale;
+		if(!isPaused())
+		{
+			m_currentTimeScaling = scale;
+		}
+	}
+
+	bool GameContext::isPaused() const
+	{
+		return m_currentTimeScaling == Util::Time::STOP_TIME;
 	}
 
 	double GameContext::getTimeScale() const
 	{
-		return m_timeScaling;
+		return m_currentTimeScaling;
 	}
 	
 	void GameContext::update()
 	{
-		m_timer.updateBy(m_updateTime, m_timeScaling);
+		m_timer.updateBy(m_updateTime, m_currentTimeScaling);
 		m_logic->checkMessages(*this);
 		m_logic->update(*this);
+		
+		input();
+		logic();
 	}
 
 	void GameContext::render(uint64_t interpolationTime)
 	{
 		m_render->render(*this, interpolationTime);
+		
+		draw(interpolationTime);
 	}
 
 	void GameContext::pause()
 	{
-		m_unpausedTimeScaling = m_timeScaling;
-		m_timeScaling = Util::Time::STOP_TIME;
+		m_currentTimeScaling = Util::Time::STOP_TIME;
 	}
 
 	void GameContext::deactivate()
@@ -106,11 +116,12 @@ namespace Core
 
 
 
-	void GameContext::input(uint32_t dt)
+	void GameContext::input()
 	{}
 
-	void GameContext::logic(uint32_t dt)
+	void GameContext::logic()
 	{}
 		
-	
+	void GameContext::draw(uint64_t interpolationTime)
+	{}
 }

@@ -14,7 +14,6 @@
 #include "Core/Entity/EntityPool.h"
 #include "Core/Space/SpacePool.h"
 #include "Engine/MessageSystem.h"
-#include "Services/Graphics/b2DebugDraw.h"
 #include "Services/Input/KeyBindings.h"
 #include "Util/Time.h"
 	/*** end header inclusion ***/
@@ -49,12 +48,12 @@ namespace Core
 		SpacePool m_spacePool;
 		Space m_allEntities;
 
-		b2World m_physicsWorld;
-		float m_b2ScalingFactor;
-		float m_b2ScalingFactorInv;
-		
 		Input::KeyBindings m_keyBindings;
 		MessageSystem m_messenger;
+
+		ActionRegistry m_allOwnedActions;
+		ActionUptr m_logic;
+		ActionUptr m_render;
 		
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources, uint64_t updateTime = UPDATE_TIME);
 		virtual ~GameContext();
@@ -65,6 +64,8 @@ namespace Core
 		
 		void setTimeScale(double scale);
 		double getTimeScale() const;
+		bool isPaused() const;
+
 		void update();
 		void render(uint64_t interpolationTime);
 
@@ -73,9 +74,7 @@ namespace Core
 		void destroy();
 
 	protected:
-		ActionRegistry m_allOwnedActions;
-		ActionUptr m_logic;
-		ActionUptr m_render;
+		
 
 		/**
 		 *	\short Adds an action into the queue specific by the second parameter
@@ -101,9 +100,9 @@ namespace Core
 		virtual void onActivate() = 0;
 
 		//update sequence, optional as most of this is done by actions
-		virtual void input(uint32_t dt);
-		virtual void logic(uint32_t dt);
-		//no need for render
+		virtual void input();
+		virtual void logic();
+		virtual void draw(uint64_t interpolationTime);
 
 		//deactivate sequence
 		virtual void onDeactivate() = 0;
@@ -112,7 +111,7 @@ namespace Core
 		virtual void destroyEntities() = 0;
 		
 	private:
-		double m_timeScaling;
 		double m_unpausedTimeScaling;
+		double m_currentTimeScaling;
 	};
 }

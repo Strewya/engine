@@ -162,6 +162,7 @@
     <ClInclude Include="..\..\source\Core\Entity\EntityPool.h" />
     <ClInclude Include="..\..\source\Core\Space\Space.h" />
     <ClInclude Include="..\..\source\Core\Space\SpacePool.h" />
+    <ClInclude Include="..\..\source\Core\State\Impl\Box2dPhysics.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
     <ClInclude Include="..\..\source\Core\State\SharedComponents.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />

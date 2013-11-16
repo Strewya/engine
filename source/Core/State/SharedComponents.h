@@ -26,6 +26,7 @@ namespace Core
 	COMPONENT(PhysicalBody)
 	{
 		b2Body* m_body;
+		b2BodyDef m_bodyDef;
 	};
 
 	COMPONENT(Velocity2d)

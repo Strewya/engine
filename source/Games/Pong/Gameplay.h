@@ -36,8 +36,7 @@ namespace Pong
 		void destroyEntities();
 
 	private:
-		Graphics::b2DebugDraw m_debug;
-
+		
 		void setupLeftPaddle(Core::Entity& paddle);
 		void setupRightPaddle(Core::Entity& paddle);
 		void setupBall(Core::Entity& ball);

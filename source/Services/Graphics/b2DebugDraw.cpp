@@ -12,22 +12,30 @@
 
 namespace Graphics
 {
-	b2DebugDraw::b2DebugDraw(IRenderer& renderer)
-		: _renderer(renderer)
-	{}
+	void b2DebugDraw::setRenderer(IRenderer& renderer)
+	{
+		m_renderer = &renderer;
+	}
+
+	void b2DebugDraw::clearRenderer()
+	{
+		m_renderer = nullptr;
+	}
 
 	void b2DebugDraw::setLengthScale(float scale)
 	{
-		_lengthScale = scale;
+		m_lengthScale = scale;
 	}
 
 	float b2DebugDraw::getLengthScale() const
 	{
-		return _lengthScale;
+		return m_lengthScale;
 	}
 
 	void b2DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
+		if(m_renderer == nullptr) return;
+
 		std::vector<Util::Vec2> polygonData(vertexCount);
 		for(int32_t i = vertexCount-1; i >= 0; --i)
 		{
@@ -38,14 +46,16 @@ namespace Graphics
 		Graphics::Polygon polygon;
 		polygon.setColor(c);
 		polygon.setSolid(false);
-		polygon.setScale(_lengthScale);
+		polygon.setScale(m_lengthScale);
 		polygon.setManual(polygonData);
-		polygon.draw(_renderer);
+		polygon.draw(*m_renderer);
 
 	}
 
 	void b2DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
+		if(m_renderer == nullptr) return;
+
 		std::vector<Util::Vec2> polygonData(vertexCount);
 		for(int32_t i = vertexCount-1; i >= 0; --i)
 		{
@@ -58,43 +68,49 @@ namespace Graphics
 		polygon.setColor(c);
 		polygon.setSolid(true);
 		polygon.setEdgeThickness(2);
-		polygon.setScale(_lengthScale);
+		polygon.setScale(m_lengthScale);
 		polygon.setManual(polygonData);
-		polygon.draw(_renderer);
+		polygon.draw(*m_renderer);
 	}
 
 	void b2DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 	{
+		if(m_renderer == nullptr) return;
+
 		Util::Color c(color.r, color.g, color.b);
 		Graphics::Polygon circle;
 		circle.setColor(c);
 		circle.setSolid(false);
-		circle.setScale(_lengthScale);
+		circle.setScale(m_lengthScale);
 		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, (uint32_t)radius * 4);
-		circle.draw(_renderer);
+		circle.draw(*m_renderer);
 	}
 	
 	void b2DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 	{
+		if(m_renderer == nullptr) return;
+
 		Util::Color c(color.r, color.g, color.b);
 		Graphics::Polygon circle;
 		circle.setColor(c);
 		circle.setEdgeThickness(2);
 		circle.setSolid(true);
-		circle.setScale(_lengthScale);
+		circle.setScale(m_lengthScale);
 		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, 36);
-		circle.draw(_renderer);
+		circle.draw(*m_renderer);
 	}
 	
 	void b2DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 	{
+		if(m_renderer == nullptr) return;
+
 		Util::Color c(color.r, color.g, color.b);
 		Graphics::Polygon line;
 		line.setSolid(false);
 		line.setColor(c);
-		line.setScale(_lengthScale);
+		line.setScale(m_lengthScale);
 		line.setAsLine(Util::Vec2(p1.x, p1.y), Util::Vec2(p2.x, p2.y));
-		line.draw(_renderer);
+		line.draw(*m_renderer);
 	}
 
 	void b2DebugDraw::DrawTransform(const b2Transform& xf)

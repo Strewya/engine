@@ -13,12 +13,12 @@ namespace Core
 
 	void MessageSystem::subscribe(InstanceID recepient)
 	{
-		m_subscribers.emplace(recepient);
+		m_postbox.emplace(recepient, Inbox_t());
 	}
 
 	void MessageSystem::unsubscribe(InstanceID recepient)
 	{
-		m_subscribers.erase(recepient);
+		m_postbox.erase(recepient);
 	}
 
 	uint32_t MessageSystem::registerMessage(const std::string& messageName)
@@ -38,23 +38,32 @@ namespace Core
 		Msg msg = {msgId, entity};
 		if(recepient != BROADCAST)
 		{
-			m_queue.emplace(recepient, msg);
+			m_postbox[recepient].emplace_back(msg);
 		}
 		else
 		{
-			std::for_each(m_subscribers.begin(), m_subscribers.end(), [&](InstanceID id){ if(id != sender) m_queue.emplace(id, msg); });
+			for(auto it : m_postbox)
+			{
+				if(it.first != sender)
+				{
+					it.second.emplace_back(msg);
+				}
+			}
 		}
 	}
 
 	bool MessageSystem::consumeMessage(InstanceID recepient, uint32_t& msgId, InstanceID& entity)
 	{
-		auto it = m_queue.find(recepient);
-		if(it != m_queue.end())
+		auto it = m_postbox.find(recepient);
+		if(it != m_postbox.end())
 		{
-			msgId = it->second.id;
-			entity = it->second.entity;
-			m_queue.erase(it);
-			return true;
+			if(!it->second.empty())
+			{
+				msgId = it->second.front().id;
+				entity = it->second.front().entity;
+				it->second.pop_front();
+				return true;
+			}
 		}
 		return false;
 	}

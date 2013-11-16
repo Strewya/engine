@@ -16,7 +16,9 @@ namespace Graphics
 	class b2DebugDraw : public b2Draw
 	{
 	public:
-		b2DebugDraw(IRenderer& renderer);
+		void setRenderer(IRenderer& renderer);
+		void clearRenderer();
+
 		void setLengthScale(float scale);
 		float getLengthScale() const;
 		
@@ -40,7 +42,7 @@ namespace Graphics
 		void DrawTransform(const b2Transform& xf);
 
 	private:
-		IRenderer& _renderer;
-		float _lengthScale;
+		IRenderer* m_renderer;
+		float m_lengthScale;
 	};
 }

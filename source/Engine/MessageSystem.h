@@ -6,9 +6,9 @@
 	/*** common header ***/
 #include "Engine/Defines.h"
 #include "Engine/FwdDecl.h"
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
@@ -33,12 +33,11 @@ namespace Core
 			uint32_t id;
 			InstanceID entity;
 		};
-		typedef std::unordered_multimap<InstanceID, Msg> MessageQueue_t;
-		typedef std::unordered_set<InstanceID> SubscribersList_t;
+		typedef std::deque<Msg> Inbox_t;
+		typedef std::unordered_map<InstanceID, Inbox_t> Postbox_t;
 		typedef std::vector<std::string> MessageCodes_t;
 
-		MessageQueue_t m_queue;
-		SubscribersList_t m_subscribers;
+		Postbox_t m_postbox;
 		MessageCodes_t m_messages;
 	};
 }

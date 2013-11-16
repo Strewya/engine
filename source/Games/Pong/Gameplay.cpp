@@ -29,19 +29,8 @@
 namespace Pong
 {
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
-		: GameContext(Core::ContextType::GAMEPLAY, services, resources), m_debug(services.getGraphics())
+		: GameContext(Core::ContextType::GAMEPLAY, services, resources)
 	{
-		m_b2ScalingFactor = 10;
-		m_b2ScalingFactorInv = 1/m_b2ScalingFactor;
-		uint32_t flags = 0;
-		flags += Graphics::b2DebugDraw::e_shapeBit;
-		flags += Graphics::b2DebugDraw::e_centerOfMassBit;
-		flags += Graphics::b2DebugDraw::e_jointBit;
-		flags += Graphics::b2DebugDraw::e_pairBit;
-		//flags += Graphics::b2DebugDraw::e_aabbBit;
-		m_debug.SetFlags(flags);
-		m_debug.setLengthScale(m_b2ScalingFactor);
-		m_physicsWorld.SetDebugDraw(&m_debug);
 		m_render.reset(Core::MainRender::create(*this).release());
 	}
 
@@ -126,7 +115,7 @@ namespace Pong
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("left");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*m_b2ScalingFactor);
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*10);
 		
 		auto* state = paddle.getState<Core::PhysicalBody>();
 		state->m_body->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
@@ -139,7 +128,7 @@ namespace Pong
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("right");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*m_b2ScalingFactor);
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*10);
 		
 		auto* state = paddle.getState<Core::PhysicalBody>();
 		state->m_body->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
@@ -164,7 +153,7 @@ namespace Pong
 		jointDef.collideConnected = true;
 		jointDef.Initialize(paddleBody->m_body, fieldBody->m_body, paddleBody->m_body->GetWorldCenter(), b2Vec2(0, 1.0f));
 
-		m_physicsWorld.CreateJoint(&jointDef);
+		//m_physicsWorld.CreateJoint(&jointDef);
 	}
 }
 

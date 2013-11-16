@@ -17,6 +17,7 @@ namespace Core
 		typedef std::unordered_multimap<InstanceID, ActionUptr> ActionStorage_t;
 
 		ActionRef addAction(ActionUptr action);
+
 		
 	protected:
 	private:

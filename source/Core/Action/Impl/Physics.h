@@ -8,6 +8,7 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include "Box2D/Box2D.h"
 #include "Core/Action/Action.h"
+#include "Services/Graphics/b2DebugDraw.h"
 	/*** end header inclusion ***/
 	
 namespace Core
@@ -15,10 +16,22 @@ namespace Core
 	class Physics2d : public AtomicAction<Physics2d>
 	{
 	public:
+		Physics2d();
+		Physics2d(const Util::Vec2& gravity, float scalingFactor);
+
 		void init(GameContext& context);
 		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
 		void update(GameContext& context);
 		void render(GameContext& context, uint64_t interpolationTime);
+
+		void onDestroyEntity(GameContext& context, InstanceID entity);
+
+		b2World m_physicsWorld;
+		float m_b2ScalingFactor;
+		float m_b2ScalingFactorInv;
+
+		Graphics::b2DebugDraw m_debug;
+
 	};
 
 

@@ -335,6 +335,9 @@
     <ClInclude Include="..\..\source\Engine\Intent.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\Impl\Box2dPhysics.h">
+      <Filter>Core/State/Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -378,6 +381,9 @@
     </Filter>
     <Filter Include="Services/Script">
       <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core/State/Impl">
+      <UniqueIdentifier>{b1d410c0-6dd5-47bf-a167-6db165abb4f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

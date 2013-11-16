@@ -49,9 +49,10 @@ namespace Core
 	*	
 	*	Derived classes should implement these methods if custom behaviour is desired:
 	*		void init(GameContext& context)
-	*		void onAddEntity(InstanceID entity)
-	*		void onRemoveEntity(InstanceID entity)
-	*		bool validateEntity(InstanceID eid)
+	*		void onAddEntity(GameContext& context, InstanceID entity)
+	*		void onRemoveEntity(GameContext& context, InstanceID entity)
+	*		void onDestroyEntity(GameContext& context, InstanceID entity)
+	*		bool validateEntity(GameContext& context, InstanceID eid)
 	*
 	**************************************************************************/
 	template<typename T> class AtomicAction : public Action
@@ -74,16 +75,18 @@ namespace Core
 		void checkMessages(GameContext& context);
 		void addAction(ActionRptr action);
 		
-		virtual void onAddEntity(InstanceID entity) {};
-		virtual void onRemoveEntity(InstanceID entity) {};
-		virtual bool validateEntity(InstanceID eid) { return true; }
+		virtual void onAddEntity(GameContext& context, InstanceID entity) {};
+		virtual void onRemoveEntity(GameContext& context, InstanceID entity) {};
+		virtual void onDestroyEntity(GameContext& context, InstanceID entity) {};
+		virtual bool validateEntity(GameContext& context, InstanceID eid) { return true; }
 		
-		bool defaultMessageHandler(uint32_t msgId, InstanceID target);
+		bool defaultMessageHandler(GameContext& context, uint32_t msgId, InstanceID target);
 	protected:
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t m_entities;
-		uint32_t m_addEntityMsgCode;
-		uint32_t m_removeEntityMsgCode;
+		uint32_t m_entityAddMsgCode;
+		uint32_t m_entityRemoveMsgCode;
+		uint32_t m_entityDestroyMsgCode;
 	};
 
 
@@ -160,15 +163,16 @@ namespace Core
 
 	template<typename T> void AtomicAction<T>::init(GameContext& context)
 	{
-		m_addEntityMsgCode = context.m_messenger.registerMessage("add_entity");
-		m_removeEntityMsgCode = context.m_messenger.registerMessage("remove_entity");
+		m_entityAddMsgCode = context.m_messenger.registerMessage("entity_add");
+		m_entityRemoveMsgCode = context.m_messenger.registerMessage("entity_remove");
+		m_entityDestroyMsgCode = context.m_messenger.registerMessage("entity_destroy");
 	}
 
 	template<typename T> void AtomicAction<T>::checkMessages(GameContext& context)
 	{
 		uint32_t msg;
 		InstanceID entity;
-		while(context.m_messenger.consumeMessage(getUID(), msg, entity) && !defaultMessageHandler(msg, entity))
+		while(context.m_messenger.consumeMessage(getUID(), msg, entity) && !defaultMessageHandler(context, msg, entity))
 		{
 			processMessage(context, msg, entity);
 		}
@@ -177,24 +181,29 @@ namespace Core
 	template<typename T> void AtomicAction<T>::addAction(ActionRptr action)
 	{}
 
-	template<typename T> bool AtomicAction<T>::defaultMessageHandler(uint32_t msgId, InstanceID target)
+	template<typename T> bool AtomicAction<T>::defaultMessageHandler(GameContext& context, uint32_t msgId, InstanceID target)
 	{
 		bool handled = true;
-		if(msgId == m_addEntityMsgCode)
+		if(msgId == m_entityAddMsgCode)
 		{
-			if(validateEntity(target))
+			if(validateEntity(context, target))
 			{
 				m_entities.emplace(target);
-				//perhaps call a virtual setup function
-				//onEntityAdded(target);
+				onAddEntity(context, target);
 			}
 		}
-		else if(msgId == m_removeEntityMsgCode)
+		else if(msgId == m_entityRemoveMsgCode)
 		{
 			if(m_entities.erase(target) == 1)
 			{
-				//perhaps call a virtual cleanup function
-				//onEntityRemoved(target);
+				onRemoveEntity(context, target);
+			}
+		}
+		else if(msgId == m_entityDestroyMsgCode)
+		{
+			if(m_entities.erase(target) == 1)
+			{
+				onDestroyEntity(context, target);
 			}
 		}
 		else
