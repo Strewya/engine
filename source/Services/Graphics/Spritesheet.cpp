@@ -30,7 +30,7 @@ namespace Graphics
 
 	bool Spritesheet::SpriteValid(uint32_t index) const
 	{
-		return (0 <= index && index < _sprites.size());
+        return (index < _sprites.size());
 	}
 
 	bool Spritesheet::AnimationValid(uint32_t index) const

@@ -16,6 +16,10 @@ namespace Core
 	class Physics2d : public AtomicAction<Physics2d>
 	{
 	public:
+		typedef std::function<void(b2Body*)> BodyDeleter_t;
+		typedef std::unique_ptr<b2Body, BodyDeleter_t> BodyUptr_t;
+
+	public:
 		Physics2d();
 		Physics2d(const Util::Vec2& gravity, float scalingFactor);
 
@@ -24,14 +28,28 @@ namespace Core
 		void update(GameContext& context);
 		void render(GameContext& context, uint64_t interpolationTime);
 
+		bool validateEntity(GameContext& context, InstanceID entity);
+		void onAddEntity(GameContext& context, InstanceID entity);
+		void onRemoveEntity(GameContext& context, InstanceID entity);
 		void onDestroyEntity(GameContext& context, InstanceID entity);
 
-		b2World m_physicsWorld;
+		BodyUptr_t createBody(const b2BodyDef& definition);
+
+	private:
+		
 		float m_b2ScalingFactor;
 		float m_b2ScalingFactorInv;
 
-		Graphics::b2DebugDraw m_debug;
+		b2World m_physicsWorld;
+		std::unordered_map<InstanceID, BodyUptr_t> m_bodies;
 
+		Graphics::b2DebugDraw m_debug;
+		
+		uint32_t m_msgCreateBody;
+		uint32_t m_msgCreateFixtures;
+		uint32_t m_msgCreateJoint;
+		uint32_t m_msgSetPosition;
+		uint32_t m_msgApplyImpulse;
 	};
 
 

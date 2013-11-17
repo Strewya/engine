@@ -7,14 +7,14 @@
 #include <Engine/Defines.h>
 #include <memory>
 #include <unordered_set>
+#include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include <Engine/GameContext.h>
 	/*** end header inclusion ***/
 
 namespace Core
 {
-	class GameContext;
-
-	enum class ActionFamily
+    enum class ActionFamily
 	{
 		Atomic,
 		Composite
@@ -29,7 +29,7 @@ namespace Core
 		virtual ~Action() {};
 		virtual InstanceID getUID() const = 0;
 		virtual ActionFamily getFamily() const = 0;
-		virtual void init(GameContext& context) = 0;
+		virtual void initialize(GameContext& context) = 0;
 		virtual void checkMessages(GameContext& context) = 0;
 		virtual void processMessage(GameContext& context, uint32_t msg, InstanceID entity) = 0;
 		virtual void update(GameContext& context) = 0;
@@ -71,10 +71,11 @@ namespace Core
 	public:
 		InstanceID getUID() const;
 		ActionFamily getFamily() const;
-		virtual void init(GameContext& context);
+		void initialize(GameContext& context);
 		void checkMessages(GameContext& context);
 		void addAction(ActionRptr action);
 		
+		virtual void init(GameContext& context) {};
 		virtual void onAddEntity(GameContext& context, InstanceID entity) {};
 		virtual void onRemoveEntity(GameContext& context, InstanceID entity) {};
 		virtual void onDestroyEntity(GameContext& context, InstanceID entity) {};
@@ -84,9 +85,9 @@ namespace Core
 	protected:
 		typedef std::unordered_set<InstanceID> EntityStorage_t;
 		EntityStorage_t m_entities;
-		uint32_t m_entityAddMsgCode;
-		uint32_t m_entityRemoveMsgCode;
-		uint32_t m_entityDestroyMsgCode;
+		uint32_t m_msgAddEntity;
+		uint32_t m_msgRemoveEntity;
+		uint32_t m_msgDestroyEntity;
 	};
 
 
@@ -117,11 +118,13 @@ namespace Core
 	public:
 		InstanceID getUID() const;
 		ActionFamily getFamily() const;
-		virtual void init(GameContext& context);
+		void initialize(GameContext& context);
 		void checkMessages(GameContext& context);
 		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
 		void addAction(ActionRptr action);
 
+        virtual void init(GameContext& context) { (void)context; };
+		
 	protected:
 		typedef std::vector<ActionRptr> ActionStorage_t;
 		ActionStorage_t m_actions;
@@ -148,6 +151,7 @@ namespace Core
 	
 	template<typename T> auto AtomicAction<T>::create(GameContext& c) -> Uptr
 	{
+        (void) c;
 		return Uptr(new Derived_t());
 	}
 
@@ -161,11 +165,14 @@ namespace Core
 		return Family;
 	}
 
-	template<typename T> void AtomicAction<T>::init(GameContext& context)
+	template<typename T> void AtomicAction<T>::initialize(GameContext& context)
 	{
-		m_entityAddMsgCode = context.m_messenger.registerMessage("entity_add");
-		m_entityRemoveMsgCode = context.m_messenger.registerMessage("entity_remove");
-		m_entityDestroyMsgCode = context.m_messenger.registerMessage("entity_destroy");
+		context.m_messenger.subscribe(UID);
+		m_msgAddEntity = context.m_messenger.encode("add_entity");
+		m_msgRemoveEntity = context.m_messenger.encode("remove_entity");
+		m_msgDestroyEntity = context.m_messenger.encode("destroy_entity");
+
+		init(context);
 	}
 
 	template<typename T> void AtomicAction<T>::checkMessages(GameContext& context)
@@ -184,7 +191,7 @@ namespace Core
 	template<typename T> bool AtomicAction<T>::defaultMessageHandler(GameContext& context, uint32_t msgId, InstanceID target)
 	{
 		bool handled = true;
-		if(msgId == m_entityAddMsgCode)
+		if(msgId == m_msgAddEntity)
 		{
 			if(validateEntity(context, target))
 			{
@@ -192,14 +199,14 @@ namespace Core
 				onAddEntity(context, target);
 			}
 		}
-		else if(msgId == m_entityRemoveMsgCode)
+		else if(msgId == m_msgRemoveEntity)
 		{
 			if(m_entities.erase(target) == 1)
 			{
 				onRemoveEntity(context, target);
 			}
 		}
-		else if(msgId == m_entityDestroyMsgCode)
+		else if(msgId == m_msgDestroyEntity)
 		{
 			if(m_entities.erase(target) == 1)
 			{
@@ -232,11 +239,13 @@ namespace Core
 		return Family;
 	}
 
-	template<typename T> void CompositeAction<T>::init(GameContext& context)
+	template<typename T> void CompositeAction<T>::initialize(GameContext& context)
 	{
+		init(context);
+
 		for(auto& action : m_actions)
 		{
-			action->init(context);
+			action->initialize(context);
 		}
 	}
 

@@ -14,14 +14,34 @@
 
 namespace Core
 {
-	COMPONENT(Box2dBody)
+	COMPONENT(Box2dBodyDef)
 	{
-		b2Body* m_body;
-		b2BodyDef m_definition;
+		b2BodyDef m_def;
+	};
+
+	struct FixtureData
+	{
+		b2FixtureDef m_def;
+		b2PolygonShape m_polygon;
+		b2CircleShape m_circle;
+		b2EdgeShape m_edge;
+		b2ChainShape m_chain;
 	};
 
 	COMPONENT(Box2dFixtures)
 	{
-		std::vector<std::pair<b2FixtureDef, b2Fixture*>> m_fixtures;
+		std::vector<FixtureData> m_fixtures;
+	};
+
+	struct JointData
+	{
+		InstanceID m_bodyA;
+		InstanceID m_bodyB;
+        std::function<void(JointData&,b2Body*,b2Body*)> m_initDefinition;
+        b2PrismaticJointDef m_prismatic;
+	};
+	COMPONENT(Box2dJoint)
+	{
+		std::vector<JointData> m_joints;
 	};
 }

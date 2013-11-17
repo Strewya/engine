@@ -13,7 +13,8 @@
 #include <Core/Action/Impl/Physics.h>
 #include <Core/Action/Impl/Render.h>
 #include <Core/Entity/Entity.h>
-#include <Games/Pong/Components.h>
+#include <Core/State/GeneralComponents.h>
+#include <Core/State/Impl/Box2dPhysics.h>
 #include <Games/Pong/EntityConstructors.h>
 #include <Games/Pong/InputController.h>
 #include <Games/Pong/Intents.h>
@@ -31,7 +32,7 @@ namespace Pong
 	Gameplay::Gameplay(Core::ServiceLocator& services, Core::ResourceLocator& resources)
 		: GameContext(Core::ContextType::GAMEPLAY, services, resources)
 	{
-		m_render.reset(Core::MainRender::create(*this).release());
+		m_render = Core::MainRender::create(*this);
 	}
 
 	void Gameplay::registerActions()
@@ -52,7 +53,7 @@ namespace Pong
 		m_keyBindings.createContext("main");
 		Input::Context& main = m_keyBindings.getContext("main");
 		m_keyBindings.pushContext("main", 1);
-
+        (void) main;
 	}
 
 	void Gameplay::createEntities()
@@ -60,12 +61,14 @@ namespace Pong
 		auto& field = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("field", field);
 		m_allEntities.addEntity(field.getID());
+		createEntity(Core::Physics2d::UID, field.getID());
 
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = m_entityPool.getNewInstanceRef();
 			m_entityFactory.createEntityType("paddle", paddle);
 			m_allEntities.addEntity(paddle.getID());
+			createEntity(Core::Physics2d::UID, paddle.getID());
 			
 			if(i == 0)
 			{
@@ -82,7 +85,7 @@ namespace Pong
 		auto& ball = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("ball", ball);
 		m_allEntities.addEntity(ball.getID());
-		setupBall(ball);
+		createEntity(Core::Physics2d::UID, ball.getID());
 	}
 
 	void Gameplay::onActivate()
@@ -105,7 +108,7 @@ namespace Pong
 	{
 		for(auto eid : m_allEntities)
 		{
-			m_entityPool.destroy(eid);
+			m_messenger.sendMessage(0, m_messenger.BROADCAST, m_messenger.encode("destroy_entity"), eid);
 		}
 		m_allEntities.clear();
 	}
@@ -115,45 +118,52 @@ namespace Pong
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("left");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*10);
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2);
 		
-		auto* state = paddle.getState<Core::PhysicalBody>();
-		state->m_body->SetTransform(b2Vec2(3-screenExtent.x, 0), 0);
+		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.encode("add_entity"), paddle.getID());
 
-		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.registerMessage("add_entity"), paddle.getID());
+		auto* state = paddle.getState<Core::Position2d>();
+		state->m_position.set(3-screenExtent.x, 0);
+		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+		
 	}
-
-
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("right");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2*10);
-		
-		auto* state = paddle.getState<Core::PhysicalBody>();
-		state->m_body->SetTransform(b2Vec2(screenExtent.x-3, 0), 0);
-	}
+		auto screenExtent = m_services.getGraphics().getScreenSize()/(2);
 
+		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.encode("add_entity"), paddle.getID());
+		
+		auto* state = paddle.getState<Core::Position2d>();
+		state->m_position.set(screenExtent.x-3, 0);
+		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+	}
 
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
-		auto* state = ball.getState<Core::PhysicalBody>();
+		auto* state = ball.getState<Core::Impulse2d>();
 		Util::Random random;
 		auto y = random.randInt(0, 10);
 		auto x = random.randInt(y, 25);
-		state->m_body->ApplyLinearImpulse(b2Vec2((float)x,(float)y), state->m_body->GetWorldCenter());
+		state->m_impulse.set((float)x, (float)y);
 	}
 
 	void Gameplay::bindPaddleToField(Core::Entity& paddle, Core::Entity& field)
 	{
-		auto* paddleBody = paddle.getState<Core::PhysicalBody>();
-		auto* fieldBody = field.getState<Core::PhysicalBody>();
-		b2PrismaticJointDef jointDef;
+		auto& joints = paddle.insert(Core::Box2dJoint::create());
 		
-		jointDef.collideConnected = true;
-		jointDef.Initialize(paddleBody->m_body, fieldBody->m_body, paddleBody->m_body->GetWorldCenter(), b2Vec2(0, 1.0f));
+		joints.m_joints.resize(1);
+        joints.m_joints[0].m_prismatic.collideConnected = true;
+        joints.m_joints[0].m_bodyA = paddle.getID();
+		joints.m_joints[0].m_bodyB = field.getID();
 
-		//m_physicsWorld.CreateJoint(&jointDef);
+        joints.m_joints[0].m_initDefinition = [](Core::JointData& data, b2Body* a, b2Body* b)
+		{
+            data.m_prismatic.Initialize(a, b, b->GetWorldPoint(b2Vec2(0,0)), b2Vec2(0,1));
+		};
+
+		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("create_joints"), paddle.getID());
 	}
 }
 

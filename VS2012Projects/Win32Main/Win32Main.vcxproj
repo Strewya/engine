@@ -118,7 +118,6 @@
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
-    <ClCompile Include="..\..\source\Games\Pong\InputController.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Converter.cpp" />
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
@@ -126,7 +125,7 @@
     <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
     <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp" />
     <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp" />
-    <ClCompile Include="..\..\source\stdafx.cpp">
+    <ClCompile Include="..\..\source\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -164,7 +163,7 @@
     <ClInclude Include="..\..\source\Core\Space\SpacePool.h" />
     <ClInclude Include="..\..\source\Core\State\Impl\Box2dPhysics.h" />
     <ClInclude Include="..\..\source\Core\State\State.h" />
-    <ClInclude Include="..\..\source\Core\State\SharedComponents.h" />
+    <ClInclude Include="..\..\source\Core\State\GeneralComponents.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Engine\Defines.h" />
     <ClInclude Include="..\..\source\Engine\Engine.h" />
@@ -176,11 +175,8 @@
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Engine\MessageSystem.h" />
     <ClInclude Include="..\..\source\Games\GameInit.h" />
-    <ClInclude Include="..\..\source\Games\Pong\Components.h" />
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
-    <ClInclude Include="..\..\source\Games\Pong\InputController.h" />
-    <ClInclude Include="..\..\source\Games\Pong\Intents.h" />
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
     <ClInclude Include="..\..\source\Services\Input\Converter.h" />
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />

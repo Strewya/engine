@@ -7,6 +7,7 @@
 #include <Engine/Defines.h>
 #include <Engine/FwdDecl.h>
 #include <deque>
+#include <unordered_map>
 	/*** extra headers if needed ***/
 #include <Engine/Intent.h>
 #include <Services/Input/Converter.h>

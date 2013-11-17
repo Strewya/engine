@@ -34,7 +34,7 @@ namespace Util
 		float getGreen() const;
 		float getBlue() const;
 		float getAlpha() const;
-		const float *const getRGBA() const;
+        float const * const getRGBA() const;
 
 	private:
 		float r, g, b, a;

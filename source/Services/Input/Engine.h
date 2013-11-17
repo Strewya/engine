@@ -7,6 +7,7 @@
 	/*** common header ***/
 #include <Engine/Defines.h>
 #include <deque>
+#include <vector>
 	/*** extra headers if needed ***/
 #include <Services/Input/KeyBindings.h>
 #include <Services/Input/DeviceConcept.h>

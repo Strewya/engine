@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include <Engine/MessageSystem.h>
 	/*** C++ headers ***/
+#include <algorithm>
 	/*** extra headers ***/
 	/*** end headers ***/
 
@@ -21,7 +22,7 @@ namespace Core
 		m_postbox.erase(recepient);
 	}
 
-	uint32_t MessageSystem::registerMessage(const std::string& messageName)
+	uint32_t MessageSystem::encode(const std::string& messageName)
 	{
 		auto lcName = lowercase(messageName);
 		auto it = std::find(m_messages.begin(), m_messages.end(), lcName);
@@ -35,6 +36,7 @@ namespace Core
 
 	void MessageSystem::sendMessage(InstanceID sender, InstanceID recepient, uint32_t msgId, InstanceID entity)
 	{
+		if(m_postbox.count(recepient) == 0) return;
 		Msg msg = {msgId, entity};
 		if(recepient != BROADCAST)
 		{

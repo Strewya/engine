@@ -24,6 +24,7 @@ namespace Graphics
 
 	bool SpritesheetCache::loadAsset(const char* filename, const LoadArgs* loadArgs, AssetPtr& asset)
 	{
+        (void) loadArgs;
 		Script::Engine script;
 		if(!script.DoFile(filename))
 		{

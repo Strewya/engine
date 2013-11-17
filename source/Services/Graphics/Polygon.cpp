@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include <Services/Graphics/Polygon.h>
 	/*** C++ headers ***/
+#include <cmath>
 	/*** extra headers ***/
 #include <Services/Graphics/Graphics.h>
 #include <Services/Graphics/IRenderer.h>
@@ -15,7 +16,7 @@
 namespace Graphics
 {
 	Polygon::Polygon()
-		: m_color(1,1,1,1), m_data(), m_isSolid(false), m_scale(1,1), m_thickness(1)
+        : m_isSolid(false), m_thickness(1), m_color(1,1,1,1), m_scale(1,1), m_data()
 	{
 	}
 
@@ -132,12 +133,12 @@ namespace Graphics
 		m_data.resize(numVertices);
 		
 		float degreesPerVertex = 360.0f / numVertices;
-		m_data[0].set(xRadius*Util::Vec2(std::cosf(Deg2Rad(0.0f)), yRadius*std::sinf(Deg2Rad(0.0f))));
+        m_data[0].set(xRadius*Util::Vec2(std::cos(Deg2Rad(0.0f)), yRadius*std::sin(Deg2Rad(0.0f))));
 		m_data[0] += center;
 		for(uint32_t i = 1; i <= numVertices/2; ++i)
 		{
 			float degree = degreesPerVertex*i;
-			m_data[i].set(xRadius*std::cosf(Deg2Rad(degree)), yRadius*std::sin(Deg2Rad(degree)));
+            m_data[i].set(xRadius*std::cos(Deg2Rad(degree)), yRadius*std::sin(Deg2Rad(degree)));
 			if(i != numVertices/2)
 			{
 				m_data[m_data.size()-i].set(m_data[i].x, -m_data[i].y);

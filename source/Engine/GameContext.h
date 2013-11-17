@@ -58,6 +58,9 @@ namespace Core
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources, uint64_t updateTime = UPDATE_TIME);
 		virtual ~GameContext();
 
+		void createEntity(InstanceID recepient, InstanceID id);
+		void destroyEntity(InstanceID id);
+
 		void init();
 		void activate();
 		void resume();

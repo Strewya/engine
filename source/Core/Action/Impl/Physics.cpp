@@ -5,7 +5,8 @@
 #include <Core/Action/Impl/Physics.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include <Core/State/SharedComponents.h>
+#include <Core/State/GeneralComponents.h>
+#include <Core/State/Impl/Box2dPhysics.h>
 #include <Engine/GameContext.h>
 #include <Engine/ServiceLocator.h>
 	/*** end headers ***/
@@ -38,7 +39,6 @@ namespace Core
 
 	void Physics2d::init(GameContext& context)
 	{
-		AtomicAction::init(context);
 		m_physicsWorld.SetAllowSleeping(true);
 
 		uint32_t flags = 0;
@@ -52,10 +52,94 @@ namespace Core
 		m_debug.setLengthScale(m_b2ScalingFactor);
 		m_debug.setRenderer(context.m_services.getGraphics());
 
+		m_physicsWorld.SetDebugDraw(&m_debug);
+
+		m_msgCreateBody = context.m_messenger.encode("create_body");
+		m_msgCreateFixtures = context.m_messenger.encode("create_fixtures");
+		m_msgCreateJoint = context.m_messenger.encode("create_joints");
+		m_msgSetPosition = context.m_messenger.encode("set_position");
+		m_msgApplyImpulse = context.m_messenger.encode("apply_impulse");
 	}
 
 	void Physics2d::processMessage(GameContext& context, uint32_t msg, InstanceID entity)
 	{
+		if(!context.m_entityPool.isAlive(entity)) return;
+		Entity& e = context.m_entityPool.getInstanceRef(entity);
+		
+		if(msg == m_msgCreateBody)
+		{
+			auto* bodyDef = e.getState<Box2dBodyDef>();
+			auto* position = e.getState<Position2d>();
+			if(bodyDef != nullptr && position != nullptr)
+			{
+				bodyDef->m_def.position = convert(position->m_position, m_b2ScalingFactor);
+				auto pair = m_bodies.emplace(entity, createBody(bodyDef->m_def));
+				pair.first->second->SetActive(false);
+				e.removeState(bodyDef->uid);
+				bodyDef = nullptr;
+			}
+		}
+		else if(msg == m_msgCreateFixtures)
+		{
+			auto it = m_bodies.find(entity);
+			if(it == m_bodies.end()) return;
+			b2Body& body = *it->second;
+
+			auto* fixtures = e.getState<Box2dFixtures>();
+			
+			if(fixtures != nullptr)
+			{
+				for(auto& fixture : fixtures->m_fixtures)
+				{
+					body.CreateFixture(&fixture.m_def);
+				}
+				e.removeState(fixtures->uid);
+				fixtures = nullptr;
+			}
+		}
+		else if(msg == m_msgCreateJoint)
+		{
+			auto it = m_bodies.find(entity);
+			if(it == m_bodies.end()) return;
+			b2Body& body = *it->second;
+
+			auto* joints = e.getState<Core::Box2dJoint>();
+			if(joints != nullptr)
+			{
+				for(auto& joint : joints->m_joints)
+				{
+					if(m_bodies.count(joint.m_bodyA) != 0 && m_bodies.count(joint.m_bodyB) != 0)
+                    {
+                        joint.m_initDefinition(joint, m_bodies[joint.m_bodyA].get(), m_bodies[joint.m_bodyB].get());
+                        m_physicsWorld.CreateJoint(&joint.m_prismatic);
+					}
+				}
+			}
+		}
+		else if(msg == m_msgSetPosition)
+		{
+			auto it = m_bodies.find(entity);
+			if(it == m_bodies.end()) return;
+			b2Body& body = *it->second;
+
+			auto* position = e.getState<Position2d>();
+			if(position != nullptr)
+			{
+				body.SetTransform(convert(position->m_position, m_b2ScalingFactorInv), 0);
+			}
+		}
+		else if(msg == m_msgApplyImpulse)
+		{
+			auto it = m_bodies.find(entity);
+			if(it == m_bodies.end()) return;
+			b2Body& body = *it->second;
+
+			auto* impulse = e.getState<Impulse2d>();
+			if(impulse != nullptr)
+			{
+				body.ApplyLinearImpulse(convert(impulse->m_impulse, m_b2ScalingFactorInv), body.GetWorldCenter());
+			}
+		}
 	}
 
 	void Physics2d::update(GameContext& context)
@@ -68,7 +152,13 @@ namespace Core
 		m_physicsWorld.Step(context.m_timer.getDeltaTime(), velocityIterations, positionIterations);
 
 		//do any post step updates, like updating the velocity states an such
-
+		for(auto eid : m_entities)
+		{
+			Entity& e = context.m_entityPool.getInstanceRef(eid);
+			auto* position = e.getState<Position2d>();
+			auto* body = m_bodies[eid].get();
+			position->m_position.set(convert(body->GetPosition(), m_b2ScalingFactor));
+		}
 	}
 
 	void Physics2d::render(GameContext& context, uint64_t interpolationTime)
@@ -76,15 +166,31 @@ namespace Core
 		m_physicsWorld.DrawDebugData();
 	}
 
-	void Physics2d::onDestroyEntity(GameContext& context, InstanceID entity)
+	bool Physics2d::validateEntity(GameContext& context, InstanceID entity)
 	{
 		Entity& e = context.m_entityPool.getInstanceRef(entity);
-		if(e.hasState(PhysicalBody::Type))
-		{
-			auto* state = e.getState<PhysicalBody>();
-			m_physicsWorld.DestroyBody(state->m_body);
-			state->m_body = nullptr;
-		}
+		return m_bodies.count(entity) != 0 &&
+			e.hasState(Position2d::Type);
+	}
+
+	void Physics2d::onAddEntity(GameContext& context, InstanceID entity)
+	{
+		m_bodies[entity]->SetActive(true);
+	}
+
+	void Physics2d::onRemoveEntity(GameContext& context, InstanceID entity)
+	{
+		m_bodies[entity]->SetActive(false);
+	}
+
+	void Physics2d::onDestroyEntity(GameContext& context, InstanceID entity)
+	{
+		m_bodies.erase(entity);
+	}
+
+	auto Physics2d::createBody(const b2BodyDef& definition) -> BodyUptr_t
+	{
+		return BodyUptr_t(m_physicsWorld.CreateBody(&definition), [&](b2Body* b){m_physicsWorld.DestroyBody(b);});
 	}
 
 

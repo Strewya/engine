@@ -7,14 +7,9 @@
 #include <Engine/Defines.h>
 #include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
+#include <Util/Color.h>
 #include <Util/Dimensional.h>
 	/*** end header inclusion ***/
-	
-
-namespace Util
-{
-	class Color;
-}
 
 namespace Graphics
 {
@@ -44,7 +39,8 @@ namespace Graphics
 		bool m_isSolid;
 		float m_thickness;
 		Util::Color m_color;
-		std::vector<Util::Vec2> m_data;
-		Util::Vec2 m_scale;
+        Util::Vec2 m_scale;
+        std::vector<Util::Vec2> m_data;
+
 	};
 }

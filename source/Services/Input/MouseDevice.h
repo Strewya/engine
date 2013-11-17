@@ -7,6 +7,7 @@
 #include <Engine/Defines.h>
 #include <Engine/FwdDecl.h>
 #include <deque>
+#include <windows.h>
 	/*** extra headers if needed ***/
 #include <Services/Input/Event.h>
 	/*** end header inclusion ***/

@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include <Services/Input/KeyBindings.h>
 	/*** C++ headers ***/
+#include <algorithm>
 	/*** extra headers ***/
 	/*** end headers ***/
 

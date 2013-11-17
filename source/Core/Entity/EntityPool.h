@@ -7,7 +7,6 @@
 #include <Engine/Defines.h>
 #include <deque>
 #include <functional>
-#include <list>
 #include <memory>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include <Core/Entity/Entity.h>
@@ -33,19 +32,19 @@ namespace Core
 		bool isAlive(InstanceID id) const;
 		bool destroy(InstanceID id);
 
-		void registerDestructionCallback(std::function<void(Entity&)> callback);
+		void registerDestructionCallback(std::function<void(InstanceID)> callback);
 		
 	private:
 		InstanceID newID(int index);
 		void dispatchDestruction(Entity& e);
 
 		std::deque<std::unique_ptr<Entity>> m_pool;
-		std::list<uint32_t> m_availableSlots;
+		std::deque<uint32_t> m_availableSlots;
 		uint32_t m_maxExpectedSize;
 		uint32_t m_indexBits;
 		uint32_t m_indexMask;
 		InstanceID m_idCounter;
-		std::deque<std::function<void(Entity&)>> m_onDestroyCallbacks;
+		std::function<void(InstanceID)> m_onDestroyCallback;
 		
 
 		

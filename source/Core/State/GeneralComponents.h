@@ -23,16 +23,15 @@ namespace Core
 		Util::Vec2 m_position;
 	};
 
-	COMPONENT(PhysicalBody)
-	{
-		b2Body* m_body;
-		b2BodyDef m_bodyDef;
-	};
-
 	COMPONENT(Velocity2d)
 	{
 		Util::Vec2 m_curVelocity;
 		Util::Vec2 m_maxVelocity;
+	};
+
+	COMPONENT(Impulse2d)
+	{
+		Util::Vec2 m_impulse;
 	};
 
 	COMPONENT(Acceleration2d)

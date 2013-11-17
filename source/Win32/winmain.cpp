@@ -15,6 +15,10 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
+    (void) hInst;
+    (void) hPrevInst;
+    (void) lpCmdLine;
+    (void) nShowCmd;
 	Win32::Window window("Snake");
 	int result = initializeWindow(window, false, window.getSizeX()-120, window.getSizeY()-120);
 	if(result != ErrorCode::OK)

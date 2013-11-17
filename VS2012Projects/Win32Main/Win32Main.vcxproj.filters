@@ -55,18 +55,17 @@
     <ClCompile Include="..\..\source\Win32\Window.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\stdafx.cpp" />
     <ClCompile Include="..\..\source\Core\State\State.cpp">
       <Filter>Core/State</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp">
-      <Filter>GameSpecific\Pong</Filter>
+      <Filter>GameSpecific/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp">
-      <Filter>GameSpecific\Pong</Filter>
+      <Filter>GameSpecific/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp">
-      <Filter>GameSpecific\Pong</Filter>
+      <Filter>GameSpecific/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Win32\winmain.cpp">
       <Filter>Win32</Filter>
@@ -149,12 +148,10 @@
     <ClCompile Include="..\..\source\Core\Action\Impl\InputController.cpp">
       <Filter>Core/Action/Impl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Games\Pong\InputController.cpp">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Engine\Intent.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\stdafx_builder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -221,20 +218,14 @@
     <ClInclude Include="..\..\source\Win32\myWindows.h">
       <Filter>Win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\SharedComponents.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\State\State.h">
       <Filter>Core/State</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Games\GameInit.h">
       <Filter>GameSpecific</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\Components.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h">
-      <Filter>GameSpecific\Pong</Filter>
+      <Filter>GameSpecific/Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h">
       <Filter>Services/Graphics</Filter>
@@ -309,10 +300,7 @@
       <Filter>Services/Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\Intents.h">
-      <Filter>GameSpecific\Pong</Filter>
+      <Filter>GameSpecific/Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\MouseDevice.h">
       <Filter>Services/Input</Filter>
@@ -329,14 +317,14 @@
     <ClInclude Include="..\..\source\Core\Action\Impl\InputController.h">
       <Filter>Core/Action/Impl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\Pong\InputController.h">
-      <Filter>GameSpecific\Pong</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\Intent.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Core\State\Impl\Box2dPhysics.h">
       <Filter>Core/State/Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\GeneralComponents.h">
+      <Filter>Core/State</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -370,9 +358,6 @@
     <Filter Include="GameSpecific">
       <UniqueIdentifier>{57c33a48-2ebd-4cf5-91c1-c02d7d69f1b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameSpecific\Pong">
-      <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Services/Graphics">
       <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
     </Filter>
@@ -384,6 +369,9 @@
     </Filter>
     <Filter Include="Core/State/Impl">
       <UniqueIdentifier>{b1d410c0-6dd5-47bf-a167-6db165abb4f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameSpecific/Pong">
+      <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

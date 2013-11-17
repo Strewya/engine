@@ -1,6 +1,7 @@
 #pragma once
 
 /*		C++ HEADERS	*/
+#include <cassert>
 #include <stdint.h>
 #include <string>
 #include <sstream>

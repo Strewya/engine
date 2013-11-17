@@ -48,9 +48,9 @@ namespace Input
 			: device(device), type(type), timestamp(0)
 		{ text = symbol; }
 		
+        DeviceCode device;
 		EventCode type;
-		DeviceCode device;
-		uint64_t timestamp;
+        uint64_t timestamp;
 		union
 		{
 			struct

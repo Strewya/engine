@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include <Services/Input/Engine.h>
 	/*** C++ headers ***/
+#include <algorithm>
 #include <vector>
 	/*** extra headers ***/
 #include <Services/Input/MouseDevice.h>

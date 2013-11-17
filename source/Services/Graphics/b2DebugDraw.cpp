@@ -89,6 +89,7 @@ namespace Graphics
 	void b2DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 	{
 		if(m_renderer == nullptr) return;
+        (void)axis;
 
 		Util::Color c(color.r, color.g, color.b);
 		Graphics::Polygon circle;

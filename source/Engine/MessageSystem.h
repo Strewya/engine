@@ -8,7 +8,7 @@
 #include <Engine/FwdDecl.h>
 #include <deque>
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
@@ -22,7 +22,7 @@ namespace Core
 		void subscribe(InstanceID recepient);
 		void unsubscribe(InstanceID recepient);
 
-		uint32_t registerMessage(const std::string& messageName);
+		uint32_t encode(const std::string& messageName);
 
 		void sendMessage(InstanceID sender, InstanceID recepient, uint32_t msgId, InstanceID entity);
 		bool consumeMessage(InstanceID recepient, uint32_t& msgId, InstanceID& entity);

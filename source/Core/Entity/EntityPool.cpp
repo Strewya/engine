@@ -89,16 +89,13 @@ namespace Core
 		return false;
 	}
 
-	void EntityPool::registerDestructionCallback(std::function<void(Entity&)> callback)
+	void EntityPool::registerDestructionCallback(std::function<void(InstanceID)> callback)
 	{
-		m_onDestroyCallbacks.push_back(callback);
+		m_onDestroyCallback = callback;
 	}
 
 	void EntityPool::dispatchDestruction(Entity& e)
 	{
-		for(auto& callback : m_onDestroyCallbacks)
-		{
-			callback(e);
-		}
+		m_onDestroyCallback(e.getID());
 	}
 }

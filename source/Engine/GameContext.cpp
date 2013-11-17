@@ -24,6 +24,10 @@ namespace Core
 		m_unpausedTimeScaling(1),
 		m_currentTimeScaling(m_unpausedTimeScaling)
 	{
+		m_entityPool.registerDestructionCallback([&](InstanceID id)
+		{
+			m_messenger.sendMessage(0, MessageSystem::BROADCAST, m_messenger.encode("destroy_entity"), id);
+		});
 	}
 
 	GameContext::~GameContext()
@@ -37,9 +41,22 @@ namespace Core
 		ActionRef actionRef = m_allOwnedActions.addAction(std::move(action));
 		if(isLogic)
 			m_logic->addAction(&actionRef);
-		if(isLogic)
+		if(isRender)
 			m_render->addAction(&actionRef);
+		actionRef.initialize(*this);
 		return actionRef;
+	}
+
+	void GameContext::createEntity(InstanceID recepient, InstanceID id)
+	{
+		m_allEntities.addEntity(id);
+		m_messenger.sendMessage(0, recepient, m_messenger.encode("add_entity"), id);
+	}
+
+	void GameContext::destroyEntity(InstanceID id)
+	{
+		m_allEntities.removeEntity(id);
+		m_messenger.sendMessage(0, m_messenger.BROADCAST, m_messenger.encode("destroy_entity"), id);
 	}
 
 	// event methods
@@ -123,5 +140,7 @@ namespace Core
 	{}
 		
 	void GameContext::draw(uint64_t interpolationTime)
-	{}
+    {
+        (void)interpolationTime; /* touch */
+    }
 }
