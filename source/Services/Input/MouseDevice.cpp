@@ -48,7 +48,7 @@ namespace Input
 		case WM_LBUTTONDOWN:
 		{
 			Event& down = makeEvent(EventCode::Button, queue);
-			down.button.code = Mouse::_LeftButton;
+			down.button.code = Mouse::m_LeftButton;
 			down.button.down = true;
 			break;
 		}
@@ -56,7 +56,7 @@ namespace Input
 		case WM_LBUTTONUP:
 		{
 			Event& up = makeEvent(EventCode::Button, queue);
-			up.button.code = Mouse::_LeftButton;
+			up.button.code = Mouse::m_LeftButton;
 			up.button.down = false;
 			break;
 		}
@@ -64,7 +64,7 @@ namespace Input
 		case WM_RBUTTONDOWN:
 		{
 			Event& down = makeEvent(EventCode::Button, queue);
-			down.button.code = Mouse::_RightButton;
+			down.button.code = Mouse::m_RightButton;
 			down.button.down = true;
 			break;
 		}
@@ -72,7 +72,7 @@ namespace Input
 		case WM_RBUTTONUP:
 		{
 			Event& up = makeEvent(EventCode::Button, queue);
-			up.button.code = Mouse::_RightButton;
+			up.button.code = Mouse::m_RightButton;
 			up.button.down = false;
 			break;
 		}
@@ -80,7 +80,7 @@ namespace Input
 		case WM_MBUTTONDOWN:
 		{
 			Event& down = makeEvent(EventCode::Button, queue);
-			down.button.code = Mouse::_MiddleButton;
+			down.button.code = Mouse::m_MiddleButton;
 			down.button.down = true;
 			break;
 		}
@@ -88,7 +88,7 @@ namespace Input
 		case WM_MBUTTONUP:
 		{
 			Event& up = makeEvent(EventCode::Button, queue);
-			up.button.code = Mouse::_MiddleButton;
+			up.button.code = Mouse::m_MiddleButton;
 			up.button.down = false;
 			break;
 		}

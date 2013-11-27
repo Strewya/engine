@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>composite action (h)</Title>
+			<Shortcut>composite_action_h</Shortcut>
+			<Description>Code snippet for a composite Action header</Description>
+			<Author>Marko Pipal</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>namespace</ID>
+					<ToolTip>Enclosing namespace</ToolTip>
+					<Default>MyNamespace</Default>
+				</Literal>
+				<Literal>
+					<ID>name</ID>
+					<ToolTip>Class name</ToolTip>
+					<Default>MyClass</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="cpp"><![CDATA[#pragma once
+/********************************************
+	class:	$name$
+	usage:
+********************************************/
+	/*** common header ***/
+#include <Engine/Defines.h>
+#include <Engine/FwdDecl.h>
+	/*** extra headers if needed ***/
+#include <Core/Action/Action.h>
+	/*** end header inclusion ***/
+
+namespace $namespace$
+{
+	class $name$ : public CompositeAction<$name$>
+	{
+	public:
+		void update(GameContext& context);
+		void render(GameContext& context, uint64_t interpolationTime);
+	
+		//void init(GameContext& context);
+	};
+}
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

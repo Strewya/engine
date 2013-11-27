@@ -26,7 +26,7 @@ namespace Graphics
     
 	void RenderingQueue::Render(const Core::ServiceLocator& services, const Core::ResourceLocator& resources) const
 	{
-        (void) services;
-        (void) resources;
+        //(void) services;
+        //(void) resources;
 	}
 }

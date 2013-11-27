@@ -8,7 +8,7 @@
 #include <Engine/GameContext.h>
 #include <Engine/ServiceLocator.h>
 #include <Engine/Intent.h>
-#include <Services/Input/Engine.h>
+#include <Services/Input/InputEngine.h>
 	/*** end headers ***/
 	
 namespace Core

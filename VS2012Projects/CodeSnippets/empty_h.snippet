@@ -2,9 +2,9 @@
 <CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 	<CodeSnippet Format="1.0.0">
 		<Header>
-			<Title>action_header</Title>
-			<Shortcut>action_header</Shortcut>
-			<Description>Code snippet for derived Action header file</Description>
+			<Title>empty_header</Title>
+			<Shortcut>empty_header</Shortcut>
+			<Description>Code snippet for empty class header file</Description>
 			<Author>Marko Pipal</Author>
 			<SnippetTypes>
 				<SnippetType>Expansion</SnippetType>
@@ -24,27 +24,29 @@
 				</Literal>
 			</Declarations>
 			<Code Language="cpp"><![CDATA[#pragma once
-	/********************************************
-		class:	$name$
-		usage:	
-	********************************************/
-		/*** common header ***/
-	#include "Engine/Defines.h"
-	#include "Engine/FwdDecl.h"
-		/*** extra headers if needed ***/
-	#include "Core/Action/Action.h"
-		/*** end header inclusion ***/
+#pragma once
+/********************************************
+	class:	PhysicsWrapper
+	usage:
+********************************************/
+	/*** common header ***/
+#include <Engine/Defines.h>
+#include <Engine/FwdDecl.h>
+	/*** extra headers if needed ***/
 
-	namespace $namespace$
+	/*** end header inclusion ***/
+
+namespace $namespace$
+{
+	class $name$
 	{
-		class $name$ : public $end$Action<$name$>
-		{
-		public:
-			void update(GameContext& context);
-			void render(GameContext& context, uint64_t interpolationTime);
-			void processMessages(GameContext& context);
-		};
-	}
+	public:
+		$end$
+
+	private:
+		
+	};
+}
 ]]>
 			</Code>
 		</Snippet>

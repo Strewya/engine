@@ -52,7 +52,6 @@
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\stdafx.cpp" />
     <ClCompile Include="..\..\source\Services\Graphics\dll_source.cpp">
       <Filter>Services/Graphics</Filter>
     </ClCompile>
@@ -68,6 +67,7 @@
     <ClCompile Include="..\..\source\Services\Graphics\D3D11\VertexBuffer.cpp">
       <Filter>Services/Graphics/D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\stdafx_builder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">

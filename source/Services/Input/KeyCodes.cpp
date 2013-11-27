@@ -40,11 +40,11 @@ namespace Input
 	
 	void Mouse::Init()
 	{
-		_map.insert( std::make_pair( Mouse::_LeftButton, "LeftButton" ) );
-		_map.insert( std::make_pair( Mouse::_RightButton, "RightButton" ) );
-		_map.insert( std::make_pair( Mouse::_MiddleButton, "MiddleButton" ) );
-		_map.insert( std::make_pair( Mouse::_XButton1, "XButton1" ) );
-		_map.insert( std::make_pair( Mouse::_XButton2, "XButton2" ) );
+		_map.insert( std::make_pair( Mouse::m_LeftButton, "LeftButton" ) );
+		_map.insert( std::make_pair( Mouse::m_RightButton, "RightButton" ) );
+		_map.insert( std::make_pair( Mouse::m_MiddleButton, "MiddleButton" ) );
+		_map.insert( std::make_pair( Mouse::m_XButton1, "XButton1" ) );
+		_map.insert( std::make_pair( Mouse::m_XButton2, "XButton2" ) );
 	}
 	
 	int Keyboard::Code(const std::string& name)
@@ -67,155 +67,155 @@ namespace Input
 	
 	void Keyboard::Init()
 	{
-		_map.insert( std::make_pair( Keyboard::_Cancel, "Cancel" ) );
+		_map.insert( std::make_pair( Keyboard::m_Cancel, "Cancel" ) );
 		
 		/*
 		* 0x07 : unassigned
 		*/
 
-		_map.insert( std::make_pair( Keyboard::_Backspace, "Backspace" ) );
-		_map.insert( std::make_pair( Keyboard::_Tab, "Tab" ) );
+		_map.insert( std::make_pair( Keyboard::m_Backspace, "Backspace" ) );
+		_map.insert( std::make_pair( Keyboard::m_Tab, "Tab" ) );
 
 		/*
 		* 0x0A - 0x0B : reserved
 		*/
 
-		_map.insert( std::make_pair( Keyboard::_Clear, "Clear" ) );
-		_map.insert( std::make_pair( Keyboard::_Enter, "Enter" ) );
+		_map.insert( std::make_pair( Keyboard::m_Clear, "Clear" ) );
+		_map.insert( std::make_pair( Keyboard::m_Enter, "Enter" ) );
 
-		_map.insert( std::make_pair( Keyboard::_Shift, "Shift" ) );
-		_map.insert( std::make_pair( Keyboard::_Control, "Control" ) );
-		_map.insert( std::make_pair( Keyboard::_Alt, "Alt" ) );
-		_map.insert( std::make_pair( Keyboard::_Pause, "Pause" ) );
-		_map.insert( std::make_pair( Keyboard::_CapsLock, "CapsLock" ) );
+		_map.insert( std::make_pair( Keyboard::m_Shift, "Shift" ) );
+		_map.insert( std::make_pair( Keyboard::m_Control, "Control" ) );
+		_map.insert( std::make_pair( Keyboard::m_Alt, "Alt" ) );
+		_map.insert( std::make_pair( Keyboard::m_Pause, "Pause" ) );
+		_map.insert( std::make_pair( Keyboard::m_CapsLock, "CapsLock" ) );
 		/*
-		_map.insert( std::make_pair( Keyboard::_KANA, "KANA" ) );
-		_map.insert( std::make_pair( Keyboard::_HANGEUL, "HANGEUL" ) );
-		_map.insert( std::make_pair( Keyboard::_HANGUL, "HANGUL" ) );
-		_map.insert( std::make_pair( Keyboard::_JUNJA, "JUNJA" ) );
-		_map.insert( std::make_pair( Keyboard::_FINAL, "FINAL" ) );
-		_map.insert( std::make_pair( Keyboard::_HANJA, "HANJA" ) );
-		_map.insert( std::make_pair( Keyboard::_KANJI, "KANJI" ) );
+		_map.insert( std::make_pair( Keyboard::m_KANA, "KANA" ) );
+		_map.insert( std::make_pair( Keyboard::m_HANGEUL, "HANGEUL" ) );
+		_map.insert( std::make_pair( Keyboard::m_HANGUL, "HANGUL" ) );
+		_map.insert( std::make_pair( Keyboard::m_JUNJA, "JUNJA" ) );
+		_map.insert( std::make_pair( Keyboard::m_FINAL, "FINAL" ) );
+		_map.insert( std::make_pair( Keyboard::m_HANJA, "HANJA" ) );
+		_map.insert( std::make_pair( Keyboard::m_KANJI, "KANJI" ) );
 		*/
-		_map.insert( std::make_pair( Keyboard::_Escape, "Escape" ) );
+		_map.insert( std::make_pair( Keyboard::m_Escape, "Escape" ) );
 		/*
-		_map.insert( std::make_pair( Keyboard::_CONVERT, "CONVERT" ) );
-		_map.insert( std::make_pair( Keyboard::_NONCONVERT, "NONCONVERT" ) );
-		_map.insert( std::make_pair( Keyboard::_ACCEPT, "ACCEPT" ) );
-		_map.insert( std::make_pair( Keyboard::_MODECHANGE, "MODECHANGE" ) );
+		_map.insert( std::make_pair( Keyboard::m_CONVERT, "CONVERT" ) );
+		_map.insert( std::make_pair( Keyboard::m_NONCONVERT, "NONCONVERT" ) );
+		_map.insert( std::make_pair( Keyboard::m_ACCEPT, "ACCEPT" ) );
+		_map.insert( std::make_pair( Keyboard::m_MODECHANGE, "MODECHANGE" ) );
 		*/
-		_map.insert( std::make_pair( Keyboard::_Space, "Space" ) );
-		_map.insert( std::make_pair( Keyboard::_PageUp, "PageUp" ) );
-		_map.insert( std::make_pair( Keyboard::_PageDown, "PageDown" ) );
-		_map.insert( std::make_pair( Keyboard::_End, "End" ) );
-		_map.insert( std::make_pair( Keyboard::_Home, "Home" ) );
-		_map.insert( std::make_pair( Keyboard::_ArrowLeft, "ArrowLeft" ) );
-		_map.insert( std::make_pair( Keyboard::_ArrowUp, "ArrowUp" ) );
-		_map.insert( std::make_pair( Keyboard::_ArrowRight, "ArrowRight" ) );
-		_map.insert( std::make_pair( Keyboard::_ArrowDown, "ArrowDown" ) );
-//		_map.insert( std::make_pair( Keyboard::_Select, "Select" ) );
-//		_map.insert( std::make_pair( Keyboard::_Print, "Print" ) );
-//		_map.insert( std::make_pair( Keyboard::_Execute, "Execute" ) );
-		_map.insert( std::make_pair( Keyboard::_PrintScreen, "PrintScreen" ) );
-		_map.insert( std::make_pair( Keyboard::_Insert, "Insert" ) );
-		_map.insert( std::make_pair( Keyboard::_Delete, "Delete" ) );
-//		_map.insert( std::make_pair( Keyboard::_HELP, "HELP" ) );
+		_map.insert( std::make_pair( Keyboard::m_Space, "Space" ) );
+		_map.insert( std::make_pair( Keyboard::m_PageUp, "PageUp" ) );
+		_map.insert( std::make_pair( Keyboard::m_PageDown, "PageDown" ) );
+		_map.insert( std::make_pair( Keyboard::m_End, "End" ) );
+		_map.insert( std::make_pair( Keyboard::m_Home, "Home" ) );
+		_map.insert( std::make_pair( Keyboard::m_ArrowLeft, "ArrowLeft" ) );
+		_map.insert( std::make_pair( Keyboard::m_ArrowUp, "ArrowUp" ) );
+		_map.insert( std::make_pair( Keyboard::m_ArrowRight, "ArrowRight" ) );
+		_map.insert( std::make_pair( Keyboard::m_ArrowDown, "ArrowDown" ) );
+//		_map.insert( std::make_pair( Keyboard::m_Select, "Select" ) );
+//		_map.insert( std::make_pair( Keyboard::m_Print, "Print" ) );
+//		_map.insert( std::make_pair( Keyboard::m_Execute, "Execute" ) );
+		_map.insert( std::make_pair( Keyboard::m_PrintScreen, "PrintScreen" ) );
+		_map.insert( std::make_pair( Keyboard::m_Insert, "Insert" ) );
+		_map.insert( std::make_pair( Keyboard::m_Delete, "Delete" ) );
+//		_map.insert( std::make_pair( Keyboard::m_HELP, "HELP" ) );
 
-		_map.insert( std::make_pair( Keyboard::_0, "0" ) );
-		_map.insert( std::make_pair( Keyboard::_1, "1" ) );
-		_map.insert( std::make_pair( Keyboard::_2, "2" ) );
-		_map.insert( std::make_pair( Keyboard::_3, "3" ) );
-		_map.insert( std::make_pair( Keyboard::_4, "4" ) );
-		_map.insert( std::make_pair( Keyboard::_5, "5" ) );
-		_map.insert( std::make_pair( Keyboard::_6, "6" ) );
-		_map.insert( std::make_pair( Keyboard::_7, "7" ) );
-		_map.insert( std::make_pair( Keyboard::_8, "8" ) );
-		_map.insert( std::make_pair( Keyboard::_9, "9" ) );
+		_map.insert( std::make_pair( Keyboard::m_0, "0" ) );
+		_map.insert( std::make_pair( Keyboard::m_1, "1" ) );
+		_map.insert( std::make_pair( Keyboard::m_2, "2" ) );
+		_map.insert( std::make_pair( Keyboard::m_3, "3" ) );
+		_map.insert( std::make_pair( Keyboard::m_4, "4" ) );
+		_map.insert( std::make_pair( Keyboard::m_5, "5" ) );
+		_map.insert( std::make_pair( Keyboard::m_6, "6" ) );
+		_map.insert( std::make_pair( Keyboard::m_7, "7" ) );
+		_map.insert( std::make_pair( Keyboard::m_8, "8" ) );
+		_map.insert( std::make_pair( Keyboard::m_9, "9" ) );
 
-		_map.insert( std::make_pair( Keyboard::_A, "A" ) );
-		_map.insert( std::make_pair( Keyboard::_B, "B" ) );
-		_map.insert( std::make_pair( Keyboard::_C, "C" ) );
-		_map.insert( std::make_pair( Keyboard::_D, "D" ) );
-		_map.insert( std::make_pair( Keyboard::_E, "E" ) );
-		_map.insert( std::make_pair( Keyboard::_F, "F" ) );
-		_map.insert( std::make_pair( Keyboard::_G, "G" ) );
-		_map.insert( std::make_pair( Keyboard::_H, "H" ) );
-		_map.insert( std::make_pair( Keyboard::_I, "I" ) );
-		_map.insert( std::make_pair( Keyboard::_J, "J" ) );
-		_map.insert( std::make_pair( Keyboard::_K, "K" ) );
-		_map.insert( std::make_pair( Keyboard::_L, "L" ) );
-		_map.insert( std::make_pair( Keyboard::_M, "M" ) );
-		_map.insert( std::make_pair( Keyboard::_N, "N" ) );
-		_map.insert( std::make_pair( Keyboard::_O, "O" ) );
-		_map.insert( std::make_pair( Keyboard::_P, "P" ) );
-		_map.insert( std::make_pair( Keyboard::_Q, "Q" ) );
-		_map.insert( std::make_pair( Keyboard::_R, "R" ) );
-		_map.insert( std::make_pair( Keyboard::_S, "S" ) );
-		_map.insert( std::make_pair( Keyboard::_T, "T" ) );
-		_map.insert( std::make_pair( Keyboard::_U, "U" ) );
-		_map.insert( std::make_pair( Keyboard::_V, "V" ) );
-		_map.insert( std::make_pair( Keyboard::_W, "W" ) );
-		_map.insert( std::make_pair( Keyboard::_X, "X" ) );
-		_map.insert( std::make_pair( Keyboard::_Y, "Y" ) );
-		_map.insert( std::make_pair( Keyboard::_Z, "Z" ) );
+		_map.insert( std::make_pair( Keyboard::m_A, "A" ) );
+		_map.insert( std::make_pair( Keyboard::m_B, "B" ) );
+		_map.insert( std::make_pair( Keyboard::m_C, "C" ) );
+		_map.insert( std::make_pair( Keyboard::m_D, "D" ) );
+		_map.insert( std::make_pair( Keyboard::m_E, "E" ) );
+		_map.insert( std::make_pair( Keyboard::m_F, "F" ) );
+		_map.insert( std::make_pair( Keyboard::m_G, "G" ) );
+		_map.insert( std::make_pair( Keyboard::m_H, "H" ) );
+		_map.insert( std::make_pair( Keyboard::m_I, "I" ) );
+		_map.insert( std::make_pair( Keyboard::m_J, "J" ) );
+		_map.insert( std::make_pair( Keyboard::m_K, "K" ) );
+		_map.insert( std::make_pair( Keyboard::m_L, "L" ) );
+		_map.insert( std::make_pair( Keyboard::m_M, "M" ) );
+		_map.insert( std::make_pair( Keyboard::m_N, "N" ) );
+		_map.insert( std::make_pair( Keyboard::m_O, "O" ) );
+		_map.insert( std::make_pair( Keyboard::m_P, "P" ) );
+		_map.insert( std::make_pair( Keyboard::m_Q, "Q" ) );
+		_map.insert( std::make_pair( Keyboard::m_R, "R" ) );
+		_map.insert( std::make_pair( Keyboard::m_S, "S" ) );
+		_map.insert( std::make_pair( Keyboard::m_T, "T" ) );
+		_map.insert( std::make_pair( Keyboard::m_U, "U" ) );
+		_map.insert( std::make_pair( Keyboard::m_V, "V" ) );
+		_map.insert( std::make_pair( Keyboard::m_W, "W" ) );
+		_map.insert( std::make_pair( Keyboard::m_X, "X" ) );
+		_map.insert( std::make_pair( Keyboard::m_Y, "Y" ) );
+		_map.insert( std::make_pair( Keyboard::m_Z, "Z" ) );
 		/*
-		_map.insert( std::make_pair( Keyboard::_LWIN, "LWIN" ) );
-		_map.insert( std::make_pair( Keyboard::_RWIN, "RWIN" ) );
-		_map.insert( std::make_pair( Keyboard::_APPS, "APPS" ) );
+		_map.insert( std::make_pair( Keyboard::m_LWIN, "LWIN" ) );
+		_map.insert( std::make_pair( Keyboard::m_RWIN, "RWIN" ) );
+		_map.insert( std::make_pair( Keyboard::m_APPS, "APPS" ) );
 		*/
 		/*
 		* 0x5E : reserved
 		*/
 
-//		_map.insert( std::make_pair( Keyboard::_SLEEP, "SLEEP" ) );
+//		_map.insert( std::make_pair( Keyboard::m_SLEEP, "SLEEP" ) );
 
-		_map.insert( std::make_pair( Keyboard::_Num0, "Num0" ) );
-		_map.insert( std::make_pair( Keyboard::_Num1, "Num1" ) );
-		_map.insert( std::make_pair( Keyboard::_Num2, "Num2" ) );
-		_map.insert( std::make_pair( Keyboard::_Num3, "Num3" ) );
-		_map.insert( std::make_pair( Keyboard::_Num4, "Num4" ) );
-		_map.insert( std::make_pair( Keyboard::_Num5, "Num5" ) );
-		_map.insert( std::make_pair( Keyboard::_Num6, "Num6" ) );
-		_map.insert( std::make_pair( Keyboard::_Num7, "Num7" ) );
-		_map.insert( std::make_pair( Keyboard::_Num8, "Num8" ) );
-		_map.insert( std::make_pair( Keyboard::_Num9, "Num9" ) );
-		_map.insert( std::make_pair( Keyboard::_NumMultiply, "NumMultiply" ) );
-		_map.insert( std::make_pair( Keyboard::_NumAdd, "NumAdd" ) );
-		_map.insert( std::make_pair( Keyboard::_NumEnter, "NumEnter" ) );
-		_map.insert( std::make_pair( Keyboard::_NumSubtract, "NumSubtract" ) );
-		_map.insert( std::make_pair( Keyboard::_NumDecimal, "NumDecimal" ) );
-		_map.insert( std::make_pair( Keyboard::_NumDivide, "NumDivide" ) );
-		_map.insert( std::make_pair( Keyboard::_F1, "F1" ) );
-		_map.insert( std::make_pair( Keyboard::_F2, "F2" ) );
-		_map.insert( std::make_pair( Keyboard::_F3, "F3" ) );
-		_map.insert( std::make_pair( Keyboard::_F4, "F4" ) );
-		_map.insert( std::make_pair( Keyboard::_F5, "F5" ) );
-		_map.insert( std::make_pair( Keyboard::_F6, "F6" ) );
-		_map.insert( std::make_pair( Keyboard::_F7, "F7" ) );
-		_map.insert( std::make_pair( Keyboard::_F8, "F8" ) );
-		_map.insert( std::make_pair( Keyboard::_F9, "F9" ) );
-		_map.insert( std::make_pair( Keyboard::_F10, "F10" ) );
-		_map.insert( std::make_pair( Keyboard::_F11, "F11" ) );
-		_map.insert( std::make_pair( Keyboard::_F12, "F12" ) );
-		_map.insert( std::make_pair( Keyboard::_F13, "F13" ) );
-		_map.insert( std::make_pair( Keyboard::_F14, "F14" ) );
-		_map.insert( std::make_pair( Keyboard::_F15, "F15" ) );
-		_map.insert( std::make_pair( Keyboard::_F16, "F16" ) );
-		_map.insert( std::make_pair( Keyboard::_F17, "F17" ) );
-		_map.insert( std::make_pair( Keyboard::_F18, "F18" ) );
-		_map.insert( std::make_pair( Keyboard::_F19, "F19" ) );
-		_map.insert( std::make_pair( Keyboard::_F20, "F20" ) );
-		_map.insert( std::make_pair( Keyboard::_F21, "F21" ) );
-		_map.insert( std::make_pair( Keyboard::_F22, "F22" ) );
-		_map.insert( std::make_pair( Keyboard::_F23, "F23" ) );
-		_map.insert( std::make_pair( Keyboard::_F24, "F24" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num0, "Num0" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num1, "Num1" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num2, "Num2" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num3, "Num3" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num4, "Num4" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num5, "Num5" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num6, "Num6" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num7, "Num7" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num8, "Num8" ) );
+		_map.insert( std::make_pair( Keyboard::m_Num9, "Num9" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumMultiply, "NumMultiply" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumAdd, "NumAdd" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumEnter, "NumEnter" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumSubtract, "NumSubtract" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumDecimal, "NumDecimal" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumDivide, "NumDivide" ) );
+		_map.insert( std::make_pair( Keyboard::m_F1, "F1" ) );
+		_map.insert( std::make_pair( Keyboard::m_F2, "F2" ) );
+		_map.insert( std::make_pair( Keyboard::m_F3, "F3" ) );
+		_map.insert( std::make_pair( Keyboard::m_F4, "F4" ) );
+		_map.insert( std::make_pair( Keyboard::m_F5, "F5" ) );
+		_map.insert( std::make_pair( Keyboard::m_F6, "F6" ) );
+		_map.insert( std::make_pair( Keyboard::m_F7, "F7" ) );
+		_map.insert( std::make_pair( Keyboard::m_F8, "F8" ) );
+		_map.insert( std::make_pair( Keyboard::m_F9, "F9" ) );
+		_map.insert( std::make_pair( Keyboard::m_F10, "F10" ) );
+		_map.insert( std::make_pair( Keyboard::m_F11, "F11" ) );
+		_map.insert( std::make_pair( Keyboard::m_F12, "F12" ) );
+		_map.insert( std::make_pair( Keyboard::m_F13, "F13" ) );
+		_map.insert( std::make_pair( Keyboard::m_F14, "F14" ) );
+		_map.insert( std::make_pair( Keyboard::m_F15, "F15" ) );
+		_map.insert( std::make_pair( Keyboard::m_F16, "F16" ) );
+		_map.insert( std::make_pair( Keyboard::m_F17, "F17" ) );
+		_map.insert( std::make_pair( Keyboard::m_F18, "F18" ) );
+		_map.insert( std::make_pair( Keyboard::m_F19, "F19" ) );
+		_map.insert( std::make_pair( Keyboard::m_F20, "F20" ) );
+		_map.insert( std::make_pair( Keyboard::m_F21, "F21" ) );
+		_map.insert( std::make_pair( Keyboard::m_F22, "F22" ) );
+		_map.insert( std::make_pair( Keyboard::m_F23, "F23" ) );
+		_map.insert( std::make_pair( Keyboard::m_F24, "F24" ) );
 
 		/*
 		* 0x88 - 0x8F : unassigned
 		*/
 
-		_map.insert( std::make_pair( Keyboard::_NumLock, "NumLock" ) );
-		_map.insert( std::make_pair( Keyboard::_ScrollLock, "ScrollLock" ) );
+		_map.insert( std::make_pair( Keyboard::m_NumLock, "NumLock" ) );
+		_map.insert( std::make_pair( Keyboard::m_ScrollLock, "ScrollLock" ) );
 
 		/*
 		* NEC PC-9800 kbd definitions
@@ -243,12 +243,12 @@ namespace Input
 		* No other API or message will distinguish left and right keys in this way.
 		*/
 
-		_map.insert( std::make_pair( Keyboard::_LShift, "LShift" ) );
-		_map.insert( std::make_pair( Keyboard::_RShift, "RShift" ) );
-		_map.insert( std::make_pair( Keyboard::_LControl, "LControl" ) );
-		_map.insert( std::make_pair( Keyboard::_RControl, "RControl" ) );
-		_map.insert( std::make_pair( Keyboard::_LAlt, "LAlt" ) );
-		_map.insert( std::make_pair( Keyboard::_RAlt, "RAlt" ) );
+		_map.insert( std::make_pair( Keyboard::m_LShift, "LShift" ) );
+		_map.insert( std::make_pair( Keyboard::m_RShift, "RShift" ) );
+		_map.insert( std::make_pair( Keyboard::m_LControl, "LControl" ) );
+		_map.insert( std::make_pair( Keyboard::m_RControl, "RControl" ) );
+		_map.insert( std::make_pair( Keyboard::m_LAlt, "LAlt" ) );
+		_map.insert( std::make_pair( Keyboard::m_RAlt, "RAlt" ) );
 		/*
 		Key_BROWSER_BACK      = 0xA6,
 		Key_BROWSER_FORWARD   = 0xA7,
@@ -275,13 +275,13 @@ namespace Input
 		* 0xB8 - 0xB9 : reserved
 		*/
 
-		_map.insert( std::make_pair( Keyboard::_Semicolon, "Semicolon" ) );
-		_map.insert( std::make_pair( Keyboard::_Plus, "Plus" ) );
-		_map.insert( std::make_pair( Keyboard::_Comma, "Comma" ) );
-		_map.insert( std::make_pair( Keyboard::_Minus, "Minus" ) );
-		_map.insert( std::make_pair( Keyboard::_Period, "Period" ) );
-		_map.insert( std::make_pair( Keyboard::_Question, "Question" ) );
-		_map.insert( std::make_pair( Keyboard::_Tilde, "Tilde" ) );
+		_map.insert( std::make_pair( Keyboard::m_Semicolon, "Semicolon" ) );
+		_map.insert( std::make_pair( Keyboard::m_Plus, "Plus" ) );
+		_map.insert( std::make_pair( Keyboard::m_Comma, "Comma" ) );
+		_map.insert( std::make_pair( Keyboard::m_Minus, "Minus" ) );
+		_map.insert( std::make_pair( Keyboard::m_Period, "Period" ) );
+		_map.insert( std::make_pair( Keyboard::m_Question, "Question" ) );
+		_map.insert( std::make_pair( Keyboard::m_Tilde, "Tilde" ) );
 
 		/*
 		* 0xC1 - 0xD7 : reserved

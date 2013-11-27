@@ -28,6 +28,7 @@ namespace Pong
 		//update sequence, optional as most of this is done by actions
 		//void input(uint32_t dt);
 		//void logic(uint32_t dt);
+		//virtual void draw(uint64_t interpolationTime);
 
 		//deactivate sequence
 		void onDeactivate();

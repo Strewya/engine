@@ -1,8 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="No PCH, Wall|Win32">
+      <Configuration>No PCH, Wall</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="no_pch_wall|Win32">
+      <Configuration>no_pch_wall</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -20,14 +28,28 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -38,11 +60,23 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -94,6 +128,52 @@
       <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$(TargetFileName) /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NO_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>lua5.1.lib;lua51.lib;$(Configuration)\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$(TargetFileName) /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">
+    <ClCompile>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NO_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
+      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>lua5.1.lib;lua51.lib;$(Configuration)\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$(TargetFileName) /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Action\Action.cpp" />
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp" />
@@ -110,7 +190,6 @@
     <ClCompile Include="..\..\source\Engine\Defines.cpp" />
     <ClCompile Include="..\..\source\Engine\Engine.cpp" />
     <ClCompile Include="..\..\source\Engine\GameContext.cpp" />
-    <ClCompile Include="..\..\source\Engine\GlobalIntents.cpp" />
     <ClCompile Include="..\..\source\Engine\Intent.cpp" />
     <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp" />
     <ClCompile Include="..\..\source\Engine\ServiceLocator.cpp" />
@@ -121,13 +200,15 @@
     <ClCompile Include="..\..\source\Services\Input\Context.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Converter.cpp" />
     <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp" />
-    <ClCompile Include="..\..\source\Services\Input\Engine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\Event.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp" />
     <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp" />
     <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp" />
     <ClCompile Include="..\..\source\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\source\Services\Graphics\AnimationInfo.cpp" />
     <ClCompile Include="..\..\source\Services\Graphics\b2DebugDraw.cpp" />
@@ -169,8 +250,8 @@
     <ClInclude Include="..\..\source\Engine\Engine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
-    <ClInclude Include="..\..\source\Engine\GlobalIntents.h" />
     <ClInclude Include="..\..\source\Engine\Intent.h" />
+    <ClInclude Include="..\..\source\Engine\PhysicsSystem.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Engine\MessageSystem.h" />
@@ -180,7 +261,7 @@
     <ClInclude Include="..\..\source\Services\Input\Context.h" />
     <ClInclude Include="..\..\source\Services\Input\Converter.h" />
     <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h" />
-    <ClInclude Include="..\..\source\Services\Input\Engine.h" />
+    <ClInclude Include="..\..\source\Services\Input\InputEngine.h" />
     <ClInclude Include="..\..\source\Services\Input\KeyBindings.h" />
     <ClInclude Include="..\..\source\Services\Input\MouseDevice.h" />
     <ClInclude Include="..\..\source\stdafx.h" />

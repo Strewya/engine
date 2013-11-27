@@ -13,7 +13,7 @@
 #include <Engine/ServiceLocator.h>
 #include <Services/Graphics/RendererFactory.h>
 #include <Services/Graphics/SpritesheetCache.h>
-#include <Services/Input/Engine.h>
+#include <Services/Input/InputEngine.h>
 #include <Services/Script/LuaEngine.h>
 	/*** end header inclusion ***/
 

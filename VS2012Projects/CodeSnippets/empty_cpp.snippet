@@ -2,9 +2,9 @@
 <CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
 	<CodeSnippet Format="1.0.0">
 		<Header>
-			<Title>action_source</Title>
-			<Shortcut>action_source</Shortcut>
-			<Description>Code snippet for derived Action source file</Description>
+			<Title>empty_source</Title>
+			<Shortcut>empty_source</Shortcut>
+			<Description>Code snippet for empty class source file</Description>
 			<Author>Marko Pipal</Author>
 			<SnippetTypes>
 				<SnippetType>Expansion</SnippetType>
@@ -24,25 +24,18 @@
 				</Literal>
 			</Declarations>
 			<Code Language="cpp"><![CDATA[//headers should be ordered alphabetically, if not REORDER THEM NOW!
-		/*** precompiled header ***/
-	#include "stdafx.h"
-		/*** personal header ***/
-	#include "Core/Action/Impl/$name$"
-		/*** C++ headers ***/
-		/*** extra headers ***/
-		/*** end headers ***/
+	/*** precompiled header ***/
+#include <stdafx.h>
+	/*** personal header ***/
+#include <$path$>
+	/*** C++ headers ***/
+	/*** extra headers ***/
+	/*** end headers ***/
 
-	namespace $namespace$
-	{
-		void $name$::processMessages(GameContext& context)
-		{$end$}
-		
-		void $name$::update(GameContext& context)
-		{}
-		
-		void $name$::render(GameContext& context, uint64_t interpolationTime)
-		{}
-	}
+namespace $namespace$
+{
+	
+}
 ]]>
 			</Code>
 		</Snippet>

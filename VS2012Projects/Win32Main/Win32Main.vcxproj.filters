@@ -127,9 +127,6 @@
     <ClCompile Include="..\..\source\Services\Input\Context.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\Engine.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp">
       <Filter>Services/Input</Filter>
     </ClCompile>
@@ -138,9 +135,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Services\Input\Converter.cpp">
       <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Engine\GlobalIntents.cpp">
-      <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Engine\MessageSystem.cpp">
       <Filter>Engine</Filter>
@@ -152,6 +146,9 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\stdafx_builder.cpp" />
+    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
+      <Filter>Services/Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Win32\WindowClass.h">
@@ -293,9 +290,6 @@
     <ClInclude Include="..\..\source\Services\Input\Context.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\Engine.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\KeyBindings.h">
       <Filter>Services/Input</Filter>
     </ClInclude>
@@ -307,9 +301,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Services\Input\Converter.h">
       <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Engine\GlobalIntents.h">
-      <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\MessageSystem.h">
       <Filter>Engine</Filter>
@@ -325,6 +316,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\Core\State\GeneralComponents.h">
       <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
+      <Filter>Services/Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\PhysicsSystem.h">
+      <Filter>Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -372,6 +369,12 @@
     </Filter>
     <Filter Include="GameSpecific/Pong">
       <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services/Physics">
+      <UniqueIdentifier>{f696866c-6d81-4fc4-9474-ec923c7097d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services/Physics\Box2D">
+      <UniqueIdentifier>{1d47ca68-5c29-4c1d-a7a0-35d42b31ee03}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -10,17 +10,16 @@
 	/*** extra headers ***/
 #include <Engine/Engine.h>
 #include <Engine/ServiceLocator.h>
+#include <Core/Action/Impl/InputController.h>
 #include <Core/Action/Impl/Physics.h>
 #include <Core/Action/Impl/Render.h>
 #include <Core/Entity/Entity.h>
 #include <Core/State/GeneralComponents.h>
 #include <Core/State/Impl/Box2dPhysics.h>
 #include <Games/Pong/EntityConstructors.h>
-#include <Games/Pong/InputController.h>
-#include <Games/Pong/Intents.h>
 #include <Services/Graphics/IRenderer.h>
 #include <Services/Input/Context.h>
-#include <Services/Input/Engine.h>
+#include <Services/Input/InputEngine.h>
 #include <Services/Input/Event.h>
 #include <Services/Input/KeyCodes.h>
 #include <Util/Color.h>
