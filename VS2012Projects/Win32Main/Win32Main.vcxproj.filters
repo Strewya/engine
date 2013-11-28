@@ -49,9 +49,6 @@
     <ClCompile Include="..\..\source\Core\Entity\EntityFactory.cpp">
       <Filter>Core/Entity</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\Render.cpp">
-      <Filter>Core/Action/Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Win32\Window.cpp">
       <Filter>Win32</Filter>
     </ClCompile>
@@ -59,58 +56,16 @@
       <Filter>Core/State</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp">
-      <Filter>GameSpecific/Pong</Filter>
+      <Filter>Games/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp">
-      <Filter>GameSpecific/Pong</Filter>
+      <Filter>Games/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp">
-      <Filter>GameSpecific/Pong</Filter>
+      <Filter>Games/Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Win32\winmain.cpp">
       <Filter>Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\AnimationInfo.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\b2DebugDraw.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\ITextureCache.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\KeyCodes.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Script\LuaEngine.cpp">
-      <Filter>Services/Script</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\Polygon.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\RendererFactory.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\RenderingQueue.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\SpriteInfo.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\Spritesheet.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\SpritesheetCache.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\TextureData.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\Physics.cpp">
-      <Filter>Core/Action/Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\Event.cpp">
-      <Filter>Services/Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Random.cpp">
       <Filter>Util</Filter>
@@ -121,33 +76,78 @@
     <ClCompile Include="..\..\source\Core\Action\ActionRegistry.cpp">
       <Filter>Core/Action</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\DeviceConcept.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\Context.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\KeyBindings.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\MouseDevice.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Input\Converter.cpp">
-      <Filter>Services/Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Engine\MessageSystem.cpp">
       <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Core\Action\Impl\InputController.cpp">
-      <Filter>Core/Action/Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\Engine\Intent.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\stdafx_builder.cpp" />
-    <ClCompile Include="..\..\source\Services\Input\InputEngine.cpp">
-      <Filter>Services/Input</Filter>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\AnimationInfo.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\ITextureCache.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\Polygon.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\RendererFactory.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\RenderingQueue.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpriteInfo.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\Spritesheet.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\TextureData.cpp">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\RenderAction.cpp">
+      <Filter>Modules\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Scripting\Service\LuaEngine.cpp">
+      <Filter>Modules\Scripting\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\Context.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\Converter.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\DeviceConcept.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\Event.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\InputEngine.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\KeyBindings.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\KeyCodes.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\Service\MouseDevice.cpp">
+      <Filter>Modules\Input\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Input\InputAction.cpp">
+      <Filter>Modules\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Physics\Box2D\Box2DAction.cpp">
+      <Filter>Modules\Physics\Box2D</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,9 +205,6 @@
     <ClInclude Include="..\..\source\Util\AssetStorage.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\Render.h">
-      <Filter>Core/Action/Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Win32\Window.h">
       <Filter>Win32</Filter>
     </ClInclude>
@@ -218,62 +215,8 @@
     <ClInclude Include="..\..\source\Core\State\State.h">
       <Filter>Core/State</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Games\GameInit.h">
-      <Filter>GameSpecific</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h">
-      <Filter>GameSpecific/Pong</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\AnimationInfo.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\b2DebugDraw.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\dll_header.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\Event.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\IRenderer.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\ITextureCache.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\KeyCodes.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Script\LuaEngine.h">
-      <Filter>Services/Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Script\LuaInclude.h">
-      <Filter>Services/Script</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\Polygon.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\RendererFactory.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\RenderingQueue.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\SpriteInfo.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\Spritesheet.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\SpritesheetCache.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\TextureData.h">
-      <Filter>Services/Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\Physics.h">
-      <Filter>Core/Action/Impl</Filter>
+      <Filter>Games/Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Util\Random.h">
       <Filter>Util</Filter>
@@ -284,44 +227,116 @@
     <ClInclude Include="..\..\source\Core\Action\ActionRegistry.h">
       <Filter>Core/Action</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\DeviceConcept.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\Context.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\KeyBindings.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h">
-      <Filter>GameSpecific/Pong</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\MouseDevice.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\Converter.h">
-      <Filter>Services/Input</Filter>
+      <Filter>Games/Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\MessageSystem.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Action\Impl\InputController.h">
-      <Filter>Core/Action/Impl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\Intent.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\Impl\Box2dPhysics.h">
-      <Filter>Core/State/Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Core\State\GeneralComponents.h">
-      <Filter>Core/State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Services\Input\InputEngine.h">
-      <Filter>Services/Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\PhysicsSystem.h">
       <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Engine\GameInit.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\State\CoreStates.h">
+      <Filter>Core/State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\AnimationInfo.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\dll_header.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\Graphics.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IIndexBuffer.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IRenderer.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\ITextureCache.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IVertexBuffer.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\Polygon.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\RendererFactory.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\RenderingQueue.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpriteInfo.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\Spritesheet.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\TextureData.h">
+      <Filter>Modules\Rendering\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Rendering\RenderAction.h">
+      <Filter>Modules\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Scripting\Service\LuaEngine.h">
+      <Filter>Modules\Scripting\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Scripting\Service\LuaInclude.h">
+      <Filter>Modules\Scripting\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\Context.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\Converter.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\DeviceConcept.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\Event.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\InputEngine.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\KeyBindings.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\KeyCodes.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\Service\MouseDevice.h">
+      <Filter>Modules\Input\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Input\InputAction.h">
+      <Filter>Modules\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DAction.h">
+      <Filter>Modules\Physics\Box2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DState.h">
+      <Filter>Modules\Physics\Box2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsModule.h">
+      <Filter>Modules\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DEngine.h">
+      <Filter>Modules\Physics\Box2D</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -349,32 +364,35 @@
     <Filter Include="resources">
       <UniqueIdentifier>{dd566029-3832-413b-b283-bb95cac542b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core/Action/Impl">
-      <UniqueIdentifier>{6bfc5868-93c7-464f-8404-b6841350c96d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSpecific">
-      <UniqueIdentifier>{57c33a48-2ebd-4cf5-91c1-c02d7d69f1b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Services/Graphics">
-      <UniqueIdentifier>{d16cbe3a-1f6a-4f3a-a8e9-753054abca58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Services/Input">
-      <UniqueIdentifier>{aacf9618-efb6-47dc-8074-09d1e766aeb2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Services/Script">
-      <UniqueIdentifier>{4058518f-6669-4a15-a99a-410065ec6698}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core/State/Impl">
-      <UniqueIdentifier>{b1d410c0-6dd5-47bf-a167-6db165abb4f5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameSpecific/Pong">
+    <Filter Include="Games/Pong">
       <UniqueIdentifier>{eaaaa878-eade-44be-af59-c8935ac315b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Services/Physics">
-      <UniqueIdentifier>{f696866c-6d81-4fc4-9474-ec923c7097d1}</UniqueIdentifier>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{36ae8957-61b2-4cfc-bd1d-0ee19b80291b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Services/Physics\Box2D">
-      <UniqueIdentifier>{1d47ca68-5c29-4c1d-a7a0-35d42b31ee03}</UniqueIdentifier>
+    <Filter Include="Modules\Input">
+      <UniqueIdentifier>{59bf2ba4-1dc6-4ce5-b60c-c21d9851bbbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Physics">
+      <UniqueIdentifier>{c89cbb66-638e-42f4-971c-bf653ec2bea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Rendering">
+      <UniqueIdentifier>{a87ee635-6c73-4953-8756-96c30f7198da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Scripting">
+      <UniqueIdentifier>{27d8c059-1cee-4952-beab-9cbe1889dc4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Input\Service">
+      <UniqueIdentifier>{015918f3-e5b2-4442-89cf-0fcef411d056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Scripting\Service">
+      <UniqueIdentifier>{388741ce-9f31-45f9-8be4-732aaf23d6c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Rendering\Service">
+      <UniqueIdentifier>{b8a54bc7-0951-45ab-9ec7-2cf829bc5a05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Physics\Box2D">
+      <UniqueIdentifier>{089d28f3-63f1-4e30-bcf7-45d1e17a305c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

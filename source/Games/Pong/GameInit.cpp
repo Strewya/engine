@@ -1,15 +1,14 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Games/GameInit.h>
+#include <Engine/GameInit.h>
 	/*** extra headers ***/
 #include <Engine/Engine.h>
 #include <Games/Pong/Gameplay.h>
 	/*** end headers ***/
 
-namespace Game
+namespace Core
 {
-	using namespace Pong;
 	void init(Core::Engine& engine)
 	{
 		/*
@@ -18,7 +17,7 @@ namespace Game
 		*/
 
 		//get the context
-		Core::GameContext& gameplay = engine.registerContext<Gameplay>();
+		GameContext& gameplay = engine.registerContext<Pong::Gameplay>();
 		
 		//set the context as active
 		engine.setActiveContext(gameplay);

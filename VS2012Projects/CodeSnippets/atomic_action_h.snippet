@@ -25,30 +25,30 @@
 			</Declarations>
 			<Code Language="cpp"><![CDATA[#pragma once
 /********************************************
-	class:	$name$
-	usage:
+*	class:	$name$
+*	usage:	
 ********************************************/
-	/*** common header ***/
+/******* common header *******/
 #include <Engine/Defines.h>
 #include <Engine/FwdDecl.h>
-	/*** extra headers if needed ***/
+/******* extra headers if needed *******/
 #include <Core/Action/Action.h>
-	/*** end header inclusion ***/
+/******* end header inclusion *******/
 
 namespace $namespace$
 {
-	class $name$ : public AtomicAction<$name$>
+	class $name$ : public Core::AtomicAction<$name$>
 	{
 	public:
-		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
-		void update(GameContext& context);
-		void render(GameContext& context, uint64_t interpolationTime);
+		void processMessage(Core::GameContext& context, uint32_t msg, InstanceID entity);
+		void update(Core::GameContext& context);
+		void render(Core::GameContext& context, uint64_t interpolationTime);
 
-		//void init(GameContext& context);
-		//void onAddEntity(GameContext& context, InstanceID entity);
-		//void onRemoveEntity(GameContext& context, InstanceID entity);
-		//void onDestroyEntity(GameContext& context, InstanceID entity);
-		//bool validateEntity(GameContext& context, InstanceID eid);
+		//void init(Core::GameContext& context);
+		//void onAddEntity(Core::GameContext& context, InstanceID entity);
+		//void onRemoveEntity(Core::GameContext& context, InstanceID entity);
+		//void onDestroyEntity(Core::GameContext& context, InstanceID entity);
+		//bool validateEntity(Core::GameContext& context, InstanceID eid);
 	};
 }
 ]]>

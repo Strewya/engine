@@ -6,7 +6,6 @@
 	/*** common and C++ headers ***/
 #include <Engine/Defines.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include <Box2D/Box2D.h>
 #include <Core/State/State.h>
 #include <Util/Dimensional.h>
 	/*** end header inclusion ***/

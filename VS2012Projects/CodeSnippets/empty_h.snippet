@@ -1,40 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
-	<CodeSnippet Format="1.0.0">
-		<Header>
-			<Title>empty_header</Title>
-			<Shortcut>empty_header</Shortcut>
-			<Description>Code snippet for empty class header file</Description>
-			<Author>Marko Pipal</Author>
-			<SnippetTypes>
-				<SnippetType>Expansion</SnippetType>
-			</SnippetTypes>
-		</Header>
-		<Snippet>
-			<Declarations>
-				<Literal>
-					<ID>namespace</ID>
-					<ToolTip>Enclosing namespace</ToolTip>
-					<Default>MyNamespace</Default>
-				</Literal>
-				<Literal>
-					<ID>name</ID>
-					<ToolTip>Class name</ToolTip>
-					<Default>MyClass</Default>
-				</Literal>
-			</Declarations>
-			<Code Language="cpp"><![CDATA[#pragma once
-#pragma once
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>empty_header</Title>
+      <Author>Marko Pipal</Author>
+      <Description>Code snippet for empty class header file</Description>
+      <HelpUrl>
+      </HelpUrl>
+      <Shortcut>empty_header</Shortcut>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>namespace</ID>
+          <ToolTip>Enclosing namespace</ToolTip>
+          <Default>MyNamespace</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>name</ID>
+          <ToolTip>Class name</ToolTip>
+          <Default>MyClass</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <Code Language="cpp"><![CDATA[#pragma once
 /********************************************
-	class:	PhysicsWrapper
-	usage:
+*	class:	$name$
+*	usage:	
 ********************************************/
-	/*** common header ***/
+/******* common header *******/
 #include <Engine/Defines.h>
 #include <Engine/FwdDecl.h>
-	/*** extra headers if needed ***/
-
-	/*** end header inclusion ***/
+/******* extra headers if needed *******/
+/******* end header inclusion *******/
 
 namespace $namespace$
 {
@@ -47,8 +51,7 @@ namespace $namespace$
 		
 	};
 }
-]]>
-			</Code>
-		</Snippet>
-	</CodeSnippet>
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
 </CodeSnippets>

@@ -8,7 +8,7 @@
 	/*** extra headers if needed ***/
 	/*** end header inclusion ***/
 
-namespace Game
+namespace Core
 {
 	void init(Core::Engine& engine);
 }

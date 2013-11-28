@@ -8,14 +8,13 @@
 #include <memory>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include <Box2D/Box2D.h>
 #include <Core/Action/ActionRegistry.h>
 #include <Core/Entity/EntityFactory.h>
 #include <Core/Entity/EntityPool.h>
 #include <Core/Space/SpacePool.h>
 #include <Engine/MessageSystem.h>
-#include <Engine/PhysicsSystem.h>
-#include <Services/Input/KeyBindings.h>
+#include <Modules/Input/Service/KeyBindings.h>
+#include <Modules/Physics/PhysicsModule.h>
 #include <Util/Time.h>
 	/*** end header inclusion ***/
 
@@ -57,7 +56,7 @@ namespace Core
 		ActionUptr m_render;
 
 		//this should not be touched by ANYONE except the Physics action and the construction functions
-		PhysicsSystem m_physics;
+		Physics::Engine m_physics;
 		
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources, uint64_t updateTime = UPDATE_TIME);
 		virtual ~GameContext();
