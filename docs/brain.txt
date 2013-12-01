@@ -1,0 +1,287 @@
+Input System gets raw input event and transforms it into device specific input event (DSIE) struct.
+This event remains in the input system, as it knows absolutely nothing about anything else except them.
+A higher level system polls the input system for all events that occured since the last update (or in the specified delta time, when i get timestamps to work).
+This higher level system then passes the DSIE to an context based input intent generator, which is basically a key binding system based on contexts.
+The key binding should be either per game context, or global. In the latter case, it should contain input contexts for each possible game context so they can be freely exchanged.
+For each DSIE, an intent struct is generated if possible (there may be a case where an inptu event cannot be mapped to an intent, i.e. it is not bound to anything).
+The intent is a messaging system element which fires of an intent for the specific entity or group of entities. This is done by having a "target" ID. Suggestion: negative means a group, positive is one entity.
+When the intents are generated, only data from the input events themselves can be filled (key state, axis value), we still don't know which entity should do the intent.
+The higher level system, which is now clear is the input handler action, has it's list of entities it should update on. These are never cleared by the input system itself.
+When the input handler action updates, for each mapped intent it loops through all the entities registered to it and places an intent with their ID in the intent system.
+When the intent is placed in the intent system, it is available for any action to modify it, or consume it.
+Every intent should be consumed by exactly one action in the queue.
+Any action can place new intents in the queue.
+Actions should have two phases of updating.
+The first phase is intent execution and consumption. This is where intents are pulled from the intent system and if the entity has the right components, it is placed in the actions list of entities to update in the second phase, and any intent specific logic is executed (the kind of logic that is done only once per intent ocurrence).
+The second phase is per frame update logic. For each registered entity, the logic is stepped (if there is any) and a decision is made whether the entity has reached the end of the actions logic and should be removed from the list of registered entities.
+
+
+.....
+
+struct Intent
+{
+	enum class Type
+	{
+		Action,
+		State,
+		Range
+	};
+	uint32_t intentID;
+	InstanceID target;
+	Type type;
+	union
+	{
+		bool state;
+		double range;
+	} extraData;
+};
+
+class InputSystem
+{
+public:
+	bool receiveRawInputEvent(....)
+	{
+		auto check = [&](Device& d){ return device.parseEvent(...., m_events); };
+		return std::any_of(m_devices.begin(), m_devices.end(), check);
+	}
+	std::deque<Event>& getEvents() { return m_events; }
+	//or
+	bool nextEvent(Event& e)
+	{
+		if(!m_events.empty())
+		{
+			e = m_events.front();
+			m_events.pop_front();
+			return true;
+		}
+		return false;
+	}
+};
+
+class KeyBindings
+{
+public:
+	bool findMapping(const Event& e, Intent& i)
+	{
+		return std::any_of(m_contexts.begin(), m_contexts.end(), [&](Context& c){ return c.findBinding(e, i); });
+	}
+};
+
+class Action
+{
+...
+	void registerIntentHandler(uint32_t intentID, IntentHandler handler)
+	{
+		m_intentHandlers[intentID] = handler;
+	}
+	void resetIntentHandlerToDefault(uint32_t intentID)
+	{
+		m_intentHandlers[intentID] = m_defaultHandlers[intentID];
+	}
+protected:
+	typedef std::function<void(Core::GameContext&,const Intent&)> IntentHandler;
+	typedef std::unordered_map<uint32_t, IntentHandler> IntentHandlingContainer;
+	IntentHandlingContainer m_intentHandlers;
+	IntentHandlingContainer m_defaultHandlers;
+	
+	void registerDefaultIntentHandler(uint32_t intentID, const IntentHandler& handler)
+	{
+		m_intentHandlers.emplace(intentID, handler);
+		m_defaultHandlers.emplace(intentID, handler);
+	}
+};
+
+SYSTEM(InputHandler)
+{
+public:
+	SYSTEM_CTOR(InputHandler);
+	void frameUpdate(float dt);
+};
+
+SYSTEM(Physics)
+{
+public:
+	SYSTEM_CTOR(Physics);
+	
+	void init()
+	{
+		using namespace std::placeholders;
+		registerDefaultIntentHandler(JUMP, std::bind(&Physics::doJump, this, _2));
+		registerDefaultIntentHandler(MOVE, std::bind(&Physics::doMove, this, _2));
+		//...
+	}
+	
+	void frameUpdate(float dt)
+	{
+		//update stuff that needs to be updated before the world
+		for(auto eid : m_entities)
+		{
+			Entity& entity = m_context.entityPool.getInstanceRef(eid);
+			//...get components
+			//update jumping
+			if(physicsState.jumping && physicsState.jumpForce > 0.01)
+			{
+				auto jumpForce = std::min(physicsState.frameJumpForce, physics.jumpForce);
+				physicsState.jumpForce -= jumpForce;
+				physicsState.body->applyForceToCenter(jumpForce);
+			}
+			//...
+		}
+		//update physics world
+		//update stuff that needs to be updated after the world
+		for(auto eid : m_entities)
+		{
+			Entity& entity = m_context.entityPool.getInstanceRef(eid);
+			//...get components
+			//update positions
+			physicsState.position = physicsState.body->getPosition()*b2rScaling; //as opposed to r2bScaling (real to box)
+			//...
+		}
+	}
+	
+	void intentUpdate(float dt)
+	{
+		Intent intent;
+		for(auto intentHandler : m_intentHandlers)
+		{
+			while(m_context.intentSystem.consumeIntent(intentHandler.first, intent))
+			{
+				intentHandler.second(m_context, intent);
+			}
+		}
+	}
+	
+	void doJump(const Intent& i)
+	{
+		if(m_context.entityPool.isAlive(i.target) && validateEntity(i.target))
+		{
+			Entity& entity = m_context.entityPool.getInstanceRef(i.target);
+			//get required components
+			switch(i.type)
+			{
+			case Intent::Action:
+				//apply one time full force
+				physicsState.body->applyForceToCenter(physicsState.jumpForce);
+				//no need to do any additional updates
+			break;
+			
+			case Intent::State:
+				if(i.extraData.state)
+				{
+					//set the entity as jumping, then each frame step add a small amount of force until no more jump force is left
+					physicsState.jumping = true;
+				}
+				else
+				{
+					physicsState.jumping = false;
+				}
+			break;
+			
+			case Intent::Range:
+				//apply the amount of force equal to i.extraData.range * fullJumpForce
+				physicsState.body->applyForceToCenter(physicsState.jumpForce * i.extraData.range);
+			break;
+			}
+		}
+	}
+}
+
+
+
+
+
+
+conceptually/pseudo code:
+
+input
+{
+	inputEvents = gatherInputEvents(updateTime);
+	inputGeneratedIntents = gatherIntentsFromInput(keyBindings, inputEvents, entitiesThatAreControlledByInput);
+}
+ai
+{
+	aiGeneratedIntents = gatherIntentsFromAI(updateTime, entitiesThatAreControlledByAI);
+}
+controller response
+{
+	respondToIntents(updateTime, inputGeneratedIntents, allEntities);
+	respondToIntents(updateTime, aiGeneratedIntents, allEntities);
+}
+physics
+{
+	updatePhysics(updateTime);
+	customCollisionResponse();
+	physicsEntities = findEntitiesWithComponents(POSITION, PHYSICS_BODY);
+	syncPositionsFromPhysics(physicsEntities);
+}
+rendering
+{
+	visibleEntities = findEntitiesWithComponents(POSITION, VISIBLE_BODY);
+	drawEntities(visibleEntities);
+}
+
+
+
+InputHandler::update(realTime, virtualTime)
+{
+	events = context.services.getInputEvents(realTime);
+	intents = context.keyBindings.processEvents(events);
+	bindEntitiesToIntents(entities, intents);
+	context.intentSystem.postIntents(intents);
+}
+
+IntentHandler::update(realTime, virtualTime)
+{
+	for(auto action : compositeActions)
+	{
+		action->update(realTime, virtualTime);
+	}
+}
+
+Action::composeAction(ActionRptr action)
+{
+	//for atomic actions this does nothing, that's why a Rptr is passed in, and the method returns false
+	return false;
+	
+	//for composite actions, this adds the action to the queue and returns true
+	//compositeActions is a vector 
+	compositeActions.push_back(action);
+	return true;
+}
+
+Action::handleIntents()
+{
+	intents = context.intentSystem.gatherIntents(this->uid);
+	for(auto intent : intents)
+	{
+		switch(intent.type)
+		{
+		case ADD_ENTITY:
+			if(validateEntity(intent.target))
+			{
+				registerEntity(intent.target);
+			}
+			break;
+		case REMOVE_ENTITY:
+			unregisterEntity(intent.target);
+			break;
+		default:
+			handleIntent(intent);
+			break;
+		}
+	}
+}
+
+
+//outside code
+intentHandler = registerAction(IntentHandler::create());
+intentHandler.composeAction(registerAction(MoveUp::create()));
+intentHandler.composeAction(registerAction(MoveDown::create()));
+
+MoveUp::update(realTime, virtualTime)
+{
+	//validate makes sure the entity has a PhysicalBody2d and Velocity2d
+	sBody = entity.getState<PhysicsBody2d>();
+	sVelocity = entity.getState<Velocity2d>();
+	
+}
