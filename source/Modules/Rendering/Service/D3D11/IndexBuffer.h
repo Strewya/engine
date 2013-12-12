@@ -4,11 +4,11 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
-#include "Engine/Defines.h"
+#include <Engine/Defines.h>
 #include <vector>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Services/Graphics/IIndexBuffer.h"
-#include "Services/Graphics/D3D11/DXInclude.h"
+#include <Modules/Rendering/Service/IIndexBuffer.h>
+#include <Modules/Rendering/Service/D3D11/DXInclude.h>
 	/*** end header inclusion ***/
 	
 namespace Graphics

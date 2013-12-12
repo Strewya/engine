@@ -7,7 +7,7 @@
 #include <Engine/Defines.h>
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include <Services/Graphics/Spritesheet.h>
+#include <Modules/Rendering/Service/Spritesheet.h>
 #include <Util/AssetStorage.h>
 	/*** end header inclusion ***/
 

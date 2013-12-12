@@ -7,10 +7,10 @@
 #include <deque>
 #include <set>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Services/Graphics/IRenderer.h"
-#include "Services/Graphics/D3D11/DXInclude.h"
-#include "Services/Graphics/D3D11/IndexBuffer.h"
-#include "Services/Graphics/D3D11/VertexBuffer.h"
+#include "Modules/Rendering/Service/IRenderer.h"
+#include "Modules/Rendering/Service/D3D11/DXInclude.h"
+#include "Modules/Rendering/Service/D3D11/IndexBuffer.h"
+#include "Modules/Rendering/Service/D3D11/VertexBuffer.h"
 	/*** end header inclusion ***/
 
 namespace Graphics

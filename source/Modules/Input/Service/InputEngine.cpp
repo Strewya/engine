@@ -2,12 +2,12 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/InputEngine.h>
+#include <Modules/Input/Service/InputEngine.h>
 	/*** C++ headers ***/
 #include <algorithm>
 #include <vector>
 	/*** extra headers ***/
-#include <Services/Input/MouseDevice.h>
+#include <Modules/Input/Service/MouseDevice.h>
 #include <Win32/Window.h>
 	/*** end headers ***/
 

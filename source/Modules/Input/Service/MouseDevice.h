@@ -9,7 +9,8 @@
 #include <deque>
 #include <windows.h>
 	/*** extra headers if needed ***/
-#include <Services/Input/Event.h>
+#include <Modules/Input/Service/Event.h>
+#include <Modules/Input/Service/MouseDevice.h>
 	/*** end header inclusion ***/
 
 namespace Input

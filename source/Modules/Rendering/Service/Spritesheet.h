@@ -7,9 +7,9 @@
 #include <Engine/Defines.h>
 #include <deque>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include <Services/Graphics/AnimationInfo.h>
-#include <Services/Graphics/SpriteInfo.h>
-#include <Services/Graphics/TextureData.h>
+#include <Modules/Rendering/Service/AnimationInfo.h>
+#include <Modules/Rendering/Service/SpriteInfo.h>
+#include <Modules/Rendering/Service/TextureData.h>
 	/*** end header inclusion ***/
 
 namespace Graphics

@@ -6,7 +6,7 @@
 	/*** common and C++ headers ***/
 #include <Engine/Defines.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include <Services/Script/LuaInclude.h>
+#include <Modules/Scripting/Service/LuaInclude.h>
 	/*** end header inclusion ***/
 
 namespace Util

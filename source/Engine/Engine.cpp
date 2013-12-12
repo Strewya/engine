@@ -5,7 +5,7 @@
 #include <Engine/Engine.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include <Services/Graphics/IRenderer.h>
+#include <Modules/Rendering/Service/IRenderer.h>
 #include <Win32/Window.h>
 	/*** end headers ***/
 

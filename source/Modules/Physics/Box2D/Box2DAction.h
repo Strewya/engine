@@ -8,12 +8,12 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include <Box2D/Box2D.h>
 #include <Core/Action/Action.h>
-#include <Services/Graphics/b2DebugDraw.h>
+#include <Modules/Rendering/Service/b2DebugDraw.h>
 	/*** end header inclusion ***/
 	
-namespace Core
+namespace Physics
 {
-	class Physics2d : public AtomicAction<Physics2d>
+	class Physics2d : public Core::AtomicAction<Physics2d>
 	{
 	public:
 		typedef std::function<void(b2Body*)> BodyDeleter_t;
@@ -23,15 +23,15 @@ namespace Core
 		Physics2d();
 		Physics2d(const Util::Vec2& gravity, float scalingFactor);
 
-		void init(GameContext& context);
-		void processMessage(GameContext& context, uint32_t msg, InstanceID entity);
-		void update(GameContext& context);
-		void render(GameContext& context, uint64_t interpolationTime);
+		void init(Core::GameContext& context);
+		void processMessage(Core::GameContext& context, uint32_t msg, InstanceID entity);
+		void update(Core::GameContext& context);
+		void render(Core::GameContext& context, uint64_t interpolationTime);
 
-		bool validateEntity(GameContext& context, InstanceID entity);
-		void onAddEntity(GameContext& context, InstanceID entity);
-		void onRemoveEntity(GameContext& context, InstanceID entity);
-		void onDestroyEntity(GameContext& context, InstanceID entity);
+		bool validateEntity(Core::GameContext& context, InstanceID entity);
+		void onAddEntity(Core::GameContext& context, InstanceID entity);
+		void onRemoveEntity(Core::GameContext& context, InstanceID entity);
+		void onDestroyEntity(Core::GameContext& context, InstanceID entity);
 
 		BodyUptr_t createBody(const b2BodyDef& definition);
 

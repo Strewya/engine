@@ -12,7 +12,7 @@
 #include <Core/State/State.h>
 	/*** end header inclusion ***/
 
-namespace Core
+namespace Physics
 {
 	COMPONENT(Box2dBodyDef)
 	{
@@ -40,6 +40,7 @@ namespace Core
         std::function<void(JointData&,b2Body*,b2Body*)> m_initDefinition;
         b2PrismaticJointDef m_prismatic;
 	};
+
 	COMPONENT(Box2dJoint)
 	{
 		std::vector<JointData> m_joints;

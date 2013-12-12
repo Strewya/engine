@@ -11,10 +11,10 @@
 #include <Engine/GameContext.h>
 #include <Engine/ResourceLocator.h>
 #include <Engine/ServiceLocator.h>
-#include <Services/Graphics/RendererFactory.h>
-#include <Services/Graphics/SpritesheetCache.h>
-#include <Services/Input/InputEngine.h>
-#include <Services/Script/LuaEngine.h>
+#include <Modules/Rendering/Service/RendererFactory.h>
+#include <Modules/Rendering/Service/SpritesheetCache.h>
+#include <Modules/Input/Service/InputEngine.h>
+#include <Modules/Scripting/Service/LuaEngine.h>
 	/*** end header inclusion ***/
 
 namespace Win32

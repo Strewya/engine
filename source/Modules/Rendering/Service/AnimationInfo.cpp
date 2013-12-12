@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/AnimationInfo.h>
+#include <Modules/Rendering/Service/AnimationInfo.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

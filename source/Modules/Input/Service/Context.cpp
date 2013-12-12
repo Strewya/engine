@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/Context.h>
+#include <Modules/Input/Service/Context.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

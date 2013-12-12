@@ -30,9 +30,9 @@ namespace Graphics
 	protected:
 		Win32::Window& m_window;
 		HMODULE m_dll;
-		std::unique_ptr<IRenderer, std::function<void(IRenderer*)>> m_renderer;
+		IRenderer* m_renderer;
 		
 		bool loadDll(const char* name);
-		bool createInterface();
+		bool acquireInterface();
 	};
 }

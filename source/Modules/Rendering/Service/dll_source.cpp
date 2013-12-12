@@ -1,18 +1,19 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 
-#include <Services/Graphics/dll_header.h>
-#include <Services/Graphics/IRenderer.h>
-#include <Services/Graphics/D3D11/DXRenderer.h>
+#include <Modules/Rendering/Service/dll_header.h>
+#include <Modules/Rendering/Service/IRenderer.h>
+#include <Modules/Rendering/Service/D3D11/DXRenderer.h>
 #include <Util/Logger.h>
 
-EXPORT int createRendererInterface(HWND hwnd, uint32_t screenW, uint32_t screenH, Graphics::IRenderer** renderer)
+EXPORT int getRendererInterface(HWND hwnd, uint32_t screenW, uint32_t screenH, Graphics::IRenderer** renderer)
 {
-	if(renderer != nullptr && *renderer == nullptr)
+	if(renderer != nullptr)
 	{
 		try
 		{
-			*renderer = new Graphics::DXRenderer(hwnd, screenW, screenH);
+			static Graphics::DXRenderer dxRenderer(hwnd, screenW, screenH);
+			*renderer = &dxRenderer;
 			return 1;
 		}
 		catch(std::exception& ex)
@@ -21,13 +22,4 @@ EXPORT int createRendererInterface(HWND hwnd, uint32_t screenW, uint32_t screenH
 		}
 	}
 	return 0;
-}
-
-EXPORT int destroyRendererInterface(Graphics::IRenderer* renderer)
-{
-	if(renderer != nullptr)
-	{
-		delete renderer;
-	}
-	return 1;
 }

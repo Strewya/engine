@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/TextureData.h>
+#include <Modules/Rendering/Service/TextureData.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/ITextureCache.h>
+#include <Modules/Rendering/Service/ITextureCache.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

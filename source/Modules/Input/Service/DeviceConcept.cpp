@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/DeviceConcept.h>
+#include <Modules/Input/Service/DeviceConcept.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

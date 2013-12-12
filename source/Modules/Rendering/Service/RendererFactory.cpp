@@ -2,11 +2,11 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/RendererFactory.h>
+#include <Modules/Rendering/Service/RendererFactory.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include <Services/Graphics/dll_header.h>
-#include <Services/Graphics/IRenderer.h>
+#include <Modules/Rendering/Service/dll_header.h>
+#include <Modules/Rendering/Service/IRenderer.h>
 #include <Win32/Window.h>
 	/*** end headers ***/
 
@@ -19,7 +19,6 @@ namespace Graphics
 	RendererFactory::~RendererFactory()
 	{
 		destroyInterface();
-		FreeLibrary(m_dll);
 	}
 
 	IRenderer& RendererFactory::getInterface()
@@ -30,12 +29,13 @@ namespace Graphics
 
 	bool RendererFactory::initInterface(const char* name)
 	{
-		return loadDll(name) && createInterface();
+		return loadDll(name) && acquireInterface();
 	}
 
 	void RendererFactory::destroyInterface()
 	{
-		m_renderer.reset(nullptr);
+		m_renderer = nullptr;
+		FreeLibrary(m_dll);
 	}
 
 	bool RendererFactory::loadDll(const char* dllShortName)
@@ -73,20 +73,16 @@ namespace Graphics
 		return loaded;
 	}
 
-	bool RendererFactory::createInterface()
+	bool RendererFactory::acquireInterface()
 	{
-		CREATE_RENDERER createFunction = (CREATE_RENDERER)GetProcAddress(m_dll, "createRendererInterface");
-		DESTROY_RENDERER destroyFunction = (DESTROY_RENDERER)GetProcAddress(m_dll, "destroyRendererInterface");
-
-		bool success = false;
-		if(createFunction != nullptr && destroyFunction != nullptr)
+		GET_RENDERER getFunction = (GET_RENDERER)GetProcAddress(m_dll, "getRendererInterface");
+		
+		bool rendererAcquired = false;
+		if (getFunction != nullptr)
 		{
-			IRenderer* render = nullptr;
-			if(createFunction(m_window.getWindowHandle(), m_window.getSizeX(), m_window.getSizeY(), &render))
+			if (getFunction(m_window.getWindowHandle(), m_window.getSizeX(), m_window.getSizeY(), &m_renderer))
 			{
-				m_renderer.reset(render);
-				m_renderer.get_deleter() = [=] (IRenderer* r) { destroyFunction(r); };
-				success = true;
+				rendererAcquired = true;
 			}
 			else
 			{
@@ -103,13 +99,11 @@ namespace Graphics
 			MessageBox(m_window.getWindowHandle(), errMsg.c_str(), "Fatal Error", MB_OK | MB_ICONERROR);
 			errMsg += ", errCode: ";
 			errMsg += toString(GetLastError());
-			errMsg += ", create|destroy = ";
-			createFunction ? errMsg += "true" : errMsg += "false";
-			errMsg += "|";
-			destroyFunction ? errMsg += "true" : errMsg += "false";
+			errMsg += ", create = ";
+			getFunction ? errMsg += "true" : errMsg += "false";
 			Util::GetDefaultLogger() << errMsg << Util::Logger::endl;
 		}
 
-		return success;
+		return rendererAcquired;
 	}
 }

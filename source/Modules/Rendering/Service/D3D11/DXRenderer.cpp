@@ -2,12 +2,12 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** personal header ***/
-#include "Services/Graphics/D3D11/DXRenderer.h"
+#include "Modules/Rendering/Service/D3D11/DXRenderer.h"
 	/*** C++ headers ***/
 #include <algorithm>
 #include <stdexcept>
 	/*** extra headers ***/
-#include "Services/Graphics/D3D11/Vertex.h"
+#include "Modules/Rendering/Service/D3D11/Vertex.h"
 	/*** end headers ***/
 
 

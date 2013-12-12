@@ -10,18 +10,19 @@
 	/*** extra headers ***/
 #include <Engine/Engine.h>
 #include <Engine/ServiceLocator.h>
-#include <Core/Action/Impl/InputController.h>
-#include <Core/Action/Impl/Physics.h>
-#include <Core/Action/Impl/Render.h>
 #include <Core/Entity/Entity.h>
-#include <Core/State/GeneralComponents.h>
-#include <Core/State/Impl/Box2dPhysics.h>
+#include <Core/State/CoreStates.h>
 #include <Games/Pong/EntityConstructors.h>
-#include <Services/Graphics/IRenderer.h>
-#include <Services/Input/Context.h>
-#include <Services/Input/InputEngine.h>
-#include <Services/Input/Event.h>
-#include <Services/Input/KeyCodes.h>
+#include <Modules/Input/InputAction.h>
+#include <Modules/Input/Service/Context.h>
+#include <Modules/Input/Service/InputEngine.h>
+#include <Modules/Input/Service/Event.h>
+#include <Modules/Input/Service/KeyCodes.h>
+#include <Modules/Physics/Box2D/Box2DAction.h>
+#include <Modules/Physics/Box2D/Box2DEngine.h>
+#include <Modules/Physics/Box2D/Box2DState.h>
+#include <Modules/Rendering/RenderAction.h>
+#include <Modules/Rendering/Service/IRenderer.h>
 #include <Util/Color.h>
 #include <Util/Random.h>
 	/*** end headers ***/
@@ -37,7 +38,7 @@ namespace Pong
 	void Gameplay::registerActions()
 	{
 		setupAction(Core::InputController::create(*this), true, false);
-		setupAction(Core::Physics2d::create(*this), true, true);
+		setupAction(Physics::Physics2d::create(*this), true, true);
 		setupAction(Core::Render::create(*this), false, true);
 		
 	}
@@ -60,14 +61,14 @@ namespace Pong
 		auto& field = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("field", field);
 		m_allEntities.addEntity(field.getID());
-		createEntity(Core::Physics2d::UID, field.getID());
+		createEntity(Physics::Physics2d::UID, field.getID());
 
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = m_entityPool.getNewInstanceRef();
 			m_entityFactory.createEntityType("paddle", paddle);
 			m_allEntities.addEntity(paddle.getID());
-			createEntity(Core::Physics2d::UID, paddle.getID());
+			createEntity(Physics::Physics2d::UID, paddle.getID());
 			
 			if(i == 0)
 			{
@@ -84,7 +85,7 @@ namespace Pong
 		auto& ball = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("ball", ball);
 		m_allEntities.addEntity(ball.getID());
-		createEntity(Core::Physics2d::UID, ball.getID());
+		createEntity(Physics::Physics2d::UID, ball.getID());
 	}
 
 	void Gameplay::onActivate()
@@ -123,7 +124,7 @@ namespace Pong
 
 		auto* state = paddle.getState<Core::Position2d>();
 		state->m_position.set(3-screenExtent.x, 0);
-		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
 		
 	}
 
@@ -136,7 +137,7 @@ namespace Pong
 		
 		auto* state = paddle.getState<Core::Position2d>();
 		state->m_position.set(screenExtent.x-3, 0);
-		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
 	}
 
 	void Gameplay::setupBall(Core::Entity& ball)
@@ -150,19 +151,19 @@ namespace Pong
 
 	void Gameplay::bindPaddleToField(Core::Entity& paddle, Core::Entity& field)
 	{
-		auto& joints = paddle.insert(Core::Box2dJoint::create());
+		auto& joints = paddle.insert(Physics::Box2dJoint::create());
 		
 		joints.m_joints.resize(1);
         joints.m_joints[0].m_prismatic.collideConnected = true;
         joints.m_joints[0].m_bodyA = paddle.getID();
 		joints.m_joints[0].m_bodyB = field.getID();
 
-        joints.m_joints[0].m_initDefinition = [](Core::JointData& data, b2Body* a, b2Body* b)
+		joints.m_joints[0].m_initDefinition = [](Physics::JointData& data, b2Body* a, b2Body* b)
 		{
             data.m_prismatic.Initialize(a, b, b->GetWorldPoint(b2Vec2(0,0)), b2Vec2(0,1));
 		};
 
-		m_messenger.sendMessage(0, Core::Physics2d::UID, m_messenger.encode("create_joints"), paddle.getID());
+		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("create_joints"), paddle.getID());
 	}
 }
 

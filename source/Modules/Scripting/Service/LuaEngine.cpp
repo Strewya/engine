@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Script/LuaEngine.h>
+#include <Modules/Scripting/Service/LuaEngine.h>
 	/*** C++ headers ***/
 #include <cstdlib>
 	/*** extra headers ***/

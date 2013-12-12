@@ -11,35 +11,35 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\stdafx.h" />
-    <ClInclude Include="..\..\source\Services\Graphics\dll_header.h">
-      <Filter>Services/Graphics</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\dll_header.h">
+      <Filter>Rendering/Service</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\graphics\D3D11\DXInclude.h">
-      <Filter>Services/Graphics/D3D11</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\Graphics.h">
+      <Filter>Rendering/Service</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\D3D11\DXRenderer.h">
-      <Filter>Services/Graphics/D3D11</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IIndexBuffer.h">
+      <Filter>Rendering/Service</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\D3D11\IndexBuffer.h">
-      <Filter>Services/Graphics/D3D11</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IRenderer.h">
+      <Filter>Rendering/Service</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\D3D11\Vertex.h">
-      <Filter>Services/Graphics/D3D11</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\IVertexBuffer.h">
+      <Filter>Rendering/Service</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\D3D11\VertexBuffer.h">
-      <Filter>Services/Graphics/D3D11</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\DXInclude.h">
+      <Filter>Rendering/Service/D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\Graphics.h">
-      <Filter>Services/Graphics</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\DXRenderer.h">
+      <Filter>Rendering/Service/D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\IRenderer.h">
-      <Filter>Services/Graphics</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\IndexBuffer.h">
+      <Filter>Rendering/Service/D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\IVertexBuffer.h">
-      <Filter>Services/Graphics</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\Vertex.h">
+      <Filter>Rendering/Service/D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Services\Graphics\IIndexBuffer.h">
-      <Filter>Services/Graphics</Filter>
+    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\VertexBuffer.h">
+      <Filter>Rendering/Service/D3D11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -52,22 +52,22 @@
     <ClCompile Include="..\..\source\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\dll_source.cpp">
-      <Filter>Services/Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\D3D11\DXRenderer.cpp">
-      <Filter>Services/Graphics/D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\D3D11\IndexBuffer.cpp">
-      <Filter>Services/Graphics/D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\D3D11\Vertex.cpp">
-      <Filter>Services/Graphics/D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Services\Graphics\D3D11\VertexBuffer.cpp">
-      <Filter>Services/Graphics/D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\stdafx_builder.cpp" />
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\dll_source.cpp">
+      <Filter>Rendering/Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\DXRenderer.cpp">
+      <Filter>Rendering/Service/D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\IndexBuffer.cpp">
+      <Filter>Rendering/Service/D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\Vertex.cpp">
+      <Filter>Rendering/Service/D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\VertexBuffer.cpp">
+      <Filter>Rendering/Service/D3D11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Util">
@@ -76,15 +76,15 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{df67c29c-3163-4898-ab1b-24a104ab0235}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Services/Graphics">
+    <Filter Include="Rendering/Service">
       <UniqueIdentifier>{40c0c906-be7b-40dd-94bc-e16fb25c1d9e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Services/Graphics/D3D11">
+    <Filter Include="Rendering/Service/D3D11">
       <UniqueIdentifier>{b4b029c6-620f-4e64-a5d9-e4f7ab16aae3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\source\Services\Graphics\Shaders\shader.hlsl">
+    <FxCompile Include="..\..\resources\Shaders\shader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

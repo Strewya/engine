@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/SpriteInfo.h>
+#include <Modules/Rendering/Service/SpriteInfo.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

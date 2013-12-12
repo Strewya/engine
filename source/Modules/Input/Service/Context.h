@@ -10,8 +10,8 @@
 #include <unordered_map>
 	/*** extra headers if needed ***/
 #include <Engine/Intent.h>
-#include <Services/Input/Converter.h>
-#include <Services/Input/Event.h>
+#include <Modules/Input/Service/Converter.h>
+#include <Modules/Input/Service/Event.h>
 	/*** end header inclusion ***/
 
 namespace Input

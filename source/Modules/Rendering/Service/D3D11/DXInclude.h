@@ -9,9 +9,9 @@
 #include <d3dx10.h>				//directx
 #include <xnamath.h>
 
-#include "Util/Color.h"
-#include "Util/Dimensional.h"
-#include "Services/Graphics/Graphics.h"
+#include <Util/Color.h>
+#include <Util/Dimensional.h>
+#include <Modules/Rendering/Service/Graphics.h>
 
 namespace Graphics
 {

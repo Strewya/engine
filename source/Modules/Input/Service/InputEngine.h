@@ -9,9 +9,9 @@
 #include <deque>
 #include <vector>
 	/*** extra headers if needed ***/
-#include <Services/Input/KeyBindings.h>
-#include <Services/Input/DeviceConcept.h>
-#include <Services/Input/Event.h>
+#include <Modules/Input/Service/KeyBindings.h>
+#include <Modules/Input/Service/DeviceConcept.h>
+#include <Modules/Input/Service/Event.h>
 	/*** end header inclusion ***/
 
 namespace Win32 { class Window; }

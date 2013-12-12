@@ -5,14 +5,6 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="No PCH, Wall|Win32">
-      <Configuration>No PCH, Wall</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="no_pch_wall|Win32">
-      <Configuration>no_pch_wall</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -37,20 +29,6 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -60,31 +38,25 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SGPROJECT)\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SGPROJECT)\source;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\source;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SGPROJECT)\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SGPROJECT)\source;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ShowIncludes>false</ShowIncludes>
@@ -112,56 +84,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>lua5.1.lib;lua51.lib;$(Configuration)\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PostBuildEvent>
-      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$(TargetFileName) /Y</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">
-    <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NO_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
-      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>lua5.1.lib;lua51.lib;$(Configuration)\Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PostBuildEvent>
-      <Command>copy $(TargetDir)$(TargetFileName) $(SGPROJECT)\$(Configuration)\$(TargetFileName) /Y</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">
-    <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NO_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
-      <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -219,8 +146,6 @@
     <ClCompile Include="..\..\source\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='no_pch_wall|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='No PCH, Wall|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\source\Util\Color.cpp" />
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
@@ -248,7 +173,6 @@
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
     <ClInclude Include="..\..\source\Engine\GameInit.h" />
     <ClInclude Include="..\..\source\Engine\Intent.h" />
-    <ClInclude Include="..\..\source\Engine\PhysicsSystem.h" />
     <ClInclude Include="..\..\source\Engine\ResourceLocator.h" />
     <ClInclude Include="..\..\source\Engine\ServiceLocator.h" />
     <ClInclude Include="..\..\source\Engine\MessageSystem.h" />
@@ -266,7 +190,7 @@
     <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DAction.h" />
     <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DEngine.h" />
     <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DState.h" />
-    <ClInclude Include="..\..\source\Modules\Physics\PhysicsModule.h" />
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsEngine.h" />
     <ClInclude Include="..\..\source\Modules\Rendering\RenderAction.h" />
     <ClInclude Include="..\..\source\Modules\Rendering\Service\AnimationInfo.h" />
     <ClInclude Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.h" />

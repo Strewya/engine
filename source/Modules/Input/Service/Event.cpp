@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/Event.h>
+#include <Modules/Input/Service/Event.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

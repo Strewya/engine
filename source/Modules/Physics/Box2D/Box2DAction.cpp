@@ -2,16 +2,19 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Core/Action/Impl/Physics.h>
+#include <Modules/Physics/Box2D/Box2DAction.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include <Core/State/GeneralComponents.h>
-#include <Core/State/Impl/Box2dPhysics.h>
+#include <Core/State/CoreStates.h>
 #include <Engine/GameContext.h>
 #include <Engine/ServiceLocator.h>
+#include <Modules/Physics/Box2D/Box2dEngine.h>
+#include <Modules/Physics/Box2D/Box2DState.h>
 	/*** end headers ***/
 	
-namespace Core
+using namespace Core;
+
+namespace Physics
 {
 	Util::Vec2 convert(const b2Vec2& v, float scaling)
 	{
@@ -103,7 +106,7 @@ namespace Core
 			if(it == m_bodies.end()) return;
 			b2Body& body = *it->second;
 
-			auto* joints = e.getState<Core::Box2dJoint>();
+			auto* joints = e.getState<Box2dJoint>();
 			if(joints != nullptr)
 			{
 				for(auto& joint : joints->m_joints)

@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/Spritesheet.h>
+#include <Modules/Rendering/Service/Spritesheet.h>
 	/*** C++ headers ***/
 #include <stdexcept>
 	/*** extra headers ***/

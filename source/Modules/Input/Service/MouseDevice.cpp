@@ -2,12 +2,11 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/MouseDevice.h>
+#include <Modules/Input/Service/MouseDevice.h>
 	/*** C++ headers ***/
 #include <windowsx.h>
 	/*** extra headers ***/
-#include <Services/Input/Event.h>
-#include <Services/Input/KeyCodes.h>
+#include <Modules/Input/Service/KeyCodes.h>
 	/*** end headers ***/
 
 namespace Input

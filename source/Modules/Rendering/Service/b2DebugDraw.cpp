@@ -2,12 +2,12 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/b2DebugDraw.h>
+#include <Modules/Rendering/Service/b2DebugDraw.h>
 	/*** C++ headers ***/
 #include <vector>
 	/*** extra headers ***/
-#include <Services/Graphics/IRenderer.h>
-#include <Services/Graphics/Polygon.h>
+#include <Modules/Rendering/Service/IRenderer.h>
+#include <Modules/Rendering/Service/Polygon.h>
 	/*** end headers ***/
 
 namespace Graphics

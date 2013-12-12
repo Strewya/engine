@@ -2,12 +2,12 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/SpritesheetCache.h>
+#include <Modules/Rendering/Service/SpritesheetCache.h>
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/
-#include <Services/Graphics/ITextureCache.h>
-#include <Services/Script/LuaEngine.h>
+#include <Modules/Rendering/Service/ITextureCache.h>
+#include <Modules/Scripting/Service/LuaEngine.h>
 #include <Util/Dimensional.h>
 	/*** end headers ***/
 

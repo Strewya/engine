@@ -17,8 +17,6 @@
 #if PHYSICS_ENGINE_TO_USE == BOX2D_ENGINE
 
 #include <Modules/Physics/Box2D/Box2DEngine.h>
-#include <Modules/Physics/Box2D/Box2DAction.h>
-#include <Modules/Physics/Box2D/Box2DState.h>
 
 namespace Physics
 {

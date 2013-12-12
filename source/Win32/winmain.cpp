@@ -8,7 +8,7 @@
 	/*** extra headers ***/
 #include <Engine/Defines.h>
 #include <Engine/Engine.h>
-#include <Games/GameInit.h>
+#include <Engine/GameInit.h>
 #include <Win32/Window.h>
 #include <Win32/WindowClass.h>
 	/*** end headers ***/
@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	try
 	{
 		Core::Engine engine(window);
-		engine.initializeGame(Game::init);
+		engine.initializeGame(Core::init);
 		
 		//start main loop
 		while(window.update())

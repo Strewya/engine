@@ -14,7 +14,7 @@
 #include <Core/Space/SpacePool.h>
 #include <Engine/MessageSystem.h>
 #include <Modules/Input/Service/KeyBindings.h>
-#include <Modules/Physics/PhysicsModule.h>
+#include <Modules/Physics/PhysicsEngine.h>
 #include <Util/Time.h>
 	/*** end header inclusion ***/
 

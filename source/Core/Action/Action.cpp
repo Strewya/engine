@@ -5,9 +5,6 @@
 #include <Core/Action/Action.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
-#include <Engine/GameContext.h>
-#include <Engine/ServiceLocator.h>
-#include <Services/Graphics/IRenderer.h>
 	/*** end headers ***/
 
 namespace Core

@@ -236,9 +236,6 @@
     <ClInclude Include="..\..\source\Engine\Intent.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Engine\PhysicsSystem.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Engine\GameInit.h">
       <Filter>Engine</Filter>
     </ClInclude>
@@ -332,11 +329,11 @@
     <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DState.h">
       <Filter>Modules\Physics\Box2D</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Physics\PhysicsModule.h">
-      <Filter>Modules\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DEngine.h">
       <Filter>Modules\Physics\Box2D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsEngine.h">
+      <Filter>Modules\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

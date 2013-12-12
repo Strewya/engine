@@ -15,6 +15,8 @@ namespace Physics
 	class Box2DEngine
 	{
 	public:
+		Box2DEngine() : m_world(b2Vec2(0,-9)) {}
+
 		b2World m_world;
 
 	};

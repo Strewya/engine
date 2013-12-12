@@ -2,14 +2,14 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Graphics/Polygon.h>
+#include <Modules/Rendering/Service/Polygon.h>
 	/*** C++ headers ***/
 #include <cmath>
 	/*** extra headers ***/
-#include <Services/Graphics/Graphics.h>
-#include <Services/Graphics/IRenderer.h>
-#include <Services/Graphics/IIndexBuffer.h>
-#include <Services/Graphics/IVertexBuffer.h>
+#include <Modules/Rendering/Service/Graphics.h>
+#include <Modules/Rendering/Service/IRenderer.h>
+#include <Modules/Rendering/Service/IIndexBuffer.h>
+#include <Modules/Rendering/Service/IVertexBuffer.h>
 #include <Util/Color.h>
 	/*** end headers ***/
 	

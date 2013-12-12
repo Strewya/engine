@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/KeyCodes.h>
+#include <Modules/Input/Service/KeyCodes.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

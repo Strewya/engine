@@ -1,5 +1,5 @@
 
-#ifndef NO_PRECOMPILED_HEADERS
+#ifdef USE_PRECOMPILED_HEADERS
 
 #pragma message("Compiling precompiled headers.\n")
 

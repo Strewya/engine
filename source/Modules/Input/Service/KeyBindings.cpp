@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Services/Input/KeyBindings.h>
+#include <Modules/Input/Service/KeyBindings.h>
 	/*** C++ headers ***/
 #include <algorithm>
 	/*** extra headers ***/

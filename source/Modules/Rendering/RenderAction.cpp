@@ -2,13 +2,13 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Core/Action/Impl/Render.h>
+#include <Modules/Rendering/RenderAction.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include <Core/Entity/Entity.h>
 #include <Engine/GameContext.h>
 #include <Engine/ServiceLocator.h>
-#include <Services/Graphics/IRenderer.h>
+#include <Modules/Rendering/Service/IRenderer.h>
 	/*** end headers ***/
 
 namespace Core

@@ -2,7 +2,7 @@
 	/*** precompiled header ***/
 #include "stdafx.h"
 	/*** personal header ***/
-#include "Services/Graphics/D3D11/Vertex.h"
+#include "Modules/Rendering/Service/D3D11/Vertex.h"
 	/*** C++ headers ***/
 	/*** extra headers ***/
 	/*** end headers ***/

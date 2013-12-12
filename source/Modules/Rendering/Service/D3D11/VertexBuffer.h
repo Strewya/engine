@@ -6,8 +6,8 @@
 	/*** common and C++ headers ***/
 #include "Engine/Defines.h"
 	/*** extra headers if needed (alphabetically ordered) ***/
-#include "Services/Graphics/IVertexBuffer.h"
-#include "Services/Graphics/D3D11/DXInclude.h"
+#include "Modules/Rendering/Service/IVertexBuffer.h"
+#include "Modules/Rendering/Service/D3D11/DXInclude.h"
 	/*** end header inclusion ***/
 	
 namespace Graphics

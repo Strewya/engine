@@ -2,13 +2,13 @@
 	/*** precompiled header ***/
 #include <stdafx.h>
 	/*** personal header ***/
-#include <Core/Action/Impl/InputController.h>
+#include <Modules/Input/InputAction.h>
 	/*** C++ headers ***/
 	/*** extra headers ***/
 #include <Engine/GameContext.h>
 #include <Engine/ServiceLocator.h>
 #include <Engine/Intent.h>
-#include <Services/Input/InputEngine.h>
+#include <Modules/Input/Service/InputEngine.h>
 	/*** end headers ***/
 	
 namespace Core
