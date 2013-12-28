@@ -56,7 +56,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOX2D_PHYSICS;USE_PRECOMPILED_HEADERS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BrowseInformation>true</BrowseInformation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ShowIncludes>false</ShowIncludes>
@@ -84,7 +84,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>USE_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOX2D_PHYSICS;USE_PRECOMPILED_HEADERS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <BrowseInformationFile>$(IntDir)%(Directory)</BrowseInformationFile>
@@ -112,7 +112,7 @@
     <ClCompile Include="..\..\source\Core\State\State.cpp" />
     <ClCompile Include="..\..\source\Core\State\Statemap.cpp" />
     <ClCompile Include="..\..\source\Engine\Defines.cpp" />
-    <ClCompile Include="..\..\source\Engine\Engine.cpp" />
+    <ClCompile Include="..\..\source\Engine\GameEngine.cpp" />
     <ClCompile Include="..\..\source\Engine\GameContext.cpp" />
     <ClCompile Include="..\..\source\Engine\Intent.cpp" />
     <ClCompile Include="..\..\source\Engine\ResourceLocator.cpp" />
@@ -121,6 +121,17 @@
     <ClCompile Include="..\..\source\Games\Pong\EntityConstructors.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\GameInit.cpp" />
     <ClCompile Include="..\..\source\Games\Pong\Gameplay.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\RenderAction.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\AnimationInfo.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\b2DebugDraw.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\ITextureCache.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\Polygon.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\RendererFactory.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\RenderingQueue.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\SpriteInfo.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\Spritesheet.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\SpritesheetCache.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\TextureData.cpp" />
     <ClCompile Include="..\..\source\Modules\Input\InputAction.cpp" />
     <ClCompile Include="..\..\source\Modules\Input\Service\Context.cpp" />
     <ClCompile Include="..\..\source\Modules\Input\Service\Converter.cpp" />
@@ -130,18 +141,9 @@
     <ClCompile Include="..\..\source\Modules\Input\Service\KeyBindings.cpp" />
     <ClCompile Include="..\..\source\Modules\Input\Service\KeyCodes.cpp" />
     <ClCompile Include="..\..\source\Modules\Input\Service\MouseDevice.cpp" />
-    <ClCompile Include="..\..\source\Modules\Physics\Box2D\Box2DAction.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\RenderAction.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\AnimationInfo.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\ITextureCache.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\Polygon.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\RendererFactory.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\RenderingQueue.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpriteInfo.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\Spritesheet.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\TextureData.cpp" />
+    <ClCompile Include="..\..\source\Modules\Physics\PhysicsAction.cpp" />
+    <ClCompile Include="..\..\source\Modules\Physics\PhysicsState.cpp" />
+    <ClCompile Include="..\..\source\Modules\Physics\Service\PhysicsEngine.cpp" />
     <ClCompile Include="..\..\source\Modules\Scripting\Service\LuaEngine.cpp" />
     <ClCompile Include="..\..\source\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -168,7 +170,7 @@
     <ClInclude Include="..\..\source\Core\State\State.h" />
     <ClInclude Include="..\..\source\Core\State\Statemap.h" />
     <ClInclude Include="..\..\source\Engine\Defines.h" />
-    <ClInclude Include="..\..\source\Engine\Engine.h" />
+    <ClInclude Include="..\..\source\Engine\GameEngine.h" />
     <ClInclude Include="..\..\source\Engine\FwdDecl.h" />
     <ClInclude Include="..\..\source\Engine\GameContext.h" />
     <ClInclude Include="..\..\source\Engine\GameInit.h" />
@@ -178,6 +180,21 @@
     <ClInclude Include="..\..\source\Engine\MessageSystem.h" />
     <ClInclude Include="..\..\source\Games\Pong\EntityConstructors.h" />
     <ClInclude Include="..\..\source\Games\Pong\Gameplay.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\RenderAction.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\AnimationInfo.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\b2DebugDraw.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\dll_header.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IIndexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IRenderer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\ITextureCache.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IVertexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\Polygon.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\RendererFactory.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\RenderingQueue.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\SpriteInfo.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\Spritesheet.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\SpritesheetCache.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\TextureData.h" />
     <ClInclude Include="..\..\source\Modules\Input\InputAction.h" />
     <ClInclude Include="..\..\source\Modules\Input\Service\Context.h" />
     <ClInclude Include="..\..\source\Modules\Input\Service\Converter.h" />
@@ -187,26 +204,9 @@
     <ClInclude Include="..\..\source\Modules\Input\Service\KeyBindings.h" />
     <ClInclude Include="..\..\source\Modules\Input\Service\KeyCodes.h" />
     <ClInclude Include="..\..\source\Modules\Input\Service\MouseDevice.h" />
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DAction.h" />
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DEngine.h" />
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DState.h" />
-    <ClInclude Include="..\..\source\Modules\Physics\PhysicsEngine.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\RenderAction.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\AnimationInfo.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\dll_header.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Graphics.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IIndexBuffer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IRenderer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\ITextureCache.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IVertexBuffer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Polygon.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\RendererFactory.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\RenderingQueue.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpriteInfo.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Spritesheet.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\TextureData.h" />
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsAction.h" />
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsState.h" />
+    <ClInclude Include="..\..\source\Modules\Physics\Service\PhysicsEngine.h" />
     <ClInclude Include="..\..\source\Modules\Scripting\Service\LuaEngine.h" />
     <ClInclude Include="..\..\source\Modules\Scripting\Service\LuaInclude.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
@@ -219,6 +219,7 @@
     <ClInclude Include="..\..\source\Win32\myWindows.h" />
     <ClInclude Include="..\..\source\Win32\WindowClass.h" />
     <ClInclude Include="..\..\source\Win32\Window.h" />
+    <ClInclude Include="..\..\source\Win32\WindowEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resources\character.sheet" />

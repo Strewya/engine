@@ -14,6 +14,37 @@
 
 namespace Core
 {
+	struct Variant
+	{
+		enum Type
+		{
+			FLOAT,
+			BOOL,
+			INT32,
+			UINT32,
+			STRINGID
+		};
+
+		Type m_type;
+		uint32_t m_nameID;
+		union
+		{
+			float m_float;
+			bool m_bool;
+			int32_t m_int32;
+			uint32_t m_uint32;
+		};
+	};
+
+	struct Message
+	{
+		static const uint32_t MAX_ARGS = 8;
+		uint32_t m_nameID;
+		Variant args[MAX_ARGS];
+		uint8_t m_numArgs;
+	};
+
+
 	class MessageSystem
 	{
 	public:

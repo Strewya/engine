@@ -14,7 +14,7 @@
 #include <Core/Space/SpacePool.h>
 #include <Engine/MessageSystem.h>
 #include <Modules/Input/Service/KeyBindings.h>
-#include <Modules/Physics/PhysicsEngine.h>
+#include <Modules/Physics/Service/PhysicsEngine.h>
 #include <Util/Time.h>
 	/*** end header inclusion ***/
 
@@ -54,9 +54,6 @@ namespace Core
 		ActionRegistry m_allOwnedActions;
 		ActionUptr m_logic;
 		ActionUptr m_render;
-
-		//this should not be touched by ANYONE except the Physics action and the construction functions
-		Physics::Engine m_physics;
 		
 		GameContext(ContextType type, ServiceLocator& services, ResourceLocator& resources, uint64_t updateTime = UPDATE_TIME);
 		virtual ~GameContext();

@@ -10,34 +10,36 @@
 
 namespace Util
 {
+	class Vec2;
+	class Vec3;
+	class Rect;
+
 	class Vec2
 	{
 	public:
-		Vec2();
 		Vec2(const Vec2& v);
-		Vec2(const float& x, const float& y);
-		~Vec2();
+		Vec2(const Vec3& v);
+		Vec2(float x = 0, float y = 0);
 		Vec2& operator*=(const Vec2& v);
-		Vec2& operator*=(const float& v);
+		Vec2& operator*=(float v);
 		Vec2& operator/=(const Vec2& v);
-		Vec2& operator/=(const float& v);
+		Vec2& operator/=(float v);
 		Vec2& operator+=(const Vec2& v);
-		Vec2& operator+=(const float& v);
+		Vec2& operator+=(float v);
 		Vec2& operator-=(const Vec2& v);
-		Vec2& operator-=(const float& v);
+		Vec2& operator-=(float v);
 		Vec2 operator+(const Vec2& v) const;
-		Vec2 operator+(const float& v) const;
+		Vec2 operator+(float v) const;
 		Vec2 operator-() const;
 		Vec2 operator-(const Vec2& v) const;
-		Vec2 operator-(const float& v) const;
+		Vec2 operator-(float v) const;
 		Vec2 operator*(const Vec2& v) const;
-		Vec2 operator*(const float& v) const;
+		Vec2 operator*(float v) const;
 		Vec2 operator/(const Vec2& v) const;
-		Vec2 operator/(const float& v) const;
+		Vec2 operator/(float v) const;
 		bool operator==(const Vec2& v) const;
 		bool operator!=(const Vec2& v) const;
 		Vec2& operator=(const Vec2& v);
-
 
 		Vec2& set(const Vec2& r);
 		Vec2& set(float x, float y);
@@ -45,8 +47,8 @@ namespace Util
 		float Dot(const Vec2& v) const;
 		Vec2 ProjectOn(const Vec2& target) const;
 		Vec2 Normalized() const;
-		void SetLength(const float& len);
-		void Truncate(const float& len);
+		void SetLength(float len);
+		void Truncate(float len);
 		float Length() const;
 		float LengthSq() const;
 		Vec2 LeftNormal() const;
@@ -59,10 +61,10 @@ namespace Util
 		float x, y;
 	};
 
-	Vec2 operator+(const float& f, const Vec2& v);
-	Vec2 operator-(const float& f, const Vec2& v);
-	Util::Vec2 operator*(const float& f, const Util::Vec2& v);
-	Vec2 operator/(const float& f, const Vec2& v);
+	Vec2 operator+(float f, const Vec2& v);
+	Vec2 operator-(float f, const Vec2& v);
+	Util::Vec2 operator*(float f, const Util::Vec2& v);
+	Vec2 operator/(float f, const Vec2& v);
 
 	float DotProduct(const Vec2& vec1, const Vec2& vec2);
 	Vec2 ProjectVector(const Vec2& vec, const Vec2& target);
@@ -73,28 +75,26 @@ namespace Util
 	class Vec3
 	{
 	public:
-		Vec3();
+		Vec3(const Vec2& v);
 		Vec3(const Vec3& v);
-		Vec3(const float& x, const float& y);
-		Vec3(const float& x, const float& y, const float& z);
-		~Vec3();
+		Vec3(float x = 0, float y = 0, float z = 0);
 		Vec3& operator*=(const Vec3& v);
-		Vec3& operator*=(const float& v);
+		Vec3& operator*=(float v);
 		Vec3& operator/=(const Vec3& v);
-		Vec3& operator/=(const float& v);
+		Vec3& operator/=(float v);
 		Vec3& operator+=(const Vec3& v);
-		Vec3& operator+=(const float& v);
+		Vec3& operator+=(float v);
 		Vec3& operator-=(const Vec3& v);
-		Vec3& operator-=(const float& v);
+		Vec3& operator-=(float v);
 		Vec3 operator+(const Vec3& v) const;
-		Vec3 operator+(const float& v) const;
+		Vec3 operator+(float v) const;
 		Vec3 operator-() const;
 		Vec3 operator-(const Vec3& v) const;
-		Vec3 operator-(const float& v) const;
+		Vec3 operator-(float v) const;
 		Vec3 operator*(const Vec3& v) const;
-		Vec3 operator*(const float& v) const;
+		Vec3 operator*(float v) const;
 		Vec3 operator/(const Vec3& v) const;
-		Vec3 operator/(const float& v) const;
+		Vec3 operator/(float v) const;
 		bool operator==(const Vec3& v) const;
 		bool operator!=(const Vec3& v) const;
 		Vec3& operator=(const Vec3& v);
@@ -105,8 +105,8 @@ namespace Util
 		float Dot(const Vec3& v) const;
 		//Vec3 ProjectOn(const Vec3& target) const;
 		Vec3 Normalized() const;
-		void SetLength(const float& len);
-		void Truncate(const float& len);
+		void SetLength(float len);
+		void Truncate(float len);
 		float Length() const;
 		float LengthSq() const;
 		Vec3 Cross(const Vec3& rhs) const;
@@ -118,44 +118,45 @@ namespace Util
 		float x, y, z;
 	};
 
-	Vec3 operator+(const float& f, const Vec3& v);
-	Vec3 operator-(const float& f, const Vec3& v);
-	Vec3 operator*(const float& f, const Vec3& v);
-	Vec3 operator/(const float& f, const Vec3& v);
+	Vec3 operator+(float f, const Vec3& v);
+	Vec3 operator-(float f, const Vec3& v);
+	Vec3 operator*(float f, const Vec3& v);
+	Vec3 operator/(float f, const Vec3& v);
 	Vec3 toVec3(const Vec2& vec);
 	Vec2 toVec2(const Vec3& vec);
 	
 	class Rect
 	{
 	public:
-		Rect();
-		Rect(const Rect& r);
-		Rect(const Vec2& position, const float& width, const float& height);
-		Rect(const float& left, const float& top, const float& width, const float& height);
+		Rect(float left = 0, float top = 0, float width = 0, float height = 0);
+		Rect(const Vec2& position, float width, float height);
 		Rect(const Vec2& topleft, const Vec2& size);
-		~Rect();
+		Rect(const Rect& r);
+
 		//Rect& operator*=(const Rect& r);
-		Rect& operator*=(const float& v);
+		Rect& operator*=(float v);
 		//Rect& operator/=(const Rect& r);
 		//Rect& operator+=(const Rect& r);
 		//Rect& operator-=(const Rect& r);
 		//Rect operator+(const Rect& r) const;
 		//Rect operator-(const Rect& r) const;
 		//Rect operator*(const Rect& r) const;
-		Rect operator*(const float& v) const;
+		Rect operator*(float v) const;
 		//Rect operator/(const Rect& r) const;
 		bool operator==(const Rect& r) const;
 		bool operator!=(const Rect& r) const;
 		Rect& operator=(const Rect& r);
-		Rect& Assign(const Rect& r);
+		
+		Rect& set(const Rect& r);
+		Rect& set(float x, float y, float w, float h);
 
 		float GetWidth() const;
 		float GetHeight() const;
 		Vec2 GetSize() const;
 		Vec2 GetCenter() const;
 
-		void SetWidth(const float& w);
-		void SetHeight(const float& h);
+		void SetWidth(float w);
+		void SetHeight(float h);
 		void SetSize(const Vec2& s);
 		void SetCenter(const Vec2& c);
 		

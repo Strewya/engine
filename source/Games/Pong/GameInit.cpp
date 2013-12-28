@@ -3,7 +3,7 @@
 	/*** personal header ***/
 #include <Engine/GameInit.h>
 	/*** extra headers ***/
-#include <Engine/Engine.h>
+#include <Engine/GameEngine.h>
 #include <Games/Pong/Gameplay.h>
 	/*** end headers ***/
 

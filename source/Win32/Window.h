@@ -11,7 +11,7 @@
 	/*** extra headers if needed (alphabetically ordered) ***/
 	/*** end header inclusion ***/
 
-namespace Input { class Event; }
+
 
 namespace Win32
 {
@@ -32,6 +32,7 @@ namespace Win32
 		virtual bool update();
 		void shutdown();
 		void showMessagebox(const char* title, const char* text);
+		void resize();
 
 		void setFullscreen(bool fs);
 		void setExtendedStyle(uint32_t style);

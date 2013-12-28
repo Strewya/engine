@@ -7,7 +7,7 @@
 #include <Win32/myWindows.h>
 	/*** extra headers ***/
 #include <Engine/Defines.h>
-#include <Engine/Engine.h>
+#include <Engine/GameEngine.h>
 #include <Engine/GameInit.h>
 #include <Win32/Window.h>
 #include <Win32/WindowClass.h>
@@ -19,32 +19,33 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
     (void) hPrevInst;
     (void) lpCmdLine;
     (void) nShowCmd;
+	
 	Win32::Window window("Snake");
 	int result = initializeWindow(window, false, window.getSizeX()-120, window.getSizeY()-120);
-	if(result != ErrorCode::OK)
+	
+	if (result == ErrorCode::OK)
 	{
-		return result;
-	}
-
-	try
-	{
-		Core::Engine engine(window);
-		engine.initializeGame(Core::init);
-		
-		//start main loop
-		while(window.update())
-		{	
-			engine.loop();
-		}
-
-		return window.getExitCode();
-	}
-	catch(std::exception& ex)
-	{
-		if(strcmp(ex.what(), "") != 0)
+		try
 		{
-			window.showMessagebox("Exception error", ex.what());
+			Core::Engine engine(window);
+			Core::init(engine);
+
+			//start main loop
+			while (window.update())
+			{
+				engine.loop();
+			}
+
+			result = window.getExitCode();
 		}
-		return ErrorCode::ExceptionThrown;
+		catch (std::exception& ex)
+		{
+			if (strcmp(ex.what(), "") != 0)
+			{
+				window.showMessagebox("Exception error", ex.what());
+			}
+			result = ErrorCode::ExceptionThrown;
+		}
 	}
+	return result;
 }

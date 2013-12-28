@@ -177,8 +177,12 @@ namespace Core
 
 	template<typename T> void AtomicAction<T>::checkMessages(GameContext& context)
 	{
-		uint32_t msg;
+		uint32_t msg = -1;
 		InstanceID entity;
+		if(msg == 100)
+		{
+			Util::GetDefaultLogger() << msg << Util::Logger::endl;
+		}
 		while(context.m_messenger.consumeMessage(getUID(), msg, entity) && !defaultMessageHandler(context, msg, entity))
 		{
 			processMessage(context, msg, entity);

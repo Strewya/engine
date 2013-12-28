@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 	/*** extra headers ***/
-#include <Engine/Engine.h>
+#include <Engine/GameEngine.h>
 #include <Engine/ServiceLocator.h>
 #include <Core/Entity/Entity.h>
 #include <Core/State/CoreStates.h>
@@ -18,11 +18,11 @@
 #include <Modules/Input/Service/InputEngine.h>
 #include <Modules/Input/Service/Event.h>
 #include <Modules/Input/Service/KeyCodes.h>
-#include <Modules/Physics/Box2D/Box2DAction.h>
-#include <Modules/Physics/Box2D/Box2DEngine.h>
-#include <Modules/Physics/Box2D/Box2DState.h>
-#include <Modules/Rendering/RenderAction.h>
-#include <Modules/Rendering/Service/IRenderer.h>
+#include <Modules/Physics/PhysicsAction.h>
+#include <Modules/Physics/PhysicsState.h>
+#include <Modules/Physics/Service/PhysicsEngine.h>
+#include <Modules/Graphics/RenderAction.h>
+#include <Modules/Graphics/Service/IRenderer.h>
 #include <Util/Color.h>
 #include <Util/Random.h>
 	/*** end headers ***/
@@ -33,12 +33,14 @@ namespace Pong
 		: GameContext(Core::ContextType::GAMEPLAY, services, resources)
 	{
 		m_render = Core::MainRender::create(*this);
+		m_services.getPhysics().setScalingFactor(10);
+		m_services.getGraphics().setScreenSize(1024, 768);
 	}
 
 	void Gameplay::registerActions()
 	{
 		setupAction(Core::InputController::create(*this), true, false);
-		setupAction(Physics::Physics2d::create(*this), true, true);
+		setupAction(Physics::PhysicsAction::create(*this), true, true);
 		setupAction(Core::Render::create(*this), false, true);
 		
 	}
@@ -54,21 +56,21 @@ namespace Pong
 		Input::Context& main = m_keyBindings.getContext("main");
 		m_keyBindings.pushContext("main", 1);
         (void) main;
+
+		main.addState(100, Input::Event(Input::DeviceCode::Mouse, Input::EventCode::Button, Input::Mouse::m_LeftButton, false));
 	}
 
 	void Gameplay::createEntities()
 	{
 		auto& field = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("field", field);
-		m_allEntities.addEntity(field.getID());
-		createEntity(Physics::Physics2d::UID, field.getID());
+		createEntity(Physics::PhysicsAction::UID, field.getID());
 
 		for(int i=0; i<2; ++i)
 		{
 			auto& paddle = m_entityPool.getNewInstanceRef();
 			m_entityFactory.createEntityType("paddle", paddle);
-			m_allEntities.addEntity(paddle.getID());
-			createEntity(Physics::Physics2d::UID, paddle.getID());
+			createEntity(Physics::PhysicsAction::UID, paddle.getID());
 			
 			if(i == 0)
 			{
@@ -84,8 +86,7 @@ namespace Pong
 		
 		auto& ball = m_entityPool.getNewInstanceRef();
 		m_entityFactory.createEntityType("ball", ball);
-		m_allEntities.addEntity(ball.getID());
-		createEntity(Physics::Physics2d::UID, ball.getID());
+		createEntity(Physics::PhysicsAction::UID, ball.getID());
 	}
 
 	void Gameplay::onActivate()
@@ -118,52 +119,58 @@ namespace Pong
 	void Gameplay::setupLeftPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("left");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2);
+		auto screenExtent = m_services.getGraphics().getScreenSize()*0.5f;
 		
+
 		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.encode("add_entity"), paddle.getID());
 
-		auto* state = paddle.getState<Core::Position2d>();
-		state->m_position.set(3-screenExtent.x, 0);
-		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+		auto* positionState = paddle.getState<Core::Position2d>();
+		auto* bodyState = paddle.getState<Physics::PhysicsBody>();
+		positionState->m_position.set(-screenExtent.x*0.95f, 0);
+		auto* body = m_services.getPhysics().getBody(bodyState->bodyID);
+		
+		body->SetTransform(Physics::convert(positionState->m_position, m_services.getPhysics().getInverseScalingFactor()), 0);
 		
 	}
 
 	void Gameplay::setupRightPaddle(Core::Entity& paddle)
 	{
 		paddle.setAlias("right");
-		auto screenExtent = m_services.getGraphics().getScreenSize()/(2);
+		auto screenExtent = m_services.getGraphics().getScreenSize()*0.5f;
 
 		m_messenger.sendMessage(0, Core::InputController::UID, m_messenger.encode("add_entity"), paddle.getID());
 		
-		auto* state = paddle.getState<Core::Position2d>();
-		state->m_position.set(screenExtent.x-3, 0);
-		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("set_position"), paddle.getID());
+		auto* positionState = paddle.getState<Core::Position2d>();
+		auto* bodyState = paddle.getState<Physics::PhysicsBody>();
+		positionState->m_position.set(screenExtent.x*0.95f, 0);
+		auto* body = m_services.getPhysics().getBody(bodyState->bodyID);
+
+		body->SetTransform(Physics::convert(positionState->m_position, m_services.getPhysics().getInverseScalingFactor()), 0);
 	}
 
 	void Gameplay::setupBall(Core::Entity& ball)
 	{
 		auto* state = ball.getState<Core::Impulse2d>();
 		Util::Random random;
-		auto y = random.randInt(0, 10);
-		auto x = random.randInt(y, 25);
+		auto y = random.randInt(90, 100);
+		auto x = -random.randInt(y, 250);
 		state->m_impulse.set((float)x, (float)y);
+		m_messenger.sendMessage(0, Physics::PhysicsAction::UID, m_messenger.encode("apply_impulse"), ball.getID());
 	}
 
 	void Gameplay::bindPaddleToField(Core::Entity& paddle, Core::Entity& field)
 	{
-		auto& joints = paddle.insert(Physics::Box2dJoint::create());
-		
-		joints.m_joints.resize(1);
-        joints.m_joints[0].m_prismatic.collideConnected = true;
-        joints.m_joints[0].m_bodyA = paddle.getID();
-		joints.m_joints[0].m_bodyB = field.getID();
+		auto& physicsEngine = m_services.getPhysics();
+		auto* bodyAState = paddle.getState<Physics::PhysicsBody>();
+		auto* bodyBState = field.getState<Physics::PhysicsBody>();
 
-		joints.m_joints[0].m_initDefinition = [](Physics::JointData& data, b2Body* a, b2Body* b)
-		{
-            data.m_prismatic.Initialize(a, b, b->GetWorldPoint(b2Vec2(0,0)), b2Vec2(0,1));
-		};
+		auto* a = physicsEngine.getBody(bodyAState->bodyID);
+		auto* b = physicsEngine.getBody(bodyBState->bodyID);
 
-		m_messenger.sendMessage(0, Physics::Physics2d::UID, m_messenger.encode("create_joints"), paddle.getID());
+		b2PrismaticJointDef jointDef;
+		jointDef.Initialize(a, b, b->GetWorldPoint(b2Vec2(0, 0)), b2Vec2(0, 1));
+		jointDef.collideConnected = true;
+		physicsEngine.createJoint(jointDef);
 	}
 }
 

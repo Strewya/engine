@@ -36,19 +36,18 @@ namespace Core
 
 	void MessageSystem::sendMessage(InstanceID sender, InstanceID recepient, uint32_t msgId, InstanceID entity)
 	{
-		if(m_postbox.count(recepient) == 0) return;
 		Msg msg = {msgId, entity};
-		if(recepient != BROADCAST)
+		if (recepient != BROADCAST && m_postbox.count(recepient) != 0)
 		{
 			m_postbox[recepient].emplace_back(msg);
 		}
 		else
 		{
-			for(auto it : m_postbox)
+			for(auto& pair : m_postbox)
 			{
-				if(it.first != sender)
+				if(pair.first != sender)
 				{
-					it.second.emplace_back(msg);
+					pair.second.emplace_back(msg);
 				}
 			}
 		}

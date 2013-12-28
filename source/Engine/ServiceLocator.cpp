@@ -58,4 +58,15 @@ namespace Core
 		assert(m_input != nullptr);
 		return *m_input;
 	}
+
+	void ServiceLocator::bind(Physics::Engine& physics)
+	{
+		m_physics = &physics;
+	}
+
+	Physics::Engine& ServiceLocator::getPhysics() const
+	{
+		assert(m_physics != nullptr);
+		return *m_physics;
+	}
 }

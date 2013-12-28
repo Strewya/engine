@@ -73,9 +73,14 @@ namespace Core
 
 	void InputController::postMessage(GameContext& context, const Intent& i) const
 	{
-		if(m_intentHandler == nullptr)
-			return;
-		m_intentHandler(context, i);
+		if (m_intentHandler == nullptr)
+		{
+			context.m_messenger.sendMessage(UID, context.m_messenger.BROADCAST, i.msgId, i.target);
+		}
+		else
+		{
+			m_intentHandler(context, i);
+		}
 	}
 
 	void InputController::setIntentHandler(const IntentHandler& handler)

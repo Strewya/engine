@@ -11,29 +11,22 @@
 namespace Util
 {
 	/*************************** VEC2 FUNCTIONS ***************************/
-	Vec2::Vec2()
-	{
-		x = 0;
-		y = 0;
-	}
-
 	Vec2::Vec2(const Vec2 &v)
-	{
-		x = v.x;
-		y = v.y;
-	}
+		: Vec2(v.x, v.y)
+	{}
 
-	Vec2::Vec2(const float& x, const float& y)
-	{
-		this->x = x;
-		this->y = y;
-	}
+	Vec2::Vec2(const Vec3& v)
+		: Vec2(v.x, v.y)
+	{}
 
-	Vec2::~Vec2() {};
+	Vec2::Vec2(float x, float y)
+		: x(x), y(y)
+	{}
 
 	bool Vec2::operator==(const Vec2& v) const
 	{
-		return ( (x == v.x) && ( y == v.y ) );
+		return (std::abs(x - v.x) < std::numeric_limits<float>::epsilon() &&
+			std::abs(y - v.y) < std::numeric_limits<float>::epsilon());
 	}
 
 	bool Vec2::operator!=(const Vec2 &v) const
@@ -41,7 +34,7 @@ namespace Util
 		return !operator==(v);
 	}
 
-	Vec2 Vec2::operator*(const float& v) const
+	Vec2 Vec2::operator*(float v) const
 	{
 		return Vec2(x * v, y * v);
 	}
@@ -51,7 +44,7 @@ namespace Util
 		return Vec2(x * v.x, y * v.y);
 	}
 
-	Vec2 operator*(const float& f, const Vec2& v)
+	Vec2 operator*(float f, const Vec2& v)
 	{
 		return v*f;
 	}
@@ -62,7 +55,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec2& Vec2::operator*=(const float& v)
+	Vec2& Vec2::operator*=(float v)
 	{
 		*this = *this * v;
 		return *this;
@@ -73,12 +66,12 @@ namespace Util
 		return Vec2(x + v.x, y + v.y);
 	}
 
-	Vec2 Vec2::operator+(const float& v) const
+	Vec2 Vec2::operator+(float v) const
 	{
 		return Vec2(x + v, y + v);
 	}
 
-	Vec2 operator+(const float& f, const Vec2& v)
+	Vec2 operator+(float f, const Vec2& v)
 	{
 		return v+f;
 	}
@@ -89,7 +82,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec2& Vec2::operator+=(const float& v)
+	Vec2& Vec2::operator+=(float v)
 	{
 		*this = *this + v;
 		return *this;
@@ -105,12 +98,12 @@ namespace Util
 		return Vec2(x - v.x, y - v.y);
 	}
 
-	Vec2 Vec2::operator-(const float& v) const
+	Vec2 Vec2::operator-(float v) const
 	{
 		return Vec2(x - v, y - v);
 	}
 
-	Vec2 operator-(const float& f, const Vec2& v)
+	Vec2 operator-(float f, const Vec2& v)
 	{
 		return v-f;
 	}
@@ -121,7 +114,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec2& Vec2::operator-=(const float& v)
+	Vec2& Vec2::operator-=(float v)
 	{
 		*this = *this - v;
 		return *this;
@@ -133,14 +126,14 @@ namespace Util
 						v.y == 0 ? 0 : y / v.y);
 	}
 
-	Vec2 Vec2::operator/(const float& v) const
+	Vec2 Vec2::operator/(float v) const
 	{
 		if(v == 0)
 			return Vec2(0,0);
 		return Vec2(x / v, y / v);
 	}
 
-	Vec2 operator/(const float& f, const Vec2& v)
+	Vec2 operator/(float f, const Vec2& v)
 	{
 		return v/f;
 	}
@@ -151,7 +144,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec2& Vec2::operator/=(const float& v)
+	Vec2& Vec2::operator/=(float v)
 	{
 		*this = *this/v;
 		return *this;
@@ -216,12 +209,12 @@ namespace Util
 		return Vec2(y, -x);
 	}
 
-	void Vec2::SetLength(const float& len)
+	void Vec2::SetLength(float len)
 	{
 		*this = Normalized() * len;
 	}
 
-	void Vec2::Truncate(const float& len)
+	void Vec2::Truncate(float len)
 	{
 		if(LengthSq() > len*len)
 			SetLength(len);
@@ -288,39 +281,23 @@ namespace Util
 	}
 
 	/*************************** VEC3 FUNCTIONS ***************************/
-	Vec3::Vec3()
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-	}
+	Vec3::Vec3(const Vec2& v)
+		:Vec3(v.x, v.y, 0)
+	{}
 
 	Vec3::Vec3(const Vec3 &v)
-	{
-		x = v.x;
-		y = v.y;
-		z = v.z;
-	}
+		: Vec3(v.x, v.y, v.z)
+	{}
 
-	Vec3::Vec3(const float& x, const float& y)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = 0;
-	}
-
-	Vec3::Vec3(const float& x, const float& y, const float& z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	Vec3::~Vec3() {};
+	Vec3::Vec3(float x, float y, float z)
+		: x(x), y(y), z(z)
+	{}
 
 	bool Vec3::operator==(const Vec3& v) const
 	{
-		return ( (x == v.x) && ( y == v.y ) && ( z == v.z ) );
+		return (std::abs(x - v.x) < std::numeric_limits<float>::epsilon() &&
+			std::abs(y - v.y) < std::numeric_limits<float>::epsilon() &&
+			std::abs(z - v.z) < std::numeric_limits<float>::epsilon());
 	}
 
 	bool Vec3::operator!=(const Vec3 &v) const
@@ -328,7 +305,7 @@ namespace Util
 		return !operator==(v);
 	}
 
-	Vec3 Vec3::operator*(const float& v) const
+	Vec3 Vec3::operator*(float v) const
 	{
 		return Vec3(x * v, y * v, z * v);
 	}
@@ -338,7 +315,7 @@ namespace Util
 		return Vec3(x * v.x, y * v.y, z * v.z);
 	}
 
-	Vec3 operator*(const float& f, const Vec3& v)
+	Vec3 operator*(float f, const Vec3& v)
 	{
 		return v*f;
 	}
@@ -349,7 +326,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec3& Vec3::operator*=(const float& v)
+	Vec3& Vec3::operator*=(float v)
 	{
 		*this = *this * v;
 		return *this;
@@ -360,12 +337,12 @@ namespace Util
 		return Vec3(x + v.x, y + v.y, z + v.z);
 	}
 
-	Vec3 Vec3::operator+(const float& v) const
+	Vec3 Vec3::operator+(float v) const
 	{
 		return Vec3(x + v, y + v, z + v);
 	}
 
-	Vec3 operator+(const float& f, const Vec3& v)
+	Vec3 operator+(float f, const Vec3& v)
 	{
 		return v+f;
 	}
@@ -376,7 +353,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec3& Vec3::operator+=(const float& v)
+	Vec3& Vec3::operator+=(float v)
 	{
 		*this = *this + v;
 		return *this;
@@ -392,12 +369,12 @@ namespace Util
 		return Vec3(x - v.x, y - v.y, z - v.z);
 	}
 
-	Vec3 Vec3::operator-(const float& v) const
+	Vec3 Vec3::operator-(float v) const
 	{
 		return Vec3(x - v, y - v, z - v);
 	}
 
-	Vec3 operator-(const float& f, const Vec3& v)
+	Vec3 operator-(float f, const Vec3& v)
 	{
 		return v-f;
 	}
@@ -408,7 +385,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec3& Vec3::operator-=(const float& v)
+	Vec3& Vec3::operator-=(float v)
 	{
 		*this = *this - v;
 		return *this;
@@ -421,14 +398,14 @@ namespace Util
 						v.z == 0 ? 0 : z / v.z);
 	}
 
-	Vec3 Vec3::operator/(const float& v) const
+	Vec3 Vec3::operator/(float v) const
 	{
 		if(v == 0)
 			return Vec3(0,0,0);
 		return Vec3(x / v, y / v, z / v);
 	}
 
-	Vec3 operator/(const float& f, const Vec3& v)
+	Vec3 operator/(float f, const Vec3& v)
 	{
 		return v/f;
 	}
@@ -439,7 +416,7 @@ namespace Util
 		return *this;
 	}
 
-	Vec3& Vec3::operator/=(const float& v)
+	Vec3& Vec3::operator/=(float v)
 	{
 		*this = *this/v;
 		return *this;
@@ -492,12 +469,12 @@ namespace Util
 		return Vec3(y*b.z-z*b.y, z*b.x-x*b.z, x*b.y-y*b.x);
 	}
 
-	void Vec3::SetLength(const float& len)
+	void Vec3::SetLength(float len)
 	{
 		*this = Normalized() * len;
 	}
 
-	void Vec3::Truncate(const float& len)
+	void Vec3::Truncate(float len)
 	{
 		if(LengthSq() > len*len)
 			SetLength(len);
@@ -535,31 +512,27 @@ namespace Util
 
 
 	/*************************** RECT FUNCTIONS ***************************/
-	Rect::Rect()
-		: position(), width(0), height(0)
+	Rect::Rect(float left, float top, float width, float height)
+		: position(left, top), width(width), height(height)
 	{}
 
-	Rect::Rect(const Rect &r)
-		: position(r.position), width(r.width), height(r.height)
+	Rect::Rect(const Vec2& pos, float width, float height)
+		: Rect(pos.x, pos.y, width, height)
 	{}
-
-	Rect::Rect(const Vec2& position, const float& width, const float& height)
-		: position(position), width(width), height(height)
-	{}
-
-	Rect::Rect(const float& left, const float& top, const float& width, const float& height)
-		: position(left,top), width(width), height(height)
-	{}
-
+	
 	Rect::Rect(const Vec2& topleft, const Vec2& size)
-		: position(topleft), width(size.x), height(size.y)
+		: Rect(topleft, size.x, size.y)
 	{}
-
-	Rect::~Rect() {};
-
+	
+	Rect::Rect(const Rect &r)
+		: Rect(r.position, r.width, r.height)
+	{}
+	
 	bool Rect::operator==(const Rect& r) const
 	{
-		return ( ( position == r.position) && ( width == r.width ) && ( height == r.height ) );
+		return position == r.position &&
+			std::abs(width - r.width) < std::numeric_limits<float>::epsilon() &&
+			std::abs(height - r.height) < std::numeric_limits<float>::epsilon();
 	}
 
 	bool Rect::operator!=(const Rect &r) const
@@ -567,7 +540,7 @@ namespace Util
 		return !operator==(r);
 	}
 	
-	Rect Rect::operator*(const float& v) const
+	Rect Rect::operator*(float v) const
 	{
 		return Rect(position, width*v, height*v);
 	}
@@ -586,7 +559,7 @@ namespace Util
 		return *this;
 	}
 	*/
-	Rect& Rect::operator*=(const float& v)
+	Rect& Rect::operator*=(float v)
 	{
 		width *= v;
 		height *= v;
@@ -637,10 +610,10 @@ namespace Util
 	*/
 	Rect& Rect::operator=(const Rect &r)
 	{
-		return Assign(r);
+		return set(r);
 	}
 
-	Rect& Rect::Assign(const Rect& r)
+	Rect& Rect::set(const Rect& r)
 	{
 		if(this != &r)
 		{
@@ -648,6 +621,14 @@ namespace Util
 			width = r.width;
 			height = r.height;
 		}
+		return *this;
+	}
+
+	Rect& Rect::set(float x, float y, float w, float h)
+	{
+		position.set(x, y);
+		width = w;
+		height = h;
 		return *this;
 	}
 
@@ -668,7 +649,10 @@ namespace Util
 		Rect rect;
 		if( IsIntersected(r) )
 		{
-			rect = Rect(std::max(position.x, r.position.x), std::max(position.y, r.position.y), std::min(position.x + width, r.position.x + r.width), std::min(position.y + height, r.position.y + r.height));
+			rect.set(std::max(position.x, r.position.x), 
+						std::max(position.y, r.position.y),
+						std::min(position.x + width, r.position.x + r.width),
+						std::min(position.y + height, r.position.y + r.height));
 		}
 		return rect;
 	}
@@ -688,12 +672,12 @@ namespace Util
 		return Vec2(GetWidth(), GetHeight());
 	}
 
-	void Rect::SetWidth(const float& w)
+	void Rect::SetWidth(float w)
 	{
 		width = w;
 	}
 
-	void Rect::SetHeight(const float& h)
+	void Rect::SetHeight(float h)
 	{
 		height = h;
 	}

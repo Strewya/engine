@@ -11,27 +11,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\DXInclude.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\DXRenderer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\IndexBuffer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\Vertex.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\D3D11\VertexBuffer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\dll_header.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Graphics.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IIndexBuffer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IRenderer.h" />
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IVertexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\D3D11\DXInclude.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\D3D11\DXRenderer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\D3D11\IndexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\D3D11\Vertex.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\D3D11\VertexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\dll_header.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\Graphics.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IIndexBuffer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IRenderer.h" />
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IVertexBuffer.h" />
     <ClInclude Include="..\..\source\stdafx.h" />
     <ClInclude Include="..\..\source\Util\Dimensional.h" />
     <ClInclude Include="..\..\source\Util\Color.h" />
     <ClInclude Include="..\..\source\Util\Logger.h" />
+    <ClInclude Include="..\..\source\Win32\Window.h" />
+    <ClInclude Include="..\..\source\Win32\WindowClass.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\DXRenderer.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\IndexBuffer.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\Vertex.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\D3D11\VertexBuffer.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\dll_source.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\D3D11\DXRenderer.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\D3D11\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\D3D11\Vertex.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\D3D11\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\dll_source.cpp" />
     <ClCompile Include="..\..\source\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -39,10 +41,13 @@
     <ClCompile Include="..\..\source\Util\Dimensional.cpp" />
     <ClCompile Include="..\..\source\Util\Color.cpp" />
     <ClCompile Include="..\..\source\Util\Logger.cpp" />
+    <ClCompile Include="..\..\source\Win32\Window.cpp" />
+    <ClCompile Include="..\..\source\Win32\WindowClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\..\resources\Shaders\shader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -77,8 +82,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SGPROJECT)\source;$(SourcePath)</SourcePath>
-    <IncludePath>$(DXSDK_DIR)\Include;$(SGPROJECT)\include;$(SGPROJECT)\source;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)\Lib\x86;$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\source;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

@@ -3,9 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(SGPROJECT)\$(Configuration)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>$(SGPROJECT)\$(Configuration)\$(TargetName)</LocalDebuggerCommand>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>$(SGPROJECT)\$(Configuration)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>$(SGPROJECT)\$(Configuration)\$(TargetName)</LocalDebuggerCommand>
   </PropertyGroup>
 </Project>

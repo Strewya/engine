@@ -28,9 +28,6 @@
     <ClCompile Include="..\..\source\Engine\Defines.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Engine\Engine.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Engine\GameContext.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
@@ -83,39 +80,6 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\stdafx_builder.cpp" />
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\AnimationInfo.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\ITextureCache.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\Polygon.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\RendererFactory.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\RenderingQueue.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpriteInfo.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\Spritesheet.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\Service\TextureData.cpp">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Rendering\RenderAction.cpp">
-      <Filter>Modules\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Modules\Scripting\Service\LuaEngine.cpp">
       <Filter>Modules\Scripting\Service</Filter>
     </ClCompile>
@@ -146,8 +110,50 @@
     <ClCompile Include="..\..\source\Modules\Input\InputAction.cpp">
       <Filter>Modules\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Modules\Physics\Box2D\Box2DAction.cpp">
-      <Filter>Modules\Physics\Box2D</Filter>
+    <ClCompile Include="..\..\source\Engine\GameEngine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Physics\PhysicsAction.cpp">
+      <Filter>Modules\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Physics\PhysicsState.cpp">
+      <Filter>Modules\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\RenderAction.cpp">
+      <Filter>Modules\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\AnimationInfo.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\b2DebugDraw.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\ITextureCache.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\Polygon.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\RendererFactory.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\RenderingQueue.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\SpriteInfo.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\Spritesheet.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\SpritesheetCache.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Graphics\Service\TextureData.cpp">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Modules\Physics\Service\PhysicsEngine.cpp">
+      <Filter>Modules\Physics\Service</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +182,6 @@
       <Filter>Core/Entity</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\Defines.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Engine\Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\Engine\GameContext.h">
@@ -242,54 +245,6 @@
     <ClInclude Include="..\..\source\Core\State\CoreStates.h">
       <Filter>Core/State</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\AnimationInfo.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\b2DebugDraw.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\dll_header.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Graphics.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IIndexBuffer.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IRenderer.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\ITextureCache.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\IVertexBuffer.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Polygon.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\RendererFactory.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\RenderingQueue.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpriteInfo.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\Spritesheet.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\SpritesheetCache.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\Service\TextureData.h">
-      <Filter>Modules\Rendering\Service</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Rendering\RenderAction.h">
-      <Filter>Modules\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Modules\Scripting\Service\LuaEngine.h">
       <Filter>Modules\Scripting\Service</Filter>
     </ClInclude>
@@ -323,17 +278,65 @@
     <ClInclude Include="..\..\source\Modules\Input\InputAction.h">
       <Filter>Modules\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DAction.h">
-      <Filter>Modules\Physics\Box2D</Filter>
+    <ClInclude Include="..\..\source\Engine\GameEngine.h">
+      <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DState.h">
-      <Filter>Modules\Physics\Box2D</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Physics\Box2D\Box2DEngine.h">
-      <Filter>Modules\Physics\Box2D</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\Modules\Physics\PhysicsEngine.h">
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsAction.h">
       <Filter>Modules\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\PhysicsState.h">
+      <Filter>Modules\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Physics\Service\PhysicsEngine.h">
+      <Filter>Modules\Physics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\RenderAction.h">
+      <Filter>Modules\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\AnimationInfo.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\b2DebugDraw.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\dll_header.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IIndexBuffer.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IRenderer.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\ITextureCache.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\IVertexBuffer.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\Polygon.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\RendererFactory.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\RenderingQueue.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\SpriteInfo.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\Spritesheet.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\SpritesheetCache.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Modules\Graphics\Service\TextureData.h">
+      <Filter>Modules\Graphics\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Win32\WindowEvent.h">
+      <Filter>Win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -373,9 +376,6 @@
     <Filter Include="Modules\Physics">
       <UniqueIdentifier>{c89cbb66-638e-42f4-971c-bf653ec2bea0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Modules\Rendering">
-      <UniqueIdentifier>{a87ee635-6c73-4953-8756-96c30f7198da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Modules\Scripting">
       <UniqueIdentifier>{27d8c059-1cee-4952-beab-9cbe1889dc4a}</UniqueIdentifier>
     </Filter>
@@ -385,11 +385,14 @@
     <Filter Include="Modules\Scripting\Service">
       <UniqueIdentifier>{388741ce-9f31-45f9-8be4-732aaf23d6c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Modules\Rendering\Service">
-      <UniqueIdentifier>{b8a54bc7-0951-45ab-9ec7-2cf829bc5a05}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Modules\Physics\Box2D">
+    <Filter Include="Modules\Physics\Service">
       <UniqueIdentifier>{089d28f3-63f1-4e30-bcf7-45d1e17a305c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Graphics">
+      <UniqueIdentifier>{a87ee635-6c73-4953-8756-96c30f7198da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Graphics\Service">
+      <UniqueIdentifier>{b8a54bc7-0951-45ab-9ec7-2cf829bc5a05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

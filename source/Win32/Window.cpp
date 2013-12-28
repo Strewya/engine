@@ -14,34 +14,26 @@
 namespace Win32
 {
 	Window::Window()
-		: m_hwnd(nullptr), m_hwndParent(nullptr), m_hMenu(nullptr), m_hInstance(nullptr),
-		  m_usePeekMessage(true), m_useWaitMessage(false), m_fullscreen(false), m_showCursor(false),
-		  m_exitCode(0), m_style(0), m_extendedStyle(0),
-		  m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT), m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-		  m_class("Window"), m_title("Window")
-	{
-		setFullscreen(m_fullscreen);
-	}
+		: Window("Window")
+	{}
 
 	Window::Window(const char* title)
 		: m_hwnd(nullptr), m_hwndParent(nullptr), m_hMenu(nullptr), m_hInstance(nullptr),
 		  m_usePeekMessage(true), m_useWaitMessage(false), m_fullscreen(false), m_showCursor(false),
 		  m_exitCode(0), m_style(0), m_extendedStyle(0),
-		  m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT), m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
+		  m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
+		  m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
 		  m_class(title), m_title(title)
-	{}
+	{
+		setFullscreen(m_fullscreen);
+	}
 
 	Window::Window(const std::string& title)
-		: m_hwnd(nullptr), m_hwndParent(nullptr), m_hMenu(nullptr), m_hInstance(nullptr),
-		  m_usePeekMessage(true), m_useWaitMessage(false), m_fullscreen(false), m_showCursor(false),
-		  m_exitCode(0), m_style(0), m_extendedStyle(0),
-		  m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT), m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-		  m_class(title), m_title(title)
+		: Window(title.c_str())
 	{}
 
 	Window::~Window()
-	{
-	}
+	{}
 	
 	bool Window::create()
 	{
@@ -159,6 +151,12 @@ namespace Win32
 	void Window::showMessagebox(const char* title, const char* text)
 	{
 		MessageBox(m_hwnd, text, title, MB_OK);
+	}
+
+	void Window::resize()
+	{
+		SetWindowPos(m_hwnd, 0, m_xPos, m_yPos, m_xSize, m_ySize, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		UpdateWindow(m_hwnd);
 	}
 
 	void Window::setExtendedStyle(uint32_t style) { m_extendedStyle = style; }
