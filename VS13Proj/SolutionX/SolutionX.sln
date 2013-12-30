@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Box2D", "Box2D\Box2D.vcxproj", "{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameX", "GameX\GameX.vcxproj", "{A0FDD4E0-D78E-495A-A0D9-505A373A349D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -18,6 +20,12 @@ Global
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Final|Win32.Build.0 = Final|Win32
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Release|Win32.ActiveCfg = Release|Win32
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Release|Win32.Build.0 = Release|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Debug|Win32.Build.0 = Debug|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Final|Win32.ActiveCfg = Final|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Final|Win32.Build.0 = Final|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Release|Win32.ActiveCfg = Release|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

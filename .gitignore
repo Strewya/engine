@@ -14,8 +14,8 @@
 
 Debug/
 Release/
+Final/
 ipch/
-docs/
 *.sdf
 *.opensdf
 *.suo
