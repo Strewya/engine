@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippets  xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>atomic action (cpp)</Title>
+			<Shortcut>atomic_action_cpp</Shortcut>
+			<Description>Code snippet for the sourtce of an atomic Action</Description>
+			<Author>Marko Pipal</Author>
+			<SnippetTypes>
+				<SnippetType>Expansion</SnippetType>
+			</SnippetTypes>
+		</Header>
+		<Snippet>
+			<Declarations>
+				<Literal>
+					<ID>filepath</ID>
+					<ToolTip>Filename</ToolTip>
+					<Default>path_to_file</Default>
+				</Literal>
+				<Literal>
+					<ID>namespace</ID>
+					<ToolTip>Enclosing namespace</ToolTip>
+					<Default>NamespaceName</Default>
+				</Literal>
+				<Literal>
+					<ID>name</ID>
+					<ToolTip>Class name</ToolTip>
+					<Default>ClassName</Default>
+				</Literal>
+			</Declarations>
+			<Code Language="cpp"><![CDATA[//headers should be ordered alphabetically, if not REORDER THEM NOW!
+/******* precompiled header *******/
+#include <stdafx.h>
+/******* personal header *******/
+#include <$filepath$>
+/******* C++ headers *******/
+/******* extra headers *******/
+/******* end headers *******/
+
+namespace $namespace$
+{
+	void $name$::processMessages(Core::GameContext& context)
+	{
+		$end$
+	}
+	
+	void $name$::update(Core::GameContext& context)
+	{}
+	
+	void $name$::render(Core::GameContext& context, uint64_t interpolationTime)
+	{}
+}
+]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>
