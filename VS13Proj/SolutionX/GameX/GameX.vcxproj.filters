@@ -35,6 +35,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
+    <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -59,5 +65,11 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h" />
+    <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h">
+      <Filter>Window</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

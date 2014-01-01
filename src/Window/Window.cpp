@@ -4,6 +4,7 @@
 	/*** personal header ***/
 #include <Window/Window.h>
 	/*** C++ headers ***/
+#include <cstdlib>
 #include <windef.h>
 	/*** extra headers ***/
 #include <Input/KeyCodes.h>
@@ -12,6 +13,8 @@
 
 namespace Core
 {
+	uint32_t toFileChangeType(DWORD action);
+
 	int initializeWindow(Window& window)
 	{
 		WindowClass wndClass(window.getClass());
@@ -37,20 +40,48 @@ namespace Core
 		: Window("Window")
 	{}
 
-	Window::Window(const char* title)
-		: m_hwnd(nullptr),
-		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
-		m_exitCode(0), m_style(0), m_extendedStyle(0),
-		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
-		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-		m_class(title), m_title(title)
-	{
-		setFullscreen(m_fullscreen);
-	}
-
 	Window::Window(const std::string& title)
 		: Window(title.c_str())
 	{}
+
+	Window::Window(const char* title)
+		: m_hwnd(nullptr),
+		m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
+		m_fullscreen(false), m_showCursor(false), m_isRunning(true), m_updateWindow(false),
+		m_exitCode(0), m_style(0), m_extendedStyle(0),
+		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
+		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
+		m_class(title), m_title(title), m_resourcesDirectory()
+	{
+		setFullscreen(m_fullscreen);
+
+		char lpName[128] = {0};
+		GetCurrentDirectory(128, lpName);
+		m_resourcesDirectory.assign(lpName);
+		auto pos = m_resourcesDirectory.find_last_of('\\');
+		m_resourcesDirectory.assign(m_resourcesDirectory.substr(0, pos + 1)).append("resources").shrink_to_fit();
+
+		m_monitor.AddDirectory(m_resourcesDirectory.c_str(), true, m_trackedChanges);
+
+		m_dirHandle = CreateFile(
+			m_resourcesDirectory.c_str(),
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
+			nullptr,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS,
+			nullptr
+			);
+		assert(m_dirHandle != INVALID_HANDLE_VALUE);
+
+		
+	}
+
+	Window::~Window()
+	{
+		m_monitor.Terminate();
+		CloseHandle(m_dirHandle);
+	}
 
 	bool Window::create()
 	{
@@ -95,15 +126,12 @@ namespace Core
 		{
 			MessageBox(nullptr, "Window::HandleMessage(): The window has not been created yet.", "Runtime error", MB_OK);
 			m_exitCode = WindowResult::WindowNotExistsError;
+			m_isRunning = false;
+			return;
 		}
 		static MSG msg;
-		while(true)
+		if(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			if(!PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				return;
-			}
-				
 			if(msg.message == WM_QUIT)
 			{
 				m_exitCode = msg.wParam;
@@ -112,6 +140,44 @@ namespace Core
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		}
+
+		if(m_updateWindow)
+		{
+			m_updateWindow = false;
+			InvalidateRect(m_hwnd, 0, true);
+		}
+	}
+
+	void Window::processFileChanges()
+	{
+		std::string file;
+		DWORD action;
+		m_timer.update(Time::NORMAL_TIME);
+		while(m_monitor.Pop(action, file))
+		{
+			if(!file.empty())
+			{	
+				m_fileChangeBuffer.emplace(file, m_timer.getCurMicros());
+			}
+		}
+		std::vector<std::string> deleteThese;
+		for(auto& pair : m_fileChangeBuffer)
+		{
+			//we only want those changes that happened half a second ago
+			if(m_timer.getCurMicros() >= (pair.second + Time::microsFromMilis(50)))
+			{
+				m_fileChanges.emplace_back(pair.first);
+				deleteThese.emplace_back(pair.first);
+				auto we = newEvent();
+				we.m_type = WindowEventType::WINDOW_FILECHANGE;
+				we.m_fileChange.m_action = toFileChangeType(action);
+				m_events.emplace_back(we);
+			}
+		}
+		for(auto str : deleteThese)
+		{
+			m_fileChangeBuffer.erase(str);
 		}
 	}
 
@@ -204,15 +270,24 @@ namespace Core
 		return eventExists;
 	}
 
+	WindowEvent Window::newEvent()
+	{
+		m_timer.update(Time::NORMAL_TIME);
+		WindowEvent we;
+		ZeroMemory(&we, sizeof(we));
+		we.m_timestamp = m_timer.getCurMicros();
+		return we;
+	}
+
 	void Window::setStyle(uint32_t style) { m_style = style; }
 	void Window::setExtendedStyle(uint32_t style) { m_extendedStyle = style; }
 	void Window::showCursor(bool isShown) { m_showCursor = isShown; }
 	
+	const std::string&	Window::getClass() const { return m_class; }
+	const std::string&	Window::getTitle() const { return m_title; }
 	HWND			Window::getWindowHandle() const { return m_hwnd; }
 	uint32_t		Window::getStyle() const { return m_style; }
 	uint32_t		Window::getExtendedStyle() const { return m_extendedStyle; }
-	const std::string&	Window::getClass() const { return m_class; }
-	const std::string&	Window::getTitle() const { return m_title; }
 	int32_t			Window::getPositionX() const { return m_xPos; }
 	int32_t			Window::getPositionY() const { return m_yPos; }
 	uint32_t		Window::getSizeX() const { return m_xSize; }
@@ -227,9 +302,7 @@ namespace Core
 	LRESULT WINAPI Window::windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 		//here we translate all WM_* messages to the Core::WindowMessage
-		m_timer.update(m_timer.NORMAL_TIME);
-		WindowEvent we;
-		we.m_timestamp = m_timer.getCurMicros();
+		auto we = newEvent();
 
 		bool eventMapped = true;
 		LRESULT result = 0;
@@ -350,13 +423,30 @@ namespace Core
 			eventMapped = false;
 			break;
 
+		case WM_ACTIVATE:
+			if(LOWORD(wParam) == WA_INACTIVE)
+			{
+				we.m_type = WindowEventType::WINDOW_LOSTFOCUS;
+			}
+			else
+			{
+				we.m_type = WindowEventType::WINDOW_GAINFOCUS;
+			}
+			result = notProcessed;
+			break;
+
 
 		case WM_PAINT:
 		{
 						 HBRUSH white = GetStockBrush(WHITE_BRUSH);
 						 HBRUSH black = GetStockBrush(BLACK_BRUSH);
 						 PAINTSTRUCT ps;
+
+						 auto copy = m_drawStrings;
+
+
 						 HDC hdc = BeginPaint(hwnd, &ps);
+						 
 						 RECT bg = {0, 0, m_xSize, m_ySize};
 						 FillRect(hdc, &bg, white);
 						 
@@ -379,10 +469,18 @@ namespace Core
 						 r.left = m_xSize - ofs - sz; r.right = m_xSize - ofs;
 						 r.top = m_ySize - ofs - sz; r.bottom = m_ySize - ofs;
 						 FillRect(hdc, &r, black);
-						 TextOut(hdc, 5, 50, "Hello, Windows!", 15);
+
+						 uint32_t i = 0;
+						 for(auto& str : copy)
+						 {
+							 TextOut(hdc, 50, 30 * i, str.c_str(), str.size());
+							 ++i;
+						 }
+						 
 
 						 EndPaint(hwnd, &ps);
-						 return 0L;
+						 eventMapped = false;
+						 result = 0;
 
 		}
 			break;
@@ -399,6 +497,38 @@ namespace Core
 			result = DefWindowProc(hwnd, msg, wParam, lParam);
 		
 		return result;
+	}
+
+
+	uint32_t toFileChangeType(DWORD action)
+	{
+		uint32_t returnValue = Core::FILE_BADDATA;
+		switch(action)
+		{
+		case FILE_ACTION_ADDED:
+			returnValue = Core::FILE_ADDED;
+			break;
+
+		case FILE_ACTION_MODIFIED:
+			returnValue = Core::FILE_MODIFIED;
+			break;
+
+		case FILE_ACTION_REMOVED:
+			returnValue = Core::FILE_REMOVED;
+			break;
+
+		case FILE_ACTION_RENAMED_OLD_NAME:
+			returnValue = Core::FILE_RENAMED_FROM;
+			break;
+
+		case FILE_ACTION_RENAMED_NEW_NAME:
+			returnValue = Core::FILE_RENAMED_TO;
+			break;
+
+		default:
+			break;
+		}
+		return returnValue;
 	}
 }
 

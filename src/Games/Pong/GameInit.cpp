@@ -4,6 +4,7 @@
 #include <Games/GameInit.h>
 	/*** extra headers ***/
 #include <algorithm>
+#include <fstream>
 #include <vector>
 //#include <Games/Pong/PongGame.h>
 #include <Input/KeyCodes.h>
@@ -47,11 +48,12 @@ namespace Core
 	{
 		Time pongLogicTimer;
 		Time pongRenderTimer;
+		double timeScale;
 
 		bool tickLogic(uint64_t updateTime, Window& window)
 		{
 			bool continueRunning = true;
-			pongLogicTimer.updateBy(updateTime, pongLogicTimer.NORMAL_TIME);
+			pongLogicTimer.updateBy(updateTime, timeScale);
 			
 			auto events = gatherInput(pongLogicTimer.getCurMicros(), window);
 			
@@ -87,8 +89,26 @@ namespace Core
 						window.resize(window.getSizeX() - 1, window.getSizeY());
 					else if(e.m_keyboard.m_keyCode == Keyboard::m_ArrowRight)
 						window.resize(window.getSizeX() + 1, window.getSizeY());
+					
 					break;
 					
+				case WindowEventType::WINDOW_LOSTFOCUS:
+					timeScale = Time::STOP_TIME;
+					break;
+
+				case WindowEventType::WINDOW_GAINFOCUS:
+					timeScale = Time::NORMAL_TIME;
+					break;
+
+				case WindowEventType::WINDOW_FILECHANGE:
+				{
+														   std::string name;
+														   if(window.getNextChangedFile(name))
+														   {
+															   window.addStringForPaint(name);
+														   }
+				}
+					break;
 
 				default:
 					break;
@@ -100,7 +120,7 @@ namespace Core
 
 		void tickRender(uint64_t updateTime)
 		{
-			pongRenderTimer.updateBy(updateTime, pongRenderTimer.NORMAL_TIME);
+			pongRenderTimer.updateBy(updateTime, timeScale);
 		}
 
 	};
@@ -120,6 +140,7 @@ namespace Core
 	void initGame(Window& window)
 	{
 		PongGame game;
+		game.timeScale = Time::NORMAL_TIME;
 		Time m_logicTimer;
 		Time m_renderTimer;
 

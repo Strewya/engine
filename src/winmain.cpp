@@ -27,12 +27,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 	if (result == Core::WindowResult::OK)
 	{
 		std::thread logicThread(Core::initGame, std::ref(window));
-
 		
 		//start input loop
 		while (window.isRunning())
 		{
 			window.update();
+			window.processFileChanges();
 		}
 		logicThread.join();
 		result = window.getExitCode();

@@ -24,6 +24,10 @@ namespace Core
 		WINDOW_MOUSEWHEEL,
 
 		WINDOW_CLOSE,
+		WINDOW_LOSTFOCUS,
+		WINDOW_GAINFOCUS,
+
+		WINDOW_FILECHANGE,
 
 		WINDOW_LASTEVENT
 	};
@@ -60,7 +64,20 @@ namespace Core
 		uint32_t m_scroll;
 	};
 
+	enum FileChangeType
+	{
+		FILE_ADDED,
+		FILE_MODIFIED,
+		FILE_REMOVED,
+		FILE_RENAMED_FROM,
+		FILE_RENAMED_TO,
+		FILE_BADDATA
+	};
 
+	struct FileChangeEvent
+	{
+		uint32_t m_action;
+	};
 
 
 
@@ -74,6 +91,7 @@ namespace Core
 			MouseMoveEvent m_mouseMove;
 			MouseButtonEvent m_mouseButton;
 			MouseWheelEvent m_mouseWheel;
+			FileChangeEvent m_fileChange;
 		};
 	};
 }

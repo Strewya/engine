@@ -136,6 +136,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Time.cpp" />
+    <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp" />
+    <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="..\..\..\src\Window\Window.cpp" />
     <ClCompile Include="..\..\..\src\Window\WindowClass.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
@@ -146,6 +148,8 @@
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />
     <ClInclude Include="..\..\..\src\Window\myWindows.h" />
+    <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h" />
+    <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h" />
     <ClInclude Include="..\..\..\src\Window\Window.h" />
     <ClInclude Include="..\..\..\src\Window\WindowClass.h" />
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />

@@ -2,11 +2,11 @@ return {
 	name = "pong.sheet",
 	texture = "../resources/pong.png",
 	frames = {
-		{name="ball", 		rect={x=33, y=0,  w=32, h=32}},
-		{name="rectangle", 	rect={x=33, y=33, w=32, h=32}},
-		{name="paddle", 	rect={x=0,  y=0,  w=32, h=128}},
-		{name="cherry", 	rect={x=66, y=0,  w=32, h=32}},
-		{name="cupcake", 	rect={x=33, y=66, w=32, h=32}},
-		{name="strawberry", rect={x=66, y=33, w=32, h=32}}
+		{name = "ball", 		rect={x=33, y=0,  w=32, h=32}},
+		{name = "rectangle", 	rect={x=33, y=33, w=32, h=32}},
+		{name = "paddle", 	rect={x=0,  y=0,  w=32, h=128}},
+		{name = "cherry", 	rect={x=66, y=0,  w=32, h=32}},
+		{name = "cupcake", 	rect={x=33, y=66, w=32, h=32}},
+		{name = "strawberry", rect={x=66, y=33, w=32, h=32}}
 	}
 };

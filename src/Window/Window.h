@@ -4,12 +4,14 @@
 	usage:	
 ********************************************/
 	/*** common and C++ headers ***/
+#include <deque>
 #include <list>
 #include <string>
 #include <Window/myWindows.h>
 	/*** extra headers if needed (alphabetically ordered) ***/
 #include <Util/Time.h>
 #include <Window/WindowEvent.h>
+#include <Window/ReadDirectoryChanges.h>
 	/*** end header inclusion ***/
 
 namespace Core
@@ -35,6 +37,7 @@ namespace Core
 		Window();
 		Window(const char* title);
 		Window(const std::string& title);
+		~Window();
 		
 		LRESULT CALLBACK windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 		bool create();
@@ -70,7 +73,12 @@ namespace Core
 		bool peek(uint64_t time, WindowEvent& outEvent);
 
 	protected:
+		WindowEvent newEvent();
+
 		HWND m_hwnd;
+
+		HANDLE m_dirHandle;
+		DWORD m_trackedChanges;
 		
 		uint32_t m_exitCode;
 		uint32_t m_style;
@@ -84,12 +92,44 @@ namespace Core
 		bool m_fullscreen;
 		bool m_showCursor;
 		bool m_isRunning;
+		bool m_updateWindow;
 
 		std::string m_class;
 		std::string m_title;
+		std::string m_resourcesDirectory;
 
 		Time m_timer;
+		CReadDirectoryChanges m_monitor;
 		std::list<WindowEvent> m_events;
+
+	public:
+		void addStringForPaint(const std::string& str)
+		{
+			if(m_drawStrings.size() > 10)
+			{
+				m_drawStrings.pop_back();
+			}
+			m_drawStrings.emplace_front(str);
+			m_updateWindow = true;
+		}
+
+		bool getNextChangedFile(std::string& outStr)
+		{
+			if(!m_fileChanges.empty())
+			{
+				outStr = m_fileChanges.front();
+				m_fileChanges.pop_front();
+				return true;
+			}
+			return false;
+		}
+
+		void processFileChanges();
+
+	private:
+		std::unordered_map<std::string, uint64_t> m_fileChangeBuffer;
+		std::list<std::string> m_fileChanges;
+		std::deque<std::string> m_drawStrings;
 	};
 
 	
