@@ -1,88 +1,95 @@
-
-
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
+/******* precompiled header *******/
 #include <stdafx.h>
-#include <process.h>
+/******* personal header *******/
 #include <Window/ReadDirectoryChanges.h>
+/******* C++ headers *******/
+#include <process.h>
+/******* extra headers *******/
 #include <Window/ReadDirectoryChangesPrivate.h>
+/******* end headers *******/
 
-using namespace ReadDirectoryChangesPrivate;
-
-///////////////////////////////////////////////////////////////////////////
-// CReadDirectoryChanges
-
-CReadDirectoryChanges::CReadDirectoryChanges(int nMaxCount)
-	: m_Notifications(nMaxCount)
+namespace Core
 {
-	m_hThread	= NULL;
-	m_dwThreadId= 0;
-	m_pServer	= new CReadChangesServer(this);
-}
+	///////////////////////////////////////////////////////////////////////////
+	// CReadDirectoryChanges
 
-CReadDirectoryChanges::~CReadDirectoryChanges()
-{
-	Terminate();
-	delete m_pServer;
-}
-
-void CReadDirectoryChanges::Init() 
-{
-	//
-	// Kick off the worker thread, which will be
-	// managed by CReadChangesServer.
-	//
-	m_hThread = (HANDLE)_beginthreadex(NULL,
-		0,
-		CReadChangesServer::ThreadStartProc,
-		m_pServer,
-		0,
-		&m_dwThreadId
-		);
-}
-
-void CReadDirectoryChanges::Terminate() 
-{
-	if (m_hThread)
+	CReadDirectoryChanges::CReadDirectoryChanges()
+		: m_notifications(), m_threadHandle(nullptr), m_threadId(0),
+		m_pServer(std::make_unique<RDCPrivate::CReadChangesServer>(this))
 	{
-		::QueueUserAPC(CReadChangesServer::TerminateProc, m_hThread, (ULONG_PTR)m_pServer);
-		::WaitForSingleObjectEx(m_hThread, 10000, true);
-		::CloseHandle(m_hThread);
-
-		m_hThread = NULL;
-		m_dwThreadId = 0;
 	}
-}
 
-void CReadDirectoryChanges::AddDirectory( const std::string& szDirectory, BOOL bWatchSubtree, DWORD dwNotifyFilter, DWORD dwBufferSize ) 
-{
-	if (!m_hThread)
-		Init();
+	CReadDirectoryChanges::~CReadDirectoryChanges()
+	{
+		Terminate();
+	}
 
-	CReadChangesRequest* pRequest = new CReadChangesRequest(m_pServer, szDirectory, bWatchSubtree, dwNotifyFilter, dwBufferSize);
-	QueueUserAPC(CReadChangesServer::AddDirectoryProc, m_hThread, (ULONG_PTR)pRequest);
-}
+	void CReadDirectoryChanges::Init()
+	{
+		//
+		// Kick off the worker thread, which will be
+		// managed by CReadChangesServer.
+		//
+		m_threadHandle = (HANDLE)_beginthreadex(nullptr,
+			0,
+			RDCPrivate::CReadChangesServer::ThreadStartProc,
+			m_pServer.get(),
+			0,
+			&m_threadId
+			);
+	}
 
-void CReadDirectoryChanges::Push(DWORD dwAction, const std::string& wstrFilename) 
-{
-	m_Notifications.push_back( TDirectoryChangeNotification(dwAction, wstrFilename) );
-}
+	void CReadDirectoryChanges::Terminate()
+	{
+		if(m_threadHandle)
+		{
+			::QueueUserAPC(RDCPrivate::CReadChangesServer::TerminateProc, m_threadHandle, (ULONG_PTR)m_pServer.get());
+			::WaitForSingleObjectEx(m_threadHandle, 10000, true);
+			::CloseHandle(m_threadHandle);
 
-bool  CReadDirectoryChanges::Pop(DWORD& outAction, std::string& outFilename) 
-{
-	TDirectoryChangeNotification pair;
-	if (m_Notifications.empty())
-		return false;
+			m_threadHandle = nullptr;
+			m_threadId = 0;
+		}
+	}
 
-	outAction = m_Notifications.front().first;
-	outFilename = m_Notifications.front().second;
-	m_Notifications.pop_front();
+	void CReadDirectoryChanges::AddDirectory(const std::string& watchedDir, BOOL watchSubdirs, DWORD trackFlags, DWORD bufferSize)
+	{
+		if(!m_threadHandle)
+			Init();
 
-	return true;
-}
+		auto* pRequest = new RDCPrivate::CReadChangesRequest(m_pServer.get(), watchedDir, watchSubdirs, trackFlags, bufferSize);
+		QueueUserAPC(RDCPrivate::CReadChangesServer::AddDirectoryProc, m_threadHandle, (ULONG_PTR)pRequest);
+	}
 
-bool CReadDirectoryChanges::CheckOverflow()
-{
-	bool b = false;
-	if (b)
-		m_Notifications.clear();
-	return b;
+	void CReadDirectoryChanges::Push(DWORD action, const std::string& filename)
+	{
+		m_notifications.push_back(TDirectoryChangeNotification(action, filename));
+	}
+
+	bool CReadDirectoryChanges::Pop(DWORD& outAction, std::string& outFilename)
+	{
+		bool found = false;
+		if(!m_notifications.empty())
+		{
+			found = true;
+			outAction = m_notifications.front().first;
+			outFilename = m_notifications.front().second;
+			m_notifications.pop_front();
+		}
+		return found;
+	}
+
+	bool CReadDirectoryChanges::CheckOverflow()
+	{
+		bool b = false;
+		if(b)
+			m_notifications.clear();
+		return b;
+	}
+
+	uint32_t CReadDirectoryChanges::GetThreadId()
+	{
+		return m_threadId;
+	}
 }

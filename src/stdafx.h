@@ -1,7 +1,7 @@
 
 #ifdef CORE_USE_PCH
 
-#pragma message("Compiling precompiled headers.\n")
+#pragma message("Precompiling headers.\n")
 
 //	STL
 #include <algorithm>

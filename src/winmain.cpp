@@ -1,17 +1,19 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
-	/*** precompiled header ***/
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** C++ headers ***/
+/******* personal header *******/
+//none
+/******* C++ headers *******/
 #include <cassert>
 #include <functional>
 #include <thread>
-	/*** extra headers ***/
+/******* extra headers *******/
 #include <Games/GameInit.h>
 #include <Window/myWindows.h>
 #include <Window/Window.h>
 #include <Window/WindowClass.h>
 #include <Window/WindowEvent.h>
-	/*** end headers ***/
+/******* end headers *******/
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {

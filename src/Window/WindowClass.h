@@ -1,13 +1,14 @@
 #pragma once
 /********************************************
-	class:	
-	usage:	
+*	class:	WindowClass
+*	usage:
 ********************************************/
-	/*** common and C++ headers ***/
-#include <Window/myWindows.h>
-	/*** extra headers if needed (alphabetically ordered) ***/
+/******* C++ headers *******/
 #include <string>
-	/*** end header inclusion ***/
+#include <Window/myWindows.h>
+/******* common headers *******/
+/******* extra headers *******/
+/******* end header inclusion *******/
 
 namespace Core
 {

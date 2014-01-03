@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Games\Pong\GameInit.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
+    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />

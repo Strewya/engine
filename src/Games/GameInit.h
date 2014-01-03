@@ -1,11 +1,12 @@
 #pragma once
 /********************************************
-	class:	
-	usage:	
+*	class:	
+*	usage:
 ********************************************/
-	/*** common header ***/
-	/*** extra headers if needed ***/
-	/*** end header inclusion ***/
+/******* C++ headers *******/
+/******* common headers *******/
+/******* extra headers *******/
+/******* end header inclusion *******/
 
 namespace Core
 {

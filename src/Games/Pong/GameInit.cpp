@@ -1,17 +1,20 @@
-	/*** precompiled header ***/
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** personal header ***/
+/******* personal header *******/
 #include <Games/GameInit.h>
-	/*** extra headers ***/
+/******* C++ headers *******/
 #include <algorithm>
 #include <fstream>
 #include <vector>
+/******* extra headers *******/
 //#include <Games/Pong/PongGame.h>
+#include <Graphics/GraphicsSystem.h>
 #include <Input/KeyCodes.h>
 #include <Util/Time.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
-	/*** end headers ***/
+/******* end headers *******/
 
 namespace Core
 {
@@ -49,6 +52,10 @@ namespace Core
 		Time pongLogicTimer;
 		Time pongRenderTimer;
 		double timeScale;
+
+		//InputSystem m_input;
+		//PhysicsSystem m_physics;
+		GraphicsSystem m_graphics;
 
 		bool tickLogic(uint64_t updateTime, Window& window)
 		{
@@ -166,38 +173,3 @@ namespace Core
 		}
 	}
 }
-
-
-/*
-WindowEvent we;
-if(window.peek(timer.getCurMicros(), we))
-{
-	switch(we.m_type)
-	{
-		case WindowEventType::WINDOW_KEYDOWN:
-
-		if(we.m_keyboard.m_keyCode == VK_ESCAPE)
-		{
-		quit = true;
-		}
-
-		break;
-
-		case WindowEventType::WINDOW_MOUSEBUTTONDOWN:
-
-		if(we.m_mouseButton.m_button == Mouse::m_LeftButton)
-		{
-		MessageBox(window.getWindowHandle(), "Helo", "oleh", MB_OK);
-		}
-
-		break;
-
-		case WindowEventType::WINDOW_CLOSE:
-		quit = true;
-		break;
-
-		default:
-		break;
-	}
-}
-*/

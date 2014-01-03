@@ -1,12 +1,12 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
-	/*** precompiled header ***/
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** personal header ***/
+/******* personal header *******/
 #include <Util/Time.h>
-	/*** C++ headers ***/
+/******* C++ headers *******/
 #include <chrono>
-	/*** extra headers ***/
-	/*** end headers ***/
+/******* extra headers *******/
+/******* end headers *******/
 	
 namespace Core
 {

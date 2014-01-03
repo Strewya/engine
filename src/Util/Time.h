@@ -1,12 +1,13 @@
 #pragma once
 /********************************************
-	class:	
-	usage:	
+*	class:	Time
+*	usage:
 ********************************************/
-	/*** common and C++ headers ***/
+/******* C++ headers *******/
 #include <cstdint>
-	/*** extra headers if needed (alphabetically ordered) ***/
-	/*** end header inclusion ***/
+/******* common headers *******/
+/******* extra headers *******/
+/******* end header inclusion *******/
 
 namespace Core
 {

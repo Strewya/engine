@@ -16,6 +16,9 @@
     <Filter Include="Util">
       <UniqueIdentifier>{9d9f1881-9f71-421b-9be2-e2b150344b17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{186bc8c2-7070-4859-98d3-7bb8a68f7daf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -40,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp">
       <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h">
       <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

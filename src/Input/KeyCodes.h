@@ -1,14 +1,14 @@
 #pragma once
 /********************************************
-	class:	
-	usage:	
+*	class:	Mouse, Keyboard
+*	usage:
 ********************************************/
-	/*** common and C++ headers ***/
-#include <unordered_map>
+/******* C++ headers *******/
 #include <string>
-	/*** extra headers if needed (alphabetically ordered) ***/
-	/*** end header inclusion ***/
-
+#include <unordered_map>
+/******* common headers *******/
+/******* extra headers *******/
+/******* end header inclusion *******/
 
 namespace Core
 {

@@ -1,18 +1,19 @@
 #pragma once
 /********************************************
-	class:	
-	usage:	
+*	class:	Window
+*	usage:
 ********************************************/
-	/*** common and C++ headers ***/
+/******* C++ headers *******/
 #include <deque>
 #include <list>
 #include <string>
 #include <Window/myWindows.h>
-	/*** extra headers if needed (alphabetically ordered) ***/
+/******* common headers *******/
+/******* extra headers *******/
 #include <Util/Time.h>
 #include <Window/WindowEvent.h>
 #include <Window/ReadDirectoryChanges.h>
-	/*** end header inclusion ***/
+/******* end header inclusion *******/
 
 namespace Core
 {

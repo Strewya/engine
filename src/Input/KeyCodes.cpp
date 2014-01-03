@@ -1,13 +1,11 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
-	/*** precompiled header ***/
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** personal header ***/
+/******* personal header *******/
 #include <Input/KeyCodes.h>
-	/*** C++ headers ***/
-	/*** extra headers ***/
-	/*** end headers ***/
-
-
+/******* C++ headers *******/
+/******* extra headers *******/
+/******* end headers *******/
 
 namespace Core
 {

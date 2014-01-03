@@ -3,9 +3,10 @@
 *	class:	WindowEvent
 *	usage:
 ********************************************/
-/******* common header *******/
+/******* C++ headers *******/
 #include <cstdint>
-/******* extra headers if needed *******/
+/******* common headers *******/
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core

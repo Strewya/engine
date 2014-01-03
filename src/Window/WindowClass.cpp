@@ -1,13 +1,15 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
-	/*** precompiled header ***/
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** personal header ***/
+/******* personal header *******/
 #include <Window/WindowClass.h>
-	/*** C++ headers ***/
+/******* C++ headers *******/
 #include <cstring>
-	/*** extra headers ***/
+/******* extra headers *******/
 #include <Window/Window.h>
-	/*** end headers ***/
+/******* end headers *******/
+
+
 
 namespace Core
 {
