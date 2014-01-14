@@ -4,9 +4,9 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
-#include <deque>
 #include <list>
 #include <string>
+#include <vector>
 #include <Window/myWindows.h>
 /******* common headers *******/
 /******* extra headers *******/
@@ -50,12 +50,16 @@ namespace Core
 		void resize(uint32_t x, uint32_t y);
 		void move(int32_t x, int32_t y);
 		void calculateClientRect(uint32_t& outXSize, uint32_t& outYSize);
+		bool getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr);
+
+		void processFileChanges();
 		
 		void showCursor(bool isShown);
 		void setFullscreen(bool isFullscreen);
 
 		void setExtendedStyle(uint32_t style);
 		void setStyle(uint32_t style);
+		void setFileChangeDelay(uint32_t delay);
 		
 		HWND getWindowHandle() const;
 		uint32_t getStyle() const;
@@ -70,67 +74,61 @@ namespace Core
 		bool isCursorShown() const;
 		bool isFullscreen() const;
 		bool isRunning() const;
+		uint32_t getFileChangeDelay() const;
 
-		bool peek(uint64_t time, WindowEvent& outEvent);
+		bool peekEvent(uint64_t time, WindowEvent& outEvent);
 
 	protected:
 		WindowEvent newEvent();
+		void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
 
-		HWND m_hwnd;
-
-		HANDLE m_dirHandle;
 		DWORD m_trackedChanges;
-		
-		uint32_t m_exitCode;
-		uint32_t m_style;
-		uint32_t m_extendedStyle;
-
 		int32_t m_xPos;
 		int32_t m_yPos;
 		int32_t m_xSize;
 		int32_t m_ySize;
+		uint32_t m_exitCode;
+		uint32_t m_style;
+		uint32_t m_extendedStyle;
+		uint32_t m_minFileChangeDelay;
+		uint32_t m_fileChangeDelay;
+
+		HWND m_hwnd;
 
 		bool m_fullscreen;
 		bool m_showCursor;
 		bool m_isRunning;
-		bool m_updateWindow;
-
+		
 		std::string m_class;
 		std::string m_title;
 		std::string m_resourcesDirectory;
 
-		Time m_timer;
-		CReadDirectoryChanges m_monitor;
 		std::list<WindowEvent> m_events;
 
-	public:
-		void addStringForPaint(const std::string& str)
+		struct FileChangeInfo
 		{
-			if(m_drawStrings.size() > 10)
+			enum State
 			{
-				m_drawStrings.pop_back();
-			}
-			m_drawStrings.emplace_front(str);
-			m_updateWindow = true;
-		}
+				UNUSED,
+				EVENT_PENDING,
+				READ_PENDING
+			};
+			FileChangeInfo(uint32_t index)
+			: m_timestamp(0), m_action(0), m_index(index), m_filename(), m_state(UNUSED)
+			{}
 
-		bool getNextChangedFile(std::string& outStr)
-		{
-			if(!m_fileChanges.empty())
-			{
-				outStr = m_fileChanges.front();
-				m_fileChanges.pop_front();
-				return true;
-			}
-			return false;
-		}
+			uint64_t		m_timestamp;
+			DWORD			m_action;
+			const uint32_t	m_index;
+			State			m_state;
+			std::string		m_filename;
+		};
 
-		void processFileChanges();
+		std::vector<FileChangeInfo> m_fileChanges;
+		uint32_t m_nextFreeSlot;
 
-	private:
-		std::unordered_map<std::string, uint64_t> m_fileChangeBuffer;
-		std::list<std::string> m_fileChanges;
-		std::deque<std::string> m_drawStrings;
+		Time m_timer;
+		CReadDirectoryChanges m_monitor;
 	};
 
 	

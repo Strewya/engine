@@ -4,8 +4,9 @@
 	/*** personal header ***/
 #include <Window/Window.h>
 	/*** C++ headers ***/
+#include <algorithm>
 #include <cstdlib>
-#include <windef.h>
+#include <iostream>
 	/*** extra headers ***/
 #include <Input/KeyCodes.h>
 #include <Window/WindowClass.h>
@@ -45,13 +46,14 @@ namespace Core
 	{}
 
 	Window::Window(const char* title)
-		: m_hwnd(nullptr),
-		m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
-		m_fullscreen(false), m_showCursor(false), m_isRunning(true), m_updateWindow(false),
-		m_exitCode(0), m_style(0), m_extendedStyle(0),
+		: m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-		m_class(title), m_title(title), m_resourcesDirectory()
+		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(100), m_fileChangeDelay(m_minFileChangeDelay),
+		m_hwnd(nullptr),
+		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
+		m_class(title), m_title(title), m_resourcesDirectory(),
+		m_nextFreeSlot(0)
 	{
 		setFullscreen(m_fullscreen);
 
@@ -63,24 +65,23 @@ namespace Core
 
 		m_monitor.AddDirectory(m_resourcesDirectory.c_str(), true, m_trackedChanges);
 
-		m_dirHandle = CreateFile(
-			m_resourcesDirectory.c_str(),
-			FILE_LIST_DIRECTORY,
-			FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
-			nullptr,
-			OPEN_EXISTING,
-			FILE_FLAG_BACKUP_SEMANTICS,
-			nullptr
-			);
-		assert(m_dirHandle != INVALID_HANDLE_VALUE);
+		AllocConsole();
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
 
-		
+		uint8_t count = 32;
+		m_fileChanges.reserve(count);
+		for(auto i = 0; i < count; ++i)
+		{
+			 m_fileChanges.emplace_back(FileChangeInfo(i));
+		}
 	}
 
 	Window::~Window()
 	{
+		FreeConsole();
 		m_monitor.Terminate();
-		CloseHandle(m_dirHandle);
 	}
 
 	bool Window::create()
@@ -130,7 +131,7 @@ namespace Core
 			return;
 		}
 		static MSG msg;
-		if(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		while(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			if(msg.message == WM_QUIT)
 			{
@@ -140,44 +141,6 @@ namespace Core
 			}
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-		}
-
-		if(m_updateWindow)
-		{
-			m_updateWindow = false;
-			InvalidateRect(m_hwnd, 0, true);
-		}
-	}
-
-	void Window::processFileChanges()
-	{
-		std::string file;
-		DWORD action;
-		m_timer.update(Time::NORMAL_TIME);
-		while(m_monitor.Pop(action, file))
-		{
-			if(!file.empty())
-			{	
-				m_fileChangeBuffer.emplace(file, m_timer.getCurMicros());
-			}
-		}
-		std::vector<std::string> deleteThese;
-		for(auto& pair : m_fileChangeBuffer)
-		{
-			//we only want those changes that happened half a second ago
-			if(m_timer.getCurMicros() >= (pair.second + Time::microsFromMilis(50)))
-			{
-				m_fileChanges.emplace_back(pair.first);
-				deleteThese.emplace_back(pair.first);
-				auto we = newEvent();
-				we.m_type = WindowEventType::WINDOW_FILECHANGE;
-				we.m_fileChange.m_action = toFileChangeType(action);
-				m_events.emplace_back(we);
-			}
-		}
-		for(auto str : deleteThese)
-		{
-			m_fileChangeBuffer.erase(str);
 		}
 	}
 
@@ -258,7 +221,7 @@ namespace Core
 		SetWindowPos(m_hwnd, 0, m_xPos, m_yPos, x, y, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	}
 
-	bool Window::peek(uint64_t time, WindowEvent& outEvent)
+	bool Window::peekEvent(uint64_t time, WindowEvent& outEvent)
 	{
 		bool eventExists = false;
 		if(!m_events.empty() && m_events.front().m_timestamp <= time)
@@ -279,9 +242,85 @@ namespace Core
 		return we;
 	}
 
+	void Window::processFileChanges()
+	{
+		std::string file;
+		DWORD action;
+		while(m_monitor.Pop(action, file))
+		{
+			if(!file.empty())
+			{
+				m_timer.update(Time::NORMAL_TIME);
+				newFileChange(m_timer.getCurMicros(), action, file);
+			}
+		}
+
+		using std::begin;
+		using std::end;
+		m_timer.update(Time::NORMAL_TIME);
+		std::for_each(begin(m_fileChanges), end(m_fileChanges), [&](FileChangeInfo& info)
+		{
+			if(info.m_state == FileChangeInfo::EVENT_PENDING &&
+			   m_timer.getCurMicros() > info.m_timestamp + Time::microsFromMilis(m_fileChangeDelay))
+			{
+				info.m_state = FileChangeInfo::READ_PENDING;
+				auto we = newEvent();
+				we.m_type = WindowEventType::WE_FILECHANGE;
+				we.m_fileChange.m_index = info.m_index;
+				m_events.emplace_back(std::move(we));
+			}
+		});
+
+	}
+
+	void Window::newFileChange(uint64_t timestamp, DWORD action, const std::string& file)
+	{
+		using std::begin;
+		using std::end;
+		
+		auto it = std::find_if(begin(m_fileChanges), end(m_fileChanges), [&](const FileChangeInfo& info)
+		{
+			return info.m_state == FileChangeInfo::EVENT_PENDING && info.m_filename == file && info.m_action == action;
+		});
+		
+		if(it != end(m_fileChanges))
+		{
+			it->m_timestamp = timestamp;
+			return;
+		}
+		
+		auto& info = m_fileChanges[m_nextFreeSlot];
+		info.m_timestamp = timestamp;
+		info.m_action = action;
+		info.m_filename.assign(file);
+		info.m_state = FileChangeInfo::EVENT_PENDING;
+		m_nextFreeSlot = (m_nextFreeSlot + 1) % m_fileChanges.size();
+		if(m_fileChanges[m_nextFreeSlot].m_state == FileChangeInfo::EVENT_PENDING)
+		{
+			std::cout << "WHOOPS, overwriting a previous file change. This is a BAD THING! Maybe we "
+			"should increase the size of our buffer from " << m_fileChanges.size() << "..." << std::endl;
+		}
+	}
+
+	bool Window::getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr)
+	{
+		if(index < m_fileChanges.size() && m_fileChanges[index].m_state == FileChangeInfo::READ_PENDING)
+		{
+			outAction = toFileChangeType(m_fileChanges[index].m_action);
+			outStr = m_fileChanges[index].m_filename;
+			m_fileChanges[index].m_state = FileChangeInfo::UNUSED;
+			m_fileChanges[index].m_action = 0;
+			m_fileChanges[index].m_filename.clear();
+			m_fileChanges[index].m_timestamp = 0;
+			return true;
+		}
+		return false;
+	}
+
 	void Window::setStyle(uint32_t style) { m_style = style; }
 	void Window::setExtendedStyle(uint32_t style) { m_extendedStyle = style; }
 	void Window::showCursor(bool isShown) { m_showCursor = isShown; }
+	void Window::setFileChangeDelay(uint32_t delay) { m_fileChangeDelay = (delay > m_minFileChangeDelay ? delay : m_minFileChangeDelay); }
 	
 	const std::string&	Window::getClass() const { return m_class; }
 	const std::string&	Window::getTitle() const { return m_title; }
@@ -296,7 +335,7 @@ namespace Core
 	bool			Window::isCursorShown() const { return m_showCursor; }
 	bool			Window::isFullscreen() const { return m_fullscreen; }
 	bool			Window::isRunning() const { return m_isRunning; }
-
+	uint32_t		Window::getFileChangeDelay() const { return m_fileChangeDelay; }
 
 
 	LRESULT WINAPI Window::windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
@@ -311,7 +350,7 @@ namespace Core
 		switch(msg)
 		{
 		case WM_MOUSEMOVE:
-			we.m_type = WindowEventType::WINDOW_MOUSEMOVE;
+			we.m_type = WindowEventType::WE_MOUSEMOVE;
 			we.m_mouseMove.m_x = GET_X_LPARAM(lParam);
 			we.m_mouseMove.m_y = GET_Y_LPARAM(lParam);
 			we.m_mouseMove.m_isRelative = false;
@@ -320,7 +359,7 @@ namespace Core
 
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
-			we.m_type = WindowEventType::WINDOW_KEYDOWN;
+			we.m_type = WindowEventType::WE_KEYBOARDKEY;
 			we.m_keyboard.m_keyCode = wParam;
 			we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
 			we.m_keyboard.m_isDown = true;
@@ -330,7 +369,7 @@ namespace Core
 
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
-			we.m_type = WindowEventType::WINDOW_KEYUP;
+			we.m_type = WindowEventType::WE_KEYBOARDKEY;
 			we.m_keyboard.m_keyCode = wParam;
 			we.m_keyboard.m_repeat = 1;
 			we.m_keyboard.m_isDown = false;
@@ -339,7 +378,7 @@ namespace Core
 			break;
 
 		case WM_CHAR:
-			we.m_type = WindowEventType::WINDOW_TEXT;
+			we.m_type = WindowEventType::WE_KEYBOARDTEXT;
 			we.m_keyboard.m_keyCode = wParam;
 			we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
 			we.m_keyboard.m_isDown = true;
@@ -351,7 +390,7 @@ namespace Core
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 		case WM_XBUTTONDOWN:
-			we.m_type = WindowEventType::WINDOW_MOUSEBUTTONDOWN;
+			we.m_type = WindowEventType::WE_MOUSEBUTTON;
 			we.m_mouseButton.m_clicks = 1;
 			we.m_mouseButton.m_isDown = true;
 			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
@@ -367,7 +406,7 @@ namespace Core
 		case WM_RBUTTONDBLCLK:
 		case WM_MBUTTONDBLCLK:
 		case WM_XBUTTONDBLCLK:
-			we.m_type = WindowEventType::WINDOW_MOUSEBUTTONDOWN;
+			we.m_type = WindowEventType::WE_MOUSEBUTTON;
 			we.m_mouseButton.m_clicks = 2;
 			we.m_mouseButton.m_isDown = true;
 			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
@@ -383,7 +422,7 @@ namespace Core
 		case WM_RBUTTONUP:
 		case WM_MBUTTONUP:
 		case WM_XBUTTONUP:
-			we.m_type = WindowEventType::WINDOW_MOUSEBUTTONUP;
+			we.m_type = WindowEventType::WE_MOUSEBUTTON;
 			we.m_mouseButton.m_clicks = 0;
 			we.m_mouseButton.m_isDown = false;
 			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
@@ -396,7 +435,7 @@ namespace Core
 			break;
 
 		case WM_MOUSEWHEEL:
-			we.m_type = WindowEventType::WINDOW_MOUSEWHEEL;
+			we.m_type = WindowEventType::WE_MOUSEWHEEL;
 			we.m_mouseWheel.m_scroll = GET_WHEEL_DELTA_WPARAM(wParam);
 			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
 			we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
@@ -404,7 +443,7 @@ namespace Core
 			break;
 
 		case WM_CLOSE:
-			we.m_type = WindowEventType::WINDOW_CLOSE;
+			we.m_type = WindowEventType::WE_CLOSE;
 			result = notProcessed;
 			break;
 
@@ -426,63 +465,13 @@ namespace Core
 		case WM_ACTIVATE:
 			if(LOWORD(wParam) == WA_INACTIVE)
 			{
-				we.m_type = WindowEventType::WINDOW_LOSTFOCUS;
+				we.m_type = WindowEventType::WE_LOSTFOCUS;
 			}
 			else
 			{
-				we.m_type = WindowEventType::WINDOW_GAINFOCUS;
+				we.m_type = WindowEventType::WE_GAINFOCUS;
 			}
 			result = notProcessed;
-			break;
-
-
-		case WM_PAINT:
-		{
-						 HBRUSH white = GetStockBrush(WHITE_BRUSH);
-						 HBRUSH black = GetStockBrush(BLACK_BRUSH);
-						 PAINTSTRUCT ps;
-
-						 auto copy = m_drawStrings;
-
-
-						 HDC hdc = BeginPaint(hwnd, &ps);
-						 
-						 RECT bg = {0, 0, m_xSize, m_ySize};
-						 FillRect(hdc, &bg, white);
-						 
-						 uint32_t ofs = 5;
-						 uint32_t sz = 10;
-						 RECT r;
-						 //top left
-						 r.left = ofs; r.right = ofs + sz;
-						 r.top = ofs; r.bottom = ofs + sz;
-						 FillRect(hdc, &r, black);
-						 //top right
-						 r.left = m_xSize - ofs - sz; r.right = m_xSize - ofs;
-						 r.top = ofs; r.bottom = ofs + sz;
-						 FillRect(hdc, &r, black);
-						 //bottom left
-						 r.left = ofs; r.right = ofs + sz;
-						 r.top = m_ySize - ofs - sz; r.bottom = m_ySize - ofs;
-						 FillRect(hdc, &r, black);
-						 //bottom right
-						 r.left = m_xSize - ofs - sz; r.right = m_xSize - ofs;
-						 r.top = m_ySize - ofs - sz; r.bottom = m_ySize - ofs;
-						 FillRect(hdc, &r, black);
-
-						 uint32_t i = 0;
-						 for(auto& str : copy)
-						 {
-							 TextOut(hdc, 50, 30 * i, str.c_str(), str.size());
-							 ++i;
-						 }
-						 
-
-						 EndPaint(hwnd, &ps);
-						 eventMapped = false;
-						 result = 0;
-
-		}
 			break;
 
 		default:
@@ -491,7 +480,10 @@ namespace Core
 		}
 
 		if(eventMapped)
+		{
 			m_events.emplace_back(we);
+		}
+			
 
 		if(result == notProcessed)
 			result = DefWindowProc(hwnd, msg, wParam, lParam);
@@ -531,199 +523,3 @@ namespace Core
 		return returnValue;
 	}
 }
-
-
-
-/*
-			switch(msg)
-			{
-			case WM_ACTIVATE:
-			{
-				Input::Event e;
-				if(LOWORD(wParam) == WA_INACTIVE)
-				{
-					e.type = Input::EventType::LostFocus;
-				}
-				else
-				{
-					e.type = Input::EventType::GainedFocus;
-				}
-				m_queue->push_back(e);
-			}
-			break;
-		
-			//----------------------- DOWN -----------------------
-			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-			{
-				Input::Event e;
-				e.type = Input::EventType::KeyPressed;
-				e.key.code = wParam;
-				e.key.alt = GetAsyncKeyState(VK_MENU) != 0;
-				e.key.shift = GetAsyncKeyState(VK_SHIFT) != 0;
-				e.key.control = GetAsyncKeyState(VK_CONTROL) != 0;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- UP -----------------------
-			case WM_KEYUP:
-			case WM_SYSKEYUP:
-			{
-				Input::Event e;
-				e.type = Input::EventType::KeyReleased;
-				e.key.code = wParam;
-				e.key.alt = GetAsyncKeyState(VK_MENU) != 0;
-				e.key.shift = GetAsyncKeyState(VK_SHIFT) != 0;
-				e.key.control = GetAsyncKeyState(VK_CONTROL) != 0;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- CHAR -----------------------
-			case WM_CHAR:
-			{
-				Input::Event e;
-				e.type = Input::EventType::TextEntered;
-				e.text.character = wParam;
-				m_queue->push_back(e);
-				return 0;
-			}	
-			break;
-			//----------------------- LMB -----------------------
-			case WM_LBUTTONDOWN:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonPressed;
-				e.mouseButton.button = Input::Mouse::_LeftButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-
-			case WM_LBUTTONUP:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonReleased;
-				e.mouseButton.button = Input::Mouse::_LeftButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- RMB -----------------------
-			case WM_RBUTTONDOWN:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonPressed;
-				e.mouseButton.button = Input::Mouse::_RightButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-
-			case WM_RBUTTONUP:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonReleased;
-				e.mouseButton.button = Input::Mouse::_RightButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- MMB -----------------------
-			case WM_MBUTTONDOWN:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonPressed;
-				e.mouseButton.button = Input::Mouse::_MiddleButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-
-			case WM_MBUTTONUP:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonReleased;
-				e.mouseButton.button = Input::Mouse::_MiddleButton;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- XMB -----------------------
-
-			case WM_XBUTTONDOWN:
-			{
-				uint32_t btn = GET_XBUTTON_WPARAM(wParam);
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonPressed;
-				if(btn == XBUTTON1)
-				{
-					e.mouseButton.button = Input::Mouse::_XButton1;
-				}
-				else if(btn == XBUTTON2)
-				{
-					e.mouseButton.button = Input::Mouse::_XButton2;
-				}
-				m_queue->push_back(e);
-				return TRUE;
-			}
-			break;
-
-			case WM_XBUTTONUP:
-			{
-				uint32_t btn = GET_XBUTTON_WPARAM(wParam);
-				Input::Event e;
-				e.type = Input::EventType::MouseButtonReleased;
-				if(btn == XBUTTON1)
-				{
-					e.mouseButton.button = Input::Mouse::_XButton1;
-				}
-				else if(btn == XBUTTON2)
-				{
-					e.mouseButton.button = Input::Mouse::_XButton2;
-				}
-				m_queue->push_back(e);
-				return TRUE;
-			}
-			break;
-
-			//----------------------- WHEEL -----------------------
-			case WM_MOUSEWHEEL:
-			{
-				Input::Event e;
-				e.type = Input::EventType::MouseWheelMoved;
-				e.mouseWheel.delta = HIWORD(wParam);
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- MOVE -----------------------
-			case WM_MOUSEMOVE:
-			{
-				POINT cursor;
-				GetCursorPos(&cursor);
-				ScreenToClient(m_hwnd, &cursor);
-				Input::Event e;
-				e.type = Input::EventType::MouseMoved;
-				e.mouseMove.x = cursor.x;
-				e.mouseMove.y = cursor.y;
-				m_queue->push_back(e);
-				return 0;
-			}
-			break;
-			//----------------------- SETCURSOR -----------------------
-			case WM_SETCURSOR:
-				POINT cur;
-				GetCursorPos(&cur);
-				RECT rc;
-				GetClientRect(m_hwnd, &rc);
-				ScreenToClient(m_hwnd, &cur);
-				if(!m_showCursor && cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
-				{
-					SetCursor( nullptr );
-					return true;
-				}
-			break;
-			}
-			*/

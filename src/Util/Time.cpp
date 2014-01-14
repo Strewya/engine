@@ -5,56 +5,63 @@
 #include <Util/Time.h>
 /******* C++ headers *******/
 #include <chrono>
+#include <Window/myWindows.h>
 /******* extra headers *******/
 /******* end headers *******/
 	
 namespace Core
 {
+
+#define QPCC 0
+#define CHRC 1
+
+#define TIME_SOURCE CHRC
+
 	/********************************************************
 	*		TIME SOURCES
 	********************************************************/
+
+#if (TIME_SOURCE == QPCC)
+#define CLOCK_TYPE HighResClock
+
+	const long long g_Frequency = []() -> long long
+	{
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		return frequency.QuadPart;
+	}();
+
+	struct HighResClock
+	{
+		typedef long long                               rep;
+		typedef std::nano                               period;
+		typedef std::chrono::duration<rep, period>      duration;
+		typedef std::chrono::time_point<HighResClock>   time_point;
+		static const bool is_steady = true;
+
+		static time_point now()
+		{
+			LARGE_INTEGER count;
+			QueryPerformanceCounter(&count);
+			return time_point(duration(count.QuadPart * static_cast<rep>(period::den) / g_Frequency));
+		}
+	};
+#elif (TIME_SOURCE == CHRC)
+#define CLOCK_TYPE std::chrono::high_resolution_clock
+#endif
+
+
 	
-	class HighPrecisionTimeSource
+	class TimeSource
 	{
 	public:
-		uint64_t getSystemMiliseconds()
-		{
-			auto now = std::chrono::high_resolution_clock::now();
-			return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-		}
 		uint64_t getSystemMicroseconds()
 		{
-			auto now = std::chrono::high_resolution_clock::now();
+			auto now = CLOCK_TYPE::now();
 			return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
 		}
 	};
 
-	class QPCTimeSource
-	{
-	public:
-		QPCTimeSource();
-		uint64_t getSystemMiliseconds()
-		{
-			return 0;
-		}
-		uint64_t getSystemMicroseconds()
-		{
-			return 0;
-		}
-	private:
-
-	};
-
-#define QPCTS QPCTimeSource
-#define HPTS HighPrecisionTimeSource
-
-	//default
-#define TIME_SOURCE HPTS
-
-#ifdef USE_QPCTS
-#undef TIME_SOURCE
-#define TIME_SOURCE QPCTS
-#endif
 
 
 	/********************************************************
@@ -64,19 +71,14 @@ namespace Core
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
 
-	uint64_t Time::microsFromSecond(float sec)
+	uint64_t Time::microsFromSeconds(uint32_t sec)
 	{
-		return static_cast<uint64_t>(sec * 1000000);
-	}
-
-	uint64_t Time::microsFromSecond(uint32_t sec)
-	{
-		return static_cast<uint64_t>(sec * 1000000);
+		return static_cast<uint64_t>(sec) * 1000 * 1000;
 	}
 
 	uint64_t Time::microsFromMilis(uint32_t mili)
 	{
-		return static_cast<uint64_t>(mili * 1000);
+		return static_cast<uint64_t>(mili) * 1000;
 	}
 
 	Time::Time()
@@ -90,7 +92,7 @@ namespace Core
 
 	uint64_t Time::getRealTimeMicros() const
 	{
-		TIME_SOURCE source;
+		static TimeSource source;
 		return source.getSystemMicroseconds();
 	}
 
@@ -105,7 +107,8 @@ namespace Core
 		uint64_t delta = now - m_oldRealTime;
 		m_oldRealTime = now;
 
-		updateBy(delta, virtualTimeScale);
+		if(delta)
+			updateBy(delta, virtualTimeScale);
 	}
 
 	void Time::updateBy(uint64_t deltaMicros, double virtualTimeScale)

@@ -22,7 +22,7 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
 	//output.position = position;
     output.texCoord = texCoord;
 	output.diffuse = diffuse;
-
+	
     return output;
 }
 

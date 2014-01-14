@@ -17,8 +17,7 @@ namespace Core
 		static const double STOP_TIME;
 		static const double NORMAL_TIME;
 
-		static uint64_t microsFromSecond(float sec);
-		static uint64_t microsFromSecond(uint32_t sec);
+		static uint64_t microsFromSeconds(uint32_t sec);
 		static uint64_t microsFromMilis(uint32_t mili);
 
 		Time();

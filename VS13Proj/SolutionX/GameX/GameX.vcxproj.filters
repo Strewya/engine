@@ -19,6 +19,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{186bc8c2-7070-4859-98d3-7bb8a68f7daf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{10fc0b2e-5afe-45c0-bd51-1f522a7ae044}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -46,6 +49,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Dimensional.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Pong\PongGame.cpp">
+      <Filter>Games\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Random.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +103,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\InputSystem.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Dimensional.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Pong\PongGame.h">
+      <Filter>Games\Pong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\KeybindSystem.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXInclude.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Random.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
