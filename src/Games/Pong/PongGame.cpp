@@ -9,7 +9,9 @@
 #include <vector>
 /******* extra headers *******/
 #include <Input/KeyCodes.h>
+#include <Util/Color.h>
 #include <Util/Dimensional.h>
+#include <Util/Transform.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
 /******* end headers *******/
@@ -49,58 +51,31 @@ namespace Core
 		m_timeScale = Time::NORMAL_TIME;
 		m_logicTimer.update(m_timeScale);
 		m_renderTimer.update(m_timeScale);
+		m_window = &window;
 
-		uint32_t w = 640, h = 480;
-		window.resize(w, h);
-
+		uint32_t screenW = 640, screenH = 480;
+		float ratio = (float)screenW / (float)screenH;
+		window.resize(screenW, screenH);
+#ifdef _DEBUG
+		window.openConsole(660, 0);
+#endif
 		bool initializationStatus = m_input.init(window) &&
-									m_physics.init(Vec2(0, -9.0f)) &&
+									m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&
 									m_graphics.init(window);
+
+		m_debugDraw.setGraphicsSystem(m_graphics);
+		m_debugDraw.AppendFlags(m_debugDraw.e_shapeBit | m_debugDraw.e_aabbBit);
+		m_debugDraw.setLengthScale(1 / m_b2Scale);
+		m_drawDebugData = false;
+
+		m_physics.addBeginContactListener(std::bind(&PongGame::updateScore, this, std::placeholders::_1));
+		m_physics.addEndContactListener(std::bind(&PongGame::speedUpBall, this, std::placeholders::_1));
 
 		if(initializationStatus)
 		{
-			b2BodyDef bodyDef;
-			b2PolygonShape polygon;
-			b2FixtureDef fixtureDef;
-			b2JointDef jointDef;
-
-			fixtureDef.density = 1;
-			fixtureDef.shape = &polygon;
-
-			//field
-			bodyDef.type = b2_staticBody;
-			m_field.m_body = m_physics.createBody(bodyDef);
-
-			auto wallSize = m_physics.convert(Vec2(w*0.5f, h*0.02f));
-			auto wallPos = m_physics.convert(Vec2(0, h*0.5f));
-			auto goalSize = m_physics.convert(Vec2(w*0.02f, h*0.5f));
-			auto goalPos = m_physics.convert(Vec2(w*0.5f, 0));
-
-			polygon.SetAsBox(wallSize.x, wallSize.y, wallPos, 0);
-			m_field.m_fixtures[0] = m_physics.createFixture(fixtureDef, m_field.m_body);
-			polygon.SetAsBox(wallSize.x, wallSize.y, -wallPos, 0);
-			m_field.m_fixtures[1] = m_physics.createFixture(fixtureDef, m_field.m_body);
-			
-			polygon.SetAsBox(goalSize.x, goalSize.y, -goalPos, 0);
-			m_field.m_fixtures[2] = m_physics.createFixture(fixtureDef, m_field.m_body);
-			polygon.SetAsBox(goalSize.x, goalSize.y, goalPos, 0);
-			m_field.m_fixtures[3] = m_physics.createFixture(fixtureDef, m_field.m_body);
-
-			//paddles
-			bodyDef.type = b2_dynamicBody;
-			bodyDef.gravityScale = 0;
-
-			auto paddleSize = m_physics.convert(Vec2(w*0.1f, h*0.1f));
-			polygon.SetAsBox(paddleSize.x, paddleSize.y);
-
-			bodyDef.position = m_physics.convert(Vec2(w*-0.45f, 0));
-			m_paddles[0].m_body = m_physics.createBody(bodyDef);
-			m_paddles[0].m_fixture = m_physics.createFixture(fixtureDef, m_paddles[0].m_body);
-
-
-			bodyDef.position = m_physics.convert(Vec2(w*0.45f, 0));
-			m_paddles[1].m_body = m_physics.createBody(bodyDef);
-			m_paddles[1].m_fixture = m_physics.createFixture(fixtureDef, m_paddles[1].m_body);
+			createField();
+			createBall();
+			createPaddles();
 		}
 
 		return initializationStatus;
@@ -164,6 +139,76 @@ namespace Core
 				{
 					continueRunning = false;
 				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_Enter && e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+				{
+					auto* body = m_physics.getBody(m_ball.m_body);
+					if(body)
+					{
+						float f = gen.randFloat();
+						float sx = gen.randFloat();
+						float sy = gen.randFloat();
+						float x = f > 0.5f ? f : 1 - f;
+						float y = 1 - x;
+						x = sx < 0.5f ? x : -x;
+						y = sy < 0.5f ? y : -y;
+						body->ApplyLinearImpulse(b2Vec2(x * 20, y * 10), body->GetWorldCenter());
+					}
+				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_W)
+				{
+					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+					{
+						m_leftPaddle.m_targetVelocity += m_leftPaddle.m_maxVelocity;
+					}
+					if(!e.m_keyboard.m_isDown)
+					{
+						m_leftPaddle.m_targetVelocity -= m_leftPaddle.m_maxVelocity;
+					}
+				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_S)
+				{
+					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+					{
+						m_leftPaddle.m_targetVelocity -= m_leftPaddle.m_maxVelocity;
+					}
+					if(!e.m_keyboard.m_isDown)
+					{
+						m_leftPaddle.m_targetVelocity += m_leftPaddle.m_maxVelocity;
+					}
+				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_ArrowUp)
+				{
+					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+					{
+						m_rightPaddle.m_targetVelocity += m_rightPaddle.m_maxVelocity;
+					}
+					if(!e.m_keyboard.m_isDown)
+					{
+						m_rightPaddle.m_targetVelocity -= m_rightPaddle.m_maxVelocity;
+					}
+				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_ArrowDown)
+				{
+					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+					{
+						m_rightPaddle.m_targetVelocity -= m_rightPaddle.m_maxVelocity;
+					}
+					if(!e.m_keyboard.m_isDown)
+					{
+						m_rightPaddle.m_targetVelocity += m_rightPaddle.m_maxVelocity;
+					}
+				}
+#ifdef _DEBUG
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_F2 && e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+				{
+					m_drawDebugData = !m_drawDebugData;
+				}
+				else if(e.m_keyboard.m_keyCode == Keyboard::m_Space && e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+				{
+					m_ball.m_reset = true;
+				}
+#endif	
+				
 				break;
 				
 			case WE_GAINFOCUS:
@@ -179,7 +224,70 @@ namespace Core
 			}
 		}
 
-		m_graphics.setBackgroundColor(gen.randFloat(), gen.randFloat(), gen.randFloat());
+		auto* body = m_physics.getBody(m_leftPaddle.m_body);
+		auto vel = body->GetLinearVelocity();
+		auto velChange = m_b2Scale*m_leftPaddle.m_targetVelocity - vel.y;
+		auto impulse = body->GetMass() * velChange;
+		body->ApplyLinearImpulse(b2Vec2(0, impulse), body->GetWorldCenter());
+
+		body = m_physics.getBody(m_rightPaddle.m_body);
+		vel = body->GetLinearVelocity();
+		velChange = m_b2Scale*m_rightPaddle.m_targetVelocity - vel.y;
+		impulse = body->GetMass() * velChange;
+		body->ApplyLinearImpulse(b2Vec2(0, impulse), body->GetWorldCenter());
+
+		m_physics.update(m_logicTimer.getDeltaTime());
+
+		body = m_physics.getBody(m_ball.m_body);
+		if(body)
+		{
+			m_ball.m_tf.position = convert(body->GetPosition())*(1 / m_b2Scale);
+		}
+
+		body = m_physics.getBody(m_leftPaddle.m_body);
+		if(body)
+		{
+			m_leftPaddle.m_tf.position = convert(body->GetPosition())*(1 / m_b2Scale);
+		}
+
+		body = m_physics.getBody(m_rightPaddle.m_body);
+		if(body)
+		{
+			m_rightPaddle.m_tf.position = convert(body->GetPosition())*(1 / m_b2Scale);
+		}
+		body = m_physics.getBody(m_ball.m_body);
+		if(body)
+		{
+			if(m_ball.m_reset)
+			{
+				body->SetTransform(b2Vec2(0, 0), 0);
+				body->SetLinearVelocity(b2Vec2(0, 0));
+				m_ball.m_reset = false;
+			}
+			if(m_ball.m_speedup)
+			{
+				vel = body->GetLinearVelocity();
+				std::cout << "pre-impulse: vel:" << vel.x << "," << vel.y << std::endl;
+				
+				b2Vec2 impulse = vel;
+				impulse.Normalize();
+				impulse = body->GetMass() * impulse;
+
+				auto length = impulse.Normalize();
+				impulse += convert(m_ball.m_sway);
+				impulse *= length;
+				
+				if((vel + impulse).LengthSquared() < m_ball.m_maxVelocity*m_ball.m_maxVelocity*m_b2Scale)
+				{
+					body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
+				}
+				vel = body->GetLinearVelocity();
+				std::cout << "post-impulse: vel:" << vel.x << "," << vel.y << std::endl;
+				m_ball.m_speedup = false;
+				m_ball.m_sway.set(0, 0);
+			}
+		}
+		
 
 		return continueRunning;
 	}
@@ -189,6 +297,213 @@ namespace Core
 		m_renderTimer.updateBy(updateTime, m_timeScale);
 		
 		//update renderer
-		m_graphics.update();
+		//m_graphics.update();
+
+		m_graphics.begin();
+
+		
+
+		m_graphics.drawQuad(m_field.m_tf, m_field.m_size*0.5f, m_field.m_c);
+
+		m_graphics.drawQuad(m_ball.m_tf, m_ball.m_size*0.5f, m_ball.m_c);
+
+		m_graphics.drawQuad(m_leftPaddle.m_tf, m_leftPaddle.m_size*0.5f, m_leftPaddle.m_c);
+
+		m_graphics.drawQuad(m_rightPaddle.m_tf, m_rightPaddle.m_size*0.5f, m_rightPaddle.m_c);
+		
+		if(m_drawDebugData)
+			m_physics.draw();
+
+		m_graphics.present();
+	}
+
+	void PongGame::updateScore(b2Contact* contact)
+	{
+		auto fA = contact->GetFixtureA();
+		auto fB = contact->GetFixtureB();
+
+		if(fA->IsSensor() == false && fB->IsSensor() == false)
+		{
+			return;
+		}
+
+		auto sensor = fA->IsSensor() ? fA : fB;
+		auto paddle = (Paddle*)sensor->GetUserData();
+		++paddle->m_score;
+
+		m_ball.m_reset = true;
+	}
+
+	void PongGame::speedUpBall(b2Contact* contact)
+	{
+		auto fA = contact->GetFixtureA();
+		auto fB = contact->GetFixtureB();
+		
+		auto bA = fA->GetBody();
+		auto bB = fB->GetBody();
+
+		b2Body* paddle = nullptr;
+		b2Body* ball = nullptr;
+
+		if(bA->GetUserData() == &m_ball)
+		{
+			ball = bA;
+			paddle = bB;
+		}
+		else if(bB->GetUserData() == &m_ball)
+		{
+			ball = bB;
+			paddle = bA;
+		}
+		else
+		{
+			std::cout << "No ball in collision, leaving" << std::endl;
+			return;
+		}
+		
+		if(paddle->GetUserData() != &m_leftPaddle && paddle->GetUserData() != &m_rightPaddle)
+		{
+			std::cout << "No paddle in collision, leaving" << std::endl;
+			return;
+		}
+		
+		m_ball.m_speedup = true;
+		auto sway = ball->GetPosition() - paddle->GetPosition();
+		sway.Normalize();
+		std::cout << "Sway will be " << sway.x << "," << sway.y << std::endl;
+		m_ball.m_sway = convert(sway);
+	}
+
+	void PongGame::createField()
+	{
+		b2BodyDef bodyDef;
+		b2FixtureDef fixtureDef;
+		b2PolygonShape polygonShape;
+
+		bodyDef.type = b2_staticBody;
+		fixtureDef.density = 1;
+		fixtureDef.shape = &polygonShape;
+
+		m_field.m_tf.position.set(0, 0);
+		m_field.m_tf.scale.set(1, 1);
+		m_field.m_tf.rotation = 0;
+		m_field.m_c.set(0.1f, 0.1f, 0.1f);
+		m_field.m_size.set(600, 400);
+
+		
+		bodyDef.userData = (void*)&m_field;
+		bodyDef.position.Set(0, 0);
+		m_field.m_body = m_physics.createBody(bodyDef);
+
+		
+		uint32_t i = 0;
+		//top and bottom walls
+		polygonShape.SetAsBox(m_field.m_size.x*m_b2Scale*0.7f, 3, convert(Vec2(0, m_field.m_size.y*0.5f)*m_b2Scale + Vec2(0, 3)), 0);
+		m_field.m_fixtures[i++] = m_physics.createFixture(fixtureDef, m_field.m_body);
+
+		polygonShape.SetAsBox(m_field.m_size.x*m_b2Scale*0.7f, 3, convert(Vec2(0, -m_field.m_size.y*0.5f)*m_b2Scale + Vec2(0, -3)), 0);
+		m_field.m_fixtures[i++] = m_physics.createFixture(fixtureDef, m_field.m_body);
+
+		//left and right goal
+		fixtureDef.isSensor = true;
+
+		fixtureDef.userData = (void*)&m_rightPaddle;
+		polygonShape.SetAsBox(3, m_field.m_size.y*m_b2Scale*0.7f, convert(Vec2(-m_field.m_size.x*0.5f, 0)*m_b2Scale + Vec2(-3, 0)), 0);
+		m_field.m_fixtures[i++] = m_physics.createFixture(fixtureDef, m_field.m_body);
+
+		fixtureDef.userData = (void*)&m_leftPaddle;
+		polygonShape.SetAsBox(3, m_field.m_size.y*m_b2Scale*0.7f, convert(Vec2(m_field.m_size.x*0.5f, 0)*m_b2Scale + Vec2(3, 0)), 0);
+		m_field.m_fixtures[i++] = m_physics.createFixture(fixtureDef, m_field.m_body);
+	}
+
+	void PongGame::createPaddles()
+	{
+		b2BodyDef bodyDef;
+		b2PolygonShape polygonShape;
+		b2FixtureDef fixtureDef;
+		b2PrismaticJointDef jointDef;
+
+		auto* bodyB = m_physics.getBody(m_field.m_body);
+
+		bodyDef.type = b2_dynamicBody;
+		bodyDef.gravityScale = 0;
+		fixtureDef.density = 1;
+		fixtureDef.shape = &polygonShape;
+		jointDef.collideConnected = true;
+
+		//left paddle
+		m_leftPaddle.m_tf.position.set(-290, 0);
+		m_leftPaddle.m_tf.scale.set(1, 1);
+		m_leftPaddle.m_tf.rotation = 0;
+		m_leftPaddle.m_c.set(1, 0, 0);
+		m_leftPaddle.m_size.set(15, 80);
+		m_leftPaddle.m_maxVelocity = 100;
+		m_leftPaddle.m_targetVelocity = 0;
+		m_leftPaddle.m_score = 0;
+
+		bodyDef.userData = (void*)&m_leftPaddle;
+		bodyDef.position = convert(m_leftPaddle.m_tf.position*m_b2Scale);
+		m_leftPaddle.m_body = m_physics.createBody(bodyDef);
+
+		polygonShape.SetAsBox(m_leftPaddle.m_size.x*m_b2Scale*0.55f, m_leftPaddle.m_size.y*m_b2Scale*0.55f);
+		m_leftPaddle.m_fixture = m_physics.createFixture(fixtureDef, m_leftPaddle.m_body);
+
+		auto* bodyA = m_physics.getBody(m_leftPaddle.m_body);
+		jointDef.Initialize(bodyA, bodyB, bodyB->GetWorldCenter(), b2Vec2(0, 1));
+		m_leftPaddle.m_joint = m_physics.createJoint(jointDef);
+
+
+
+		//right paddle
+		m_rightPaddle.m_tf.position.set(290, 0);
+		m_rightPaddle.m_tf.scale.set(1, 1);
+		m_rightPaddle.m_tf.rotation = 0;
+		m_rightPaddle.m_c.set(0, 0, 1);
+		m_rightPaddle.m_size.set(15, 80);
+		m_rightPaddle.m_maxVelocity = 100;
+		m_rightPaddle.m_targetVelocity = 0;
+		m_rightPaddle.m_score = 0;
+
+		bodyDef.userData = (void*)&m_rightPaddle;
+		bodyDef.position = convert(m_rightPaddle.m_tf.position*m_b2Scale);
+		m_rightPaddle.m_body = m_physics.createBody(bodyDef);
+		
+		polygonShape.SetAsBox(m_rightPaddle.m_size.x*m_b2Scale*0.55f, m_rightPaddle.m_size.y*m_b2Scale*0.55f);
+		m_rightPaddle.m_fixture = m_physics.createFixture(fixtureDef, m_rightPaddle.m_body);
+
+		bodyA = m_physics.getBody(m_rightPaddle.m_body);
+		jointDef.Initialize(bodyA, bodyB, bodyB->GetWorldCenter(), b2Vec2(0, 1));
+		m_rightPaddle.m_joint = m_physics.createJoint(jointDef);
+	}
+
+	void PongGame::createBall()
+	{
+		b2BodyDef bodyDef;
+		b2FixtureDef fixtureDef;
+		b2PolygonShape polygonShape;
+
+		bodyDef.type = b2_dynamicBody;
+		bodyDef.gravityScale = 0;
+		fixtureDef.restitution = 1;
+		fixtureDef.friction = 0;
+		fixtureDef.density = 1;
+		fixtureDef.shape = &polygonShape;
+
+		m_ball.m_tf.position.set(0, 0);
+		m_ball.m_tf.scale.set(1, 1);
+		m_ball.m_tf.rotation = 0;
+		m_ball.m_c.set(1, 1, 1);
+		m_ball.m_size.set(10, 10);
+		m_ball.m_reset = false;
+		m_ball.m_speedup = false;
+		m_ball.m_maxVelocity = 500;
+		m_ball.m_sway.set(0, 0);
+
+		
+		bodyDef.userData = (void*)&m_ball;
+		m_ball.m_body = m_physics.createBody(bodyDef);
+
+		polygonShape.SetAsBox(m_ball.m_size.x*m_b2Scale*0.5f, m_ball.m_size.y*m_b2Scale*0.5f);
+		m_ball.m_fixture = m_physics.createFixture(fixtureDef, m_ball.m_body);
 	}
 }

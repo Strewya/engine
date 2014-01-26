@@ -29,7 +29,6 @@ namespace Core
 	//************************************ INPUT SYSTEM ************************************//
 	bool InputSystem::init(Window& window)
 	{
-		std::cout << "InputSystem init start" << std::endl;
 		bool status = true;
 
 		m_window = &window;
@@ -40,7 +39,6 @@ namespace Core
 
 	bool InputSystem::shutdown()
 	{
-		std::cout << "InputSystem shutdown start" << std::endl;
 		bool status = true;
 
 		std::cout << "InputSystem shutdown " << (status ? "OK" : "FAIL") << std::endl;

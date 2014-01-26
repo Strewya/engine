@@ -6,6 +6,10 @@
 	/*** C++ headers ***/
 #include <vector>
 	/*** extra headers ***/
+#include <Graphics/GraphicsSystem.h>
+#include <Util/Color.h>
+#include <Util/Dimensional.h>
+#include <Util/Transform.h>
 	/*** end headers ***/
 
 namespace Core
@@ -20,28 +24,38 @@ namespace Core
 		return m_lengthScale;
 	}
 
+	void Box2dDebugDraw::setGraphicsSystem(GraphicsSystem& graphics)
+	{
+		m_graphics = &graphics;
+	}
+
+	void Box2dDebugDraw::clearGraphicsSystem()
+	{
+		m_graphics = nullptr;
+	}
+
 	void Box2dDebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
-		/*if(m_renderer == nullptr) return;
+		if(m_graphics == nullptr)
+			return;
 
-		std::vector<Util::Vec2> polygonData(vertexCount);
+		std::vector<Vec2> polygonData(vertexCount);
 		for(int32_t i = vertexCount-1; i >= 0; --i)
 		{
 			polygonData[i].set(vertices[i].x, vertices[i].y);
 		}
-		Util::Color c(color.r, color.g, color.b);
+		Color c(color.r, color.g, color.b);
 
-		Graphics::Polygon polygon;
-		polygon.setColor(c);
-		polygon.setSolid(false);
-		polygon.setScale(m_lengthScale);
-		polygon.setManual(polygonData);
-		polygon.draw(*m_renderer);*/
-
+		Transform t;
+		t.scale.set(m_lengthScale, m_lengthScale);
+		t.rotation = 0;
+		
+		m_graphics->drawLine(t, polygonData.data(), vertexCount, c);
 	}
 
 	void Box2dDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
+		DrawPolygon(vertices, vertexCount, color);
 		/*if(m_renderer == nullptr) return;
 
 		std::vector<Util::Vec2> polygonData(vertexCount);
@@ -91,15 +105,14 @@ namespace Core
 	
 	void Box2dDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 	{
-		/*if(m_renderer == nullptr) return;
+		if(m_graphics == nullptr) return;
 
-		Util::Color c(color.r, color.g, color.b);
-		Graphics::Polygon line;
-		line.setSolid(false);
-		line.setColor(c);
-		line.setScale(m_lengthScale);
-		line.setAsLine(Util::Vec2(p1.x, p1.y), Util::Vec2(p2.x, p2.y));
-		line.draw(*m_renderer);*/
+		Color c(color.r, color.g, color.b);
+		Vec2 pos[] { Vec2(p1.x, p1.y), Vec2(p2.x, p2.y) };
+		Transform t;
+		t.scale.set(m_lengthScale, m_lengthScale);
+		t.rotation = 0;
+		m_graphics->drawLine(t, pos, 2, c);
 	}
 
 	void Box2dDebugDraw::DrawTransform(const b2Transform& xf)

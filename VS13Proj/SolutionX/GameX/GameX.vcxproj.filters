@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Input">
-      <UniqueIdentifier>{5a969a7b-44ad-44d6-aaf4-45c407a0d7f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Window">
       <UniqueIdentifier>{e21b46bd-0384-4959-b2c0-f39c77fa8a3e}</UniqueIdentifier>
     </Filter>
@@ -16,16 +13,22 @@
     <Filter Include="Util">
       <UniqueIdentifier>{9d9f1881-9f71-421b-9be2-e2b150344b17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics">
+    <Filter Include="Systems">
+      <UniqueIdentifier>{79e0dfca-e5dc-4d42-b9d0-c9d7c53d0ef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Input">
+      <UniqueIdentifier>{5a969a7b-44ad-44d6-aaf4-45c407a0d7f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Graphics">
       <UniqueIdentifier>{186bc8c2-7070-4859-98d3-7bb8a68f7daf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Physics">
+    <Filter Include="Systems\Physics">
       <UniqueIdentifier>{10fc0b2e-5afe-45c0-bd51-1f522a7ae044}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
-      <Filter>Input</Filter>
+      <Filter>Systems\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Pong\GameInit.cpp">
       <Filter>Games\Pong</Filter>
@@ -47,15 +50,6 @@
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp">
       <Filter>Window</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
-      <Filter>Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Dimensional.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -63,18 +57,36 @@
       <Filter>Games\Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp">
-      <Filter>Input</Filter>
+      <Filter>Systems\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp">
-      <Filter>Graphics</Filter>
+      <Filter>Systems\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Random.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Color.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Transform.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp">
+      <Filter>Systems\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
+      <Filter>Systems\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
+      <Filter>Systems\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
+      <Filter>Systems\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
-      <Filter>Input</Filter>
+      <Filter>Systems\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
       <Filter>Games</Filter>
@@ -101,15 +113,6 @@
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h">
       <Filter>Window</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Input\InputSystem.h">
-      <Filter>Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Dimensional.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -117,16 +120,34 @@
       <Filter>Games\Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\KeybindSystem.h">
-      <Filter>Input</Filter>
+      <Filter>Systems\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h">
-      <Filter>Graphics</Filter>
+      <Filter>Systems\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h">
-      <Filter>Graphics</Filter>
+      <Filter>Systems\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Random.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Color.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Transform.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Vertex.h">
+      <Filter>Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h">
+      <Filter>Systems\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
+      <Filter>Systems\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\InputSystem.h">
+      <Filter>Systems\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

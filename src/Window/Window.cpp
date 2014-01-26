@@ -14,7 +14,9 @@
 
 namespace Core
 {
-	uint32_t toFileChangeType(DWORD action);
+	static uint32_t toFileChangeType(DWORD action);
+	static Mouse::Keys toMouseKey(uint32_t key, DWORD wParam);
+
 
 	int initializeWindow(Window& window)
 	{
@@ -65,11 +67,6 @@ namespace Core
 
 		m_monitor.AddDirectory(m_resourcesDirectory.c_str(), true, m_trackedChanges);
 
-		AllocConsole();
-		freopen("CONIN$", "r", stdin);
-		freopen("CONOUT$", "w", stdout);
-		freopen("CONOUT$", "w", stderr);
-
 		uint8_t count = 32;
 		m_fileChanges.reserve(count);
 		for(auto i = 0; i < count; ++i)
@@ -80,7 +77,9 @@ namespace Core
 
 	Window::~Window()
 	{
-		FreeConsole();
+#ifdef _DEBUG
+		closeConsole();
+#endif
 		m_monitor.Terminate();
 	}
 
@@ -118,7 +117,11 @@ namespace Core
 
 	void Window::close()
 	{
+#ifdef _DEBUG
+		InvalidateRect(m_hwnd, nullptr, true);
+#else
 		PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+#endif
 	}
 
 	void Window::update()
@@ -316,7 +319,33 @@ namespace Core
 		}
 		return false;
 	}
+#ifdef _DEBUG
+	void Window::openConsole(uint32_t xPos, uint32_t yPos)
+	{
+		if(!AllocConsole())
+			return;
+		
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
 
+		char name[] { "CoreDebugConsole" };
+		SetConsoleTitle(name);
+		Sleep(40);
+		HWND hConsole = FindWindow(nullptr, name);
+		RECT consoleSize;
+		GetWindowRect(hConsole, &consoleSize);
+		auto x = consoleSize.right - consoleSize.left;
+		auto y = consoleSize.bottom - consoleSize.top;
+		SetWindowPos(hConsole, 0, xPos, yPos, x, y, 0); //SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW
+		SetForegroundWindow(m_hwnd);
+	}
+
+	void Window::closeConsole()
+	{
+		FreeConsole();
+	}
+#endif
 	void Window::setStyle(uint32_t style) { m_style = style; }
 	void Window::setExtendedStyle(uint32_t style) { m_extendedStyle = style; }
 	void Window::showCursor(bool isShown) { m_showCursor = isShown; }
@@ -341,154 +370,168 @@ namespace Core
 	LRESULT WINAPI Window::windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
 	{
 		//here we translate all WM_* messages to the Core::WindowMessage
-		auto we = newEvent();
-
 		bool eventMapped = true;
 		LRESULT result = 0;
 		const LRESULT notProcessed = -1;
-
+		auto we = newEvent();
 		switch(msg)
 		{
-		case WM_MOUSEMOVE:
-			we.m_type = WindowEventType::WE_MOUSEMOVE;
-			we.m_mouseMove.m_x = GET_X_LPARAM(lParam);
-			we.m_mouseMove.m_y = GET_Y_LPARAM(lParam);
-			we.m_mouseMove.m_isRelative = false;
-			
-			break;
-
-		case WM_KEYDOWN:
-		case WM_SYSKEYDOWN:
-			we.m_type = WindowEventType::WE_KEYBOARDKEY;
-			we.m_keyboard.m_keyCode = wParam;
-			we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
-			we.m_keyboard.m_isDown = true;
-			we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
-		
-			break;
-
-		case WM_KEYUP:
-		case WM_SYSKEYUP:
-			we.m_type = WindowEventType::WE_KEYBOARDKEY;
-			we.m_keyboard.m_keyCode = wParam;
-			we.m_keyboard.m_repeat = 1;
-			we.m_keyboard.m_isDown = false;
-			we.m_keyboard.m_previouslyDown = true;
-
-			break;
-
-		case WM_CHAR:
-			we.m_type = WindowEventType::WE_KEYBOARDTEXT;
-			we.m_keyboard.m_keyCode = wParam;
-			we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
-			we.m_keyboard.m_isDown = true;
-			we.m_keyboard.m_previouslyDown = false;
-		
-			break;
-
-		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_MBUTTONDOWN:
-		case WM_XBUTTONDOWN:
-			we.m_type = WindowEventType::WE_MOUSEBUTTON;
-			we.m_mouseButton.m_clicks = 1;
-			we.m_mouseButton.m_isDown = true;
-			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
-			we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
-			we.m_mouseButton.m_button = (msg == WM_LBUTTONDOWN ? Mouse::m_LeftButton :
-										 (msg == WM_RBUTTONDOWN ? Mouse::m_RightButton :
-										 (msg == WM_MBUTTONDOWN ? Mouse::m_MiddleButton :
-										 result = TRUE, (GET_XBUTTON_WPARAM(wParam) == XBUTTON1 ? Mouse::m_XButton1 : Mouse::m_XButton2))));
-
-			break;
-
-		case WM_LBUTTONDBLCLK:
-		case WM_RBUTTONDBLCLK:
-		case WM_MBUTTONDBLCLK:
-		case WM_XBUTTONDBLCLK:
-			we.m_type = WindowEventType::WE_MOUSEBUTTON;
-			we.m_mouseButton.m_clicks = 2;
-			we.m_mouseButton.m_isDown = true;
-			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
-			we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
-			we.m_mouseButton.m_button = (msg == WM_LBUTTONDOWN ? Mouse::m_LeftButton :
-										 (msg == WM_RBUTTONDOWN ? Mouse::m_RightButton :
-										 (msg == WM_MBUTTONDOWN ? Mouse::m_MiddleButton :
-										 result = TRUE, (GET_XBUTTON_WPARAM(wParam) == XBUTTON1 ? Mouse::m_XButton1 : Mouse::m_XButton2))));
-
-			break;
-
-		case WM_LBUTTONUP:
-		case WM_RBUTTONUP:
-		case WM_MBUTTONUP:
-		case WM_XBUTTONUP:
-			we.m_type = WindowEventType::WE_MOUSEBUTTON;
-			we.m_mouseButton.m_clicks = 0;
-			we.m_mouseButton.m_isDown = false;
-			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
-			we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
-			we.m_mouseButton.m_button = (msg == WM_LBUTTONDOWN ? Mouse::m_LeftButton :
-										 (msg == WM_RBUTTONDOWN ? Mouse::m_RightButton :
-										 (msg == WM_MBUTTONDOWN ? Mouse::m_MiddleButton :
-										 result = TRUE, (GET_XBUTTON_WPARAM(wParam) == XBUTTON1 ? Mouse::m_XButton1 : Mouse::m_XButton2))));
-
-			break;
-
-		case WM_MOUSEWHEEL:
-			we.m_type = WindowEventType::WE_MOUSEWHEEL;
-			we.m_mouseWheel.m_scroll = GET_WHEEL_DELTA_WPARAM(wParam);
-			we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
-			we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
-
-			break;
-
-		case WM_CLOSE:
-			we.m_type = WindowEventType::WE_CLOSE;
-			result = notProcessed;
-			break;
-
-		case WM_SETCURSOR:
-			POINT cur;
-			GetCursorPos(&cur);
-			RECT rc;
-			GetClientRect(m_hwnd, &rc);
-			ScreenToClient(m_hwnd, &cur);
-			result = notProcessed;
-			if(!m_showCursor && cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
+			case WM_MOUSEMOVE:
 			{
-				SetCursor(nullptr);
-				result = TRUE;
+				we.m_type = WindowEventType::WE_MOUSEMOVE;
+				we.m_mouseMove.m_x = GET_X_LPARAM(lParam);
+				we.m_mouseMove.m_y = GET_Y_LPARAM(lParam);
+				we.m_mouseMove.m_isRelative = false;
 			}
-			eventMapped = false;
 			break;
 
-		case WM_ACTIVATE:
-			if(LOWORD(wParam) == WA_INACTIVE)
+			case WM_KEYDOWN:
+			case WM_SYSKEYDOWN:
 			{
-				we.m_type = WindowEventType::WE_LOSTFOCUS;
+				we.m_type = WindowEventType::WE_KEYBOARDKEY;
+				we.m_keyboard.m_keyCode = wParam;
+				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
+				we.m_keyboard.m_isDown = true;
+				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
 			}
-			else
-			{
-				we.m_type = WindowEventType::WE_GAINFOCUS;
-			}
-			result = notProcessed;
 			break;
 
-		default:
-			eventMapped = false;
-			result = notProcessed;
+			case WM_KEYUP:
+			case WM_SYSKEYUP:
+			{
+				we.m_type = WindowEventType::WE_KEYBOARDKEY;
+				we.m_keyboard.m_keyCode = wParam;
+				we.m_keyboard.m_repeat = 1;
+				we.m_keyboard.m_isDown = false;
+				we.m_keyboard.m_previouslyDown = true;
+			}
+			break;
+
+			case WM_CHAR:
+			{
+				we.m_type = WindowEventType::WE_KEYBOARDTEXT;
+				we.m_keyboard.m_keyCode = wParam;
+				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
+				we.m_keyboard.m_isDown = true;
+				we.m_keyboard.m_previouslyDown = false;
+			}
+			break;
+
+			case WM_LBUTTONDOWN:
+			case WM_RBUTTONDOWN:
+			case WM_MBUTTONDOWN:
+			case WM_XBUTTONDOWN:
+			{
+				we.m_type = WindowEventType::WE_MOUSEBUTTON;
+				we.m_mouseButton.m_clicks = 1;
+				we.m_mouseButton.m_isDown = true;
+				we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
+				we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
+				we.m_mouseButton.m_button = toMouseKey(msg, wParam);
+				if(we.m_mouseButton.m_button == Mouse::Keys::m_XButton1 || we.m_mouseButton.m_button == Mouse::Keys::m_XButton2)
+				{
+					result = TRUE;
+				}
+			}
+			break;
+
+			case WM_LBUTTONDBLCLK:
+			case WM_RBUTTONDBLCLK:
+			case WM_MBUTTONDBLCLK:
+			case WM_XBUTTONDBLCLK:
+			{
+				we.m_type = WindowEventType::WE_MOUSEBUTTON;
+				we.m_mouseButton.m_clicks = 2;
+				we.m_mouseButton.m_isDown = true;
+				we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
+				we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
+				we.m_mouseButton.m_button = toMouseKey(msg, wParam);
+				if(we.m_mouseButton.m_button == Mouse::Keys::m_XButton1 || we.m_mouseButton.m_button == Mouse::Keys::m_XButton2)
+				{
+					result = TRUE;
+				}
+			}
+			break;
+
+			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+			case WM_MBUTTONUP:
+			case WM_XBUTTONUP:
+			{
+				we.m_type = WindowEventType::WE_MOUSEBUTTON;
+				we.m_mouseButton.m_clicks = 0;
+				we.m_mouseButton.m_isDown = false;
+				we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
+				we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
+				we.m_mouseButton.m_button = toMouseKey(msg, wParam);
+				if(we.m_mouseButton.m_button == Mouse::Keys::m_XButton1 || we.m_mouseButton.m_button == Mouse::Keys::m_XButton2)
+				{
+					result = TRUE;
+				}
+			}
+			break;
+
+			case WM_MOUSEWHEEL:
+			{
+				we.m_type = WindowEventType::WE_MOUSEWHEEL;
+				we.m_mouseWheel.m_scroll = GET_WHEEL_DELTA_WPARAM(wParam);
+				we.m_mouseButton.m_x = GET_X_LPARAM(lParam);
+				we.m_mouseButton.m_y = GET_Y_LPARAM(lParam);
+			}
+			break;
+
+			case WM_CLOSE:
+			{
+				we.m_type = WindowEventType::WE_CLOSE;
+				result = notProcessed;
+			}
+			break;
+
+			case WM_SETCURSOR:
+			{
+				POINT cur;
+				GetCursorPos(&cur);
+				RECT rc;
+				GetClientRect(m_hwnd, &rc);
+				ScreenToClient(m_hwnd, &cur);
+				result = notProcessed;
+				if(!m_showCursor && cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right)
+				{
+					SetCursor(nullptr);
+					result = TRUE;
+				}
+				eventMapped = false;
+			}
+			break;
+
+			case WM_ACTIVATE:
+			{
+				if(LOWORD(wParam) == WA_INACTIVE)
+				{
+					we.m_type = WindowEventType::WE_LOSTFOCUS;
+				}
+				else
+				{
+					we.m_type = WindowEventType::WE_GAINFOCUS;
+				}
+				result = notProcessed;
+			}
+			break;
+
+			default:
+			{
+				eventMapped = false;
+				result = notProcessed;
+			}
+			break;
 		}
 
 		if(eventMapped)
 		{
 			m_events.emplace_back(we);
 		}
-			
 
-		if(result == notProcessed)
-			result = DefWindowProc(hwnd, msg, wParam, lParam);
-		
-		return result;
+		return result == notProcessed ? DefWindowProc(hwnd, msg, wParam, lParam) : result;
 	}
 
 
@@ -497,29 +540,82 @@ namespace Core
 		uint32_t returnValue = Core::FILE_BADDATA;
 		switch(action)
 		{
-		case FILE_ACTION_ADDED:
-			returnValue = Core::FILE_ADDED;
+			case FILE_ACTION_ADDED:
+			{
+				returnValue = Core::FILE_ADDED;
+			}
 			break;
 
-		case FILE_ACTION_MODIFIED:
-			returnValue = Core::FILE_MODIFIED;
+			case FILE_ACTION_MODIFIED:
+			{
+				returnValue = Core::FILE_MODIFIED;
+			}
 			break;
 
-		case FILE_ACTION_REMOVED:
-			returnValue = Core::FILE_REMOVED;
+			case FILE_ACTION_REMOVED:
+			{
+				returnValue = Core::FILE_REMOVED;
+			}
 			break;
 
-		case FILE_ACTION_RENAMED_OLD_NAME:
-			returnValue = Core::FILE_RENAMED_FROM;
+			case FILE_ACTION_RENAMED_OLD_NAME:
+			{
+				returnValue = Core::FILE_RENAMED_FROM;
+			}
 			break;
 
-		case FILE_ACTION_RENAMED_NEW_NAME:
-			returnValue = Core::FILE_RENAMED_TO;
+			case FILE_ACTION_RENAMED_NEW_NAME:
+			{
+				returnValue = Core::FILE_RENAMED_TO;
+			}
 			break;
 
-		default:
+			default:
 			break;
 		}
 		return returnValue;
+	}
+
+	Mouse::Keys toMouseKey(uint32_t code, DWORD wParam)
+	{
+		Mouse::Keys key = Mouse::Keys::m_KeyCount;
+		switch(code)
+		{
+			case WM_LBUTTONDBLCLK:
+			case WM_LBUTTONDOWN:
+			case WM_LBUTTONUP:
+			{
+				key = Mouse::Keys::m_LeftButton;
+			}
+			break;
+
+			case WM_RBUTTONDBLCLK:
+			case WM_RBUTTONDOWN:
+			case WM_RBUTTONUP:
+			{
+				key = Mouse::Keys::m_RightButton;
+			}
+			break;
+
+			case WM_MBUTTONDBLCLK:
+			case WM_MBUTTONDOWN:
+			case WM_MBUTTONUP:
+			{
+				key = Mouse::Keys::m_MiddleButton;
+			}
+			break;
+
+			case WM_XBUTTONDBLCLK:
+			case WM_XBUTTONDOWN:
+			case WM_XBUTTONUP:
+			{
+				key = GET_XBUTTON_WPARAM(wParam) == XBUTTON1 ? Mouse::m_XButton1 : Mouse::m_XButton2;
+			}
+			break;
+
+			default:
+			break;
+		}
+		return key;
 	}
 }

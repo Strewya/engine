@@ -12,22 +12,21 @@
 namespace Core
 {
 	PhysicsSystem::PhysicsSystem()
-		: m_world(b2Vec2(0, -9)), m_scalingFactor(1), m_scalingFactorInv(1)
+		: m_world(b2Vec2(0, -9))
 	{
 		m_bodies.reserve(20);
 		m_fixtures.reserve(40);
 		m_joints.reserve(20);
 	}
 
-	bool PhysicsSystem::init(const Vec2& gravity, float scalingFactor, b2Draw* debugDraw)
+	bool PhysicsSystem::init(const Vec2& gravity, b2Draw* debugDraw)
 	{
-		std::cout << "PhysicsSystem init start" << std::endl;
 		bool status = true;
 
 		m_world.SetGravity(convert(gravity));
 		if(debugDraw != nullptr)
 			m_world.SetDebugDraw(debugDraw);
-		setScalingFactor(scalingFactor);
+		m_world.SetContactListener(this);
 
 		std::cout << "PhysicsSystem init " << (status ? "OK" : "FAIL") << std::endl;
 		return status;
@@ -35,7 +34,6 @@ namespace Core
 
 	bool PhysicsSystem::shutdown()
 	{
-		std::cout << "PhysicsSystem shutdown start" << std::endl;
 		bool status = true;
 
 		for(auto* joint : m_joints)
@@ -56,27 +54,16 @@ namespace Core
 		return status;
 	}
 
-	void PhysicsSystem::setScalingFactor(float scale)
+	void PhysicsSystem::update(float dt)
 	{
-		m_scalingFactor = scale;
-		m_scalingFactorInv = 1 / scale;
+		const int32_t velocityIterations = 8;
+		const int32_t positionIterations = 3;
+		m_world.Step(dt, velocityIterations, positionIterations);
 	}
 
-	float PhysicsSystem::getScalingFactor() const
+	void PhysicsSystem::draw()
 	{
-		return m_scalingFactor;
-	}
-
-	Vec2 PhysicsSystem::convert(const b2Vec2& v)
-	{
-		//scale up
-		return Vec2(v.x*m_scalingFactor, v.y*m_scalingFactor);
-	}
-
-	b2Vec2 PhysicsSystem::convert(const Vec2& v)
-	{
-		//scale down
-		return b2Vec2(v.x*m_scalingFactorInv, v.y*m_scalingFactorInv);
+		m_world.DrawDebugData();
 	}
 
 	InstanceID PhysicsSystem::createBody(const b2BodyDef& bodyDef)
@@ -144,15 +131,30 @@ namespace Core
 		m_joints[jointID] = nullptr;
 	}
 
+	void PhysicsSystem::addBeginContactListener(std::function<void(b2Contact*)> f)
+	{
+		m_beginContactListeners.emplace_back(f);
+	}
+
+	void PhysicsSystem::addEndContactListener(std::function<void(b2Contact*)> f)
+	{
+		m_endContactListeners.emplace_back(f);
+	}
 
 	void PhysicsSystem::BeginContact(b2Contact* contact)
 	{
-		
+		for(auto& f : m_beginContactListeners)
+		{
+			f(contact);
+		}	
 	}
 
 	void PhysicsSystem::EndContact(b2Contact* contact)
 	{
-		
+		for(auto& f : m_endContactListeners)
+		{
+			f(contact);
+		}
 	}
 
 	void PhysicsSystem::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)

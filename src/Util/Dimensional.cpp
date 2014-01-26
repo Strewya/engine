@@ -14,6 +14,37 @@ namespace Core
 	Vec2::Vec2(float x, float y)
 		: x(x), y(y)
 	{}
+
+	Vec2::Vec2()
+		: Vec2(0, 0)
+	{}
+
+	void Vec2::set(float x, float y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+
+
+	Vec2 operator+(const Vec2& a, const Vec2& b)
+	{
+		return Vec2(a.x + b.x, a.y + b.y);
+	}
+
+	Vec2 operator-(const Vec2& v)
+	{
+		return Vec2(-v.x, -v.y);
+	}
+
+	Vec2 operator*(const Vec2& v, float f)
+	{
+		return Vec2(v.x * f, v.y * f);
+	}
+
+	Vec2 operator*(float f, const Vec2& v)
+	{
+		return v*f;
+	}
 }
 
 
@@ -42,11 +73,6 @@ namespace Core
 //	bool Vec2::operator!=(const Vec2 &v) const
 //	{
 //		return !operator==(v);
-//	}
-//
-//	Vec2 Vec2::operator*(float v) const
-//	{
-//		return Vec2(x * v, y * v);
 //	}
 //
 //	Vec2 Vec2::operator*(const Vec2 &v) const
@@ -96,11 +122,6 @@ namespace Core
 //	{
 //		*this = *this + v;
 //		return *this;
-//	}
-//
-//	Vec2 Vec2::operator-() const
-//	{
-//		return Vec2(-x, -y);
 //	}
 //
 //	Vec2 Vec2::operator-(const Vec2 &v) const

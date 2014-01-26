@@ -15,9 +15,16 @@ namespace Core
 	public:
 		float x, y;
 
+		Vec2();
 		Vec2(float x, float y);
-
+		
+		void set(float x, float y);
 	};
+
+	Vec2 operator+(const Vec2& a, const Vec2& b);
+	Vec2 operator-(const Vec2& rhs);
+	Vec2 operator*(const Vec2& v, float f);
+	Vec2 operator*(float f, const Vec2& v);
 }
 
 // #include <iostream>
@@ -44,11 +51,9 @@ namespace Core
 //		Vec2& operator-=(float v);
 //		Vec2 operator+(const Vec2& v) const;
 //		Vec2 operator+(float v) const;
-//		Vec2 operator-() const;
 //		Vec2 operator-(const Vec2& v) const;
 //		Vec2 operator-(float v) const;
 //		Vec2 operator*(const Vec2& v) const;
-//		Vec2 operator*(float v) const;
 //		Vec2 operator/(const Vec2& v) const;
 //		Vec2 operator/(float v) const;
 //		bool operator==(const Vec2& v) const;

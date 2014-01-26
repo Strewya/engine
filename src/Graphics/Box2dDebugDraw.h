@@ -5,17 +5,21 @@
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
-/******* extra headers *******/
 #include <Box2D/Box2D.h>
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core
 {
+	class GraphicsSystem;
+
 	class Box2dDebugDraw : public b2Draw
 	{
 	public:
 		void setLengthScale(float scale);
 		float getLengthScale() const;
+		void setGraphicsSystem(GraphicsSystem& graphics);
+		void clearGraphicsSystem();
 
 		/// Draw a closed polygon provided in CCW order.
 		void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color);
@@ -38,5 +42,6 @@ namespace Core
 
 	private:
 		float m_lengthScale;
+		GraphicsSystem* m_graphics;
 	};
 }

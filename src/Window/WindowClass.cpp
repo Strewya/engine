@@ -40,7 +40,7 @@ namespace Core
 		this->cbClsExtra	= 0;
 		this->cbSize		= sizeof(WNDCLASSEX);
 		this->cbWndExtra	= 0;
-		this->hbrBackground	= 0; //(HBRUSH)GetStockObject(BLACK_BRUSH);
+		this->hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
 		this->hCursor		= LoadCursor(nullptr, IDC_ARROW);
 		this->hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		this->hIconSm		= nullptr;

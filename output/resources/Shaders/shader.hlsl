@@ -9,6 +9,7 @@ struct VOut
 cbuffer cbPerObject
 {
 	float4x4 WVP;
+	float4 FillColor;
 };
 
 Texture2D ObjTexture;
@@ -21,7 +22,7 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
     output.position = mul(position, WVP);
 	//output.position = position;
     output.texCoord = texCoord;
-	output.diffuse = diffuse;
+	output.diffuse = diffuse * FillColor;
 	
     return output;
 }
