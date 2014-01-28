@@ -25,6 +25,9 @@
     <Filter Include="Systems\Physics">
       <UniqueIdentifier>{10fc0b2e-5afe-45c0-bd51-1f522a7ae044}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\Scripting">
+      <UniqueIdentifier>{3e731b0d-23e9-4888-afe1-a0fd7ea0c51a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -82,6 +85,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
       <Filter>Systems\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
+      <Filter>Systems\Scripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +154,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\InputSystem.h">
       <Filter>Systems\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h">
+      <Filter>Systems\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <Filter>Systems\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

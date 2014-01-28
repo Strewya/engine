@@ -137,6 +137,7 @@
     <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -164,6 +165,8 @@
     <ClInclude Include="..\..\..\src\Input\KeybindSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
+    <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
     <ClInclude Include="..\..\..\src\Util\Dimensional.h" />

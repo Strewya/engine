@@ -10,6 +10,7 @@
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Physics/PhysicsSystem.h>
+#include <Scripting/ScriptingSystem.h>
 #include <Util/Color.h>
 #include <Util/Random.h>
 #include <Util/Time.h>
@@ -76,6 +77,7 @@ namespace Core
 
 		InputSystem m_input;
 		PhysicsSystem m_physics;
+		ScriptingSystem m_scripts;
 		GraphicsSystem m_graphics;
 		Box2dDebugDraw m_debugDraw;
 

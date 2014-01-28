@@ -420,7 +420,34 @@ namespace Core
 		return true;
 	}
 
+	//*****************************************************************
+	//					INIT SAMPLER STATE
+	//*****************************************************************
+	bool GraphicsSystem::initSamplerState()
+	{
+		D3D11_SAMPLER_DESC sampd;
+		ZeroMemory(&sampd, sizeof(D3D11_SAMPLER_DESC));
+		sampd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		sampd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		sampd.ComparisonFunc = D3D11_COMPARISON_NEVER;
+		sampd.MinLOD = 0;
+		sampd.MaxLOD = D3D11_FLOAT32_MAX;
 
+		HRESULT hr = m_dev->CreateSamplerState(&sampd, &m_samplerState);
+		
+		return SUCCEEDED(hr);
+	}
+
+	//*****************************************************************
+	//					
+	//*****************************************************************
+	bool GraphicsSystem::loadFont(const char* filename)
+	{
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename, nullptr, nullptr, &m_font, nullptr);
+		return SUCCEEDED(hr);
+	}
 
 
 

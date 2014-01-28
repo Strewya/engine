@@ -36,6 +36,7 @@ namespace Core
 		bool initVertexShader(const std::string& shaderFile);
 		bool initPixelShader(const std::string& shaderFile);
 		bool initViewport();
+		bool initSamplerState();
 
 
 		void setBackgroundColor(float red, float green, float blue);
@@ -44,7 +45,7 @@ namespace Core
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 
-
+		bool loadFont(const char* filename);
 
 		
 
@@ -64,7 +65,8 @@ namespace Core
 		ID3D11VertexShader* m_vertexShader;
 		ID3D11PixelShader* m_pixelShader;
 		ID3D11InputLayout* m_inputLayout;
-
+		ID3D11SamplerState* m_samplerState;
+		
 		XMMATRIX m_camView;
 		XMMATRIX m_camProjection;
 		XMVECTOR m_camPosition;
@@ -72,6 +74,9 @@ namespace Core
 		XMVECTOR m_camUp;
 		XMMATRIX m_world;
 		
+		//this shouldn't be explicit like this, refactor later
+		ID3D11ShaderResourceView* m_font;
+
 	};
 
 	template<typename T> void GraphicsSystem::SafeRelease(T** ptr)

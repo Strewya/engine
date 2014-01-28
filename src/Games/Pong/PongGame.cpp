@@ -61,6 +61,7 @@ namespace Core
 #endif
 		bool initializationStatus = m_input.init(window) &&
 									m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&
+									m_scripts.init() &&
 									m_graphics.init(window);
 
 		m_debugDraw.setGraphicsSystem(m_graphics);
@@ -70,6 +71,21 @@ namespace Core
 
 		m_physics.addBeginContactListener(std::bind(&PongGame::updateScore, this, std::placeholders::_1));
 		m_physics.addEndContactListener(std::bind(&PongGame::speedUpBall, this, std::placeholders::_1));
+
+
+		m_scripts.loadFile("../resources/font.sheet");
+		m_scripts.dumpStack();
+		std::string name = m_scripts.getString("name");
+		m_scripts.dumpStack();
+		std::string texture = m_scripts.getString("texture");
+		m_scripts.dumpStack();
+		uint32_t size = m_scripts.getInt("size");
+		m_scripts.dumpStack();
+
+
+
+
+
 
 		if(initializationStatus)
 		{

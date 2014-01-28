@@ -1,0 +1,36 @@
+return {
+	name = "font",
+	texture = "../resources/font_t.png",
+	size = 32,
+	glyphCount = 95,
+	glyphs = {
+		{ ascii=32,  left=0, right=24},    { ascii=33,  left=43, right=52},   { ascii=34,  left=73, right=84},   { ascii=35,  left=99, right=124},
+		{ ascii=36,  left=129, right=158}, { ascii=37,  left=163, right=188}, { ascii=38,  left=197, right=218}, { ascii=39,  left=237, right=242},
+		{ ascii=40,  left=261, right=274}, { ascii=41,  left=301, right=314}, { ascii=42,  left=325, right=346}, { ascii=43,  left=355, right=380},
+		{ ascii=44,  left=397, right=402}, { ascii=45,  left=419, right=444}, { ascii=46,  left=461, right=466}, { ascii=47,  left=483, right=508},
+		{ ascii=48,  left=517, right=538}, { ascii=49,  left=565, right=570}, { ascii=50,  left=581, right=602}, { ascii=51,  left=613, right=634},
+		
+		{ ascii=52,  left=5, right=26},    { ascii=53,  left=37, right=58},   { ascii=54,  left=69, right=90},   { ascii=55,  left=101, right=122},
+		{ ascii=56,  left=133, right=154}, { ascii=57,  left=165, right=186}, { ascii=58,  left=205, right=210}, { ascii=59,  left=237, right=242},
+		{ ascii=60,  left=259, right=284}, { ascii=61,  left=293, right=314}, { ascii=62,  left=323, right=348}, { ascii=63,  left=357, right=378},
+		{ ascii=64,  left=387, right=412}, { ascii=65,  left=421, right=442}, { ascii=66,  left=453, right=474}, { ascii=67,  left=485, right=506},
+		{ ascii=68,  left=517, right=538}, { ascii=69,  left=549, right=570}, { ascii=70,  left=581, right=602}, { ascii=71,  left=613, right=634},
+		
+		{ ascii=72,  left=5, right=26},    { ascii=73,  left=39, right=56},   { ascii=74,  left=71, right=88},   { ascii=75,  left=101, right=120},
+		{ ascii=76,  left=133, right=154}, { ascii=77,  left=165, right=186}, { ascii=78,  left=197, right=218}, { ascii=79,  left=229, right=250},
+		{ ascii=80,  left=261, right=282}, { ascii=81,  left=293, right=314}, { ascii=82,  left=325, right=346}, { ascii=83,  left=357, right=378},
+		{ ascii=84,  left=389, right=410}, { ascii=85,  left=421, right=442}, { ascii=86,  left=453, right=474}, { ascii=87,  left=485, right=506},
+		{ ascii=88,  left=517, right=558}, { ascii=89,  left=549, right=570}, { ascii=90,  left=581, right=602}, { ascii=91,  left=613, right=634},
+		
+		{ ascii=92,  left=3, right=28},    { ascii=93,  left=37, right=58},   { ascii=94,  left=71, right=88},   { ascii=95,  left=99, right=124},
+		{ ascii=96,  left=142, right=146}, { ascii=97,  left=163, right=188}, { ascii=98,  left=197, right=218}, { ascii=99,  left=229, right=250},
+		{ ascii=100, left=261, right=282}, { ascii=101, left=293, right=314}, { ascii=102, left=325, right=346}, { ascii=103, left=357, right=378},
+		{ ascii=104, left=389, right=410}, { ascii=105, left=429, right=434}, { ascii=106, left=453, right=466}, { ascii=107, left=489, right=504},
+		{ ascii=108, left=525, right=530}, { ascii=109, left=549, right=570}, { ascii=110, left=581, right=602}, { ascii=111, left=613, right=634},
+		
+		{ ascii=112, left=5, right=26},    { ascii=113, left=37, right=58},   { ascii=114, left=73, right=84},   { ascii=115, left=101, right=122},
+		{ ascii=116, left=135, right=148}, { ascii=117, left=167, right=186}, { ascii=118, left=197, right=218}, { ascii=119, left=229, right=250},
+		{ ascii=120, left=263, right=280}, { ascii=121, left=293, right=314}, { ascii=122, left=325, right=346}, { ascii=125, left=357, right=372},
+		{ ascii=124, left=397, right=402}, { ascii=125, left=427, right=442}, { ascii=126, left=453, right=474}
+	}
+};
