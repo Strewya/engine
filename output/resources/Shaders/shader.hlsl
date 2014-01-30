@@ -10,6 +10,7 @@ cbuffer cbPerObject
 {
 	float4x4 WVP;
 	float4 FillColor;
+	float4 isTexture;
 };
 
 Texture2D ObjTexture;
@@ -30,7 +31,9 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
 
 float4 PShader(VOut input) : SV_TARGET
 {
-    //float4 diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord);
-	//clip(diffuse.a - 0.25f);
-	return input.diffuse;
+    float4 diffuse = input.diffuse;
+	if(isTexture.x > 0.5)
+		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord);
+	clip(diffuse.a - 0.25f);
+	return diffuse;
 }

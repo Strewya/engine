@@ -62,30 +62,32 @@ namespace Core
 		DEBUG_LINE(window.openConsole(660, 0));
 
 		bool initializationStatus = m_input.init(window) &&
-									m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&
-									m_scripts.init() &&
-									m_graphics.init(window);
-
-		m_debugDraw.setGraphicsSystem(m_graphics);
-		m_debugDraw.AppendFlags(m_debugDraw.e_shapeBit | m_debugDraw.e_aabbBit);
-		m_debugDraw.setLengthScale(1 / m_b2Scale);
-		m_drawDebugData = false;
-
-		m_physics.addBeginContactListener(std::bind(&PongGame::updateScore, this, std::placeholders::_1));
-		m_physics.addEndContactListener(std::bind(&PongGame::speedUpBall, this, std::placeholders::_1));
-
-
-		m_scripts.loadConfiguration("../resources/font.sheet");
-		std::string name = m_scripts.getString("name");
-		std::string texture = m_scripts.getString("texture");
-		uint32_t size = m_scripts.getInt("size");
-		m_scripts.closeConfiguration();
-		
-
-		DEBUG_INFO("name: ", name, ", texture: ", texture, " (full path: ", RESOURCE_S(texture), "), size: ", size);
+			m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&
+			m_scripts.init() &&
+			m_graphics.init(window);
 		
 		if(initializationStatus)
 		{
+			m_debugDraw.setGraphicsSystem(m_graphics);
+			m_debugDraw.AppendFlags(m_debugDraw.e_shapeBit | m_debugDraw.e_aabbBit);
+			m_debugDraw.setLengthScale(1 / m_b2Scale);
+			m_drawDebugData = false;
+
+			m_physics.addBeginContactListener(std::bind(&PongGame::updateScore, this, std::placeholders::_1));
+			m_physics.addEndContactListener(std::bind(&PongGame::speedUpBall, this, std::placeholders::_1));
+
+			initializationStatus &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
+			initializationStatus &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
+
+			auto df = m_scripts.getDataFile();
+			if(df.open(RESOURCE("Sheets/font.sheet")))
+			{
+				initializationStatus &= m_graphics.initFont(df);
+				df.close();
+			}
+			
+			DEBUG_INFO("init status is now ", initializationStatus ? "true" : "false");
+
 			createField();
 			createBall();
 			createPaddles();
@@ -321,8 +323,10 @@ namespace Core
 		m_graphics.drawQuad(m_ball.m_tf, m_ball.m_size*0.5f, m_ball.m_c);
 
 		m_graphics.drawQuad(m_leftPaddle.m_tf, m_leftPaddle.m_size*0.5f, m_leftPaddle.m_c);
+		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), m_leftPaddle.m_tf.position + Vec2(10, 0), m_leftPaddle.m_c);
 
 		m_graphics.drawQuad(m_rightPaddle.m_tf, m_rightPaddle.m_size*0.5f, m_rightPaddle.m_c);
+		m_graphics.drawText(std::to_string(m_rightPaddle.m_score), m_rightPaddle.m_tf.position + Vec2(-10, 0), m_rightPaddle.m_c);
 		
 		if(m_drawDebugData)
 			m_physics.draw();

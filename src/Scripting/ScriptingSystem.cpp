@@ -19,11 +19,10 @@ namespace Core
 		m_luaState = luaL_newstate();
 		if(m_luaState)
 		{
-			m_extractionString.assign("local data = ...; return data.");
 			luaL_openlibs(m_luaState);
 			status = true;
 		}
-		
+		DEBUG_INFO("ScriptingSystem init ", status ? "OK" : "FAIL");
 		return status;
 	}
 
@@ -33,82 +32,106 @@ namespace Core
 		return true;
 	}
 
-	void ScriptingSystem::extract(const char* key)
+	DataFile ScriptingSystem::getDataFile(const char* filename)
 	{
-		std::string extractStatement(m_extractionString);
-		extractStatement.append(key);
-		luaL_loadstring(m_luaState, extractStatement.c_str());
-		lua_pushvalue(m_luaState, -2);
-		lua_pcall(m_luaState, 1, 1, 0);
+		DataFile df(m_luaState);
+		if(filename != nullptr)
+			df.open(filename);
+		return df;
 	}
 
-	void ScriptingSystem::loadConfiguration(const char* filename)
+
+	DataFile::DataFile(lua_State* lua)
+		: m_luaState(lua)
+	{}
+
+	bool DataFile::open(const char* filename)
 	{
-		DEBUG_LINE(auto top = lua_gettop(m_luaState));
-		luaL_dofile(m_luaState, filename);
-		DEBUG_LINE(assert(top == lua_gettop(m_luaState) - 1));
+		assert(filename != nullptr);
+		int32_t ret = luaL_loadfile(m_luaState, filename);
+		ret = lua_pcall(m_luaState, 0, LUA_MULTRET, 0);
+		return ret == 0;
 	}
 
-	void ScriptingSystem::closeConfiguration()
+	void DataFile::close()
 	{
 		lua_pop(m_luaState, 1);
 	}
 
-	std::string ScriptingSystem::getString(const char* key)
+	std::string DataFile::getString(const char* key)
 	{
-		extract(key);
+		extract(m_luaState, key);
 		std::string ret(lua_tostring(m_luaState, -1));
 		lua_pop(m_luaState, 1);
 		return ret;
 	}
 
-	int32_t ScriptingSystem::getInt(const char* key)
+	int32_t DataFile::getInt(const char* key)
 	{
-		extract(key);
+		extract(m_luaState, key);
 		int32_t ret = lua_tointeger(m_luaState, -1);
 		lua_pop(m_luaState, 1);
 		return ret;
 	}
 
-	float ScriptingSystem::getFloat(const char* key)
+	double DataFile::getDouble(const char* key)
 	{
-		extract(key);
+		extract(m_luaState, key);
+		double ret = lua_tonumber(m_luaState, -1);
+		lua_pop(m_luaState, 1);
+		return ret;
+	}
+
+	float DataFile::getFloat(const char* key)
+	{
+		extract(m_luaState, key);
 		float ret = (float)lua_tonumber(m_luaState, -1);
 		lua_pop(m_luaState, 1);
 		return ret;
 	}
-		
-	bool ScriptingSystem::getBool(const char* key)
+
+	bool DataFile::getBool(const char* key)
 	{
-		extract(key);
+		extract(m_luaState, key);
 		bool ret = lua_toboolean(m_luaState, -1) == 1;
 		lua_pop(m_luaState, 1);
 		return ret;
 	}
 
-#ifdef _DEBUG
-	void ScriptingSystem::dumpStack()
+
+
+
+	void extract(lua_State* lua, const char* key)
 	{
-		uint32_t top = lua_gettop(m_luaState);
+		std::string extractStatement("local data = ...; return data.");
+		luaL_loadstring(lua, (extractStatement + key).c_str());
+		lua_pushvalue(lua, -2);
+		lua_pcall(lua, 1, 1, 0);
+	}
+	
+#ifdef _DEBUG
+	void dumpStack(lua_State* lua)
+	{
+		uint32_t top = lua_gettop(lua);
 		for(uint32_t i = 1; i <= top; ++i)
 		{  /* repeat for each level */
-			int t = lua_type(m_luaState, i);
+			int t = lua_type(lua, i);
 			switch(t)
 			{
 				case LUA_TSTRING:  /* strings */
-				std::cout << lua_tostring(m_luaState, i);
+				std::cout << lua_tostring(lua, i);
 				break;
 
 				case LUA_TBOOLEAN:  /* booleans */
-				std::cout << lua_toboolean(m_luaState, i) ? "true" : "false";
+				std::cout << lua_toboolean(lua, i) ? "true" : "false";
 				break;
 
 				case LUA_TNUMBER:  /* numbers */
-				std::cout << lua_tonumber(m_luaState, i);
+				std::cout << lua_tonumber(lua, i);
 				break;
 
 				default:  /* other values */
-				std::cout << lua_typename(m_luaState, t);
+				std::cout << lua_typename(lua, t);
 				break;
 
 			}

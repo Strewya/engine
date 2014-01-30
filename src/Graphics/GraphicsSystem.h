@@ -15,9 +15,29 @@
 namespace Core
 {
 	class Color;
+	class DataFile;
 	class Transform;
 	class Vec2;
 	class Window;
+
+	class Glyph
+	{
+	public:
+		uint32_t m_ascii;
+		uint32_t m_left;
+		uint32_t m_right;
+		uint32_t m_top;
+		char m_character;
+	};
+
+	class Font
+	{
+	public:
+		uint32_t m_size;
+		std::string m_name;
+		std::string m_texture;
+		std::vector<Glyph> m_glyphs;
+	};
 
 	class GraphicsSystem
 	{
@@ -33,10 +53,11 @@ namespace Core
 		bool initDevice();
 		bool initSwapChain();
 		bool initRenderTarget();
-		bool initVertexShader(const std::string& shaderFile);
-		bool initPixelShader(const std::string& shaderFile);
+		bool initVertexShader(const char* shaderFile);
+		bool initPixelShader(const char* shaderFile);
 		bool initViewport();
 		bool initSamplerState();
+		bool initFont(DataFile& file);
 
 
 		void setBackgroundColor(float red, float green, float blue);
@@ -45,13 +66,13 @@ namespace Core
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 
-		bool loadFont(const char* filename);
-
-		
+		void drawText(const std::string& text, const Vec2& pos, const Color& tint);
 
 	private:
-		template<typename T> static void ReleasePtr(T* ptr);
-		template<typename T> static void SafeRelease(T** ptr);
+		template<typename T> static void releasePtr(T* ptr);
+		template<typename T> static void safeRelease(T*& ptr);
+		template<typename T> void declare(T** ptr);
+
 
 		DXGI_SWAP_CHAIN_DESC m_swapChainDesc;
 		D3DXCOLOR m_backgroundColor;
@@ -75,24 +96,33 @@ namespace Core
 		XMMATRIX m_world;
 		
 		//this shouldn't be explicit like this, refactor later
-		ID3D11ShaderResourceView* m_font;
+		ID3D11ShaderResourceView* m_fontTexture;
+		Font m_font;
 
+		std::vector<IUnknown*> m_dxResources;
 	};
 
-	template<typename T> void GraphicsSystem::SafeRelease(T** ptr)
+	template<typename T> void GraphicsSystem::safeRelease(T*& ptr)
 	{
-		if(*ptr != nullptr)
+		if(ptr != nullptr)
 		{
-			ReleasePtr(*ptr);
-			*ptr = nullptr;
+			releasePtr(ptr);
+			ptr = nullptr;
 		}
 	}
 
-	template<typename T> void GraphicsSystem::ReleasePtr(T* ptr)
+	template<typename T> void GraphicsSystem::releasePtr(T* ptr)
 	{
 		if(ptr != nullptr)
 		{
 			ptr->Release();
 		}
+	}
+
+	template<typename T> void GraphicsSystem::declare(T** ptr)
+	{
+		assert(ptr != nullptr);
+		*ptr = nullptr;
+		m_dxResources.emplace_back(*ptr);
 	}
 }

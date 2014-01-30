@@ -8,6 +8,7 @@
 #include <iostream>
 /******* extra headers *******/
 #include <Graphics/Vertex.h>
+#include <Scripting/ScriptingSystem.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
@@ -20,6 +21,7 @@ namespace Core
 	{
 		XMMATRIX WVP;
 		XMFLOAT4 FillColor;
+		XMFLOAT4 isTexture;
 	};
 
 	static void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd, HWND hwnd, uint32_t width, uint32_t height);
@@ -31,14 +33,16 @@ namespace Core
 	{
 		bool status = true;
 
-		m_dxgiFactory = nullptr;
-		m_dev = nullptr;
-		m_devcon = nullptr;
-		m_swapchain = nullptr;
-		m_renderTarget = nullptr;
-		m_vertexShader = nullptr;
-		m_pixelShader = nullptr;
-		m_inputLayout = nullptr;
+		declare(&m_dxgiFactory);
+		declare(&m_dev);
+		declare(&m_devcon);
+		declare(&m_swapchain);
+		declare(&m_renderTarget);
+		declare(&m_vertexShader);
+		declare(&m_pixelShader);
+		declare(&m_inputLayout);
+		declare(&m_samplerState);
+		declare(&m_fontTexture);
 
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
@@ -46,9 +50,7 @@ namespace Core
 		status = initDevice() &&
 			initSwapChain() &&
 			initRenderTarget() &&
-			initViewport() &&
-			initVertexShader("shader.hlsl") &&
-			initPixelShader("shader.hlsl");
+			initViewport();
 
 		m_camPosition = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
 		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -71,14 +73,10 @@ namespace Core
 			m_swapchain->SetFullscreenState(false, nullptr);
 		}
 
-		SafeRelease(&m_inputLayout);
-		SafeRelease(&m_pixelShader);
-		SafeRelease(&m_vertexShader);
-		SafeRelease(&m_renderTarget);
-		SafeRelease(&m_swapchain);
-		SafeRelease(&m_devcon);
-		SafeRelease(&m_dev);
-		SafeRelease(&m_dxgiFactory);
+		for(auto* ptr : m_dxResources)
+		{
+			safeRelease(ptr);
+		}
 
 		DEBUG_INFO("GraphicsSystem shutdown ", status ? "OK" : "FAIL");
 		return status;
@@ -152,6 +150,7 @@ namespace Core
 		cbpo.FillColor.y = c.g;
 		cbpo.FillColor.z = c.b;
 		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 0;
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
@@ -203,6 +202,7 @@ namespace Core
 		cbpo.FillColor.y = c.g;
 		cbpo.FillColor.z = c.b;
 		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 0;
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
@@ -271,6 +271,7 @@ namespace Core
 		cbpo.FillColor.y = c.g;
 		cbpo.FillColor.z = c.b;
 		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 0;
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
@@ -283,7 +284,116 @@ namespace Core
 		vb->Release();
 	}
 	
+	void GraphicsSystem::drawText(const std::string& text, const Vec2& pos, const Color& tint)
+	{
+		ID3D11Resource* res = nullptr;
+		m_fontTexture->GetResource(&res);
 
+		ID3D11Texture2D* texture = nullptr;
+		HRESULT hr = res->QueryInterface(&texture);
+
+		if(SUCCEEDED(hr))
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			texture->GetDesc(&desc);
+			float w = static_cast<float>(desc.Width);
+			float h = static_cast<float>(desc.Height);
+			std::vector<Vertex> verts(text.size() * 4);
+			std::vector<uint32_t> inds(text.size() * 6);
+			uint32_t v = 0;
+			uint32_t i = 0;
+			
+			for(char c : text)
+			{
+				Glyph& glyph = m_font.m_glyphs[c - 32];
+				float tv_top = (float)glyph.m_top / h;
+				float tv_bot = (float)(glyph.m_top + m_font.m_size) / h;
+				float tu_left = (float)glyph.m_left / w;
+				float tu_rght = (float)glyph.m_right / w;
+
+				inds[i++] = v + 2;
+				inds[i++] = v + 0;
+				inds[i++] = v + 1;
+				inds[i++] = v + 1;
+				inds[i++] = v + 3;
+				inds[i++] = v + 2;
+
+				verts[v].setPosition(pos.x, pos.y, 0);
+				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setTextureCoords(tu_left, tv_top);
+				++v;
+				verts[v].setPosition(pos.x, pos.y, 0);
+				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setTextureCoords(tu_rght, tv_top);
+				++v;
+				verts[v].setPosition(pos.x, pos.y, 0);
+				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setTextureCoords(tu_left, tv_bot);
+				++v;
+				verts[v].setPosition(pos.x, pos.y, 0);
+				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setTextureCoords(tu_rght, tv_bot);
+				++v;
+			}
+			D3D11_MAPPED_SUBRESOURCE ms;
+
+			auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
+
+			HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+			assert(SUCCEEDED(hr));
+			memcpy(ms.pData, verts.data(), verts.size() * sizeof(Vertex));
+			m_devcon->Unmap(vb, 0);
+
+			uint32_t stride = sizeof(Vertex);
+			uint32_t offset = 0;
+			m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+			m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+			/****** INDEX BUFER ******/
+			auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
+			hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+			assert(SUCCEEDED(hr));
+			memcpy(ms.pData, inds.data(), inds.size() * sizeof(uint32_t));
+			m_devcon->Unmap(ib, 0);
+
+			m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+			/****** CONSTANT BUFFER ******/
+			auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
+
+			m_world = XMMatrixIdentity();
+			m_world *= XMMatrixScaling(1.0f, 1.0f, 1.0f);
+			//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+			//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+			//m_world *= XMMatrixRotationZ(XMConvertToRadians(0));
+			m_world *= XMMatrixTranslation(pos.x, pos.y, 0);
+
+
+			cbPerObject cbpo;
+			cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+			cbpo.FillColor.x = tint.r;
+			cbpo.FillColor.y = tint.g;
+			cbpo.FillColor.z = tint.b;
+			cbpo.FillColor.w = tint.a;
+			cbpo.isTexture.x = 1;
+
+			m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+			m_devcon->VSSetConstantBuffers(0, 1, &cb);
+			m_devcon->PSSetShaderResources(0, 1, &m_fontTexture);
+
+			m_devcon->DrawIndexed(inds.size() , 0, 0);
+
+
+
+			safeRelease(cb);
+			safeRelease(ib);
+			safeRelease(vb);
+		}
+
+		safeRelease(res);
+		safeRelease(texture);
+	}
 
 	//*****************************************************************
 	//					INIT DEVICE
@@ -348,12 +458,11 @@ namespace Core
 	//*****************************************************************
 	//					INIT VERTEX SHADER
 	//*****************************************************************
-	bool GraphicsSystem::initVertexShader(const std::string& shaderFile)
+	bool GraphicsSystem::initVertexShader(const char* shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-		std::string shaderPath("../resources/Shaders/" + shaderFile);
 		
-		HRESULT hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
 			hr = m_dev->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_vertexShader);
@@ -379,12 +488,11 @@ namespace Core
 	//*****************************************************************
 	//					INIT PIXEL SHADER
 	//*****************************************************************
-	bool GraphicsSystem::initPixelShader(const std::string& shaderFile)
+	bool GraphicsSystem::initPixelShader(const char* shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-		std::string shaderPath("../resources/Shaders/" + shaderFile);
 
-		HRESULT hr = D3DX11CompileFromFile(shaderPath.c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
 			hr = m_dev->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_pixelShader);
@@ -438,15 +546,29 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					
+	//					INIT FONT
 	//*****************************************************************
-	bool GraphicsSystem::loadFont(const char* filename)
+	bool GraphicsSystem::initFont(DataFile& file)
 	{
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename, nullptr, nullptr, &m_font, nullptr);
+		m_font.m_name = file.getString("name");
+		m_font.m_texture = file.getString("texture");
+		m_font.m_size = file.getInt("size");
+		uint32_t glyphCount = file.getInt("glyphCount");
+		m_font.m_glyphs.resize(glyphCount);
+		for(uint32_t i = 0; i < glyphCount; ++i)
+		{
+			m_font.m_glyphs[i].m_ascii = file.getInt(("glyphs[" + std::to_string(i + 1) + "].ascii").c_str());
+			m_font.m_glyphs[i].m_character = static_cast<char>(m_font.m_glyphs[i].m_ascii);
+			m_font.m_glyphs[i].m_left = file.getInt(("glyphs[" + std::to_string(i + 1) + "].left").c_str());
+			m_font.m_glyphs[i].m_right = file.getInt(("glyphs[" + std::to_string(i + 1) + "].right").c_str());
+			m_font.m_glyphs[i].m_top = file.getInt(("glyphs[" + std::to_string(i + 1) + "].top").c_str());
+		}
+
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_font.m_texture), nullptr, nullptr, &m_fontTexture, nullptr);
 		return SUCCEEDED(hr);
 	}
 
-
+	
 
 	ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
 	{
