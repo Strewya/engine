@@ -7,6 +7,7 @@
 #include <iostream>
 /******* extra headers *******/
 #include <Util/Time.h>
+#include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
 /******* end headers *******/
@@ -33,7 +34,7 @@ namespace Core
 
 		m_window = &window;
 
-		std::cout << "InputSystem init " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("InputSystem init ", status ? "OK" : "FAIL");
 		return status;
 	}
 
@@ -41,7 +42,7 @@ namespace Core
 	{
 		bool status = true;
 
-		std::cout << "InputSystem shutdown " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("InputSystem shutdown ", status ? "OK" : "FAIL");
 		return status;
 	}
 

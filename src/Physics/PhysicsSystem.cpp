@@ -7,6 +7,7 @@
 #include <iostream>
 /******* extra headers *******/
 #include <Util/Dimensional.h>
+#include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
@@ -28,7 +29,7 @@ namespace Core
 			m_world.SetDebugDraw(debugDraw);
 		m_world.SetContactListener(this);
 
-		std::cout << "PhysicsSystem init " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("PhysicsSystem init ", status ? "OK" : "FAIL");
 		return status;
 	}
 
@@ -50,7 +51,7 @@ namespace Core
 		m_fixtures.clear();
 		m_bodies.clear();
 
-		std::cout << "PhysicsSystem shutdown " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("PhysicsSystem shutdown ", status ? "OK" : "FAIL");
 		return status;
 	}
 

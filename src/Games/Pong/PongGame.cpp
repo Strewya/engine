@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <Games/Pong/PongGame.h>
 /******* C++ headers *******/
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@
 #include <Util/Color.h>
 #include <Util/Dimensional.h>
 #include <Util/Transform.h>
+#include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
 /******* end headers *******/
@@ -56,9 +58,9 @@ namespace Core
 		uint32_t screenW = 640, screenH = 480;
 		float ratio = (float)screenW / (float)screenH;
 		window.resize(screenW, screenH);
-#ifdef _DEBUG
-		window.openConsole(660, 0);
-#endif
+
+		DEBUG_LINE(window.openConsole(660, 0));
+
 		bool initializationStatus = m_input.init(window) &&
 									m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&
 									m_scripts.init() &&
@@ -73,20 +75,15 @@ namespace Core
 		m_physics.addEndContactListener(std::bind(&PongGame::speedUpBall, this, std::placeholders::_1));
 
 
-		m_scripts.loadFile("../resources/font.sheet");
-		m_scripts.dumpStack();
+		m_scripts.loadConfiguration("../resources/font.sheet");
 		std::string name = m_scripts.getString("name");
-		m_scripts.dumpStack();
 		std::string texture = m_scripts.getString("texture");
-		m_scripts.dumpStack();
 		uint32_t size = m_scripts.getInt("size");
-		m_scripts.dumpStack();
+		m_scripts.closeConfiguration();
+		
 
-
-
-
-
-
+		DEBUG_INFO("name: ", name, ", texture: ", texture, " (full path: ", RESOURCE_S(texture), "), size: ", size);
+		
 		if(initializationStatus)
 		{
 			createField();
@@ -102,6 +99,7 @@ namespace Core
 		//do some shutdown logic, like saving states and whatnot
 		m_input.shutdown();
 		m_physics.shutdown();
+		m_scripts.shutdown();
 		m_graphics.shutdown();
 	}
 
@@ -223,8 +221,7 @@ namespace Core
 				{
 					m_ball.m_reset = true;
 				}
-#endif	
-				
+#endif
 				break;
 				
 			case WE_GAINFOCUS:
@@ -283,7 +280,7 @@ namespace Core
 			if(m_ball.m_speedup)
 			{
 				vel = body->GetLinearVelocity();
-				std::cout << "pre-impulse: vel:" << vel.x << "," << vel.y << std::endl;
+				DEBUG_INFO("pre-impulse: vel:", vel.x, ",", vel.y);
 				
 				b2Vec2 impulse = vel;
 				impulse.Normalize();
@@ -298,7 +295,7 @@ namespace Core
 					body->ApplyLinearImpulse(impulse, body->GetWorldCenter());
 				}
 				vel = body->GetLinearVelocity();
-				std::cout << "post-impulse: vel:" << vel.x << "," << vel.y << std::endl;
+				DEBUG_INFO("post-impulse: vel:", vel.x, ",", vel.y);
 				m_ball.m_speedup = false;
 				m_ball.m_sway.set(0, 0);
 			}
@@ -373,20 +370,20 @@ namespace Core
 		}
 		else
 		{
-			std::cout << "No ball in collision, leaving" << std::endl;
+			DEBUG_INFO("No ball in collision, leaving");
 			return;
 		}
 		
 		if(paddle->GetUserData() != &m_leftPaddle && paddle->GetUserData() != &m_rightPaddle)
 		{
-			std::cout << "No paddle in collision, leaving" << std::endl;
+			DEBUG_INFO("No paddle in collision, leaving");
 			return;
 		}
 		
 		m_ball.m_speedup = true;
 		auto sway = ball->GetPosition() - paddle->GetPosition();
 		sway.Normalize();
-		std::cout << "Sway will be " << sway.x << "," << sway.y << std::endl;
+		DEBUG_INFO("Sway will be ", sway.x, ",", sway.y);
 		m_ball.m_sway = convert(sway);
 	}
 

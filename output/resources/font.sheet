@@ -1,6 +1,6 @@
 return {
 	name = "font",
-	texture = "../resources/font_t.png",
+	texture = "font_t.png",
 	size = 32,
 	glyphCount = 95,
 	glyphs = {

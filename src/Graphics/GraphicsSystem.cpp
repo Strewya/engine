@@ -10,6 +10,7 @@
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
+#include <Util/Utility.h>
 #include <Window/Window.h>
 /******* end headers *******/
 
@@ -57,7 +58,7 @@ namespace Core
 		//m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
 		m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
 		
-		std::cout << "GraphicsSystem init " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("GraphicsSystem init ", status ? "OK" : "FAIL");
 		return status;
 	}
 
@@ -79,7 +80,7 @@ namespace Core
 		SafeRelease(&m_dev);
 		SafeRelease(&m_dxgiFactory);
 
-		std::cout << "GraphicsSystem shutdown " << (status ? "OK" : "FAIL") << std::endl;
+		DEBUG_INFO("GraphicsSystem shutdown ", status ? "OK" : "FAIL");
 		return status;
 	}
 
@@ -308,8 +309,7 @@ namespace Core
 			}
 		}
 
-		if(FAILED(hr))
-			std::cout << "\tinitDevice failed" << std::endl;
+		DEBUG_LINE(if(FAILED(hr)) DEBUG_INFO("\tinitDevice failed"));
 
 		return SUCCEEDED(hr);
 	}
@@ -341,8 +341,7 @@ namespace Core
 			}
 			bbTexture->Release();
 		}
-		if(FAILED(hr))
-			std::cout << "\tinitRenderTarget failed" << std::endl;
+		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitRenderTarget failed"));
 		return SUCCEEDED(hr);
 	}
 
@@ -373,8 +372,7 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		if(FAILED(hr))
-			std::cout << "\tinitVertexShader failed" << std::endl;
+		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitVertexShader failed"));
 		return SUCCEEDED(hr);
 	}
 	
@@ -396,8 +394,7 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		if(FAILED(hr))
-			std::cout << "\tinitPixelShader failed" << std::endl;
+		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitPixelShader failed"));
 		return SUCCEEDED(hr);
 	}
 

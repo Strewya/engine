@@ -169,6 +169,7 @@
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
+    <ClInclude Include="..\..\..\src\Util\Utility.h" />
     <ClInclude Include="..\..\..\src\Util\Dimensional.h" />
     <ClInclude Include="..\..\..\src\Util\Random.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />

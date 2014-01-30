@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 /******* common headers *******/
 #include <Scripting/LuaInclude.h>
@@ -18,7 +19,8 @@ namespace Core
 		bool init();
 		bool shutdown();
 
-		void loadFile(const char* filename);
+		void loadConfiguration(const char* filename);
+		void closeConfiguration();
 		std::string getString(const char* key);
 		int32_t getInt(const char* key);
 		float getFloat(const char* key);

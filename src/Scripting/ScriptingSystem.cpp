@@ -8,6 +8,7 @@
 #include <iostream>
 #endif
 /******* extra headers *******/
+#include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
@@ -36,18 +37,21 @@ namespace Core
 	{
 		std::string extractStatement(m_extractionString);
 		extractStatement.append(key);
-		dumpStack();
 		luaL_loadstring(m_luaState, extractStatement.c_str());
-		dumpStack();
 		lua_pushvalue(m_luaState, -2);
-		dumpStack();
 		lua_pcall(m_luaState, 1, 1, 0);
-		dumpStack();
 	}
 
-	void ScriptingSystem::loadFile(const char* filename)
+	void ScriptingSystem::loadConfiguration(const char* filename)
 	{
+		DEBUG_LINE(auto top = lua_gettop(m_luaState));
 		luaL_dofile(m_luaState, filename);
+		DEBUG_LINE(assert(top == lua_gettop(m_luaState) - 1));
+	}
+
+	void ScriptingSystem::closeConfiguration()
+	{
+		lua_pop(m_luaState, 1);
 	}
 
 	std::string ScriptingSystem::getString(const char* key)
@@ -55,7 +59,6 @@ namespace Core
 		extract(key);
 		std::string ret(lua_tostring(m_luaState, -1));
 		lua_pop(m_luaState, 1);
-		dumpStack();
 		return ret;
 	}
 
@@ -64,7 +67,6 @@ namespace Core
 		extract(key);
 		int32_t ret = lua_tointeger(m_luaState, -1);
 		lua_pop(m_luaState, 1);
-		dumpStack();
 		return ret;
 	}
 
@@ -73,7 +75,6 @@ namespace Core
 		extract(key);
 		float ret = (float)lua_tonumber(m_luaState, -1);
 		lua_pop(m_luaState, 1);
-		dumpStack();
 		return ret;
 	}
 		
@@ -82,7 +83,6 @@ namespace Core
 		extract(key);
 		bool ret = lua_toboolean(m_luaState, -1) == 1;
 		lua_pop(m_luaState, 1);
-		dumpStack();
 		return ret;
 	}
 

@@ -161,5 +161,8 @@
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
       <Filter>Systems\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Utility.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

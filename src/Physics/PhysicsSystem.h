@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <algorithm>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 #include <Box2D/Box2D.h>
