@@ -84,6 +84,9 @@ namespace Core
 		Paddle m_leftPaddle, m_rightPaddle;
 		Field m_field;
 		Ball m_ball;
+		uint32_t m_winScore;
+		uint32_t m_winner;
+		uint64_t m_resetTime;
 
 		bool init(Window& window);
 		bool tick();

@@ -4,7 +4,7 @@ return {
 	size = 32,
 	glyphCount = 95,
 	glyphs = {
-		{ ascii=32,  left=0,   right=24,  top=0}, { ascii=33,  left=43,  right=52,  top=0}, { ascii=34,  left=73,  right=84,  top=0}, { ascii=35,  left=99,  right=124, top=0},
+		{ ascii=32,  left=5,   right=29,  top=0}, { ascii=33,  left=43,  right=52,  top=0}, { ascii=34,  left=73,  right=84,  top=0}, { ascii=35,  left=99,  right=124, top=0},
 		{ ascii=36,  left=129, right=158, top=0}, { ascii=37,  left=163, right=188, top=0}, { ascii=38,  left=197, right=218, top=0}, { ascii=39,  left=237, right=242, top=0},
 		{ ascii=40,  left=261, right=274, top=0}, { ascii=41,  left=301, right=314, top=0}, { ascii=42,  left=325, right=346, top=0}, { ascii=43,  left=355, right=380, top=0},
 		{ ascii=44,  left=397, right=402, top=0}, { ascii=45,  left=419, right=444, top=0}, { ascii=46,  left=461, right=466, top=0}, { ascii=47,  left=483, right=508, top=0},

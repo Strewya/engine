@@ -18,6 +18,9 @@ namespace Core
 		Random();
 		Random(uint32_t seed);
 
+		//change the seed
+		void reseed(uint32_t seed);
+
 		//in interval between bounds
 		int32_t randInt(int32_t lowerBound, int32_t upperBound);
 

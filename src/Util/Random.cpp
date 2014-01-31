@@ -17,6 +17,11 @@ namespace Core
 		: m_randEngine(seed)
 	{}
 
+	void Random::reseed(uint32_t seed)
+	{
+		m_randEngine.seed(seed);
+	}
+
 	int32_t Random::randInt(int32_t lowerBound, int32_t upperBound)
 	{
 		std::uniform_int_distribution<int32_t> distro(lowerBound, upperBound);

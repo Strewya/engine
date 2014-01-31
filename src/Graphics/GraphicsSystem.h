@@ -66,7 +66,8 @@ namespace Core
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 
-		void drawText(const std::string& text, const Vec2& pos, const Color& tint);
+		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
+		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification);
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);

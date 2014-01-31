@@ -21,8 +21,7 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
     VOut output;
 
     output.position = mul(position, WVP);
-	//output.position = position;
-    output.texCoord = texCoord;
+	output.texCoord = texCoord;
 	output.diffuse = diffuse * FillColor;
 	
     return output;
@@ -32,8 +31,8 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
 float4 PShader(VOut input) : SV_TARGET
 {
     float4 diffuse = input.diffuse;
-	if(isTexture.x > 0.5)
-		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord);
+	if(isTexture.x != 0)
+		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
 	clip(diffuse.a - 0.25f);
 	return diffuse;
 }

@@ -154,6 +154,7 @@ namespace Core
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 
 		m_devcon->Draw(count, 0);
 
@@ -206,6 +207,7 @@ namespace Core
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 
 		m_devcon->Draw(count, 0);
 
@@ -275,6 +277,7 @@ namespace Core
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 
 		//m_devcon->Draw(4, 0);
 		m_devcon->DrawIndexed(6, 0, 0);
@@ -284,7 +287,7 @@ namespace Core
 		vb->Release();
 	}
 	
-	void GraphicsSystem::drawText(const std::string& text, const Vec2& pos, const Color& tint)
+	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification)
 	{
 		ID3D11Resource* res = nullptr;
 		m_fontTexture->GetResource(&res);
@@ -302,6 +305,8 @@ namespace Core
 			std::vector<uint32_t> inds(text.size() * 6);
 			uint32_t v = 0;
 			uint32_t i = 0;
+			float xPos = 0;
+			float yPos = m_font.m_size * 0.5f;
 			
 			for(char c : text)
 			{
@@ -311,33 +316,34 @@ namespace Core
 				float tu_left = (float)glyph.m_left / w;
 				float tu_rght = (float)glyph.m_right / w;
 
-				inds[i++] = v + 2;
 				inds[i++] = v + 0;
 				inds[i++] = v + 1;
-				inds[i++] = v + 1;
-				inds[i++] = v + 3;
 				inds[i++] = v + 2;
+				inds[i++] = v + 2;
+				inds[i++] = v + 3;
+				inds[i++] = v + 0;
 
-				verts[v].setPosition(pos.x, pos.y, 0);
-				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
-				verts[v].setTextureCoords(tu_left, tv_top);
-				++v;
-				verts[v].setPosition(pos.x, pos.y, 0);
-				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
-				verts[v].setTextureCoords(tu_rght, tv_top);
-				++v;
-				verts[v].setPosition(pos.x, pos.y, 0);
-				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setPosition(xPos, -yPos, 0);
+				verts[v].setDiffuse(1,1,1,1);
 				verts[v].setTextureCoords(tu_left, tv_bot);
 				++v;
-				verts[v].setPosition(pos.x, pos.y, 0);
-				verts[v].setDiffuse(tint.r, tint.g, tint.b, tint.a);
+				verts[v].setPosition(xPos, yPos, 0);
+				verts[v].setDiffuse(1, 1, 1, 1);
+				verts[v].setTextureCoords(tu_left, tv_top);
+				++v;
+				xPos += (glyph.m_right - glyph.m_left);
+				verts[v].setPosition(xPos, yPos, 0);
+				verts[v].setDiffuse(1, 1, 1, 1);
+				verts[v].setTextureCoords(tu_rght, tv_top);
+				++v;
+				verts[v].setPosition(xPos, -yPos, 0);
+				verts[v].setDiffuse(1, 1, 1, 1);
 				verts[v].setTextureCoords(tu_rght, tv_bot);
 				++v;
 			}
 			D3D11_MAPPED_SUBRESOURCE ms;
 
-			auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
+			auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), verts.size());
 
 			HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 			assert(SUCCEEDED(hr));
@@ -351,7 +357,7 @@ namespace Core
 
 
 			/****** INDEX BUFER ******/
-			auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
+			auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), inds.size());
 			hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 			assert(SUCCEEDED(hr));
 			memcpy(ms.pData, inds.data(), inds.size() * sizeof(uint32_t));
@@ -363,11 +369,22 @@ namespace Core
 			auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
 
 			m_world = XMMatrixIdentity();
-			m_world *= XMMatrixScaling(1.0f, 1.0f, 1.0f);
+			m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
 			//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
 			//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-			//m_world *= XMMatrixRotationZ(XMConvertToRadians(0));
-			m_world *= XMMatrixTranslation(pos.x, pos.y, 0);
+			m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+
+			float move = 0;
+			if (justification == 1)
+			{
+				move = xPos*0.5f*tf.scale.x;
+			}
+			else if (justification == 2)
+			{
+				move = xPos*tf.scale.x;
+			}
+
+			m_world *= XMMatrixTranslation(tf.position.x - move, tf.position.y, 0);
 
 
 			cbPerObject cbpo;
@@ -380,9 +397,11 @@ namespace Core
 
 			m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
 			m_devcon->VSSetConstantBuffers(0, 1, &cb);
+			m_devcon->PSSetConstantBuffers(0, 1, &cb);
+			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
 			m_devcon->PSSetShaderResources(0, 1, &m_fontTexture);
 
-			m_devcon->DrawIndexed(inds.size() , 0, 0);
+			m_devcon->DrawIndexed(inds.size(), 0, 0);
 
 
 
@@ -559,8 +578,8 @@ namespace Core
 		{
 			m_font.m_glyphs[i].m_ascii = file.getInt(("glyphs[" + std::to_string(i + 1) + "].ascii").c_str());
 			m_font.m_glyphs[i].m_character = static_cast<char>(m_font.m_glyphs[i].m_ascii);
-			m_font.m_glyphs[i].m_left = file.getInt(("glyphs[" + std::to_string(i + 1) + "].left").c_str());
-			m_font.m_glyphs[i].m_right = file.getInt(("glyphs[" + std::to_string(i + 1) + "].right").c_str());
+			m_font.m_glyphs[i].m_left = file.getInt(("glyphs[" + std::to_string(i + 1) + "].left").c_str())-1;
+			m_font.m_glyphs[i].m_right = file.getInt(("glyphs[" + std::to_string(i + 1) + "].right").c_str())+1;
 			m_font.m_glyphs[i].m_top = file.getInt(("glyphs[" + std::to_string(i + 1) + "].top").c_str());
 		}
 

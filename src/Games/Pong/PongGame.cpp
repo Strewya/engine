@@ -54,6 +54,10 @@ namespace Core
 		m_logicTimer.update(m_timeScale);
 		m_renderTimer.update(m_timeScale);
 		m_window = &window;
+		gen.reseed(static_cast<uint32_t>(m_logicTimer.getCurMicros()));
+		m_winner = 0;
+		m_resetTime = 0;
+		m_winScore = 10;
 
 		uint32_t screenW = 640, screenH = 480;
 		float ratio = (float)screenW / (float)screenH;
@@ -155,7 +159,7 @@ namespace Core
 				{
 					continueRunning = false;
 				}
-				else if(e.m_keyboard.m_keyCode == Keyboard::m_Enter && e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
+				else if(m_resetTime == 0 && e.m_keyboard.m_keyCode == Keyboard::m_Enter && e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
 				{
 					auto* body = m_physics.getBody(m_ball.m_body);
 					if(body)
@@ -302,7 +306,28 @@ namespace Core
 				m_ball.m_sway.set(0, 0);
 			}
 		}
+
+		if(m_leftPaddle.m_score == m_winScore)
+		{
+			m_winner = 1;
+			m_resetTime = m_logicTimer.getCurMicros() + Time::microsFromSeconds(5);
+			m_leftPaddle.m_score = 0;
+			m_rightPaddle.m_score = 0;
+		}
+		if(m_rightPaddle.m_score == m_winScore)
+		{
+			m_winner = 2;
+			m_resetTime = m_logicTimer.getCurMicros() + Time::microsFromSeconds(5);
+			m_leftPaddle.m_score = 0;
+			m_rightPaddle.m_score = 0;
+		}
 		
+		if(m_resetTime != 0 && m_resetTime <= m_logicTimer.getCurMicros())
+		{
+			m_winner = 0;
+			m_resetTime = 0;
+			m_ball.m_reset = true;
+		}
 
 		return continueRunning;
 	}
@@ -314,19 +339,43 @@ namespace Core
 		//update renderer
 		//m_graphics.update();
 
+		auto h = m_window->getSizeY()*0.5f - 20;
+
 		m_graphics.begin();
 
 		
 
 		m_graphics.drawQuad(m_field.m_tf, m_field.m_size*0.5f, m_field.m_c);
 
-		m_graphics.drawQuad(m_ball.m_tf, m_ball.m_size*0.5f, m_ball.m_c);
+		if(m_resetTime == 0)
+		{
+			m_graphics.drawQuad(m_ball.m_tf, m_ball.m_size*0.5f, m_ball.m_c);
+		}
 
+		Transform textTransform;
+		textTransform.rotation = 0;
+		textTransform.scale.set(1, 1);
+		
 		m_graphics.drawQuad(m_leftPaddle.m_tf, m_leftPaddle.m_size*0.5f, m_leftPaddle.m_c);
-		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), m_leftPaddle.m_tf.position + Vec2(10, 0), m_leftPaddle.m_c);
+		textTransform.position.set(m_leftPaddle.m_tf.position.x, h);
+		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), textTransform, m_leftPaddle.m_c, 0);
 
 		m_graphics.drawQuad(m_rightPaddle.m_tf, m_rightPaddle.m_size*0.5f, m_rightPaddle.m_c);
-		m_graphics.drawText(std::to_string(m_rightPaddle.m_score), m_rightPaddle.m_tf.position + Vec2(-10, 0), m_rightPaddle.m_c);
+		textTransform.position.set(m_rightPaddle.m_tf.position.x, h);
+		m_graphics.drawText(std::to_string(m_rightPaddle.m_score), textTransform, m_rightPaddle.m_c, 2);
+
+		static const std::string players[2] = {"Red", "Blue"};
+		if(m_winner != 0)
+		{
+			textTransform.position.set(0, 0);
+			m_graphics.drawText(players[m_winner - 1] + " player WINS!", textTransform, Color(1, 1, 1), 1);
+		}
+		else
+		{
+			textTransform.position.set(0, h);
+			textTransform.scale.set(0.5f, 0.5f);
+			m_graphics.drawText("Press Enter to launch ball, Escape to exit", textTransform, Color(1, 1, 1), 1);
+		}
 		
 		if(m_drawDebugData)
 			m_physics.draw();
