@@ -25,12 +25,14 @@ namespace Core
 	{
 		//logic
 		uint32_t m_score;
+		
 		//physics
 		InstanceID m_body;
 		InstanceID m_fixture;
 		InstanceID m_joint;
 		float m_maxVelocity;
 		float m_targetVelocity;
+		
 		//render
 		Vec2 m_size;
 		Color m_c;
@@ -42,6 +44,7 @@ namespace Core
 		//physics
 		InstanceID m_body;
 		InstanceID m_fixtures[4];
+
 		//render
 		Vec2 m_size;
 		Color m_c;
@@ -55,6 +58,7 @@ namespace Core
 		bool m_speedup;
 		float m_maxVelocity;
 		Vec2 m_sway;
+
 		//physics
 		InstanceID m_body;
 		InstanceID m_fixture;
@@ -62,7 +66,7 @@ namespace Core
 		//rendering
 		Vec2 m_size;
 		Color m_c;
-		Transform m_tf;		
+		Transform m_tf;
 	};
 
 	struct PongGame
@@ -87,6 +91,7 @@ namespace Core
 		uint32_t m_winScore;
 		uint32_t m_winner;
 		uint64_t m_resetTime;
+		bool m_aiActive;
 
 		bool init(Window& window);
 		bool tick();
@@ -100,5 +105,6 @@ namespace Core
 		void createBall();
 		void updateScore(b2Contact* contact);
 		void speedUpBall(b2Contact* contact);
+		void updatePaddleAI();
 	};
 }

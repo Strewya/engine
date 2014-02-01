@@ -58,6 +58,7 @@ namespace Core
 		m_winner = 0;
 		m_resetTime = 0;
 		m_winScore = 10;
+		m_aiActive = true;
 
 		uint32_t screenW = 640, screenH = 480;
 		float ratio = (float)screenW / (float)screenH;
@@ -196,7 +197,7 @@ namespace Core
 						m_leftPaddle.m_targetVelocity += m_leftPaddle.m_maxVelocity;
 					}
 				}
-				else if(e.m_keyboard.m_keyCode == Keyboard::m_ArrowUp)
+				else if(!m_aiActive && e.m_keyboard.m_keyCode == Keyboard::m_ArrowUp)
 				{
 					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
 					{
@@ -207,7 +208,7 @@ namespace Core
 						m_rightPaddle.m_targetVelocity -= m_rightPaddle.m_maxVelocity;
 					}
 				}
-				else if(e.m_keyboard.m_keyCode == Keyboard::m_ArrowDown)
+				else if(!m_aiActive && e.m_keyboard.m_keyCode == Keyboard::m_ArrowDown)
 				{
 					if(e.m_keyboard.m_isDown && !e.m_keyboard.m_previouslyDown)
 					{
@@ -241,6 +242,11 @@ namespace Core
 			default:
 				break;
 			}
+		}
+
+		if(m_aiActive)
+		{
+			updatePaddleAI();
 		}
 
 		auto* body = m_physics.getBody(m_leftPaddle.m_body);
@@ -437,7 +443,12 @@ namespace Core
 		auto sway = ball->GetPosition() - paddle->GetPosition();
 		sway.Normalize();
 		DEBUG_INFO("Sway will be ", sway.x, ",", sway.y);
-		m_ball.m_sway = convert(sway);
+		m_ball.m_sway = convert(sway)*2;
+	}
+
+	void PongGame::updatePaddleAI()
+	{
+		m_scripts.executeScriptFile(RESOURCE("Scripts/test.lua"));
 	}
 
 	void PongGame::createField()

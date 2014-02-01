@@ -89,6 +89,9 @@
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
       <Filter>Systems\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp">
+      <Filter>Systems\Scripting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Utility.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\luaBinding.h">
+      <Filter>Systems\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

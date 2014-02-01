@@ -6,4 +6,4 @@ extern "C"
 #include <lualib.h>
 #include <lauxlib.h>
 }
-//#include <tolua++.h>
+#include <tolua++.h>

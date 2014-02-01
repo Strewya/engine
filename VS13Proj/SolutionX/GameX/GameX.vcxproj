@@ -86,7 +86,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource> </AssemblyLinkResource>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -105,7 +106,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource> </AssemblyLinkResource>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
@@ -124,7 +126,8 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource> </AssemblyLinkResource>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -137,6 +140,7 @@
     <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -165,6 +169,7 @@
     <ClInclude Include="..\..\..\src\Input\KeybindSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
+    <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />

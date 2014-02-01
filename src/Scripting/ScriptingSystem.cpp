@@ -4,10 +4,13 @@
 /******* personal header *******/
 #include <Scripting/ScriptingSystem.h>
 /******* C++ headers *******/
+#include <cassert>
 #ifdef _DEBUG
 #include <iostream>
 #endif
 /******* extra headers *******/
+#include <Scripting/luaBinding.h>
+#include <Util/Dimensional.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -20,6 +23,7 @@ namespace Core
 		if(m_luaState)
 		{
 			luaL_openlibs(m_luaState);
+			tolua_s_open(m_luaState);
 			status = true;
 		}
 		DEBUG_INFO("ScriptingSystem init ", status ? "OK" : "FAIL");
@@ -38,6 +42,15 @@ namespace Core
 		if(filename != nullptr)
 			df.open(filename);
 		return df;
+	}
+
+	void ScriptingSystem::executeScriptFile(const char* scriptName)
+	{
+		int32_t ret = luaL_loadfile(m_luaState, scriptName);
+		Vec2 v(43, 42);
+		tolua_pushusertype(m_luaState, &v, "Core::Vec2");
+		lua_pcall(m_luaState, 1, 0, 0);
+		assert(v.x != 43);
 	}
 
 

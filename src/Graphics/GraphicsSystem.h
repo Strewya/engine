@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cassert>
 #include <memory>
 #include <string>
 #include <vector>

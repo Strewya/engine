@@ -44,6 +44,8 @@ namespace Core
 
 		DataFile getDataFile(const char* filename = nullptr);
 
+		void executeScriptFile(const char* scriptName);
+
 	private:
 		lua_State* m_luaState;
 	};

@@ -26,19 +26,19 @@ namespace Core
 	}
 
 
-	Vec2 operator+(const Vec2& a, const Vec2& b)
+	Vec2 Vec2::operator+(const Vec2& b) const
 	{
-		return Vec2(a.x + b.x, a.y + b.y);
+		return Vec2(x + b.x, y + b.y);
 	}
 
-	Vec2 operator-(const Vec2& v)
+	Vec2 Vec2::operator-() const
 	{
-		return Vec2(-v.x, -v.y);
+		return Vec2(-x, -y);
 	}
 
-	Vec2 operator*(const Vec2& v, float f)
+	Vec2 Vec2::operator*(float f) const
 	{
-		return Vec2(v.x * f, v.y * f);
+		return Vec2(x * f, y * f);
 	}
 
 	Vec2 operator*(float f, const Vec2& v)
