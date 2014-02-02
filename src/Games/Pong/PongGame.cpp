@@ -311,6 +311,7 @@ namespace Core
 				m_ball.m_speedup = false;
 				m_ball.m_sway.set(0, 0);
 			}
+			m_ball.m_velocity = convert(body->GetLinearVelocity()) / m_b2Scale;
 		}
 
 		if(m_leftPaddle.m_score == m_winScore)
@@ -448,7 +449,7 @@ namespace Core
 
 	void PongGame::updatePaddleAI()
 	{
-		m_scripts.executeScriptFile(RESOURCE("Scripts/test.lua"));
+		m_scripts.executeScriptFile(RESOURCE("Scripts/paddleAI.lua"), this, CLASS(PongGame));
 	}
 
 	void PongGame::createField()
@@ -522,7 +523,7 @@ namespace Core
 		bodyDef.position = convert(m_leftPaddle.m_tf.position*m_b2Scale);
 		m_leftPaddle.m_body = m_physics.createBody(bodyDef);
 
-		polygonShape.SetAsBox(m_leftPaddle.m_size.x*m_b2Scale*0.55f, m_leftPaddle.m_size.y*m_b2Scale*0.55f);
+		polygonShape.SetAsBox(m_leftPaddle.m_size.x*m_b2Scale * 2, m_leftPaddle.m_size.y*m_b2Scale*0.55f, b2Vec2(-m_leftPaddle.m_size.x*m_b2Scale*1.5f, 0), 0);
 		m_leftPaddle.m_fixture = m_physics.createFixture(fixtureDef, m_leftPaddle.m_body);
 
 		auto* bodyA = m_physics.getBody(m_leftPaddle.m_body);
@@ -545,7 +546,7 @@ namespace Core
 		bodyDef.position = convert(m_rightPaddle.m_tf.position*m_b2Scale);
 		m_rightPaddle.m_body = m_physics.createBody(bodyDef);
 		
-		polygonShape.SetAsBox(m_rightPaddle.m_size.x*m_b2Scale*0.55f, m_rightPaddle.m_size.y*m_b2Scale*0.55f);
+		polygonShape.SetAsBox(m_rightPaddle.m_size.x*m_b2Scale * 2, m_rightPaddle.m_size.y*m_b2Scale*0.55f, b2Vec2(m_rightPaddle.m_size.x*m_b2Scale*1.5f, 0), 0);
 		m_rightPaddle.m_fixture = m_physics.createFixture(fixtureDef, m_rightPaddle.m_body);
 
 		bodyA = m_physics.getBody(m_rightPaddle.m_body);

@@ -171,4 +171,9 @@
       <Filter>Systems\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\Scripting\luaExport.pkg">
+      <Filter>Systems\Scripting</Filter>
+    </None>
+  </ItemGroup>
 </Project>

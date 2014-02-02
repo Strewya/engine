@@ -44,7 +44,7 @@ namespace Core
 
 		DataFile getDataFile(const char* filename = nullptr);
 
-		void executeScriptFile(const char* scriptName);
+		void executeScriptFile(const char* scriptName, void* game, const char* argType);
 
 	private:
 		lua_State* m_luaState;

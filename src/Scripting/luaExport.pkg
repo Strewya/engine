@@ -1,0 +1,164 @@
+
+$#include <Games/Pong/PongGame.h>
+$#include <Util/Color.h>
+$#include <Util/Dimensional.h>
+$#include <Util/Random.h>
+$#include <Util/Time.h>
+$#include <Util/Transform.h>
+
+typedef signed char        int8_t;
+typedef short              int16_t;
+typedef int                int32_t;
+typedef long long          int64_t;
+typedef unsigned char      uint8_t;
+typedef unsigned short     uint16_t;
+typedef unsigned int       uint32_t;
+typedef unsigned long long uint64_t;
+typedef uint32_t           InstanceID;
+
+namespace Core 
+{
+	class Vec2
+	{
+		float x, y;
+
+		Vec2();
+		Vec2(float x, float y);
+		
+		void set(float x, float y);
+
+		/* these are inside the class for tolua++ binding compatibility */
+		Vec2 operator+(const Vec2& b) const;
+		Vec2 operator-() const;
+		Vec2 operator-(const Vec2& v) const;
+		Vec2 operator*(float f) const;
+		Vec2 operator/(float f) const;
+	};
+
+	class Color
+	{
+		float r, g, b, a;
+
+		Color();
+		Color(float r, float g, float b);
+
+		void set(float r, float g, float b);
+	};
+
+	class Transform
+	{
+		Transform();
+
+		Vec2 position;
+		Vec2 scale;
+		float rotation;
+	};
+
+	class Random
+	{
+		Random();
+		Random(uint32_t seed);
+
+		//change the seed
+		void reseed(uint32_t seed);
+
+		//in interval between bounds
+		int32_t randInt(int32_t lowerBound, int32_t upperBound);
+
+		//in interval between 0 and 1
+		float randFloat();
+	};
+
+	class Time
+	{
+		static const double STOP_TIME;
+		static const double NORMAL_TIME;
+
+		static uint64_t microsFromSeconds(uint32_t sec);
+		static uint64_t microsFromMilis(uint32_t mili);
+
+		Time();
+
+		void update(double virtualTimeScale);
+		void updateBy(uint64_t delta, double virtualTimeScale);
+		uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
+
+		uint64_t getLastRealTimeMicros() const;
+		uint64_t getRealTimeMicros() const;
+		
+		uint64_t getCurMicros() const;
+		uint64_t getDeltaMicros() const;
+		float getDeltaTime() const;
+
+		uint64_t getVirtCurMicros() const;
+		uint64_t getVirtDeltaMicros() const;
+		float getVirtDeltaTime() const;
+	};
+
+	struct Paddle
+	{
+		//logic
+		uint32_t m_score;
+		
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixture;
+		InstanceID m_joint;
+		float m_maxVelocity;
+		float m_targetVelocity;
+		
+		//render
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct Field
+	{
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixtures[4];
+
+		//render
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct Ball
+	{
+		//logic
+		bool m_reset;
+		bool m_speedup;
+		float m_maxVelocity;
+		Vec2 m_sway;
+
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixture;
+		Vec2 m_velocity;
+		
+		//rendering
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct PongGame
+	{
+		const Time m_logicTimer;
+		const Time m_renderTimer;
+		double m_timeScale;
+		Random gen;
+		const float m_b2Scale;
+		bool m_drawDebugData;
+
+		Paddle m_leftPaddle, m_rightPaddle;
+		Field m_field;
+		Ball m_ball;
+		uint32_t m_winScore;
+		uint32_t m_winner;
+		uint64_t m_resetTime;
+		bool m_aiActive;
+	};
+}

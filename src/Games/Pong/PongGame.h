@@ -62,6 +62,7 @@ namespace Core
 		//physics
 		InstanceID m_body;
 		InstanceID m_fixture;
+		Vec2 m_velocity;
 		
 		//rendering
 		Vec2 m_size;

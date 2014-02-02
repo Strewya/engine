@@ -14,7 +14,7 @@ namespace Core
 #define RESOURCE(name) "../resources/"name
 #define RESOURCE_S(name) ("../resources/" + name).c_str()
 
-#define AS_STRING(x) #x
+#define CLASS(x) "Core::"#x
 
 #ifdef _DEBUG
 

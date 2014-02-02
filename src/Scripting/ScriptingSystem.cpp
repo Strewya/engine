@@ -16,6 +16,12 @@
 
 namespace Core
 {
+	static const char* codeName(uint32_t code)
+	{
+		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error"};
+		return names[code];
+	}
+
 	bool ScriptingSystem::init()
 	{
 		bool status = false;
@@ -23,7 +29,7 @@ namespace Core
 		if(m_luaState)
 		{
 			luaL_openlibs(m_luaState);
-			tolua_s_open(m_luaState);
+			tolua_core_open(m_luaState);
 			status = true;
 		}
 		DEBUG_INFO("ScriptingSystem init ", status ? "OK" : "FAIL");
@@ -44,13 +50,13 @@ namespace Core
 		return df;
 	}
 
-	void ScriptingSystem::executeScriptFile(const char* scriptName)
+	void ScriptingSystem::executeScriptFile(const char* scriptName, void* game, const char* argType)
 	{
 		int32_t ret = luaL_loadfile(m_luaState, scriptName);
-		Vec2 v(43, 42);
-		tolua_pushusertype(m_luaState, &v, "Core::Vec2");
-		lua_pcall(m_luaState, 1, 0, 0);
-		assert(v.x != 43);
+		DEBUG_LINE(if(ret != 0) { DEBUG_INFO(scriptName, " loading: ", codeName(ret)); });
+		tolua_pushusertype(m_luaState, game, argType);
+		ret = lua_pcall(m_luaState, 1, 0, 0);
+		DEBUG_LINE(if(ret != 0) { std::string msg = tolua_tostring(m_luaState, 1, 0); DEBUG_INFO(scriptName, " execution:\n", codeName(ret), " - ", msg); });
 	}
 
 

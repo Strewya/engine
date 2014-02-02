@@ -86,9 +86,14 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AssemblyLinkResource> </AssemblyLinkResource>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource>
+      </AssemblyLinkResource>
+      <ForceFileOutput> </ForceFileOutput>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SGPROJECT)\bin\export.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -106,9 +111,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AssemblyLinkResource> </AssemblyLinkResource>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource>
+      </AssemblyLinkResource>
+      <ForceFileOutput> </ForceFileOutput>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SGPROJECT)\bin\export.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <ClCompile>
@@ -120,15 +130,21 @@
       <PreprocessorDefinitions>CORE_USE_PCH;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\toLua.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AssemblyLinkResource> </AssemblyLinkResource>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyLinkResource>
+      </AssemblyLinkResource>
+      <ForceFileOutput> </ForceFileOutput>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SGPROJECT)\bin\export.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Games\Pong\GameInit.cpp" />
@@ -185,6 +201,9 @@
     <ClInclude Include="..\..\..\src\Window\Window.h" />
     <ClInclude Include="..\..\..\src\Window\WindowClass.h" />
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\Scripting\luaExport.pkg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
