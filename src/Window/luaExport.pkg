@@ -1,0 +1,106 @@
+
+$#include <Window/Window.h>
+$#include <Window/WindowEvent.h>
+
+namespace Core
+{
+	enum WindowEventType
+	{
+		WE_INVALID=0,
+
+		WE_KEYBOARDKEY,
+		WE_KEYBOARDTEXT,
+		
+		WE_MOUSEMOVE,
+		WE_MOUSEBUTTON,
+		WE_MOUSEWHEEL,
+
+		WE_CLOSE,
+		WE_LOSTFOCUS,
+		WE_GAINFOCUS,
+
+		WE_FILECHANGE,
+
+		WE_LASTEVENT
+	};
+
+	struct KeyboardEvent
+	{
+		uint8_t m_keyCode;
+		uint8_t m_repeat;
+		bool m_isDown;
+		bool m_previouslyDown;
+
+	};
+
+	struct MouseMoveEvent
+	{
+		int32_t m_x;
+		int32_t m_y;
+		bool m_isRelative;
+	};
+
+	struct MouseButtonEvent
+	{
+		int32_t m_x;
+		int32_t m_y;
+		uint8_t m_button;
+		uint8_t m_clicks;
+		bool m_isDown;
+	};
+
+	struct MouseWheelEvent
+	{
+		int32_t m_x;
+		int32_t m_y;
+		uint32_t m_scroll;
+	};
+
+	enum FileChangeType
+	{
+		FILE_ADDED,
+		FILE_MODIFIED,
+		FILE_REMOVED,
+		FILE_RENAMED_FROM,
+		FILE_RENAMED_TO,
+		FILE_BADDATA
+	};
+
+	struct FileChangeEvent
+	{
+		uint32_t m_index;
+	};
+
+
+
+	struct WindowEvent
+	{
+		uint32_t m_type;
+		uint64_t m_timestamp;
+		KeyboardEvent m_keyboard;
+		MouseMoveEvent m_mouseMove;
+		MouseButtonEvent m_mouseButton;
+		MouseWheelEvent m_mouseWheel;
+		FileChangeEvent m_fileChange;
+	};
+
+
+	class Window
+	{
+		void showMessagebox(const char* title, const char* text);
+		void resize(uint32_t x, uint32_t y);
+		void move(int32_t x, int32_t y);
+	
+		void showCursor(bool isShown);
+		void setFullscreen(bool isFullscreen);
+		void setFileChangeDelay(uint32_t delay);
+		
+		int32_t getPositionX() const;
+		int32_t getPositionY() const;
+		uint32_t getSizeX() const;
+		uint32_t getSizeY() const;
+		bool isCursorShown() const;
+		bool isFullscreen() const;
+		uint32_t getFileChangeDelay() const;
+	};
+}

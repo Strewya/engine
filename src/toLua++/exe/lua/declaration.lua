@@ -277,11 +277,15 @@ function classDeclaration:builddeclaration (narg, cplusplus)
   		t = 'userdata'
   	end
 	if not t and ptr=='' then line = concatparam(line,'*') end
-	line = concatparam(line,'((',self.mod,type)
-	if not t then
-		line = concatparam(line,'*')
+	if(t == 'boolean') then
+		line = concatparam(line, '(')
+	else
+		line = concatparam(line,'((',self.mod,type)
+		if not t then
+			line = concatparam(line,'*')
+		end
+		line = concatparam(line,') ')
 	end
-	line = concatparam(line,') ')
 	if isenum(nctype) then
 		line = concatparam(line,'(int) ')
 	end
@@ -293,7 +297,11 @@ function classDeclaration:builddeclaration (narg, cplusplus)
 		end
 	end
 	if t then
-		line = concatparam(line,'tolua_to'..t,'(tolua_S,',narg,',',def,'));')
+		local boolCastFix = '';
+		if(t == 'boolean') then
+			boolCastFix = ' == 1';
+		end;
+		line = concatparam(line,'tolua_to'..t,'(tolua_S,',narg,',',def,')'..boolCastFix..');')
 	else
 		local to_func = get_to_function(type)
 		line = concatparam(line,to_func..'(tolua_S,',narg,',',def,'));')

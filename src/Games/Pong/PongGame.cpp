@@ -394,17 +394,19 @@ namespace Core
 	{
 		auto fA = contact->GetFixtureA();
 		auto fB = contact->GetFixtureB();
+		DEBUG_INFO("Update score called");
 
-		if(fA->IsSensor() == false && fB->IsSensor() == false)
+		if((fA->IsSensor() && fB->GetBody()->GetUserData() == &m_ball) ||
+		   (fB->IsSensor() && fA->GetBody()->GetUserData() == &m_ball))
 		{
-			return;
+			DEBUG_INFO("Increasing score");
+			auto sensor = fA->IsSensor() ? fA : fB;
+			auto paddle = (Paddle*)sensor->GetUserData();
+			++paddle->m_score;
+
+			m_ball.m_reset = true;
 		}
-
-		auto sensor = fA->IsSensor() ? fA : fB;
-		auto paddle = (Paddle*)sensor->GetUserData();
-		++paddle->m_score;
-
-		m_ball.m_reset = true;
+		
 	}
 
 	void PongGame::speedUpBall(b2Contact* contact)
@@ -562,6 +564,7 @@ namespace Core
 
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.gravityScale = 0;
+		bodyDef.fixedRotation = true;
 		fixtureDef.restitution = 1;
 		fixtureDef.friction = 0;
 		fixtureDef.density = 1;

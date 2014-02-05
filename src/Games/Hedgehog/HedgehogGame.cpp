@@ -2,14 +2,25 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Transform.h>
+#include <Games/Hedgehog/HedgehogGame.h>
 /******* C++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/
 
 namespace Core
 {
-	Transform::Transform()
-		: position(0,0), scale(1, 1), rotation(0)
-	{}
+	bool HedgehogGame::init(Window& window)
+	{
+		return true;
+	}
+
+	bool HedgehogGame::tick()
+	{
+		return true;
+	}
+
+	bool HedgehogGame::shutdown()
+	{
+		return true;
+	}
 }

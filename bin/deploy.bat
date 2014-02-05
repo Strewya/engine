@@ -9,3 +9,4 @@ if /I "%config%"=="release" (
 	copy /Y "%myPath%\tolua++.dll" "%myPath%\..\output\Release\"
 	copy /Y "%myPath%\tolua++.dll" "%myPath%\..\output\Final\"
 )
+del "%myPath%\..\lib\tolua++.dll"

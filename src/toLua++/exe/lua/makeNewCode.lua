@@ -1,5 +1,5 @@
 
-local name = "variable";
+local name = "declaration";
 
 oldFile = io.open(name..".lua", "r");
 newFile = io.open(name.."2.lua", "w");

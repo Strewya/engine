@@ -7,9 +7,6 @@
     <Filter Include="Games">
       <UniqueIdentifier>{ae1566d8-43e8-4f55-b3c8-2cb82f9de399}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Games\Pong">
-      <UniqueIdentifier>{c71dadb2-8bce-4635-b14f-77014a0cae0a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{9d9f1881-9f71-421b-9be2-e2b150344b17}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,15 @@
     </Filter>
     <Filter Include="Systems\Scripting">
       <UniqueIdentifier>{3e731b0d-23e9-4888-afe1-a0fd7ea0c51a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\HedgehogGame">
+      <UniqueIdentifier>{9fbd413f-2f33-43f2-a107-98249e0c292a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\Pong">
+      <UniqueIdentifier>{c71dadb2-8bce-4635-b14f-77014a0cae0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Systems\Audio">
+      <UniqueIdentifier>{74f038fd-d05e-4aea-ab58-d00da26e7c36}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -55,9 +61,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Dimensional.cpp">
       <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Pong\PongGame.cpp">
-      <Filter>Games\Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp">
       <Filter>Systems\Input</Filter>
@@ -92,6 +95,15 @@
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp">
       <Filter>Systems\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Hedgehog\GameInit.cpp">
+      <Filter>Games\HedgehogGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Hedgehog\HedgehogGame.cpp">
+      <Filter>Games\HedgehogGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Pong\PongGame.cpp">
+      <Filter>Games\Pong</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -124,9 +136,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Dimensional.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Pong\PongGame.h">
-      <Filter>Games\Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\KeybindSystem.h">
       <Filter>Systems\Input</Filter>
@@ -170,10 +179,43 @@
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h">
       <Filter>Systems\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Hedgehog\HedgehogGame.h">
+      <Filter>Games\HedgehogGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Pong\PongGame.h">
+      <Filter>Games\Pong</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Scripting\luaExport.pkg">
       <Filter>Systems\Scripting</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\luaExport.pkg">
+      <Filter>Games</Filter>
+    </None>
+    <None Include="..\..\..\src\Window\luaExport.pkg">
+      <Filter>Window</Filter>
+    </None>
+    <None Include="..\..\..\src\Util\luaExport.pkg">
+      <Filter>Util</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\Pong\luaExport.pkg">
+      <Filter>Games\Pong</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
+      <Filter>Games\HedgehogGame</Filter>
+    </None>
+    <None Include="..\..\..\src\Graphics\luaExport.pkg">
+      <Filter>Systems\Graphics</Filter>
+    </None>
+    <None Include="..\..\..\src\Input\luaExport.pkg">
+      <Filter>Systems\Input</Filter>
+    </None>
+    <None Include="..\..\..\src\Physics\luaExport.pkg">
+      <Filter>Systems\Physics</Filter>
+    </None>
+    <None Include="..\..\..\src\Audio\luaExport.pkg">
+      <Filter>Systems\Audio</Filter>
     </None>
   </ItemGroup>
 </Project>

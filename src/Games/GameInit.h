@@ -20,7 +20,7 @@ namespace Core
 		GAME game;
 
 		bool running = game.init(window);
-		while(running)
+		while(running && window.isRunning())
 		{
 			running = game.tick();
 		}
