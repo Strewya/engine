@@ -43,7 +43,7 @@ namespace Core
 		window.resize(1024, 768);
 		DEBUG_LINE(window.openConsole(780, 0));
 
-		bool initStatus = m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua"));
+		bool initStatus = m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
 
 		if(initStatus)
 		{
@@ -53,6 +53,7 @@ namespace Core
 		if(initStatus)
 		{
 			m_scripter.executeFunction("game_init", this, CLASS(HedgehogGame));
+//			initStatus &= m_scripting.parseScriptFile(RESOURCE("Scripts/GameInit.lua")) && m_scripting.callFunction("game_init", this, CLASS(HedgehogGame));
 		}
 		return initStatus;
 	}

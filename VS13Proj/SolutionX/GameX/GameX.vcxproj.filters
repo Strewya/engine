@@ -39,9 +39,6 @@
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
       <Filter>Systems\Input</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Pong\GameInit.cpp">
-      <Filter>Games\Pong</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Window\Window.cpp">
       <Filter>Window</Filter>
     </ClCompile>
@@ -95,14 +92,14 @@
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp">
       <Filter>Systems\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Hedgehog\GameInit.cpp">
-      <Filter>Games\HedgehogGame</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Hedgehog\HedgehogGame.cpp">
       <Filter>Games\HedgehogGame</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Pong\PongGame.cpp">
       <Filter>Games\Pong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\GameInit.cpp">
+      <Filter>Games</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

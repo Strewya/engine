@@ -108,7 +108,7 @@ namespace Core
 	void ScriptingSystem::executeFunction(const char* function, void* objArg, const char* objType)
 	{
 		assert(function != nullptr && objArg != nullptr && objType != nullptr);
-		if(extractFunction(m_luaState, function))
+		if(extractFunction(m_luaState, function) && lua_isfunction(m_luaState, -1))
 		{
 			tolua_pushusertype(m_luaState, objArg, objType);
 			int32_t ret = lua_pcall(m_luaState, 1, 0, 0);
@@ -159,42 +159,57 @@ namespace Core
 
 	std::string DataFile::getString(const char* key)
 	{
-		extract(m_luaState, key);
-		std::string ret(lua_tostring(m_luaState, -1));
-		lua_pop(m_luaState, 1);
-		return ret;
+		if(extract(m_luaState, key))
+		{
+			std::string ret(lua_tostring(m_luaState, -1));
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return "";
 	}
 
 	int32_t DataFile::getInt(const char* key)
 	{
-		extract(m_luaState, key);
-		int32_t ret = lua_tointeger(m_luaState, -1);
-		lua_pop(m_luaState, 1);
-		return ret;
+		if(extract(m_luaState, key))
+		{
+			int32_t ret = lua_tointeger(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return 0;
 	}
 
 	double DataFile::getDouble(const char* key)
 	{
-		extract(m_luaState, key);
-		double ret = lua_tonumber(m_luaState, -1);
-		lua_pop(m_luaState, 1);
-		return ret;
+		if(extract(m_luaState, key))
+		{
+			double ret = lua_tonumber(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return 0;
 	}
 
 	float DataFile::getFloat(const char* key)
 	{
-		extract(m_luaState, key);
-		float ret = (float)lua_tonumber(m_luaState, -1);
-		lua_pop(m_luaState, 1);
-		return ret;
+		if(extract(m_luaState, key))
+		{
+			float ret = (float)lua_tonumber(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return 0;
 	}
 
 	bool DataFile::getBool(const char* key)
 	{
-		extract(m_luaState, key);
-		bool ret = lua_toboolean(m_luaState, -1) == 1;
-		lua_pop(m_luaState, 1);
-		return ret;
+		if(extract(m_luaState, key))
+		{
+			bool ret = lua_toboolean(m_luaState, -1) == 1;
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return false;
 	}
 }
 /*

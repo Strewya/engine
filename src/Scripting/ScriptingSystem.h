@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 #include <cstdint>
 #include <string>
+#include <vector>
 /******* common headers *******/
 #include <Scripting/LuaInclude.h>
 /******* extra headers *******/
@@ -39,7 +40,7 @@ namespace Core
 
 		DataFile getDataFile(const char* filename = nullptr);
 
-		void executeScriptFile(const char* scriptName);
+		void executeScriptFile(const char* filename);
 		void executeFunction(const char* function, void* objArg, const char* objType);
 
 		bool functionExists(const char* function);
@@ -47,5 +48,6 @@ namespace Core
 
 	private:
 		lua_State* m_luaState;
+		std::vector<std::string> m_loadedScripts;
 	};
 }
