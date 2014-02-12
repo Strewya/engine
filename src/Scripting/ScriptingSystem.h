@@ -13,11 +13,6 @@
 
 namespace Core
 {
-	void extract(lua_State* lua, const char* key);
-#ifdef _DEBUG
-	void dumpStack(lua_State* lua);
-#endif
-
 	class DataFile
 	{
 	public:
@@ -44,7 +39,11 @@ namespace Core
 
 		DataFile getDataFile(const char* filename = nullptr);
 
-		void executeScriptFile(const char* scriptName, void* game, const char* argType);
+		void executeScriptFile(const char* scriptName);
+		void executeFunction(const char* function, void* objArg, const char* objType);
+
+		bool functionExists(const char* function);
+		bool scriptFileExists(const char* scriptName);
 
 	private:
 		lua_State* m_luaState;

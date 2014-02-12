@@ -84,6 +84,12 @@ namespace Core
 			initializationStatus &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			initializationStatus &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
+			initializationStatus &= m_scripts.scriptFileExists(RESOURCE("Scripts/paddleAI.lua"));
+			if(initializationStatus)
+			{
+				m_scripts.executeScriptFile(RESOURCE("Scripts/paddleAI.lua"));
+			}
+
 			auto df = m_scripts.getDataFile();
 			if(df.open(RESOURCE("Sheets/font.sheet")))
 			{
@@ -451,7 +457,7 @@ namespace Core
 
 	void PongGame::updatePaddleAI()
 	{
-		m_scripts.executeScriptFile(RESOURCE("Scripts/paddleAI.lua"), this, CLASS(PongGame));
+		m_scripts.executeFunction("paddleAI", this, CLASS(PongGame));
 	}
 
 	void PongGame::createField()

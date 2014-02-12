@@ -16,6 +16,53 @@
 
 namespace Core
 {
+	static bool extract(lua_State* lua, const char* key)
+	{
+		std::string extractStatement("local data = ...; return data.");
+		luaL_loadstring(lua, (extractStatement + key).c_str());
+		lua_pushvalue(lua, -2);
+		return lua_pcall(lua, 1, 1, 0) == 0;
+	}
+
+	static bool extractFunction(lua_State* lua, const char* func)
+	{
+		std::string extractStatement("return ");
+		luaL_loadstring(lua, (extractStatement + func).c_str());
+		return lua_pcall(lua, 0, 1, 0) == 0;
+	}
+
+#ifdef _DEBUG
+	void dumpStack(lua_State* lua)
+	{
+		uint32_t top = lua_gettop(lua);
+		for(uint32_t i = 1; i <= top; ++i)
+		{  /* repeat for each level */
+			int t = lua_type(lua, i);
+			switch(t)
+			{
+			case LUA_TSTRING:  /* strings */
+			std::cout << lua_tostring(lua, i);
+			break;
+
+			case LUA_TBOOLEAN:  /* booleans */
+			std::cout << lua_toboolean(lua, i) ? "true" : "false";
+			break;
+
+			case LUA_TNUMBER:  /* numbers */
+			std::cout << lua_tonumber(lua, i);
+			break;
+
+			default:  /* other values */
+			std::cout << lua_typename(lua, t);
+			break;
+
+			}
+			std::cout << " ";
+		}
+		std::cout << std::endl;
+	}
+#endif
+
 	static const char* codeName(uint32_t code)
 	{
 		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error"};
@@ -50,13 +97,46 @@ namespace Core
 		return df;
 	}
 
-	void ScriptingSystem::executeScriptFile(const char* scriptName, void* game, const char* argType)
+	void ScriptingSystem::executeScriptFile(const char* scriptName)
 	{
 		int32_t ret = luaL_loadfile(m_luaState, scriptName);
 		DEBUG_LINE(if(ret != 0) { DEBUG_INFO(scriptName, " loading: ", codeName(ret)); });
-		tolua_pushusertype(m_luaState, game, argType);
-		ret = lua_pcall(m_luaState, 1, 0, 0);
+		ret = lua_pcall(m_luaState, 0, 0, 0);
 		DEBUG_LINE(if(ret != 0) { std::string msg = tolua_tostring(m_luaState, 1, 0); DEBUG_INFO(scriptName, " execution:\n", codeName(ret), " - ", msg); });
+	}
+
+	void ScriptingSystem::executeFunction(const char* function, void* objArg, const char* objType)
+	{
+		assert(function != nullptr && objArg != nullptr && objType != nullptr);
+		if(extractFunction(m_luaState, function))
+		{
+			tolua_pushusertype(m_luaState, objArg, objType);
+			int32_t ret = lua_pcall(m_luaState, 1, 0, 0);
+			assert(ret == 0);
+		}
+	}
+
+	bool ScriptingSystem::functionExists(const char* function)
+	{
+		assert(function != nullptr);
+		auto exists = false;
+		if(extractFunction(m_luaState, function))
+		{
+			exists = true;
+			lua_pop(m_luaState, 1);
+		}
+		return exists;
+	}
+
+	bool ScriptingSystem::scriptFileExists(const char* scriptName)
+	{
+		assert(scriptName != nullptr);
+		int32_t ret = luaL_loadfile(m_luaState, scriptName);
+		if(ret == 0)
+		{
+			lua_pop(m_luaState, 1);
+		}
+		return ret == 0;
 	}
 
 
@@ -116,49 +196,6 @@ namespace Core
 		lua_pop(m_luaState, 1);
 		return ret;
 	}
-
-
-
-
-	void extract(lua_State* lua, const char* key)
-	{
-		std::string extractStatement("local data = ...; return data.");
-		luaL_loadstring(lua, (extractStatement + key).c_str());
-		lua_pushvalue(lua, -2);
-		lua_pcall(lua, 1, 1, 0);
-	}
-	
-#ifdef _DEBUG
-	void dumpStack(lua_State* lua)
-	{
-		uint32_t top = lua_gettop(lua);
-		for(uint32_t i = 1; i <= top; ++i)
-		{  /* repeat for each level */
-			int t = lua_type(lua, i);
-			switch(t)
-			{
-				case LUA_TSTRING:  /* strings */
-				std::cout << lua_tostring(lua, i);
-				break;
-
-				case LUA_TBOOLEAN:  /* booleans */
-				std::cout << lua_toboolean(lua, i) ? "true" : "false";
-				break;
-
-				case LUA_TNUMBER:  /* numbers */
-				std::cout << lua_tonumber(lua, i);
-				break;
-
-				default:  /* other values */
-				std::cout << lua_typename(lua, t);
-				break;
-
-			}
-			std::cout << " ";
-		}
-		std::cout << std::endl;
-	}
-#endif
 }
 /*
 namespace Script

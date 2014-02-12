@@ -1,0 +1,29 @@
+
+
+namespace Core
+{
+	class PhysicsSystem
+	{
+		void update(float dt);
+		void draw();
+
+		void addBeginContactListener(std::function<void(b2Contact*)> f);
+		void addEndContactListener(std::function<void(b2Contact*)> f);
+
+		InstanceID createBody(const b2BodyDef& bodyDef);
+		b2Body* getBody(InstanceID bodyID) const;
+		void destroyBody(InstanceID bodyID);
+
+		InstanceID createFixture(const b2FixtureDef& fixtureDef, InstanceID bodyID);
+		b2Fixture* getFixture(InstanceID fixtureID) const;
+		void destroyFixture(InstanceID bodyID, uint32_t fixtureID);
+
+		InstanceID createJoint(const b2JointDef& jointDef);
+		b2Joint* getJoint(InstanceID jointID) const;
+		void destroyJoint(InstanceID jointID);
+	};
+
+	Vec2 convert(const b2Vec2& v);
+
+	b2Vec2 convert(const Vec2& v);
+}

@@ -5,7 +5,7 @@
 #include <Games/GameInit.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Games/Hedgehog/Game.h>
+#include <Games/Hedgehog/HedgehogGame.h>
 /******* end headers *******/
 
 namespace Core
