@@ -93,7 +93,7 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>$(SGPROJECT)\bin\export.bat</Command>
+      <Command>$(SGPROJECT)\bin\export.bat $(CORE_GAME_INST)</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -151,8 +151,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <ClCompile Include="..\..\..\src\Games\Hedgehog\HedgehogGame.cpp" />
-    <ClCompile Include="..\..\..\src\Games\Pong\PongGame.cpp" />
+    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg" />
+    <None Include="..\..\..\src\Games\luaExport.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
@@ -180,8 +182,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
-    <ClInclude Include="..\..\..\src\Games\Hedgehog\HedgehogGame.h" />
-    <ClInclude Include="..\..\..\src\Games\Pong\PongGame.h" />
+    <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
+    <ClInclude Include="..\..\..\src\Games\GameSelector.h" />
+    <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h" />
+    <ClInclude Include="..\..\..\src\Games\Pong\Pong.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
@@ -209,8 +213,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Audio\luaExport.pkg" />
-    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg" />
-    <None Include="..\..\..\src\Games\luaExport.pkg" />
+    <None Include="..\..\..\src\Games\luaExport.pkg">
+      <FileType>Document</FileType>
+    </None>
     <None Include="..\..\..\src\Games\Pong\luaExport.pkg" />
     <None Include="..\..\..\src\Graphics\luaExport.pkg" />
     <None Include="..\..\..\src\Input\luaExport.pkg" />

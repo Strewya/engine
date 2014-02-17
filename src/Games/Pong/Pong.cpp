@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Games/Pong/PongGame.h>
+#include <Games/Pong/Pong.h>
 /******* C++ headers *******/
 #include <functional>
 #include <iostream>

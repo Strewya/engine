@@ -1,5 +1,4 @@
 
-$#include <Games/Pong/PongGame.h>
 
 namespace Core
 {

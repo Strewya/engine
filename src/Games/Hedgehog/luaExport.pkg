@@ -1,5 +1,4 @@
 
-$#include <Games/Hedgehog/HedgehogGame.h>
 
 namespace Core
 {
