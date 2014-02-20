@@ -19,6 +19,7 @@ namespace Core
 		EventVector_t evs;
 		evs.reserve(20);
 		WindowEvent we;
+		auto pwe = &we;
 		while(window.peekEvent(currentTimeMicros, we))
 		{
 			evs.emplace_back(we);
@@ -54,5 +55,17 @@ namespace Core
 	const EventVector_t& InputSystem::getEvents() const
 	{
 		return m_inputEvents;
+	}
+
+	uint32_t InputSystem::getEventCount() const
+	{
+		return m_inputEvents.size();
+	}
+
+	WindowEvent InputSystem::getEvent(uint32_t index) const
+	{
+		if(index < m_inputEvents.size())
+			return m_inputEvents[index];
+		return WindowEvent();
 	}
 }

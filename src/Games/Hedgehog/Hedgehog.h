@@ -4,6 +4,8 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <functional>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Graphics/GraphicsSystem.h>
@@ -14,6 +16,7 @@
 namespace Core
 {
 	class Window;
+	class WindowEvent;
 
 	class HedgehogGame
 	{
@@ -26,6 +29,7 @@ namespace Core
 		double m_timeScale;
 		Window* m_window;
 
+		std::vector<std::function<bool(WindowEvent&)>> m_messageHandlers;
 
 		bool init(Window& window);
 		bool tick();

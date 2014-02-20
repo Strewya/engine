@@ -1,0 +1,168 @@
+
+$#include <Input/KeyCodes.h>
+$#include <Input/InputSystem.h>
+
+namespace Core
+{
+	class InputSystem
+	{
+		void update(const Time& timer);
+
+		uint32_t getEventCount() const;
+		WindowEvent getEvent(uint32_t index) const;
+	};
+
+
+
+	class Mouse
+	{
+		static int Code(const std::string& name);
+		static std::string Name(const unsigned int &code);
+
+		static const int m_Unknown;
+		enum Keys
+		{
+			m_LeftButton,
+			m_RightButton,
+			m_MiddleButton,
+			m_XButton1,
+			m_XButton2,
+
+			m_KeyCount
+		};
+	};
+
+	class Keyboard
+	{
+		static int Code(const std::string& name);
+		static std::string Name(const unsigned int &code);
+		
+		static const int m_Unknown;
+		enum Keys
+		{
+			m_Cancel,
+			m_Backspace,
+			m_Tab,
+			m_Clear,
+			m_Enter,
+			m_Shift,
+			m_Control,
+			m_Alt,
+			m_Pause,
+			m_CapsLock,
+			m_Escape,
+			m_Space,
+			m_PageUp,
+			m_PageDown,
+			m_End,
+			m_Home,
+			m_ArrowLeft,
+			m_ArrowUp,
+			m_ArrowRight,
+			m_ArrowDown,
+			m_PrintScreen,
+			m_Insert,
+			m_Delete,
+	
+			m_0,
+			m_1,
+			m_2,
+			m_3,
+			m_4,
+			m_5,
+			m_6,
+			m_7,
+			m_8,
+			m_9,
+
+			m_A,
+			m_B,
+			m_C,
+			m_D,
+			m_E,
+			m_F,
+			m_G,
+			m_H,
+			m_I,
+			m_J,
+			m_K,
+			m_L,
+			m_M,
+			m_N,
+			m_O,
+			m_P,
+			m_Q,
+			m_R,
+			m_S,
+			m_T,
+			m_U,
+			m_V,
+			m_W,
+			m_X,
+			m_Y,
+			m_Z,
+			
+			m_Num0,
+			m_Num1,
+			m_Num2,
+			m_Num3,
+			m_Num4,
+			m_Num5,
+			m_Num6,
+			m_Num7,
+			m_Num8,
+			m_Num9,
+			m_NumMultiply,
+			m_NumAdd,
+			m_NumEnter,
+			m_NumSubtract,
+			m_NumDecimal,
+			m_NumDivide,
+			
+			m_F1,
+			m_F2,
+			m_F3,
+			m_F4,
+			m_F5,
+			m_F6,
+			m_F7,
+			m_F8,
+			m_F9,
+			m_F10,
+			m_F11,
+			m_F12,
+			m_F13,
+			m_F14,
+			m_F15,
+			m_F16,
+			m_F17,
+			m_F18,
+			m_F19,
+			m_F20,
+			m_F21,
+			m_F22,
+			m_F23,
+			m_F24,
+			
+			m_NumLock,
+			m_ScrollLock,
+			
+			m_LShift,
+			m_RShift,
+			m_LControl,
+			m_RControl,
+			m_LAlt,
+			m_RAlt,
+			
+			m_Semicolon,
+			m_Plus,
+			m_Comma,
+			m_Minus,
+			m_Period,
+			m_Question,
+			m_Tilde,
+			
+			m_KeyCount
+		};
+	};
+}

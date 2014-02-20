@@ -27,6 +27,10 @@ namespace Core
 
 		const EventVector_t& getEvents() const;
 
+		uint32_t getEventCount() const;
+		WindowEvent getEvent(uint32_t index) const;
+		
+
 	private:
 		Window* m_window;
 		EventVector_t m_inputEvents;

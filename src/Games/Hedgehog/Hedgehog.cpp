@@ -18,7 +18,7 @@ namespace Core
 		m_window = &window;
 
 		window.resize(1024, 768);
-		DEBUG_LINE(window.openConsole(780, 0));
+		DEBUG_LINE(window.openConsole(1050, 0));
 
 		bool initStatus = m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
 
@@ -58,20 +58,7 @@ namespace Core
 		m_scripter.shutdown();
 		return true;
 	}
-
-	typedef std::vector<WindowEvent> EventVector_t;
-	static EventVector_t gatherInput(uint64_t currentTimeMicros, Window& window)
-	{
-		EventVector_t evs;
-		evs.reserve(20);
-		WindowEvent we;
-		while(window.peekEvent(currentTimeMicros, we))
-		{
-			evs.emplace_back(we);
-		}
-		return evs;
-	}
-
+	
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));

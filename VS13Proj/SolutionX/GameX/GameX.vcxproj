@@ -159,7 +159,6 @@
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Input\KeybindSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
@@ -191,7 +190,6 @@
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
-    <ClInclude Include="..\..\..\src\Input\KeybindSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />

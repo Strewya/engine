@@ -80,8 +80,9 @@ namespace Core
 
 
 
-	struct WindowEvent
+	class WindowEvent
 	{
+	public:
 		uint32_t m_type;
 		uint64_t m_timestamp;
 		union

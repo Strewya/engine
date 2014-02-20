@@ -73,7 +73,7 @@ namespace Core
 
 
 
-	struct WindowEvent
+	class WindowEvent
 	{
 		uint32_t m_type;
 		uint64_t m_timestamp;

@@ -18,7 +18,7 @@ namespace Core
 	{
 	private:
 		typedef std::unordered_map<unsigned int, std::string> Map;
-		static Map _map;
+		static Map m_map;
 
 		friend void InitializeInputConstants();
 		static void Init();
@@ -27,7 +27,7 @@ namespace Core
 		static int Code(const std::string& name);
 		static std::string Name(const unsigned int &code);
 
-		static const int _Unknown = -1;
+		static const int m_Unknown = -1;
 		enum Keys
 		{
 			m_LeftButton		= 0x00,
@@ -43,7 +43,7 @@ namespace Core
 	class Keyboard
 	{
 		typedef std::unordered_map<unsigned int, std::string> Map;
-		static Map _map;
+		static Map m_map;
 
 		friend void InitializeInputConstants();
 		static void Init();
@@ -51,7 +51,7 @@ namespace Core
 		static int Code(const std::string& name);
 		static std::string Name(const unsigned int &code);
 		
-		static const int _Unknown = -1;
+		static const int m_Unknown = -1;
 		enum Keys
 		{
 			m_Cancel		= 0x03,

@@ -226,6 +226,8 @@ namespace Core
 
 	bool Window::peekEvent(uint64_t time, WindowEvent& outEvent)
 	{
+		//assert(outEvent != nullptr);
+
 		bool eventExists = false;
 		if(!m_events.empty() && m_events.front().m_timestamp <= time)
 		{
