@@ -587,6 +587,14 @@ namespace Core
 		return SUCCEEDED(hr);
 	}
 
+	//*****************************************************************
+	//					INIT SPRITESHEET
+	//*****************************************************************
+	bool GraphicsSystem::initSpritesheet(DataFile& file)
+	{
+
+	}
+
 	
 
 	ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)

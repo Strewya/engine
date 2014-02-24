@@ -16,10 +16,10 @@ namespace Core
 
 	class Mouse
 	{
-		static int Code(const std::string& name);
-		static std::string Name(const unsigned int &code);
+		static int32_t Code(const std::string& name);
+		static std::string Name(uint32_t code);
 
-		static const int m_Unknown;
+		static const int32_t m_Unknown;
 		enum Keys
 		{
 			m_LeftButton,
@@ -34,10 +34,10 @@ namespace Core
 
 	class Keyboard
 	{
-		static int Code(const std::string& name);
-		static std::string Name(const unsigned int &code);
+		static int32_t Code(const std::string& name);
+		static std::string Name(uint32_t code);
 		
-		static const int m_Unknown;
+		static const int32_t m_Unknown;
 		enum Keys
 		{
 			m_Cancel,

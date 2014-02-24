@@ -40,6 +40,19 @@ namespace Core
 		std::vector<Glyph> m_glyphs;
 	};
 
+	class Image
+	{
+	public:
+		Vec2 m_texCoords[4];
+	};
+
+	class Sheet
+	{
+	public:
+		std::vector<Image> m_images;
+		std::string m_texture;
+	};
+
 	class GraphicsSystem
 	{
 	public:
@@ -59,7 +72,9 @@ namespace Core
 		bool initViewport();
 		bool initSamplerState();
 		bool initFont(DataFile& file);
+		bool initSpritesheet(DataFile& file);
 
+		
 
 		void setBackgroundColor(float red, float green, float blue);
 		

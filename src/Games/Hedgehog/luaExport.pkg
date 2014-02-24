@@ -5,6 +5,9 @@ namespace Core
 	class HedgehogGame
 	{
 	public:
+		GraphicsSystem m_graphics;
+		InputSystem m_input;
+
 		const Time m_logicTimer;
 		const Time m_renderTimer;
 		double m_timeScale;

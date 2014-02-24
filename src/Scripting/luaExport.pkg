@@ -17,6 +17,7 @@ typedef uint32_t           InstanceID;
 // and then into subdirs to find the other packages
 
 
+$pfile "../../../src/Graphics/luaExport.pkg"
 $pfile "../../../src/Input/luaExport.pkg"
 $pfile "../../../src/Util/luaExport.pkg"
 $pfile "../../../src/Window/luaExport.pkg"

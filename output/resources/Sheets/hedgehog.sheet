@@ -1,0 +1,4 @@
+return {
+	texture = "Textures/hedgehog.png",
+	imageCount = 1
+};

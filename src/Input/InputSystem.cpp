@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 #include <iostream>
 /******* extra headers *******/
+#include <Input/KeyCodes.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
@@ -34,6 +35,8 @@ namespace Core
 		bool status = true;
 
 		m_window = &window;
+
+		InitializeInputConstants();
 
 		DEBUG_INFO("InputSystem init ", status ? "OK" : "FAIL");
 		return status;
@@ -66,6 +69,6 @@ namespace Core
 	{
 		if(index < m_inputEvents.size())
 			return m_inputEvents[index];
-		return WindowEvent();
+		return WindowEvent{0, 0};
 	}
 }

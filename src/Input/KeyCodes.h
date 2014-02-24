@@ -17,17 +17,17 @@ namespace Core
 	class Mouse
 	{
 	private:
-		typedef std::unordered_map<unsigned int, std::string> Map;
+		typedef std::unordered_map<uint32_t, std::string> Map;
 		static Map m_map;
 
 		friend void InitializeInputConstants();
 		static void Init();
 
 	public:
-		static int Code(const std::string& name);
-		static std::string Name(const unsigned int &code);
+		static int32_t Code(const std::string& name);
+		static std::string Name(uint32_t code);
 
-		static const int m_Unknown = -1;
+		static const int32_t m_Unknown = -1;
 		enum Keys
 		{
 			m_LeftButton		= 0x00,
@@ -42,16 +42,16 @@ namespace Core
 
 	class Keyboard
 	{
-		typedef std::unordered_map<unsigned int, std::string> Map;
+		typedef std::unordered_map<uint32_t, std::string> Map;
 		static Map m_map;
 
 		friend void InitializeInputConstants();
 		static void Init();
 	public:
-		static int Code(const std::string& name);
-		static std::string Name(const unsigned int &code);
+		static int32_t Code(const std::string& name);
+		static std::string Name(uint32_t code);
 		
-		static const int m_Unknown = -1;
+		static const int32_t m_Unknown = -1;
 		enum Keys
 		{
 			m_Cancel		= 0x03,

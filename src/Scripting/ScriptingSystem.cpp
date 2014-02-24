@@ -65,7 +65,7 @@ namespace Core
 
 	static const char* codeName(uint32_t code)
 	{
-		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error"};
+		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error", "file not exists"};
 		return names[code];
 	}
 
@@ -85,8 +85,12 @@ namespace Core
 
 	bool ScriptingSystem::shutdown()
 	{
+		bool status = true;
+
 		lua_close(m_luaState);
-		return true;
+
+		DEBUG_INFO("ScriptingSystem shutdown ", status ? "OK" : "FAIL");
+		return status;
 	}
 
 	DataFile ScriptingSystem::getDataFile(const char* filename)
@@ -112,7 +116,7 @@ namespace Core
 		{
 			tolua_pushusertype(m_luaState, objArg, objType);
 			int32_t ret = lua_pcall(m_luaState, 1, 0, 0);
-			assert(ret == 0);
+			DEBUG_IF(ret != 0, DEBUG_INFO("Function call failed: ", function, "(", objType, "[", objArg, "])"));
 		}
 	}
 
@@ -136,7 +140,13 @@ namespace Core
 		{
 			lua_pop(m_luaState, 1);
 		}
-		return ret == 0;
+		else
+		{
+			DEBUG_INFO("Err code: ", codeName(ret), ", dumping stack");
+			DEBUG_LINE(dumpStack(m_luaState));
+			lua_settop(m_luaState, 0);
+		}
+		return ret != LUA_ERRFILE;
 	}
 
 

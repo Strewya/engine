@@ -51,7 +51,7 @@ namespace Core
 		: m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(100), m_fileChangeDelay(m_minFileChangeDelay),
+		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
 		m_hwnd(nullptr),
 		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),
@@ -278,6 +278,18 @@ namespace Core
 
 	}
 
+	void replaceAll(std::string& str, const std::string& from, const std::string& to)
+	{
+		if(from.empty())
+			return;
+		size_t start_pos = 0;
+		while((start_pos = str.find(from, start_pos)) != std::string::npos)
+		{
+			str.replace(start_pos, from.length(), to);
+			start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+		}
+	}
+
 	void Window::newFileChange(uint64_t timestamp, DWORD action, const std::string& file)
 	{
 		using std::begin;
@@ -306,6 +318,8 @@ namespace Core
 			"should increase the size of our buffer from " << m_fileChanges.size() << "..." << std::endl;
 		}
 	}
+	
+	
 
 	bool Window::getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr)
 	{
@@ -313,6 +327,7 @@ namespace Core
 		{
 			outAction = toFileChangeType(m_fileChanges[index].m_action);
 			outStr = m_fileChanges[index].m_filename;
+			replaceAll(outStr, "\\", "/");
 			m_fileChanges[index].m_state = FileChangeInfo::UNUSED;
 			m_fileChanges[index].m_action = 0;
 			m_fileChanges[index].m_filename.clear();

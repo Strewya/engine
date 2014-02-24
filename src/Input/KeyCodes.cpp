@@ -18,7 +18,7 @@ namespace Core
 		Mouse::Init();
 	}
 
-	int Mouse::Code(const std::string& name)
+	int32_t Mouse::Code(const std::string& name)
 	{
 		Map::iterator it = m_map.begin();
 		Map::iterator end = m_map.end();
@@ -30,7 +30,7 @@ namespace Core
 		return m_Unknown;
 	}
 
-	std::string Mouse::Name(const unsigned int& code)
+	std::string Mouse::Name(uint32_t code)
 	{
 		Map::iterator it = m_map.find(code);
 		return (it != m_map.end() ? it->second : "" );
@@ -45,7 +45,7 @@ namespace Core
 		m_map.insert( std::make_pair( Mouse::m_XButton2, "XButton2" ) );
 	}
 	
-	int Keyboard::Code(const std::string& name)
+	int32_t Keyboard::Code(const std::string& name)
 	{
 		Map::iterator it = m_map.begin();
 		Map::iterator end = m_map.end();
@@ -57,7 +57,7 @@ namespace Core
 		return m_Unknown;
 	}
 
-	std::string Keyboard::Name(const unsigned int& code)
+	std::string Keyboard::Name(uint32_t code)
 	{
 		Map::iterator it = m_map.find(code);
 		return (it != m_map.end() ? it->second : "" );

@@ -32,6 +32,7 @@ namespace Core
 		lua_State* m_luaState;
 	};
 
+
 	class ScriptingSystem
 	{
 	public:

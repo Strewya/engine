@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
+#include <Input/KeyCodes.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
@@ -20,19 +21,65 @@ namespace Core
 		window.resize(1024, 768);
 		DEBUG_LINE(window.openConsole(1050, 0));
 
-		bool initStatus = m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
+		m_isRunning = m_input.init(window) && m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
 
-		if(initStatus)
+		if(m_isRunning)
 		{
 			m_scripter.executeScriptFile(RESOURCE("Scripts/hedgehog_game.lua"));
-			initStatus &= m_scripter.functionExists("game_init") && m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
+			m_isRunning &= m_scripter.functionExists("game_init") && m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
-		if(initStatus)
+		if(m_isRunning)
 		{
 			m_scripter.executeFunction("game_init", this, CLASS(HedgehogGame));
-//			initStatus &= m_scripting.parseScriptFile(RESOURCE("Scripts/GameInit.lua")) && m_scripting.callFunction("game_init", this, CLASS(HedgehogGame));
+
+			
+			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
+			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
+
+			auto df = m_scripter.getDataFile();
+			if(df.open(RESOURCE("Sheets/font.sheet")))
+			{
+				m_isRunning &= m_graphics.initFont(df);
+				df.close();
+			}
+
+			m_messageHandlers.reserve(2);
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY)
+				{
+					if(w.m_keyboard.m_keyCode == Keyboard::m_Escape)
+					{
+						m_window->close();
+						m_isRunning = false;
+						return true;
+					}
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_FILECHANGE)
+				{
+					uint32_t action;
+					std::string file;
+					if(m_window->getChangedFile(w.m_fileChange.m_index, action, file))
+					{
+						auto pos = file.find_last_of('.');
+						if(file.substr(pos + 1) == "lua")
+						{
+							DEBUG_INFO("Reloading script ", file);
+							m_scripter.executeScriptFile(RESOURCE_S(file));
+							return true;
+						}
+					}
+				}
+				return false;
+			});
 		}
-		return initStatus;
+		DEBUG_INFO("---------------------------------");
+		return m_isRunning;
 	}
 
 	bool HedgehogGame::tick()
@@ -44,29 +91,54 @@ namespace Core
 		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros); l--;)
 		{
 			if(!tickLogic(microsPerFrame))
-				return false;
+			{
+				m_isRunning = false;
+				break;
+			}
 		}
 
 		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);
 
-		return true;
+		return m_isRunning;
 	}
 
 	bool HedgehogGame::shutdown()
 	{
+		DEBUG_INFO("---------------------------------");
+		m_input.shutdown();
 		m_scripter.shutdown();
+		m_graphics.shutdown();
 		return true;
 	}
 	
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
+		bool continueRunning = true;
+		m_logicTimer.updateBy(updateTime, m_timeScale);
+
+		m_input.update(m_logicTimer);
+		auto& evs = m_input.getEvents();
+		for(auto& e : evs)
+		{
+			for(auto& f : m_messageHandlers)
+			{
+				f(e);
+			}
+		}
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
-		return true;
+		return continueRunning;
 	}
 
 	void HedgehogGame::tickRender(uint64_t updateTime)
 	{
+		m_renderTimer.updateBy(updateTime, m_timeScale);
+
+		m_graphics.begin();
+
 		m_scripter.executeFunction("game_render", this, CLASS(HedgehogGame));
+
+		m_graphics.present();
+		
 	}
 }
