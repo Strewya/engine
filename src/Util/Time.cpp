@@ -71,9 +71,14 @@ namespace Core
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
 
-	uint64_t Time::microsFromSeconds(uint32_t sec)
+	/*uint64_t Time::microsFromSeconds(uint32_t sec)
 	{
 		return static_cast<uint64_t>(sec) * 1000 * 1000;
+	}*/
+
+	uint64_t Time::microsFromSeconds(float sec)
+	{
+		return static_cast<uint64_t>(sec * 1000 * 1000);
 	}
 
 	uint64_t Time::microsFromMilis(uint32_t mili)

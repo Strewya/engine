@@ -43,6 +43,7 @@ namespace Core
 		declare(&m_inputLayout);
 		declare(&m_samplerState);
 		declare(&m_fontTexture);
+		declare(&m_sheetTexture);
 
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
@@ -592,7 +593,38 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::initSpritesheet(DataFile& file)
 	{
+		m_sheet.m_textureName = file.getString("texture");
+		uint32_t imgCount = file.getInt("imageCount");
+		uint32_t animCount = file.getInt("animationCount");
+		m_sheet.m_images.resize(imgCount);
+		m_sheet.m_animations.resize(animCount);
+		for(uint32_t i = 0; i < imgCount; ++i)
+		{
+			m_sheet.m_images[i].m_name = file.getString(("images[" + std::to_string(i + 1) + "][1]").c_str());
+			m_sheet.m_images[i].m_texCoords[0].x = file.getFloat(("images[" + std::to_string(i + 1) + "][2][1]").c_str());
+			m_sheet.m_images[i].m_texCoords[0].y = file.getFloat(("images[" + std::to_string(i + 1) + "][2][2]").c_str());
+			m_sheet.m_images[i].m_texCoords[1].x = file.getFloat(("images[" + std::to_string(i + 1) + "][3][1]").c_str());
+			m_sheet.m_images[i].m_texCoords[1].y = file.getFloat(("images[" + std::to_string(i + 1) + "][3][2]").c_str());
+			m_sheet.m_images[i].m_texCoords[2].x = file.getFloat(("images[" + std::to_string(i + 1) + "][4][1]").c_str());
+			m_sheet.m_images[i].m_texCoords[2].y = file.getFloat(("images[" + std::to_string(i + 1) + "][4][2]").c_str());
+			m_sheet.m_images[i].m_texCoords[3].x = file.getFloat(("images[" + std::to_string(i + 1) + "][5][1]").c_str());
+			m_sheet.m_images[i].m_texCoords[3].y = file.getFloat(("images[" + std::to_string(i + 1) + "][5][2]").c_str());
+		}
 
+		for(uint32_t i = 0; i < animCount; ++i)
+		{
+			m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
+			m_sheet.m_animations[i].m_duration = Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str()));
+			m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
+			uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
+			m_sheet.m_animations[i].m_images.resize(animImageCount);
+			for(uint32_t j = 0; j < animImageCount; ++j)
+			{
+				uint32_t index = file.getInt(("animations[" + std::to_string(i + 1) + "].images[" + std::to_string(j + 1) + "]").c_str());
+				m_sheet.m_animations[i].m_images[j] = &m_sheet.m_images[index];
+			}
+		}
+		return true;
 	}
 
 	

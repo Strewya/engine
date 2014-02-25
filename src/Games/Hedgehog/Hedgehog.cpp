@@ -42,6 +42,11 @@ namespace Core
 				m_isRunning &= m_graphics.initFont(df);
 				df.close();
 			}
+			if(df.open(RESOURCE("Sheets/hedgehog.sheet")))
+			{
+				m_isRunning &= m_graphics.initSpritesheet(df); 
+				df.close();
+			}
 
 			m_messageHandlers.reserve(2);
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)

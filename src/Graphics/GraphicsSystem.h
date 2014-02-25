@@ -11,6 +11,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Util/Dimensional.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -44,13 +45,25 @@ namespace Core
 	{
 	public:
 		Vec2 m_texCoords[4];
+		std::string m_name;
+	};
+
+	class Animation
+	{
+	public:
+		std::string m_name;
+		std::vector<Image*> m_images;
+		uint64_t m_duration;
+		bool m_isLooped;
 	};
 
 	class Sheet
 	{
 	public:
+		std::string m_name;
+		std::string m_textureName;
 		std::vector<Image> m_images;
-		std::string m_texture;
+		std::vector<Animation> m_animations;
 	};
 
 	class GraphicsSystem
@@ -115,6 +128,9 @@ namespace Core
 		//this shouldn't be explicit like this, refactor later
 		ID3D11ShaderResourceView* m_fontTexture;
 		Font m_font;
+
+		ID3D11ShaderResourceView* m_sheetTexture;
+		Sheet m_sheet;
 
 		std::vector<IUnknown*> m_dxResources;
 	};

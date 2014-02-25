@@ -21,6 +21,9 @@ ipch/
 *.suo
 *.log
 *.dll
-!lib/*.dll
-lib/Box2D*
 *.exe
+
+lib/tolua*
+lib/Box2D*
+
+luaBinding.*
