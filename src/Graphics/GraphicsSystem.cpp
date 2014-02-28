@@ -287,6 +287,86 @@ namespace Core
 		ib->Release();
 		vb->Release();
 	}
+
+	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, uint32_t i)
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+		if(i >= m_sheet.m_images.size())
+			return;
+
+
+		Image& img = m_sheet.m_images[i];
+		float hw = (img.m_texCoords[1].x - img.m_texCoords[0].x)*10;
+		float hh = (img.m_texCoords[2].y - img.m_texCoords[0].y)*10;
+
+		/****** VERTEX BUFFER ******/
+		Vertex vertices[]
+		{
+			Vertex(-1,  1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
+			Vertex( 1,  1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
+			Vertex(-1, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y),
+			Vertex( 1, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y)
+		};
+
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
+
+		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, vertices, 4 * sizeof(Vertex));
+		m_devcon->Unmap(vb, 0);
+
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+		/****** INDEX BUFER ******/
+		uint32_t indices[]
+		{
+			0, 1, 2,   1, 3, 2
+		};
+
+		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
+		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, indices, 6 * sizeof(uint32_t));
+		m_devcon->Unmap(ib, 0);
+
+		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+		/****** CONSTANT BUFFER ******/
+		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
+
+		m_world = XMMatrixIdentity();
+		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
+		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+
+
+		cbPerObject cbpo;
+		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+		cbpo.FillColor.x = c.r;
+		cbpo.FillColor.y = c.g;
+		cbpo.FillColor.z = c.b;
+		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 1;
+
+		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
+		m_devcon->PSSetShaderResources(0, 1, &m_sheetTexture);
+
+		//m_devcon->Draw(4, 0);
+		m_devcon->DrawIndexed(6, 0, 0);
+
+		cb->Release();
+		ib->Release();
+		vb->Release();
+	}
 	
 	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification)
 	{
@@ -624,7 +704,10 @@ namespace Core
 				m_sheet.m_animations[i].m_images[j] = &m_sheet.m_images[index];
 			}
 		}
-		return true;
+
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_sheet.m_textureName), nullptr, nullptr, &m_sheetTexture, nullptr);
+
+		return SUCCEEDED(hr);
 	}
 
 	
