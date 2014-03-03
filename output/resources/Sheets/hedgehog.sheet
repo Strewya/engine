@@ -2,20 +2,20 @@ return {
 	texture = "Textures/hedgehog.png",
 	imageCount = 10,
 	images = {
-		{ "idle_00", {0, 0},    	{0.25, 0},    {0, 0.33},    {0.25, 0.33} },
-		{ "idle_01", {0.25, 0}, 	{0.5, 0},     {0.25, 0.33}, {0.5, 0.33} },
-		{ "idle_02", {0.5, 0},  	{0.75, 0},    {0.5, 0.33},  {0.75, 0.33} },
-		{ "idle_03", {0.75, 0}, 	{1, 0},    	  {0.75, 0.33}, {1, 0.33} },
-		{ "walk_00", {0, 0.33},    {0.25, 0.33}, {0, 0.66},    {0.25, 0.66} },
-		{ "walk_01", {0.25, 0.33}, {0.5, 0.33},  {0.25, 0.66}, {0.5, 0.66} },
-		{ "walk_02", {0.5, 0.33},  {0.75, 0.33}, {0.5, 0.66},  {0.75, 0.66} },
-		{ "walk_03", {0.75, 0.33}, {1, 0.33},    {0.75, 0.66}, {1, 0.66} },
-		{ "walk_04", {0, 0.66},	{0.25, 0.66}, {0, 1},       {0.25, 1} },
-		{ "walk_05", {0.25, 0.66}, {0.5, 0.66},  {0.25, 1},    {0.5, 1} },
+		{ name="idle_00", pos={x=0,y=0},   width=450, height=300 },
+		{ name="idle_01", pos={450,  0},   width=450, height=300 },
+		{ name="idle_02", pos={900,  0},   width=450, height=300 },
+		{ name="idle_03", pos={1350, 0},   width=450, height=300 },
+		{ name="walk_00", pos={0,    300}, width=450, height=300 },
+		{ name="walk_01", pos={450,  300}, width=450, height=300 },
+		{ name="walk_02", pos={900,  300}, width=450, height=300 },
+		{ name="walk_03", pos={1350, 300}, width=450, height=300 },
+		{ name="walk_04", pos={0,    600}, width=450, height=300 },
+		{ name="walk_05", pos={450,  600}, width=450, height=300 },
 	},
 	animationCount = 2,
 	animations = {
-		{ name = "walk", imageCount = 6, images = {4, 5, 6, 7, 8, 9}, duration = 1.5, type = "loop"	},
+		{ name = "walk", imageCount = 6, images = {4, 5, 6, 7, 8, 9}, duration = 0.2, type = "loop"	},
 		{ name = "idle", imageCount = 4, images = {3, 2, 1, 0}, duration = 0.7, type = "once" }
 	}
 };

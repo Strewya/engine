@@ -110,6 +110,24 @@ namespace Core
 		m_backgroundColor.b = b;
 	}
 
+	uint32_t GraphicsSystem::getAnimationIndex(const char* name) const
+	{
+		auto it = std::find_if(std::begin(m_sheet.m_animations), std::end(m_sheet.m_animations),
+							   [&](const Animation& a) { return a.m_name == name; });
+		uint32_t index = 0;
+		if(it != std::end(m_sheet.m_animations))
+		{
+			index = std::distance(std::begin(m_sheet.m_animations), it);
+		}
+		return index;
+	}
+
+	const Animation& GraphicsSystem::getAnimation(uint32_t index) const
+	{
+		assert(index < m_sheet.m_animations.size());
+		return m_sheet.m_animations[index];
+	}
+
 	void GraphicsSystem::drawLine(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -296,16 +314,14 @@ namespace Core
 
 
 		Image& img = m_sheet.m_images[i];
-		float hw = (img.m_texCoords[1].x - img.m_texCoords[0].x)*10;
-		float hh = (img.m_texCoords[2].y - img.m_texCoords[0].y)*10;
-
+		
 		/****** VERTEX BUFFER ******/
 		Vertex vertices[]
 		{
-			Vertex(-1,  1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
-			Vertex( 1,  1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
-			Vertex(-1, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y),
-			Vertex( 1, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y)
+			Vertex(-img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
+			Vertex( img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
+			Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y),
+			Vertex( img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y)
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
@@ -674,39 +690,63 @@ namespace Core
 	bool GraphicsSystem::initSpritesheet(DataFile& file)
 	{
 		m_sheet.m_textureName = file.getString("texture");
-		uint32_t imgCount = file.getInt("imageCount");
-		uint32_t animCount = file.getInt("animationCount");
-		m_sheet.m_images.resize(imgCount);
-		m_sheet.m_animations.resize(animCount);
-		for(uint32_t i = 0; i < imgCount; ++i)
+		
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_sheet.m_textureName), nullptr, nullptr, &m_sheetTexture, nullptr);
+		
+		if(SUCCEEDED(hr))
 		{
-			m_sheet.m_images[i].m_name = file.getString(("images[" + std::to_string(i + 1) + "][1]").c_str());
-			m_sheet.m_images[i].m_texCoords[0].x = file.getFloat(("images[" + std::to_string(i + 1) + "][2][1]").c_str());
-			m_sheet.m_images[i].m_texCoords[0].y = file.getFloat(("images[" + std::to_string(i + 1) + "][2][2]").c_str());
-			m_sheet.m_images[i].m_texCoords[1].x = file.getFloat(("images[" + std::to_string(i + 1) + "][3][1]").c_str());
-			m_sheet.m_images[i].m_texCoords[1].y = file.getFloat(("images[" + std::to_string(i + 1) + "][3][2]").c_str());
-			m_sheet.m_images[i].m_texCoords[2].x = file.getFloat(("images[" + std::to_string(i + 1) + "][4][1]").c_str());
-			m_sheet.m_images[i].m_texCoords[2].y = file.getFloat(("images[" + std::to_string(i + 1) + "][4][2]").c_str());
-			m_sheet.m_images[i].m_texCoords[3].x = file.getFloat(("images[" + std::to_string(i + 1) + "][5][1]").c_str());
-			m_sheet.m_images[i].m_texCoords[3].y = file.getFloat(("images[" + std::to_string(i + 1) + "][5][2]").c_str());
-		}
+			ID3D11Resource* res = nullptr;
+			m_sheetTexture->GetResource(&res);
 
-		for(uint32_t i = 0; i < animCount; ++i)
-		{
-			m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
-			m_sheet.m_animations[i].m_duration = Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str()));
-			m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
-			uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
-			m_sheet.m_animations[i].m_images.resize(animImageCount);
-			for(uint32_t j = 0; j < animImageCount; ++j)
+			ID3D11Texture2D* texture = nullptr;
+			HRESULT hr = res->QueryInterface(&texture);
+
+			if(SUCCEEDED(hr))
 			{
-				uint32_t index = file.getInt(("animations[" + std::to_string(i + 1) + "].images[" + std::to_string(j + 1) + "]").c_str());
-				m_sheet.m_animations[i].m_images[j] = &m_sheet.m_images[index];
+				D3D11_TEXTURE2D_DESC desc;
+				texture->GetDesc(&desc);
+				float tw = static_cast<float>(desc.Width);
+				float th = static_cast<float>(desc.Height);
+
+				uint32_t imgCount = file.getInt("imageCount");
+				uint32_t animCount = file.getInt("animationCount");
+				m_sheet.m_images.resize(imgCount);
+				m_sheet.m_animations.resize(animCount);
+				for(uint32_t i = 0; i < imgCount; ++i)
+				{
+					m_sheet.m_images[i].m_name = file.getString(("images[" + std::to_string(i + 1) + "].name").c_str());
+					Vec2 pos = file.getVec2(("images[" + std::to_string(i + 1) + "].pos").c_str());
+					float w = file.getFloat(("images[" + std::to_string(i + 1) + "].width").c_str());
+					float h = file.getFloat(("images[" + std::to_string(i + 1) + "].height").c_str());
+					m_sheet.m_images[i].m_ratio = w / h;
+					Vec2 wh = pos + Vec2(w, h);
+
+					m_sheet.m_images[i].m_texCoords[0].x = pos.x / tw;
+					m_sheet.m_images[i].m_texCoords[0].y = pos.y / th;
+					m_sheet.m_images[i].m_texCoords[1].x = wh.x / tw;
+					m_sheet.m_images[i].m_texCoords[1].y = m_sheet.m_images[i].m_texCoords[0].y;
+					m_sheet.m_images[i].m_texCoords[2].x = m_sheet.m_images[i].m_texCoords[0].x;
+					m_sheet.m_images[i].m_texCoords[2].y = wh.y / th;
+					m_sheet.m_images[i].m_texCoords[3].x = m_sheet.m_images[i].m_texCoords[1].x;
+					m_sheet.m_images[i].m_texCoords[3].y = m_sheet.m_images[i].m_texCoords[2].y;
+					
+				}
+
+				for(uint32_t i = 0; i < animCount; ++i)
+				{
+					m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
+					m_sheet.m_animations[i].m_duration = Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str()));
+					m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
+					uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
+					m_sheet.m_animations[i].m_images.resize(animImageCount);
+					for(uint32_t j = 0; j < animImageCount; ++j)
+					{
+						uint32_t index = file.getInt(("animations[" + std::to_string(i + 1) + "].images[" + std::to_string(j + 1) + "]").c_str());
+						m_sheet.m_animations[i].m_images[j] = index;
+					}
+				}
 			}
 		}
-
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_sheet.m_textureName), nullptr, nullptr, &m_sheetTexture, nullptr);
-
 		return SUCCEEDED(hr);
 	}
 

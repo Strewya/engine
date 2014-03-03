@@ -45,6 +45,7 @@ namespace Core
 	{
 	public:
 		Vec2 m_texCoords[4];
+		float m_ratio;
 		std::string m_name;
 	};
 
@@ -52,7 +53,7 @@ namespace Core
 	{
 	public:
 		std::string m_name;
-		std::vector<Image*> m_images;
+		std::vector<uint32_t> m_images;
 		uint64_t m_duration;
 		bool m_isLooped;
 	};
@@ -88,8 +89,10 @@ namespace Core
 		bool initSpritesheet(DataFile& file);
 
 		
-
 		void setBackgroundColor(float red, float green, float blue);
+
+		uint32_t getAnimationIndex(const char* name) const;
+		const Animation& getAnimation(uint32_t index) const;
 		
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);

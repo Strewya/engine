@@ -82,6 +82,10 @@ namespace Core
 				}
 				return false;
 			});
+
+			m_player.m_currAnimation = m_graphics.getAnimationIndex("walk");
+			m_player.m_currAnimationFrame = 0;
+			m_player.m_currAnimationTime = m_logicTimer.getCurMicros();
 		}
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -131,6 +135,27 @@ namespace Core
 				f(e);
 			}
 		}
+
+		//animation step
+		auto& anim = m_graphics.getAnimation(m_player.m_currAnimation);
+		
+		if(m_logicTimer.getCurMicros() > m_player.m_currAnimationTime)
+		{
+			if(anim.m_isLooped)
+			{
+				++m_player.m_currAnimationFrame;
+				m_player.m_currAnimationFrame %= anim.m_images.size();
+			}
+			else if(m_player.m_currAnimationFrame < anim.m_images.size() - 1)
+			{
+				++m_player.m_currAnimationFrame;
+			}
+
+			m_player.m_currImage = anim.m_images[m_player.m_currAnimationFrame];
+			m_player.m_currAnimationTime += (anim.m_duration / anim.m_images.size());
+		}
+		//animation step end
+
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
 		return continueRunning;
 	}

@@ -12,12 +12,10 @@ function game_render(game)
 	tx.position:set(0,0);
 	local col = Core.Color();
 	col:set(1,1,0.5);
-	game.m_graphics:drawText("hello from lua", tx, col, 1);
+	game.m_graphics:drawText("ivana je luda malo.", tx, col, 1);
 	
-	tx.position:set(-100, -200);
+	tx.position:set(-200, -50);
 	col:set(1,1,1);
-	local hs = Core.Vec2(10, 10);
-	game.m_graphics:drawQuad(tx, hs, col);
 	tx.scale:set(200,200);
-	game.m_graphics:drawTexturedQuad(tx, col, 5);
+	game.m_graphics:drawTexturedQuad(tx, col, game.m_player.m_currImage);
 end;

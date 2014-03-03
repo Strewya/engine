@@ -11,6 +11,7 @@
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/ScriptingSystem.h>
+#include <Util/Color.h>
 #include <Util/Time.h>
 #include <Util/Transform.h>
 /******* end header inclusion *******/
@@ -24,6 +25,11 @@ namespace Core
 	{
 	public:
 		Transform m_transform;
+		Color m_tint;
+		uint32_t m_currAnimation;
+		uint32_t m_currAnimationFrame;
+		uint32_t m_currImage;
+		uint64_t m_currAnimationTime;
 	};
 
 	class HedgehogGame

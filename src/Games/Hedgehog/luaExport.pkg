@@ -2,11 +2,20 @@
 
 namespace Core
 {
+	class Player
+	{
+	public:
+		Transform m_transform;
+		uint32_t m_currImage;
+	};
+
 	class HedgehogGame
 	{
 	public:
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
+
+		Player m_player;
 
 		const Time m_logicTimer;
 		const Time m_renderTimer;

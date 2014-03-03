@@ -38,6 +38,7 @@ namespace Core
 		for(uint32_t i = 1; i <= top; ++i)
 		{  /* repeat for each level */
 			int t = lua_type(lua, i);
+			std::cout << "[" << i << "]=";
 			switch(t)
 			{
 			case LUA_TSTRING:  /* strings */
@@ -57,7 +58,7 @@ namespace Core
 			break;
 
 			}
-			std::cout << " ";
+			std::cout << ", ";
 		}
 		std::cout << std::endl;
 	}
@@ -220,6 +221,32 @@ namespace Core
 			return ret;
 		}
 		return false;
+	}
+
+	Vec2 DataFile::getVec2(const char* key)
+	{
+		if(extract(m_luaState, key))
+		{
+			Vec2 ret;
+			if(extract(m_luaState, "x") && lua_isnil(m_luaState, -1))
+			{
+				lua_pop(m_luaState, 1);
+				lua_pushinteger(m_luaState, 1);
+				lua_gettable(m_luaState, -2);
+			}
+			ret.x = (float)lua_tonumber(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+			if(extract(m_luaState, "y") && lua_isnil(m_luaState, -1))
+			{
+				lua_pop(m_luaState, 1);
+				lua_pushinteger(m_luaState, 2);
+				lua_gettable(m_luaState, -2);
+			}
+			ret.y = (float)lua_tonumber(m_luaState, -1);
+			lua_pop(m_luaState, 2);
+			return ret;
+		}
+		return Vec2();
 	}
 }
 /*

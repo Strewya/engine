@@ -10,6 +10,7 @@
 /******* common headers *******/
 #include <Scripting/LuaInclude.h>
 /******* extra headers *******/
+#include <Util/Dimensional.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -27,6 +28,7 @@ namespace Core
 		double getDouble(const char* key);
 		float getFloat(const char* key);
 		bool getBool(const char* key);
+		Vec2 getVec2(const char* key);
 
 	private:
 		lua_State* m_luaState;
