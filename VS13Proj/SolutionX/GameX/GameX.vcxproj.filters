@@ -77,9 +77,6 @@
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
       <Filter>Systems\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
-      <Filter>Systems\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
       <Filter>Systems\Scripting</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
       <Filter>Systems\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
+      <Filter>Systems\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,9 +152,6 @@
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h">
       <Filter>Systems\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
-      <Filter>Systems\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h">
       <Filter>Systems\Scripting</Filter>
     </ClInclude>
@@ -181,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\InputSystem.h">
       <Filter>Systems\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
+      <Filter>Systems\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

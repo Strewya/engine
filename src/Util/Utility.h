@@ -12,7 +12,7 @@
 namespace Core
 {
 #define RESOURCE(name) "../resources/"name
-#define RESOURCE_S(name) ("../resources/" + name).c_str()
+#define RESOURCE_S(name) std::string("../resources/").append(name).c_str()
 
 #define CLASS(x) "Core::"#x
 

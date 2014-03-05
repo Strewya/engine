@@ -42,8 +42,6 @@ namespace Core
 		declare(&m_pixelShader);
 		declare(&m_inputLayout);
 		declare(&m_samplerState);
-		declare(&m_fontTexture);
-		declare(&m_sheetTexture);
 
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
@@ -51,7 +49,8 @@ namespace Core
 		status = initDevice() &&
 			initSwapChain() &&
 			initRenderTarget() &&
-			initViewport();
+			initViewport() &&
+			initSamplerState();
 
 		m_camPosition = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
 		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -74,9 +73,9 @@ namespace Core
 			m_swapchain->SetFullscreenState(false, nullptr);
 		}
 
-		for(auto* ptr : m_dxResources)
+		for(auto** ptr : m_dxInterfaces)
 		{
-			safeRelease(ptr);
+			safeRelease(*ptr);
 		}
 
 		DEBUG_INFO("GraphicsSystem shutdown ", status ? "OK" : "FAIL");
@@ -374,7 +373,8 @@ namespace Core
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		m_devcon->PSSetShaderResources(0, 1, &m_sheetTexture);
+		auto srv = m_textures[m_sheetTextureID].get();
+		m_devcon->PSSetShaderResources(0, 1, &srv);
 
 		//m_devcon->Draw(4, 0);
 		m_devcon->DrawIndexed(6, 0, 0);
@@ -387,7 +387,7 @@ namespace Core
 	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification)
 	{
 		ID3D11Resource* res = nullptr;
-		m_fontTexture->GetResource(&res);
+		m_textures[m_fontTextureID]->GetResource(&res);
 
 		ID3D11Texture2D* texture = nullptr;
 		HRESULT hr = res->QueryInterface(&texture);
@@ -496,7 +496,8 @@ namespace Core
 			m_devcon->VSSetConstantBuffers(0, 1, &cb);
 			m_devcon->PSSetConstantBuffers(0, 1, &cb);
 			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-			m_devcon->PSSetShaderResources(0, 1, &m_fontTexture);
+			auto srv = m_textures[m_fontTextureID].get();
+			m_devcon->PSSetShaderResources(0, 1, &srv);
 
 			m_devcon->DrawIndexed(inds.size(), 0, 0);
 
@@ -680,8 +681,8 @@ namespace Core
 			m_font.m_glyphs[i].m_top = file.getInt(("glyphs[" + std::to_string(i + 1) + "].top").c_str());
 		}
 
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_font.m_texture), nullptr, nullptr, &m_fontTexture, nullptr);
-		return SUCCEEDED(hr);
+		m_fontTextureID = loadTextureFromFile(m_font.m_texture.c_str());
+		return m_fontTextureID != -1;
 	}
 
 	//*****************************************************************
@@ -691,12 +692,12 @@ namespace Core
 	{
 		m_sheet.m_textureName = file.getString("texture");
 		
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(m_sheet.m_textureName), nullptr, nullptr, &m_sheetTexture, nullptr);
+		m_sheetTextureID = loadTextureFromFile(m_sheet.m_textureName.c_str());
 		
-		if(SUCCEEDED(hr))
+		if(m_sheetTextureID != -1)
 		{
 			ID3D11Resource* res = nullptr;
-			m_sheetTexture->GetResource(&res);
+			m_textures[m_sheetTextureID]->GetResource(&res);
 
 			ID3D11Texture2D* texture = nullptr;
 			HRESULT hr = res->QueryInterface(&texture);
@@ -747,9 +748,25 @@ namespace Core
 				}
 			}
 		}
-		return SUCCEEDED(hr);
+		return m_sheetTextureID != -1;
 	}
 
+	//*****************************************************************
+	//					LOAD TEXTURE FROM FILE
+	//*****************************************************************
+	uint32_t GraphicsSystem::loadTextureFromFile(const char* filename)
+	{
+		assert(filename != nullptr);
+		ID3D11ShaderResourceView* texturePtr = nullptr;
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(filename), nullptr, nullptr, &texturePtr, nullptr);
+		uint32_t id = -1;
+		if(SUCCEEDED(hr))
+		{
+			m_textures.emplace_back(DxTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>));
+			id = m_textures.size() - 1;
+		}
+		return id;
+	}
 	
 
 	ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)

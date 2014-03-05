@@ -107,6 +107,7 @@ namespace Core
 		template<typename T> static void safeRelease(T*& ptr);
 		template<typename T> void declare(T** ptr);
 
+		uint32_t loadTextureFromFile(const char* filename);
 
 		DXGI_SWAP_CHAIN_DESC m_swapChainDesc;
 		D3DXCOLOR m_backgroundColor;
@@ -130,13 +131,17 @@ namespace Core
 		XMMATRIX m_world;
 		
 		//this shouldn't be explicit like this, refactor later
-		ID3D11ShaderResourceView* m_fontTexture;
+		uint32_t m_fontTextureID;
 		Font m_font;
 
-		ID3D11ShaderResourceView* m_sheetTexture;
+		uint32_t m_sheetTextureID;
 		Sheet m_sheet;
 
-		std::vector<IUnknown*> m_dxResources;
+		//this is for automatic cleanup of all named DX objects
+		std::vector<IUnknown**> m_dxInterfaces;
+
+		typedef std::unique_ptr<ID3D11ShaderResourceView, void(*)(ID3D11ShaderResourceView*)> DxTexturePtr;
+		std::vector<DxTexturePtr> m_textures;
 	};
 
 	template<typename T> void GraphicsSystem::safeRelease(T*& ptr)
@@ -160,6 +165,6 @@ namespace Core
 	{
 		assert(ptr != nullptr);
 		*ptr = nullptr;
-		m_dxResources.emplace_back(*ptr);
+		m_dxInterfaces.emplace_back((IUnknown**)ptr);
 	}
 }
