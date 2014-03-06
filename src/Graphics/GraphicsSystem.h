@@ -54,7 +54,7 @@ namespace Core
 	public:
 		std::string m_name;
 		std::vector<uint32_t> m_images;
-		uint64_t m_duration;
+		uint32_t m_duration;
 		bool m_isLooped;
 	};
 

@@ -21,15 +21,20 @@ namespace Core
 	class Window;
 	class WindowEvent;
 
+	class AnimationData
+	{
+	public:
+		uint32_t m_currAnimation;
+		uint32_t m_currImage;
+		uint32_t m_currAnimationTime;
+	};
+
 	class Player
 	{
 	public:
 		Transform m_transform;
 		Color m_tint;
-		uint32_t m_currAnimation;
-		uint32_t m_currAnimationFrame;
-		uint32_t m_currImage;
-		uint64_t m_currAnimationTime;
+		AnimationData m_animationData;
 	};
 
 	class HedgehogGame

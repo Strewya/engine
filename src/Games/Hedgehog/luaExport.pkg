@@ -2,24 +2,33 @@
 
 namespace Core
 {
+	class AnimationData
+	{
+	public:
+		uint32_t m_currAnimation;
+		uint32_t m_currImage;
+		uint32_t m_currAnimationTime;
+	};
+
 	class Player
 	{
 	public:
 		Transform m_transform;
-		uint32_t m_currImage;
+		Color m_tint;
+		AnimationData m_animationData;
 	};
 
 	class HedgehogGame
 	{
 	public:
-		GraphicsSystem m_graphics;
-		InputSystem m_input;
+		tolua_readonly GraphicsSystem m_graphics;
+		tolua_readonly InputSystem m_input;
 
-		Player m_player;
+		tolua_readonly Player m_player;
 
-		const Time m_logicTimer;
-		const Time m_renderTimer;
+		tolua_readonly Time m_logicTimer;
+		tolua_readonly Time m_renderTimer;
 		double m_timeScale;
-		Window* m_window;
+		tolua_readonly Window* m_window;
 	};
 }

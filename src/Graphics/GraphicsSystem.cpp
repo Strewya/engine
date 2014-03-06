@@ -29,6 +29,9 @@ namespace Core
 	static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
 	static ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize);
 
+	//*****************************************************************
+	//					INIT
+	//*****************************************************************
 	bool GraphicsSystem::init(Window& window)
 	{
 		bool status = true;
@@ -64,6 +67,9 @@ namespace Core
 		return status;
 	}
 
+	//*****************************************************************
+	//					SHUTDOWN
+	//*****************************************************************
 	bool GraphicsSystem::shutdown()
 	{
 		bool status = true;
@@ -82,6 +88,9 @@ namespace Core
 		return status;
 	}
 
+	//*****************************************************************
+	//					UPDATE
+	//*****************************************************************
 	void GraphicsSystem::update()
 	{
 		m_devcon->ClearRenderTargetView(m_renderTarget, m_backgroundColor);
@@ -92,16 +101,25 @@ namespace Core
 		m_swapchain->Present(0, 0);
 	}
 
+	//*****************************************************************
+	//					BEGIN DRAWING
+	//*****************************************************************
 	void GraphicsSystem::begin()
 	{
 		m_devcon->ClearRenderTargetView(m_renderTarget, m_backgroundColor);
 	}
 
+	//*****************************************************************
+	//					PRESENT BACKBUFFER
+	//*****************************************************************
 	void GraphicsSystem::present()
 	{
 		m_swapchain->Present(0, 0);
 	}
 
+	//*****************************************************************
+	//					SET BACKGROUND COLOR
+	//*****************************************************************
 	void GraphicsSystem::setBackgroundColor(float r, float g, float b)
 	{
 		m_backgroundColor.r = r;
@@ -109,6 +127,9 @@ namespace Core
 		m_backgroundColor.b = b;
 	}
 
+	//*****************************************************************
+	//					GET ANIMATION INDEX
+	//*****************************************************************
 	uint32_t GraphicsSystem::getAnimationIndex(const char* name) const
 	{
 		auto it = std::find_if(std::begin(m_sheet.m_animations), std::end(m_sheet.m_animations),
@@ -121,12 +142,18 @@ namespace Core
 		return index;
 	}
 
+	//*****************************************************************
+	//					GET ANIMATION
+	//*****************************************************************
 	const Animation& GraphicsSystem::getAnimation(uint32_t index) const
 	{
 		assert(index < m_sheet.m_animations.size());
 		return m_sheet.m_animations[index];
 	}
 
+	//*****************************************************************
+	//					DRAW LINE
+	//*****************************************************************
 	void GraphicsSystem::drawLine(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -180,6 +207,9 @@ namespace Core
 		vb->Release();
 	}
 
+	//*****************************************************************
+	//					DRAW POLYGON
+	//*****************************************************************
 	void GraphicsSystem::drawPolygon(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -233,6 +263,9 @@ namespace Core
 		vb->Release();
 	}
 
+	//*****************************************************************
+	//					DRAW QUAD
+	//*****************************************************************
 	void GraphicsSystem::drawQuad(const Transform& tf, const Vec2& hs, const Color& c)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -305,6 +338,9 @@ namespace Core
 		vb->Release();
 	}
 
+	//*****************************************************************
+	//					DRAW TEXTURED QUAD
+	//*****************************************************************
 	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, uint32_t i)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -384,6 +420,9 @@ namespace Core
 		vb->Release();
 	}
 	
+	//*****************************************************************
+	//					DRAW TEXT
+	//*****************************************************************
 	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification)
 	{
 		ID3D11Resource* res = nullptr;
@@ -736,7 +775,7 @@ namespace Core
 				for(uint32_t i = 0; i < animCount; ++i)
 				{
 					m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
-					m_sheet.m_animations[i].m_duration = Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str()));
+					m_sheet.m_animations[i].m_duration = static_cast<uint32_t>(Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str())));
 					m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
 					uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
 					m_sheet.m_animations[i].m_images.resize(animImageCount);
@@ -768,7 +807,9 @@ namespace Core
 		return id;
 	}
 	
-
+	//*****************************************************************
+	//					MAKE INDEX BUFFER
+	//*****************************************************************
 	ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
 	{
 		assert(unitSize > 0 && unitCount > 0);
@@ -788,6 +829,9 @@ namespace Core
 	}
 
 
+	//*****************************************************************
+	//					MAKE VERTEX BUFFER
+	//*****************************************************************
 	ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
 	{
 		assert(unitSize > 0 && unitCount > 0);
@@ -806,6 +850,9 @@ namespace Core
 		return buffer;
 	}
 
+	//*****************************************************************
+	//					MAKE CONSTANT BUFFER
+	//*****************************************************************
 	ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize)
 	{
 		assert(unitSize > 0);
@@ -825,6 +872,9 @@ namespace Core
 		return buffer;
 	}
 
+	//*****************************************************************
+	//					FILL SWAP CHAIN
+	//*****************************************************************
 	void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd, HWND hwnd, uint32_t width, uint32_t height)
 	{
 		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));

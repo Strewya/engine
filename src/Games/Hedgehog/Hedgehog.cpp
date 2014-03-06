@@ -83,9 +83,8 @@ namespace Core
 				return false;
 			});
 
-			m_player.m_currAnimation = m_graphics.getAnimationIndex("walk");
-			m_player.m_currAnimationFrame = 0;
-			m_player.m_currAnimationTime = m_logicTimer.getCurMicros();
+			m_player.m_animationData.m_currAnimation = m_graphics.getAnimationIndex("walk");
+			m_player.m_animationData.m_currAnimationTime = static_cast<uint32_t>(m_logicTimer.getCurMicros());
 		}
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -137,23 +136,25 @@ namespace Core
 		}
 
 		//animation step
-		auto& anim = m_graphics.getAnimation(m_player.m_currAnimation);
+		auto& anim = m_graphics.getAnimation(m_player.m_animationData.m_currAnimation);
 		
-		if(m_logicTimer.getCurMicros() > m_player.m_currAnimationTime)
+		m_player.m_animationData.m_currAnimationTime += static_cast<uint32_t>(m_logicTimer.getDeltaMicros());
+		
+		if(m_player.m_animationData.m_currAnimationTime > anim.m_duration)
 		{
 			if(anim.m_isLooped)
 			{
-				++m_player.m_currAnimationFrame;
-				m_player.m_currAnimationFrame %= anim.m_images.size();
+				m_player.m_animationData.m_currAnimationTime -= anim.m_duration;
 			}
-			else if(m_player.m_currAnimationFrame < anim.m_images.size() - 1)
+			else
 			{
-				++m_player.m_currAnimationFrame;
+				m_player.m_animationData.m_currAnimationTime = anim.m_duration;
 			}
-
-			m_player.m_currImage = anim.m_images[m_player.m_currAnimationFrame];
-			m_player.m_currAnimationTime += (anim.m_duration / anim.m_images.size());
 		}
+		uint32_t frameTime = anim.m_duration / anim.m_images.size();
+		uint32_t animFrame = m_player.m_animationData.m_currAnimationTime / frameTime;
+		m_player.m_animationData.m_currImage = anim.m_images[animFrame];
+		
 		//animation step end
 
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
