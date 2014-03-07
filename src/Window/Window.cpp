@@ -266,7 +266,7 @@ namespace Core
 		std::for_each(begin(m_fileChanges), end(m_fileChanges), [&](FileChangeInfo& info)
 		{
 			if(info.m_state == FileChangeInfo::EVENT_PENDING &&
-			   m_timer.getCurMicros() > info.m_timestamp + Time::microsFromMilis(m_fileChangeDelay))
+			   m_timer.getCurMicros() > info.m_timestamp + Time::milisToMicros(m_fileChangeDelay))
 			{
 				info.m_state = FileChangeInfo::READ_PENDING;
 				auto we = newEvent();

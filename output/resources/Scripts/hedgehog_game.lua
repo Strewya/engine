@@ -4,7 +4,8 @@ function game_init(game)
 end;
 
 function game_tick(game)
-	game.m_window:resize(1024,768);
+	game.m_window:resize(800,600);
+	game.m_timeScale = 1;
 end;
 
 function game_render(game)
@@ -17,5 +18,5 @@ function game_render(game)
 	tx.position:set(-200, -50);
 	col:set(1,1,1);
 	tx.scale:set(200,200);
-	game.m_graphics:drawTexturedQuad(tx, col, game.m_player.m_currImage);
+	game.m_graphics:drawTexturedQuad(tx, col, game.m_player.m_animationData.m_imageID);
 end;

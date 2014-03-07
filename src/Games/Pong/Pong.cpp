@@ -285,14 +285,14 @@ namespace Core
 		if(m_leftPaddle.m_score == m_winScore)
 		{
 			m_winner = 1;
-			m_resetTime = m_logicTimer.getCurMicros() + Time::microsFromSeconds(5);
+			m_resetTime = m_logicTimer.getCurMicros() + Time::secondsToMicros(5);
 			m_leftPaddle.m_score = 0;
 			m_rightPaddle.m_score = 0;
 		}
 		if(m_rightPaddle.m_score == m_winScore)
 		{
 			m_winner = 2;
-			m_resetTime = m_logicTimer.getCurMicros() + Time::microsFromSeconds(5);
+			m_resetTime = m_logicTimer.getCurMicros() + Time::secondsToMicros(5);
 			m_leftPaddle.m_score = 0;
 			m_rightPaddle.m_score = 0;
 		}

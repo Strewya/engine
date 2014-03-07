@@ -21,6 +21,8 @@ namespace Core
 		window.resize(1024, 768);
 		DEBUG_LINE(window.openConsole(1050, 0));
 
+		m_timeScale = Time::NORMAL_TIME;
+
 		m_isRunning = m_input.init(window) && m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
 
 		if(m_isRunning)
@@ -83,8 +85,8 @@ namespace Core
 				return false;
 			});
 
-			m_player.m_animationData.m_currAnimation = m_graphics.getAnimationIndex("walk");
-			m_player.m_animationData.m_currAnimationTime = static_cast<uint32_t>(m_logicTimer.getCurMicros());
+			m_player.m_animationData.m_animationID = m_graphics.getAnimationIndex("walk");
+			m_player.m_animationData.m_time = 0;
 		}
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -136,24 +138,24 @@ namespace Core
 		}
 
 		//animation step
-		auto& anim = m_graphics.getAnimation(m_player.m_animationData.m_currAnimation);
+		auto& anim = m_graphics.getAnimation(m_player.m_animationData.m_animationID);
 		
-		m_player.m_animationData.m_currAnimationTime += static_cast<uint32_t>(m_logicTimer.getDeltaMicros());
+		m_player.m_animationData.m_time += m_logicTimer.getVirtDeltaMicros();
 		
-		if(m_player.m_animationData.m_currAnimationTime > anim.m_duration)
+		if(m_player.m_animationData.m_time >= anim.m_duration)
 		{
 			if(anim.m_isLooped)
 			{
-				m_player.m_animationData.m_currAnimationTime -= anim.m_duration;
+				m_player.m_animationData.m_time -= anim.m_duration;
 			}
 			else
 			{
-				m_player.m_animationData.m_currAnimationTime = anim.m_duration;
+				m_player.m_animationData.m_time = anim.m_duration;
 			}
 		}
-		uint32_t frameTime = anim.m_duration / anim.m_images.size();
-		uint32_t animFrame = m_player.m_animationData.m_currAnimationTime / frameTime;
-		m_player.m_animationData.m_currImage = anim.m_images[animFrame];
+		uint32_t frameTime = anim.m_duration / (anim.m_images.size()-1);
+		uint32_t animFrame = m_player.m_animationData.m_time / frameTime;
+		m_player.m_animationData.m_imageID = anim.m_images[animFrame];
 		
 		//animation step end
 

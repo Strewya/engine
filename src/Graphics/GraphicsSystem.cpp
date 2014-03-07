@@ -775,7 +775,7 @@ namespace Core
 				for(uint32_t i = 0; i < animCount; ++i)
 				{
 					m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
-					m_sheet.m_animations[i].m_duration = static_cast<uint32_t>(Time::microsFromSeconds(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str())));
+					m_sheet.m_animations[i].m_duration = static_cast<uint32_t>(Time::secondsToMicros(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str())));
 					m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
 					uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
 					m_sheet.m_animations[i].m_images.resize(animImageCount);

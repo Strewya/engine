@@ -70,20 +70,40 @@ namespace Core
 
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
-
-	/*uint64_t Time::microsFromSeconds(uint32_t sec)
-	{
-		return static_cast<uint64_t>(sec) * 1000 * 1000;
-	}*/
-
-	uint64_t Time::microsFromSeconds(float sec)
+	
+	uint64_t Time::secondsToMicros(float sec)
 	{
 		return static_cast<uint64_t>(sec * 1000 * 1000);
 	}
 
-	uint64_t Time::microsFromMilis(uint32_t mili)
+	uint64_t Time::milisToMicros(uint32_t mili)
 	{
-		return static_cast<uint64_t>(mili) * 1000;
+		return static_cast<uint64_t>(mili)* 1000;
+	}
+
+	float Time::milisToSeconds(uint32_t mili)
+	{
+		return static_cast<float>(mili)*0.001f;
+	}
+
+	float Time::microsToSeconds(uint64_t micros)
+	{
+		return static_cast<float>(micros)*0.001f*0.001f;
+	}
+	
+	uint32_t Time::secondsToMilis(float sec)
+	{
+		return static_cast<uint32_t>(sec * 1000);
+	}
+	
+	uint32_t Time::microsToMilis(uint64_t micros)
+	{
+		return static_cast<uint32_t>(micros / 1000);
+	}
+
+	uint32_t Time::microsDelta(uint64_t start, uint64_t end)
+	{
+		return static_cast<uint32_t>(end - start);
 	}
 
 	Time::Time()
@@ -123,7 +143,7 @@ namespace Core
 		m_deltaMicros = m_curMicros - m_lastMicros;
 		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
 
-		if(virtualTimeScale > 0) //zero is full stop, less would mean rewind, which is impossible?
+		//if(virtualTimeScale > 0) //zero is full stop, less would mean rewind, which is impossible?
 		{
 			m_virtLastMicros = m_virtCurMicros;
 			m_virtCurMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros) * virtualTimeScale);
@@ -151,9 +171,9 @@ namespace Core
 		return m_curMicros;
 	}
 
-	uint64_t Time::getDeltaMicros() const
+	uint32_t Time::getDeltaMicros() const
 	{
-		return m_deltaMicros;
+		return static_cast<uint32_t>(m_deltaMicros);
 	}
 
 	float Time::getDeltaTime() const
@@ -166,9 +186,9 @@ namespace Core
 		return m_virtCurMicros;
 	}
 
-	uint64_t Time::getVirtDeltaMicros() const
+	uint32_t Time::getVirtDeltaMicros() const
 	{
-		return m_virtDeltaMicros;
+		return static_cast<uint32_t>(m_virtDeltaMicros);
 	}
 
 	float Time::getVirtDeltaTime() const
