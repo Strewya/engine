@@ -21,7 +21,7 @@ namespace Core
 		window.resize(1024, 768);
 		DEBUG_LINE(window.openConsole(1050, 0));
 
-		m_timeScale = Time::NORMAL_TIME;
+		m_logicTimeScale = Time::NORMAL_TIME;
 
 		m_isRunning = m_input.init(window) && m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
 
@@ -50,7 +50,7 @@ namespace Core
 				df.close();
 			}
 
-			m_messageHandlers.reserve(2);
+			m_messageHandlers.reserve(3);
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
 				if(w.m_type == WindowEventType::WE_KEYBOARDKEY)
@@ -84,6 +84,7 @@ namespace Core
 				}
 				return false;
 			});
+
 
 			m_player.m_animationData.m_animationID = m_graphics.getAnimationIndex("walk");
 			m_player.m_animationData.m_time = 0;
@@ -125,7 +126,7 @@ namespace Core
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
 		bool continueRunning = true;
-		m_logicTimer.updateBy(updateTime, m_timeScale);
+		m_logicTimer.updateBy(updateTime, m_logicTimeScale);
 
 		m_input.update(m_logicTimer);
 		auto& evs = m_input.getEvents();
@@ -139,10 +140,21 @@ namespace Core
 
 		//animation step
 		auto& anim = m_graphics.getAnimation(m_player.m_animationData.m_animationID);
-		
-		m_player.m_animationData.m_time += m_logicTimer.getVirtDeltaMicros();
-		
-		if(m_player.m_animationData.m_time >= anim.m_duration)
+
+		m_player.m_animationData.m_timer.updateBy(m_logicTimer.getVirtDeltaMicros(), m_player.m_animationData.m_timeScale);
+		m_player.m_animationData.m_time += m_player.m_animationData.m_timer.getVirtDeltaMicros();
+		if(m_player.m_animationData.m_time < 0)
+		{
+			if(anim.m_isLooped)
+			{
+				m_player.m_animationData.m_time += anim.m_duration;
+			}
+			else
+			{
+				m_player.m_animationData.m_time = 0;
+			}
+		}
+		else if(m_player.m_animationData.m_time >= (int32_t)anim.m_duration)
 		{
 			if(anim.m_isLooped)
 			{
@@ -150,13 +162,14 @@ namespace Core
 			}
 			else
 			{
-				m_player.m_animationData.m_time = anim.m_duration;
+				m_player.m_animationData.m_time = anim.m_duration-1;
 			}
 		}
-		uint32_t frameTime = anim.m_duration / (anim.m_images.size()-1);
-		uint32_t animFrame = m_player.m_animationData.m_time / frameTime;
-		m_player.m_animationData.m_imageID = anim.m_images[animFrame];
-		
+
+		float time = static_cast<float>(m_player.m_animationData.m_time) / static_cast<float>(anim.m_duration);
+		uint32_t animIndex = static_cast<uint32_t>(time*anim.m_images.size());
+		m_player.m_animationData.m_imageID = anim.m_images[animIndex];
+
 		//animation step end
 
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
@@ -165,7 +178,7 @@ namespace Core
 
 	void HedgehogGame::tickRender(uint64_t updateTime)
 	{
-		m_renderTimer.updateBy(updateTime, m_timeScale);
+		m_renderTimer.updateBy(updateTime, Time::NORMAL_TIME);
 
 		m_graphics.begin();
 

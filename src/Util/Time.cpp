@@ -195,4 +195,16 @@ namespace Core
 	{
 		return m_virtDeltaTime;
 	}
+
+	void Time::reset()
+	{
+		m_curMicros = 0;
+		m_deltaMicros = 0;
+		m_deltaTime = 0;
+		m_lastMicros = 0;
+		m_virtCurMicros = 0;
+		m_virtDeltaMicros = 0;
+		m_virtDeltaTime = 0;
+		m_virtLastMicros = 0;
+	}
 }

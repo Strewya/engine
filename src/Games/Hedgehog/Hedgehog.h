@@ -24,7 +24,9 @@ namespace Core
 	class AnimationData
 	{
 	public:
-		uint32_t m_time;
+		Time m_timer;
+		double m_timeScale;
+		int32_t m_time;
 		uint32_t m_animationID;
 		uint32_t m_imageID;
 	};
@@ -47,10 +49,10 @@ namespace Core
 		InputSystem m_input;
 
 		Player m_player;
-
+		
+		double m_logicTimeScale;
 		Time m_logicTimer;
 		Time m_renderTimer;
-		double m_timeScale;
 		Window* m_window;
 		bool m_isRunning;
 

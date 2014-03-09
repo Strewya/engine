@@ -5,9 +5,10 @@ namespace Core
 	class AnimationData
 	{
 	public:
-		uint32_t m_time;
-		uint32_t m_animationID;
 		uint32_t m_imageID;
+		double m_timeScale;
+		int32_t m_time;
+		uint32_t m_animationID;
 	};
 
 	class Player
@@ -15,7 +16,7 @@ namespace Core
 	public:
 		Transform m_transform;
 		Color m_tint;
-		AnimationData m_animationData;
+		tolua_readonly AnimationData m_animationData;
 	};
 
 	class HedgehogGame
@@ -28,7 +29,6 @@ namespace Core
 
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;
-		double m_timeScale;
 		tolua_readonly Window* m_window;
 	};
 }

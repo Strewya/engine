@@ -43,6 +43,9 @@ namespace Core
 		uint32_t getVirtDeltaMicros() const;
 		float getVirtDeltaTime() const;
 
+		//use only for countup related timers
+		void reset();
+
 	protected:
 		uint64_t m_oldRealTime;
 		

@@ -5,7 +5,8 @@ end;
 
 function game_tick(game)
 	game.m_window:resize(800,600);
-	game.m_timeScale = 1;
+	game.m_player.m_animationData.m_timeScale = 1;
+	game.m_player.m_animationData.m_animationID = 1;
 end;
 
 function game_render(game)
