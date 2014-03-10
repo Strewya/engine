@@ -1,0 +1,22 @@
+
+$#include <Animation/AnimationSystem.h>
+
+namespace Core
+{
+	class AnimationData
+	{
+	public:
+		double m_timeScale;
+		int32_t m_time;
+		uint32_t m_animationID;
+		uint32_t m_imageID;
+	};
+
+	class AnimationSystem
+	{
+		void update(uint64_t dt);
+
+		void registerData(AnimationData& data);
+		void unregisterData(AnimationData& data);
+	};
+}

@@ -23,7 +23,12 @@ namespace Core
 
 		m_logicTimeScale = Time::NORMAL_TIME;
 
-		m_isRunning = m_input.init(window) && m_scripter.init() && m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) && m_graphics.init(window);
+		m_isRunning = 
+			m_scripter.init() &&
+			m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) &&
+			m_input.init(window) &&
+			m_animation.init(m_graphics) &&
+			m_graphics.init(window);
 
 		if(m_isRunning)
 		{
@@ -88,6 +93,7 @@ namespace Core
 
 			m_player.m_animationData.m_animationID = m_graphics.getAnimationIndex("walk");
 			m_player.m_animationData.m_time = 0;
+			m_animation.registerData(m_player.m_animationData);
 		}
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -119,6 +125,7 @@ namespace Core
 		DEBUG_INFO("---------------------------------");
 		m_input.shutdown();
 		m_scripter.shutdown();
+		m_animation.shutdown();
 		m_graphics.shutdown();
 		return true;
 	}
@@ -138,39 +145,7 @@ namespace Core
 			}
 		}
 
-		//animation step
-		auto& anim = m_graphics.getAnimation(m_player.m_animationData.m_animationID);
-
-		m_player.m_animationData.m_timer.updateBy(m_logicTimer.getVirtDeltaMicros(), m_player.m_animationData.m_timeScale);
-		m_player.m_animationData.m_time += m_player.m_animationData.m_timer.getVirtDeltaMicros();
-		if(m_player.m_animationData.m_time < 0)
-		{
-			if(anim.m_isLooped)
-			{
-				m_player.m_animationData.m_time += anim.m_duration;
-			}
-			else
-			{
-				m_player.m_animationData.m_time = 0;
-			}
-		}
-		else if(m_player.m_animationData.m_time >= (int32_t)anim.m_duration)
-		{
-			if(anim.m_isLooped)
-			{
-				m_player.m_animationData.m_time -= anim.m_duration;
-			}
-			else
-			{
-				m_player.m_animationData.m_time = anim.m_duration-1;
-			}
-		}
-
-		float time = static_cast<float>(m_player.m_animationData.m_time) / static_cast<float>(anim.m_duration);
-		uint32_t animIndex = static_cast<uint32_t>(time*anim.m_images.size());
-		m_player.m_animationData.m_imageID = anim.m_images[animIndex];
-
-		//animation step end
+		m_animation.update(m_logicTimer.getDeltaMicros());
 
 		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
 		return continueRunning;

@@ -31,5 +31,5 @@
 
 
 
-$#include <Games/Hedgehog/Hedgehog.h>
+
 $pfile "../../../src/Games/Hedgehog/luaExport.pkg"

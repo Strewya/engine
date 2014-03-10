@@ -34,6 +34,9 @@
     <Filter Include="Games\Pong">
       <UniqueIdentifier>{c71dadb2-8bce-4635-b14f-77014a0cae0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\Animation">
+      <UniqueIdentifier>{e86503bd-3b6f-4614-8760-ad6a219efab1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -97,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
       <Filter>Systems\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp">
+      <Filter>Systems\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,6 +188,9 @@
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
       <Filter>Systems\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h">
+      <Filter>Systems\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Scripting\luaExport.pkg">
@@ -216,6 +225,9 @@
     </None>
     <None Include="..\..\..\src\Games\Pong\luaExport.pkg">
       <Filter>Games\Pong</Filter>
+    </None>
+    <None Include="..\..\..\src\Animation\luaExport.pkg">
+      <Filter>Systems\Animation</Filter>
     </None>
   </ItemGroup>
 </Project>

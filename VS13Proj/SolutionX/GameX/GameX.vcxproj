@@ -150,7 +150,9 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
+    <None Include="..\..\..\src\Animation\luaExport.pkg" />
     <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg" />
     <None Include="..\..\..\src\Games\luaExport.cpp" />
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
@@ -180,6 +182,7 @@
     <ClCompile Include="..\..\..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
     <ClInclude Include="..\..\..\src\Games\GameSelector.h" />

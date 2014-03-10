@@ -1,22 +1,16 @@
 
 
+$#include <Games/Hedgehog/Hedgehog.h>
+
 namespace Core
 {
-	class AnimationData
-	{
-	public:
-		uint32_t m_imageID;
-		double m_timeScale;
-		int32_t m_time;
-		uint32_t m_animationID;
-	};
-
 	class Player
 	{
 	public:
 		Transform m_transform;
 		Color m_tint;
 		tolua_readonly AnimationData m_animationData;
+		tolua_readonly Time m_mainTimer;
 	};
 
 	class HedgehogGame

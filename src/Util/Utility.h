@@ -30,4 +30,33 @@ namespace Core
 #define DEBUG_LINE(func) void(0)
 #define DEBUG_IF(check, line) void(0)
 #endif
+
+
+	template<typename T> T& wrap(const T& low, const T& high, T& value)
+	{
+		auto d = high - low;
+		if(value < low)
+		{
+			value += d;
+		}
+		else if(value > high)
+		{
+			value -= d;
+		}
+		return value;
+	}
+
+	template<typename T> T& clamp(const T& low, const T& high, T& value)
+	{
+		if(value < low)
+		{
+			value = low;
+		}
+		else if(value > high)
+		{
+			value = high;
+		}
+		return value;
+	}
+
 }

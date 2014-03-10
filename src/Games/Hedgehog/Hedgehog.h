@@ -8,6 +8,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Animation/AnimationSystem.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/ScriptingSystem.h>
@@ -21,22 +22,13 @@ namespace Core
 	class Window;
 	class WindowEvent;
 
-	class AnimationData
-	{
-	public:
-		Time m_timer;
-		double m_timeScale;
-		int32_t m_time;
-		uint32_t m_animationID;
-		uint32_t m_imageID;
-	};
-
 	class Player
 	{
 	public:
 		Transform m_transform;
 		Color m_tint;
 		AnimationData m_animationData;
+		Time m_mainTimer;
 	};
 
 	class HedgehogGame
@@ -47,6 +39,7 @@ namespace Core
 		//these can be exposed to lua
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
+		AnimationSystem m_animation;
 
 		Player m_player;
 		

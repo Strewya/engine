@@ -1,5 +1,7 @@
 
 
+$#include <Games/Pong/Pong.h>
+
 namespace Core
 {
 	struct Paddle
