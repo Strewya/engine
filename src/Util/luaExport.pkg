@@ -79,6 +79,8 @@ namespace Core
 		uint64_t getVirtCurMicros() const;
 		uint64_t getVirtDeltaMicros() const;
 		float getVirtDeltaTime() const;
+
+		void reset();
 	};
 
 	class Transform

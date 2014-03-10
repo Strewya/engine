@@ -193,17 +193,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\Scripting\luaExport.pkg">
-      <Filter>Systems\Scripting</Filter>
-    </None>
     <None Include="..\..\..\src\Window\luaExport.pkg">
       <Filter>Window</Filter>
     </None>
     <None Include="..\..\..\src\Util\luaExport.pkg">
       <Filter>Util</Filter>
-    </None>
-    <None Include="..\..\..\src\Graphics\luaExport.pkg">
-      <Filter>Systems\Graphics</Filter>
     </None>
     <None Include="..\..\..\src\Input\luaExport.pkg">
       <Filter>Systems\Input</Filter>
@@ -214,14 +208,8 @@
     <None Include="..\..\..\src\Audio\luaExport.pkg">
       <Filter>Systems\Audio</Filter>
     </None>
-    <None Include="..\..\..\src\Games\luaExport.pkg">
-      <Filter>Games</Filter>
-    </None>
     <None Include="..\..\..\src\Games\luaExport.cpp">
       <Filter>Games</Filter>
-    </None>
-    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
-      <Filter>Games\Hedgehog</Filter>
     </None>
     <None Include="..\..\..\src\Games\Pong\luaExport.pkg">
       <Filter>Games\Pong</Filter>
@@ -229,5 +217,19 @@
     <None Include="..\..\..\src\Animation\luaExport.pkg">
       <Filter>Systems\Animation</Filter>
     </None>
+    <None Include="..\..\..\src\Games\luaExport.pkg">
+      <Filter>Games</Filter>
+    </None>
+    <None Include="..\..\..\src\Graphics\luaExport.pkg">
+      <Filter>Systems\Graphics</Filter>
+    </None>
+    <None Include="..\..\..\src\Scripting\luaExport.pkg">
+      <Filter>Systems\Scripting</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
+      <Filter>Games\Hedgehog</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
