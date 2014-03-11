@@ -5,7 +5,6 @@ namespace Core
 {
 	class AnimationData
 	{
-	public:
 		double m_timeScale;
 		int32_t m_time;
 		uint32_t m_animationID;

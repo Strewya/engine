@@ -59,7 +59,7 @@
     <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
-    <CustomBuildBeforeTargets>Compile</CustomBuildBeforeTargets>
+    <CustomBuildBeforeTargets>PreBuildEvent</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -94,8 +94,25 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>$(SGPROJECT)\bin\export.bat</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <CustomBuild>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
+      <LinkObjects>false</LinkObjects>
+    </CustomBuild>
+    <CustomBuildStep>
+      <Command>$(SGPROJECT)\bin\export.bat</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(SGPROJECT)\src\Scripting\luaBinding.h;$(SGPROJECT)\src\Scripting\luaBinding.cpp</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>*.pkg</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -154,15 +171,12 @@
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <None Include="..\..\..\src\Animation\luaExport.pkg" />
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SGPROJECT)\bin\export.bat</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SGPROJECT)\src\Scripting\luaBinding.h;$(SGPROJECT)\src\Scripting\luaBinding.cpp</Outputs>
-    </CustomBuild>
+    </None>
     <None Include="..\..\..\src\Games\luaExport.cpp" />
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp" />
@@ -233,11 +247,8 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SGPROJECT)\bin\export.bat</Command>
     </None>
     <None Include="..\..\..\src\Input\luaExport.pkg" />
+    <None Include="..\..\..\src\luaExportMaster.pkg" />
     <None Include="..\..\..\src\Physics\luaExport.pkg" />
-    <None Include="..\..\..\src\Scripting\luaExport.pkg">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SGPROJECT)\bin\export.bat</Command>
-    </None>
     <None Include="..\..\..\src\Util\luaExport.pkg" />
     <None Include="..\..\..\src\Window\luaExport.pkg" />
   </ItemGroup>

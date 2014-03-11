@@ -223,13 +223,9 @@
     <None Include="..\..\..\src\Graphics\luaExport.pkg">
       <Filter>Systems\Graphics</Filter>
     </None>
-    <None Include="..\..\..\src\Scripting\luaExport.pkg">
-      <Filter>Systems\Scripting</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
+    <None Include="..\..\..\src\luaExportMaster.pkg" />
+    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
       <Filter>Games\Hedgehog</Filter>
-    </CustomBuild>
+    </None>
   </ItemGroup>
 </Project>

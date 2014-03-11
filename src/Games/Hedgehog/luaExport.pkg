@@ -6,7 +6,6 @@ namespace Core
 {
 	class Player
 	{
-	public:
 		Transform m_transform;
 		Color m_tint;
 		tolua_readonly AnimationData m_animationData;
@@ -15,9 +14,9 @@ namespace Core
 
 	class HedgehogGame
 	{
-	public:
 		tolua_readonly GraphicsSystem m_graphics;
 		tolua_readonly InputSystem m_input;
+		tolua_readonly AnimationSystem m_animation;
 
 		tolua_readonly Player m_player;
 
