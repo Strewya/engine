@@ -11,13 +11,14 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
-#include <Util/Dimensional.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
 	class Color;
 	class DataFile;
+	class Image;
 	class Transform;
 	class Vec2;
 	class Window;
@@ -41,32 +42,6 @@ namespace Core
 		std::vector<Glyph> m_glyphs;
 	};
 
-	class Image
-	{
-	public:
-		Vec2 m_texCoords[4];
-		float m_ratio;
-		std::string m_name;
-	};
-
-	class Animation
-	{
-	public:
-		std::string m_name;
-		std::vector<uint32_t> m_images;
-		uint32_t m_duration;
-		bool m_isLooped;
-	};
-
-	class Sheet
-	{
-	public:
-		std::string m_name;
-		std::string m_textureName;
-		std::vector<Image> m_images;
-		std::vector<Animation> m_animations;
-	};
-
 	class GraphicsSystem
 	{
 	public:
@@ -86,28 +61,26 @@ namespace Core
 		bool initViewport();
 		bool initSamplerState();
 		bool initFont(DataFile& file);
-		bool initSpritesheet(DataFile& file);
 
 		
 		void setBackgroundColor(float red, float green, float blue);
 
-		uint32_t getAnimationIndex(const char* name) const;
-		const Animation& getAnimation(uint32_t index) const;
-		
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
-		void drawTexturedQuad(const Transform& transform, const Color& fillColor, uint32_t imageIndex);
+		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image, uint32_t textureID);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification);
+
+		uint32_t loadTextureFromFile(const char* filename);
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);
 		template<typename T> static void safeRelease(T*& ptr);
 		template<typename T> void declare(T** ptr);
 
-		uint32_t loadTextureFromFile(const char* filename);
+		
 
 		DXGI_SWAP_CHAIN_DESC m_swapChainDesc;
 		D3DXCOLOR m_backgroundColor;
@@ -133,9 +106,6 @@ namespace Core
 		//this shouldn't be explicit like this, refactor later
 		uint32_t m_fontTextureID;
 		Font m_font;
-
-		uint32_t m_sheetTextureID;
-		Sheet m_sheet;
 
 		//this is for automatic cleanup of all named DX objects
 		std::vector<IUnknown**> m_dxInterfaces;

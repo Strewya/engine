@@ -10,7 +10,7 @@
 /******* common headers *******/
 #include <Box2D/Box2D.h>
 /******* extra headers *******/
-#include <Util/Dimensional.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core

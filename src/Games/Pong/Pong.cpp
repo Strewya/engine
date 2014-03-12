@@ -12,9 +12,9 @@
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
 #include <Util/Color.h>
-#include <Util/Dimensional.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
+#include <Util/Vec2.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
 /******* end headers *******/

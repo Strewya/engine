@@ -1,9 +1,9 @@
 
 $#include <Util/Color.h>
-$#include <Util/Dimensional.h>
 $#include <Util/Random.h>
 $#include <Util/Time.h>
 $#include <Util/Transform.h>
+$#include <Util/Vec2.h>
 
 namespace Core
 {
@@ -15,23 +15,6 @@ namespace Core
 		Color(float r, float g, float b);
 
 		void set(float r, float g, float b);
-	};
-
-	class Vec2
-	{
-		float x, y;
-
-		Vec2();
-		Vec2(float x, float y);
-		
-		void set(float x, float y);
-
-		/* these are inside the class for tolua++ binding compatibility */
-		Vec2 operator+(const Vec2& b) const;
-		Vec2 operator-() const;
-		Vec2 operator-(const Vec2& v) const;
-		Vec2 operator*(float f) const;
-		Vec2 operator/(float f) const;
 	};
 
 	class Random
@@ -90,5 +73,22 @@ namespace Core
 		Vec2 position;
 		Vec2 scale;
 		float rotation;
+	};
+
+	class Vec2
+	{
+		float x, y;
+
+		Vec2();
+		Vec2(float x, float y);
+		
+		void set(float x, float y);
+
+		/* these are inside the class for tolua++ binding compatibility */
+		Vec2 operator+(const Vec2& b) const;
+		Vec2 operator-() const;
+		Vec2 operator-(const Vec2& v) const;
+		Vec2 operator*(float f) const;
+		Vec2 operator/(float f) const;
 	};
 }

@@ -1,24 +1,28 @@
 #pragma once
 /********************************************
-*	class:	Transform
+*	class:	SpritesheetCache
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec2.h>
+#include <DataStructs/Spritesheet.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class Transform
+	class DataFile;
+
+	class SpritesheetCache
 	{
 	public:
-		Transform();
+		bool loadSpritesheet(DataFile& df);
 
-		Vec2 position;
-		Vec2 scale;
-		float rotation;
 
+	private:
+		
+		std::vector<Spritesheet> m_sheets;
 	};
 }

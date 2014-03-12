@@ -10,7 +10,7 @@
 /******* common headers *******/
 #include <Scripting/LuaInclude.h>
 /******* extra headers *******/
-#include <Util/Dimensional.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core

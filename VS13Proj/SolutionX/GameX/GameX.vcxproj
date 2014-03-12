@@ -169,6 +169,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <None Include="..\..\..\src\Animation\luaExport.pkg" />
     <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
@@ -194,10 +195,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Dimensional.cpp" />
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Time.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Vec2.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="..\..\..\src\Window\Window.cpp" />
@@ -206,6 +207,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
+    <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
     <ClInclude Include="..\..\..\src\Games\GameSelector.h" />
@@ -224,10 +229,10 @@
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
-    <ClInclude Include="..\..\..\src\Util\Dimensional.h" />
     <ClInclude Include="..\..\..\src\Util\Random.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />
     <ClInclude Include="..\..\..\src\Util\Transform.h" />
+    <ClInclude Include="..\..\..\src\Util\Vec2.h" />
     <ClInclude Include="..\..\..\src\Window\myWindows.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h" />

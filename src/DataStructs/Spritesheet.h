@@ -1,24 +1,23 @@
 #pragma once
 /********************************************
-*	class:	Transform
+*	class:	Spritesheet
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <string>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec2.h>
+#include <DataStructs/Image.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class Transform
+	class Spritesheet
 	{
 	public:
-		Transform();
-
-		Vec2 position;
-		Vec2 scale;
-		float rotation;
-
+		uint32_t m_textureID;
+		std::string m_name;
+		std::vector<Image> m_images;
 	};
 }

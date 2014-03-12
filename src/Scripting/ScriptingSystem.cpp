@@ -10,7 +10,6 @@
 #endif
 /******* extra headers *******/
 #include <Scripting/luaBinding.h>
-#include <Util/Dimensional.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 

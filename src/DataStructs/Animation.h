@@ -1,24 +1,25 @@
 #pragma once
 /********************************************
-*	class:	Transform
+*	class:	Animation
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
+#include <string>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class Transform
+	class Animation
 	{
 	public:
-		Transform();
-
-		Vec2 position;
-		Vec2 scale;
-		float rotation;
-
+		uint32_t m_durationDefault;
+		uint32_t m_spritesheetID;
+		std::vector<uint32_t> m_sequence;
+		std::string m_name;
+		bool m_isLoopDefault;
 	};
 }

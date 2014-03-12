@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 /******* extra headers *******/
+#include <DataStructs/Image.h>
 #include <Graphics/Vertex.h>
 #include <Scripting/ScriptingSystem.h>
 #include <Util/Color.h>
@@ -341,14 +342,9 @@ namespace Core
 	//*****************************************************************
 	//					DRAW TEXTURED QUAD
 	//*****************************************************************
-	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, uint32_t i)
+	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, const Image& img, uint32_t tx)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
-		if(i >= m_sheet.m_images.size())
-			return;
-
-
-		Image& img = m_sheet.m_images[i];
 		
 		/****** VERTEX BUFFER ******/
 		Vertex vertices[]
@@ -409,7 +405,7 @@ namespace Core
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		auto srv = m_textures[m_sheetTextureID].get();
+		auto srv = m_textures[tx].get();
 		m_devcon->PSSetShaderResources(0, 1, &srv);
 
 		//m_devcon->Draw(4, 0);
@@ -722,72 +718,6 @@ namespace Core
 
 		m_fontTextureID = loadTextureFromFile(m_font.m_texture.c_str());
 		return m_fontTextureID != -1;
-	}
-
-	//*****************************************************************
-	//					INIT SPRITESHEET
-	//*****************************************************************
-	bool GraphicsSystem::initSpritesheet(DataFile& file)
-	{
-		m_sheet.m_textureName = file.getString("texture");
-		
-		m_sheetTextureID = loadTextureFromFile(m_sheet.m_textureName.c_str());
-		
-		if(m_sheetTextureID != -1)
-		{
-			ID3D11Resource* res = nullptr;
-			m_textures[m_sheetTextureID]->GetResource(&res);
-
-			ID3D11Texture2D* texture = nullptr;
-			HRESULT hr = res->QueryInterface(&texture);
-
-			if(SUCCEEDED(hr))
-			{
-				D3D11_TEXTURE2D_DESC desc;
-				texture->GetDesc(&desc);
-				float tw = static_cast<float>(desc.Width);
-				float th = static_cast<float>(desc.Height);
-
-				uint32_t imgCount = file.getInt("imageCount");
-				uint32_t animCount = file.getInt("animationCount");
-				m_sheet.m_images.resize(imgCount);
-				m_sheet.m_animations.resize(animCount);
-				for(uint32_t i = 0; i < imgCount; ++i)
-				{
-					m_sheet.m_images[i].m_name = file.getString(("images[" + std::to_string(i + 1) + "].name").c_str());
-					Vec2 pos = file.getVec2(("images[" + std::to_string(i + 1) + "].pos").c_str());
-					float w = file.getFloat(("images[" + std::to_string(i + 1) + "].width").c_str());
-					float h = file.getFloat(("images[" + std::to_string(i + 1) + "].height").c_str());
-					m_sheet.m_images[i].m_ratio = w / h;
-					Vec2 wh = pos + Vec2(w, h);
-
-					m_sheet.m_images[i].m_texCoords[0].x = pos.x / tw;
-					m_sheet.m_images[i].m_texCoords[0].y = pos.y / th;
-					m_sheet.m_images[i].m_texCoords[1].x = wh.x / tw;
-					m_sheet.m_images[i].m_texCoords[1].y = m_sheet.m_images[i].m_texCoords[0].y;
-					m_sheet.m_images[i].m_texCoords[2].x = m_sheet.m_images[i].m_texCoords[0].x;
-					m_sheet.m_images[i].m_texCoords[2].y = wh.y / th;
-					m_sheet.m_images[i].m_texCoords[3].x = m_sheet.m_images[i].m_texCoords[1].x;
-					m_sheet.m_images[i].m_texCoords[3].y = m_sheet.m_images[i].m_texCoords[2].y;
-					
-				}
-
-				for(uint32_t i = 0; i < animCount; ++i)
-				{
-					m_sheet.m_animations[i].m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
-					m_sheet.m_animations[i].m_duration = static_cast<uint32_t>(Time::secondsToMicros(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str())));
-					m_sheet.m_animations[i].m_isLooped = file.getString(("animations[" + std::to_string(i + 1) + "].type").c_str()) == "loop";
-					uint32_t animImageCount = file.getInt(("animations[" + std::to_string(i + 1) + "].imageCount").c_str());
-					m_sheet.m_animations[i].m_images.resize(animImageCount);
-					for(uint32_t j = 0; j < animImageCount; ++j)
-					{
-						uint32_t index = file.getInt(("animations[" + std::to_string(i + 1) + "].images[" + std::to_string(j + 1) + "]").c_str());
-						m_sheet.m_animations[i].m_images[j] = index;
-					}
-				}
-			}
-		}
-		return m_sheetTextureID != -1;
 	}
 
 	//*****************************************************************

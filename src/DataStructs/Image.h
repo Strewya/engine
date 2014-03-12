@@ -1,9 +1,10 @@
 #pragma once
 /********************************************
-*	class:	Transform
+*	class:	Image
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <string>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Vec2.h>
@@ -11,14 +12,11 @@
 
 namespace Core
 {
-	class Transform
+	class Image
 	{
 	public:
-		Transform();
-
-		Vec2 position;
-		Vec2 scale;
-		float rotation;
-
+		Vec2 m_texCoords[4];
+		float m_ratio;
+		std::string m_name;
 	};
 }

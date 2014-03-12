@@ -1,16 +1,16 @@
 //headers should be ordered alphabetically, if not REORDER THEM NOW!
-	/*** precompiled header ***/
+/******* precompiled header *******/
 #include <stdafx.h>
-	/*** personal header ***/
+/******* personal header *******/
 #include <Graphics/Box2dDebugDraw.h>
-	/*** C++ headers ***/
+/******* C++ headers *******/
 #include <vector>
-	/*** extra headers ***/
+/******* extra headers *******/
 #include <Graphics/GraphicsSystem.h>
 #include <Util/Color.h>
-#include <Util/Dimensional.h>
 #include <Util/Transform.h>
-	/*** end headers ***/
+#include <Util/Vec2.h>
+/******* end headers *******/
 
 namespace Core
 {

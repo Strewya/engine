@@ -6,7 +6,6 @@
 /******* C++ headers *******/
 #include <iostream>
 /******* extra headers *******/
-#include <Util/Dimensional.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 

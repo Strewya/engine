@@ -37,6 +37,12 @@
     <Filter Include="Systems\Animation">
       <UniqueIdentifier>{e86503bd-3b6f-4614-8760-ad6a219efab1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Systems\Caches">
+      <UniqueIdentifier>{b63ebf69-5586-4f80-bc9a-d829f19eeadd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructs">
+      <UniqueIdentifier>{4ab7d446-61ac-434f-948e-a2ec3bbda22d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -58,9 +64,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp">
       <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\Dimensional.cpp">
-      <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp">
       <Filter>Systems\Graphics</Filter>
@@ -104,6 +107,12 @@
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp">
       <Filter>Systems\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Vec2.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp">
+      <Filter>Systems\Caches</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -133,9 +142,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h">
       <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Dimensional.h">
-      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h">
       <Filter>Systems\Graphics</Filter>
@@ -190,6 +196,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h">
       <Filter>Systems\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h">
+      <Filter>Systems\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DataStructs\Image.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec2.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h">
+      <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DataStructs\Animation.h">
+      <Filter>DataStructs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
