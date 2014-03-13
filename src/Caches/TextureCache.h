@@ -1,32 +1,32 @@
 #pragma once
 /********************************************
-*	class:	SpritesheetCache
+*	class:	TextureCache
 *	usage:
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <string>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <DataStructs/Spritesheet.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class DataFile;
-	class TextureCache;
+	class GraphicsSystem;
 
-	class SpritesheetCache
+	class TextureCache
 	{
 	public:
-		bool init(TextureCache& textures);
+		bool init(GraphicsSystem& graphics);
 		bool shutdown();
 
-		bool loadSpritesheet(DataFile& df);
-
-
+		uint32_t getTextureID(const char* path);
+		Vec2 getTextureDimensions(uint32_t texID);
+		
 	private:
-		TextureCache* m_textures;
-		std::vector<Spritesheet> m_sheets;
+		GraphicsSystem* m_graphics;
+
+		std::vector<std::pair<std::string, uint32_t>> m_loadedTextures;
 	};
 }

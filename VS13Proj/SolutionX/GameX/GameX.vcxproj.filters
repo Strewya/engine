@@ -113,6 +113,12 @@
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp">
       <Filter>Systems\Caches</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp">
+      <Filter>Systems\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp">
+      <Filter>Systems\Caches</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -211,6 +217,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h">
       <Filter>DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\TextureCache.h">
+      <Filter>Systems\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\AnimationCache.h">
+      <Filter>Systems\Caches</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

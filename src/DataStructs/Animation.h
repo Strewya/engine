@@ -16,10 +16,10 @@ namespace Core
 	class Animation
 	{
 	public:
-		uint32_t m_durationDefault;
+		uint32_t m_defaultDuration;
 		uint32_t m_spritesheetID;
 		std::vector<uint32_t> m_sequence;
 		std::string m_name;
-		bool m_isLoopDefault;
+		bool m_defaultRepeat;
 	};
 }

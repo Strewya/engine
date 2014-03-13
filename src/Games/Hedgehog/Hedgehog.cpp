@@ -14,6 +14,23 @@
 
 namespace Core
 {
+	void HedgehogGame::shutdown()
+	{
+		DEBUG_INFO("---------------------------------");
+		bool status = true;
+		status &= m_textureCache.shutdown();
+		status &= m_animationCache.shutdown();
+		status &= m_spritesheetCache.shutdown();
+		status &= m_input.shutdown();
+		status &= m_scripter.shutdown();
+		status &= m_animation.shutdown();
+		status &= m_graphics.shutdown();
+		if(!status)
+		{
+			DEBUG_INFO("\nShutdown has failed! Bugs...");
+		}
+	}
+
 	bool HedgehogGame::init(Window& window)
 	{
 		m_window = &window;
@@ -23,23 +40,28 @@ namespace Core
 
 		m_logicTimeScale = Time::NORMAL_TIME;
 
-		m_isRunning = 
+		m_isRunning =
+			//systems
 			m_scripter.init() &&
 			m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) &&
 			m_input.init(window) &&
 			m_animation.init(m_graphics) &&
-			m_graphics.init(window);
+			m_graphics.init(window) &&
+			//caches
+			m_textureCache.init(m_graphics) &&
+			m_spritesheetCache.init(m_textureCache) &&
+			m_animationCache.init() &&
+			//last statement so all previous can have '&&' at the end
+			true;
+
 
 		if(m_isRunning)
 		{
 			m_scripter.executeScriptFile(RESOURCE("Scripts/hedgehog_game.lua"));
-			m_isRunning &= m_scripter.functionExists("game_init") && m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
+			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
 		if(m_isRunning)
-		{
-			m_scripter.executeFunction("game_init", this, CLASS(HedgehogGame));
-
-			
+		{	
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
@@ -49,9 +71,10 @@ namespace Core
 				m_isRunning &= m_graphics.initFont(df);
 				df.close();
 			}
+			
 			if(df.open(RESOURCE("Sheets/hedgehog.sheet")))
 			{
-				m_isRunning &= m_graphics.initSpritesheet(df); 
+				m_isRunning &= m_spritesheetCache.loadSpritesheet(df); 
 				df.close();
 			}
 
@@ -74,30 +97,22 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_FILECHANGE)
 				{
-					uint32_t action;
-					std::string file;
-					if(m_window->getChangedFile(w.m_fileChange.m_index, action, file))
-					{
-						auto pos = file.find_last_of('.');
-						if(file.substr(pos + 1) == "lua")
-						{
-							DEBUG_INFO("Reloading script ", file);
-							m_scripter.executeScriptFile(RESOURCE_S(file));
-							return true;
-						}
-					}
+					this->onFileChanged(w.m_fileChange.m_index);
+					return true;
 				}
 				return false;
 			});
 
 
-			m_player.m_animationData.m_animationID = m_graphics.getAnimationIndex("walk");
+			m_player.m_animationData.m_animationID = m_animationCache.getAnimationIndex("hedgehog_walk");
 			m_player.m_animationData.m_time = 0;
 			m_animation.registerData(m_player.m_animationData);
 		}
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
 	}
+
+	
 
 	bool HedgehogGame::tick()
 	{
@@ -120,15 +135,7 @@ namespace Core
 		return m_isRunning;
 	}
 
-	bool HedgehogGame::shutdown()
-	{
-		DEBUG_INFO("---------------------------------");
-		m_input.shutdown();
-		m_scripter.shutdown();
-		m_animation.shutdown();
-		m_graphics.shutdown();
-		return true;
-	}
+	
 	
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
@@ -161,5 +168,21 @@ namespace Core
 
 		m_graphics.present();
 		
+	}
+
+	void HedgehogGame::onFileChanged(uint32_t index)
+	{
+		uint32_t action;
+		std::string file;
+		if(m_window->getChangedFile(index, action, file))
+		{
+			auto pos = file.find_last_of('.');
+			auto ext = file.substr(pos + 1);
+			if(ext == "lua")
+			{
+				DEBUG_INFO("Reloading script ", file);
+				m_scripter.executeScriptFile(RESOURCE_S(file));
+			}
+		}
 	}
 }

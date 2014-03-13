@@ -64,7 +64,7 @@ namespace Core
 		//m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
 		m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
 		
-		DEBUG_INFO("GraphicsSystem init ", status ? "OK" : "FAIL");
+		DEBUG_INIT("GraphicsSystem");
 		return status;
 	}
 
@@ -85,7 +85,7 @@ namespace Core
 			safeRelease(*ptr);
 		}
 
-		DEBUG_INFO("GraphicsSystem shutdown ", status ? "OK" : "FAIL");
+		DEBUG_SHUTDOWN("GraphicsSystem");
 		return status;
 	}
 
@@ -129,29 +129,29 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					GET ANIMATION INDEX
+	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
-	uint32_t GraphicsSystem::getAnimationIndex(const char* name) const
+	Vec2 GraphicsSystem::getTextureDimensions(uint32_t texID)
 	{
-		auto it = std::find_if(std::begin(m_sheet.m_animations), std::end(m_sheet.m_animations),
-							   [&](const Animation& a) { return a.m_name == name; });
-		uint32_t index = 0;
-		if(it != std::end(m_sheet.m_animations))
+		ID3D11Resource* res = nullptr;
+		m_textures[texID]->GetResource(&res);
+
+		ID3D11Texture2D* texture = nullptr;
+		HRESULT hr = res->QueryInterface(&texture);
+
+		Vec2 dim(0, 0);
+		if(SUCCEEDED(hr))
 		{
-			index = std::distance(std::begin(m_sheet.m_animations), it);
+			D3D11_TEXTURE2D_DESC desc;
+			texture->GetDesc(&desc);
+			dim.x = static_cast<float>(desc.Width);
+			dim.y = static_cast<float>(desc.Height);
 		}
-		return index;
-	}
-
-	//*****************************************************************
-	//					GET ANIMATION
-	//*****************************************************************
-	const Animation& GraphicsSystem::getAnimation(uint32_t index) const
-	{
-		assert(index < m_sheet.m_animations.size());
-		return m_sheet.m_animations[index];
-	}
-
+		safeRelease(texture);
+		safeRelease(res);
+		return dim;
+	}	
+	
 	//*****************************************************************
 	//					DRAW LINE
 	//*****************************************************************

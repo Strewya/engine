@@ -1,32 +1,31 @@
 #pragma once
 /********************************************
-*	class:	SpritesheetCache
+*	class:	AnimationCache
 *	usage:
 ********************************************/
 /******* C++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <DataStructs/Spritesheet.h>
+#include <DataStructs/Animation.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
 	class DataFile;
-	class TextureCache;
+	class SpritesheetCache;
 
-	class SpritesheetCache
+	class AnimationCache
 	{
 	public:
-		bool init(TextureCache& textures);
+		bool init(SpritesheetCache& spritesheets);
 		bool shutdown();
 
-		bool loadSpritesheet(DataFile& df);
-
+		bool loadAnimation(DataFile& df);
 
 	private:
-		TextureCache* m_textures;
-		std::vector<Spritesheet> m_sheets;
+		SpritesheetCache* m_spritesheets;
+
+		std::vector<Animation> m_animations;
 	};
 }

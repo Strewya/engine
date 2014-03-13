@@ -62,7 +62,7 @@ namespace Core
 		bool initSamplerState();
 		bool initFont(DataFile& file);
 
-		
+		Vec2 getTextureDimensions(uint32_t texID);
 		void setBackgroundColor(float red, float green, float blue);
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);

@@ -9,6 +9,9 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
+#include <Caches/AnimationCache.h>
+#include <Caches/SpritesheetCache.h>
+#include <Caches/TextureCache.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/ScriptingSystem.h>
@@ -36,10 +39,16 @@ namespace Core
 	public:
 		//this will never be exposed to lua!!
 		ScriptingSystem m_scripter;
-		//these can be exposed to lua
+		
+		
+		//systems
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
 		AnimationSystem m_animation;
+		//caches
+		TextureCache m_textureCache;
+		SpritesheetCache m_spritesheetCache;
+		AnimationCache m_animationCache;
 
 		Player m_player;
 		
@@ -53,9 +62,12 @@ namespace Core
 
 		bool init(Window& window);
 		bool tick();
-		bool shutdown();
+		void shutdown();
 
 		bool tickLogic(uint64_t updateTime);
 		void tickRender(uint64_t updateTime);
+
+	private:
+		void onFileChanged(uint32_t index);
 	};
 }
