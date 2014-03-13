@@ -34,11 +34,10 @@ namespace Core
 
 	bool AnimationCache::loadAnimation(DataFile& file)
 	{
-		auto name = file.getString("name");
 		using std::begin; using std::end;
 		auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
 		{
-			return name == anim.m_name;
+			return file.getFilename() == anim.m_name;
 		});
 		
 		if(it != end(m_animations))
@@ -58,9 +57,30 @@ namespace Core
 		return true; //when will i ever return false??? prolly when fill animation fails.. it should also return bool.
 	}
 
+	uint32_t AnimationCache::getAnimationID(const char* name) const
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
+		{
+			return name == anim.m_name;
+		});
+
+		if(it != end(m_animations))
+		{
+			return std::distance(begin(m_animations), it);
+		}
+		return -1;
+	}
+	
+	const Animation& AnimationCache::getAnimation(uint32_t id) const
+	{
+		assert(id < m_animations.size());
+		return m_animations[id];
+	}
+
 	void fillAnimation(DataFile& file, Animation& anim, SpritesheetCache& spritesheets)
 	{
-		uint32_t animCount = file.getInt("animationCount");
+		uint32_t animCount = file.getArraySize("animations");
 		for(uint32_t i = 0; i < animCount; ++i)
 		{
 			anim.m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());

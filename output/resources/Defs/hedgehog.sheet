@@ -1,6 +1,5 @@
 return {
 	texture = "Textures/hedgehog.png",
-	imageCount = 10,
 	images = {
 		{ name="idle_00", pos={x=0,y=0},   width=450, height=300 },
 		{ name="idle_01", pos={450,  0},   width=450, height=300 },
@@ -12,11 +11,5 @@ return {
 		{ name="walk_03", pos={1350, 300}, width=450, height=300 },
 		{ name="walk_04", pos={0,    600}, width=450, height=300 },
 		{ name="walk_05", pos={450,  600}, width=450, height=300 },
-	},
-	animationCount = 3,
-	animations = {
-		{ name = "walk", imageCount = 6, images = {4, 5, 6, 7, 8, 9}, duration = 1, type = "loop" },
-		{ name = "sit", imageCount = 4, images = {3, 2, 1, 0}, duration = 1, type = "once" },
-		{ name = "unsit", imageCount = 4, images = {0, 1, 2, 3}, duration = 1, type = "once" }
 	}
 };

@@ -12,7 +12,7 @@
 
 namespace Core
 {
-	class GraphicsSystem;
+	class AnimationCache;
 
 	class AnimationData
 	{
@@ -27,7 +27,7 @@ namespace Core
 	class AnimationSystem
 	{
 	public:
-		bool init(GraphicsSystem& graphics);
+		bool init(AnimationCache& animations);
 		bool shutdown();
 
 		void update(uint64_t dt);
@@ -36,7 +36,7 @@ namespace Core
 		void unregisterData(AnimationData& data);
 
 	private:
-		GraphicsSystem* m_graphics;
+		AnimationCache* m_animations;
 
 		std::vector<AnimationData*> m_data;
 	};

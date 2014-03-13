@@ -23,15 +23,18 @@ namespace Core
 		bool open(const char* filename);
 		void close();
 
+		const std::string& getFilename() const;
 		std::string getString(const char* key);
 		int32_t getInt(const char* key);
 		double getDouble(const char* key);
 		float getFloat(const char* key);
 		bool getBool(const char* key);
 		Vec2 getVec2(const char* key);
+		uint32_t getArraySize(const char* key);
 
 	private:
 		lua_State* m_luaState;
+		std::string m_filename;
 	};
 
 

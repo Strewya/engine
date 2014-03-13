@@ -68,7 +68,7 @@ namespace Core
 			}
 
 			auto df = m_scripts.getDataFile();
-			if(df.open(RESOURCE("Sheets/font.sheet")))
+			if(df.open(RESOURCE("Defs/font.sheet")))
 			{
 				initializationStatus &= m_graphics.initFont(df);
 				df.close();

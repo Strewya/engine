@@ -9,6 +9,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core

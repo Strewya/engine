@@ -174,6 +174,8 @@
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <None Include="..\..\..\src\Animation\luaExport.pkg" />
+    <None Include="..\..\..\src\Caches\luaExport.pkg" />
+    <None Include="..\..\..\src\DataStructs\luaExport.pkg" />
     <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
       <FileType>Document</FileType>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -34,12 +34,12 @@ namespace Core
 
 	bool SpritesheetCache::loadSpritesheet(DataFile& df)
 	{
-		std::string name = df.getString("name");
 		using std::begin; using std::end;
 		auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
 		{
-			return sheet.m_name == name;
+			return sheet.m_name == df.getFilename();
 		});
+
 		if(it != end(m_sheets))
 		{
 			it->m_images.clear();
@@ -67,7 +67,7 @@ namespace Core
 			float tw = td.x;
 			float th = td.y;
 
-			uint32_t imgCount = file.getInt("imageCount");
+			uint32_t imgCount = file.getArraySize("images");
 			sheet.m_images.resize(imgCount);
 			for(uint32_t i = 0; i < imgCount; ++i)
 			{

@@ -1,8 +1,4 @@
 
-function game_init(game)
-	
-end;
-
 function game_tick(game)
 	game.m_window:resize(800,600);
 	
@@ -42,12 +38,3 @@ function game_render(game)
 	game.m_graphics:drawTexturedQuad(tx, col, game.m_player.m_animationData.m_imageID);
 end;
 
-
---[[
-these are so i can know what stuff was loaded, so i could reload them when the file was changed externally
-
-SheetCache
-AnimationCache
-ImageCache
-ScriptCache
-]]

@@ -23,6 +23,9 @@ namespace Core
 
 		bool loadAnimation(DataFile& df);
 
+		uint32_t getAnimationID(const char* name) const;
+		const Animation& getAnimation(uint32_t id) const;
+
 	private:
 		SpritesheetCache* m_spritesheets;
 

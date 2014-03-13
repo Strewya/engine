@@ -260,5 +260,11 @@
     <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
       <Filter>Games\Hedgehog</Filter>
     </None>
+    <None Include="..\..\..\src\DataStructs\luaExport.pkg">
+      <Filter>DataStructs</Filter>
+    </None>
+    <None Include="..\..\..\src\Caches\luaExport.pkg">
+      <Filter>Systems\Caches</Filter>
+    </None>
   </ItemGroup>
 </Project>

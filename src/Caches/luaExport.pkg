@@ -1,0 +1,23 @@
+
+$#include <Caches/TextureCache.h>
+$#include <Caches/SpritesheetCache.h>
+$#include <Caches/AnimationCache.h>
+
+namespace Core
+{
+	class TextureCache
+	{
+		uint32_t getTextureID(const char* path);
+		Vec2 getTextureDimensions(uint32_t texID);
+	};
+
+	class SpritesheetCache
+	{
+	};
+
+	class AnimationCache
+	{
+		uint32_t getAnimationID(const char* name) const;
+		const Animation& getAnimation(uint32_t id) const;
+	};
+}

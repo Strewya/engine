@@ -45,12 +45,12 @@ namespace Core
 			m_scripter.init() &&
 			m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) &&
 			m_input.init(window) &&
-			m_animation.init(m_graphics) &&
+			m_animation.init(m_animationCache) &&
 			m_graphics.init(window) &&
 			//caches
 			m_textureCache.init(m_graphics) &&
 			m_spritesheetCache.init(m_textureCache) &&
-			m_animationCache.init() &&
+			m_animationCache.init(m_spritesheetCache) &&
 			//last statement so all previous can have '&&' at the end
 			true;
 
@@ -60,23 +60,31 @@ namespace Core
 			m_scripter.executeScriptFile(RESOURCE("Scripts/hedgehog_game.lua"));
 			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
+
 		if(m_isRunning)
 		{	
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
 			auto df = m_scripter.getDataFile();
-			if(df.open(RESOURCE("Sheets/font.sheet")))
+			if(df.open(RESOURCE("Defs/font.sheet")))
 			{
 				m_isRunning &= m_graphics.initFont(df);
 				df.close();
 			}
 			
-			if(df.open(RESOURCE("Sheets/hedgehog.sheet")))
+			if(df.open(RESOURCE("Defs/hedgehog.sheet")))
 			{
-				m_isRunning &= m_spritesheetCache.loadSpritesheet(df); 
+				m_isRunning &= m_spritesheetCache.loadSpritesheet(df);
 				df.close();
 			}
+
+			if(df.open(RESOURCE("Defs/hedgehog.anim")))
+			{
+				m_isRunning &= m_animationCache.loadAnimation(df);
+				df.close();
+			}
+			
 
 			m_messageHandlers.reserve(3);
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
@@ -104,7 +112,7 @@ namespace Core
 			});
 
 
-			m_player.m_animationData.m_animationID = m_animationCache.getAnimationIndex("hedgehog_walk");
+			m_player.m_animationData.m_animationID = m_animationCache.getAnimationID("walk");
 			m_player.m_animationData.m_time = 0;
 			m_animation.registerData(m_player.m_animationData);
 		}

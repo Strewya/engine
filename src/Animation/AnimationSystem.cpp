@@ -5,17 +5,17 @@
 #include <Animation/AnimationSystem.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Graphics/GraphicsSystem.h>
+#include <Caches/AnimationCache.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	bool AnimationSystem::init(GraphicsSystem& graphics)
+	bool AnimationSystem::init(AnimationCache& animations)
 	{
 		bool status = true;
 
-		m_graphics = &graphics;
+		m_animations = &animations;
 
 		DEBUG_INFO("GraphicsSystem init ", status ? "OK" : "FAIL");
 		return status;
@@ -36,26 +36,26 @@ namespace Core
 		for(auto* ptr : m_data)
 		{
 			auto& animData = *ptr;
-			auto& anim = m_graphics->getAnimation(animData.m_animationID);
+			const auto& anim = m_animations->getAnimation(animData.m_animationID);
 
 			animData.m_timer.updateBy(dt, animData.m_timeScale);
 			animData.m_time += animData.m_timer.getDeltaMicros();
 
-			if(anim.m_isLooped)
+			if(anim.m_defaultRepeat)
 			{
-				wrap<int32_t>(0, anim.m_duration, animData.m_time);
+				wrap<int32_t>(0, anim.m_defaultDuration, animData.m_time);
 			}
 			else
 			{
-				clamp<int32_t>(0, anim.m_duration, animData.m_time);
+				clamp<int32_t>(0, anim.m_defaultDuration, animData.m_time);
 			}
 
-			float time = static_cast<float>(animData.m_time) / static_cast<float>(anim.m_duration);
-			uint32_t animIndex = static_cast<uint32_t>(time*anim.m_images.size());
-			if(animIndex == anim.m_images.size())
+			float time = static_cast<float>(animData.m_time) / static_cast<float>(anim.m_defaultDuration);
+			uint32_t animIndex = static_cast<uint32_t>(time*anim.m_sequence.size());
+			if(animIndex == anim.m_sequence.size())
 				--animIndex;
 
-			animData.m_imageID = anim.m_images[animIndex];
+			animData.m_imageID = anim.m_sequence[animIndex];
 		}
 	}
 

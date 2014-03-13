@@ -159,12 +159,21 @@ namespace Core
 		assert(filename != nullptr);
 		int32_t ret = luaL_loadfile(m_luaState, filename);
 		ret = lua_pcall(m_luaState, 0, LUA_MULTRET, 0);
+		if(ret == 0)
+		{
+			m_filename.assign(filename);
+		}
 		return ret == 0;
 	}
 
 	void DataFile::close()
 	{
 		lua_pop(m_luaState, 1);
+	}
+
+	const std::string& DataFile::getFilename() const
+	{
+		return m_filename;
 	}
 
 	std::string DataFile::getString(const char* key)
@@ -246,6 +255,17 @@ namespace Core
 			return ret;
 		}
 		return Vec2();
+	}
+
+	uint32_t DataFile::getArraySize(const char* key)
+	{
+		if(extract(m_luaState, key))
+		{
+			uint32_t ret = lua_objlen(m_luaState, -1);
+			lua_pop(m_luaState, 1);
+			return ret;
+		}
+		return 0;
 	}
 }
 /*
