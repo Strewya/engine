@@ -21,7 +21,7 @@ namespace Core
 		bool init(SpritesheetCache& spritesheets);
 		bool shutdown();
 
-		bool loadAnimation(DataFile& df);
+		bool loadAnimations(DataFile& df);
 
 		uint32_t getAnimationID(const char* name) const;
 		const Animation& getAnimation(uint32_t id) const;

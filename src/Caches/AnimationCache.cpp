@@ -32,27 +32,32 @@ namespace Core
 		return status;
 	}
 
-	bool AnimationCache::loadAnimation(DataFile& file)
+	bool AnimationCache::loadAnimations(DataFile& file)
 	{
 		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
+
+		uint32_t animCount = file.getArraySize("animations");
+		for(uint32_t i = 0; i < animCount; ++i)
 		{
-			return file.getFilename() == anim.m_name;
-		});
-		
-		if(it != end(m_animations))
-		{
-			it->m_defaultDuration = 0;
-			it->m_defaultRepeat = false;
-			it->m_name.clear();
-			it->m_sequence.clear();
-			it->m_spritesheetID = -1;
-			fillAnimation(file, *it, *m_spritesheets);
-		}
-		else
-		{
-			m_animations.emplace_back();
-			fillAnimation(file, m_animations.back(), *m_spritesheets);
+			auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
+			{
+				return file.getFilename() == anim.m_name;
+			});
+
+			if(it != end(m_animations))
+			{
+				it->m_defaultDuration = 0;
+				it->m_defaultRepeat = false;
+				it->m_name.clear();
+				it->m_sequence.clear();
+				it->m_spritesheetID = -1;
+				fillAnimation(file, *it, *m_spritesheets);
+			}
+			else
+			{
+				m_animations.emplace_back();
+				fillAnimation(file, m_animations.back(), *m_spritesheets);
+			}
 		}
 		return true; //when will i ever return false??? prolly when fill animation fails.. it should also return bool.
 	}
@@ -80,8 +85,8 @@ namespace Core
 
 	void fillAnimation(DataFile& file, Animation& anim, SpritesheetCache& spritesheets)
 	{
-		uint32_t animCount = file.getArraySize("animations");
-		for(uint32_t i = 0; i < animCount; ++i)
+		
+		
 		{
 			anim.m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
 			anim.m_defaultDuration = static_cast<uint32_t>(Time::secondsToMicros(file.getFloat(("animations[" + std::to_string(i + 1) + "].duration").c_str())));

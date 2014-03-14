@@ -17,6 +17,7 @@ namespace Core
 {
 	static bool extract(lua_State* lua, const char* key)
 	{
+		assert(key != nullptr);
 		std::string extractStatement("local data = ...; return data.");
 		luaL_loadstring(lua, (extractStatement + key).c_str());
 		lua_pushvalue(lua, -2);
@@ -25,6 +26,7 @@ namespace Core
 
 	static bool extractFunction(lua_State* lua, const char* func)
 	{
+		assert(func != nullptr);
 		std::string extractStatement("return ");
 		luaL_loadstring(lua, (extractStatement + func).c_str());
 		return lua_pcall(lua, 0, 1, 0) == 0;
@@ -66,6 +68,7 @@ namespace Core
 	static const char* codeName(uint32_t code)
 	{
 		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error", "file not exists"};
+		assert(code < 7);
 		return names[code];
 	}
 
@@ -95,6 +98,7 @@ namespace Core
 
 	DataFile ScriptingSystem::getDataFile(const char* filename)
 	{
+		assert(filename != nullptr);
 		DataFile df(m_luaState);
 		if(filename != nullptr)
 			df.open(filename);
@@ -174,6 +178,16 @@ namespace Core
 	const std::string& DataFile::getFilename() const
 	{
 		return m_filename;
+	}
+
+	bool DataFile::keyExists(const char* key)
+	{
+		bool exists = extract(m_luaState, key);
+		if(exists)
+		{
+			lua_pop(m_luaState, 1);
+		}
+		return exists;
 	}
 
 	std::string DataFile::getString(const char* key)

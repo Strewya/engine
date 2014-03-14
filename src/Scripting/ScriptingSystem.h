@@ -31,6 +31,7 @@ namespace Core
 		bool getBool(const char* key);
 		Vec2 getVec2(const char* key);
 		uint32_t getArraySize(const char* key);
+		bool keyExists(const char* key);
 
 	private:
 		lua_State* m_luaState;
