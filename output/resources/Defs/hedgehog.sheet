@@ -1,6 +1,9 @@
-return {
+return
+{
+	name = "hedgehog.sheet",
 	texture = "Textures/hedgehog.png",
-	images = {
+	images =
+	{
 		{ name="idle_00", pos={x=0,y=0},   width=450, height=300 },
 		{ name="idle_01", pos={450,  0},   width=450, height=300 },
 		{ name="idle_02", pos={900,  0},   width=450, height=300 },

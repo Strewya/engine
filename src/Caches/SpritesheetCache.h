@@ -13,7 +13,7 @@
 
 namespace Core
 {
-	class DataFile;
+	class ConfigFile;
 	class TextureCache;
 
 	class SpritesheetCache
@@ -22,8 +22,8 @@ namespace Core
 		bool init(TextureCache& textures);
 		bool shutdown();
 
-		bool loadSpritesheet(DataFile& df);
-
+		bool loadSpritesheet(ConfigFile& file);
+		bool reloadSpritesheet(ConfigFile& file);
 
 	private:
 		TextureCache* m_textures;

@@ -96,16 +96,7 @@ namespace Core
 		return status;
 	}
 
-	DataFile ScriptingSystem::getDataFile(const char* filename)
-	{
-		assert(filename != nullptr);
-		DataFile df(m_luaState);
-		if(filename != nullptr)
-			df.open(filename);
-		return df;
-	}
-
-	void ScriptingSystem::executeScriptFile(const char* scriptName)
+	void ScriptingSystem::executeFile(const char* scriptName)
 	{
 		int32_t ret = luaL_loadfile(m_luaState, scriptName);
 		DEBUG_LINE(if(ret != 0) { DEBUG_INFO(scriptName, " loading: ", codeName(ret)); });
@@ -113,6 +104,20 @@ namespace Core
 		DEBUG_LINE(if(ret != 0) { std::string msg = tolua_tostring(m_luaState, 1, 0); DEBUG_INFO(scriptName, " execution:\n", codeName(ret), " - ", msg); });
 	}
 
+	bool ScriptingSystem::fileExists(const char* scriptName)
+	{
+		assert(scriptName != nullptr);
+		uint32_t top = lua_gettop(m_luaState);
+		int32_t ret = luaL_loadfile(m_luaState, scriptName);
+		if(ret != 0)
+		{
+			DEBUG_INFO("Err code: ", codeName(ret), ", dumping stack");
+			DEBUG_LINE(dumpStack(m_luaState));
+		}
+		lua_settop(m_luaState, top);
+		return ret != LUA_ERRFILE;
+	}
+	
 	void ScriptingSystem::executeFunction(const char* function, void* objArg, const char* objType)
 	{
 		assert(function != nullptr && objArg != nullptr && objType != nullptr);
@@ -136,151 +141,29 @@ namespace Core
 		return exists;
 	}
 
-	bool ScriptingSystem::scriptFileExists(const char* scriptName)
-	{
-		assert(scriptName != nullptr);
-		int32_t ret = luaL_loadfile(m_luaState, scriptName);
-		if(ret == 0)
-		{
-			lua_pop(m_luaState, 1);
-		}
-		else
-		{
-			DEBUG_INFO("Err code: ", codeName(ret), ", dumping stack");
-			DEBUG_LINE(dumpStack(m_luaState));
-			lua_settop(m_luaState, 0);
-		}
-		return ret != LUA_ERRFILE;
-	}
+	
 
-
-	DataFile::DataFile(lua_State* lua)
-		: m_luaState(lua)
-	{}
-
-	bool DataFile::open(const char* filename)
-	{
-		assert(filename != nullptr);
-		int32_t ret = luaL_loadfile(m_luaState, filename);
-		ret = lua_pcall(m_luaState, 0, LUA_MULTRET, 0);
-		if(ret == 0)
-		{
-			m_filename.assign(filename);
-		}
-		return ret == 0;
-	}
-
-	void DataFile::close()
+	void ScriptingSystem::pop()
 	{
 		lua_pop(m_luaState, 1);
 	}
-
-	const std::string& DataFile::getFilename() const
+	
+	bool ScriptingSystem::fetchString(const char* key)
 	{
-		return m_filename;
+		
 	}
 
-	bool DataFile::keyExists(const char* key)
+	std::string ScriptingSystem::toString(const char* valueIfNotPresent) const
 	{
-		bool exists = extract(m_luaState, key);
-		if(exists)
+		if(lua_gettop(m_luaState) > 0 && lua_isstring(m_luaState, -1))
 		{
-			lua_pop(m_luaState, 1);
+			return lua_tostring(m_luaState, -1);
 		}
-		return exists;
+		return valueIfNotPresent;
 	}
 
-	std::string DataFile::getString(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			std::string ret(lua_tostring(m_luaState, -1));
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return "";
-	}
 
-	int32_t DataFile::getInt(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			int32_t ret = lua_tointeger(m_luaState, -1);
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return 0;
-	}
-
-	double DataFile::getDouble(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			double ret = lua_tonumber(m_luaState, -1);
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return 0;
-	}
-
-	float DataFile::getFloat(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			float ret = (float)lua_tonumber(m_luaState, -1);
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return 0;
-	}
-
-	bool DataFile::getBool(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			bool ret = lua_toboolean(m_luaState, -1) == 1;
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return false;
-	}
-
-	Vec2 DataFile::getVec2(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			Vec2 ret;
-			if(extract(m_luaState, "x") && lua_isnil(m_luaState, -1))
-			{
-				lua_pop(m_luaState, 1);
-				lua_pushinteger(m_luaState, 1);
-				lua_gettable(m_luaState, -2);
-			}
-			ret.x = (float)lua_tonumber(m_luaState, -1);
-			lua_pop(m_luaState, 1);
-			if(extract(m_luaState, "y") && lua_isnil(m_luaState, -1))
-			{
-				lua_pop(m_luaState, 1);
-				lua_pushinteger(m_luaState, 2);
-				lua_gettable(m_luaState, -2);
-			}
-			ret.y = (float)lua_tonumber(m_luaState, -1);
-			lua_pop(m_luaState, 2);
-			return ret;
-		}
-		return Vec2();
-	}
-
-	uint32_t DataFile::getArraySize(const char* key)
-	{
-		if(extract(m_luaState, key))
-		{
-			uint32_t ret = lua_objlen(m_luaState, -1);
-			lua_pop(m_luaState, 1);
-			return ret;
-		}
-		return 0;
-	}
+	
 }
 /*
 namespace Script

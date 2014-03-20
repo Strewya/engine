@@ -119,6 +119,9 @@
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp">
       <Filter>Systems\Caches</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\ConfigFile.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -223,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h">
       <Filter>Systems\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\ConfigFile.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
