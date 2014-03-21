@@ -32,6 +32,34 @@ namespace Core
 		return lua_pcall(lua, 0, 1, 0) == 0;
 	}
 
+	static bool getField(lua_State* lua, const char* key, bool global)
+	{
+		bool success = false;
+		if(key != nullptr)
+		{
+			int32_t index = -1;
+			if(global)
+			{
+				index = LUA_GLOBALSINDEX;
+			}
+			if(lua_istable(lua, index))
+			{
+				uint32_t top = lua_gettop(lua);
+				lua_getfield(lua, index, key);
+				uint32_t diff = lua_gettop(lua) - top;
+				if(diff == 1)
+				{
+					success = true;
+				}
+				else
+				{
+					lua_settop(lua, top);
+				}
+			}
+		}
+		return success;
+	}
+
 #ifdef _DEBUG
 	void dumpStack(lua_State* lua)
 	{
@@ -143,14 +171,15 @@ namespace Core
 
 	
 
-	void ScriptingSystem::pop()
+	void ScriptingSystem::pop(uint32_t count)
 	{
-		lua_pop(m_luaState, 1);
+		assert(count >= 0);
+		lua_pop(m_luaState, count);
 	}
-	
-	bool ScriptingSystem::fetchString(const char* key)
+
+	bool ScriptingSystem::getString(const char* key, bool global = false)
 	{
-		
+		return getField(m_luaState, key, global) && lua_isstring(m_luaState, -1);
 	}
 
 	std::string ScriptingSystem::toString(const char* valueIfNotPresent) const
@@ -162,8 +191,69 @@ namespace Core
 		return valueIfNotPresent;
 	}
 
+	bool ScriptingSystem::getFloat(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_isnumber(m_luaState, -1);
+	}
 
-	
+	float ScriptingSystem::toFloat(float valueIfNotPresent) const
+	{
+		if(lua_gettop(m_luaState) > 0 && lua_isnumber(m_luaState, -1))
+		{
+			return (float)lua_tonumber(m_luaState, -1);
+		}
+		return valueIfNotPresent;
+	}
+
+	bool ScriptingSystem::getDouble(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_isnumber(m_luaState, -1);
+	}
+
+	double ScriptingSystem::toDouble(double valueIfNotPresent) const
+	{
+
+	}
+
+	bool ScriptingSystem::getBool(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_isboolean(m_luaState, -1);
+	}
+
+	bool ScriptingSystem::toBool(bool valueIfNotPresent) const
+	{
+
+	}
+
+	bool ScriptingSystem::getInt(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_isnumber(m_luaState, -1);
+	}
+
+	int32_t ScriptingSystem::toInt(int32_t valueIfNotPresent) const
+	{
+
+	}
+
+	bool ScriptingSystem::getVec2(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_istable(m_luaState, -1);
+	}
+
+	Vec2 ScriptingSystem::toVec2(const Vec2& valueIfNotPresent) const
+	{
+
+	}
+
+	bool ScriptingSystem::getColor(const char* key, bool global = false)
+	{
+		return getField(m_luaState, key, global) && lua_istable(m_luaState, -1);
+	}
+
+	Color ScriptingSystem::toColor(const Color& valueIfNotPresent) const
+	{
+
+	}	
 }
 /*
 namespace Script
