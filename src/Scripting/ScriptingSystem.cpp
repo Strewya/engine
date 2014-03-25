@@ -5,9 +5,6 @@
 #include <Scripting/ScriptingSystem.h>
 /******* C++ headers *******/
 #include <cassert>
-#ifdef _DEBUG
-#include <iostream>
-#endif
 /******* extra headers *******/
 #include <Scripting/luaBinding.h>
 #include <Util/Utility.h>

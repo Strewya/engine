@@ -111,7 +111,8 @@
       <Outputs>$(SGPROJECT)\src\Scripting\luaBinding.h;$(SGPROJECT)\src\Scripting\luaBinding.cpp</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>*.pkg</Inputs>
+      <Inputs>$(SGPROJECT)\src\Games\Hedgehog\luaExport.pkg</Inputs>
+      <Message>DOING CRAP BECAUSE WHY NOT</Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -173,16 +174,7 @@
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <None Include="..\..\..\src\Animation\luaExport.pkg" />
-    <None Include="..\..\..\src\Caches\luaExport.pkg" />
-    <None Include="..\..\..\src\DataStructs\luaExport.pkg" />
-    <None Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
-      <FileType>Document</FileType>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </AdditionalInputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-    </None>
-    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
+    <ClCompile Include="..\..\..\src\Games\luaExport.asd">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -253,21 +245,45 @@
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\src\Audio\luaExport.pkg" />
-    <None Include="..\..\..\src\Games\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\..\src\Games\Pong\luaExport.pkg" />
-    <None Include="..\..\..\src\Graphics\luaExport.pkg">
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Audio\luaExport.pkg">
       <FileType>Document</FileType>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SGPROJECT)\bin\export.bat</Command>
-    </None>
-    <None Include="..\..\..\src\Input\luaExport.pkg" />
-    <None Include="..\..\..\src\luaExportMaster.pkg" />
-    <None Include="..\..\..\src\Physics\luaExport.pkg" />
-    <None Include="..\..\..\src\Util\luaExport.pkg" />
-    <None Include="..\..\..\src\Window\luaExport.pkg" />
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\DataStructs\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Graphics\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Input\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\luaExportMaster.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Util\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
+      <FileType>Document</FileType>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

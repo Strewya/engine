@@ -4,6 +4,7 @@ $#include <Games/Hedgehog/Hedgehog.h>
 
 namespace Core
 {
+
 	class Player
 	{
 		Transform m_transform;

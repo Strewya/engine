@@ -100,6 +100,7 @@ namespace Core
 				}
 				return false;
 			});
+			
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{

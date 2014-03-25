@@ -3,6 +3,7 @@ $#include <Graphics/GraphicsSystem.h>
 
 namespace Core
 {
+
 	class GraphicsSystem
 	{
 		void begin();

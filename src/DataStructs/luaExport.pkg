@@ -5,6 +5,7 @@ $#include <DataStructs/Spritesheet.h>
 
 namespace Core
 {
+
 	class Animation
 	{
 	public:
