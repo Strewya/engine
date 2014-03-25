@@ -12,7 +12,7 @@
 
 namespace Core
 {
-	class DataFile;
+	class ConfigFile;
 	class SpritesheetCache;
 
 	class AnimationCache
@@ -21,8 +21,8 @@ namespace Core
 		bool init(SpritesheetCache& spritesheets);
 		bool shutdown();
 
-		bool loadAnimations(DataFile& file);
-		bool reloadAnimations(DataFile& file);
+		bool loadAnimations(ConfigFile& file);
+		bool reloadAnimations(ConfigFile& file);
 
 		uint32_t getAnimationID(const char* name) const;
 		const Animation& getAnimation(uint32_t id) const;

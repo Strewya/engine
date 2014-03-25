@@ -11,19 +11,133 @@
 namespace Core
 {
 	ConfigFile::ConfigFile(ScriptingSystem& scripting)
-		: m_scripting(&scripting)
+		: m_scripting(&scripting), m_isOpen(false), m_filename("")
 	{}
+
+	bool ConfigFile::open(const char* filename)
+	{
+		assert(filename != nullptr);
+		uint32_t resetPoint = m_scripting->getTop();
+		if(m_isOpen == false && m_scripting->doFile(filename, 1))
+		{
+			m_isOpen = true;
+			return true;
+		}
+		m_scripting->pop(m_scripting->getTop() - resetPoint);
+		return false;
+	}
+
+	void ConfigFile::close()
+	{
+		if(m_isOpen)
+		{
+			m_scripting->pop(1);
+			m_isOpen = false;
+		}
+	}
+
+	const std::string& ConfigFile::getFilename() const
+	{
+		return m_filename;
+	}
 
 	std::string ConfigFile::getString(const char* key, const char* valueIfNotPresent)
 	{
-		if(m_scripting->pushString(key))
+		assert(valueIfNotPresent);
+		std::string ret = valueIfNotPresent;
+		if(m_scripting->getValue(key, -1))
 		{
-			auto ret = m_scripting->toString();
+			if(m_scripting->isString())
+			{
+				ret = m_scripting->toString();
+			}
 			m_scripting->pop();
-			return ret;
+		}
+		return ret;
+	}
+
+	int32_t ConfigFile::getInt(const char* key, int32_t valueIfNotPresent)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			if(m_scripting->isNumber())
+			{
+				valueIfNotPresent = m_scripting->toInt();
+			}
+			m_scripting->pop();
 		}
 		return valueIfNotPresent;
 	}
+
+	float ConfigFile::getFloat(const char* key, float valueIfNotPresent)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			if(m_scripting->isNumber())
+			{
+				valueIfNotPresent = m_scripting->toFloat();
+			}
+			m_scripting->pop();
+		}
+		return valueIfNotPresent;
+	}
+
+	Vec2 ConfigFile::getVec2(const char* key, Vec2 valueIfNotPresent)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			if(m_scripting->isTable())
+			{
+				auto top = m_scripting->getTop();
+				if((m_scripting->getValue("x", -1) || m_scripting->getValue(1, -1)) &&
+				   (m_scripting->getValue("y", -2) || m_scripting->getValue(2, -2)))
+				{
+					if(m_scripting->isNumber())
+					{
+						valueIfNotPresent.y = m_scripting->toFloat();
+					}
+					m_scripting->pop();
+					if(m_scripting->isNumber())
+					{
+						valueIfNotPresent.x = m_scripting->toFloat();
+					}
+					m_scripting->pop();
+				}
+				m_scripting->pop(m_scripting->getTop() - top);
+			}
+			m_scripting->pop();
+		}
+		return valueIfNotPresent;
+	}
+
+	bool ConfigFile::getListElement(const char* list, uint32_t element)
+	{
+		if(m_scripting->getValue(list, -1))
+		{
+			if(m_scripting->getValue(element, -1))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	uint32_t ConfigFile::getListSize(const char* list)
+	{
+		uint32_t size = 0;
+		if(m_scripting->getValue(list, -1))
+		{
+			size = m_scripting->getObjLen();
+			m_scripting->pop();
+		}
+		return size;
+	}
+
+	void ConfigFile::popListElement()
+	{
+		m_scripting->pop(2);
+	}
+
 
 
 	/*std::string asString(DataFile& file, const char* key)

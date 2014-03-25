@@ -11,6 +11,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
+#include <Util/ConfigFile.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
@@ -61,13 +62,9 @@ namespace Core
 			initializationStatus &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			initializationStatus &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
-			initializationStatus &= m_scripts.scriptFileExists(RESOURCE("Scripts/paddleAI.lua"));
-			if(initializationStatus)
-			{
-				m_scripts.executeScriptFile(RESOURCE("Scripts/paddleAI.lua"));
-			}
-
-			auto df = m_scripts.getDataFile();
+			initializationStatus &= m_scripts.doFile(RESOURCE("Scripts/paddleAI.lua"));
+			
+			ConfigFile df(m_scripts);
 			if(df.open(RESOURCE("Defs/font.sheet")))
 			{
 				initializationStatus &= m_graphics.initFont(df);
@@ -419,7 +416,7 @@ namespace Core
 
 	void PongGame::updatePaddleAI()
 	{
-		m_scripts.executeFunction("paddleAI", this, CLASS(PongGame));
+		m_scripts.doFunction("paddleAI", this, CLASS(PongGame));
 	}
 
 	void PongGame::createField()

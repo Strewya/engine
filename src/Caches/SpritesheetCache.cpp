@@ -95,9 +95,24 @@ namespace Core
 
 	bool fillSheet(ConfigFile& file, Spritesheet& sheet, TextureCache& textures)
 	{
-		auto textureName = file.getString("texture", "");
+		/* example sheet:
+		{
+			-- sheet name is its' filename
+			texture = "Textures/tex.png",
+			defaultWidth = 450, --optional, but each image MUST have both dimensions > 0
+			defaultHeight = 300, --optional, see above
+			images = {
+				{ name = "frame01", pos = {0,0}, width = 450, height = 300},
+				{ name = "frame02", pos = {450,300} },
+				...
+			}
+		}
 
-		if(textureName.empty())
+		*/
+		bool success = false;
+
+		auto textureName = file.getString("texture", "");
+		if(!textureName.empty())
 		{
 			sheet.m_textureID = textures.getTextureID(textureName.c_str());
 
@@ -106,34 +121,45 @@ namespace Core
 				Vec2 td = textures.getTextureDimensions(sheet.m_textureID);
 				float tw = td.x;
 				float th = td.y;
-
-				if(file.getList("images"))
+				auto defaultWidth = file.getInt("defaultWidth", 0);
+				auto defaultHeight = file.getInt("defaultHeight", 0);
+				auto imageCount = file.getListSize("images");
+				sheet.m_images.resize(imageCount);
+				for(uint32_t i = 0; i < imageCount; ++i)
 				{
-					uint32_t imgCount = file.getListSize();
-					sheet.m_images.resize(imgCount);
-					for(uint32_t i = 0; i < imgCount; ++i)
+					if(file.getListElement("images", i + 1))
 					{
-						file.getListElement(i);
-						sheet.m_images[i].m_name = file.getString("name", "");
-						Vec2 pos = file.getVec2("pos", Vec2(0, 0));
-						float w = file.getFloat("width", 0);
-						float h = file.getFloat("height", 0);
+						auto imgName = file.getString("name", "");
+						auto imgWidth = file.getInt("width", defaultWidth);
+						auto imgHeight = file.getInt("height", defaultHeight);
+						auto pos = file.getVec2("pos", Vec2(-1, -1));
+						if(!imgName.empty() && imgWidth > 0 && imgHeight > 0 && pos.x >= 0 && pos.y >= 0)
+						{
+							float w = static_cast<float>(imgWidth);
+							float h = static_cast<float>(imgHeight);
+							//image is valid, add it
+							sheet.m_images[i].m_name.assign(imgName);
 
-						if()
-						sheet.m_images[i].m_ratio = w / h;
-						Vec2 wh = pos + Vec2(w, h);
+							sheet.m_images[i].m_ratio = w / h;
+							Vec2 wh = pos + Vec2(w, h);
 
-						sheet.m_images[i].m_texCoords[0].x = pos.x / tw;
-						sheet.m_images[i].m_texCoords[0].y = pos.y / th;
-						sheet.m_images[i].m_texCoords[1].x = wh.x / tw;
-						sheet.m_images[i].m_texCoords[1].y = sheet.m_images[i].m_texCoords[0].y;
-						sheet.m_images[i].m_texCoords[2].x = sheet.m_images[i].m_texCoords[0].x;
-						sheet.m_images[i].m_texCoords[2].y = wh.y / th;
-						sheet.m_images[i].m_texCoords[3].x = sheet.m_images[i].m_texCoords[1].x;
-						sheet.m_images[i].m_texCoords[3].y = sheet.m_images[i].m_texCoords[2].y;
+							sheet.m_images[i].m_texCoords[0].x = pos.x / tw;
+							sheet.m_images[i].m_texCoords[0].y = pos.y / th;
+							sheet.m_images[i].m_texCoords[1].x = wh.x / tw;
+							sheet.m_images[i].m_texCoords[1].y = sheet.m_images[i].m_texCoords[0].y;
+							sheet.m_images[i].m_texCoords[2].x = sheet.m_images[i].m_texCoords[0].x;
+							sheet.m_images[i].m_texCoords[2].y = wh.y / th;
+							sheet.m_images[i].m_texCoords[3].x = sheet.m_images[i].m_texCoords[1].x;
+							sheet.m_images[i].m_texCoords[3].y = sheet.m_images[i].m_texCoords[2].y;
+						}
+						else
+						{
+							DEBUG_INFO("Image in ", file.getFilename(), " spritesheet is invalid: ", imgName, ",", imgWidth, ",", imgHeight, ",", pos);
+						}
+						file.popListElement();
 					}
-					file.popList();
 				}
+				success = !sheet.m_images.empty();
 			}
 			else
 			{
@@ -144,7 +170,6 @@ namespace Core
 		{
 			DEBUG_INFO("Texture name is missing in file ", file.getFilename());
 		}
+		return success;
 	}
-
-
 }

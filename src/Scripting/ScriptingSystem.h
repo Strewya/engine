@@ -22,16 +22,45 @@ namespace Core
 		bool init();
 		bool shutdown();
 
-		void executeFile(const char* filename);
+		uint32_t getTop() const;
+		void pop(uint32_t count = 1);
+
+		bool doFile(const char* filename, uint32_t numReturnValues = 0);
+		bool functionExists(const char* function);
+		void doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues = 0);
+
+		void push(const char* val);
+		void push(int32_t val);
+
+		bool getValue(int32_t key, int32_t table);
+		bool getValue(const char* key, int32_t table);
+
+		bool isString() const;
+		std::string toString() const;
+
+		bool isNumber() const;
+		int32_t toInt() const;
+		float toFloat() const;
+		double toDouble() const;
+
+		bool isBoolean() const;
+		bool toBool() const;
+
+		bool isTable() const;
+		uint32_t getObjLen() const;
+
+
+		/*
+		
 		bool fileExists(const char* filename);
 
 		void executeFunction(const char* function, void* objArg, const char* objType);
-		bool functionExists(const char* function);
+		
 
 		//pops <count> number of arguments from the stack
 		//<count> is 1 by default
 		//always succeeds, if <count> is greater than num of elements on stack, all are popped
-		void pop(uint32_t count = 1);
+		
 		
 		//FOR ALL GET FUNCTIONS:
 		//puts the value t[key] onto the stack, where 't' is either the global table (if <global> == true) or the table on the top of the stack
@@ -64,7 +93,7 @@ namespace Core
 		bool isBoolean();
 		bool isList();
 		bool isVec2();
-		bool isColor();
+		bool isColor();*/
 
 	private:
 		lua_State* m_luaState;

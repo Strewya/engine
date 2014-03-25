@@ -182,7 +182,11 @@
       </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
     </None>
-    <None Include="..\..\..\src\Games\luaExport.cpp" />
+    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />

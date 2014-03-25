@@ -5,14 +5,14 @@
 #include <Caches/AnimationCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Scripting/ScriptingSystem.h>
+#include <Util/ConfigFile.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	void fillAnimation(DataFile& file, Animation& anim, SpritesheetCache& spritesheets);
+	static bool fillAnimation(ConfigFile& file, Animation& anim, SpritesheetCache& spritesheets);
 
 	bool AnimationCache::init(SpritesheetCache& spritesheets)
 	{
@@ -32,11 +32,11 @@ namespace Core
 		return status;
 	}
 
-	bool AnimationCache::loadAnimations(DataFile& file)
+	bool AnimationCache::loadAnimations(ConfigFile& file)
 	{
 		using std::begin; using std::end;
 
-		uint32_t animCount = file.getArraySize("animations");
+		uint32_t animCount = file.getListSize("animations");
 		for(uint32_t i = 0; i < animCount; ++i)
 		{
 			auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
@@ -83,9 +83,9 @@ namespace Core
 		return m_animations[id];
 	}
 
-	void fillAnimation(DataFile& file, Animation& anim, SpritesheetCache& spritesheets)
+	static bool fillAnimation(ConfigFile& file, Animation& anim, SpritesheetCache& spritesheets)
 	{
-		
+		/*
 		
 		{
 			anim.m_name = file.getString(("animations[" + std::to_string(i + 1) + "].name").c_str());
@@ -98,6 +98,7 @@ namespace Core
 				uint32_t index = file.getInt(("animations[" + std::to_string(i + 1) + "].images[" + std::to_string(j + 1) + "]").c_str());
 				anim.m_sequence[j] = index;
 			}
-		}
+		}*/
+		return true;
 	}
 }

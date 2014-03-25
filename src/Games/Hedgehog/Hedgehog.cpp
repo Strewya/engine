@@ -7,6 +7,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
+#include <Util/ConfigFile.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
@@ -43,7 +44,6 @@ namespace Core
 		m_isRunning =
 			//systems
 			m_scripter.init() &&
-			m_scripter.scriptFileExists(RESOURCE("Scripts/hedgehog_game.lua")) &&
 			m_input.init(window) &&
 			m_animation.init(m_animationCache) &&
 			m_graphics.init(window) &&
@@ -57,7 +57,7 @@ namespace Core
 
 		if(m_isRunning)
 		{
-			m_scripter.executeScriptFile(RESOURCE("Scripts/hedgehog_game.lua"));
+			m_isRunning &= m_scripter.doFile(RESOURCE("Scripts/hedgehog_game.lua"));
 			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
 
@@ -66,23 +66,23 @@ namespace Core
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
-			auto df = m_scripter.getDataFile();
-			if(df.open(RESOURCE("Defs/font.sheet")))
+			ConfigFile config(m_scripter);
+			if(config.open(RESOURCE("Defs/font.sheet")))
 			{
-				m_isRunning &= m_graphics.initFont(df);
-				df.close();
+				m_isRunning &= m_graphics.initFont(config);
+				config.close();
 			}
 			
-			if(df.open(RESOURCE("Defs/hedgehog.sheet")))
+			if(config.open(RESOURCE("Defs/hedgehog.sheet")))
 			{
-				m_isRunning &= m_spritesheetCache.loadSpritesheet(df);
-				df.close();
+				m_isRunning &= m_spritesheetCache.loadSpritesheet(config);
+				config.close();
 			}
 
-			if(df.open(RESOURCE("Defs/hedgehog.anim")))
+			if(config.open(RESOURCE("Defs/hedgehog.anim")))
 			{
-				m_isRunning &= m_animationCache.loadAnimation(df);
-				df.close();
+				m_isRunning &= m_animationCache.loadAnimations(config);
+				config.close();
 			}
 			
 
@@ -162,7 +162,7 @@ namespace Core
 
 		m_animation.update(m_logicTimer.getDeltaMicros());
 
-		m_scripter.executeFunction("game_tick", this, CLASS(HedgehogGame));
+		m_scripter.doFunction("game_tick", this, CLASS(HedgehogGame));
 		return continueRunning;
 	}
 
@@ -172,7 +172,7 @@ namespace Core
 
 		m_graphics.begin();
 
-		m_scripter.executeFunction("game_render", this, CLASS(HedgehogGame));
+		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
 
 		m_graphics.present();
 		
@@ -189,7 +189,7 @@ namespace Core
 			if(ext == "lua")
 			{
 				DEBUG_INFO("Reloading script ", file);
-				m_scripter.executeScriptFile(RESOURCE_S(file));
+				m_scripter.doFile(RESOURCE_S(file));
 			}
 		}
 	}

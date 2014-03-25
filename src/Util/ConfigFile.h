@@ -9,6 +9,7 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Vec2.h>
+#include <Util/Color.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -21,11 +22,23 @@ namespace Core
 	public:
 		ConfigFile(ScriptingSystem& state);
 
+		bool open(const char* filename);
+		void close();
 		const std::string& getFilename() const;
+		
 		std::string getString(const char* key, const char* valueIfNotPresent);
+		int32_t getInt(const char* key, int32_t valueIfNotPresent);
+		float getFloat(const char* key, float valueIfNotPresent);
+		Vec2 getVec2(const char* key, Vec2 valueIfNotPresent);
+		
+		uint32_t getListSize(const char* list);
+		bool getListElement(const char* list, uint32_t element);
+		void popListElement();
 
 	private:
 		ScriptingSystem* m_scripting;
+		bool m_isOpen;
 		std::string m_filename;
+		
 	};
 }

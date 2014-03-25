@@ -141,36 +141,39 @@ namespace Core
 		return status;
 	}
 
-	void ScriptingSystem::executeFile(const char* scriptName)
+	bool ScriptingSystem::doFile(const char* scriptName, uint32_t numReturnValues)
 	{
 		int32_t ret = luaL_loadfile(m_luaState, scriptName);
-		DEBUG_LINE(if(ret != 0) { DEBUG_INFO(scriptName, " loading: ", codeName(ret)); });
-		ret = lua_pcall(m_luaState, 0, 0, 0);
-		DEBUG_LINE(if(ret != 0) { std::string msg = tolua_tostring(m_luaState, 1, 0); DEBUG_INFO(scriptName, " execution:\n", codeName(ret), " - ", msg); });
-	}
-
-	bool ScriptingSystem::fileExists(const char* scriptName)
-	{
-		assert(scriptName != nullptr);
-		uint32_t top = lua_gettop(m_luaState);
-		int32_t ret = luaL_loadfile(m_luaState, scriptName);
-		if(ret != 0)
+		if(ret == 0)
 		{
-			DEBUG_INFO("Err code: ", codeName(ret), ", dumping stack");
-			DEBUG_LINE(dumpStack(m_luaState));
+			ret = lua_pcall(m_luaState, 0, numReturnValues, 0);
+			if(ret == 0)
+			{
+				return true;
+			}
+			else
+			{
+				DEBUG_INFO("Lua failed to call file ", scriptName);
+			}
 		}
-		lua_settop(m_luaState, top);
-		return ret != LUA_ERRFILE;
+		else
+		{
+			DEBUG_INFO("Lua failed to load file ", scriptName);
+		}
+		return false;
 	}
 	
-	void ScriptingSystem::executeFunction(const char* function, void* objArg, const char* objType)
+	void ScriptingSystem::doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues)
 	{
 		assert(function != nullptr && objArg != nullptr && objType != nullptr);
-		if(extractFunction(m_luaState, function) && lua_isfunction(m_luaState, -1))
+		if(getValue(function, LUA_GLOBALSINDEX) && lua_isfunction(m_luaState, -1))
 		{
 			tolua_pushusertype(m_luaState, objArg, objType);
-			int32_t ret = lua_pcall(m_luaState, 1, 0, 0);
-			DEBUG_IF(ret != 0, DEBUG_INFO("Function call failed: ", function, "(", objType, "[", objArg, "])"));
+			int32_t ret = lua_pcall(m_luaState, 1, numReturnValues, 0);
+			if(ret != 0)
+			{
+				DEBUG_INFO("Function ", function, " failed to execute");
+			}
 		}
 	}
 
@@ -178,241 +181,106 @@ namespace Core
 	{
 		assert(function != nullptr);
 		auto exists = false;
-		if(extractFunction(m_luaState, function))
+		if(getValue(function, LUA_GLOBALSINDEX))
 		{
-			exists = true;
-			lua_pop(m_luaState, 1);
+			if(lua_isfunction(m_luaState, -1))
+			{
+				exists = true;
+			}
+			pop();
 		}
 		return exists;
 	}
 
-	
+	uint32_t ScriptingSystem::getTop() const
+	{
+		return lua_gettop(m_luaState);
+	}
 
 	void ScriptingSystem::pop(uint32_t count)
 	{
-		assert(count >= 0);
-		lua_pop(m_luaState, count);
+		assert(count <= (uint32_t)lua_gettop(m_luaState));
+		lua_pop(m_luaState, (int32_t)count);
+	}
+
+	bool ScriptingSystem::getValue(int32_t key, int32_t table)
+	{
+		auto top = getTop();
+		push(key);
+		if(table < 0) --table;
+		lua_gettable(m_luaState, table);
+		return (top + 1) == getTop();
+	}
+
+	bool ScriptingSystem::getValue(const char* key, int32_t table)
+	{
+		auto top = getTop();
+		lua_getfield(m_luaState, table, key);
+		return (top + 1) == getTop();
+	}
+
+	uint32_t ScriptingSystem::getObjLen() const
+	{
+		return lua_objlen(m_luaState, -1);
+	}
+
+	void ScriptingSystem::push(const char* val)
+	{
+		lua_pushstring(m_luaState, val);
+	}
+
+	void ScriptingSystem::push(int32_t val)
+	{
+		lua_pushinteger(m_luaState, val);
 	}
 
 
 	//*********************** IS FUNCTIONS ************//
-	bool ScriptingSystem::isString()
+	bool ScriptingSystem::isString() const
 	{
-		return lua_isstring(m_luaState, -1);
+		return lua_isstring(m_luaState, -1) == 1;
 	}
 
-	bool ScriptingSystem::isNumber()
+	bool ScriptingSystem::isNumber() const
 	{
-		return lua_isnumber(m_luaState, -1);
+		return lua_isnumber(m_luaState, -1) == 1;
 	}
 
-	bool ScriptingSystem::isBoolean()
+	bool ScriptingSystem::isBoolean() const
 	{
-		return lua_isboolean(m_luaState, -1);
+		return lua_isboolean(m_luaState, -1) == 1;
 	}
 
-	bool ScriptingSystem::isVec2()
+	bool ScriptingSystem::isTable() const
 	{
-		bool isType = false;
-		if(lua_istable(m_luaState, -1))
-		{
-			uint32_t top = lua_gettop(m_luaState);
-			uint32_t len = lua_objlen(m_luaState, -1);
-			if(len == 2)
-			{
-				if(getIndex(m_luaState, 1, -1, top) && getIndex(m_luaState, 2, -2, top))
-				{
-					if(lua_isnumber(m_luaState, -1) && lua_isnumber(m_luaState, -2))
-					{
-						isType = true;
-					}
-					pop(len);
-				}
-			}
-			else
-			{
-				len = 2;
-				if(getField(m_luaState, "x", -1, top) && getField(m_luaState, "y", -2, top))
-				{
-					if(lua_isnumber(m_luaState, -1) && lua_isnumber(m_luaState, -2))
-					{
-						isType = true;
-					}
-					pop(len);
-				}
-			}
-		}
-		return isType;
-	}
-
-	bool ScriptingSystem::isColor()
-	{
-		bool isType = false;
-		if(lua_istable(m_luaState, -1))
-		{
-			uint32_t top = lua_gettop(m_luaState);
-			uint32_t len = lua_objlen(m_luaState, -1);
-			if(len == 3 || len == 4)
-			{
-				if(getIndex(m_luaState, 1, -1, top) && getIndex(m_luaState, 2, -2, top) && getIndex(m_luaState, 3, -3, top) && (len == 3 || getIndex(m_luaState, 4, -4, top)))
-				{
-					isType = true;
-					for(auto i = len + 1; --i; isType)
-					{
-						isType = lua_isnumber(m_luaState, -i);
-					}
-					pop(len);
-				}
-			}
-			else
-			{
-				len = 3;
-				if(getField(m_luaState, "r", -1, top) && getField(m_luaState, "g", -2, top) && getField(m_luaState, "b", -3, top) && (getField(m_luaState, "a", -4, top) ? ++len : len))
-				{
-					isType = true;
-					for(auto i = len + 1; --i; isType)
-					{
-						isType = lua_isnumber(m_luaState, -i);
-					}
-					pop(len);
-				}
-			}
-		}
-		return isType;
-	}
-
-	//*********************** GET FUNCTIONS ************//
-	bool ScriptingSystem::getString(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isString();
-	}
-
-	bool ScriptingSystem::getFloat(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isNumber();
-	}
-
-	bool ScriptingSystem::getDouble(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isNumber();
-	}
-
-	bool ScriptingSystem::getInt(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isNumber();
-	}
-
-	bool ScriptingSystem::getBool(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isBoolean();
-	}
-
-	bool ScriptingSystem::getVec2(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isVec2();
-	}
-
-	bool ScriptingSystem::getColor(const char* key, bool global = false)
-	{
-		int32_t tableIndex = global ? -1 : 0;
-		return getField(m_luaState, key, tableIndex, lua_gettop(m_luaState)) && isColor();
+		return lua_istable(m_luaState, -1) == 1;
 	}
 
 	//*********************** TO FUNCTIONS ************//
-	std::string ScriptingSystem::toString(const char* valueIfNotPresent)
+	std::string ScriptingSystem::toString() const
 	{
-		if(lua_gettop(m_luaState) > 0 && isString())
-		{
-			return lua_tostring(m_luaState, -1);
-		}
-		return valueIfNotPresent;
+		return lua_tostring(m_luaState, -1);
 	}
 
-	float ScriptingSystem::toFloat(float valueIfNotPresent)
+	float ScriptingSystem::toFloat() const
 	{
-		if(lua_gettop(m_luaState) > 0 && isNumber())
-		{
-			return (float)lua_tonumber(m_luaState, -1);
-		}
-		return valueIfNotPresent;
+		return (float)lua_tonumber(m_luaState, -1);
 	}
 
-	double ScriptingSystem::toDouble(double valueIfNotPresent)
+	double ScriptingSystem::toDouble() const
 	{
-		if(lua_gettop(m_luaState) > 0 && isNumber())
-		{
-			return (double)lua_tonumber(m_luaState, -1);
-		}
-		return valueIfNotPresent;
+		return (double)lua_tonumber(m_luaState, -1);
 	}
 
-	int32_t ScriptingSystem::toInt(int32_t valueIfNotPresent)
+	int32_t ScriptingSystem::toInt() const
 	{
-		if(lua_gettop(m_luaState) > 0 && isNumber())
-		{
-			return (int32_t)lua_tonumber(m_luaState, -1);
-		}
-		return valueIfNotPresent;
+		return (int32_t)lua_tointeger(m_luaState, -1);
 	}
 
-	bool ScriptingSystem::toBool(bool valueIfNotPresent)
+	bool ScriptingSystem::toBool() const
 	{
-		if(lua_gettop(m_luaState) > 0 && isBoolean())
-		{
-			return lua_toboolean(m_luaState, -1) == 1;
-		}
-		return valueIfNotPresent;
+		return lua_toboolean(m_luaState, -1) == 1;
 	}
-
-	Vec2 ScriptingSystem::toVec2(const Vec2& valueIfNotPresent)
-	{
-		if(lua_gettop(m_luaState) > 0 && isVec2())
-		{
-			Vec2 ret;
-			auto top = lua_gettop(m_luaState);
-			
-			getField(m_luaState, "x", -1, top) || getIndex(m_luaState, 1, -1, top);
-			ret.x = toFloat(0);
-			pop();
-			
-			getField(m_luaState, "y", -1, top) || getIndex(m_luaState, 2, -1, top);
-			ret.y = toFloat(0);
-			pop();
-		}
-		return valueIfNotPresent;
-	}
-
-	Color ScriptingSystem::toColor(const Color& valueIfNotPresent)
-	{
-		if(lua_gettop(m_luaState) > 0 && isColor())
-		{
-			Color ret;
-			auto top = lua_gettop(m_luaState);
-
-			getField(m_luaState, "r", -1, top) || getIndex(m_luaState, 1, -1, top);
-			ret.r = toFloat(0);
-			pop();
-
-			getField(m_luaState, "g", -1, top) || getIndex(m_luaState, 2, -1, top);
-			ret.g = toFloat(0);
-			pop();
-
-			getField(m_luaState, "b", -1, top) || getIndex(m_luaState, 3, -1, top);
-			ret.b = toFloat(0);
-			pop();
-
-			getField(m_luaState, "y", -1, top) || getIndex(m_luaState, 4, -1, top);
-			ret.a = toFloat(1);
-			pop();
-		}
-		return valueIfNotPresent;
-	}	
 }
 /*
 namespace Script

@@ -58,6 +58,12 @@ namespace Core
 	{
 		return v/f;
 	}
+
+	std::ostream& operator<<(std::ostream& os, const Vec2& v)
+	{
+		os << "{" << v.x << "," << v.y << "}";
+		return os;
+	}
 }
 
 
