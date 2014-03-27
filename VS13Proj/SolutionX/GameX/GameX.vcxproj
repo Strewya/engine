@@ -59,7 +59,8 @@
     <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
-    <CustomBuildBeforeTargets>PreBuildEvent</CustomBuildBeforeTargets>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -94,8 +95,9 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
+      <Message>
+      </Message>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -105,14 +107,18 @@
       <LinkObjects>false</LinkObjects>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>$(SGPROJECT)\bin\export.bat</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(SGPROJECT)\src\Scripting\luaBinding.h;$(SGPROJECT)\src\Scripting\luaBinding.cpp</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(SGPROJECT)\src\Games\Hedgehog\luaExport.pkg</Inputs>
-      <Message>DOING CRAP BECAUSE WHY NOT</Message>
+      <Inputs>
+      </Inputs>
+      <Message>
+      </Message>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,8 +144,12 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>$(SGPROJECT)\bin\export.bat</Command>
+      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
     </PreBuildEvent>
+    <CustomBuild>
+      <Command>
+      </Command>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <ClCompile>
@@ -165,8 +175,12 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>$(SGPROJECT)\bin\export.bat</Command>
+      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
     </PreBuildEvent>
+    <CustomBuild>
+      <Command>
+      </Command>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
@@ -174,7 +188,7 @@
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <ClCompile Include="..\..\..\src\Games\luaExport.asd">
+    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

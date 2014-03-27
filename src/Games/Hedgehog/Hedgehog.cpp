@@ -192,6 +192,24 @@ namespace Core
 				DEBUG_INFO("Reloading script ", file);
 				m_scripter.doFile(RESOURCE_S(file));
 			}
+			else if(ext == "anim")
+			{
+				ConfigFile config(m_scripter);
+				if(config.open(RESOURCE_S(file)))
+				{
+					if(m_animationCache.reloadAnimations(config))
+						DEBUG_INFO("Reloaded animation file ", file);
+				}
+			}
+			else if(ext == "sheet")
+			{
+				ConfigFile config(m_scripter);
+				if(config.open(RESOURCE_S(file)))
+				{
+					if(m_spritesheetCache.reloadSpritesheet(config))
+						DEBUG_INFO("Reloaded spritesheet file ", file);
+				}
+			}
 		}
 	}
 }

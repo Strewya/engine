@@ -25,6 +25,9 @@ namespace Core
 		bool loadSpritesheet(ConfigFile& file);
 		bool reloadSpritesheet(ConfigFile& file);
 
+		uint32_t getSpritesheetID(const char* name) const;
+		const Spritesheet& getSpritesheet(uint32_t id) const;
+
 	private:
 		TextureCache* m_textures;
 		std::vector<Spritesheet> m_sheets;

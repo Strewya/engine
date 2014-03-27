@@ -122,7 +122,7 @@
     <ClCompile Include="..\..\..\src\Util\ConfigFile.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\luaExport.asd">
+    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
       <Filter>Games</Filter>
     </ClCompile>
   </ItemGroup>
@@ -235,42 +235,42 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="..\..\..\src\luaExportMaster.pkg" />
+    <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
+      <Filter>Games\Pong</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
+      <Filter>Systems\Caches</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
       <Filter>Games\Hedgehog</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\DataStructs\luaExport.pkg">
       <Filter>DataStructs</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
-      <Filter>Games\Pong</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\luaExportMaster.pkg" />
-    <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
-      <Filter>Systems\Animation</Filter>
+    <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
+      <Filter>Games</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Util\luaExport.pkg">
       <Filter>Util</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
-      <Filter>Systems\Caches</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
-      <Filter>Games</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
-      <Filter>Systems\Physics</Filter>
+    <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
+      <Filter>Window</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Input\luaExport.pkg">
       <Filter>Systems\Input</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
-      <Filter>Window</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graphics\luaExport.pkg">
       <Filter>Systems\Graphics</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
+      <Filter>Systems\Animation</Filter>
+    </CustomBuild>
     <CustomBuild Include="..\..\..\src\Audio\luaExport.pkg">
       <Filter>Systems\Audio</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
+      <Filter>Systems\Physics</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 #include <Games/GameSelector.h>
 
 
-#define WHOLE_DIR(dir_name) ../../../src/Games/dir_name/luaExport.pkg
+#define WHOLE_DIR(dir_name) ../src/Games/dir_name/luaExport.pkg
 
 #define STRINGIZE_HELPER(x) #x
 #define STRINGIZE(x) STRINGIZE_HELPER(x)

@@ -32,4 +32,4 @@
 
 
 
-$pfile "../../../src/Games/Hedgehog/luaExport.pkg"
+$pfile "../src/Games/Hedgehog/luaExport.pkg"

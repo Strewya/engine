@@ -169,7 +169,8 @@ namespace Core
 			int32_t ret = lua_pcall(m_luaState, 1, numReturnValues, 0);
 			if(ret != 0)
 			{
-				DEBUG_INFO("Function ", function, " failed to execute");
+				DEBUG_INFO("Function ", function, " failed to execute with ", lua_tostring(m_luaState, -1));
+				pop();
 			}
 		}
 	}
@@ -206,6 +207,10 @@ namespace Core
 		push(key);
 		if(table < 0) --table;
 		lua_gettable(m_luaState, table);
+		if(lua_isnil(m_luaState, -1))
+		{
+			pop();
+		}
 		return (top + 1) == getTop();
 	}
 
@@ -213,6 +218,10 @@ namespace Core
 	{
 		auto top = getTop();
 		lua_getfield(m_luaState, table, key);
+		if(lua_isnil(m_luaState, -1))
+		{
+			pop();
+		}
 		return (top + 1) == getTop();
 	}
 

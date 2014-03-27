@@ -9,19 +9,19 @@ typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 typedef uint32_t           InstanceID;
 
-// for very stupid reasons, these paths are relative to the location of the project
-// which is in VS2013/SolutionX/GameX
-// so we need to go 3 dirs up first, then into /src/
+// these paths are relative to the location of the /bin directory
+// so we need to go 1 dir up first, then into /src/
 // and then into subdirs to find the other packages
 
-$pfile "../../../src/Animation/luaExport.pkg"
-$pfile "../../../src/Caches/luaExport.pkg"
-$pfile "../../../src/DataStructs/luaExport.pkg"
-$pfile "../../../src/Graphics/luaExport.pkg"
-$pfile "../../../src/Input/luaExport.pkg"
-$pfile "../../../src/Util/luaExport.pkg"
-$pfile "../../../src/Window/luaExport.pkg"
+
+$pfile "../src/Animation/luaExport.pkg"
+$pfile "../src/Caches/luaExport.pkg"
+$pfile "../src/DataStructs/luaExport.pkg"
+$pfile "../src/Graphics/luaExport.pkg"
+$pfile "../src/Input/luaExport.pkg"
+$pfile "../src/Util/luaExport.pkg"
+$pfile "../src/Window/luaExport.pkg"
 
 //this one is last, as it's game specific
 
-$pfile "../../../src/Games/luaExport.pkg"
+$pfile "../src/Games/luaExport.pkg"

@@ -21,6 +21,7 @@ namespace Core
 		if(m_isOpen == false && m_scripting->doFile(filename, 1))
 		{
 			m_isOpen = true;
+			m_filename.assign(filename);
 			return true;
 		}
 		m_scripting->pop(m_scripting->getTop() - resetPoint);
@@ -33,6 +34,7 @@ namespace Core
 		{
 			m_scripting->pop(1);
 			m_isOpen = false;
+			m_filename.clear();
 		}
 	}
 
@@ -41,73 +43,118 @@ namespace Core
 		return m_filename;
 	}
 
-	std::string ConfigFile::getString(const char* key, const char* valueIfNotPresent)
+	std::string ConfigFile::getString(const char* key, const char* defaultValue)
 	{
-		assert(valueIfNotPresent);
-		std::string ret = valueIfNotPresent;
+		assert(defaultValue);
+		std::string ret(defaultValue);
 		if(m_scripting->getValue(key, -1))
 		{
-			if(m_scripting->isString())
-			{
-				ret = m_scripting->toString();
-			}
+			ret = getString(defaultValue);
 			m_scripting->pop();
 		}
 		return ret;
 	}
 
-	int32_t ConfigFile::getInt(const char* key, int32_t valueIfNotPresent)
+	std::string ConfigFile::getString(const char* defaultValue)
 	{
-		if(m_scripting->getValue(key, -1))
+		assert(defaultValue);
+		std::string ret(defaultValue);
+		if(m_scripting->isString())
 		{
-			if(m_scripting->isNumber())
-			{
-				valueIfNotPresent = m_scripting->toInt();
-			}
-			m_scripting->pop();
+			ret = m_scripting->toString();
 		}
-		return valueIfNotPresent;
+		return ret;
 	}
 
-	float ConfigFile::getFloat(const char* key, float valueIfNotPresent)
+	int32_t ConfigFile::getInt(const char* key, int32_t defaultValue)
 	{
 		if(m_scripting->getValue(key, -1))
 		{
-			if(m_scripting->isNumber())
-			{
-				valueIfNotPresent = m_scripting->toFloat();
-			}
+			defaultValue = getInt(defaultValue);
 			m_scripting->pop();
 		}
-		return valueIfNotPresent;
+		return defaultValue;
 	}
 
-	Vec2 ConfigFile::getVec2(const char* key, Vec2 valueIfNotPresent)
+	int32_t ConfigFile::getInt(int32_t defaultValue)
+	{
+		if(m_scripting->isNumber())
+		{
+			defaultValue = m_scripting->toInt();
+		}
+		return defaultValue;
+	}
+
+	float ConfigFile::getFloat(const char* key, float defaultValue)
 	{
 		if(m_scripting->getValue(key, -1))
 		{
-			if(m_scripting->isTable())
+			defaultValue = getFloat(defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	float ConfigFile::getFloat(float defaultValue)
+	{
+		if(m_scripting->isNumber())
+		{
+			defaultValue = m_scripting->toFloat();
+		}
+		return defaultValue;
+	}
+
+	bool ConfigFile::getBool(const char* key, bool defaultValue)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			defaultValue = getBool(defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	bool ConfigFile::getBool(bool defaultValue)
+	{
+		if(m_scripting->isBoolean())
+		{
+			defaultValue = m_scripting->toBool();
+		}
+		return defaultValue;
+	}
+
+	Vec2 ConfigFile::getVec2(const char* key, Vec2 defaultValue)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			defaultValue = getVec2(defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	Vec2 ConfigFile::getVec2(Vec2 defaultValue)
+	{
+		if(m_scripting->isTable())
+		{
+			auto top = m_scripting->getTop();
+			if((m_scripting->getValue("x", -1) || m_scripting->getValue(1, -1)) &&
+			   (m_scripting->getValue("y", -2) || m_scripting->getValue(2, -2)))
 			{
-				auto top = m_scripting->getTop();
-				if((m_scripting->getValue("x", -1) || m_scripting->getValue(1, -1)) &&
-				   (m_scripting->getValue("y", -2) || m_scripting->getValue(2, -2)))
+				if(m_scripting->isNumber())
 				{
-					if(m_scripting->isNumber())
-					{
-						valueIfNotPresent.y = m_scripting->toFloat();
-					}
-					m_scripting->pop();
-					if(m_scripting->isNumber())
-					{
-						valueIfNotPresent.x = m_scripting->toFloat();
-					}
-					m_scripting->pop();
+					defaultValue.y = m_scripting->toFloat();
 				}
-				m_scripting->pop(m_scripting->getTop() - top);
+				m_scripting->pop();
+				if(m_scripting->isNumber())
+				{
+					defaultValue.x = m_scripting->toFloat();
+				}
+				m_scripting->pop();
 			}
-			m_scripting->pop();
+			m_scripting->pop(m_scripting->getTop() - top);
 		}
-		return valueIfNotPresent;
+		return defaultValue;
 	}
 
 	bool ConfigFile::getListElement(const char* list, uint32_t element)

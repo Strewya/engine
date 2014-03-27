@@ -26,8 +26,9 @@ namespace Core
 
 		uint32_t getAnimationID(const char* name) const;
 		const Animation& getAnimation(uint32_t id) const;
-
+		
 	private:
+		bool parseConfig(ConfigFile& file, bool isReload);
 		SpritesheetCache* m_spritesheets;
 
 		std::vector<Animation> m_animations;

@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <Caches/SpritesheetCache.h>
 /******* C++ headers *******/
+#include <cassert>
 /******* extra headers *******/
 #include <Caches/TextureCache.h>
 #include <Util/ConfigFile.h>
@@ -36,27 +37,22 @@ namespace Core
 	{
 		using std::begin; using std::end;
 		bool status = false;
-		auto name = file.getString("name", "");
-		if(!name.empty())
-		{
-			auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
-			{
-				return sheet.m_name == name;
-			});
+		auto name = file.getFilename();
 
-			if(it == end(m_sheets))
-			{
-				m_sheets.emplace_back();
-				status = fillSheet(file, m_sheets.back(), *m_textures);
-			}
-			else
-			{
-				DEBUG_INFO("Cannot init-load spritesheet ", name, ", already loaded!");
-			}
+		auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
+		{
+			return sheet.m_name == name;
+		});
+
+		if(it == end(m_sheets))
+		{
+			m_sheets.emplace_back();
+			m_sheets.back().m_name = name;
+			status = fillSheet(file, m_sheets.back(), *m_textures);
 		}
 		else
 		{
-			DEBUG_INFO("Config file error, 'name' doesn't exist in sheet ", file.getFilename());
+			DEBUG_INFO("Cannot init spritesheet ", name, ", already loaded!");
 		}
 		return status;
 	}
@@ -65,32 +61,47 @@ namespace Core
 	{
 		using std::begin; using std::end;
 		bool status = false;
-		auto name = file.getString("name", "");
-		if(!name.empty())
-		{
-			auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
-			{
-				return sheet.m_name == name;
-			});
+		auto name = file.getFilename();
 
-			if(it != end(m_sheets))
-			{
-				it->m_images.clear();
-				it->m_name.clear();
-				it->m_textureID = -1;
-				status = fillSheet(file, *it, *m_textures);
-			}
-			else
-			{
-				DEBUG_INFO("Cannot reload spritesheet ", name, ", not loaded!");
-			}
+		auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
+		{
+			return sheet.m_name == name;
+		});
+
+		if(it != end(m_sheets))
+		{
+			it->m_images.clear();
+			it->m_name = name;
+			it->m_textureID = -1;
+			status = fillSheet(file, *it, *m_textures);
 		}
 		else
 		{
-			DEBUG_INFO("Config file error, 'name' doesn't exist in sheet ", file.getFilename());
+			DEBUG_INFO("Cannot reload spritesheet ", name, ", not loaded!");
 		}
-		return status;
 		
+		return status;
+	}
+
+	uint32_t SpritesheetCache::getSpritesheetID(const char* name) const
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
+		{
+			return name == sheet.m_name;
+		});
+
+		if(it != end(m_sheets))
+		{
+			return std::distance(begin(m_sheets), it);
+		}
+		return -1;
+	}
+
+	const Spritesheet& SpritesheetCache::getSpritesheet(uint32_t id) const
+	{
+		assert(id < m_sheets.size());
+		return m_sheets[id];
 	}
 
 	bool fillSheet(ConfigFile& file, Spritesheet& sheet, TextureCache& textures)

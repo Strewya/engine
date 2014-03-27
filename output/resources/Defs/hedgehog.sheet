@@ -1,18 +1,19 @@
 return
 {
-	name = "hedgehog.sheet",
 	texture = "Textures/hedgehog.png",
+	defaultWidth = 450,
+	defaultHeight = 300,
 	images =
 	{
-		{ name="idle_00", pos={x=0,y=0},   width=450, height=300 },
-		{ name="idle_01", pos={450,  0},   width=450, height=300 },
-		{ name="idle_02", pos={900,  0},   width=450, height=300 },
-		{ name="idle_03", pos={1350, 0},   width=450, height=300 },
-		{ name="walk_00", pos={0,    300}, width=450, height=300 },
-		{ name="walk_01", pos={450,  300}, width=450, height=300 },
-		{ name="walk_02", pos={900,  300}, width=450, height=300 },
-		{ name="walk_03", pos={1350, 300}, width=450, height=300 },
-		{ name="walk_04", pos={0,    600}, width=450, height=300 },
-		{ name="walk_05", pos={450,  600}, width=450, height=300 },
+		{ name="idle_00", pos={x=0,y=0} },
+		{ name="idle_01", pos={450,  0} },
+		{ name="idle_02", pos={900,  0} },
+		{ name="idle_03", pos={1350, 0} },
+		{ name="walk_00", pos={0,    300} },
+		{ name="walk_01", pos={450,  300} },
+		{ name="walk_02", pos={900,  300} },
+		{ name="walk_03", pos={1350, 300} },
+		{ name="walk_04", pos={0,    600} },
+		{ name="walk_05", pos={450,  600} },
 	}
 };

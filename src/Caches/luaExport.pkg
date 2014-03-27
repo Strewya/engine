@@ -13,6 +13,8 @@ namespace Core
 
 	class SpritesheetCache
 	{
+		uint32_t getSpritesheetID(const char* name) const;
+		const Spritesheet& getSpritesheet(uint32_t id) const;
 	};
 
 	class AnimationCache

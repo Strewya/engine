@@ -27,9 +27,15 @@ namespace Core
 		const std::string& getFilename() const;
 		
 		std::string getString(const char* key, const char* valueIfNotPresent);
+		std::string getString(const char* valueIfNotPresent);
 		int32_t getInt(const char* key, int32_t valueIfNotPresent);
+		int32_t getInt(int32_t defaultValue);
 		float getFloat(const char* key, float valueIfNotPresent);
+		float getFloat(float defaultValue);
 		Vec2 getVec2(const char* key, Vec2 valueIfNotPresent);
+		Vec2 getVec2(Vec2 defaultValue);
+		bool getBool(const char* key, bool valueIfNotPresent);
+		bool getBool(bool defaultValue);
 		
 		uint32_t getListSize(const char* list);
 		bool getListElement(const char* list, uint32_t element);
