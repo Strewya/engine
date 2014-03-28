@@ -70,6 +70,7 @@ namespace Core
 
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
+	const float Time::m_microToSec = static_cast<float>(1.0 / 1000000.0);
 	
 	uint64_t Time::secondsToMicros(float sec)
 	{
@@ -109,9 +110,7 @@ namespace Core
 	Time::Time()
 		: m_oldRealTime(getRealTimeMicros()),
 		m_lastMicros(0), m_curMicros(0), m_deltaMicros(0),
-		m_virtLastMicros(0), m_virtCurMicros(0), m_virtDeltaMicros(0),
-		m_deltaTime(0), m_virtDeltaTime(0),
-		m_microToSec(static_cast<float>(1.0/1000000.0))
+		m_deltaTime(0), m_timeScale(NORMAL_TIME)
 	{
 	}
 
@@ -126,30 +125,22 @@ namespace Core
 		return m_oldRealTime;
 	}
 
-	void Time::update(double virtualTimeScale)
+	void Time::update()
 	{
 		uint64_t now = getRealTimeMicros();
 		uint64_t delta = now - m_oldRealTime;
 		m_oldRealTime = now;
 
 		if(delta)
-			updateBy(delta, virtualTimeScale);
+			updateBy(delta);
 	}
 
-	void Time::updateBy(uint64_t deltaMicros, double virtualTimeScale)
+	void Time::updateBy(uint64_t deltaMicros)
 	{
 		m_lastMicros = m_curMicros;
-		m_curMicros += deltaMicros;
+		m_curMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros)* m_timeScale);
 		m_deltaMicros = m_curMicros - m_lastMicros;
 		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
-
-		//if(virtualTimeScale > 0) //zero is full stop, less would mean rewind, which is impossible?
-		{
-			m_virtLastMicros = m_virtCurMicros;
-			m_virtCurMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros) * virtualTimeScale);
-			m_virtDeltaMicros = m_virtCurMicros - m_virtLastMicros;
-			m_virtDeltaTime = static_cast<float>(m_virtDeltaMicros) * m_microToSec;
-		}
 	}
 
 	uint32_t Time::getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime)
@@ -181,19 +172,14 @@ namespace Core
 		return m_deltaTime;
 	}
 
-	uint64_t Time::getVirtCurMicros() const
+	void Time::setTimeScale(double timeScale)
 	{
-		return m_virtCurMicros;
+		m_timeScale = timeScale;
 	}
 
-	uint32_t Time::getVirtDeltaMicros() const
+	double Time::getTimeScale() const
 	{
-		return static_cast<uint32_t>(m_virtDeltaMicros);
-	}
-
-	float Time::getVirtDeltaTime() const
-	{
-		return m_virtDeltaTime;
+		return m_timeScale;
 	}
 
 	void Time::reset()
@@ -202,9 +188,5 @@ namespace Core
 		m_deltaMicros = 0;
 		m_deltaTime = 0;
 		m_lastMicros = 0;
-		m_virtCurMicros = 0;
-		m_virtDeltaMicros = 0;
-		m_virtDeltaTime = 0;
-		m_virtLastMicros = 0;
 	}
 }

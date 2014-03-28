@@ -74,7 +74,6 @@ namespace Core
 	{
 		Time m_logicTimer;
 		Time m_renderTimer;
-		double m_timeScale;
 		Random gen;
 		const float m_b2Scale = 1.0f / 10.0f;
 		bool m_drawDebugData;

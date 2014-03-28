@@ -28,9 +28,10 @@ namespace Core
 
 	bool PongGame::init(Window& window)
 	{
-		m_timeScale = Time::NORMAL_TIME;
-		m_logicTimer.update(m_timeScale);
-		m_renderTimer.update(m_timeScale);
+		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
+		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
+		m_logicTimer.update();
+		m_renderTimer.update();
 		m_window = &window;
 		gen.reseed(static_cast<uint32_t>(m_logicTimer.getCurMicros()));
 		m_winner = 0;
@@ -111,7 +112,7 @@ namespace Core
 	bool PongGame::tickLogic(uint64_t updateTime)
 	{
 		bool continueRunning = true;
-		m_logicTimer.updateBy(updateTime, m_timeScale);
+		m_logicTimer.updateBy(updateTime);
 	
 		m_input.update(m_logicTimer);
 		const auto& events = m_input.getEvents();
@@ -197,13 +198,25 @@ namespace Core
 				break;
 				
 			case WE_GAINFOCUS:
-				m_timeScale = Time::NORMAL_TIME;
-				break;
+			{
+				m_logicTimer.setTimeScale(Time::NORMAL_TIME);
+				m_renderTimer.setTimeScale(Time::NORMAL_TIME);
+			}			
+			break;
+
 			case WE_LOSTFOCUS:
-				m_timeScale = Time::STOP_TIME;
-				break;
+			{
+				m_logicTimer.setTimeScale(Time::STOP_TIME);
+				m_renderTimer.setTimeScale(Time::STOP_TIME);
+			}
+			break;
+			
 			case WE_CLOSE:
+			{
 				continueRunning = false;
+			}
+			break;
+			
 			default:
 				break;
 			}
@@ -306,7 +319,7 @@ namespace Core
 
 	void PongGame::tickRender(uint64_t updateTime)
 	{
-		m_renderTimer.updateBy(updateTime, m_timeScale);
+		m_renderTimer.updateBy(updateTime);
 		
 		//update renderer
 		//m_graphics.update();

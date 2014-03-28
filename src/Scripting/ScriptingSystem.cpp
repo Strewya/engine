@@ -107,7 +107,7 @@ namespace Core
 	}
 #endif
 
-	static const char* codeName(uint32_t code)
+	static const char* getErrorName(uint32_t code)
 	{
 		static const char* names[] = {"OK", "yield", "runtime error", "syntax error", "memory alloc error", "error handler error", "file not exists"};
 		assert(code < 7);
@@ -150,12 +150,14 @@ namespace Core
 			}
 			else
 			{
-				DEBUG_INFO("Lua failed to call file ", scriptName);
+				DEBUG_INFO("Lua API pcall failed with error: ", getErrorName(ret), "\n", lua_tostring(m_luaState, -1));
+				pop();
 			}
 		}
 		else
 		{
-			DEBUG_INFO("Lua failed to load file ", scriptName);
+			DEBUG_INFO("Lua API loadfile failed with error: ", getErrorName(ret), "\n", lua_tostring(m_luaState, -1));
+			pop();
 		}
 		return false;
 	}

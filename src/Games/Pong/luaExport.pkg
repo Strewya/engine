@@ -57,7 +57,6 @@ namespace Core
 	{
 		const Time m_logicTimer;
 		const Time m_renderTimer;
-		double m_timeScale;
 		Random gen;
 		const float m_b2Scale;
 		bool m_drawDebugData;

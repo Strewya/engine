@@ -18,7 +18,6 @@ namespace Core
 	{
 	public:
 		Time m_timer;
-		double m_timeScale;
 		int32_t m_time;
 		uint32_t m_animationID;
 		uint32_t m_imageID;

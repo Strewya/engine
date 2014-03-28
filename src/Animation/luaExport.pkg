@@ -5,7 +5,7 @@ namespace Core
 {
 	class AnimationData
 	{
-		double m_timeScale;
+		tolua_readonly Time m_timer;
 		int32_t m_time;
 		uint32_t m_animationID;
 		uint32_t m_imageID;

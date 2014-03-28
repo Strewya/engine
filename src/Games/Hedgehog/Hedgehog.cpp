@@ -39,7 +39,8 @@ namespace Core
 		window.resize(1024, 768);
 		DEBUG_LINE(window.openConsole(1050, 0));
 
-		m_logicTimeScale = Time::NORMAL_TIME;
+		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
+		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
 		m_isRunning =
 			//systems
@@ -51,7 +52,7 @@ namespace Core
 			m_textureCache.init(m_graphics) &&
 			m_spritesheetCache.init(m_textureCache) &&
 			m_animationCache.init(m_spritesheetCache) &&
-			//last statement so all previous can have '&&' at the end
+			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
 
@@ -149,7 +150,7 @@ namespace Core
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
 		bool continueRunning = true;
-		m_logicTimer.updateBy(updateTime, m_logicTimeScale);
+		m_logicTimer.updateBy(updateTime);
 
 		m_input.update(m_logicTimer);
 		auto& evs = m_input.getEvents();
@@ -169,7 +170,7 @@ namespace Core
 
 	void HedgehogGame::tickRender(uint64_t updateTime)
 	{
-		m_renderTimer.updateBy(updateTime, Time::NORMAL_TIME);
+		m_renderTimer.updateBy(updateTime);
 
 		m_graphics.begin();
 
@@ -189,8 +190,8 @@ namespace Core
 			auto ext = file.substr(pos + 1);
 			if(ext == "lua")
 			{
-				DEBUG_INFO("Reloading script ", file);
-				m_scripter.doFile(RESOURCE_S(file));
+				if(m_scripter.doFile(RESOURCE_S(file)))
+					DEBUG_INFO("Reloaded script ", file);
 			}
 			else if(ext == "anim")
 			{

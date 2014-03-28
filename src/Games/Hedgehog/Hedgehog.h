@@ -52,7 +52,6 @@ namespace Core
 
 		Player m_player;
 		
-		double m_logicTimeScale;
 		Time m_logicTimer;
 		Time m_renderTimer;
 		Window* m_window;

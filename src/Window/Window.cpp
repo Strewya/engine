@@ -240,7 +240,7 @@ namespace Core
 
 	WindowEvent Window::newEvent()
 	{
-		m_timer.update(Time::NORMAL_TIME);
+		m_timer.update();
 		WindowEvent we;
 		ZeroMemory(&we, sizeof(we));
 		we.m_timestamp = m_timer.getCurMicros();
@@ -255,14 +255,14 @@ namespace Core
 		{
 			if(!file.empty())
 			{
-				m_timer.update(Time::NORMAL_TIME);
+				m_timer.update();
 				newFileChange(m_timer.getCurMicros(), action, file);
 			}
 		}
 
 		using std::begin;
 		using std::end;
-		m_timer.update(Time::NORMAL_TIME);
+		m_timer.update();
 		std::for_each(begin(m_fileChanges), end(m_fileChanges), [&](FileChangeInfo& info)
 		{
 			if(info.m_state == FileChangeInfo::EVENT_PENDING &&

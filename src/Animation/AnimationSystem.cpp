@@ -38,7 +38,7 @@ namespace Core
 			auto& animData = *ptr;
 			const auto& anim = m_animations->getAnimation(animData.m_animationID);
 
-			animData.m_timer.updateBy(dt, animData.m_timeScale);
+			animData.m_timer.updateBy(dt);
 			animData.m_time += animData.m_timer.getDeltaMicros();
 
 			if(anim.m_defaultRepeat)
