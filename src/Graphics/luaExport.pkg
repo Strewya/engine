@@ -21,6 +21,6 @@ namespace Core
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image, uint32_t textureID);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
-		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification);
+		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 	};
 }

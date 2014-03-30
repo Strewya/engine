@@ -419,7 +419,7 @@ namespace Core
 	//*****************************************************************
 	//					DRAW TEXT
 	//*****************************************************************
-	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification)
+	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification, bool isItalic)
 	{
 		ID3D11Resource* res = nullptr;
 		m_textures[m_fontTextureID]->GetResource(&res);
@@ -455,20 +455,22 @@ namespace Core
 				inds[i++] = v + 3;
 				inds[i++] = v + 0;
 
-				verts[v].setPosition(xPos, -yPos, 0);
+				float italicOffset = isItalic ? 2.5f : 0;
+
+				verts[v].setPosition(xPos - italicOffset, -yPos, 0);
 				verts[v].setDiffuse(1,1,1,1);
 				verts[v].setTextureCoords(tu_left, tv_bot);
 				++v;
-				verts[v].setPosition(xPos, yPos, 0);
+				verts[v].setPosition(xPos + italicOffset, yPos, 0);
 				verts[v].setDiffuse(1, 1, 1, 1);
 				verts[v].setTextureCoords(tu_left, tv_top);
 				++v;
 				xPos += (glyph.m_right - glyph.m_left);
-				verts[v].setPosition(xPos, yPos, 0);
+				verts[v].setPosition(xPos + italicOffset, yPos, 0);
 				verts[v].setDiffuse(1, 1, 1, 1);
 				verts[v].setTextureCoords(tu_rght, tv_top);
 				++v;
-				verts[v].setPosition(xPos, -yPos, 0);
+				verts[v].setPosition(xPos - italicOffset, -yPos, 0);
 				verts[v].setDiffuse(1, 1, 1, 1);
 				verts[v].setTextureCoords(tu_rght, tv_bot);
 				++v;

@@ -24,17 +24,31 @@ function game_tick(game)
 		player.m_animationData.m_animationID = game.m_animationCache:getAnimationID("unsit");
 		player.m_animationData.m_time = 0;
 	end;
-	if(milis > 5.5) then
+	if(milis > 5.2) then
 		player.m_mainTimer:reset();
 	end;
+	
+	--[[
+	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
+	//i should make a special function for this so i can invoke it from Lua for prototyping purposes
+	//also, current state of hhog is needed, with transitional data (was sitting, should move, and v.versa)
+	
+	//input system should receive key, type and bind function which binds the state/action/range of the key to a variable in memory!
+	//separate Images into their own cache
+	//animation system should be able to start a new animation, and have a trigger for it's end, either repeat or transition or do nothing.
+	
+	
+	]]
 end;
 
 function game_render(game)
 	local tx = Core.Transform();
-	tx.position:set(0,0);
+	tx.position:set(0,200);
 	local col = Core.Color();
 	col:set(1,1,0.5);
-	game.m_graphics:drawText("Hello from the beautiful land of Lua!", tx, col, 1);
+	game.m_graphics:drawText("Hello from the beautiful land of Lua!", tx, col, 1, true);
+	tx.position.y = tx.position.y + 40;
+	game.m_graphics:drawText("Hello from the beautiful land of Lua!", tx, col, 1, false);
 	
 	tx.position:set(-200, -50);
 	col:set(1,1,1);

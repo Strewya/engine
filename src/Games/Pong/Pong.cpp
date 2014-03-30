@@ -343,23 +343,23 @@ namespace Core
 		
 		m_graphics.drawQuad(m_leftPaddle.m_tf, m_leftPaddle.m_size*0.5f, m_leftPaddle.m_c);
 		textTransform.position.set(m_leftPaddle.m_tf.position.x, h);
-		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), textTransform, m_leftPaddle.m_c, 0);
+		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), textTransform, m_leftPaddle.m_c, 0, false);
 
 		m_graphics.drawQuad(m_rightPaddle.m_tf, m_rightPaddle.m_size*0.5f, m_rightPaddle.m_c);
 		textTransform.position.set(m_rightPaddle.m_tf.position.x, h);
-		m_graphics.drawText(std::to_string(m_rightPaddle.m_score), textTransform, m_rightPaddle.m_c, 2);
+		m_graphics.drawText(std::to_string(m_rightPaddle.m_score), textTransform, m_rightPaddle.m_c, 2, false);
 
 		static const std::string players[2] = {"Red", "Blue"};
 		if(m_winner != 0)
 		{
 			textTransform.position.set(0, 0);
-			m_graphics.drawText(players[m_winner - 1] + " player WINS!", textTransform, Color(1, 1, 1), 1);
+			m_graphics.drawText(players[m_winner - 1] + " player WINS!", textTransform, Color(1, 1, 1), 1, false);
 		}
 		else
 		{
 			textTransform.position.set(0, h);
 			textTransform.scale.set(0.5f, 0.5f);
-			m_graphics.drawText("Press Enter to launch ball, Escape to exit", textTransform, Color(1, 1, 1), 1);
+			m_graphics.drawText("Press Enter to launch ball, Escape to exit", textTransform, Color(1, 1, 1), 1, false);
 		}
 		
 		if(m_drawDebugData)
