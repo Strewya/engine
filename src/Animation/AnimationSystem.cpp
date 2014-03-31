@@ -17,7 +17,7 @@ namespace Core
 
 		m_animations = &animations;
 
-		DEBUG_INFO("GraphicsSystem init ", status ? "OK" : "FAIL");
+		DEBUG_INIT(AnimationSystem);
 		return status;
 	}
 
@@ -27,7 +27,7 @@ namespace Core
 
 
 
-		DEBUG_INFO("GraphicsSystem shutdown ", status ? "OK" : "FAIL");
+		DEBUG_SHUTDOWN(AnimationSystem);
 		return status;
 	}
 

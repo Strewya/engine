@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
@@ -223,6 +224,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />

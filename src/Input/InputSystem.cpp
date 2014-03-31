@@ -38,7 +38,7 @@ namespace Core
 
 		InitializeInputConstants();
 
-		DEBUG_INFO("InputSystem init ", status ? "OK" : "FAIL");
+		DEBUG_INIT(InputSystem);
 		return status;
 	}
 
@@ -46,7 +46,7 @@ namespace Core
 	{
 		bool status = true;
 
-		DEBUG_INFO("InputSystem shutdown ", status ? "OK" : "FAIL");
+		DEBUG_SHUTDOWN(InputSystem);
 		return status;
 	}
 

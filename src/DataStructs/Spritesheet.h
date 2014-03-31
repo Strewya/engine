@@ -18,12 +18,6 @@ namespace Core
 	public:
 		uint32_t m_textureID;
 		std::string m_name;
-		std::vector<Image> m_images;
-
-		const Image& getImage(uint32_t id) const
-		{
-			assert(id < m_images.size());
-			return m_images[id];
-		}
+		std::vector<uint32_t> m_images;
 	};
 }

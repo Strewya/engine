@@ -16,22 +16,20 @@ namespace Core
 
 #define CLASS(x) "Core::"#x
 
-#define DEBUG_INIT(c) DEBUG_INFO(c" init ", status ? "OK" : "FAIL")
-#define DEBUG_SHUTDOWN(c) DEBUG_INFO(c" shutdown ", status ? "OK" : "FAIL")
+#define DEBUG_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL")
+#define DEBUG_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL")
 
 #ifdef _DEBUG
 
 #define DEBUG_INFO(...) debugPrint(__VA_ARGS__)
-#define DEBUG_LINE(func) func
-#define DEBUG_IF(check, line) if(check) { DEBUG_LINE(line); }
+#define DEBUG_CODE(code) { code }
 
 	inline void debugPrint() { std::cout << std::endl; }
 	template<typename T, typename... Args> void debugPrint(T t, Args... args) { std::cout << t; debugPrint(args...); }
 
 #else
 #define DEBUG_INFO(...) void(0)
-#define DEBUG_LINE(func) void(0)
-#define DEBUG_IF(check, line) void(0)
+#define DEBUG_CODE(code) void(0);
 #endif
 
 

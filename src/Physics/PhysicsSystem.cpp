@@ -28,7 +28,7 @@ namespace Core
 			m_world.SetDebugDraw(debugDraw);
 		m_world.SetContactListener(this);
 
-		DEBUG_INFO("PhysicsSystem init ", status ? "OK" : "FAIL");
+		DEBUG_INIT(PhysicsSystem);
 		return status;
 	}
 
@@ -50,7 +50,7 @@ namespace Core
 		m_fixtures.clear();
 		m_bodies.clear();
 
-		DEBUG_INFO("PhysicsSystem shutdown ", status ? "OK" : "FAIL");
+		DEBUG_SHUTDOWN(PhysicsSystem);
 		return status;
 	}
 

@@ -5,6 +5,7 @@
 #include <Caches/AnimationCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Caches/ImageCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <DataStructs/Spritesheet.h>
 #include <Util/ConfigFile.h>
@@ -14,15 +15,16 @@
 
 namespace Core
 {
-	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& spritesheets);
+	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& spritesheets, const ImageCache& images);
 
-	bool AnimationCache::init(SpritesheetCache& spritesheets)
+	bool AnimationCache::init(SpritesheetCache& spritesheets, ImageCache& images)
 	{
 		bool status = true;
 
 		m_spritesheets = &spritesheets;
+		m_images = &images;
 
-		DEBUG_INIT("AnimationCache");
+		DEBUG_INIT(AnimationCache);
 		return status;
 	}
 
@@ -30,21 +32,11 @@ namespace Core
 	{
 		bool status = true;
 
-		DEBUG_SHUTDOWN("AnimationCache");
+		DEBUG_SHUTDOWN(AnimationCache);
 		return status;
 	}
 
-	bool AnimationCache::loadAnimations(ConfigFile& file)
-	{
-		return parseConfig(file, false);
-	}
-
-	bool AnimationCache::reloadAnimations(ConfigFile& file)
-	{
-		return parseConfig(file, true);
-	}
-
-	bool AnimationCache::parseConfig(ConfigFile& file, bool isReload)
+	bool AnimationCache::loadAnimations(ConfigFile& file, bool reload)
 	{
 		bool success = false;
 		std::string spritesheetName = file.getString("spritesheet", "");
@@ -61,7 +53,7 @@ namespace Core
 				{
 					auto animName = file.getString("name", "");
 					auto animID = getAnimationID(animName.c_str());
-					if(isReload)
+					if(reload)
 					{
 						if(animID != -1)
 						{
@@ -71,7 +63,7 @@ namespace Core
 							m_animations[animID].m_name.clear();
 							m_animations[animID].m_sequence.clear();
 							m_animations[animID].m_spritesheetID = sheetID;
-							success &= fillAnimation(file, m_animations[animID], sheet);
+							success &= fillAnimation(file, m_animations[animID], sheet, *m_images);
 						}
 						else
 						{
@@ -86,7 +78,7 @@ namespace Core
 							animID = m_animations.size();
 							m_animations.emplace_back();
 							m_animations[animID].m_spritesheetID = sheetID;
-							success &= fillAnimation(file, m_animations[animID], sheet);
+							success &= fillAnimation(file, m_animations[animID], sheet, *m_images);
 						}
 						else
 						{
@@ -121,7 +113,7 @@ namespace Core
 		return m_animations[id];
 	}
 	
-	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& sheet)
+	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& sheet, const ImageCache& images)
 	{	
 		anim.m_name = file.getString("name", "");
 		anim.m_defaultDuration = static_cast<uint32_t>(Time::secondsToMicros(file.getFloat("duration", 0)));
@@ -132,13 +124,15 @@ namespace Core
 		{
 			if(file.getListElement("images", i + 1))
 			{
-				uint32_t index = file.getInt(-1);
-				if(index == -1)
+				auto image = file.getString("");
+				if(!image.empty())
 				{
-					index = 0;
+					anim.m_sequence[i] = images.getImageID(image.c_str());
+				}
+				else
+				{
 					DEBUG_INFO("Image index in ", anim.m_name, " is invalid");
 				}
-				anim.m_sequence[i] = index;
 				file.popListElement();
 			}
 		}

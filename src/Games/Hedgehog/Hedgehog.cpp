@@ -22,6 +22,7 @@ namespace Core
 		status &= m_textureCache.shutdown();
 		status &= m_animationCache.shutdown();
 		status &= m_spritesheetCache.shutdown();
+		status &= m_imageCache.shutdown();
 		status &= m_input.shutdown();
 		status &= m_scripter.shutdown();
 		status &= m_animation.shutdown();
@@ -37,7 +38,9 @@ namespace Core
 		m_window = &window;
 
 		window.resize(1024, 768);
-		DEBUG_LINE(window.openConsole(1050, 0));
+		DEBUG_CODE(
+			window.openConsole(1050, 0);
+		)
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
@@ -50,8 +53,10 @@ namespace Core
 			m_graphics.init(window) &&
 			//caches
 			m_textureCache.init(m_graphics) &&
-			m_spritesheetCache.init(m_textureCache) &&
-			m_animationCache.init(m_spritesheetCache) &&
+			m_imageCache.init() &&
+			m_spritesheetCache.init(m_textureCache, m_imageCache) &&
+			m_animationCache.init(m_spritesheetCache, m_imageCache) &&
+			
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
@@ -82,7 +87,7 @@ namespace Core
 
 			if(config.open(RESOURCE("Defs/hedgehog.anim")))
 			{
-				m_isRunning &= m_animationCache.loadAnimations(config);
+				m_isRunning &= m_animationCache.loadAnimations(config, true);
 				config.close();
 			}
 			
@@ -198,7 +203,7 @@ namespace Core
 				ConfigFile config(m_scripter);
 				if(config.open(RESOURCE_S(file)))
 				{
-					if(m_animationCache.reloadAnimations(config))
+					if(m_animationCache.loadAnimations(config, true))
 						DEBUG_INFO("Reloaded animation file ", file);
 				}
 			}

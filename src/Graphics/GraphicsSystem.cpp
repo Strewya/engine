@@ -64,7 +64,7 @@ namespace Core
 		//m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
 		m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
 		
-		DEBUG_INIT("GraphicsSystem");
+		DEBUG_INIT(GraphicsSystem);
 		return status;
 	}
 
@@ -85,7 +85,7 @@ namespace Core
 			safeRelease(*ptr);
 		}
 
-		DEBUG_SHUTDOWN("GraphicsSystem");
+		DEBUG_SHUTDOWN(GraphicsSystem);
 		return status;
 	}
 
@@ -564,16 +564,21 @@ namespace Core
 			{
 				auto driverType = D3D_DRIVER_TYPE_UNKNOWN;
 				uint32_t flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
-#ifdef _DEBUG
-				flags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
+
+				DEBUG_CODE(
+					flags |= D3D11_CREATE_DEVICE_DEBUG;
+				)
+
 				hr = D3D11CreateDevice(adapter, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &m_dev, nullptr, &m_devcon);
 
 				adapter->Release();
 			}
 		}
 
-		DEBUG_LINE(if(FAILED(hr)) DEBUG_INFO("\tinitDevice failed"));
+		DEBUG_CODE(
+			if(FAILED(hr))
+				DEBUG_INFO("\tinitDevice failed");
+		)
 
 		return SUCCEEDED(hr);
 	}
@@ -605,7 +610,10 @@ namespace Core
 			}
 			bbTexture->Release();
 		}
-		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitRenderTarget failed"));
+		DEBUG_CODE(
+			if(FAILED(hr))
+				DEBUG_INFO("\tinitRenderTarget failed");
+		)
 		return SUCCEEDED(hr);
 	}
 
@@ -635,7 +643,10 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitVertexShader failed"));
+		DEBUG_CODE(
+			if(FAILED(hr))
+				DEBUG_INFO("\tinitVertexShader failed");
+		)
 		return SUCCEEDED(hr);
 	}
 	
@@ -656,7 +667,10 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		DEBUG_LINE(if (FAILED(hr)) DEBUG_INFO("\tinitPixelShader failed"));
+		DEBUG_CODE(
+			if(FAILED(hr))
+				DEBUG_INFO("\tinitPixelShader failed");
+		)
 		return SUCCEEDED(hr);
 	}
 

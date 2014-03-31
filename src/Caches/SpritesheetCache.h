@@ -15,11 +15,12 @@ namespace Core
 {
 	class ConfigFile;
 	class TextureCache;
+	class ImageCache;
 
 	class SpritesheetCache
 	{
 	public:
-		bool init(TextureCache& textures);
+		bool init(TextureCache& textures, ImageCache& images);
 		bool shutdown();
 
 		bool loadSpritesheet(ConfigFile& file);
@@ -30,6 +31,7 @@ namespace Core
 
 	private:
 		TextureCache* m_textures;
+		ImageCache* m_images;
 		std::vector<Spritesheet> m_sheets;
 	};
 }

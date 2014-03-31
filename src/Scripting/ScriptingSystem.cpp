@@ -124,7 +124,7 @@ namespace Core
 			tolua_core_open(m_luaState);
 			status = true;
 		}
-		DEBUG_INFO("ScriptingSystem init ", status ? "OK" : "FAIL");
+		DEBUG_INIT(ScriptingSystem);
 		return status;
 	}
 
@@ -134,7 +134,7 @@ namespace Core
 
 		lua_close(m_luaState);
 
-		DEBUG_INFO("ScriptingSystem shutdown ", status ? "OK" : "FAIL");
+		DEBUG_SHUTDOWN(ScriptingSystem);
 		return status;
 	}
 

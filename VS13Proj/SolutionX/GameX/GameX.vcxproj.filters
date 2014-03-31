@@ -125,6 +125,9 @@
     <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
       <Filter>Games</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp">
+      <Filter>Systems\Caches</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\ConfigFile.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\ImageCache.h">
+      <Filter>Systems\Caches</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

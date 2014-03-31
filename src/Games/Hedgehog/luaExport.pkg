@@ -21,6 +21,7 @@ namespace Core
 		tolua_readonly TextureCache m_textureCache;
 		tolua_readonly SpritesheetCache m_spritesheetCache;
 		tolua_readonly AnimationCache m_animationCache;
+		tolua_readonly ImageCache m_imageCache;
 
 		tolua_readonly Player m_player;
 

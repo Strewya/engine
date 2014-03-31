@@ -53,10 +53,7 @@ function game_render(game)
 	tx.position:set(-200, -50);
 	col:set(1,1,1);
 	tx.scale:set(200,200);
-	local animID = game.m_player.m_animationData.m_animationID;
-	local animation = game.m_animationCache:getAnimation(animID);
-	local spritesheet = game.m_spritesheetCache:getSpritesheet(animation.m_spritesheetID);
-	local img = spritesheet:getImage(game.m_player.m_animationData.m_imageID);
+	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
 	local texID = spritesheet.m_textureID;
 	game.m_graphics:drawTexturedQuad(tx, col, img, texID);
 end;

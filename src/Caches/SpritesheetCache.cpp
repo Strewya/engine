@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 #include <cassert>
 /******* extra headers *******/
+#include <Caches/ImageCache.h>
 #include <Caches/TextureCache.h>
 #include <Util/ConfigFile.h>
 #include <Util/Utility.h>
@@ -13,15 +14,16 @@
 
 namespace Core
 {
-	bool fillSheet(ConfigFile& df, Spritesheet& sheet, TextureCache& textures);
+	bool fillSheet(ConfigFile& df, Spritesheet& sheet, TextureCache& textures, ImageCache& images);
 
-	bool SpritesheetCache::init(TextureCache& textures)
+	bool SpritesheetCache::init(TextureCache& textures, ImageCache& images)
 	{
 		bool status = true;
 
 		m_textures = &textures;
+		m_images = &images;
 
-		DEBUG_INIT("SpritesheetCache");
+		DEBUG_INIT(SpritesheetCache);
 		return status;
 	}
 
@@ -29,7 +31,7 @@ namespace Core
 	{
 		bool status = true;
 
-		DEBUG_SHUTDOWN("SpritesheetCache");
+		DEBUG_SHUTDOWN(SpritesheetCache);
 		return status;
 	}
 
@@ -48,7 +50,7 @@ namespace Core
 		{
 			m_sheets.emplace_back();
 			m_sheets.back().m_name = name;
-			status = fillSheet(file, m_sheets.back(), *m_textures);
+			status = fillSheet(file, m_sheets.back(), *m_textures, *m_images);
 		}
 		else
 		{
@@ -73,7 +75,7 @@ namespace Core
 			it->m_images.clear();
 			it->m_name = name;
 			it->m_textureID = -1;
-			status = fillSheet(file, *it, *m_textures);
+			status = fillSheet(file, *it, *m_textures, *m_images);
 		}
 		else
 		{
@@ -104,7 +106,7 @@ namespace Core
 		return m_sheets[id];
 	}
 
-	bool fillSheet(ConfigFile& file, Spritesheet& sheet, TextureCache& textures)
+	bool fillSheet(ConfigFile& file, Spritesheet& sheet, TextureCache& textures, ImageCache& images)
 	{
 		/* example sheet:
 		{
@@ -149,19 +151,25 @@ namespace Core
 							float w = static_cast<float>(imgWidth);
 							float h = static_cast<float>(imgHeight);
 							//image is valid, add it
-							sheet.m_images[i].m_name.assign(imgName);
+							Image img;
+							img.m_name.assign(imgName);
 
-							sheet.m_images[i].m_ratio = w / h;
+							img.m_ratio = w / h;
 							Vec2 wh = pos + Vec2(w, h);
 
-							sheet.m_images[i].m_texCoords[0].x = pos.x / tw;
-							sheet.m_images[i].m_texCoords[0].y = pos.y / th;
-							sheet.m_images[i].m_texCoords[1].x = wh.x / tw;
-							sheet.m_images[i].m_texCoords[1].y = sheet.m_images[i].m_texCoords[0].y;
-							sheet.m_images[i].m_texCoords[2].x = sheet.m_images[i].m_texCoords[0].x;
-							sheet.m_images[i].m_texCoords[2].y = wh.y / th;
-							sheet.m_images[i].m_texCoords[3].x = sheet.m_images[i].m_texCoords[1].x;
-							sheet.m_images[i].m_texCoords[3].y = sheet.m_images[i].m_texCoords[2].y;
+							img.m_texCoords[0].x = pos.x / tw;
+							img.m_texCoords[0].y = pos.y / th;
+							img.m_texCoords[1].x = wh.x / tw;
+							img.m_texCoords[1].y = img.m_texCoords[0].y;
+							img.m_texCoords[2].x = img.m_texCoords[0].x;
+							img.m_texCoords[2].y = wh.y / th;
+							img.m_texCoords[3].x = img.m_texCoords[1].x;
+							img.m_texCoords[3].y = img.m_texCoords[2].y;
+
+							if(!images.addImage(img, &sheet.m_images[i]))
+							{
+								DEBUG_INFO("Failed to add image with name ", imgName, ", skipping it!");
+							}
 						}
 						else
 						{

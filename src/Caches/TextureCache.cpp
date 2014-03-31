@@ -17,7 +17,7 @@ namespace Core
 
 		m_graphics = &graphics;
 
-		DEBUG_INIT("TextureCache");
+		DEBUG_INIT(TextureCache);
 		return status;
 	}
 
@@ -29,7 +29,7 @@ namespace Core
 		// what if i decide to destroy the texture manager, but not the graphics? i get a leak...
 		// when that happens, implement it.
 
-		DEBUG_SHUTDOWN("TextureCache");
+		DEBUG_SHUTDOWN(TextureCache);
 		return status;
 	}
 

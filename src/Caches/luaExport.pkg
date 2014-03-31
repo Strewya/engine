@@ -22,4 +22,12 @@ namespace Core
 		uint32_t getAnimationID(const char* name) const;
 		const Animation& getAnimation(uint32_t id) const;
 	};
+
+	class ImageCache
+	{
+		uint32_t getImageID(const char* name) const;
+		const Image& getImage(uint32_t id) const;
+		
+		bool addImage(const Image& image, uint32_t* outIndex = 0);
+	};
 }

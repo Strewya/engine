@@ -10,6 +10,7 @@
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
+#include <Caches/ImageCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <Caches/TextureCache.h>
 #include <Graphics/GraphicsSystem.h>
@@ -49,6 +50,7 @@ namespace Core
 		TextureCache m_textureCache;
 		SpritesheetCache m_spritesheetCache;
 		AnimationCache m_animationCache;
+		ImageCache m_imageCache;
 
 		Player m_player;
 		
