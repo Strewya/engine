@@ -11,7 +11,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
-#include <Util/ConfigFile.h>
+#include <Util/DataFile.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
@@ -67,7 +67,7 @@ namespace Core
 
 			initializationStatus &= m_scripts.doFile(RESOURCE("Scripts/paddleAI.lua"));
 			
-			ConfigFile df(m_scripts);
+			DataFile df(m_scripts);
 			if(df.open(RESOURCE("Defs/font.sheet")))
 			{
 				initializationStatus &= m_graphics.initFont(df);

@@ -210,7 +210,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
-    <ClCompile Include="..\..\..\src\Util\ConfigFile.cpp" />
+    <ClCompile Include="..\..\..\src\Util\DataFile.cpp" />
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Time.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
@@ -247,7 +247,7 @@
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
-    <ClInclude Include="..\..\..\src\Util\ConfigFile.h" />
+    <ClInclude Include="..\..\..\src\Util\DataFile.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
     <ClInclude Include="..\..\..\src\Util\Random.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />

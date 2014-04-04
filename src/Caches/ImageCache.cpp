@@ -5,6 +5,7 @@
 #include <Caches/ImageCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Util/DataFile.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -47,19 +48,43 @@ namespace Core
 		return index;
 	}
 
-	bool ImageCache::addImage(const Image& image, uint32_t* outIndex)
+	bool ImageCache::addImage(const Image& image, bool reload, uint32_t* outIndex)
 	{
-		auto index = getImageID(image.m_name.c_str());
-		bool added = false;
-		if(index == -1)
-		{
-			m_images.emplace_back(image);
-			added = true;
-			if(outIndex != nullptr)
+		bool success = false;
+		uint32_t slot = -1;
+		auto id = getImageID(image.m_name.c_str());
+		if(reload)
+		{	
+			if(id == -1)
 			{
-				*outIndex = m_images.size() - 1;
+				DEBUG_INFO("The image '", image.m_name, "' cannot be reloaded, it does not exist!");
+			}
+			else
+			{
+				slot = id;
 			}
 		}
-		return added;
+		else
+		{
+			if(id != -1)
+			{
+				DEBUG_INFO("Cannot load image '", image.m_name, "', name already exists!");
+			}
+			else
+			{
+				slot = m_images.size();
+				m_images.emplace_back();
+			}
+		}
+		if(slot != -1)
+		{
+			m_images[slot] = image;
+			if(outIndex != nullptr)
+			{
+				*outIndex = slot;
+			}
+			success = true;
+		}
+		return success;
 	}
 }

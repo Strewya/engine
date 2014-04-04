@@ -10,7 +10,7 @@
 #include <DataStructs/Image.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
-#include <Util/ConfigFile.h>
+#include <Util/DataFile.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
@@ -131,7 +131,7 @@ namespace Core
 	//*****************************************************************
 	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
-	Vec2 GraphicsSystem::getTextureDimensions(uint32_t texID)
+	Vec2 GraphicsSystem::getTextureDimensions(uint32_t texID) const
 	{
 		ID3D11Resource* res = nullptr;
 		m_textures[texID]->GetResource(&res);
@@ -716,7 +716,7 @@ namespace Core
 	//*****************************************************************
 	//					INIT FONT
 	//*****************************************************************
-	bool GraphicsSystem::initFont(ConfigFile& file)
+	bool GraphicsSystem::initFont(DataFile& file)
 	{
 		m_font.m_name = file.getString("name", "");
 		m_font.m_texture = file.getString("texture", "");
@@ -726,28 +726,32 @@ namespace Core
 		{
 			uint32_t glyphCount = file.getListSize("glyphs");
 			m_font.m_glyphs.resize(glyphCount);
-			for(uint32_t i = 0; i < glyphCount; ++i)
+			if(file.getList("glyphs"))
 			{
-				if(file.getListElement("glyphs", i + 1))
+				for(uint32_t i = 0; i < glyphCount; ++i)
 				{
-					auto ascii = file.getInt("ascii", 0);
-					auto left = file.getInt("left", -1);
-					auto right = file.getInt("right", -1);
-					auto top = file.getInt("top", -1);
-					if(ascii != 0 && left != -1 && right != -1 && top != -1)
+					if(file.getList(i + 1))
 					{
-						m_font.m_glyphs[i].m_ascii = ascii;
-						m_font.m_glyphs[i].m_character = static_cast<char>(m_font.m_glyphs[i].m_ascii);
-						m_font.m_glyphs[i].m_left = left;
-						m_font.m_glyphs[i].m_right = right;
-						m_font.m_glyphs[i].m_top = top;
+						auto ascii = file.getInt("ascii", 0);
+						auto left = file.getInt("left", -1);
+						auto right = file.getInt("right", -1);
+						auto top = file.getInt("top", -1);
+						if(ascii != 0 && left != -1 && right != -1 && top != -1)
+						{
+							m_font.m_glyphs[i].m_ascii = ascii;
+							m_font.m_glyphs[i].m_character = static_cast<char>(m_font.m_glyphs[i].m_ascii);
+							m_font.m_glyphs[i].m_left = left;
+							m_font.m_glyphs[i].m_right = right;
+							m_font.m_glyphs[i].m_top = top;
+						}
+						else
+						{
+							DEBUG_INFO("Glyph in ", file.getFilename(), " font sheet is invalid: ", ascii, ",", left, ",", right, ",", top);
+						}
+						file.popList();
 					}
-					else
-					{
-						DEBUG_INFO("Glyph in ", file.getFilename(), " font sheet is invalid: ", ascii, ",", left, ",", right, ",", top);
-					}
-					file.popListElement();
 				}
+				file.popList();
 			}
 
 			success = !m_font.m_glyphs.empty();

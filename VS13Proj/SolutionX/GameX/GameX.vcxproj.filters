@@ -1,58 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Window">
-      <UniqueIdentifier>{e21b46bd-0384-4959-b2c0-f39c77fa8a3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Games">
-      <UniqueIdentifier>{ae1566d8-43e8-4f55-b3c8-2cb82f9de399}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{9d9f1881-9f71-421b-9be2-e2b150344b17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems">
-      <UniqueIdentifier>{79e0dfca-e5dc-4d42-b9d0-c9d7c53d0ef6}</UniqueIdentifier>
+    <Filter Include="Design">
+      <UniqueIdentifier>{ae1566d8-43e8-4f55-b3c8-2cb82f9de399}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\Input">
-      <UniqueIdentifier>{5a969a7b-44ad-44d6-aaf4-45c407a0d7f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Systems\Graphics">
-      <UniqueIdentifier>{186bc8c2-7070-4859-98d3-7bb8a68f7daf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Systems\Physics">
-      <UniqueIdentifier>{10fc0b2e-5afe-45c0-bd51-1f522a7ae044}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Systems\Scripting">
-      <UniqueIdentifier>{3e731b0d-23e9-4888-afe1-a0fd7ea0c51a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Systems\Audio">
-      <UniqueIdentifier>{74f038fd-d05e-4aea-ab58-d00da26e7c36}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Games\Hedgehog">
+    <Filter Include="Design\Hedgehog">
       <UniqueIdentifier>{9fbd413f-2f33-43f2-a107-98249e0c292a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Games\Pong">
+    <Filter Include="Design\Pong">
       <UniqueIdentifier>{c71dadb2-8bce-4635-b14f-77014a0cae0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\Animation">
+    <Filter Include="Framework">
+      <UniqueIdentifier>{79e0dfca-e5dc-4d42-b9d0-c9d7c53d0ef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Input">
+      <UniqueIdentifier>{5a969a7b-44ad-44d6-aaf4-45c407a0d7f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Graphics">
+      <UniqueIdentifier>{186bc8c2-7070-4859-98d3-7bb8a68f7daf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Physics">
+      <UniqueIdentifier>{10fc0b2e-5afe-45c0-bd51-1f522a7ae044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Scripting">
+      <UniqueIdentifier>{3e731b0d-23e9-4888-afe1-a0fd7ea0c51a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Audio">
+      <UniqueIdentifier>{74f038fd-d05e-4aea-ab58-d00da26e7c36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Animation">
       <UniqueIdentifier>{e86503bd-3b6f-4614-8760-ad6a219efab1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Systems\Caches">
+    <Filter Include="Framework\Caches">
       <UniqueIdentifier>{b63ebf69-5586-4f80-bc9a-d829f19eeadd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DataStructs">
+    <Filter Include="Framework\DataStructs">
       <UniqueIdentifier>{4ab7d446-61ac-434f-948e-a2ec3bbda22d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Window">
+      <UniqueIdentifier>{e21b46bd-0384-4959-b2c0-f39c77fa8a3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
-      <Filter>Systems\Input</Filter>
+      <Filter>Framework\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\Window.cpp">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\WindowClass.cpp">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Time.cpp">
       <Filter>Util</Filter>
@@ -60,13 +60,13 @@
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Random.cpp">
       <Filter>Util</Filter>
@@ -78,91 +78,91 @@
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
-      <Filter>Systems\Physics</Filter>
+      <Filter>Framework\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
-      <Filter>Systems\Scripting</Filter>
+      <Filter>Framework\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp">
-      <Filter>Systems\Scripting</Filter>
+      <Filter>Framework\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp">
-      <Filter>Games\Pong</Filter>
+      <Filter>Design\Pong</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp">
-      <Filter>Games\Hedgehog</Filter>
+      <Filter>Design\Hedgehog</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
-      <Filter>Systems\Input</Filter>
+      <Filter>Framework\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp">
-      <Filter>Systems\Animation</Filter>
+      <Filter>Framework\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Vec2.cpp">
       <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp">
-      <Filter>Systems\Caches</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\ConfigFile.cpp">
-      <Filter>Util</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\DataFile.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
-      <Filter>Systems\Input</Filter>
+      <Filter>Framework\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\myWindows.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\Window.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\WindowClass.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Time.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Random.h">
       <Filter>Util</Filter>
@@ -174,109 +174,109 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h">
-      <Filter>Systems\Physics</Filter>
+      <Filter>Framework\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h">
-      <Filter>Systems\Scripting</Filter>
+      <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
-      <Filter>Systems\Scripting</Filter>
+      <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Utility.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h">
-      <Filter>Systems\Scripting</Filter>
+      <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\GameSelector.h">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Pong\Pong.h">
-      <Filter>Games\Pong</Filter>
+      <Filter>Design\Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h">
-      <Filter>Games\Hedgehog</Filter>
+      <Filter>Design\Hedgehog</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\InputSystem.h">
-      <Filter>Systems\Input</Filter>
+      <Filter>Framework\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h">
-      <Filter>Systems\Animation</Filter>
+      <Filter>Framework\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Image.h">
-      <Filter>DataStructs</Filter>
+      <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Vec2.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h">
-      <Filter>DataStructs</Filter>
+      <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h">
-      <Filter>DataStructs</Filter>
+      <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h">
-      <Filter>Systems\Caches</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\ConfigFile.h">
-      <Filter>Util</Filter>
+      <Filter>Framework\Caches</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\DataFile.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\luaExportMaster.pkg" />
     <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
-      <Filter>Games\Pong</Filter>
+      <Filter>Design\Pong</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
-      <Filter>Systems\Caches</Filter>
+      <Filter>Framework\Caches</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
-      <Filter>Games\Hedgehog</Filter>
+      <Filter>Design\Hedgehog</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\DataStructs\luaExport.pkg">
-      <Filter>DataStructs</Filter>
+      <Filter>Framework\DataStructs</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
-      <Filter>Games</Filter>
+      <Filter>Design</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Util\luaExport.pkg">
       <Filter>Util</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
-      <Filter>Window</Filter>
+      <Filter>Framework\Window</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Input\luaExport.pkg">
-      <Filter>Systems\Input</Filter>
+      <Filter>Framework\Input</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graphics\luaExport.pkg">
-      <Filter>Systems\Graphics</Filter>
+      <Filter>Framework\Graphics</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
-      <Filter>Systems\Animation</Filter>
+      <Filter>Framework\Animation</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Audio\luaExport.pkg">
-      <Filter>Systems\Audio</Filter>
+      <Filter>Framework\Audio</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
-      <Filter>Systems\Physics</Filter>
+      <Filter>Framework\Physics</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

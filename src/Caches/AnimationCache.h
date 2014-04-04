@@ -12,25 +12,18 @@
 
 namespace Core
 {
-	class ConfigFile;
-	class SpritesheetCache;
-	class ImageCache;
-
 	class AnimationCache
 	{
 	public:
-		bool init(SpritesheetCache& spritesheets, ImageCache& images);
+		bool init();
 		bool shutdown();
 
-		bool loadAnimations(ConfigFile& file, bool reload);
+		bool addAnimations(const Animation& anim, bool reload, uint32_t* outIndex = nullptr);
 
 		uint32_t getAnimationID(const char* name) const;
 		const Animation& getAnimation(uint32_t id) const;
 		
 	private:
-		SpritesheetCache* m_spritesheets;
-		ImageCache* m_images;
-
 		std::vector<Animation> m_animations;
 	};
 }

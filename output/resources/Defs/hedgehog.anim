@@ -1,9 +1,0 @@
-return
-{
-	spritesheet = "Defs/hedgehog.sheet",
-	animations = {
-		{ name = "walk",  duration = 0.4, loop = true,  transition = "sit" ,  images = {"walk_00", "walk_01", "walk_02", "walk_03", "walk_04", "walk_05"} },
-		{ name = "sit",   duration = 0.1, loop = false, transition = "unsit", images = {"idle_03", "idle_02", "idle_01", "idle_00"} },
-		{ name = "unsit", duration = 0.1, loop = false, transition = "walk",  images = {"idle_00", "idle_01", "idle_02", "idle_03"} }
-	}
-};

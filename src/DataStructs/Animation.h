@@ -17,7 +17,6 @@ namespace Core
 	{
 	public:
 		uint32_t m_defaultDuration;
-		uint32_t m_spritesheetID;
 		std::vector<uint32_t> m_sequence;
 		std::string m_name;
 		bool m_defaultRepeat;

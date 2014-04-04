@@ -53,7 +53,7 @@ namespace Core
 		return textureID;
 	}
 
-	Vec2 TextureCache::getTextureDimensions(uint32_t texID)
+	Vec2 TextureCache::getTextureDimensions(uint32_t texID) const
 	{
 		return m_graphics->getTextureDimensions(texID);
 	}

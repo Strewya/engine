@@ -23,7 +23,7 @@ namespace Core
 		bool shutdown();
 
 		uint32_t getTextureID(const char* path);
-		Vec2 getTextureDimensions(uint32_t texID);
+		Vec2 getTextureDimensions(uint32_t texID) const;
 		
 	private:
 		GraphicsSystem* m_graphics;

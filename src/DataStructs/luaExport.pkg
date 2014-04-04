@@ -9,8 +9,6 @@ namespace Core
 	{
 	public:
 		uint32_t m_defaultDuration;
-		uint32_t m_spritesheetID;
-		//std::vector<uint32_t> m_sequence;
 		std::string m_name;
 		bool m_defaultRepeat;
 	};
@@ -18,16 +16,15 @@ namespace Core
 	class Image
 	{
 	public:
-		Vec2 m_texCoords[4];
+		uint32_t m_textureID;
 		float m_ratio;
+		Vec2 m_texCoords[4];
 		std::string m_name;
 	};
 
 	class Spritesheet
 	{
 	public:
-		uint32_t m_textureID;
 		std::string m_name;
-		//std::vector<Image> m_images;
 	};
 }

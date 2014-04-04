@@ -1,14 +1,17 @@
 
-$#include <Caches/TextureCache.h>
-$#include <Caches/SpritesheetCache.h>
 $#include <Caches/AnimationCache.h>
+$#include <Caches/ImageCache.h>
+$#include <Caches/SpritesheetCache.h>
+$#include <Caches/TextureCache.h>
+
+
 
 namespace Core
 {
 	class TextureCache
 	{
 		uint32_t getTextureID(const char* path);
-		Vec2 getTextureDimensions(uint32_t texID);
+		Vec2 getTextureDimensions(uint32_t texID) const;
 	};
 
 	class SpritesheetCache
@@ -27,7 +30,5 @@ namespace Core
 	{
 		uint32_t getImageID(const char* name) const;
 		const Image& getImage(uint32_t id) const;
-		
-		bool addImage(const Image& image, uint32_t* outIndex = 0);
 	};
 }

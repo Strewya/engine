@@ -1,19 +1,33 @@
 return
 {
-	texture = "Textures/hedgehog.png",
-	defaultWidth = 450,
-	defaultHeight = 300,
-	images =
+	imageData =
 	{
-		{ name="idle_00", pos={x=0,y=0} },
-		{ name="idle_01", pos={450,  0} },
-		{ name="idle_02", pos={900,  0} },
-		{ name="idle_03", pos={1350, 0} },
-		{ name="walk_00", pos={0,    300} },
-		{ name="walk_01", pos={450,  300} },
-		{ name="walk_02", pos={900,  300} },
-		{ name="walk_03", pos={1350, 300} },
-		{ name="walk_04", pos={0,    600} },
-		{ name="walk_05", pos={450,  600} },
+		--pos, width and height are transitional data, and are not stored!
+		texture = "Textures/hedgehog.png",
+		defaultWidth = 450,
+		defaultHeight = 300,
+		list = {
+			{ name="idle_00", pos={x=0,y=0} },
+			{ name="idle_01", pos={450,  0} },
+			{ name="idle_02", pos={900,  0} },
+			{ name="idle_03", pos={1350, 0} },
+			{ name="walk_00", pos={0,    300} },
+			{ name="walk_01", pos={450,  300} },
+			{ name="walk_02", pos={900,  300} },
+			{ name="walk_03", pos={1350, 300} },
+			{ name="walk_04", pos={0,    600} },
+			{ name="walk_05", pos={450,  600} },
+		}
+	},
+	
+	animationData = {
+		defaultDuration = 1,
+		defaultRepeat = false,
+		list = {
+			{ name = "walk",  duration = 0.4, loop = true,  images = {"walk_00", "walk_01", "walk_02", "walk_03", "walk_04", "walk_05"} },
+			{ name = "sit",   duration = 0.1, loop = false, images = {"idle_03", "idle_02", "idle_01", "idle_00"} },
+			{ name = "unsit", duration = 0.1, loop = false, images = {"idle_00", "idle_01", "idle_02", "idle_03"} }
+		}
 	}
 };
+

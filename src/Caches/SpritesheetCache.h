@@ -13,23 +13,25 @@
 
 namespace Core
 {
-	class ConfigFile;
-	class TextureCache;
+	class AnimationCache;
+	class DataFile;
 	class ImageCache;
+	class TextureCache;
+	
 
 	class SpritesheetCache
 	{
 	public:
-		bool init(TextureCache& textures, ImageCache& images);
+		bool init(AnimationCache& animations, ImageCache& images, TextureCache& textures);
 		bool shutdown();
 
-		bool loadSpritesheet(ConfigFile& file);
-		bool reloadSpritesheet(ConfigFile& file);
+		bool loadFromFile(DataFile& file, bool reload);
 
 		uint32_t getSpritesheetID(const char* name) const;
 		const Spritesheet& getSpritesheet(uint32_t id) const;
 
 	private:
+		AnimationCache* m_animations;
 		TextureCache* m_textures;
 		ImageCache* m_images;
 		std::vector<Spritesheet> m_sheets;

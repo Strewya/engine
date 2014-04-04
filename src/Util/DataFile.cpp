@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/ConfigFile.h>
+#include <Util/DataFile.h>
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Scripting/ScriptingSystem.h>
@@ -10,11 +10,18 @@
 
 namespace Core
 {
-	ConfigFile::ConfigFile(ScriptingSystem& scripting)
+	void fillValue(ScriptingSystem& script, std::string& v);
+	void fillValue(ScriptingSystem& script, int32_t& v);
+	void fillValue(ScriptingSystem& script, float& v);
+	void fillValue(ScriptingSystem& script, bool& v);
+	void fillValue(ScriptingSystem& script, Vec2& v);
+
+
+	DataFile::DataFile(ScriptingSystem& scripting)
 		: m_scripting(&scripting), m_isOpen(false), m_filename("")
 	{}
 
-	bool ConfigFile::open(const char* filename)
+	bool DataFile::open(const char* filename)
 	{
 		assert(filename != nullptr);
 		uint32_t resetPoint = m_scripting->getTop();
@@ -28,7 +35,7 @@ namespace Core
 		return false;
 	}
 
-	void ConfigFile::close()
+	void DataFile::close()
 	{
 		if(m_isOpen)
 		{
@@ -38,138 +45,138 @@ namespace Core
 		}
 	}
 
-	const std::string& ConfigFile::getFilename() const
+	const std::string& DataFile::getFilename() const
 	{
 		return m_filename;
 	}
 
-	std::string ConfigFile::getString(const char* key, const char* defaultValue)
+	std::string DataFile::getString(const char* key, const char* defaultValue)
 	{
 		assert(defaultValue);
 		std::string ret(defaultValue);
 		if(m_scripting->getValue(key, -1))
 		{
-			ret = getString(defaultValue);
+			fillValue(*m_scripting, ret);
 			m_scripting->pop();
 		}
 		return ret;
 	}
 
-	std::string ConfigFile::getString(const char* defaultValue)
+	std::string DataFile::getString(uint32_t index, const char* defaultValue)
 	{
 		assert(defaultValue);
 		std::string ret(defaultValue);
-		if(m_scripting->isString())
+		if(m_scripting->getValue(index, -1))
 		{
-			ret = m_scripting->toString();
+			fillValue(*m_scripting, ret);
+			m_scripting->pop();
 		}
 		return ret;
 	}
 
-	int32_t ConfigFile::getInt(const char* key, int32_t defaultValue)
+	int32_t DataFile::getInt(const char* key, int32_t defaultValue)
 	{
 		if(m_scripting->getValue(key, -1))
 		{
-			defaultValue = getInt(defaultValue);
+			fillValue(*m_scripting, defaultValue);
 			m_scripting->pop();
 		}
 		return defaultValue;
 	}
 
-	int32_t ConfigFile::getInt(int32_t defaultValue)
+	int32_t DataFile::getInt(uint32_t index, int32_t defaultValue)
 	{
-		if(m_scripting->isNumber())
+		if(m_scripting->getValue(index, -1))
 		{
-			defaultValue = m_scripting->toInt();
-		}
-		return defaultValue;
-	}
-
-	float ConfigFile::getFloat(const char* key, float defaultValue)
-	{
-		if(m_scripting->getValue(key, -1))
-		{
-			defaultValue = getFloat(defaultValue);
+			fillValue(*m_scripting, defaultValue);
 			m_scripting->pop();
 		}
 		return defaultValue;
 	}
 
-	float ConfigFile::getFloat(float defaultValue)
-	{
-		if(m_scripting->isNumber())
-		{
-			defaultValue = m_scripting->toFloat();
-		}
-		return defaultValue;
-	}
-
-	bool ConfigFile::getBool(const char* key, bool defaultValue)
+	float DataFile::getFloat(const char* key, float defaultValue)
 	{
 		if(m_scripting->getValue(key, -1))
 		{
-			defaultValue = getBool(defaultValue);
+			fillValue(*m_scripting, defaultValue);
 			m_scripting->pop();
 		}
 		return defaultValue;
 	}
 
-	bool ConfigFile::getBool(bool defaultValue)
+	float DataFile::getFloat(uint32_t index, float defaultValue)
 	{
-		if(m_scripting->isBoolean())
+		if(m_scripting->getValue(index, -1))
 		{
-			defaultValue = m_scripting->toBool();
-		}
-		return defaultValue;
-	}
-
-	Vec2 ConfigFile::getVec2(const char* key, Vec2 defaultValue)
-	{
-		if(m_scripting->getValue(key, -1))
-		{
-			defaultValue = getVec2(defaultValue);
+			fillValue(*m_scripting, defaultValue);
 			m_scripting->pop();
 		}
 		return defaultValue;
 	}
 
-	Vec2 ConfigFile::getVec2(Vec2 defaultValue)
+	bool DataFile::getBool(const char* key, bool defaultValue)
 	{
-		if(m_scripting->isTable())
+		if(m_scripting->getValue(key, -1))
 		{
-			auto top = m_scripting->getTop();
-			if((m_scripting->getValue("x", -1) || m_scripting->getValue(1, -1)) &&
-			   (m_scripting->getValue("y", -2) || m_scripting->getValue(2, -2)))
-			{
-				if(m_scripting->isNumber())
-				{
-					defaultValue.y = m_scripting->toFloat();
-				}
-				m_scripting->pop();
-				if(m_scripting->isNumber())
-				{
-					defaultValue.x = m_scripting->toFloat();
-				}
-				m_scripting->pop();
-			}
-			m_scripting->pop(m_scripting->getTop() - top);
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
 		}
 		return defaultValue;
 	}
 
-	bool ConfigFile::getListElement(const char* list, uint32_t element)
+	bool DataFile::getBool(uint32_t index, bool defaultValue)
+	{
+		if(m_scripting->getValue(index, -1))
+		{
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	Vec2 DataFile::getVec2(const char* key, Vec2 defaultValue)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	Vec2 DataFile::getVec2(uint32_t index, Vec2 defaultValue)
+	{
+		if(m_scripting->getValue(index, -1))
+		{
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	bool DataFile::getList(const char* list)
 	{
 		if(m_scripting->getValue(list, -1))
 		{
-			if(m_scripting->getValue(element, -1))
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
 
-	uint32_t ConfigFile::getListSize(const char* list)
+	bool DataFile::getList(uint32_t index)
+	{
+		if(m_scripting->getValue(index, -1))
+		{
+			if(m_scripting->isTable())
+			{
+				return true;
+			}
+			m_scripting->pop();
+		}
+		return false;
+	}
+
+	uint32_t DataFile::getListSize(const char* list)
 	{
 		uint32_t size = 0;
 		if(m_scripting->getValue(list, -1))
@@ -180,11 +187,67 @@ namespace Core
 		return size;
 	}
 
-	void ConfigFile::popListElement()
+	void DataFile::popList()
 	{
-		m_scripting->pop(2);
+		m_scripting->pop(1);
 	}
 
+	void fillValue(ScriptingSystem& script, std::string& v)
+	{
+		if(script.isString())
+		{
+			v = script.toString();
+		}
+	}
+
+	void fillValue(ScriptingSystem& script, int32_t& v)
+	{
+		if(script.isString())
+		{
+			v = script.toInt();
+		}
+	}
+
+	void fillValue(ScriptingSystem& script, float& v)
+	{
+		if(script.isString())
+		{
+			v = script.toFloat();
+		}
+	}
+
+	void fillValue(ScriptingSystem& script, bool& v)
+	{
+		if(script.isString())
+		{
+			v = script.toBool();
+		}
+	}
+
+	void fillValue(ScriptingSystem& script, Vec2& v)
+	{
+		if(script.isTable())
+		{
+			auto top = script.getTop();
+			if((script.getValue("x", -1) || script.getValue(1, -1)) &&
+			   (script.getValue("y", -2) || script.getValue(2, -2)))
+			{
+				if(script.isNumber())
+				{
+					v.y = script.toFloat();
+				}
+				script.pop();
+				if(script.isNumber())
+				{
+					v.x = script.toFloat();
+				}
+				script.pop();
+			}
+			script.pop(script.getTop() - top);
+		}
+	}
+
+	
 
 
 	/*std::string asString(DataFile& file, const char* key)

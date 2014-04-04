@@ -7,7 +7,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
-#include <Util/ConfigFile.h>
+#include <Util/DataFile.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
@@ -47,15 +47,15 @@ namespace Core
 
 		m_isRunning =
 			//systems
-			m_scripter.init() &&
-			m_input.init(window) &&
 			m_animation.init(m_animationCache) &&
 			m_graphics.init(window) &&
+			m_input.init(window) &&
+			m_scripter.init() &&
 			//caches
-			m_textureCache.init(m_graphics) &&
+			m_animationCache.init() &&
 			m_imageCache.init() &&
-			m_spritesheetCache.init(m_textureCache, m_imageCache) &&
-			m_animationCache.init(m_spritesheetCache, m_imageCache) &&
+			m_spritesheetCache.init(m_animationCache, m_imageCache, m_textureCache) &&
+			m_textureCache.init(m_graphics) &&
 			
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
@@ -72,25 +72,21 @@ namespace Core
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
-			ConfigFile config(m_scripter);
-			if(config.open(RESOURCE("Defs/font.sheet")))
-			{
-				m_isRunning &= m_graphics.initFont(config);
-				config.close();
-			}
-			
-			if(config.open(RESOURCE("Defs/hedgehog.sheet")))
-			{
-				m_isRunning &= m_spritesheetCache.loadSpritesheet(config);
-				config.close();
-			}
 
-			if(config.open(RESOURCE("Defs/hedgehog.anim")))
+			
+
+			DataFile dataFile(m_scripter);
+			if(dataFile.open(RESOURCE("Defs/font.sheet")))
 			{
-				m_isRunning &= m_animationCache.loadAnimations(config, true);
-				config.close();
+				m_isRunning &= m_graphics.initFont(dataFile);
+				dataFile.close();
 			}
 			
+			if(dataFile.open(RESOURCE("Defs/hedgehog.sheet")))
+			{
+				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
+				dataFile.close();
+			}
 
 			m_messageHandlers.reserve(3);
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
@@ -198,21 +194,12 @@ namespace Core
 				if(m_scripter.doFile(RESOURCE_S(file)))
 					DEBUG_INFO("Reloaded script ", file);
 			}
-			else if(ext == "anim")
-			{
-				ConfigFile config(m_scripter);
-				if(config.open(RESOURCE_S(file)))
-				{
-					if(m_animationCache.loadAnimations(config, true))
-						DEBUG_INFO("Reloaded animation file ", file);
-				}
-			}
 			else if(ext == "sheet")
 			{
-				ConfigFile config(m_scripter);
+				DataFile config(m_scripter);
 				if(config.open(RESOURCE_S(file)))
 				{
-					if(m_spritesheetCache.reloadSpritesheet(config))
+					if(m_spritesheetCache.loadFromFile(config, true))
 						DEBUG_INFO("Reloaded spritesheet file ", file);
 				}
 			}

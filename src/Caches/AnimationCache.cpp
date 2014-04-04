@@ -8,21 +8,16 @@
 #include <Caches/ImageCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <DataStructs/Spritesheet.h>
-#include <Util/ConfigFile.h>
+#include <Util/DataFile.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& spritesheets, const ImageCache& images);
-
-	bool AnimationCache::init(SpritesheetCache& spritesheets, ImageCache& images)
+	bool AnimationCache::init()
 	{
 		bool status = true;
-
-		m_spritesheets = &spritesheets;
-		m_images = &images;
 
 		DEBUG_INIT(AnimationCache);
 		return status;
@@ -36,58 +31,42 @@ namespace Core
 		return status;
 	}
 
-	bool AnimationCache::loadAnimations(ConfigFile& file, bool reload)
+	bool AnimationCache::addAnimations(const Animation& anim, bool reload, uint32_t* outIndex)
 	{
 		bool success = false;
-		std::string spritesheetName = file.getString("spritesheet", "");
-		if(!spritesheetName.empty())
+		uint32_t slot = -1;
+		auto id = getAnimationID(anim.m_name.c_str());
+		if(reload)
 		{
-			auto sheetID = m_spritesheets->getSpritesheetID(RESOURCE_S(spritesheetName));
-			auto& sheet = m_spritesheets->getSpritesheet(sheetID);
-			uint32_t animCount = file.getListSize("animations");
-			uint32_t size = m_animations.size();
-			success = true;
-			for(uint32_t i = 0; i < animCount; ++i)
+			if(id == -1)
 			{
-				if(file.getListElement("animations", i + 1))
-				{
-					auto animName = file.getString("name", "");
-					auto animID = getAnimationID(animName.c_str());
-					if(reload)
-					{
-						if(animID != -1)
-						{
-							//ok
-							m_animations[animID].m_defaultDuration = 0;
-							m_animations[animID].m_defaultRepeat = false;
-							m_animations[animID].m_name.clear();
-							m_animations[animID].m_sequence.clear();
-							m_animations[animID].m_spritesheetID = sheetID;
-							success &= fillAnimation(file, m_animations[animID], sheet, *m_images);
-						}
-						else
-						{
-							DEBUG_INFO("Cannot reload animation ", animName, ", doesn't exist!");
-						}
-					}
-					else
-					{
-						if(animID == -1)
-						{
-							//ok
-							animID = m_animations.size();
-							m_animations.emplace_back();
-							m_animations[animID].m_spritesheetID = sheetID;
-							success &= fillAnimation(file, m_animations[animID], sheet, *m_images);
-						}
-						else
-						{
-							DEBUG_INFO("Cannot init animation ", animName, ", already exists!");
-						}
-					}
-					file.popListElement();
-				}
+				DEBUG_INFO("The animation '", anim.m_name, "' cannot be reloaded, it does not exist!");
 			}
+			else
+			{
+				slot = id;
+			}
+		}
+		else
+		{
+			if(id != -1)
+			{
+				DEBUG_INFO("Cannot load animation '", anim.m_name, "', name already exists!");
+			}
+			else
+			{
+				slot = m_animations.size();
+				m_animations.emplace_back();
+			}
+		}
+		if(slot != -1)
+		{
+			m_animations[slot] = anim;
+			if(outIndex != nullptr)
+			{
+				*outIndex = slot;
+			}
+			success = true;
 		}
 		return success;
 	}
@@ -111,31 +90,5 @@ namespace Core
 	{
 		assert(id < m_animations.size());
 		return m_animations[id];
-	}
-	
-	static bool fillAnimation(ConfigFile& file, Animation& anim, const Spritesheet& sheet, const ImageCache& images)
-	{	
-		anim.m_name = file.getString("name", "");
-		anim.m_defaultDuration = static_cast<uint32_t>(Time::secondsToMicros(file.getFloat("duration", 0)));
-		anim.m_defaultRepeat = file.getBool("loop", false);
-		uint32_t animImageCount = file.getListSize("images");
-		anim.m_sequence.resize(animImageCount);
-		for(uint32_t i = 0; i < animImageCount; ++i)
-		{
-			if(file.getListElement("images", i + 1))
-			{
-				auto image = file.getString("");
-				if(!image.empty())
-				{
-					anim.m_sequence[i] = images.getImageID(image.c_str());
-				}
-				else
-				{
-					DEBUG_INFO("Image index in ", anim.m_name, " is invalid");
-				}
-				file.popListElement();
-			}
-		}
-		return true;
 	}
 }

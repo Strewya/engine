@@ -17,7 +17,7 @@
 namespace Core
 {
 	class Color;
-	class ConfigFile;
+	class DataFile;
 	class Image;
 	class Transform;
 	class Vec2;
@@ -60,9 +60,9 @@ namespace Core
 		bool initPixelShader(const char* shaderFile);
 		bool initViewport();
 		bool initSamplerState();
-		bool initFont(ConfigFile& file);
+		bool initFont(DataFile& file);
 
-		Vec2 getTextureDimensions(uint32_t texID);
+		Vec2 getTextureDimensions(uint32_t texID) const;
 		void setBackgroundColor(float red, float green, float blue);
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
