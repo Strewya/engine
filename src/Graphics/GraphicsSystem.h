@@ -65,6 +65,8 @@ namespace Core
 		Vec2 getTextureDimensions(uint32_t texID) const;
 		void setBackgroundColor(float red, float green, float blue);
 
+		void setCulling(bool isEnabled);
+
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);

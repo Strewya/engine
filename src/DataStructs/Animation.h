@@ -16,7 +16,7 @@ namespace Core
 	class Animation
 	{
 	public:
-		uint32_t m_defaultDuration;
+		uint64_t m_defaultDuration;
 		std::vector<uint32_t> m_sequence;
 		std::string m_name;
 		bool m_defaultRepeat;

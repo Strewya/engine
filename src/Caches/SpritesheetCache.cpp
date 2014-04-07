@@ -143,6 +143,12 @@ namespace Core
 									img.m_ratio = w / h;
 									Vec2 wh = pos + Vec2(w, h);
 
+									/* the vertices are in the following order:
+									0--1
+									|  |
+									3--2
+									*/
+
 									img.m_texCoords[0].x = pos.x / tw;
 									img.m_texCoords[0].y = pos.y / th;
 									
@@ -214,7 +220,7 @@ namespace Core
 					{
 						Animation anim;
 						anim.m_name.assign(file.getString("name", ""));
-						anim.m_defaultDuration = Time::secondsToMilis(file.getFloat("duration", defaultDuration));
+						anim.m_defaultDuration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
 						anim.m_defaultRepeat = file.getBool("loop", defaultRepeat);
 						auto imageCnt = file.getListSize("images");
 						anim.m_sequence.resize(imageCnt);
@@ -225,7 +231,7 @@ namespace Core
 							{
 								for(uint32_t j = 0; j < imageCnt; ++j)
 								{
-									auto imgName = file.getString(i + 1, "");
+									auto imgName = file.getString(j + 1, "");
 									auto imgID = images.getImageID(imgName.c_str());
 									if(imgID != -1)
 									{

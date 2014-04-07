@@ -202,7 +202,7 @@ namespace Core
 
 	void fillValue(ScriptingSystem& script, int32_t& v)
 	{
-		if(script.isString())
+		if(script.isNumber())
 		{
 			v = script.toInt();
 		}
@@ -210,7 +210,7 @@ namespace Core
 
 	void fillValue(ScriptingSystem& script, float& v)
 	{
-		if(script.isString())
+		if(script.isNumber())
 		{
 			v = script.toFloat();
 		}
@@ -218,7 +218,7 @@ namespace Core
 
 	void fillValue(ScriptingSystem& script, bool& v)
 	{
-		if(script.isString())
+		if(script.isBoolean())
 		{
 			v = script.toBool();
 		}

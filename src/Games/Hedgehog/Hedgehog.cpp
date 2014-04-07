@@ -68,12 +68,14 @@ namespace Core
 		}
 
 		if(m_isRunning)
-		{	
+		{
+			if(m_scripter.functionExists("game_init"))
+			{
+				m_scripter.doFunction("game_init", this, CLASS(HedgehogGame));
+			}
+
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
-
-
-			
 
 			DataFile dataFile(m_scripter);
 			if(dataFile.open(RESOURCE("Defs/font.sheet")))

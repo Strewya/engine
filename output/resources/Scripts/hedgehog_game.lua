@@ -1,10 +1,16 @@
 
 function game_init(game)
-
+	gActions = {};
+	game.m_window:resize(800,600);
+	
+	game.m_player.m_transform.position:set(0, 0);
+	game.m_player.m_transform.scale:set(200, 200);
+	game.m_graphics:setCulling(false);
 end;
 
 function game_tick(game)
-	game.m_window:resize(800,600);
+	
+	parseInput(game.m_input);
 	
 	local player = game.m_player;
 	local gameTimer = game.m_logicTimer;
@@ -28,6 +34,13 @@ function game_tick(game)
 		player.m_mainTimer:reset();
 	end;
 	
+	if((gActions.moveLeft and player.m_transform.scale.x > 0)) then
+		player.m_transform.scale.x = -200;
+	end;
+	if(gActions.moveRight and player.m_transform.scale.x < 0) then
+		player.m_transform.scale.x = 200;
+	end;
+	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
 	//i should make a special function for this so i can invoke it from Lua for prototyping purposes
@@ -46,15 +59,15 @@ function game_render(game)
 	tx.position:set(0,200);
 	local col = Core.Color();
 	col:set(1,1,0.5);
-	game.m_graphics:drawText("Hello from the beautiful land of Lua!", tx, col, 1, true);
+	local text = "Hello from the beautiful land of Lua!!!";
+	game.m_graphics:drawText(text, tx, col, 1, true);
 	tx.position.y = tx.position.y + 40;
-	game.m_graphics:drawText("Hello from the beautiful land of Lua!", tx, col, 1, false);
+	game.m_graphics:drawText(text, tx, col, 1, false);
 	
-	tx.position:set(-200, -50);
+	
 	col:set(1,1,1);
-	tx.scale:set(200,200);
 	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
-	game.m_graphics:drawTexturedQuad(tx, col, img, img.m_textureID);
+	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img, img.m_textureID);
 end;
 
 --[[
@@ -72,3 +85,28 @@ for every update of logic tick:
 
 
 ]]
+
+
+function parseInput(input)
+	local cnt = input:getEventCount();
+	for i=0, cnt-1 do
+		local event = input:getEvent(i);
+		if(event.m_type == Core.WE_KEYBOARDKEY) then
+			if(event.m_keyboard.m_keyCode == Core.Keyboard.m_ArrowLeft) then
+				if(event.m_keyboard.m_isDown) then
+					gActions.moveLeft = true;
+				else
+					gActions.moveLeft = nil;
+				end;
+			end;
+			if(event.m_keyboard.m_keyCode == Core.Keyboard.m_ArrowRight) then
+				if(event.m_keyboard.m_isDown) then
+					gActions.moveRight = true;
+				else
+					gActions.moveRight = nil;
+				end;
+			end;
+		end;
+	end;
+end;
+

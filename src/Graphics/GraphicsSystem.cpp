@@ -128,6 +128,37 @@ namespace Core
 		m_backgroundColor.b = b;
 	}
 
+	void GraphicsSystem::setCulling(bool isEnabled)
+	{
+		D3D11_RASTERIZER_DESC rd;
+		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+		
+		if(isEnabled)
+		{
+			rd.CullMode = D3D11_CULL_BACK;
+		}
+		else
+		{
+			rd.CullMode = D3D11_CULL_NONE;
+		}
+		rd.FillMode = D3D11_FILL_SOLID;
+		
+
+		ID3D11RasterizerState* state = nullptr;
+		
+		HRESULT hr = m_dev->CreateRasterizerState(&rd, &state);
+		if(SUCCEEDED(hr))
+		{
+			m_devcon->RSSetState(state);
+			DEBUG_INFO("Culling is now ", isEnabled ? "on" : "off");
+			safeRelease(state);
+		}
+		else
+		{
+			DEBUG_INFO("Failed to create rasterizer state! Code: ", hr);
+		}
+	}
+
 	//*****************************************************************
 	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
@@ -351,8 +382,8 @@ namespace Core
 		{
 			Vertex(-img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
 			Vertex( img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
-			Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y),
-			Vertex( img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y)
+			Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y),
+			Vertex( img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y)
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
