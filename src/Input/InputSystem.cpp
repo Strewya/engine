@@ -15,20 +15,6 @@
 
 namespace Core
 {
-	static EventVector_t gatherInput(uint64_t currentTimeMicros, Window& window)
-	{
-		EventVector_t evs;
-		evs.reserve(20);
-		WindowEvent we;
-		auto pwe = &we;
-		while(window.peekEvent(currentTimeMicros, we))
-		{
-			evs.emplace_back(we);
-		}
-		return evs;
-	}
-
-
 	//************************************ INPUT SYSTEM ************************************//
 	bool InputSystem::init(Window& window)
 	{
@@ -52,7 +38,25 @@ namespace Core
 
 	void InputSystem::update(const Time& timer)
 	{
-		m_inputEvents = gatherInput(timer.getCurMicros(), *m_window);
+		m_inputEvents.clear();
+		WindowEvent we;
+		while(m_window->peekEvent(timer.getCurMicros(), we))
+		{
+			m_inputEvents.emplace_back(we);
+		}
+		DEBUG_CODE(
+			if(m_inputEvents.size() > 0)
+			{
+				DEBUG_INFO("Collected input, count: ", m_inputEvents.size(), " @ time ", timer.getCurMicros(), " with window time: ", m_window->getTimer().getCurMicros());
+				for(auto& eventInst : m_inputEvents)
+				{
+					DEBUG_INFO("\t type:", eventInst.m_type, ", time:", eventInst.m_timestamp);
+				}
+				auto windowLastTime = m_window->getTimer().getRealTimeMicros();
+				auto myLastTime = timer.getRealTimeMicros();
+				DEBUG_INFO("window: ", windowLastTime, ", me: ", myLastTime, ", diff: ", windowLastTime - myLastTime);
+			}
+		);
 	}
 
 	const EventVector_t& InputSystem::getEvents() const

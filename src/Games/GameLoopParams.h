@@ -8,6 +8,7 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Time.h>
+#include <Util/Utility.h>
 /******* end header inclusion *******/
 
 #define CORE_VARIABLE_STEP 0
@@ -32,7 +33,6 @@ namespace Core
 
 		const uint32_t maxUpdateCount = static_cast<uint32_t>(maxUpdateTime / microsPerFrame);
 		const uint32_t updateCount = timer.getFixedStepUpdateCount(microsPerFrame, outFraction, outUnusedMicros);
-
 		return updateCount < maxUpdateCount ? updateCount : maxUpdateCount;
 	}
 }

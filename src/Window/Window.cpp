@@ -9,6 +9,7 @@
 #include <iostream>
 	/*** extra headers ***/
 #include <Input/KeyCodes.h>
+#include <Util/Utility.h>
 #include <Window/WindowClass.h>
 	/*** end headers ***/
 
@@ -226,8 +227,6 @@ namespace Core
 
 	bool Window::peekEvent(uint64_t time, WindowEvent& outEvent)
 	{
-		//assert(outEvent != nullptr);
-
 		bool eventExists = false;
 		if(!m_events.empty() && m_events.front().m_timestamp <= time)
 		{
@@ -410,6 +409,7 @@ namespace Core
 				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
 				we.m_keyboard.m_isDown = true;
 				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
+				DEBUG_INFO("Received keypress: ", wParam, ", time:", we.m_timestamp);
 			}
 			break;
 

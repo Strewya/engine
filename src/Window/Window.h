@@ -82,7 +82,7 @@ namespace Core
 		void openConsole(uint32_t xPos, uint32_t yPos);
 		void closeConsole();
 #endif
-	protected:
+	protected:	
 		WindowEvent newEvent();
 		void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
 
@@ -133,6 +133,8 @@ namespace Core
 
 		Time m_timer;
 		CReadDirectoryChanges m_monitor;
+	public:
+		const Time& getTimer() const { return m_timer; }
 	};
 
 	

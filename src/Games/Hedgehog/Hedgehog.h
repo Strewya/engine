@@ -40,7 +40,7 @@ namespace Core
 	public:
 		//this will never be exposed to lua!! (lua calling itself through the scripting system really makes no sense)
 		ScriptingSystem m_scripter;
-		
+		Time m_framerateTimer;
 		
 		//systems
 		GraphicsSystem m_graphics;
