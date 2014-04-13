@@ -31,6 +31,7 @@ namespace Core
 
 		void update(uint64_t dt);
 
+
 		void registerData(AnimationData& data);
 		void unregisterData(AnimationData& data);
 

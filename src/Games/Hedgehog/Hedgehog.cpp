@@ -41,9 +41,7 @@ namespace Core
 		DEBUG_CODE(
 			window.openConsole(1050, 0);
 		);
-
-		m_logicTimer = window.getTimer();
-
+		
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
@@ -53,6 +51,7 @@ namespace Core
 			m_graphics.init(window) &&
 			m_input.init(window) &&
 			m_scripter.init() &&
+
 			//caches
 			m_animationCache.init() &&
 			m_imageCache.init() &&
@@ -134,10 +133,10 @@ namespace Core
 	{
 		float fraction = 0;
 		uint64_t unusedMicros = 0;
-		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
+		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;		
 		
 		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros); l--;)
-		{
+		{			
 			if(!tickLogic(microsPerFrame))
 			{
 				m_isRunning = false;
@@ -171,6 +170,7 @@ namespace Core
 		m_animation.update(m_logicTimer.getDeltaMicros());
 
 		m_scripter.doFunction("game_tick", this, CLASS(HedgehogGame));
+
 		return continueRunning;
 	}
 
@@ -184,7 +184,7 @@ namespace Core
 		
 		framerateTf.position.set(-0.5f*m_window->getSizeX(), 0.5f*m_window->getSizeY());
 		framerateTf.scale.set(0.6f, 0.6f);
-		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(), 0, false);
+		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0,0,0), 0, false);
 
 		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
 

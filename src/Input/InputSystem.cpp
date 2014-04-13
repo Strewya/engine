@@ -40,23 +40,11 @@ namespace Core
 	{
 		m_inputEvents.clear();
 		WindowEvent we;
-		while(m_window->peekEvent(timer.getCurMicros(), we))
+		auto currentPeekTime = timer.getRealTimeMicros();
+		while(m_window->peekEvent(currentPeekTime, we))
 		{
 			m_inputEvents.emplace_back(we);
 		}
-		DEBUG_CODE(
-			if(m_inputEvents.size() > 0)
-			{
-				DEBUG_INFO("Collected input, count: ", m_inputEvents.size(), " @ time ", timer.getCurMicros(), " with window time: ", m_window->getTimer().getCurMicros());
-				for(auto& eventInst : m_inputEvents)
-				{
-					DEBUG_INFO("\t type:", eventInst.m_type, ", time:", eventInst.m_timestamp);
-				}
-				auto windowLastTime = m_window->getTimer().getRealTimeMicros();
-				auto myLastTime = timer.getRealTimeMicros();
-				DEBUG_INFO("window: ", windowLastTime, ", me: ", myLastTime, ", diff: ", windowLastTime - myLastTime);
-			}
-		);
 	}
 
 	const EventVector_t& InputSystem::getEvents() const

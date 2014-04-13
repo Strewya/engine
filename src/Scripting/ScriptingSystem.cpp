@@ -7,6 +7,7 @@
 #include <cassert>
 /******* extra headers *******/
 #include <Scripting/luaBinding.h>
+#include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -131,9 +132,11 @@ namespace Core
 	bool ScriptingSystem::shutdown()
 	{
 		bool status = true;
-
-		lua_close(m_luaState);
-
+		Time timer;
+		timer.reset();
+		//lua_close(m_luaState);
+		timer.update();
+		DEBUG_INFO("Script took ", timer.getDeltaMicros(), " micros to shutdown");
 		DEBUG_SHUTDOWN(ScriptingSystem);
 		return status;
 	}
@@ -141,12 +144,13 @@ namespace Core
 	bool ScriptingSystem::doFile(const char* scriptName, uint32_t numReturnValues)
 	{
 		int32_t ret = luaL_loadfile(m_luaState, scriptName);
+		bool status = false;
 		if(ret == 0)
 		{
 			ret = lua_pcall(m_luaState, 0, numReturnValues, 0);
 			if(ret == 0)
 			{
-				return true;
+				status = true;
 			}
 			else
 			{
@@ -159,7 +163,8 @@ namespace Core
 			DEBUG_INFO("Lua API loadfile failed with error: ", getErrorName(ret), "\n", lua_tostring(m_luaState, -1));
 			pop();
 		}
-		return false;
+		DEBUG_INFO("Stack size is ", lua_gettop(m_luaState));
+		return status;
 	}
 	
 	void ScriptingSystem::doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues)

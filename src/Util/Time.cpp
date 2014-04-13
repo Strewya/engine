@@ -109,7 +109,7 @@ namespace Core
 
 	Time::Time()
 		: m_oldRealTime(getRealTimeMicros()),
-		m_lastMicros(0), m_curMicros(0), m_deltaMicros(0),
+		m_lastMicros(m_oldRealTime), m_curMicros(m_oldRealTime), m_deltaMicros(0),
 		m_deltaTime(0), m_timeScale(NORMAL_TIME)
 	{
 	}

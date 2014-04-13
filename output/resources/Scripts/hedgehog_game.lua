@@ -1,14 +1,56 @@
-
+reloaded = true;
 function game_init(game)
 	gActions = {};
-	game.m_window:resize(800,600);
+	gInputMap = {};
+	gState = {};
 	
+	game.m_window:resize(800,600);
 	game.m_player.m_transform.position:set(0, 0);
 	game.m_player.m_transform.scale:set(200, 200);
 	game.m_graphics:setCulling(false);
+	
+	
+	onReload(game);
+end;
+
+function onReload(game)
+	reloaded = false;
+	
+	gInputMap[Core.Keyboard.m_ArrowLeft] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gActions.moveLeft = true;
+		else
+			gActions.moveLeft = nil;
+		end;
+	end;
+	
+	gInputMap[Core.Keyboard.m_ArrowRight] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gActions.moveRight = true;
+		else
+			gActions.moveRight = nil;
+		end;
+	end;
+	
+	gInputMap[Core.Keyboard.m_ArrowUp] = function(event)
+		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			gActions.jump = true;
+		end;
+	end;
+	
+	gState.animation = "moving";
+	gState.impulse = 0;
+	gState.maxJumpsAvailable = 2;
+	gState.jumpsAvailable = gState.maxJumpsAvailable;
+	gState.gravity = -5;
+	gState.minY = -270;
 end;
 
 function game_tick(game)
+	if(reloaded) then
+		onReload(game);
+	end;
+	game.m_graphics:setBackgroundColor(1,1,1);
 	
 	parseInput(game.m_input);
 	
@@ -18,28 +60,47 @@ function game_tick(game)
 	player.m_mainTimer:updateBy(gameTimer:getDeltaMicros());
 	local milis = Core.Time:microsToSeconds(player.m_mainTimer:getCurMicros());
 	
-	if(milis > 0 and milis < 0.1) then
-		player.m_animationData.m_animationID = game.m_animationCache:getAnimationID("walk");
-		player.m_animationData.m_time = 0;
+	local walk = game.m_animationCache:getAnimationID("walk");
+	local sit = game.m_animationCache:getAnimationID("sit");
+	local unsit = game.m_animationCache:getAnimationID("unsit");
+	
+	if(gActions.moveLeft) then
+		if(player.m_transform.scale.x > 0) then
+			player.m_transform.scale.x = -200;
+		end;
+		player.m_transform.position.x = player.m_transform.position.x - 20;
 	end;
-	if(milis >= 3 and milis < 3.1) then
-		player.m_animationData.m_animationID = game.m_animationCache:getAnimationID("sit");
-		player.m_animationData.m_time = 0;
-	end;
-	if(milis >= 5 and milis < 5.1) then
-		player.m_animationData.m_animationID = game.m_animationCache:getAnimationID("unsit");
-		player.m_animationData.m_time = 0;
-	end;
-	if(milis > 5.2) then
-		player.m_mainTimer:reset();
+	if(gActions.moveRight) then
+		if(player.m_transform.scale.x < 0) then
+			player.m_transform.scale.x = 200;
+		end;
+		player.m_transform.position.x = player.m_transform.position.x + 20;
 	end;
 	
-	if((gActions.moveLeft and player.m_transform.scale.x > 0)) then
-		player.m_transform.scale.x = -200;
+	
+	
+	--jumper
+	if(gActions.jump == true) then
+		gActions.jump = nil;
+		if(gState.jumpsAvailable > 0) then
+			gState.jumpsAvailable = gState.jumpsAvailable - 1;
+			gState.impulse = 34;
+		end;
 	end;
-	if(gActions.moveRight and player.m_transform.scale.x < 0) then
-		player.m_transform.scale.x = 200;
+	
+	player.m_transform.position.y = player.m_transform.position.y + gState.impulse;
+	--gravity
+	gState.impulse = gState.impulse + gState.gravity;
+		
+	if(player.m_transform.position.y < gState.minY) then
+		gState.impulse = 0;
+		player.m_transform.position.y = gState.minY;
+		gState.jumpsAvailable = gState.maxJumpsAvailable;
 	end;
+	
+	
+	
+	
 	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
@@ -58,7 +119,7 @@ function game_render(game)
 	local tx = Core.Transform();
 	tx.position:set(0,200);
 	local col = Core.Color();
-	col:set(1,1,0.5);
+	col:set(0,0,0.5);
 	local text = "Hello from the beautiful land of Lua!!!";
 	game.m_graphics:drawText(text, tx, col, 1, true);
 	tx.position.y = tx.position.y + 40;
@@ -92,21 +153,12 @@ function parseInput(input)
 	for i=0, cnt-1 do
 		local event = input:getEvent(i);
 		if(event.m_type == Core.WE_KEYBOARDKEY) then
-			if(event.m_keyboard.m_keyCode == Core.Keyboard.m_ArrowLeft) then
-				if(event.m_keyboard.m_isDown) then
-					gActions.moveLeft = true;
-				else
-					gActions.moveLeft = nil;
-				end;
-			end;
-			if(event.m_keyboard.m_keyCode == Core.Keyboard.m_ArrowRight) then
-				if(event.m_keyboard.m_isDown) then
-					gActions.moveRight = true;
-				else
-					gActions.moveRight = nil;
+			for k,v in pairs(gInputMap) do
+				if(event.m_keyboard.m_keyCode == k) then
+					v(event);
+					break;
 				end;
 			end;
 		end;
 	end;
 end;
-

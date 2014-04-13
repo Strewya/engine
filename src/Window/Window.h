@@ -133,8 +133,6 @@ namespace Core
 
 		Time m_timer;
 		CReadDirectoryChanges m_monitor;
-	public:
-		const Time& getTimer() const { return m_timer; }
 	};
 
 	

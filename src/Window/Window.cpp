@@ -239,10 +239,9 @@ namespace Core
 
 	WindowEvent Window::newEvent()
 	{
-		m_timer.update();
 		WindowEvent we;
 		ZeroMemory(&we, sizeof(we));
-		we.m_timestamp = m_timer.getCurMicros();
+		we.m_timestamp = m_timer.getRealTimeMicros();
 		return we;
 	}
 
@@ -409,7 +408,6 @@ namespace Core
 				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
 				we.m_keyboard.m_isDown = true;
 				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
-				DEBUG_INFO("Received keypress: ", wParam, ", time:", we.m_timestamp);
 			}
 			break;
 
