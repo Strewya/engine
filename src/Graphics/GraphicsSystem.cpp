@@ -596,9 +596,9 @@ namespace Core
 				auto driverType = D3D_DRIVER_TYPE_UNKNOWN;
 				uint32_t flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 
-				DEBUG_CODE(
+				DEBUG_CODE_START
 					flags |= D3D11_CREATE_DEVICE_DEBUG;
-				)
+				DEBUG_CODE_END
 
 				hr = D3D11CreateDevice(adapter, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &m_dev, nullptr, &m_devcon);
 
@@ -606,10 +606,10 @@ namespace Core
 			}
 		}
 
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			if(FAILED(hr))
 				DEBUG_INFO("\tinitDevice failed");
-		)
+		DEBUG_CODE_END
 
 		return SUCCEEDED(hr);
 	}
@@ -641,10 +641,10 @@ namespace Core
 			}
 			bbTexture->Release();
 		}
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			if(FAILED(hr))
 				DEBUG_INFO("\tinitRenderTarget failed");
-		)
+		DEBUG_CODE_END
 		return SUCCEEDED(hr);
 	}
 
@@ -674,10 +674,10 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			if(FAILED(hr))
 				DEBUG_INFO("\tinitVertexShader failed");
-		)
+		DEBUG_CODE_END
 		return SUCCEEDED(hr);
 	}
 	
@@ -698,10 +698,10 @@ namespace Core
 			}
 			m_shaderBlob->Release();
 		}
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			if(FAILED(hr))
 				DEBUG_INFO("\tinitPixelShader failed");
-		)
+		DEBUG_CODE_END
 		return SUCCEEDED(hr);
 	}
 

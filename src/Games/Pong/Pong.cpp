@@ -43,9 +43,9 @@ namespace Core
 		float ratio = (float)screenW / (float)screenH;
 		window.resize(screenW, screenH);
 
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			window.openConsole(660, 0);
-		)
+		DEBUG_CODE_END
 
 		bool initializationStatus = m_input.init(window) &&
 			m_physics.init(Vec2(0, -9.0f), &m_debugDraw) &&

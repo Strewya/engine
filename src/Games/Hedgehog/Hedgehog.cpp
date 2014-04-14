@@ -38,10 +38,13 @@ namespace Core
 		m_window = &window;
 
 		window.resize(1024, 768);
-		DEBUG_CODE(
+		DEBUG_CODE_START
 			window.openConsole(1050, 0);
-		);
-		
+		DEBUG_CODE_END;
+
+		window.setGameTimer(m_logicTimer);
+
+		m_logicTimer = window.getTimer();
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
@@ -133,7 +136,7 @@ namespace Core
 	{
 		float fraction = 0;
 		uint64_t unusedMicros = 0;
-		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;		
+		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
 		
 		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros); l--;)
 		{			

@@ -40,11 +40,24 @@ namespace Core
 	{
 		m_inputEvents.clear();
 		WindowEvent we;
-		auto currentPeekTime = timer.getRealTimeMicros();
+		auto currentPeekTime = timer.getCurMicros();
 		while(m_window->peekEvent(currentPeekTime, we))
 		{
 			m_inputEvents.emplace_back(we);
 		}
+		
+		DEBUG_CODE_START
+			if(!m_inputEvents.empty())
+			{
+				DEBUG_INFO("Peeked with ", currentPeekTime, " with drift: ", timer.getRealTimeMicros()-currentPeekTime);
+				DEBUG_INFO("Logic timer drift: ", timer.getRealTimeMicros() - timer.getCurMicros());
+				for(auto& e : m_inputEvents)
+				{
+					DEBUG_INFO("event type ", e.m_type, ", timestamp ", e.m_timestamp, ", diff: ", currentPeekTime - e.m_timestamp);
+				}
+
+			}
+		DEBUG_CODE_END;
 	}
 
 	const EventVector_t& InputSystem::getEvents() const

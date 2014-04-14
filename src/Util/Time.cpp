@@ -116,7 +116,7 @@ namespace Core
 
 	uint64_t Time::getRealTimeMicros() const
 	{
-		static TimeSource source;
+		TimeSource source;
 		return source.getSystemMicroseconds();
 	}
 
@@ -138,7 +138,7 @@ namespace Core
 	void Time::updateBy(uint64_t deltaMicros)
 	{
 		m_lastMicros = m_curMicros;
-		m_curMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros)* m_timeScale);
+		m_curMicros += deltaMicros;
 		m_deltaMicros = m_curMicros - m_lastMicros;
 		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
 	}
@@ -152,7 +152,7 @@ namespace Core
 		uint64_t addMe = count * frameTime;
 		m_oldRealTime += addMe;
 		remainderTime = delta - addMe;
-       
+		
 		ratio = static_cast<float>(static_cast<double>(addMe) / static_cast<double>(frameTime));
 		return count;
 	}
