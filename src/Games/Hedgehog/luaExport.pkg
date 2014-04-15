@@ -15,13 +15,16 @@ namespace Core
 
 	class HedgehogGame
 	{
+		//systems
+		tolua_readonly AnimationSystem m_animation;
 		tolua_readonly GraphicsSystem m_graphics;
 		tolua_readonly InputSystem m_input;
-		tolua_readonly AnimationSystem m_animation;
-		tolua_readonly TextureCache m_textureCache;
-		tolua_readonly SpritesheetCache m_spritesheetCache;
+		//caches
 		tolua_readonly AnimationCache m_animationCache;
 		tolua_readonly ImageCache m_imageCache;
+		tolua_readonly ScriptCache m_scriptCache;
+		tolua_readonly SpritesheetCache m_spritesheetCache;
+		tolua_readonly TextureCache m_textureCache;
 
 		tolua_readonly Player m_player;
 

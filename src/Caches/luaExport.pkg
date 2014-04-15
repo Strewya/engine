@@ -31,4 +31,9 @@ namespace Core
 		uint32_t getImageID(const char* name) const;
 		const Image& getImage(uint32_t id) const;
 	};
+
+	class ScriptCache
+	{
+		bool loadFromFile(const char* file, bool reload);
+	};
 }

@@ -11,6 +11,7 @@
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
 #include <Caches/ImageCache.h>
+#include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <Caches/TextureCache.h>
 #include <Graphics/GraphicsSystem.h>
@@ -43,14 +44,16 @@ namespace Core
 		Time m_framerateTimer;
 		
 		//systems
+		AnimationSystem m_animation;
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
-		AnimationSystem m_animation;
 		//caches
-		TextureCache m_textureCache;
-		SpritesheetCache m_spritesheetCache;
 		AnimationCache m_animationCache;
 		ImageCache m_imageCache;
+		ScriptCache m_scriptCache;
+		SpritesheetCache m_spritesheetCache;
+		TextureCache m_textureCache;
+		
 
 		Player m_player;
 		

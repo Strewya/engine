@@ -1,3 +1,4 @@
+
 reloaded = true;
 function game_init(game)
 	gActions = {};
@@ -9,8 +10,9 @@ function game_init(game)
 	game.m_player.m_transform.scale:set(200, 200);
 	game.m_graphics:setCulling(false);
 	
-	
+	st = game.m_scriptCache:loadFromFile("../resources/Scripts/lib.lua", false);
 	onReload(game);
+	return st;
 end;
 
 function onReload(game)
@@ -40,7 +42,7 @@ function onReload(game)
 	
 	gState.animation = "moving";
 	gState.impulse = 0;
-	gState.maxJumpsAvailable = 2;
+	gState.maxJumpsAvailable = 3;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -5;
 	gState.minY = -270;
@@ -146,19 +148,3 @@ for every update of logic tick:
 
 
 ]]
-
-
-function parseInput(input)
-	local cnt = input:getEventCount();
-	for i=0, cnt-1 do
-		local event = input:getEvent(i);
-		if(event.m_type == Core.WE_KEYBOARDKEY) then
-			for k,v in pairs(gInputMap) do
-				if(event.m_keyboard.m_keyCode == k) then
-					v(event);
-					break;
-				end;
-			end;
-		end;
-	end;
-end;

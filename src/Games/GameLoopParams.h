@@ -23,22 +23,18 @@
 #define CORE_MAX_MICROS_PER_FRAME 1000000ULL/CORE_CLAMPED_STEP_MIN_FPS
 
 
-#define CORE_STEP CORE_FIXED_STEP_FPS
+#define CORE_STEP CORE_CLAMPED_STEP
 
 namespace Core
 {
-	inline uint32_t getLogicUpdateCount(Time& timer, const uint64_t& microsPerFrame, float& outFraction, uint64_t& outUnusedMicros)
+	inline uint32_t getLogicUpdateCount(Time& timer, const uint64_t& microsPerFrame, float& outFraction, uint64_t& outUnusedMicros, uint64_t& outDroppedTime)
 	{
 		static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
 
 		const uint32_t maxUpdateCount = static_cast<uint32_t>(maxUpdateTime / microsPerFrame);
 		const uint32_t updateCount = timer.getFixedStepUpdateCount(microsPerFrame, outFraction, outUnusedMicros);
-		DEBUG_CODE_START
-			if(updateCount)
-			{
-				DEBUG_INFO("update count is ", updateCount, ", but we are doing it ", updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
-			}
-		DEBUG_CODE_END;
+		outDroppedTime = updateCount > maxUpdateCount ? updateCount - maxUpdateCount : 0;
+		outDroppedTime *= microsPerFrame;
 		return updateCount <= maxUpdateCount ? updateCount : maxUpdateCount;
 	}
 }

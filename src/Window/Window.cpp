@@ -409,13 +409,6 @@ namespace Core
 				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
 				we.m_keyboard.m_isDown = true;
 				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
-
-				//DEBUG_INFO("Timestamp ", we.m_timestamp, ", drift: ", m_timer.getRealTimeMicros() - we.m_timestamp);
-				//DEBUG_INFO("Window timer drift: ", m_timer.getRealTimeMicros() - m_timer.getCurMicros());
-
-				DEBUG_INFO("Window timer: ", m_timer.getCurMicros());
-				DEBUG_INFO("Game timer:   ", gameTimer->getCurMicros());
-				DEBUG_INFO("Time diff:    ", m_timer.getCurMicros() - gameTimer->getCurMicros());
 			}
 			break;
 

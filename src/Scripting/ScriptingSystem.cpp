@@ -167,9 +167,10 @@ namespace Core
 		return status;
 	}
 	
-	void ScriptingSystem::doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues)
+	bool ScriptingSystem::doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues)
 	{
 		assert(function != nullptr && objArg != nullptr && objType != nullptr);
+		auto top = getTop();
 		if(getValue(function, LUA_GLOBALSINDEX) && lua_isfunction(m_luaState, -1))
 		{
 			tolua_pushusertype(m_luaState, objArg, objType);
@@ -180,6 +181,7 @@ namespace Core
 				pop();
 			}
 		}
+		return (top + numReturnValues) == getTop();
 	}
 
 	bool ScriptingSystem::functionExists(const char* function)

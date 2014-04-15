@@ -97,13 +97,15 @@ namespace Core
 	{
 		float fraction = 0;
 		uint64_t unusedMicros = 0;
+		uint64_t droppedTime = 0;
 		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
 		
-		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros); l--;)
+		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime); l--;)
 		{
 			if(!tickLogic(microsPerFrame))
 				return false;
 		}
+		m_logicTimer.updateBy(droppedTime);
 
 		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);

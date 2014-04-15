@@ -19,14 +19,15 @@ namespace Core
 	{
 		DEBUG_INFO("---------------------------------");
 		bool status = true;
-		status &= m_textureCache.shutdown();
 		status &= m_animationCache.shutdown();
-		status &= m_spritesheetCache.shutdown();
 		status &= m_imageCache.shutdown();
-		status &= m_input.shutdown();
-		status &= m_scripter.shutdown();
+		status &= m_scriptCache.shutdown();
+		status &= m_spritesheetCache.shutdown();
+		status &= m_textureCache.shutdown();
 		status &= m_animation.shutdown();
 		status &= m_graphics.shutdown();
+		status &= m_input.shutdown();
+		status &= m_scripter.shutdown();
 		if(!status)
 		{
 			DEBUG_INFO("\nShutdown has failed! Bugs...");
@@ -58,6 +59,7 @@ namespace Core
 			//caches
 			m_animationCache.init() &&
 			m_imageCache.init() &&
+			m_scriptCache.init(m_scripter) &&
 			m_spritesheetCache.init(m_animationCache, m_imageCache, m_textureCache) &&
 			m_textureCache.init(m_graphics) &&
 			
@@ -67,7 +69,8 @@ namespace Core
 
 		if(m_isRunning)
 		{
-			m_isRunning &= m_scripter.doFile(RESOURCE("Scripts/hedgehog_game.lua"));
+			m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/hedgehog_game.lua"), false);
+			//m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/lib.lua"), false);
 			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
 
@@ -75,7 +78,11 @@ namespace Core
 		{
 			if(m_scripter.functionExists("game_init"))
 			{
-				m_scripter.doFunction("game_init", this, CLASS(HedgehogGame));
+				if(m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1))
+				{
+					m_isRunning &= m_scripter.toBool();
+					m_scripter.pop();
+				}
 			}
 
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
@@ -125,8 +132,9 @@ namespace Core
 			m_player.m_animationData.m_time = 0;
 			m_animation.registerData(m_player.m_animationData);
 		}
-		DEBUG_INFO("---------------------------------");
 		m_framerateTimer.update();
+
+		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
 	}
 
@@ -136,9 +144,10 @@ namespace Core
 	{
 		float fraction = 0;
 		uint64_t unusedMicros = 0;
+		uint64_t droppedTime = 0;
 		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
 		
-		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros); l--;)
+		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime); l--;)
 		{			
 			if(!tickLogic(microsPerFrame))
 			{
@@ -146,6 +155,7 @@ namespace Core
 				break;
 			}
 		}
+		m_logicTimer.updateBy(droppedTime);
 
 		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);
@@ -205,7 +215,7 @@ namespace Core
 			auto ext = file.substr(pos + 1);
 			if(ext == "lua")
 			{
-				if(m_scripter.doFile(RESOURCE_S(file)))
+				if(m_scriptCache.loadFromFile(RESOURCE_S(file), true))
 					DEBUG_INFO("Reloaded script ", file);
 			}
 			else if(ext == "sheet")
@@ -215,6 +225,7 @@ namespace Core
 				{
 					if(m_spritesheetCache.loadFromFile(config, true))
 						DEBUG_INFO("Reloaded spritesheet file ", file);
+					config.close();
 				}
 			}
 		}

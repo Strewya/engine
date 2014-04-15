@@ -27,7 +27,7 @@ namespace Core
 
 		bool doFile(const char* filename, uint32_t numReturnValues = 0);
 		bool functionExists(const char* function);
-		void doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues = 0);
+		bool doFunction(const char* function, void* objArg, const char* objType, uint32_t numReturnValues = 0);
 
 		void push(const char* val);
 		void push(int32_t val);
