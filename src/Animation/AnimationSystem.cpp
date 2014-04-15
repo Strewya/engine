@@ -43,11 +43,11 @@ namespace Core
 
 			if(anim.m_defaultRepeat)
 			{
-				wrap<int32_t>(0, anim.m_defaultDuration, animData.m_time);
+				wrap<int32_t>(0, static_cast<uint32_t>(anim.m_defaultDuration), animData.m_time);
 			}
 			else
 			{
-				clamp<int32_t>(0, anim.m_defaultDuration, animData.m_time);
+				clamp<int32_t>(0, static_cast<uint32_t>(anim.m_defaultDuration), animData.m_time);
 			}
 
 			float time = static_cast<float>(animData.m_time) / static_cast<float>(anim.m_defaultDuration);

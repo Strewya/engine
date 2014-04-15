@@ -163,7 +163,6 @@ namespace Core
 			DEBUG_INFO("Lua API loadfile failed with error: ", getErrorName(ret), "\n", lua_tostring(m_luaState, -1));
 			pop();
 		}
-		DEBUG_INFO("Stack size is ", lua_gettop(m_luaState));
 		return status;
 	}
 	

@@ -798,7 +798,7 @@ namespace Core
 	{
 		assert(filename != nullptr);
 		ID3D11ShaderResourceView* texturePtr = nullptr;
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, RESOURCE_S(filename), nullptr, nullptr, &texturePtr, nullptr);
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, ResourcePath(filename).c_str(), nullptr, nullptr, &texturePtr, nullptr);
 		uint32_t id = -1;
 		if(SUCCEEDED(hr))
 		{

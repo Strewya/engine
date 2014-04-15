@@ -11,8 +11,19 @@
 
 namespace Core
 {
-#define RESOURCE(name) "../resources/"name
-#define RESOURCE_S(name) std::string("../resources/").append(name).c_str()
+
+#define RESOURCE_PATH "../resources/"
+#define RESOURCE(name) RESOURCE_PATH##name
+
+	inline std::string ResourcePath(const char* path)
+	{
+		return std::string(RESOURCE_PATH).append(path);
+	}
+
+	inline std::string ResourcePath(std::string& path)
+	{
+		return std::string(RESOURCE_PATH).append(path);
+	}
 
 #define CLASS(x) "Core::"#x
 
@@ -61,5 +72,4 @@ namespace Core
 		}
 		return value;
 	}
-
 }

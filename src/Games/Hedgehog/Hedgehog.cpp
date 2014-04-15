@@ -215,13 +215,13 @@ namespace Core
 			auto ext = file.substr(pos + 1);
 			if(ext == "lua")
 			{
-				if(m_scriptCache.loadFromFile(RESOURCE_S(file), true))
+				if(m_scriptCache.loadFromFile(ResourcePath(file).c_str(), true))
 					DEBUG_INFO("Reloaded script ", file);
 			}
 			else if(ext == "sheet")
 			{
 				DataFile config(m_scripter);
-				if(config.open(RESOURCE_S(file)))
+				if(config.open(ResourcePath(file).c_str()))
 				{
 					if(m_spritesheetCache.loadFromFile(config, true))
 						DEBUG_INFO("Reloaded spritesheet file ", file);

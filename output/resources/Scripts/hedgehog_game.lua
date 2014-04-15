@@ -10,8 +10,9 @@ function game_init(game)
 	game.m_player.m_transform.scale:set(200, 200);
 	game.m_graphics:setCulling(false);
 	
-	st = game.m_scriptCache:loadFromFile("../resources/Scripts/lib.lua", false);
-	onReload(game);
+	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
+	st = st and onReload(game);
 	return st;
 end;
 
@@ -40,12 +41,15 @@ function onReload(game)
 		end;
 	end;
 	
-	gState.animation = "moving";
 	gState.impulse = 0;
 	gState.maxJumpsAvailable = 3;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -5;
 	gState.minY = -270;
+	gState.animStates = {};
+	table.insert(gState.animStates, State("walk"));
+	
+	return true;
 end;
 
 function game_tick(game)
