@@ -156,6 +156,7 @@ namespace Core
 
 		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);
+		m_scripter.update();
 		m_framerateTimer.update();
 		return m_isRunning;
 	}

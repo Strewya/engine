@@ -21,6 +21,7 @@ namespace Core
 	public:
 		bool init();
 		bool shutdown();
+		void update();
 
 		uint32_t getTop() const;
 		void pop(uint32_t count = 1);

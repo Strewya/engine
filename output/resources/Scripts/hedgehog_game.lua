@@ -63,8 +63,8 @@ function game_tick(game)
 	if(reloaded) then
 		onReload(game);
 	end;
-	game.m_graphics:setBackgroundColor(1,1,1);
 	
+	game.m_graphics:setBackgroundColor(1,1,1);
 	parseInput(game.m_input);
 	
 	local player = game.m_player;
@@ -80,29 +80,30 @@ function game_tick(game)
 	if(gActions.moveLeft) then
 		if(player.m_transform.scale.x > 0) then
 			player.m_transform.scale.x = -200;
+			Console:add("Moving to the left i see...");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x - 20;
 	end;
 	if(gActions.moveRight) then
 		if(player.m_transform.scale.x < 0) then
 			player.m_transform.scale.x = 200;
+			Console:add("Moving to the right i see...");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x + 20;
 	end;
 	
-	
-	
-	--jumper
 	if(gActions.jump == true) then
 		gActions.jump = nil;
 		if(gState.jumpsAvailable > 0) then
 			gState.jumpsAvailable = gState.jumpsAvailable - 1;
 			gState.impulse = 34;
+			Console:add("Jumpy hedgehog!");
+		else
+			Console:add("No jumpy more than " .. gState.maxJumpsAvailable .. " times!");
 		end;
 	end;
 	
 	player.m_transform.position.y = player.m_transform.position.y + gState.impulse;
-	--gravity
 	gState.impulse = gState.impulse + gState.gravity;
 		
 	if(player.m_transform.position.y < gState.minY) then
@@ -110,10 +111,6 @@ function game_tick(game)
 		player.m_transform.position.y = gState.minY;
 		gState.jumpsAvailable = gState.maxJumpsAvailable;
 	end;
-	
-	
-	
-	
 	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
@@ -123,8 +120,6 @@ function game_tick(game)
 	//input system should receive key, type and bind function which binds the state/action/range of the key to a variable in memory!
 	//separate Images into their own cache
 	//animation system should be able to start a new animation, and have a trigger for it's end, either repeat or transition or do nothing.
-	
-	
 	]]
 end;
 
@@ -137,7 +132,6 @@ function game_render(game)
 	game.m_graphics:drawText(text, tx, col, 1, true);
 	tx.position.y = tx.position.y + 40;
 	game.m_graphics:drawText(text, tx, col, 1, false);
-	
 	
 	col:set(1,1,1);
 	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);

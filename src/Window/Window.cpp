@@ -112,7 +112,9 @@ namespace Core
 
 		return m_hwnd != nullptr;
 	}
-
+#ifdef _DEBUG
+	static bool trackEvents = true;
+#endif
 	void Window::show()
 	{
 		ShowWindow(m_hwnd, SW_SHOW);
@@ -123,6 +125,7 @@ namespace Core
 	{
 #ifdef _DEBUG
 		InvalidateRect(m_hwnd, nullptr, true);
+		trackEvents = false;
 #else
 		PostMessage(m_hwnd, WM_CLOSE, 0, 0);
 #endif
@@ -295,6 +298,9 @@ namespace Core
 
 	void Window::writeEvent()
 	{
+#ifdef _DEBUG
+		if(!trackEvents) return;
+#endif
 		if(m_headIndex == m_tailIndex)
 		{
 			DEBUG_INFO("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "

@@ -134,11 +134,16 @@ namespace Core
 		bool status = true;
 		Time timer;
 		timer.reset();
-		//lua_close(m_luaState);
+		lua_close(m_luaState);
 		timer.update();
 		DEBUG_INFO("Script took ", timer.getDeltaMicros(), " micros to shutdown");
 		DEBUG_SHUTDOWN(ScriptingSystem);
 		return status;
+	}
+
+	void ScriptingSystem::update()
+	{
+		lua_gc(m_luaState, LUA_GCSTEP, 10);
 	}
 
 	bool ScriptingSystem::doFile(const char* scriptName, uint32_t numReturnValues)
