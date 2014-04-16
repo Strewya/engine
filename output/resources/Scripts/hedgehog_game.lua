@@ -12,6 +12,7 @@ function game_init(game)
 	
 	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	st = st and onReload(game);
 	return st;
 end;
@@ -38,6 +39,12 @@ function onReload(game)
 	gInputMap[Core.Keyboard.m_ArrowUp] = function(event)
 		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
 			gActions.jump = true;
+		end;
+	end;
+	
+	gInputMap[Core.Keyboard.m_F1] = function(event)
+		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			Console.isOpen = not Console.isOpen;
 		end;
 	end;
 	
@@ -135,6 +142,8 @@ function game_render(game)
 	col:set(1,1,1);
 	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img, img.m_textureID);
+	
+	Console:draw(game.m_graphics);
 end;
 
 --[[

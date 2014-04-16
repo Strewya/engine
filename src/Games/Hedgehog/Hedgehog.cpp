@@ -43,9 +43,6 @@ namespace Core
 			window.openConsole(1050, 0);
 		DEBUG_CODE_END;
 
-		window.setGameTimer(m_logicTimer);
-
-		m_logicTimer = window.getTimer();
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 

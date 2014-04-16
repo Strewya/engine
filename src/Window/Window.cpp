@@ -53,6 +53,7 @@ namespace Core
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
 		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
+		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(128),
 		m_hwnd(nullptr),
 		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),
@@ -74,6 +75,8 @@ namespace Core
 		{
 			 m_fileChanges.emplace_back(FileChangeInfo(i));
 		}
+
+		m_events.resize(m_eventQueueSize);
 	}
 
 	Window::~Window()
@@ -225,23 +228,24 @@ namespace Core
 		SetWindowPos(m_hwnd, 0, m_xPos, m_yPos, x, y, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	}
 
-	bool Window::peekEvent(uint64_t time, WindowEvent& outEvent)
+	bool Window::readEvent(uint64_t time, WindowEvent& outEvent)
 	{
 		bool eventExists = false;
-		if(!m_events.empty() && m_events.front().m_timestamp <= time)
+		auto readIndex = (m_tailIndex + 1) % m_eventQueueSize;
+		if(readIndex != m_headIndex && m_events[readIndex].m_timestamp <= time)
 		{
 			eventExists = true;
-			outEvent = m_events.front();
-			m_events.pop_front();
+			outEvent = m_events[readIndex];
+			m_tailIndex = readIndex;
 		}
 		return eventExists;
 	}
 
-	WindowEvent Window::newEvent()
+	WindowEvent& Window::newEvent()
 	{
 		m_timer.update();
-		WindowEvent we;
-		ZeroMemory(&we, sizeof(we));
+		WindowEvent& we = m_events[m_headIndex];
+		ZeroMemory(&we, sizeof(WindowEvent));
 		we.m_timestamp = m_timer.getCurMicros();
 		return we;
 	}
@@ -268,10 +272,10 @@ namespace Core
 			   m_timer.getCurMicros() > info.m_timestamp + Time::milisToMicros(m_fileChangeDelay))
 			{
 				info.m_state = FileChangeInfo::READ_PENDING;
-				auto we = newEvent();
+				auto& we = newEvent();
 				we.m_type = WindowEventType::WE_FILECHANGE;
 				we.m_fileChange.m_index = info.m_index;
-				m_events.emplace_back(std::move(we));
+				writeEvent();
 			}
 		});
 
@@ -287,6 +291,17 @@ namespace Core
 			str.replace(start_pos, from.length(), to);
 			start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 		}
+	}
+
+	void Window::writeEvent()
+	{
+		if(m_headIndex == m_tailIndex)
+		{
+			DEBUG_INFO("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "
+					   "should increase the size of our buffer from ", m_eventQueueSize, "...");	
+		}
+		
+		m_headIndex = (m_headIndex + 1) % m_eventQueueSize;
 	}
 
 	void Window::newFileChange(uint64_t timestamp, DWORD action, const std::string& file)
@@ -313,8 +328,8 @@ namespace Core
 		m_nextFreeSlot = (m_nextFreeSlot + 1) % m_fileChanges.size();
 		if(m_fileChanges[m_nextFreeSlot].m_state == FileChangeInfo::EVENT_PENDING)
 		{
-			std::cout << "WHOOPS, overwriting a previous file change. This is a BAD THING! Maybe we "
-			"should increase the size of our buffer from " << m_fileChanges.size() << "..." << std::endl;
+			DEBUG_INFO("WHOOPS, overwriting a previous file change. This is a BAD THING! Maybe we "
+			"should increase the size of our buffer from ", m_fileChanges.size(), "...");
 		}
 	}
 	
@@ -389,7 +404,7 @@ namespace Core
 		bool eventMapped = true;
 		LRESULT result = 0;
 		const LRESULT notProcessed = -1;
-		auto we = newEvent();
+		auto& we = newEvent();
 		switch(msg)
 		{
 			case WM_MOUSEMOVE:
@@ -544,7 +559,7 @@ namespace Core
 
 		if(eventMapped)
 		{
-			m_events.emplace_back(we);
+			writeEvent();
 		}
 
 		return result == notProcessed ? DefWindowProc(hwnd, msg, wParam, lParam) : result;

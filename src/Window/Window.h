@@ -4,7 +4,6 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
-#include <list>
 #include <string>
 #include <vector>
 #include <Window/myWindows.h>
@@ -77,14 +76,15 @@ namespace Core
 		
 		uint32_t getFileChangeDelay() const;
 
-		bool peekEvent(uint64_t time, WindowEvent& outEvent);
+		bool readEvent(uint64_t time, WindowEvent& outEvent);
 #ifdef _DEBUG
 		void openConsole(uint32_t xPos, uint32_t yPos);
 		void closeConsole();
 #endif
 	protected:	
-		WindowEvent newEvent();
+		WindowEvent& newEvent();
 		void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
+		void writeEvent();
 
 		DWORD m_trackedChanges;
 		int32_t m_xPos;
@@ -96,6 +96,9 @@ namespace Core
 		uint32_t m_extendedStyle;
 		uint32_t m_minFileChangeDelay;
 		uint32_t m_fileChangeDelay;
+		uint32_t m_headIndex;
+		uint32_t m_tailIndex;
+		const uint32_t m_eventQueueSize;
 
 		HWND m_hwnd;
 
@@ -107,7 +110,8 @@ namespace Core
 		std::string m_title;
 		std::string m_resourcesDirectory;
 
-		std::list<WindowEvent> m_events;
+		std::vector<WindowEvent> m_events;
+
 
 		struct FileChangeInfo
 		{
@@ -133,11 +137,6 @@ namespace Core
 
 		Time m_timer;
 		CReadDirectoryChanges m_monitor;
-
-		public:
-			const Time& getTimer() const { return m_timer; }
-			Time* gameTimer;
-			void setGameTimer(Time& t) { gameTimer = &t; }
 	};
 
 	

@@ -41,7 +41,7 @@ namespace Core
 		m_inputEvents.clear();
 		WindowEvent we;
 		auto currentPeekTime = timer.getCurMicros();
-		while(m_window->peekEvent(currentPeekTime, we))
+		while(m_window->readEvent(currentPeekTime, we))
 		{
 			m_inputEvents.emplace_back(we);
 		}
