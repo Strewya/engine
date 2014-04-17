@@ -5,11 +5,12 @@ function game_init(game)
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	
+	
 	gActions = {};
 	gInputMap = {};
 	gState = {};
 	
-	game.m_player.m_transform.position:set(0, 0);
+	game.m_player.m_transform.position:set(0,0);
 	game.m_player.m_transform.scale:set(1,1);
 	game.m_graphics:setCulling(false);
 	
@@ -54,11 +55,43 @@ function onReload(game)
 		end;
 	end;
 	
+	gInputMap[Core.Keyboard.m_A] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gState.moveCamLeft = true;
+		else
+			gState.moveCamLeft = false;
+		end;
+	end;
+	gInputMap[Core.Keyboard.m_D] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gState.moveCamRight = true;
+		else
+			gState.moveCamRight = false;
+		end;
+	end;
+	gInputMap[Core.Keyboard.m_W] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gState.moveCamUp = true;
+		else
+			gState.moveCamUp = false;
+		end;
+	end;
+	gInputMap[Core.Keyboard.m_S] = function(event)
+		if(event.m_keyboard.m_isDown) then
+			gState.moveCamDown = true;
+		else
+			gState.moveCamDown = false;
+		end;
+	end;
+	
+	gState.moveCamRight = false;
+	gState.moveCamLeft = false;
+	gState.impulseStrength = 0.34;
 	gState.impulse = 0;
 	gState.maxJumpsAvailable = 3;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
-	gState.gravity = -5;
-	gState.minY = -270;
+	gState.gravity = -0.05;
+	gState.minY = -3;
 	gState.proj = "ortho";
 	gState.changeProj = false;
 	gState.camera = Core.Vec2(0,0);
@@ -88,24 +121,24 @@ function game_tick(game)
 	
 	if(gActions.moveLeft) then
 		if(player.m_transform.scale.x > 0) then
-			player.m_transform.scale.x = -200;
+			player.m_transform.scale.x = -1;
 			Console:add("Moving to the left i see...");
 		end;
-		player.m_transform.position.x = player.m_transform.position.x - 20;
+		player.m_transform.position.x = player.m_transform.position.x - 0.2;
 	end;
 	if(gActions.moveRight) then
 		if(player.m_transform.scale.x < 0) then
-			player.m_transform.scale.x = 200;
+			player.m_transform.scale.x = 1;
 			Console:add("Moving to the right i see...");
 		end;
-		player.m_transform.position.x = player.m_transform.position.x + 20;
+		player.m_transform.position.x = player.m_transform.position.x + 0.2;
 	end;
 	
 	if(gActions.jump == true) then
 		gActions.jump = nil;
 		if(gState.jumpsAvailable > 0) then
 			gState.jumpsAvailable = gState.jumpsAvailable - 1;
-			gState.impulse = 34;
+			gState.impulse = gState.impulseStrength;
 			Console:add("Jumpy hedgehog!");
 		else
 			Console:add("No jumpy more than " .. gState.maxJumpsAvailable .. " times!");
@@ -132,13 +165,19 @@ function game_tick(game)
 		end;
 	end;
 	
-	game.m_graphics:moveCamera(gState.camera, true);
-	
-	gState.camera.x = gState.camera.x+1;
-	local bound = 5;
-	if(gState.camera.x > bound) then
-		gState.camera.x = -bound;
+	if(gState.moveCamLeft) then	
+		game.m_graphics:moveCamera(Core.Vec2(-0.1, 0));
 	end;
+	if(gState.moveCamRight) then	
+		game.m_graphics:moveCamera(Core.Vec2(0.1, 0));
+	end;
+	if(gState.moveCamUp) then	
+		game.m_graphics:moveCamera(Core.Vec2(0, 0.1));
+	end;
+	if(gState.moveCamDown) then	
+		game.m_graphics:moveCamera(Core.Vec2(0, -0.1));
+	end;
+	
 	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
@@ -157,12 +196,14 @@ function game_render(game)
 	local col = Core.Color();
 	col:set(0,0,0.5);
 	local text = "Hello from the beautiful land of Lua!!!";
+	game.m_graphics:setOrthographicProjection();
 	game.m_graphics:drawText(text, tx, col, 1, true);
 	tx.position.y = tx.position.y + 40;
 	game.m_graphics:drawText(text, tx, col, 1, false);
 	
 	col:set(1,1,1);
 	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
+	game.m_graphics:setPerspectiveProjection();
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img, img.m_textureID);
 	
 	Console:draw(game.m_graphics);

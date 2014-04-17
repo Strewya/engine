@@ -36,6 +36,14 @@ namespace Core
 		Time m_mainTimer;
 	};
 
+	class Prop
+	{
+	public:
+		Transform m_transform;
+		Color m_tint;
+		uint32_t m_image;
+	};
+
 	class HedgehogGame
 	{
 	public:
@@ -54,8 +62,8 @@ namespace Core
 		SpritesheetCache m_spritesheetCache;
 		TextureCache m_textureCache;
 		
-
 		Player m_player;
+		Prop m_prop1;
 		
 		Time m_logicTimer;
 		Time m_renderTimer;

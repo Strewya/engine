@@ -62,7 +62,7 @@ namespace Core
 
 		m_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		m_camPosition = XMVectorSet(0.0f, 0.0f, -1800.0f, 0.0f);
+		m_camPosition = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
 		
 		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
 		
@@ -220,7 +220,17 @@ namespace Core
 	//*****************************************************************
 	void GraphicsSystem::moveCamera(const Vec2& translation, bool isAbsolute)
 	{
-		
+		if(isAbsolute)
+		{
+			m_camPosition = XMVectorSet(translation.x, translation.y, -1.0f, 0.0f);
+			m_camLookAt = XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
+		}
+		else
+		{
+			m_camPosition += XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
+			m_camLookAt += XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
+		}
+		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
 	}
 
 	//*****************************************************************
@@ -617,7 +627,7 @@ namespace Core
 
 
 			cbPerObject cbpo;
-			cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+			cbpo.WVP = XMMatrixTranspose(m_world * /*m_camView * */m_camProjection);
 			cbpo.FillColor.x = tint.r;
 			cbpo.FillColor.y = tint.g;
 			cbpo.FillColor.z = tint.b;

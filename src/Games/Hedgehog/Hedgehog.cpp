@@ -98,6 +98,12 @@ namespace Core
 				dataFile.close();
 			}
 
+			if(dataFile.open(RESOURCE("Defs/.sheet")))
+			{
+				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
+				dataFile.close();
+			}
+
 			m_messageHandlers.reserve(3);
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
@@ -191,13 +197,13 @@ namespace Core
 
 		m_graphics.begin();
 
-		static Transform framerateTf;
-		
-		framerateTf.position.set(-0.4f*m_window->getSizeX(), 0.4f*m_window->getSizeY());
-		framerateTf.scale.set(0.6f, 0.6f);
-		
 		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
-		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
+
+		static Transform framerateTf;
+		framerateTf.position.set(0.5f*m_window->getSizeX() - 20, 0.5f*m_window->getSizeY()-10);
+		framerateTf.scale.set(0.5f, 0.5f);
+		m_graphics.setOrthographicProjection();
+		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 2, false);
 
 		m_graphics.present();
 		
