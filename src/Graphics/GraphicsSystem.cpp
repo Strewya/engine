@@ -46,24 +46,47 @@ namespace Core
 		declare(&m_pixelShader);
 		declare(&m_inputLayout);
 		declare(&m_samplerState);
+		declare(&m_depthStencilView);
+		declare(&m_depthStencilBuffer);
+		declare(&m_transparency);
 
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
 		
 		status = initDevice() &&
 			initSwapChain() &&
+			//initDepthBuffer() &&
 			initRenderTarget() &&
 			initViewport() &&
 			initSamplerState();
 
-		m_camPosition = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		m_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
-		//m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
-		m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
+		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
+		m_camPosition = XMVectorSet(0.0f, 0.0f, -1800.0f, 0.0f);
 		
+		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
+		
+		setPerspectiveProjection();
+
+		D3D11_BLEND_DESC blendDesc;
+		ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+
+		blendDesc.AlphaToCoverageEnable = false;
+
+		D3D11_RENDER_TARGET_BLEND_DESC& rtbd = blendDesc.RenderTarget[0];
+		rtbd.BlendEnable = true;
+		rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+		rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+		rtbd.DestBlendAlpha = D3D11_BLEND_ZERO;
+		rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+
+		HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
+
+		status &= SUCCEEDED(hr);
+
 		DEBUG_INIT(GraphicsSystem);
 		return status;
 	}
@@ -95,6 +118,7 @@ namespace Core
 	void GraphicsSystem::update()
 	{
 		m_devcon->ClearRenderTargetView(m_renderTarget, m_backgroundColor);
+		m_devcon->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 		//go through the command list and execute each one
 		//each command is a special draw call for whatever needs to be drawn
@@ -128,6 +152,9 @@ namespace Core
 		m_backgroundColor.b = b;
 	}
 
+	//*****************************************************************
+	//					SET CULLING
+	//*****************************************************************
 	void GraphicsSystem::setCulling(bool isEnabled)
 	{
 		D3D11_RASTERIZER_DESC rd;
@@ -157,6 +184,43 @@ namespace Core
 		{
 			DEBUG_INFO("Failed to create rasterizer state! Code: ", hr);
 		}
+	}
+
+	//*****************************************************************
+	//					SET TRANSPAERNCY MODE
+	//*****************************************************************
+	void GraphicsSystem::setTransparencyMode(bool isEnabled)
+	{
+		auto transpEnabled = m_transparency;
+		if(!isEnabled)
+		{
+			transpEnabled = nullptr;
+		}
+		m_devcon->OMSetBlendState(transpEnabled, nullptr, 0xffffffff);
+	}
+
+	//*****************************************************************
+	//					SET ORTHOGRAPHIC PROJECTION
+	//*****************************************************************
+	void GraphicsSystem::setOrthographicProjection()
+	{
+		m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
+	}
+
+	//*****************************************************************
+	//					SET PERSPECTIVE PROJECTION
+	//*****************************************************************
+	void GraphicsSystem::setPerspectiveProjection()
+	{
+		m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
+	}
+
+	//*****************************************************************
+	//					MOVE CAMERA
+	//*****************************************************************
+	void GraphicsSystem::moveCamera(const Vec2& translation, bool isAbsolute)
+	{
+		
 	}
 
 	//*****************************************************************
@@ -637,7 +701,7 @@ namespace Core
 			hr = m_dev->CreateRenderTargetView(bbTexture, nullptr, &m_renderTarget);
 			if(SUCCEEDED(hr))
 			{
-				m_devcon->OMSetRenderTargets(1, &m_renderTarget, nullptr);
+				m_devcon->OMSetRenderTargets(1, &m_renderTarget, m_depthStencilView);
 			}
 			bbTexture->Release();
 		}
@@ -741,6 +805,36 @@ namespace Core
 
 		HRESULT hr = m_dev->CreateSamplerState(&sampd, &m_samplerState);
 		
+		return SUCCEEDED(hr);
+	}
+
+	//*****************************************************************
+	//					INIT DEPTH BUFFER
+	//*****************************************************************
+	bool GraphicsSystem::initDepthBuffer()
+	{
+		D3D11_TEXTURE2D_DESC dsd;
+		ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
+
+		dsd.Width = m_window->getSizeX();
+		dsd.Height = m_window->getSizeY();
+		dsd.MipLevels = 1;
+		dsd.ArraySize = 1;
+		dsd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsd.Usage = D3D11_USAGE_DEFAULT;
+		dsd.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		dsd.CPUAccessFlags = 0;
+		dsd.MiscFlags = 0;
+
+		DXGI_SAMPLE_DESC& sd = dsd.SampleDesc;
+		sd.Count = 1;
+		sd.Quality = 0;
+
+		auto hr = m_dev->CreateTexture2D(&dsd, nullptr, &m_depthStencilBuffer);
+		if(SUCCEEDED(hr))
+		{
+			hr = m_dev->CreateDepthStencilView(m_depthStencilBuffer, nullptr, &m_depthStencilView);
+		}
 		return SUCCEEDED(hr);
 	}
 

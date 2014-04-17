@@ -60,12 +60,19 @@ namespace Core
 		bool initPixelShader(const char* shaderFile);
 		bool initViewport();
 		bool initSamplerState();
+		bool initDepthBuffer();
 		bool initFont(DataFile& file);
 
 		Vec2 getTextureDimensions(uint32_t texID) const;
 		void setBackgroundColor(float red, float green, float blue);
 
 		void setCulling(bool isEnabled);
+		void setTransparencyMode(bool isEnabled);
+
+		void setOrthographicProjection();
+		void setPerspectiveProjection();
+
+		void moveCamera(const Vec2& translation, bool isAbsolute = false);
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
@@ -97,6 +104,9 @@ namespace Core
 		ID3D11PixelShader* m_pixelShader;
 		ID3D11InputLayout* m_inputLayout;
 		ID3D11SamplerState* m_samplerState;
+		ID3D11DepthStencilView* m_depthStencilView;
+		ID3D11Texture2D* m_depthStencilBuffer;
+		ID3D11BlendState* m_transparency;
 		
 		XMMATRIX m_camView;
 		XMMATRIX m_camProjection;

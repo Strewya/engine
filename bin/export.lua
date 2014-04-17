@@ -39,8 +39,8 @@ end;
 if(rebuild) then
 	print("Generating Lua bindings...");
 	lfs.chdir(sgprojDir .. "/bin");
-	os.execute(string.format("cl.exe /EP %s/src/Games/luaExport.cpp > %s/src/Games/luaExport.pkg", sgprojDir, sgprojDir));
-	os.execute(string.format("tolua++.exe -n core -H %s/src/Scripting/luaBinding.h -o %s/src/Scripting/luaBinding.cpp %s/src/luaExportMaster.pkg", sgprojDir, sgprojDir, sgprojDir));
+	os.execute(string.format("cl.exe /EP %s/src/Games/Game.cpp > %s/src/Games/Game.pkg", sgprojDir, sgprojDir));
+	os.execute(string.format("tolua++.exe -n core -H %s/src/Scripting/luaBinding.h -o %s/src/Scripting/luaBinding.cpp %s/src/mainExport.pkg", sgprojDir, sgprojDir, sgprojDir));
 else
 	print("Bindings up to date...");
 end;

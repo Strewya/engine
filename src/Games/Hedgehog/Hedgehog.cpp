@@ -193,11 +193,11 @@ namespace Core
 
 		static Transform framerateTf;
 		
-		framerateTf.position.set(-0.5f*m_window->getSizeX(), 0.5f*m_window->getSizeY());
+		framerateTf.position.set(-0.4f*m_window->getSizeX(), 0.4f*m_window->getSizeY());
 		framerateTf.scale.set(0.6f, 0.6f);
-		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0,0,0), 0, false);
-
+		
 		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
+		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
 
 		m_graphics.present();
 		

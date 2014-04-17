@@ -190,7 +190,7 @@
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
+    <ClCompile Include="..\..\..\src\Games\Game.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -263,43 +263,43 @@
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Animation\Animation.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Audio\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Audio\Audio.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Caches\Caches.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\DataStructs\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\DataStructs\DataStructs.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\gameExport.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Game.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Pong\gameExport.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Graphics\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Graphics\Graphics.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Input\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Input\Input.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\luaExportMaster.pkg">
+    <CustomBuild Include="..\..\..\src\mainExport.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Physics\Physics.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Util\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Util\Util.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Window\Window.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
   </ItemGroup>

@@ -43,6 +43,9 @@
     <Filter Include="Framework\Window">
       <UniqueIdentifier>{e21b46bd-0384-4959-b2c0-f39c77fa8a3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\toluaPackages">
+      <UniqueIdentifier>{76c8f24b-ee3d-4d15-8ebf-3e2102e9ac4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -119,9 +122,6 @@
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\luaExport.cpp">
-      <Filter>Design</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
@@ -130,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp">
       <Filter>Framework\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Game.cpp">
+      <Filter>Design</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -247,42 +250,44 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\src\luaExportMaster.pkg" />
-    <CustomBuild Include="..\..\..\src\Games\Pong\luaExport.pkg">
-      <Filter>Design\Pong</Filter>
+    <CustomBuild Include="..\..\..\src\Input\Input.pkg">
+      <Filter>Framework\toluaPackages</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Caches\luaExport.pkg">
-      <Filter>Framework\Caches</Filter>
+    <CustomBuild Include="..\..\..\src\Graphics\Graphics.pkg">
+      <Filter>Framework\toluaPackages</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\luaExport.pkg">
-      <Filter>Design\Hedgehog</Filter>
+    <CustomBuild Include="..\..\..\src\DataStructs\DataStructs.pkg">
+      <Filter>Framework\toluaPackages</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\DataStructs\luaExport.pkg">
-      <Filter>Framework\DataStructs</Filter>
+    <CustomBuild Include="..\..\..\src\Caches\Caches.pkg">
+      <Filter>Framework\toluaPackages</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\luaExport.pkg">
+    <CustomBuild Include="..\..\..\src\Audio\Audio.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Animation\Animation.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Physics\Physics.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Window\Window.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Util\Util.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\mainExport.pkg">
+      <Filter>Framework\toluaPackages</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Games\Game.pkg">
       <Filter>Design</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Util\luaExport.pkg">
-      <Filter>Util</Filter>
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\gameExport.pkg">
+      <Filter>Design\Hedgehog</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Window\luaExport.pkg">
-      <Filter>Framework\Window</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Input\luaExport.pkg">
-      <Filter>Framework\Input</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Graphics\luaExport.pkg">
-      <Filter>Framework\Graphics</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Animation\luaExport.pkg">
-      <Filter>Framework\Animation</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Audio\luaExport.pkg">
-      <Filter>Framework\Audio</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Physics\luaExport.pkg">
-      <Filter>Framework\Physics</Filter>
+    <CustomBuild Include="..\..\..\src\Games\Pong\gameExport.pkg">
+      <Filter>Design\Pong</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

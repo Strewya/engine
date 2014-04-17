@@ -1,18 +1,18 @@
 
 reloaded = true;
 function game_init(game)
+	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
+	
 	gActions = {};
 	gInputMap = {};
 	gState = {};
 	
-	game.m_window:resize(800,600);
 	game.m_player.m_transform.position:set(0, 0);
-	game.m_player.m_transform.scale:set(200, 200);
+	game.m_player.m_transform.scale:set(1,1);
 	game.m_graphics:setCulling(false);
 	
-	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	st = st and onReload(game);
 	return st;
 end;
@@ -48,11 +48,20 @@ function onReload(game)
 		end;
 	end;
 	
+	gInputMap[Core.Keyboard.m_F2] = function(event)
+		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			gState.changeProj = true;
+		end;
+	end;
+	
 	gState.impulse = 0;
 	gState.maxJumpsAvailable = 3;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -5;
 	gState.minY = -270;
+	gState.proj = "ortho";
+	gState.changeProj = false;
+	gState.camera = Core.Vec2(0,0);
 	gState.animStates = {};
 	table.insert(gState.animStates, State("walk"));
 	
@@ -110,6 +119,25 @@ function game_tick(game)
 		gState.impulse = 0;
 		player.m_transform.position.y = gState.minY;
 		gState.jumpsAvailable = gState.maxJumpsAvailable;
+	end;
+	
+	if(gState.changeProj) then
+		gState.changeProj = false;
+		if(gState.proj == "ortho") then
+			gState.proj = "persp";
+			game.m_graphics:setPerspectiveProjection();
+		else
+			gState.proj = "ortho";
+			game.m_graphics:setOrthographicProjection();
+		end;
+	end;
+	
+	game.m_graphics:moveCamera(gState.camera, true);
+	
+	gState.camera.x = gState.camera.x+1;
+	local bound = 5;
+	if(gState.camera.x > bound) then
+		gState.camera.x = -bound;
 	end;
 	
 	--[[

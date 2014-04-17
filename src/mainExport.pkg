@@ -14,14 +14,14 @@ typedef uint32_t           InstanceID;
 // and then into subdirs to find the other packages
 
 
-$pfile "../src/Animation/luaExport.pkg"
-$pfile "../src/Caches/luaExport.pkg"
-$pfile "../src/DataStructs/luaExport.pkg"
-$pfile "../src/Graphics/luaExport.pkg"
-$pfile "../src/Input/luaExport.pkg"
-$pfile "../src/Util/luaExport.pkg"
-$pfile "../src/Window/luaExport.pkg"
+$pfile "../src/Animation/Animation.pkg"
+$pfile "../src/Caches/Caches.pkg"
+$pfile "../src/DataStructs/DataStructs.pkg"
+$pfile "../src/Graphics/Graphics.pkg"
+$pfile "../src/Input/Input.pkg"
+$pfile "../src/Util/Util.pkg"
+$pfile "../src/Window/Window.pkg"
 
 //this one is last, as it's game specific
 
-$pfile "../src/Games/luaExport.pkg"
+$pfile "../src/Games/Game.pkg"

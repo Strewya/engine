@@ -15,6 +15,12 @@ namespace Core
 		Vec2 getTextureDimensions(uint32_t texID);
 		void setBackgroundColor(float red, float green, float blue);
 		void setCulling(bool isEnabled);
+		void setTransparencyMode(bool isEnabled);
+
+		void setOrthographicProjection();
+		void setPerspectiveProjection();
+
+		void moveCamera(const Vec2& translation, bool isAbsolute = false);
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
