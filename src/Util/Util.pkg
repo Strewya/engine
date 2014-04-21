@@ -5,6 +5,7 @@ $#include <Util/Time.h>
 $#include <Util/Transform.h>
 $#include <Util/Utility.h>
 $#include <Util/Vec2.h>
+$#include <Util/Vec3.h>
 
 namespace Core
 {
@@ -93,5 +94,21 @@ namespace Core
 		Vec2 operator-(const Vec2& v) const;
 		Vec2 operator*(float f) const;
 		Vec2 operator/(float f) const;
+	};
+
+	class Vec3
+	{
+		float x, y, z;
+
+		Vec3();
+		Vec3(float x, float y, float z);
+
+		void set(float x, float y, float z);
+
+		Vec3 operator+(const Vec3& v) const;
+		Vec3 operator-() const;
+		Vec3 operator-(const Vec3& v) const;
+		Vec3 operator*(float f) const;
+		Vec3 operator/(float f) const;
 	};
 }

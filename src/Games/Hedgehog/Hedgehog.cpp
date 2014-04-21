@@ -63,6 +63,8 @@ namespace Core
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
+		m_camera.setPosition(Vec3(0, 0, -10));
+
 
 		if(m_isRunning)
 		{
@@ -73,15 +75,6 @@ namespace Core
 
 		if(m_isRunning)
 		{
-			if(m_scripter.functionExists("game_init"))
-			{
-				if(m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1))
-				{
-					m_isRunning &= m_scripter.toBool();
-					m_scripter.pop();
-				}
-			}
-
 			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
@@ -98,7 +91,7 @@ namespace Core
 				dataFile.close();
 			}
 
-			if(dataFile.open(RESOURCE("Defs/.sheet")))
+			if(dataFile.open(RESOURCE("Defs/apples.sheet")))
 			{
 				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
 				dataFile.close();
@@ -134,6 +127,15 @@ namespace Core
 			m_player.m_animationData.m_animationID = m_animationCache.getAnimationID("walk");
 			m_player.m_animationData.m_time = 0;
 			m_animation.registerData(m_player.m_animationData);
+
+			if(m_scripter.functionExists("game_init"))
+			{
+				if(m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1))
+				{
+					m_isRunning &= m_scripter.toBool();
+					m_scripter.pop();
+				}
+			}
 		}
 		m_framerateTimer.update();
 
@@ -203,6 +205,7 @@ namespace Core
 		framerateTf.position.set(0.5f*m_window->getSizeX() - 20, 0.5f*m_window->getSizeY()-10);
 		framerateTf.scale.set(0.5f, 0.5f);
 		m_graphics.setOrthographicProjection();
+		m_graphics.clearCamera();
 		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 2, false);
 
 		m_graphics.present();

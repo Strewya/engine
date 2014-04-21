@@ -2,17 +2,13 @@
 reloaded = true;
 function game_init(game)
 	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false)
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	
-	
 	gActions = {};
-	gInputMap = {};
 	gState = {};
-	
 	game.m_player.m_transform.position:set(0,0);
-	game.m_player.m_transform.scale:set(1,1);
-	game.m_graphics:setCulling(false);
 	
 	st = st and onReload(game);
 	return st;
@@ -21,77 +17,36 @@ end;
 function onReload(game)
 	reloaded = false;
 	
-	gInputMap[Core.Keyboard.m_ArrowLeft] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gActions.moveLeft = true;
-		else
-			gActions.moveLeft = nil;
-		end;
-	end;
+	setupInput();
 	
-	gInputMap[Core.Keyboard.m_ArrowRight] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gActions.moveRight = true;
-		else
-			gActions.moveRight = nil;
-		end;
-	end;
+	game.m_graphics:setBackgroundColor(0.92, 0.94, 0.87);
+	game.m_player.m_transform.scale:set(0.5,0.5);
+	game.m_graphics:setCulling(false);
 	
-	gInputMap[Core.Keyboard.m_ArrowUp] = function(event)
-		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
-			gActions.jump = true;
-		end;
-	end;
+	game.m_prop1.m_image = game.m_imageCache:getImageID("apple_0");
+	Console:add("prop1 is set with imageID " .. game.m_prop1.m_image);
+	game.m_prop1.m_transform.scale:set(0.2,0.2);
 	
-	gInputMap[Core.Keyboard.m_F1] = function(event)
-		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
-			Console.isOpen = not Console.isOpen;
-		end;
-	end;
-	
-	gInputMap[Core.Keyboard.m_F2] = function(event)
-		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
-			gState.changeProj = true;
-		end;
-	end;
-	
-	gInputMap[Core.Keyboard.m_A] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gState.moveCamLeft = true;
-		else
-			gState.moveCamLeft = false;
-		end;
-	end;
-	gInputMap[Core.Keyboard.m_D] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gState.moveCamRight = true;
-		else
-			gState.moveCamRight = false;
-		end;
-	end;
-	gInputMap[Core.Keyboard.m_W] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gState.moveCamUp = true;
-		else
-			gState.moveCamUp = false;
-		end;
-	end;
-	gInputMap[Core.Keyboard.m_S] = function(event)
-		if(event.m_keyboard.m_isDown) then
-			gState.moveCamDown = true;
-		else
-			gState.moveCamDown = false;
-		end;
-	end;
+	game.m_camera:setSpeed(0.01);
 	
 	gState.moveCamRight = false;
 	gState.moveCamLeft = false;
+	gState.moveCamUp = false;
+	gState.moveCamDown = false;
+	gState.moveCamFwd = false;
+	gState.moveCamBack = false;
+	gState.resetCam = false;
+	gState.rotateCam = false;
+	gState.mx = 0;
+	gState.my = 0;
+	gState.rmx = 0;
+	gState.rmy = 0;
 	gState.impulseStrength = 0.34;
 	gState.impulse = 0;
 	gState.maxJumpsAvailable = 3;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -0.05;
-	gState.minY = -3;
+	gState.minY = -3.4;
 	gState.proj = "ortho";
 	gState.changeProj = false;
 	gState.camera = Core.Vec2(0,0);
@@ -106,7 +61,6 @@ function game_tick(game)
 		onReload(game);
 	end;
 	
-	game.m_graphics:setBackgroundColor(1,1,1);
 	parseInput(game.m_input);
 	
 	local player = game.m_player;
@@ -121,15 +75,15 @@ function game_tick(game)
 	
 	if(gActions.moveLeft) then
 		if(player.m_transform.scale.x > 0) then
-			player.m_transform.scale.x = -1;
-			Console:add("Moving to the left i see...");
+			player.m_transform.scale.x = -player.m_transform.scale.x;
+			Console:add("DON'T GO BACK!");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x - 0.2;
 	end;
 	if(gActions.moveRight) then
 		if(player.m_transform.scale.x < 0) then
-			player.m_transform.scale.x = 1;
-			Console:add("Moving to the right i see...");
+			player.m_transform.scale.x = -player.m_transform.scale.x;
+			Console:add("You're a right mover!");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x + 0.2;
 	end;
@@ -166,18 +120,42 @@ function game_tick(game)
 	end;
 	
 	if(gState.moveCamLeft) then	
-		game.m_graphics:moveCamera(Core.Vec2(-0.1, 0));
+		game.m_camera:move(Core.Vec3(-0.1, 0, 0));
+		Console:add("moving the camera left");
 	end;
-	if(gState.moveCamRight) then	
-		game.m_graphics:moveCamera(Core.Vec2(0.1, 0));
+	if(gState.moveCamRight) then
+		game.m_camera:move(Core.Vec3(0.1, 0, 0));
+		Console:add("moving the camera right");
 	end;
-	if(gState.moveCamUp) then	
-		game.m_graphics:moveCamera(Core.Vec2(0, 0.1));
+	if(gState.moveCamUp) then
+		game.m_camera:move(Core.Vec3(0, 0.1, 0));
+		Console:add("moving the camera up");
 	end;
-	if(gState.moveCamDown) then	
-		game.m_graphics:moveCamera(Core.Vec2(0, -0.1));
+	if(gState.moveCamDown) then
+		game.m_camera:move(Core.Vec3(0, -0.1, 0));
+		Console:add("moving the camera down");
 	end;
-	
+	if(gState.moveCamFwd) then
+		game.m_camera:move(Core.Vec3(0, 0, 0.5));
+		Console:add("zooming in");
+		gState.moveCamFwd = false;
+	end;
+	if(gState.moveCamBack) then
+		game.m_camera:move(Core.Vec3(0, 0, -0.5));
+		Console:add("zooming out");
+		gState.moveCamBack = false;
+	end;
+	if(gState.resetCam) then
+		Console:add("resetting camera");
+		game.m_camera:setPosition(Core.Vec3(0,0,-10));
+		game.m_camera:setRotation(Core.Vec3(0,0,0));
+		gState.resetCam = false;
+	end;
+	if(gState.rotateCam) then
+		game.m_camera:rotate(Core.Vec3(gState.rmy, gState.rmx, 0));
+		gState.rmx = 0;
+		gState.rmy = 0;
+	end;
 	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges
@@ -191,20 +169,18 @@ function game_tick(game)
 end;
 
 function game_render(game)
-	local tx = Core.Transform();
-	tx.position:set(0,200);
-	local col = Core.Color();
-	col:set(0,0,0.5);
-	local text = "Hello from the beautiful land of Lua!!!";
-	game.m_graphics:setOrthographicProjection();
-	game.m_graphics:drawText(text, tx, col, 1, true);
-	tx.position.y = tx.position.y + 40;
-	game.m_graphics:drawText(text, tx, col, 1, false);
-	
-	col:set(1,1,1);
-	local img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
 	game.m_graphics:setPerspectiveProjection();
-	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img, img.m_textureID);
+	local col = Core.Color();
+	col:set(1,1,1);
+	game.m_graphics:applyCamera(game.m_camera);
+	
+	local img = game.m_imageCache:getImage(game.m_prop1.m_image);
+	game.m_graphics:drawTexturedQuad(game.m_prop1.m_transform, col, img);
+	
+	img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
+	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
+	
+	
 	
 	Console:draw(game.m_graphics);
 end;

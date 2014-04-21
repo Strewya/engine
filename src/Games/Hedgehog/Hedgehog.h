@@ -14,6 +14,7 @@
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <Caches/TextureCache.h>
+#include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/ScriptingSystem.h>
@@ -61,6 +62,8 @@ namespace Core
 		ScriptCache m_scriptCache;
 		SpritesheetCache m_spritesheetCache;
 		TextureCache m_textureCache;
+
+		Camera m_camera;
 		
 		Player m_player;
 		Prop m_prop1;

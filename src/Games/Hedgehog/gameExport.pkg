@@ -13,6 +13,13 @@ namespace Core
 		tolua_readonly Time m_mainTimer;
 	};
 
+	class Prop
+	{
+		Transform m_transform;
+		Color m_tint;
+		uint32_t m_image;
+	};
+
 	class HedgehogGame
 	{
 		//systems
@@ -26,7 +33,10 @@ namespace Core
 		tolua_readonly SpritesheetCache m_spritesheetCache;
 		tolua_readonly TextureCache m_textureCache;
 
+		tolua_readonly Camera m_camera;
+
 		tolua_readonly Player m_player;
+		tolua_readonly Prop m_prop1;
 
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;

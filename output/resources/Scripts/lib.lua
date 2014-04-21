@@ -3,10 +3,9 @@ function parseInput(input)
 	local cnt = input:getEventCount();
 	for i=0, cnt-1 do
 		local event = input:getEvent(i);
-		if(event.m_type == Core.WE_KEYBOARDKEY) then
-			for k,v in pairs(gInputMap) do
-				if(event.m_keyboard.m_keyCode == k) then
-					v(event);
+		if(gInput[event.m_type] ~= nil) then
+			for k,v in pairs(gInput[event.m_type]) do
+				if(v(event)) then
 					break;
 				end;
 			end;
@@ -14,3 +13,9 @@ function parseInput(input)
 	end;
 end;
 
+function addInput(eventType, fn)
+	if(gInput[eventType] == nil) then
+		gInput[eventType] = {};
+	end;
+	table.insert(gInput[eventType], fn);
+end;

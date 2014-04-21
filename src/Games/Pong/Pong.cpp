@@ -10,6 +10,7 @@
 #include <vector>
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
+#include <Graphics/Camera.h>
 #include <Input/KeyCodes.h>
 #include <Util/DataFile.h>
 #include <Util/Color.h>
@@ -331,7 +332,10 @@ namespace Core
 		auto h = m_window->getSizeY()*0.5f - 20;
 
 		m_graphics.begin();
-
+		m_graphics.setOrthographicProjection();
+		Camera cam;
+		cam.setPosition(Vec3(0, 0, -1));
+		m_graphics.applyCamera(cam);
 		
 
 		m_graphics.drawQuad(m_field.m_tf, m_field.m_size*0.5f, m_field.m_c);

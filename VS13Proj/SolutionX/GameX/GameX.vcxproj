@@ -198,6 +198,7 @@
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
@@ -216,6 +217,7 @@
     <ClCompile Include="..\..\..\src\Util\Time.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
     <ClCompile Include="..\..\..\src\Util\Vec2.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Vec3.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="..\..\..\src\Window\Window.cpp" />
@@ -238,6 +240,7 @@
     <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h" />
     <ClInclude Include="..\..\..\src\Games\Pong\Pong.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
@@ -255,6 +258,7 @@
     <ClInclude Include="..\..\..\src\Util\Time.h" />
     <ClInclude Include="..\..\..\src\Util\Transform.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2.h" />
+    <ClInclude Include="..\..\..\src\Util\Vec3.h" />
     <ClInclude Include="..\..\..\src\Window\myWindows.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h" />

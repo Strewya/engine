@@ -8,11 +8,13 @@
 #include <iostream>
 /******* extra headers *******/
 #include <DataStructs/Image.h>
+#include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
 #include <Util/DataFile.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
+#include <Util/Vec3.h>
 #include <Window/Window.h>
 /******* end headers *******/
 
@@ -29,6 +31,7 @@ namespace Core
 	static ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
 	static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
 	static ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize);
+	static XMVECTOR convert(const Vec3& v);
 
 	//*****************************************************************
 	//					INIT
@@ -60,11 +63,7 @@ namespace Core
 			initViewport() &&
 			initSamplerState();
 
-		m_camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-		m_camLookAt = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		m_camPosition = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
-		
-		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
+		m_camView = XMMatrixIdentity();
 		
 		setPerspectiveProjection();
 
@@ -187,7 +186,7 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					SET TRANSPAERNCY MODE
+	//					SET TRANSPARENCY MODE
 	//*****************************************************************
 	void GraphicsSystem::setTransparencyMode(bool isEnabled)
 	{
@@ -216,21 +215,28 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					MOVE CAMERA
+	//					APPLY CAMERA
 	//*****************************************************************
-	void GraphicsSystem::moveCamera(const Vec2& translation, bool isAbsolute)
+	void GraphicsSystem::applyCamera(const Camera& cam)
 	{
-		if(isAbsolute)
-		{
-			m_camPosition = XMVectorSet(translation.x, translation.y, -1.0f, 0.0f);
-			m_camLookAt = XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
-		}
-		else
-		{
-			m_camPosition += XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
-			m_camLookAt += XMVectorSet(translation.x, translation.y, 0.0f, 0.0f);
-		}
-		m_camView = XMMatrixLookAtLH(m_camPosition, m_camLookAt, m_camUp);
+		auto pos = convert(cam.getPosition());
+		auto lookAt = convert(cam.getLookAtAxis());
+		auto up = convert(cam.getUpAxis());
+		auto rot = convert(cam.getRotation()*cam.getSpeed());
+
+		auto rotMat = XMMatrixRotationRollPitchYawFromVector(rot);
+		rot = XMVector3Transform(lookAt, rotMat);
+		lookAt = rot + pos;
+
+		m_camView = XMMatrixLookAtLH(pos, lookAt, up);
+	}
+
+	//*****************************************************************
+	//					CLEAR CAMERA
+	//*****************************************************************
+	void GraphicsSystem::clearCamera()
+	{
+		m_camView = XMMatrixIdentity();
 	}
 
 	//*****************************************************************
@@ -447,7 +453,7 @@ namespace Core
 	//*****************************************************************
 	//					DRAW TEXTURED QUAD
 	//*****************************************************************
-	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, const Image& img, uint32_t tx)
+	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, const Image& img)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
 		
@@ -510,7 +516,7 @@ namespace Core
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		auto srv = m_textures[tx].get();
+		auto srv = m_textures[img.m_textureID].get();
 		m_devcon->PSSetShaderResources(0, 1, &srv);
 
 		//m_devcon->Draw(4, 0);
@@ -627,7 +633,7 @@ namespace Core
 
 
 			cbPerObject cbpo;
-			cbpo.WVP = XMMatrixTranspose(m_world * /*m_camView * */m_camProjection);
+			cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
 			cbpo.FillColor.x = tint.r;
 			cbpo.FillColor.y = tint.g;
 			cbpo.FillColor.z = tint.b;
@@ -1002,5 +1008,10 @@ namespace Core
 		DXGI_SAMPLE_DESC& sd = scd.SampleDesc;
 		sd.Count = 1;
 		sd.Quality = 0;
+	}
+
+	static XMVECTOR convert(const Vec3& v)
+	{
+		return XMVectorSet(v.x, v.y, v.z, 0);
 	}
 }

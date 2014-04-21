@@ -2,14 +2,77 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Dimensional.h>
+#include <Util/Vec3.h>
 /******* C++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/
 
 namespace Core
 {
-	
+	Vec3::Vec3(float x, float y, float z)
+		: x(x), y(y), z(z)
+	{}
+
+	Vec3::Vec3()
+		: Vec3(0, 0, 0)
+	{}
+
+	void Vec3::set(float x, float y, float z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+
+	Vec3 Vec3::operator+(const Vec3& v) const
+	{
+		return Vec3(x + v.x, y + v.y, z + v.z);
+	}
+
+	Vec3& Vec3::operator+=(const Vec3& v)
+	{
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+
+	Vec3 Vec3::operator-() const
+	{
+		return Vec3(-x, -y, -z);
+	}
+
+	Vec3 Vec3::operator-(const Vec3& v) const
+	{
+		return Vec3(x - v.x, y - v.y, z - v.z);
+	}
+
+	Vec3 Vec3::operator*(float f) const
+	{
+		return Vec3(x * f, y * f, z * f);
+	}
+
+	Vec3 Vec3::operator/(float f) const
+	{
+		return Vec3(x / f, y / f, z / f);
+	}
+
+	Vec3 operator*(float f, const Vec3& v)
+	{
+		return v*f;
+	}
+
+	Vec3 operator/(float f, const Vec3& v)
+	{
+		return v / f;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const Vec3& v)
+	{
+		os << "{" << v.x << "," << v.y  << "," << v.z << "}";
+		return os;
+	}
 }
 
 

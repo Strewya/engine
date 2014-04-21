@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*	class:	Vec2
+*	class:	Vec3
 *	usage:
 ********************************************/
 /******* C++ headers *******/
@@ -10,7 +10,27 @@
 
 namespace Core 
 {
-	
+	class Vec3
+	{
+	public:
+		float x, y, z;
+
+		Vec3();
+		Vec3(float x, float y, float z);
+
+		void set(float x, float y, float z);
+
+		Vec3 operator+(const Vec3& v) const;
+		Vec3& operator+=(const Vec3& v);
+		Vec3 operator-() const;
+		Vec3 operator-(const Vec3& v) const;
+		Vec3 operator*(float f) const;
+		Vec3 operator/(float f) const;
+	};
+
+	Vec3 operator*(float f, const Vec3& v);
+	Vec3 operator/(float f, const Vec3& v);
+	std::ostream& operator<<(std::ostream& os, const Vec3& v);
 }
 
 // #include <iostream>

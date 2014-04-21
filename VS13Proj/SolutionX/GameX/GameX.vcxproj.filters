@@ -134,6 +134,12 @@
     <ClCompile Include="..\..\..\src\Games\Game.cpp">
       <Filter>Design</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Camera.cpp">
+      <Filter>Framework\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Vec3.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -247,6 +253,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h">
       <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Camera.h">
+      <Filter>Framework\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec3.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

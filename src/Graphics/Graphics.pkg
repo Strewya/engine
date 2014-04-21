@@ -1,8 +1,28 @@
 
+$#include <Graphics/Camera.h>
 $#include <Graphics/GraphicsSystem.h>
 
 namespace Core
 {
+	class Camera
+	{
+		Camera();
+
+		void move(const Vec3& translation);
+		void rotate(const Vec3& rotation);
+
+		const Vec3& getPosition() const;
+		const Vec3& getLookAtAxis() const;
+		const Vec3& getUpAxis() const;
+		const Vec3& getRotation() const;
+		float getSpeed() const;
+
+		void setPosition(const Vec3& pos);
+		void setUpAxis(const Vec3& upAxis);
+		void setLookAtAxis(const Vec3& lookAtAxis);
+		void setRotation(const Vec3& rot);
+		void setSpeed(float speed);
+	};
 
 	class GraphicsSystem
 	{
@@ -20,12 +40,13 @@ namespace Core
 		void setOrthographicProjection();
 		void setPerspectiveProjection();
 
-		void moveCamera(const Vec2& translation, bool isAbsolute = false);
+		void applyCamera(const Camera& cam);
+		void clearCamera();
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
-		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image, uint32_t textureID);
+		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);

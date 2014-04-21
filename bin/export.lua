@@ -24,8 +24,9 @@ local d = lfs.chdir(sgprojDir);
 local pkgFiles = {};
 attrdir(sgprojDir .. "/src", pkgFiles);
 local cppAttr = lfs.attributes(sgprojDir .. "/src/Scripting/luaBinding.cpp");
+local selectorAttr = lfs.attributes(sgprojDir .. "/src/Games/GameSelector.h");
 local rebuild = true;
-if(cppAttr ~= nil) then
+if(cppAttr ~= nil and selectorAttr.modification < cppAttr.modification) then
 	rebuild = false;
 	for k,v in pairs(pkgFiles) do
 		local fileTS = lfs.attributes(v, "modification");

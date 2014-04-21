@@ -16,6 +16,7 @@
 
 namespace Core
 {
+	class Camera;
 	class Color;
 	class DataFile;
 	class Image;
@@ -72,12 +73,13 @@ namespace Core
 		void setOrthographicProjection();
 		void setPerspectiveProjection();
 
-		void moveCamera(const Vec2& translation, bool isAbsolute = false);
+		void applyCamera(const Camera& camera);
+		void clearCamera();
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
-		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image, uint32_t textureID);
+		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
@@ -110,9 +112,6 @@ namespace Core
 		
 		XMMATRIX m_camView;
 		XMMATRIX m_camProjection;
-		XMVECTOR m_camPosition;
-		XMVECTOR m_camLookAt;
-		XMVECTOR m_camUp;
 		XMMATRIX m_world;
 		
 		//this shouldn't be explicit like this, refactor later

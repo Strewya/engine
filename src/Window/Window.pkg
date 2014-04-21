@@ -53,7 +53,7 @@ namespace Core
 	{
 		int32_t m_x;
 		int32_t m_y;
-		uint32_t m_scroll;
+		int32_t m_scroll;
 	};
 
 	enum FileChangeType
