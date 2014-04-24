@@ -9,15 +9,15 @@ namespace Core
 	{
 		Transform m_transform;
 		Color m_tint;
-		tolua_readonly AnimationData m_animationData;
-		tolua_readonly Time m_mainTimer;
+		uint32_t m_animationPlayerID;
+		uint32_t m_imageID;
 	};
 
 	class Prop
 	{
 		Transform m_transform;
 		Color m_tint;
-		uint32_t m_image;
+		uint32_t m_imageID;
 	};
 
 	class HedgehogGame

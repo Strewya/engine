@@ -23,8 +23,9 @@ function onReload(game)
 	game.m_player.m_transform.scale:set(0.5,0.5);
 	game.m_graphics:setCulling(false);
 	
-	game.m_prop1.m_image = game.m_imageCache:getImageID("apple_0");
-	Console:add("prop1 is set with imageID " .. game.m_prop1.m_image);
+	game.m_prop1.m_imageID = game.m_imageCache:getImageID("apple_0");
+	game.m_player.m_imageID = game.m_imageCache:getImageID("idle_00");
+	
 	game.m_prop1.m_transform.scale:set(0.2,0.2);
 	
 	game.m_camera:setSpeed(0.01);
@@ -65,13 +66,6 @@ function game_tick(game)
 	
 	local player = game.m_player;
 	local gameTimer = game.m_logicTimer;
-	
-	player.m_mainTimer:updateBy(gameTimer:getDeltaMicros());
-	local milis = Core.Time:microsToSeconds(player.m_mainTimer:getCurMicros());
-	
-	local walk = game.m_animationCache:getAnimationID("walk");
-	local sit = game.m_animationCache:getAnimationID("sit");
-	local unsit = game.m_animationCache:getAnimationID("unsit");
 	
 	if(gActions.moveLeft) then
 		if(player.m_transform.scale.x > 0) then
@@ -174,10 +168,10 @@ function game_render(game)
 	col:set(1,1,1);
 	game.m_graphics:applyCamera(game.m_camera);
 	
-	local img = game.m_imageCache:getImage(game.m_prop1.m_image);
+	local img = game.m_imageCache:getImage(game.m_prop1.m_imageID);
 	game.m_graphics:drawTexturedQuad(game.m_prop1.m_transform, col, img);
 	
-	img = game.m_imageCache:getImage(game.m_player.m_animationData.m_imageID);
+	img = game.m_imageCache:getImage(game.m_player.m_imageID);
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
 	
 	

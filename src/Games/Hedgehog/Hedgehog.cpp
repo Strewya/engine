@@ -123,11 +123,6 @@ namespace Core
 				return false;
 			});
 
-
-			m_player.m_animationData.m_animationID = m_animationCache.getAnimationID("walk");
-			m_player.m_animationData.m_time = 0;
-			m_animation.registerData(m_player.m_animationData);
-
 			if(m_scripter.functionExists("game_init"))
 			{
 				if(m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1))
@@ -136,6 +131,9 @@ namespace Core
 					m_scripter.pop();
 				}
 			}
+
+			uint32_t walkID = m_animationCache.getAnimationID("walk");
+			m_animation.startAnimation(walkID, true, 1, IT_LINEAR, m_player.m_imageID);
 		}
 		m_framerateTimer.update();
 

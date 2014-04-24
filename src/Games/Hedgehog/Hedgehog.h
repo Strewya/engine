@@ -33,8 +33,8 @@ namespace Core
 	public:
 		Transform m_transform;
 		Color m_tint;
-		AnimationData m_animationData;
-		Time m_mainTimer;
+		uint32_t m_animationPlayerID;
+		uint32_t m_imageID;
 	};
 
 	class Prop
@@ -42,7 +42,7 @@ namespace Core
 	public:
 		Transform m_transform;
 		Color m_tint;
-		uint32_t m_image;
+		uint32_t m_imageID;
 	};
 
 	class HedgehogGame
