@@ -28,6 +28,7 @@ namespace Core
 		bool status = true;
 
 		m_animations = &animations;
+		m_idCounter = 0;
 
 		DEBUG_INIT(AnimationSystem);
 		return status;
@@ -37,16 +38,12 @@ namespace Core
 	{
 		bool status = true;
 
-
-
 		DEBUG_SHUTDOWN(AnimationSystem);
 		return status;
 	}
 
 	void AnimationSystem::update(uint64_t deltaTime)
 	{
-		static Interpolator functions[] = {linear, quadratic};
-
 		m_timer.updateBy(deltaTime);
 
 		for(auto& player : m_runningAnimations)
@@ -58,11 +55,11 @@ namespace Core
 				uint64_t current = m_timer.getCurMicros() - player.m_startTime;
 				uint64_t length = player.m_endTime - player.m_startTime;
 				float time = static_cast<float>(current) / static_cast<float>(length);
-				uint64_t referenceTime = interpolate(player.m_startTime, player.m_endTime, functions[player.m_interpolation], time);
+				uint64_t referenceTime = interpolate(player.m_startTime, player.m_endTime, linear, time);
 
 				if(referenceTime >= player.m_endTime)
 				{
-					if(player.m_loops)
+					if(animation.m_defaultRepeat)
 					{
 						player.m_startTime += animation.m_defaultDuration;
 						player.m_endTime += animation.m_defaultDuration;
@@ -89,19 +86,34 @@ namespace Core
 		}
 	}
 
-	uint32_t AnimationSystem::startAnimation(uint32_t animationID, bool isLooped, float playbackRate, InterpolationType interpolationFn, uint32_t& outImageID)
+	uint32_t AnimationSystem::createPlayer(uint32_t& outImageID)
+	{
+		auto& player = getFreePlayer();
+		player.m_outImageID = &outImageID;
+		player.m_state = AnimationPlayer::STOPPED;
+		DEBUG_INFO("Creating player ", player.m_id);
+		return player.m_id;
+	}
+
+	void AnimationSystem::releasePlayer(uint32_t playerID)
+	{
+		auto index = findPlayer(playerID);
+		if(index != -1)
+		{
+			m_runningAnimations[index].m_state = AnimationPlayer::UNUSED;
+		}
+	}
+
+	void AnimationSystem::startAnimation(uint32_t playerID, uint32_t animationID, float playbackRate)
 	{
 		const auto& animation = m_animations->getAnimation(animationID);
-		auto& player = getFreePlayer();
+		auto& player = m_runningAnimations[findPlayer(playerID)];
 		player.m_animationID = animationID;
 		player.m_startTime = m_timer.getCurMicros();
 		player.m_endTime = player.m_startTime + animation.m_defaultDuration;
-		player.m_outImageID = &outImageID;
 		player.m_playbackRate = playbackRate;
-		player.m_loops = isLooped;
 		player.m_state = AnimationPlayer::RUNNING;
-		player.m_interpolation = interpolationFn;
-		return player.m_id;
+		DEBUG_INFO("Starting animation ", animation.m_name, " for player ", playerID);
 	}
 
 	void AnimationSystem::stopAnimation(uint32_t playerID)
@@ -113,72 +125,45 @@ namespace Core
 		}
 	}
 
-	void AnimationSystem::pauseAnimation(uint32_t playerID)
-	{
-		auto index = findPlayer(playerID);
-		if(checkState(index, AnimationPlayer::RUNNING))
-		{
-			m_runningAnimations[index].m_state = AnimationPlayer::PAUSED;
-		}
-	}
-
-	void AnimationSystem::resumeAnimation(uint32_t playerID)
-	{
-		auto index = findPlayer(playerID);
-		if(checkState(index, AnimationPlayer::PAUSED))
-		{
-			m_runningAnimations[index].m_state = AnimationPlayer::RUNNING;
-		}
-	}
-
-	bool AnimationSystem::isStopped(uint32_t playerID)
-	{
-		auto index = findPlayer(playerID);
-		return index == -1 || checkState(index, AnimationPlayer::STOPPED);
-	}
-
-	bool AnimationSystem::isPaused(uint32_t playerID)
-	{
-		auto index = findPlayer(playerID);
-		return checkState(index, AnimationPlayer::PAUSED);
-	}
-
 	bool AnimationSystem::isRunning(uint32_t playerID)
 	{
 		auto index = findPlayer(playerID);
-		return checkState(index, AnimationPlayer::RUNNING);
+		return index != -1 && m_runningAnimations[index].m_state == AnimationPlayer::RUNNING;
 	}
 
-	bool AnimationSystem::checkState(uint32_t index, AnimationPlayer::State state)
+	bool AnimationSystem::isActive(uint32_t playerID)
 	{
-		return index != -1 && m_runningAnimations[index].m_state == state;
+		auto index = findPlayer(playerID);
+		return index != -1 && m_runningAnimations[index].m_state != AnimationPlayer::UNUSED;
 	}
 
 	uint32_t AnimationSystem::findPlayer(uint32_t playerID)
 	{
 		using std::begin; using std::end;
-		for(auto it = begin(m_runningAnimations); it != end(m_runningAnimations); ++it)
+		auto it = std::find_if(begin(m_runningAnimations), end(m_runningAnimations),
+							   [=](const AnimationPlayer& p){ return p.m_id == playerID; });
+		
+		uint32_t index = -1;
+		if(it != end(m_runningAnimations))
 		{
-			if(it->m_id == playerID)
-			{
-				return std::distance(begin(m_runningAnimations), it);
-			}
+			index = std::distance(begin(m_runningAnimations), it);
 		}
-		return -1;
+		
+		return index;
 	}
 
 	AnimationPlayer& AnimationSystem::getFreePlayer()
 	{
-		for(auto& a : m_runningAnimations)
+		auto it = std::find_if(begin(m_runningAnimations), end(m_runningAnimations),
+							   [](const AnimationPlayer& p){ return p.m_state == AnimationPlayer::UNUSED; });
+		if(it == end(m_runningAnimations))
 		{
-			if(a.m_state == AnimationPlayer::STOPPED)
-			{
-				a.m_id = ++m_idCounter;
-				return a;
-			}
+			auto index = m_runningAnimations.size();
+			m_runningAnimations.emplace_back();
+			it = std::next(begin(m_runningAnimations), index);
 		}
-		m_runningAnimations.emplace_back();
-		m_runningAnimations.back().m_id = ++m_idCounter;
-		return m_runningAnimations.back();
+		
+		it->m_id = ++m_idCounter;
+		return *it;
 	}
 }

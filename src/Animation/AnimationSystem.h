@@ -15,19 +15,14 @@ namespace Core
 	class Animation;
 	class AnimationCache;
 
-	enum InterpolationType
-	{
-		IT_LINEAR,
-		IT_QUADRATIC
-	};
 	
 	class AnimationPlayer
 	{
 	public:
 		enum State
 		{
+			UNUSED,
 			STOPPED,
-			PAUSED,
 			RUNNING
 		};
 
@@ -38,26 +33,22 @@ namespace Core
 		uint32_t m_id;
 		State m_state;
 		float m_playbackRate;
-		InterpolationType m_interpolation;
-		bool m_loops;
 	};
 
 	class AnimationSystem
 	{
 	public:
-		
-
 		bool init(AnimationCache& animations);
 		bool shutdown();
 
 		void update(uint64_t dt);
 
-		uint32_t startAnimation(uint32_t animationID, bool loop, float playbackRate, InterpolationType fn, uint32_t& outImageID);
+		uint32_t createPlayer(uint32_t& outImageID);
+		void releasePlayer(uint32_t playerID);
+
+		void startAnimation(uint32_t playerID, uint32_t animationID, float playbackRate);
 		void stopAnimation(uint32_t playerID);
-		void pauseAnimation(uint32_t playerID);
-		void resumeAnimation(uint32_t playerID);
-		bool isStopped(uint32_t playerID);
-		bool isPaused(uint32_t playerID);
+		bool isActive(uint32_t playerID);
 		bool isRunning(uint32_t playerID);
 		
 	private:
@@ -66,7 +57,6 @@ namespace Core
 		AnimationCache* m_animations;
 		uint32_t m_idCounter;
 		
-		bool checkState(uint32_t index, AnimationPlayer::State state);
 		uint32_t findPlayer(uint32_t playerID);
 		AnimationPlayer& getFreePlayer();
 	};

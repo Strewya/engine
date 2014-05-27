@@ -25,8 +25,7 @@ return
 		defaultRepeat = false,
 		list = {
 			{ name = "walk",  duration = 0.4, loop = true,  images = {"walk_00", "walk_01", "walk_02", "walk_03", "walk_04", "walk_05"} },
-			{ name = "sit",   duration = 0.1, loop = false, images = {"idle_03", "idle_02", "idle_01", "idle_00"} },
-			{ name = "unsit", duration = 0.1, loop = false, images = {"idle_00", "idle_01", "idle_02", "idle_03"} }
+			{ name = "idle_to_walk", duration = 0.1, loop = false, images = {"idle_00", "idle_01", "idle_02", "idle_03"} }
 		}
 	}
 };

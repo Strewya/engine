@@ -3,22 +3,16 @@ $#include <Animation/AnimationSystem.h>
 
 namespace Core
 {
-	enum InterpolationType
-	{
-		IT_LINEAR,
-		IT_QUADRATIC
-	};
-
 	class AnimationSystem
 	{
 		void update(uint64_t dt);
 
-		uint32_t startAnimation(uint32_t animationID, bool loop, float playbackRate, InterpolationType fn, uint32_t& outImageID);
+		uint32_t createPlayer(uint32_t& outImageID);
+		void releasePlayer(uint32_t playerID);
+
+		void startAnimation(uint32_t playerID, uint32_t animationID, float playbackRate);
 		void stopAnimation(uint32_t playerID);
-		void pauseAnimation(uint32_t playerID);
-		void resumeAnimation(uint32_t playerID);
-		bool isStopped(uint32_t playerID);
-		bool isPaused(uint32_t playerID);
+		bool isActive(uint32_t playerID);
 		bool isRunning(uint32_t playerID);
 	};
 }

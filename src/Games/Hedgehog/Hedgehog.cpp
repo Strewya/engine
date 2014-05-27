@@ -19,6 +19,7 @@ namespace Core
 	{
 		DEBUG_INFO("---------------------------------");
 		bool status = true;
+		m_animation.releasePlayer(m_player.m_animationPlayerID);
 		status &= m_animationCache.shutdown();
 		status &= m_imageCache.shutdown();
 		status &= m_scriptCache.shutdown();
@@ -132,8 +133,7 @@ namespace Core
 				}
 			}
 
-			uint32_t walkID = m_animationCache.getAnimationID("walk");
-			m_animation.startAnimation(walkID, true, 1, IT_LINEAR, m_player.m_imageID);
+			m_player.m_animationPlayerID = m_animation.createPlayer(m_player.m_imageID);
 		}
 		m_framerateTimer.update();
 

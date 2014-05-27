@@ -20,7 +20,7 @@ function onReload(game)
 	setupInput();
 	
 	game.m_graphics:setBackgroundColor(0.92, 0.94, 0.87);
-	game.m_player.m_transform.scale:set(0.5,0.5);
+	game.m_player.m_transform.scale:set(1,1);
 	game.m_graphics:setCulling(false);
 	
 	game.m_prop1.m_imageID = game.m_imageCache:getImageID("apple_0");
@@ -44,15 +44,71 @@ function onReload(game)
 	gState.rmy = 0;
 	gState.impulseStrength = 0.34;
 	gState.impulse = 0;
-	gState.maxJumpsAvailable = 3;
+	gState.maxJumpsAvailable = 2;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -0.05;
-	gState.minY = -3.4;
+	gState.minY = -3.0;
 	gState.proj = "ortho";
 	gState.changeProj = false;
 	gState.camera = Core.Vec2(0,0);
-	gState.animStates = {};
-	table.insert(gState.animStates, State("walk"));
+	
+	gState.asm = StateMachine();
+	
+	local s = State("idle");
+	function s.fenter(game)
+		game.m_player.m_imageID = game.m_imageCache:getImageID("idle_00");
+	end;
+	function s.fevent(event, asm)
+		if(event == "walk") then
+			asm:setState("idle_to_walk");
+		end;
+	end;
+	gState.asm:addState(s);
+	
+	s = State("idle_to_walk");
+	function s.fenter(game)
+		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("idle_to_walk"), 1);
+	end;
+	function s.fupdate(game, asm)
+		if(game.m_animation:isRunning(game.m_player.m_animationPlayerID) == false) then
+			asm:setState("walk");
+		end;
+	end;
+	function s.fevent(event, asm)
+		if(event == "idle") then
+			asm:setState("idle");
+		end;
+	end;
+	gState.asm:addState(s);
+	
+	s = State("walk");
+	function s.fenter(game)
+		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("walk", 1));
+	end;
+	function s.fevent(event, asm)
+		if(event == "idle") then
+			asm:setState("walk_to_idle");
+		end;
+	end;
+	gState.asm:addState(s);
+	
+	s = State("walk_to_idle");
+	function s.fenter(game)
+		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("idle_to_walk", -1));
+	end;
+	function s.fupdate(game, asm)
+		if(not game.m_animation:isRunning(game.m_player.m_animationPlayerID)) then
+			asm:setState("idle");
+		end;
+	end;
+	function s.fevent(event, asm)
+		if(event == "walk") then
+			asm:setState("walk");
+		end;
+	end;
+	gState.asm:addState(s);
+	
+	gState.asm:setState("idle");
 	
 	return true;
 end;
@@ -68,18 +124,24 @@ function game_tick(game)
 	local gameTimer = game.m_logicTimer;
 	
 	if(gActions.moveLeft) then
+		gState.asm:transition("walk");
 		if(player.m_transform.scale.x > 0) then
 			player.m_transform.scale.x = -player.m_transform.scale.x;
 			Console:add("DON'T GO BACK!");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x - 0.2;
+	else
+		gState.asm:transition("idle");
 	end;
 	if(gActions.moveRight) then
+		gState.asm:transition("walk");
 		if(player.m_transform.scale.x < 0) then
 			player.m_transform.scale.x = -player.m_transform.scale.x;
 			Console:add("You're a right mover!");
 		end;
 		player.m_transform.position.x = player.m_transform.position.x + 0.2;
+	else
+		gState.asm:transition("idle");
 	end;
 	
 	if(gActions.jump == true) then
@@ -150,6 +212,8 @@ function game_tick(game)
 		gState.rmx = 0;
 		gState.rmy = 0;
 	end;
+
+	gState.asm:update(game);
 	
 	--[[
 	//the c++ side parses the raw input events, and maps/binds them to game specific states/actions/ranges

@@ -48,8 +48,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\engine\include;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\engine\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SGPROJECT)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SGPROJECT)\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SGPROJECT)\lib\</OutDir>
     <TargetName>tolua++</TargetName>
   </PropertyGroup>
