@@ -39,7 +39,6 @@ function StateMachine:setState(name)
 			self.m_current:onExit(self);
 		end;
 		self.m_current = self.m_states[name];
-		Console:add("Current state is " .. name);
 		self.m_current:onEnter(self);
 	end;
 end;

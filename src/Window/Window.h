@@ -77,10 +77,10 @@ namespace Core
 		uint32_t getFileChangeDelay() const;
 
 		bool readEvent(uint64_t time, WindowEvent& outEvent);
-#ifdef _DEBUG
+
 		void openConsole(uint32_t xPos, uint32_t yPos);
 		void closeConsole();
-#endif
+
 	protected:	
 		WindowEvent& newEvent();
 		void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);

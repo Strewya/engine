@@ -10,7 +10,7 @@ namespace Core
 		Transform m_transform;
 		Color m_tint;
 		uint32_t m_animationPlayerID;
-		uint32_t m_imageID;
+		uint32_t m_imageID; 
 	};
 
 	class Prop

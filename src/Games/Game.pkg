@@ -32,4 +32,4 @@
 
 
 
-$pfile "../src/Games/Hedgehog/gameExport.pkg"
+$pfile "../src/Games/Hedgehog/Hedgehog.pkg"

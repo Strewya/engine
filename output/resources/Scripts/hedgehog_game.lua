@@ -2,7 +2,8 @@
 reloaded = true;
 function game_init(game)
 	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false)
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	
@@ -47,67 +48,14 @@ function onReload(game)
 	gState.maxJumpsAvailable = 2;
 	gState.jumpsAvailable = gState.maxJumpsAvailable;
 	gState.gravity = -0.05;
-	gState.minY = -3.0;
+	gState.minY = -2.0;
+	gState.xvelocity = 0.1;
 	gState.proj = "ortho";
 	gState.changeProj = false;
 	gState.camera = Core.Vec2(0,0);
 	
 	gState.asm = StateMachine();
-	
-	local s = State("idle");
-	function s.fenter(game)
-		game.m_player.m_imageID = game.m_imageCache:getImageID("idle_00");
-	end;
-	function s.fevent(event, asm)
-		if(event == "walk") then
-			asm:setState("idle_to_walk");
-		end;
-	end;
-	gState.asm:addState(s);
-	
-	s = State("idle_to_walk");
-	function s.fenter(game)
-		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("idle_to_walk"), 1);
-	end;
-	function s.fupdate(game, asm)
-		if(game.m_animation:isRunning(game.m_player.m_animationPlayerID) == false) then
-			asm:setState("walk");
-		end;
-	end;
-	function s.fevent(event, asm)
-		if(event == "idle") then
-			asm:setState("idle");
-		end;
-	end;
-	gState.asm:addState(s);
-	
-	s = State("walk");
-	function s.fenter(game)
-		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("walk", 1));
-	end;
-	function s.fevent(event, asm)
-		if(event == "idle") then
-			asm:setState("walk_to_idle");
-		end;
-	end;
-	gState.asm:addState(s);
-	
-	s = State("walk_to_idle");
-	function s.fenter(game)
-		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("idle_to_walk", -1));
-	end;
-	function s.fupdate(game, asm)
-		if(not game.m_animation:isRunning(game.m_player.m_animationPlayerID)) then
-			asm:setState("idle");
-		end;
-	end;
-	function s.fevent(event, asm)
-		if(event == "walk") then
-			asm:setState("walk");
-		end;
-	end;
-	gState.asm:addState(s);
-	
+	makeStates(gState.asm);
 	gState.asm:setState("idle");
 	
 	return true;
@@ -129,18 +77,17 @@ function game_tick(game)
 			player.m_transform.scale.x = -player.m_transform.scale.x;
 			Console:add("DON'T GO BACK!");
 		end;
-		player.m_transform.position.x = player.m_transform.position.x - 0.2;
-	else
-		gState.asm:transition("idle");
-	end;
+		player.m_transform.position.x = player.m_transform.position.x - gState.xvelocity;
+	end;		
 	if(gActions.moveRight) then
 		gState.asm:transition("walk");
 		if(player.m_transform.scale.x < 0) then
 			player.m_transform.scale.x = -player.m_transform.scale.x;
 			Console:add("You're a right mover!");
 		end;
-		player.m_transform.position.x = player.m_transform.position.x + 0.2;
-	else
+		player.m_transform.position.x = player.m_transform.position.x + gState.xvelocity;
+	end;
+	if(not gActions.moveLeft and not gActions.moveRight) then
 		gState.asm:transition("idle");
 	end;
 	

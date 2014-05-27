@@ -295,10 +295,10 @@
     <CustomBuild Include="..\..\..\src\Games\Game.pkg">
       <Filter>Design</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\gameExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\Hedgehog.pkg">
       <Filter>Design\Hedgehog</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Pong\gameExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
       <Filter>Design\Pong</Filter>
     </CustomBuild>
   </ItemGroup>

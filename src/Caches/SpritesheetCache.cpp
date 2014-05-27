@@ -220,11 +220,11 @@ namespace Core
 					{
 						Animation anim;
 						anim.m_name.assign(file.getString("name", ""));
-						anim.m_defaultDuration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
-						anim.m_defaultRepeat = file.getBool("loop", defaultRepeat);
+						anim.m_duration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
+						anim.m_repeats = file.getBool("loop", defaultRepeat);
 						auto imageCnt = file.getListSize("images");
 						anim.m_sequence.resize(imageCnt);
-						if(!anim.m_name.empty() && anim.m_defaultDuration > 0 && imageCnt > 0)
+						if(!anim.m_name.empty() && anim.m_duration > 0 && imageCnt > 0)
 						{
 							//anim valid, parse images
 							if(file.getList("images"))

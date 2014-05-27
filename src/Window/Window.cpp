@@ -356,7 +356,7 @@ namespace Core
 		}
 		return false;
 	}
-#ifdef _DEBUG
+
 	void Window::openConsole(uint32_t xPos, uint32_t yPos)
 	{
 		if(!AllocConsole())
@@ -382,7 +382,7 @@ namespace Core
 	{
 		FreeConsole();
 	}
-#endif
+
 	void Window::setStyle(uint32_t style) { m_style = style; }
 	void Window::setExtendedStyle(uint32_t style) { m_extendedStyle = style; }
 	void Window::showCursor(bool isShown) { m_showCursor = isShown; }

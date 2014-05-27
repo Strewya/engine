@@ -1,0 +1,72 @@
+
+
+$#include <Games/Pong/Pong.h>
+
+namespace Core
+{
+	struct Paddle
+	{
+		//logic
+		uint32_t m_score;
+		
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixture;
+		InstanceID m_joint;
+		float m_maxVelocity;
+		float m_targetVelocity;
+		
+		//render
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct Field
+	{
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixtures[4];
+
+		//render
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct Ball
+	{
+		//logic
+		bool m_reset;
+		bool m_speedup;
+		float m_maxVelocity;
+		Vec2 m_sway;
+
+		//physics
+		InstanceID m_body;
+		InstanceID m_fixture;
+		Vec2 m_velocity;
+		
+		//rendering
+		Vec2 m_size;
+		Color m_c;
+		Transform m_tf;
+	};
+
+	struct PongGame
+	{
+		const Time m_logicTimer;
+		const Time m_renderTimer;
+		Random gen;
+		const float m_b2Scale;
+		bool m_drawDebugData;
+
+		Paddle m_leftPaddle, m_rightPaddle;
+		Field m_field;
+		Ball m_ball;
+		uint32_t m_winScore;
+		uint32_t m_winner;
+		uint64_t m_resetTime;
+		bool m_aiActive;
+	};
+}

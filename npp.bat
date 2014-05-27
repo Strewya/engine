@@ -1,0 +1,1 @@
+c:/Notepad++/notepad++.exe -nosession -noPlugin -multiInst %*

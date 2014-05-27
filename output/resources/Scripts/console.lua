@@ -5,9 +5,9 @@ if(Console == nil) then
 	Console.isOpen = false;
 	Console.tf = Core.Transform();	
 end;
-Console.showCount = 20;
+Console.showCount = 43;
 Console.tf.position:set(-210,222);
-Console.size = Core.Vec2(300,160);
+Console.size = Core.Vec2(300,500);
 Console.fill = Core.Color(0.2, 0.2, 0.2, 0.5);
 
 function Console:add(text)

@@ -55,14 +55,23 @@ namespace Core
 				uint64_t current = m_timer.getCurMicros() - player.m_startTime;
 				uint64_t length = player.m_endTime - player.m_startTime;
 				float time = static_cast<float>(current) / static_cast<float>(length);
-				uint64_t referenceTime = interpolate(player.m_startTime, player.m_endTime, linear, time);
+				auto startTime = player.m_startTime;
+				auto endTime = player.m_endTime;
+				auto playback = player.m_playbackRate;
+				if(player.m_playbackRate < 0)
+				{
+					startTime = player.m_endTime;
+					endTime = player.m_startTime;
+					playback = -playback;
+				}
+				uint64_t referenceTime = interpolate(player.m_startTime, player.m_endTime, linear, time*playback);
 
 				if(referenceTime >= player.m_endTime)
 				{
-					if(animation.m_defaultRepeat)
+					if(animation.m_repeats)
 					{
-						player.m_startTime += animation.m_defaultDuration;
-						player.m_endTime += animation.m_defaultDuration;
+						player.m_startTime += animation.m_duration;
+						player.m_endTime += animation.m_duration;
 					}
 					else
 					{
@@ -110,10 +119,9 @@ namespace Core
 		auto& player = m_runningAnimations[findPlayer(playerID)];
 		player.m_animationID = animationID;
 		player.m_startTime = m_timer.getCurMicros();
-		player.m_endTime = player.m_startTime + animation.m_defaultDuration;
+		player.m_endTime = player.m_startTime + animation.m_duration;
 		player.m_playbackRate = playbackRate;
 		player.m_state = AnimationPlayer::RUNNING;
-		DEBUG_INFO("Starting animation ", animation.m_name, " for player ", playerID);
 	}
 
 	void AnimationSystem::stopAnimation(uint32_t playerID)

@@ -8,9 +8,9 @@ namespace Core
 	class Animation
 	{
 	public:
-		uint32_t m_defaultDuration;
+		uint32_t m_duration;
 		std::string m_name;
-		bool m_defaultRepeat;
+		bool m_repeats;
 	};
 
 	class Image

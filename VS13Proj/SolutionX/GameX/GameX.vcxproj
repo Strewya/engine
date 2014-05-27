@@ -279,13 +279,13 @@
     <CustomBuild Include="..\..\..\src\DataStructs\DataStructs.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\gameExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Hedgehog\Hedgehog.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\Game.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Pong\gameExport.pkg">
+    <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Graphics\Graphics.pkg">
