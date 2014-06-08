@@ -14,6 +14,7 @@
 #include <Util/DataFile.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
+#include <Util/Rect.h>
 #include <Util/Vec3.h>
 #include <Window/Window.h>
 /******* end headers *******/
@@ -278,7 +279,7 @@ namespace Core
 			vertices[i].setDiffuse(1, 1, 1, 1);
 		}
 
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), count);
 
 		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		assert(SUCCEEDED(hr));
@@ -334,7 +335,7 @@ namespace Core
 			vertices[i].setDiffuse(1, 1, 1, 1);
 		}
 
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), count);
 
 		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		assert(SUCCEEDED(hr));
@@ -373,6 +374,20 @@ namespace Core
 
 		cb->Release();
 		vb->Release();
+	}
+
+	void GraphicsSystem::drawPolygon(const Transform& tf, const Rect& rect, const Color& c)
+	{
+		/****** VERTEX BUFFER ******/
+		uint32_t count = 5;
+		std::vector<Vec2> vertices(count);
+		vertices[0].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
+		vertices[1].set(rect.center.x + rect.halfWidth, rect.center.y - rect.halfHeight);
+		vertices[2].set(rect.center.x + rect.halfWidth, rect.center.y + rect.halfHeight);
+		vertices[3].set(rect.center.x - rect.halfWidth, rect.center.y + rect.halfHeight);
+		vertices[4].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
+		
+		drawLine(tf, vertices.data(), count, c);
 	}
 
 	//*****************************************************************
@@ -859,21 +874,34 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::initFont(DataFile& file)
 	{
-		m_font.m_name = file.getString("name", "");
-		m_font.m_texture = file.getString("texture", "");
-		m_font.m_size = file.getInt("size", 0);
+		auto name = file.getString("name", "");
+		auto texture = file.getString("texture", "");
+		auto size = file.getInt("size", 0);
+
 		bool success = false;
-		if(!m_font.m_name.empty() && !m_font.m_texture.empty() && m_font.m_size > 0)
+		if(!name.empty() && !texture.empty() && size > 0)
 		{
+			if(!m_font.m_texture.empty() && m_font.m_texture != texture)
+			{
+				//this means the texture for the font has changed, so we first release the existing one
+				releaseTexture(m_fontTextureID);
+			}
+			m_font.m_name = name;
+			m_font.m_texture = texture;
+			m_font.m_size = size;
+
+			m_fontTextureID = loadTextureFromFile(m_font.m_texture.c_str());
+			success = m_fontTextureID != -1;
+
 			uint32_t glyphCount = file.getListSize("glyphs");
 			m_font.m_glyphs.resize(glyphCount);
-			if(file.getList("glyphs"))
+			if(success && file.getList("glyphs"))
 			{
 				for(uint32_t i = 0; i < glyphCount; ++i)
 				{
 					if(file.getList(i + 1))
 					{
-						auto ascii = file.getInt("ascii", 0);
+						auto ascii = file.getChar("char", 0);
 						auto left = file.getInt("left", -1);
 						auto right = file.getInt("right", -1);
 						auto top = file.getInt("top", -1);
@@ -893,12 +921,10 @@ namespace Core
 					}
 				}
 				file.popList();
+				success = !m_font.m_glyphs.empty();
 			}
-
-			success = !m_font.m_glyphs.empty();
 		}
-		m_fontTextureID = loadTextureFromFile(m_font.m_texture.c_str());
-		return m_fontTextureID != -1;
+		return success;
 	}
 
 	//*****************************************************************
@@ -912,10 +938,29 @@ namespace Core
 		uint32_t id = -1;
 		if(SUCCEEDED(hr))
 		{
-			m_textures.emplace_back(DxTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>));
-			id = m_textures.size() - 1;
+			DxTexturePtr loadedTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>);
+			auto it = std::find_if(m_textures.begin(), m_textures.end(), [](const DxTexturePtr& ptr) { return ptr == nullptr; });
+			if(it == m_textures.end())
+			{
+				id = m_textures.size();
+				m_textures.emplace_back(std::move(loadedTexturePtr));
+			}
+			else
+			{
+				id = std::distance(m_textures.begin(), it);
+				it->swap(loadedTexturePtr);
+			}
 		}
 		return id;
+	}
+
+	//*****************************************************************
+	//					RELEASE TEXTURE
+	//*****************************************************************
+	void GraphicsSystem::releaseTexture(uint32_t id)
+	{
+		assert(id < m_textures.size());
+		m_textures[id].reset(nullptr);
 	}
 	
 	//*****************************************************************

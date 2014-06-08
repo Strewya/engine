@@ -69,7 +69,7 @@ namespace Core
 			initializationStatus &= m_scripts.doFile(RESOURCE("Scripts/paddleAI.lua"));
 			
 			DataFile df(m_scripts);
-			if(df.open(RESOURCE("Defs/font.sheet")))
+			if(df.open(RESOURCE("Defs/font.font")))
 			{
 				initializationStatus &= m_graphics.initFont(df);
 				df.close();
@@ -352,6 +352,11 @@ namespace Core
 		m_graphics.drawQuad(m_leftPaddle.m_tf, m_leftPaddle.m_size*0.5f, m_leftPaddle.m_c);
 		textTransform.position.set(m_leftPaddle.m_tf.position.x, h);
 		m_graphics.drawText(std::to_string(m_leftPaddle.m_score), textTransform, m_leftPaddle.m_c, 0, false);
+		Color c(1, 1, 1);
+		textTransform.position.set(m_leftPaddle.m_tf.position.x - (m_leftPaddle.m_size*2.2f).x, m_leftPaddle.m_tf.position.y + (m_leftPaddle.m_size*0.5f).y);
+		m_graphics.drawText("w", textTransform, c, 0, false);
+		textTransform.position.set(m_leftPaddle.m_tf.position.x - (m_leftPaddle.m_size*2.2f).x, m_leftPaddle.m_tf.position.y - (m_leftPaddle.m_size*0.5f).y);
+		m_graphics.drawText("s", textTransform, c, 0, false);
 
 		m_graphics.drawQuad(m_rightPaddle.m_tf, m_rightPaddle.m_size*0.5f, m_rightPaddle.m_c);
 		textTransform.position.set(m_rightPaddle.m_tf.position.x, h);

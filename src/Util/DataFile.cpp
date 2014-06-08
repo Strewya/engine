@@ -11,6 +11,7 @@
 namespace Core
 {
 	void fillValue(ScriptingSystem& script, std::string& v);
+	void fillValue(ScriptingSystem& script, char& v);
 	void fillValue(ScriptingSystem& script, int32_t& v);
 	void fillValue(ScriptingSystem& script, float& v);
 	void fillValue(ScriptingSystem& script, bool& v);
@@ -72,6 +73,26 @@ namespace Core
 			m_scripting->pop();
 		}
 		return ret;
+	}
+
+	char DataFile::getChar(const char* key, char defaultValue)
+	{
+		if(m_scripting->getValue(key, -1))
+		{
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
+	}
+
+	char DataFile::getChar(uint32_t index, char defaultValue)
+	{
+		if(m_scripting->getValue(index, -1))
+		{
+			fillValue(*m_scripting, defaultValue);
+			m_scripting->pop();
+		}
+		return defaultValue;
 	}
 
 	int32_t DataFile::getInt(const char* key, int32_t defaultValue)
@@ -197,6 +218,14 @@ namespace Core
 		if(script.isString())
 		{
 			v = script.toString();
+		}
+	}
+
+	void fillValue(ScriptingSystem& script, char& v)
+	{
+		if(script.isString())
+		{
+			v = script.toString()[0];
 		}
 	}
 

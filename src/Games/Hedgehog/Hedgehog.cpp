@@ -66,7 +66,6 @@ namespace Core
 
 		m_camera.setPosition(Vec3(0, 0, -10));
 
-
 		if(m_isRunning)
 		{
 			m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/hedgehog_game.lua"), false);
@@ -80,7 +79,7 @@ namespace Core
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
 			DataFile dataFile(m_scripter);
-			if(dataFile.open(RESOURCE("Defs/font.sheet")))
+			if(dataFile.open(RESOURCE("Defs/font.font")))
 			{
 				m_isRunning &= m_graphics.initFont(dataFile);
 				dataFile.close();
@@ -141,7 +140,7 @@ namespace Core
 		return m_isRunning;
 	}
 
-	
+
 
 	bool HedgehogGame::tick()
 	{
@@ -167,8 +166,8 @@ namespace Core
 		return m_isRunning;
 	}
 
-	
-	
+
+
 	bool HedgehogGame::tickLogic(uint64_t updateTime)
 	{
 		bool continueRunning = true;
@@ -191,6 +190,8 @@ namespace Core
 		return continueRunning;
 	}
 
+
+
 	void HedgehogGame::tickRender(uint64_t updateTime)
 	{
 		m_renderTimer.updateBy(updateTime);
@@ -200,14 +201,30 @@ namespace Core
 		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
 
 		static Transform framerateTf;
-		framerateTf.position.set(0.5f*m_window->getSizeX() - 20, 0.5f*m_window->getSizeY()-10);
+		framerateTf.position.set(0.5f*m_window->getSizeX() - 20, 0.5f*m_window->getSizeY() - 10);
 		framerateTf.scale.set(0.5f, 0.5f);
 		m_graphics.setOrthographicProjection();
 		m_graphics.clearCamera();
 		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 2, false);
 
 		m_graphics.present();
-		
+	}
+
+
+
+	uint32_t HedgehogGame::createProp()
+	{
+		return m_props.create();
+	}
+
+	Prop& HedgehogGame::getProp(uint32_t id)
+	{
+		return m_props.get(id);
+	}
+
+	void HedgehogGame::removeProp(uint32_t id)
+	{
+		m_props.remove(id);
 	}
 
 	void HedgehogGame::onFileChanged(uint32_t index)
@@ -230,6 +247,16 @@ namespace Core
 				{
 					if(m_spritesheetCache.loadFromFile(config, true))
 						DEBUG_INFO("Reloaded spritesheet file ", file);
+					config.close();
+				}
+			}
+			else if(ext == "font")
+			{
+				DataFile config(m_scripter);
+				if(config.open(ResourcePath(file).c_str()))
+				{
+					if(m_graphics.initFont(config))
+						DEBUG_INFO("Reloaded font file ", file);
 					config.close();
 				}
 			}

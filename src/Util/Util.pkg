@@ -1,6 +1,7 @@
 
 $#include <Util/Color.h>
 $#include <Util/Random.h>
+$#include <Util/Rect.h>
 $#include <Util/Time.h>
 $#include <Util/Transform.h>
 $#include <Util/Utility.h>
@@ -37,6 +38,20 @@ namespace Core
 		float randFloat();
 	};
 
+	class Rect
+	{
+		Rect();
+
+		float left() const;
+		float right() const;
+		float top() const;
+		float bottom() const;
+
+		Vec2 center;
+		float halfWidth;
+		float halfHeight;
+	};
+
 	class Time
 	{
 		static const double STOP_TIME;
@@ -50,6 +65,11 @@ namespace Core
 		static uint32_t microsToMilis(uint64_t micros);
 
 		static uint32_t microsDelta(uint64_t start, uint64_t end);
+
+		static uint32_t countMilisInMicros(uint64_t micros);
+		static uint32_t countSecondsInMicros(uint64_t micros);
+		static uint32_t countMinutesInMicros(uint64_t micros);
+		static uint32_t countHoursInMicros(uint64_t micros);
 
 		Time();
 

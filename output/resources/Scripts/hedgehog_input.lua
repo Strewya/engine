@@ -3,6 +3,20 @@ function setupInput()
 	gInput = {};
 	
 	addInput(Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_R ~= event.m_keyboard.m_keyCode) then return false; end;
+		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			gActions.resetGame = true;
+		end;
+	end);
+	
+	addInput(Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_Q ~= event.m_keyboard.m_keyCode) then return false; end;
+		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			gActions.resetScore = true;
+		end;
+	end);
+	
+	addInput(Core.WE_KEYBOARDKEY, function(event)
 		if(Core.Keyboard.m_ArrowLeft ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown) then
 			gActions.moveLeft = true;
@@ -31,13 +45,6 @@ function setupInput()
 		if(Core.Keyboard.m_F1 ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
 			Console.isOpen = not Console.isOpen;
-		end;
-	end);
-	
-	addInput(Core.WE_KEYBOARDKEY, function(event)
-		if(Core.Keyboard.m_F2 ~= event.m_keyboard.m_keyCode) then return false; end;
-		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
-			gState.changeProj = true;
 		end;
 	end);
 	
@@ -89,3 +96,5 @@ function setupInput()
 		end;
 	end);
 end;
+
+setupInput();

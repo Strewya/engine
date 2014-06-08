@@ -6,14 +6,28 @@
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core 
 {
-	
+	class Rect
+	{
+	public:
+		Rect();
+
+		float left() const;
+		float right() const;
+		float top() const;
+		float bottom() const;
+
+		Vec2 center;
+		float halfWidth;
+		float halfHeight;
+	};
 }
 
-// #include <iostream>
+//#include <iostream>
 //namespace Util
 //{
 //	class Rect

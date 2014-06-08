@@ -22,7 +22,12 @@ namespace Core
 		static float milisToSeconds(uint32_t mili);
 		static float microsToSeconds(uint64_t micros);
 		static uint32_t secondsToMilis(float sec);
-		static uint32_t microsToMilis(uint64_t milis);
+		static uint32_t microsToMilis(uint64_t micros);
+		
+		static uint32_t countMilisInMicros(uint64_t micros);
+		static uint32_t countSecondsInMicros(uint64_t micros);
+		static uint32_t countMinutesInMicros(uint64_t micros);
+		static uint32_t countHoursInMicros(uint64_t micros);
 
 		static uint32_t microsDelta(uint64_t start, uint64_t end);
 

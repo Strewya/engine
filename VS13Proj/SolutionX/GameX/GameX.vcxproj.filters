@@ -46,6 +46,9 @@
     <Filter Include="Framework\toluaPackages">
       <UniqueIdentifier>{76c8f24b-ee3d-4d15-8ebf-3e2102e9ac4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{ab6ba035-5e34-4bd3-8b5f-f5b1145b7dbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -138,6 +141,9 @@
       <Filter>Framework\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Vec3.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Rect.cpp">
       <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -260,6 +266,12 @@
     <ClInclude Include="..\..\..\src\Util\Vec3.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\ObjectContainer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Rect.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Input\Input.pkg">
@@ -301,5 +313,13 @@
     <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
       <Filter>Design\Pong</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua">
+      <Filter>Design\Hedgehog</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\Pong\resourceList.lua">
+      <Filter>Design\Pong</Filter>
+    </None>
   </ItemGroup>
 </Project>

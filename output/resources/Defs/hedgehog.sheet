@@ -24,7 +24,7 @@ return
 		defaultDuration = 1,
 		defaultRepeat = false,
 		list = {
-			{ name = "walk",  duration = 0.4, loop = true,  images = {"walk_00", "walk_01", "walk_02", "walk_03", "walk_04", "walk_05"} },
+			{ name = "walk",  duration = 0.6, loop = true,  images = {"walk_00", "walk_01", "walk_02", "walk_03", "walk_04", "walk_05"} },
 			{ name = "idle_to_walk", duration = 0.1, loop = false, images = {"idle_00", "idle_01", "idle_02", "idle_03"} }
 		}
 	}

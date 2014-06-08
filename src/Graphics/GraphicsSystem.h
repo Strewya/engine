@@ -20,8 +20,8 @@ namespace Core
 	class Color;
 	class DataFile;
 	class Image;
+	class Rect;
 	class Transform;
-	class Vec2;
 	class Window;
 
 	class Glyph
@@ -78,6 +78,7 @@ namespace Core
 
 		void drawLine(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
+		void drawPolygon(const Transform& transform, const Rect& rect, const Color& color);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
@@ -85,6 +86,7 @@ namespace Core
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 
 		uint32_t loadTextureFromFile(const char* filename);
+		void releaseTexture(uint32_t id);
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);

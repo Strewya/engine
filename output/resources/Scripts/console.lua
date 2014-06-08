@@ -24,11 +24,11 @@ function Console:draw(gfx)
 		gfx:setTransparencyMode(true);
 		gfx:drawQuad(self.tf, self.size, self.fill);
 		gfx:setTransparencyMode(false);
+		local tf = Core.Transform();
+		local tint = Core.Color(1,1,0);
 		for i,text in ipairs(self.content) do
-			local tf = Core.Transform();
 			tf.position:set(self.tf.position.x - self.size.x + 5, self.tf.position.y - self.size.y + i*15);
 			tf.scale:set(0.5, 0.5);
-			local tint = Core.Color(1,1,0);
 			gfx:drawText(text, tf, tint, 0, false);
 		end;
 	end;

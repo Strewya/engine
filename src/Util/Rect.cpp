@@ -9,7 +9,29 @@
 
 namespace Core
 {
-	
+	Rect::Rect()
+		: halfWidth(0), halfHeight(0)
+	{}
+
+	float Rect::left() const
+	{
+		return center.x - halfWidth;
+	}
+
+	float Rect::right() const
+	{
+		return center.x + halfWidth;
+	}
+
+	float Rect::top() const
+	{
+		return center.y + halfHeight;
+	}
+
+	float Rect::bottom() const
+	{
+		return center.y - halfHeight;
+	}
 }
 
 

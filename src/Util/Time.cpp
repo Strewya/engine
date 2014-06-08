@@ -74,12 +74,12 @@ namespace Core
 	
 	uint64_t Time::secondsToMicros(float sec)
 	{
-		return static_cast<uint64_t>(sec * 1000 * 1000);
+		return static_cast<uint64_t>(sec * 1000.0f * 1000.0f);
 	}
 
 	uint64_t Time::milisToMicros(uint32_t mili)
 	{
-		return static_cast<uint64_t>(mili)* 1000;
+		return static_cast<uint64_t>(mili) * 1000ULL;
 	}
 
 	float Time::milisToSeconds(uint32_t mili)
@@ -94,17 +94,37 @@ namespace Core
 	
 	uint32_t Time::secondsToMilis(float sec)
 	{
-		return static_cast<uint32_t>(sec * 1000);
+		return static_cast<uint32_t>(sec * 1000ULL);
 	}
 	
 	uint32_t Time::microsToMilis(uint64_t micros)
 	{
-		return static_cast<uint32_t>(micros / 1000);
+		return static_cast<uint32_t>(micros / 1000ULL);
 	}
 
 	uint32_t Time::microsDelta(uint64_t start, uint64_t end)
 	{
 		return static_cast<uint32_t>(end - start);
+	}
+
+	uint32_t Time::countMilisInMicros(uint64_t micros)
+	{
+		return static_cast<uint32_t>(micros / 1000ULL);
+	}
+
+	uint32_t Time::countSecondsInMicros(uint64_t micros)
+	{
+		return static_cast<uint32_t>(micros / 1000000ULL);
+	}
+
+	uint32_t Time::countMinutesInMicros(uint64_t micros)
+	{
+		return static_cast<uint32_t>(micros / (60ULL * 1000000ULL));
+	}
+
+	uint32_t Time::countHoursInMicros(uint64_t micros)
+	{
+		return static_cast<uint32_t>(micros / (60ULL * 60ULL * 1000000ULL));
 	}
 
 	Time::Time()

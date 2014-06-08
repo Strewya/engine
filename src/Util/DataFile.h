@@ -29,6 +29,8 @@ namespace Core
 
 		std::string getString(const char* key, const char* valueIfNotPresent);
 		std::string getString(uint32_t index, const char* valueIfNotPresent);
+		char getChar(const char* key, char valueIfNotPresent);
+		char getChar(uint32_t index, char valueIfNotPresent);
 		int32_t getInt(const char* key, int32_t valueIfNotPresent);
 		int32_t getInt(uint32_t index, int32_t defaultValue);
 		float getFloat(const char* key, float valueIfNotPresent);

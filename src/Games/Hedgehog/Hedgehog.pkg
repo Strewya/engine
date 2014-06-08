@@ -9,6 +9,7 @@ namespace Core
 	{
 		Transform m_transform;
 		Color m_tint;
+		Rect m_collisionRect;
 		uint32_t m_animationPlayerID;
 		uint32_t m_imageID; 
 	};
@@ -17,6 +18,7 @@ namespace Core
 	{
 		Transform m_transform;
 		Color m_tint;
+		Rect m_collisionRect;
 		uint32_t m_imageID;
 	};
 
@@ -36,10 +38,13 @@ namespace Core
 		tolua_readonly Camera m_camera;
 
 		tolua_readonly Player m_player;
-		tolua_readonly Prop m_prop1;
-
+		
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;
 		tolua_readonly Window* m_window;
+
+		uint32_t createProp();
+		Prop& getProp(uint32_t id);
+		void removeProp(uint32_t id);
 	};
 }

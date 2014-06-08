@@ -19,8 +19,10 @@
 #include <Input/InputSystem.h>
 #include <Scripting/ScriptingSystem.h>
 #include <Util/Color.h>
+#include <Util/ObjectContainer.h>
 #include <Util/Time.h>
 #include <Util/Transform.h>
+#include <Util/Rect.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -33,6 +35,7 @@ namespace Core
 	public:
 		Transform m_transform;
 		Color m_tint;
+		Rect m_collisionRect;
 		uint32_t m_animationPlayerID;
 		uint32_t m_imageID;
 	};
@@ -42,6 +45,7 @@ namespace Core
 	public:
 		Transform m_transform;
 		Color m_tint;
+		Rect m_collisionRect;
 		uint32_t m_imageID;
 	};
 
@@ -66,7 +70,6 @@ namespace Core
 		Camera m_camera;
 		
 		Player m_player;
-		Prop m_prop1;
 		
 		Time m_logicTimer;
 		Time m_renderTimer;
@@ -82,7 +85,13 @@ namespace Core
 		bool tickLogic(uint64_t updateTime);
 		void tickRender(uint64_t updateTime);
 
+		uint32_t createProp();
+		Prop& getProp(uint32_t id);
+		void removeProp(uint32_t id);
+
 	private:
 		void onFileChanged(uint32_t index);
+
+		ObjectContainer<Prop> m_props;
 	};
 }
