@@ -11,7 +11,7 @@
 #define PONG 0
 #define HEDGEHOG 1
 
-#define CORE_GAME_BUILD HEDGEHOG
+#define CORE_GAME_BUILD PONG
 
 #if CORE_GAME_BUILD == PONG
 #define CORE_GAME Pong
