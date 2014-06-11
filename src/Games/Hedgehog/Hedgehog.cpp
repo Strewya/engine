@@ -50,7 +50,7 @@ namespace Core
 		m_isRunning =
 			//systems
 			m_animation.init(m_animationCache) &&
-			m_graphics.init(window) &&
+			m_graphics.init(m_textureCache, window) &&
 			m_input.init(window) &&
 			m_scripter.init() &&
 
@@ -64,7 +64,7 @@ namespace Core
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
-		m_camera.setPosition(Vec3(0, 0, -10));
+		m_camera.setPosition(Vec3(0, 0, -15));
 
 		if(m_isRunning)
 		{
@@ -235,12 +235,12 @@ namespace Core
 		{
 			auto pos = file.find_last_of('.');
 			auto ext = file.substr(pos + 1);
-			if(ext == "lua")
+			if(ext == "lua" && action == Core::FILE_MODIFIED)
 			{
 				if(m_scriptCache.loadFromFile(ResourcePath(file).c_str(), true))
 					DEBUG_INFO("Reloaded script ", file);
 			}
-			else if(ext == "sheet")
+			else if(ext == "sheet" && action == Core::FILE_MODIFIED)
 			{
 				DataFile config(m_scripter);
 				if(config.open(ResourcePath(file).c_str()))
@@ -250,7 +250,7 @@ namespace Core
 					config.close();
 				}
 			}
-			else if(ext == "font")
+			else if(ext == "font" && action == Core::FILE_MODIFIED)
 			{
 				DataFile config(m_scripter);
 				if(config.open(ResourcePath(file).c_str()))
@@ -259,6 +259,32 @@ namespace Core
 						DEBUG_INFO("Reloaded font file ", file);
 					config.close();
 				}
+			}
+			else if(ext == "hlsl" && action == Core::FILE_MODIFIED)
+			{
+				if(m_graphics.initVertexShader(ResourcePath(file).c_str()) &&
+				   m_graphics.initPixelShader(ResourcePath(file).c_str()))
+				{
+					DEBUG_INFO("Reloaded shader file ", file);
+				}
+			}
+			else if(ext == "tif" || ext == "png")
+			{
+				if(action == Core::FILE_MODIFIED)
+				{
+					if(m_textureCache.onFileModified(ResourcePath(file).c_str()))
+						DEBUG_INFO("Reloaded texture file ", file);
+					else
+						DEBUG_INFO("Reload failed for texture file ", file);
+				}
+				else
+				{
+					DEBUG_INFO("Unsupported event type ", action, " for file ", file);
+				}
+			}
+			else
+			{
+				DEBUG_INFO("No reload for file ", file);
 			}
 		}
 	}

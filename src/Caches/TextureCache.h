@@ -24,6 +24,9 @@ namespace Core
 
 		uint32_t getTextureID(const char* path);
 		Vec2 getTextureDimensions(uint32_t texID) const;
+		bool releaseTexture(uint32_t texID);
+		
+		bool onFileModified(const std::string& path);
 		
 	private:
 		GraphicsSystem* m_graphics;

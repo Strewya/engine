@@ -8,13 +8,17 @@ function game_init(game)
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
 	
+	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_globals.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_asm.lua"), false);
 	
-	
+	gState.propList = {};
+	gState.asm = StateMachine();
+	gState.rand = Core.Random(os.time());
+	gState.timer = Core.Time();
 	
 	game.m_player.m_transform.position:set(0,0);
+	game.m_player.m_transform.scale:set(1,1);
 	
 	st = st and onReload(game);
 	return st;
@@ -30,18 +34,10 @@ function onReload(game)
 	
 	game.m_camera:setSpeed(0.01);
 	
-	gState.camera = Core.Vec2(0,0);
-	gState.rand = Core.Random(os.time());
-	gState.asm = StateMachine();
-	
 	makeStates(gState.asm);
 	gState.asm:setState("idle");
 	
-	gState.timer = Core.Time();
 	gState.timer:reset();
-	
-	game.m_player.m_imageID = game.m_imageCache:getImageID("idle_00");
-	game.m_player.m_transform.scale:set(1,1);
 	
 	return true;
 end;
@@ -51,7 +47,9 @@ function doMovement(dt, position)
 	if(gState.velocity > gState.maxVelocity) then
 		gState.velocity = gState.maxVelocity;
 	end;
-	position.x = position.x + gState.direction*gState.velocity*dt;
+	local dpos = gState.direction*gState.velocity*dt;
+	position.x = position.x + dpos;
+	return dpos;
 end;
 
 function intersection(a, b)
@@ -90,15 +88,18 @@ function doCollision(game, player)
 		if(collides) then
 			game:removeProp(gState.propList[i]);
 			table.remove(gState.propList, i);
-			gState.spawnCount = gState.spawnCount + 1;
 			gState.eatenApples = gState.eatenApples + 1;
 		end;
 	end;	
 end;
 
 function doAppleSpawn(game)
-	while(gState.spawnCount > 0) do
-		local x, y, a = gState.rand:randFloat()*10-5, gState.rand:randFloat()*3-2, gState.rand:randInt(0,2);
+	while(#gState.propList < gState.spawnCount) do
+		local x, y = gState.rand:randFloat()*gState.treeTopHS.x*2+gState.treeTopPos.x-gState.treeTopHS.x, gState.rand:randFloat()*gState.treeTopHS.y+gState.treeTopPos.y-gState.treeTopHS.y;
+		local a, d = gState.rand:randInt(0,2), gState.rand:randInt(0,1);
+		if(d == 0) then
+			x = -x;
+		end;
 		table.insert(gState.propList, game:createProp());
 		local prop = game:getProp(gState.propList[#gState.propList]);
 		prop.m_transform.scale:set(0.2,0.2);
@@ -106,7 +107,6 @@ function doAppleSpawn(game)
 		prop.m_imageID = game.m_imageCache:getImageID("apple_"..tostring(a));
 		prop.m_collisionRect.halfWidth = 1;
 		prop.m_collisionRect.halfHeight = 1;
-		gState.spawnCount = gState.spawnCount - 1;
 	end;
 end;
 
@@ -143,21 +143,21 @@ function game_tick(game)
 		gState.velocity = 0;
 	end;
 	doMovement(dt, player.m_transform.position);
+	local px, py = player.m_transform.position.x, player.m_transform.position.y;
+	--game.m_camera:setPosition(Core.Vec3(px, py, -10));
 	
 	if(gActions.jump == true) then
 		gActions.jump = nil;
 		if(gState.jumpsAvailable > 0) then
 			gState.jumpsAvailable = gState.jumpsAvailable - 1;
 			gState.yVel = gState.impulseStrength;
-			gState.yAcc = 0;
 			Console:add("Jumpy hedgehog!");
 		else
 			Console:add("No jumpy more than " .. gState.maxJumpsAvailable .. " times!");
 		end;
 	end;
 	
-	gState.yAcc = gState.yAcc + gState.gravity;
-	gState.yVel = gState.yVel + gState.yAcc*dt;
+	gState.yVel = gState.yVel + gState.gravity*dt;
 	player.m_transform.position.y = player.m_transform.position.y + gState.yVel*dt;
 	
 		
@@ -209,7 +209,7 @@ function game_tick(game)
 	end;
 	if(gState.resetCam) then
 		Console:add("resetting camera");
-		game.m_camera:setPosition(Core.Vec3(0,0,-10));
+		game.m_camera:setPosition(Core.Vec3(0,0,-15));
 		game.m_camera:setRotation(Core.Vec3(0,0,0));
 		gState.resetCam = false;
 	end;
@@ -248,17 +248,35 @@ function game_tick(game)
 end;
 
 function game_render(game)
-	game.m_graphics:setPerspectiveProjection();
+	
 	local col = Core.Color();
 	local textTf = Core.Transform();
 	textTf.scale:set(0.7,0.7);
+	
+	game.m_graphics:setPerspectiveProjection();
 	game.m_graphics:applyCamera(game.m_camera);
+	game.m_graphics:setTransparencyMode(true);
+	local tf = Core.Transform();
+	tf.position:set(0,-4.5);
+	col:set(70/255, 0, 0);
+	game.m_graphics:drawQuad(tf, Core.Vec2(20,2.01), col);
+	
+	tf.position = gState.treePos;
+	game.m_graphics:drawQuad(tf, gState.treeHS, gState.treeCol);
+	tf.position.x = -tf.position.x;
+	game.m_graphics:drawQuad(tf, gState.treeHS, gState.treeCol);
+	
+	tf.position = gState.treeTopPos;
+	game.m_graphics:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
+	tf.position.x = -tf.position.x;
+	game.m_graphics:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
+	
 	
 	for k,v in ipairs(gState.propList) do
 		local prop = game:getProp(v);
 		local img = game.m_imageCache:getImage(prop.m_imageID);
-		col:set(0,0,0);
-		game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, col);
+		--col:set(0,0,0);
+		--game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, col);
 		col:set(1,1,1);
 		game.m_graphics:drawTexturedQuad(prop.m_transform, col, img);
 		col:set(0,0,0);
@@ -272,8 +290,8 @@ function game_render(game)
 	end;
 	
 	img = game.m_imageCache:getImage(game.m_player.m_imageID);
-	col:set(0,0,0);
-	game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, col);
+	--col:set(0,0,0);
+	--game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, col);
 	col:set(1,1,1);
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
 	--[[game.m_graphics:setOrthographicProjection();
@@ -285,17 +303,18 @@ function game_render(game)
 							 textTf, col, 0, false);
 	game.m_graphics:setPerspectiveProjection();]]
 	
+	game.m_graphics:clearCamera();
 	game.m_graphics:setOrthographicProjection();
 	local text = "Eat "..gState.targetApples.." apples as fast as you can! You ate " .. gState.eatenApples .. " apples";
 	textTf.position:set(-game.m_window:getSizeX()/2+5,game.m_window:getSizeY()/2-20);
 	col:set(0,0,0);
 	game.m_graphics:drawText(text, textTf, col, 0, false);
 	textTf.position.y = textTf.position.y - 20;
-	text = "Best time:  " .. makeTimeStringFromMicros(gState.bestTime);
+	text = "Best time: " .. makeTimeStringFromMicros(gState.bestTime);
 	game.m_graphics:drawText(text, textTf, col, 0, false);
 	textTf.position.y = textTf.position.y - 20;
 	local currentTime = gState.timer:getCurMicros();
-	text = "Your time:  " .. makeTimeStringFromMicros(currentTime);
+	text = "Your time: " .. makeTimeStringFromMicros(currentTime);
 	if(gState.gameOver and currentTime == gState.bestTime) then
 		text = text .. "   NEW BEST!";
 	end;
@@ -314,8 +333,11 @@ function game_render(game)
 end;
 
 function makeTimeStringFromMicros(micros)
+	local oneMicroSecond = 1000000;
 	local minutes = Core.Time:countMinutesInMicros(micros);
-	local seconds = Core.Time:countSecondsInMicros(micros)-60*minutes;
-	local milis = Core.Time:countMilisInMicros(micros)-1000*seconds - 60000*minutes;
+	micros = micros - minutes*60*oneMicroSecond;
+	local seconds = Core.Time:countSecondsInMicros(micros);
+	micros = micros - seconds*oneMicroSecond;
+	local milis = Core.Time:countMilisInMicros(micros);
 	return string.format("%02d:%02d:%03d", minutes, seconds, milis);
 end;

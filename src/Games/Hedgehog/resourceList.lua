@@ -6,6 +6,7 @@ return {
 	"Scripts/console.lua",
 	"Scripts/hedgehog_asm.lua",
 	"Scripts/hedgehog_game.lua",
+	"Scripts/hedgehog_globals.lua",
 	"Scripts/hedgehog_input.lua",
 	"Scripts/lib.lua",
 	"Shaders/shader.hlsl",

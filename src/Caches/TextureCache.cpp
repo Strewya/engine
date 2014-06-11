@@ -57,4 +57,36 @@ namespace Core
 	{
 		return m_graphics->getTextureDimensions(texID);
 	}
+
+	bool TextureCache::releaseTexture(uint32_t texID)
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const std::pair<std::string, uint32_t>& tex)
+		{
+			return tex.second == texID;
+		});
+		if(it != end(m_loadedTextures))
+		{
+			m_graphics->releaseTexture(texID);
+			m_loadedTextures.erase(it);
+			return true;
+		}
+		return false;
+	}
+
+	bool TextureCache::onFileModified(const std::string& path)
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const std::pair<std::string, uint32_t>& tex)
+		{
+			return ResourcePath(tex.first.c_str()) == path;
+		});
+		if(it != end(m_loadedTextures))
+		{
+			m_graphics->releaseTexture(it->second);
+			it->second = m_graphics->loadTextureFromFile(it->first.c_str());
+			return true;
+		}
+		return false;
+	}
 }

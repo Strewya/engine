@@ -61,5 +61,3 @@ function makeStates(asm)
 	asm:addState(s);
 	
 end;
-
-makeStates(gState.asm);

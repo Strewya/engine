@@ -21,6 +21,7 @@ namespace Core
 	class DataFile;
 	class Image;
 	class Rect;
+	class TextureCache;
 	class Transform;
 	class Window;
 
@@ -46,7 +47,7 @@ namespace Core
 	class GraphicsSystem
 	{
 	public:
-		bool init(Window& window);
+		bool init(TextureCache& texCache, Window& window);
 		bool shutdown();
 
 		void update();
@@ -119,6 +120,7 @@ namespace Core
 		//this shouldn't be explicit like this, refactor later
 		uint32_t m_fontTextureID;
 		Font m_font;
+		TextureCache* m_textureCache;
 
 		//this is for automatic cleanup of all named DX objects
 		std::vector<IUnknown**> m_dxInterfaces;

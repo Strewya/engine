@@ -96,5 +96,3 @@ function setupInput()
 		end;
 	end);
 end;
-
-setupInput();

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 /******* extra headers *******/
+#include <Caches/TextureCache.h>
 #include <DataStructs/Image.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
@@ -37,7 +38,7 @@ namespace Core
 	//*****************************************************************
 	//					INIT
 	//*****************************************************************
-	bool GraphicsSystem::init(Window& window)
+	bool GraphicsSystem::init(TextureCache& texCache, Window& window)
 	{
 		bool status = true;
 
@@ -54,6 +55,7 @@ namespace Core
 		declare(&m_depthStencilBuffer);
 		declare(&m_transparency);
 
+		m_textureCache = &texCache;
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
 		
@@ -753,12 +755,13 @@ namespace Core
 		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
+			safeRelease(m_vertexShader);
 			hr = m_dev->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_vertexShader);
 			
 			if(SUCCEEDED(hr))
 			{
 				auto& ied = Vertex::getDescription();
-
+				safeRelease(m_inputLayout);
 				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), &m_inputLayout);
 
 				if(SUCCEEDED(hr))
@@ -767,7 +770,7 @@ namespace Core
 					m_devcon->IASetInputLayout(m_inputLayout);
 				}
 			}
-			m_shaderBlob->Release();
+			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
 			if(FAILED(hr))
@@ -786,12 +789,13 @@ namespace Core
 		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
+			safeRelease(m_pixelShader);
 			hr = m_dev->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_pixelShader);
 			if(SUCCEEDED(hr))
 			{
 				m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
 			}
-			m_shaderBlob->Release();
+			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
 			if(FAILED(hr))
@@ -884,13 +888,13 @@ namespace Core
 			if(!m_font.m_texture.empty() && m_font.m_texture != texture)
 			{
 				//this means the texture for the font has changed, so we first release the existing one
-				releaseTexture(m_fontTextureID);
+				m_textureCache->releaseTexture(m_fontTextureID);
 			}
 			m_font.m_name = name;
 			m_font.m_texture = texture;
 			m_font.m_size = size;
 
-			m_fontTextureID = loadTextureFromFile(m_font.m_texture.c_str());
+			m_fontTextureID = m_textureCache->getTextureID(m_font.m_texture.c_str());
 			success = m_fontTextureID != -1;
 
 			uint32_t glyphCount = file.getListSize("glyphs");

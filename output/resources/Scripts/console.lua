@@ -23,7 +23,6 @@ function Console:draw(gfx)
 		gfx:setOrthographicProjection();
 		gfx:setTransparencyMode(true);
 		gfx:drawQuad(self.tf, self.size, self.fill);
-		gfx:setTransparencyMode(false);
 		local tf = Core.Transform();
 		local tint = Core.Color(1,1,0);
 		for i,text in ipairs(self.content) do

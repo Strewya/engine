@@ -3,7 +3,7 @@ return
 	imageData =
 	{
 		--pos, width and height are transitional data, and are not stored!
-		texture = "Textures/hedgehog.png",
+		texture = "Textures/hedgehog.tif",
 		defaultWidth = 450,
 		defaultHeight = 300,
 		list = {
