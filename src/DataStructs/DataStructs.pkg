@@ -7,7 +7,6 @@ namespace Core
 {
 	class Animation
 	{
-	public:
 		uint32_t m_duration;
 		std::string m_name;
 		bool m_repeats;
@@ -15,7 +14,6 @@ namespace Core
 
 	class Image
 	{
-	public:
 		uint32_t m_textureID;
 		float m_ratio;
 		Vec2 m_texCoords[4];
@@ -24,7 +22,6 @@ namespace Core
 
 	class Spritesheet
 	{
-	public:
 		std::string m_name;
 	};
 }

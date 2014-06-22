@@ -7,9 +7,6 @@ namespace Core
 		void update(float dt);
 		void draw();
 
-		void addBeginContactListener(std::function<void(b2Contact*)> f);
-		void addEndContactListener(std::function<void(b2Contact*)> f);
-
 		InstanceID createBody(const b2BodyDef& bodyDef);
 		b2Body* getBody(InstanceID bodyID) const;
 		void destroyBody(InstanceID bodyID);

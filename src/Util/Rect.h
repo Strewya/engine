@@ -9,7 +9,7 @@
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
-namespace Core 
+namespace Core
 {
 	class Rect
 	{

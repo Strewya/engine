@@ -15,7 +15,10 @@ namespace Core
 	
 	class Color
 	{
-		float r, g, b, a;
+		float r;
+		float g;
+		float b;
+		float a;
 
 		Color();
 		Color(float r, float g, float b, float a = 1);
@@ -28,13 +31,10 @@ namespace Core
 		Random();
 		Random(uint32_t seed);
 
-		//change the seed
 		void reseed(uint32_t seed);
 
-		//in interval between bounds
 		int32_t randInt(int32_t lowerBound, int32_t upperBound);
 
-		//in interval between 0 and 1
 		float randFloat();
 	};
 
@@ -101,14 +101,14 @@ namespace Core
 
 	class Vec2
 	{
-		float x, y;
+		float x;
+		float y;
 
 		Vec2();
 		Vec2(float x, float y);
 		
 		void set(float x, float y);
 
-		/* these are inside the class for tolua++ binding compatibility */
 		Vec2 operator+(const Vec2& b) const;
 		Vec2 operator-() const;
 		Vec2 operator-(const Vec2& v) const;
@@ -118,7 +118,9 @@ namespace Core
 
 	class Vec3
 	{
-		float x, y, z;
+		float x;
+		float y;
+		float z;
 
 		Vec3();
 		Vec3(float x, float y, float z);

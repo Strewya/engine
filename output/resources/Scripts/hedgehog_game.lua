@@ -4,6 +4,8 @@ function game_init(game)
 	gState = {};
 	gActions = {};
 	
+	game.m_window:showCursor(true);
+	
 	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
@@ -11,6 +13,10 @@ function game_init(game)
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_asm.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_globals.lua"), false);
 	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false);
+	
+	if(st == false) then
+		return st;
+	end;
 	
 	gState.propList = {};
 	gState.asm = StateMachine();
@@ -52,7 +58,7 @@ function doMovement(dt, position)
 	return dpos;
 end;
 
-function intersection(a, b)
+function intersection_old(a, b)
 	local r1, r2 = Core.Rect(), Core.Rect();
 	r1.center = a.m_collisionRect.center;
 	r1.center.x = r1.center.x*a.m_transform.scale.x;
@@ -81,6 +87,34 @@ function intersection(a, b)
 	return true;
 end;
 
+function intersection(o, p)
+	local a, b = Core.Rect(), Core.Rect();
+	local oPos = o.m_transform.position;
+	local oScale = o.m_transform.scale;
+	local oRect = o.m_collisionRect;
+	local pPos = p.m_transform.position;
+	local pScale = p.m_transform.scale;
+	local pRect = p.m_collisionRect;
+	
+	a.center = oPos + Core.Vec2(oRect.center.x*oScale.x, oRect.center.y*oScale.y);
+	a.halfWidth = oRect.halfWidth*math.abs(oScale.x);
+	a.halfHeight = oRect.halfHeight*math.abs(oScale.y);
+	
+	b.center = pPos + Core.Vec2(pRect.center.x*pScale.x, pRect.center.y*pScale.y);
+	b.halfWidth = pRect.halfWidth*math.abs(pScale.x);
+	b.halfHeight = pRect.halfHeight*math.abs(pScale.y);
+	
+	local hs = Core.Vec2(a.halfWidth, a.halfHeight) + Core.Vec2(b.halfWidth, b.halfHeight);
+	local dist = a.center - b.center;
+	if(hs.x <= math.abs(dist.x)) then
+		return false;
+	end;
+	if(hs.y <= math.abs(dist.y)) then
+		return false;
+	end;
+	return true;
+end;
+
 function doCollision(game, player)
 	for i = #gState.propList, 1, -1 do
 		local prop = game:getProp(gState.propList[i]);
@@ -90,7 +124,7 @@ function doCollision(game, player)
 			table.remove(gState.propList, i);
 			gState.eatenApples = gState.eatenApples + 1;
 		end;
-	end;	
+	end;
 end;
 
 function doAppleSpawn(game)
@@ -149,6 +183,7 @@ function game_tick(game)
 	if(gActions.jump == true) then
 		gActions.jump = nil;
 		if(gState.jumpsAvailable > 0) then
+			gState.asm:transition("jump");
 			gState.jumpsAvailable = gState.jumpsAvailable - 1;
 			gState.yVel = gState.impulseStrength;
 			Console:add("Jumpy hedgehog!");
@@ -259,7 +294,7 @@ function game_render(game)
 	local tf = Core.Transform();
 	tf.position:set(0,-4.5);
 	col:set(70/255, 0, 0);
-	game.m_graphics:drawQuad(tf, Core.Vec2(20,2.01), col);
+	game.m_graphics:drawQuad(tf, Core.Vec2(20,2), col);
 	
 	tf.position = gState.treePos;
 	game.m_graphics:drawQuad(tf, gState.treeHS, gState.treeCol);
@@ -275,8 +310,7 @@ function game_render(game)
 	for k,v in ipairs(gState.propList) do
 		local prop = game:getProp(v);
 		local img = game.m_imageCache:getImage(prop.m_imageID);
-		--col:set(0,0,0);
-		--game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, col);
+		--game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
 		col:set(1,1,1);
 		game.m_graphics:drawTexturedQuad(prop.m_transform, col, img);
 		col:set(0,0,0);
@@ -290,8 +324,7 @@ function game_render(game)
 	end;
 	
 	img = game.m_imageCache:getImage(game.m_player.m_imageID);
-	--col:set(0,0,0);
-	--game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, col);
+	--game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
 	col:set(1,1,1);
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
 	--[[game.m_graphics:setOrthographicProjection();

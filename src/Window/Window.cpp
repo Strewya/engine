@@ -53,7 +53,7 @@ namespace Core
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
 		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
-		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(128),
+		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(256),
 		m_hwnd(nullptr),
 		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),

@@ -98,7 +98,7 @@ namespace Core
 			}
 
 			m_messageHandlers.reserve(3);
-			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			/*m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
 				if(w.m_type == WindowEventType::WE_KEYBOARDKEY)
 				{
@@ -110,7 +110,7 @@ namespace Core
 					}
 				}
 				return false;
-			});
+			});*/
 			
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
@@ -123,16 +123,17 @@ namespace Core
 				return false;
 			});
 
+			m_player.m_animationPlayerID = m_animation.createPlayer(m_player.m_imageID);
+
 			if(m_scripter.functionExists("game_init"))
 			{
-				if(m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1))
+				m_isRunning &= m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1);
+				if(m_isRunning)
 				{
 					m_isRunning &= m_scripter.toBool();
 					m_scripter.pop();
 				}
 			}
-
-			m_player.m_animationPlayerID = m_animation.createPlayer(m_player.m_imageID);
 		}
 		m_framerateTimer.update();
 

@@ -24,5 +24,6 @@ ipch/
 
 lib/tolua*
 bin/*.dll
-
 luaBinding.*
+docs.html
+src/Games/Game.pkg

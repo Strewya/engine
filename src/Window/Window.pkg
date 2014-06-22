@@ -6,7 +6,7 @@ namespace Core
 {
 	enum WindowEventType
 	{
-		WE_INVALID=0,
+		WE_INVALID,
 
 		WE_KEYBOARDKEY,
 		WE_KEYBOARDTEXT,

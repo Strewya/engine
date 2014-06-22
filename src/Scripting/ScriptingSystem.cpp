@@ -143,7 +143,7 @@ namespace Core
 
 	void ScriptingSystem::update()
 	{
-		lua_gc(m_luaState, LUA_GCSTEP, 10);
+		lua_gc(m_luaState, LUA_GCSTEP, 20);
 	}
 
 	bool ScriptingSystem::doFile(const char* scriptName, uint32_t numReturnValues)
