@@ -46,9 +46,6 @@
     <Filter Include="Framework\toluaPackages">
       <UniqueIdentifier>{76c8f24b-ee3d-4d15-8ebf-3e2102e9ac4a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tests">
-      <UniqueIdentifier>{ab6ba035-5e34-4bd3-8b5f-f5b1145b7dbf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">

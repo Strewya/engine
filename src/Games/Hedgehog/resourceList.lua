@@ -1,4 +1,10 @@
-return {
+return 
+{ -- DLL dependencies
+	"tolua++",
+	"lua51",
+	"lua5.1"
+},
+{ -- resource dependencies
 	"Defs/apples.sheet",
 	"Defs/font.font",
 	"Defs/hedgehog.sheet",

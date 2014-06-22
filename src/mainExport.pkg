@@ -9,19 +9,17 @@ typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
 typedef uint32_t           InstanceID;
 
-// these paths are relative to the location of the /bin directory
-// so we need to go 1 dir up first, then into /src/
-// and then into subdirs to find the other packages
+// these paths are relative to the location of the /src directory
+// the script that parses the 
 
-
-$pfile "../src/Animation/Animation.pkg"
-$pfile "../src/Caches/Caches.pkg"
-$pfile "../src/DataStructs/DataStructs.pkg"
-$pfile "../src/Graphics/Graphics.pkg"
-$pfile "../src/Input/Input.pkg"
-$pfile "../src/Util/Util.pkg"
-$pfile "../src/Window/Window.pkg"
+$pfile "Animation/Animation.pkg"
+$pfile "Caches/Caches.pkg"
+$pfile "DataStructs/DataStructs.pkg"
+$pfile "Graphics/Graphics.pkg"
+$pfile "Input/Input.pkg"
+$pfile "Util/Util.pkg"
+$pfile "Window/Window.pkg"
 
 //this one is last, as it's game specific
 
-$pfile "../src/Games/Game.pkg"
+$pfile "Games/Game.pkg"

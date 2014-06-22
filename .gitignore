@@ -20,10 +20,9 @@ ipch/
 *.opensdf
 *.suo
 *.log
-*.dll
 *.exe
 
 lib/tolua*
-lib/Box2D*
+bin/*.dll
 
 luaBinding.*

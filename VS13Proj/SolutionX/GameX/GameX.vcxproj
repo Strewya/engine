@@ -56,23 +56,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
@@ -96,7 +98,7 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
+      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -108,16 +110,13 @@
       <LinkObjects>false</LinkObjects>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>
-      </Command>
+      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>
-      </Outputs>
+      <Outputs>dummy</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>
-      </Inputs>
+      <Inputs>dummy</Inputs>
       <Message>
       </Message>
     </CustomBuildStep>
@@ -145,12 +144,17 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
+      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
       </Command>
     </CustomBuild>
+    <CustomBuildStep>
+      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Outputs>dummy</Outputs>
+      <Inputs>dummy</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <ClCompile>
@@ -176,7 +180,7 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\export.lua</Command>
+      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -187,11 +191,12 @@
       </Command>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>call lua $(SGPROJECT)\bin\deploy.lua</Command>
+      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>dummy</Inputs>
       <Outputs>dummy</Outputs>
+      <Message />
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -210,6 +215,8 @@
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp" />
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
@@ -255,6 +262,8 @@
     <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h" />
     <ClInclude Include="..\..\..\src\Games\Pong\Pong.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
