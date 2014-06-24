@@ -102,3 +102,30 @@ function findInTable(t, f)
 	end;
 	return false;
 end;
+
+function extractGameName()
+	local selector = gProjDir .. "/src/Games/GameSelector.h";
+	local gameDef = "#define CORE_GAME_BUILD";
+
+	local game, defEnd = findLineContaining(selector, gameDef);
+	ensure(game ~= nil, "Game not defined!");
+	game = game:sub(defEnd+2);
+	game = game:sub(1,1) .. game:sub(2):lower();
+	
+	return game;
+end;
+
+function assertResourcesPresent(resList, resRootDir)
+	local resOK = true;
+	if(resList ~= nil) then
+		for _, res in pairs(resList) do
+			if(not checkFileExists(resRootDir.."/"..res)) then
+				print("Missing resource dependency " .. res);
+				resOK = false;
+			end;
+		end;
+	else
+		print("No resource dependencies found, skipping...")
+	end;
+	return resOK;
+end;

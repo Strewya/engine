@@ -61,7 +61,6 @@
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
-    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -69,7 +68,6 @@
     <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
-    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -110,16 +108,22 @@
       <LinkObjects>false</LinkObjects>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>dummy</Outputs>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>dummy</Inputs>
+      <Inputs>
+      </Inputs>
       <Message>
       </Message>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -152,9 +156,14 @@
     </CustomBuild>
     <CustomBuildStep>
       <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
-      <Outputs>dummy</Outputs>
-      <Inputs>dummy</Inputs>
+      <Outputs>
+      </Outputs>
+      <Inputs>
+      </Inputs>
     </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
     <ClCompile>
@@ -194,7 +203,8 @@
       <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>dummy</Inputs>
+      <Inputs>
+      </Inputs>
       <Outputs>dummy</Outputs>
       <Message />
     </CustomBuildStep>

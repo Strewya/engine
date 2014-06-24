@@ -310,31 +310,40 @@ function game_render(game)
 	for k,v in ipairs(gState.propList) do
 		local prop = game:getProp(v);
 		local img = game.m_imageCache:getImage(prop.m_imageID);
-		--game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
+		if(gState.drawCollisionRect) then
+			game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
+		end;
 		col:set(1,1,1);
 		game.m_graphics:drawTexturedQuad(prop.m_transform, col, img);
 		col:set(0,0,0);
-		--[[game.m_graphics:setOrthographicProjection();
-		textTf.position = prop.m_transform.position;
-		textTf.position.x = textTf.position.x*100;
-		textTf.position.y = textTf.position.y*100;
-		game.m_graphics:drawText(tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y),
-								 textTf, col, 0, false);
-		game.m_graphics:setPerspectiveProjection();]]
+		if(gState.drawPositions) then
+			game.m_graphics:setOrthographicProjection();
+			textTf.position = prop.m_transform.position;
+			textTf.position.x = textTf.position.x*100;
+			textTf.position.y = textTf.position.y*100;
+			game.m_graphics:drawText(tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y),
+									 textTf, col, 0, false);
+			game.m_graphics:setPerspectiveProjection();
+		end;
 	end;
 	
 	img = game.m_imageCache:getImage(game.m_player.m_imageID);
-	--game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
+	if(gState.drawCollisionRect) then
+		game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
+	end;
 	col:set(1,1,1);
 	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
-	--[[game.m_graphics:setOrthographicProjection();
-	textTf.position = game.m_player.m_transform.position;
-	textTf.position.x = textTf.position.x*100;
-	textTf.position.y = textTf.position.y*100;
-	col:set(0,0,0);
-	game.m_graphics:drawText(tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y),
-							 textTf, col, 0, false);
-	game.m_graphics:setPerspectiveProjection();]]
+	
+	if(gState.drawPositions) then
+		game.m_graphics:setOrthographicProjection();
+		textTf.position = game.m_player.m_transform.position;
+		textTf.position.x = textTf.position.x*100;
+		textTf.position.y = textTf.position.y*100;
+		col:set(0,0,0);
+		game.m_graphics:drawText(tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y),
+								 textTf, col, 0, false);
+		game.m_graphics:setPerspectiveProjection();
+	end;
 	
 	game.m_graphics:clearCamera();
 	game.m_graphics:setOrthographicProjection();

@@ -41,7 +41,7 @@ function setupInput()
 	end);
 	
 	addInput(gInput.CMD_PROMPT, Core.WE_KEYBOARDKEY, function(event)
-		if(event.m_keyboard.m_isDown and not event.m_keyboard.m_previouslyDown) then
+		if(event.m_keyboard.m_isDown) then
 			Console:moveCarret(event.m_keyboard.m_keyCode);
 		end;
 	end);

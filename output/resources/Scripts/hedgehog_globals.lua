@@ -17,7 +17,7 @@ gState.yVel = 0;
 gState.yAcc = 0;
 gState.maxJumpsAvailable = 1;
 gState.jumpsAvailable = gState.maxJumpsAvailable;
-gState.gravity = -30;
+gState.gravity = -31;
 gState.minY = -2.15;
 gState.velocity = 0;
 gState.maxVelocity = 5;
@@ -28,6 +28,8 @@ gState.targetApples = 10;
 gState.gameOver = false;
 gState.bestTime = 0;
 gState.bboxColor = Core.Color(0,0,0);
+gState.drawPositions = false;
+gState.drawCollisionRect = false;
 
 gState.treeHS = Core.Vec2(0.4, 2);
 gState.treeCol = Core.Color(127/255, 63/255, 63/255);
@@ -35,3 +37,11 @@ gState.treePos = Core.Vec2(3,-0.5);
 gState.treeTopHS = Core.Vec2(2, 1);
 gState.treeTopCol = Core.Color(58/255, 1, 75/255);
 gState.treeTopPos = Core.Vec2(3,1.2);
+
+function toggleDrawPositions()
+	gState.drawPositions = not gState.drawPositions;
+end;
+
+function toggleDrawCollision()
+	gState.drawCollisionRect = not gState.drawCollisionRect;
+end;

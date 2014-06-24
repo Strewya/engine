@@ -1,9 +1,4 @@
 return 
-{ -- DLL dependencies
-	"tolua++",
-	"lua51",
-	"lua5.1"
-},
 { -- resource dependencies
 	"Defs/apples.sheet",
 	"Defs/font.font",
@@ -19,4 +14,9 @@ return
 	"Textures/apples.png",
 	"Textures/font_t.png",
 	"Textures/hedgehog.png"
+},
+{ -- DLL dependencies
+	"tolua++",
+	"lua51",
+	"lua5.1"
 };
