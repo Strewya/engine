@@ -212,6 +212,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\FileLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\FontCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
@@ -259,13 +261,18 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\FileLoader.h" />
+    <ClInclude Include="..\..\..\src\Caches\FontCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\ResourceCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Font.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Texture.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
     <ClInclude Include="..\..\..\src\Games\GameSelector.h" />

@@ -9,6 +9,8 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Caches/ResourceCache.h>
+#include <DataStructs/Texture.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -16,21 +18,33 @@ namespace Core
 {
 	class GraphicsSystem;
 
-	class TextureCache
+	class TextureLoader
 	{
 	public:
-		bool init(GraphicsSystem& graphics);
-		bool shutdown();
+		typedef std::vector<Texture> TextureVector;
+		
+		TextureLoader() = default;
+		TextureLoader(GraphicsSystem& graphics);
 
-		uint32_t getTextureID(const char* path);
-		Vec2 getTextureDimensions(uint32_t texID) const;
-		bool releaseTexture(uint32_t texID);
-		
-		bool onFileModified(const std::string& path);
-		
+		bool load(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const;
+		bool reload(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const;
+		bool unload(TextureVector& textures, uint32_t ID);
+		bool unloadAll(TextureVector& textures) const;
+
 	private:
+		friend class TextureCache;
 		GraphicsSystem* m_graphics;
 
-		std::vector<std::pair<std::string, uint32_t>> m_loadedTextures;
+		bool processLoading(Texture& tex, const std::string& texturePath) const;
+	};
+
+
+
+	class TextureCache : public ResourceCache<Texture, TextureLoader>
+	{
+	public:
+		Vec2 getTextureDimensions(uint32_t texID) const;
+		
+		bool onFileModified(const std::string& path);
 	};
 }

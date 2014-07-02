@@ -7,23 +7,34 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Caches/ResourceCache.h>
 #include <DataStructs/Animation.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class AnimationCache
+	class ImageCache;
+
+	class AnimationLoader
 	{
 	public:
-		bool init();
-		bool shutdown();
+		typedef std::vector<Animation> AnimationVector;
+		typedef std::function<bool(const Animation&)> Inserter;
 
-		bool addAnimations(const Animation& anim, bool reload, uint32_t* outIndex = nullptr);
-
-		uint32_t getAnimationID(const char* name) const;
-		const Animation& getAnimation(uint32_t id) const;
+		AnimationLoader() = default;
+		AnimationLoader(ImageCache& images);
 		
+		bool load(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const;
+		bool reload(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const;
+		bool unload(AnimationVector& animations, uint32_t id) const;
+		bool unloadAll(AnimationVector& animations) const;
+
 	private:
-		std::vector<Animation> m_animations;
+		ImageCache* m_images;
+
+		bool processLoading(AnimationVector& animations, DataFile& file, const Inserter& inserter) const;
+		bool parseAnimation(Animation& anim, DataFile& file, float defaultDuration, bool defaultRepeat) const;
 	};
+
+	class AnimationCache : public ResourceCache < Animation, AnimationLoader > {};
 }

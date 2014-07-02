@@ -2,7 +2,6 @@ return {
 	name = "font",
 	texture = "Textures/font_t.png",
 	size = 32,
-	glyphCount = 95,
 	glyphs = {
 		{ char=' ',  left=5,   right=29,  top=0},
 		{ char='!',  left=43,  right=52,  top=0},

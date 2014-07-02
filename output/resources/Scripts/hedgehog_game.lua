@@ -138,7 +138,7 @@ function doAppleSpawn(game)
 		local prop = game:getProp(gState.propList[#gState.propList]);
 		prop.m_transform.scale:set(0.2,0.2);
 		prop.m_transform.position:set(x,y);
-		prop.m_imageID = game.m_imageCache:getImageID("apple_"..tostring(a));
+		prop.m_imageID = game.m_imageCache:getResourceID("apple_"..tostring(a));
 		prop.m_collisionRect.halfWidth = 1;
 		prop.m_collisionRect.halfHeight = 1;
 	end;
@@ -309,7 +309,7 @@ function game_render(game)
 	
 	for k,v in ipairs(gState.propList) do
 		local prop = game:getProp(v);
-		local img = game.m_imageCache:getImage(prop.m_imageID);
+		local img = game.m_imageCache:getResource(prop.m_imageID);
 		if(gState.drawCollisionRect) then
 			game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
 		end;
@@ -327,7 +327,7 @@ function game_render(game)
 		end;
 	end;
 	
-	img = game.m_imageCache:getImage(game.m_player.m_imageID);
+	img = game.m_imageCache:getResource(game.m_player.m_imageID);
 	if(gState.drawCollisionRect) then
 		game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
 	end;

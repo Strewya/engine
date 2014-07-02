@@ -11,6 +11,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <DataStructs/Font.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -25,24 +26,7 @@ namespace Core
 	class Transform;
 	class Window;
 
-	class Glyph
-	{
-	public:
-		uint32_t m_ascii;
-		uint32_t m_left;
-		uint32_t m_right;
-		uint32_t m_top;
-		char m_character;
-	};
-
-	class Font
-	{
-	public:
-		uint32_t m_size;
-		std::string m_name;
-		std::string m_texture;
-		std::vector<Glyph> m_glyphs;
-	};
+	
 
 	class GraphicsSystem
 	{

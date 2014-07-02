@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
@@ -18,32 +19,38 @@ namespace Core
 		ObjectContainer(uint32_t initialSize = 0);
 
 		uint32_t create();
+		template<typename F> uint32_t getID(const F& fn) const;
 		T& get(uint32_t id);
 		void remove(uint32_t id);
 
 	private:
 		std::vector<T> m_data;
-		std::vector<uint32_t> m_freeIds;
+		std::vector<uint32_t> m_allocated;
+		uint32_t m_firstFree;
+
+		void setSize(uint32_t size);
 	};
 
 	template<typename T> ObjectContainer<T>::ObjectContainer(uint32_t initialSize)
+		: m_firstFree(0)
 	{
-		m_data.reserve(initialSize);
+		setSize(initialSize);
 	}
 
 	template<typename T> uint32_t ObjectContainer<T>::create()
 	{
-		uint32_t id = m_data.size();
-		if(!m_freeIds.empty())
+		if(m_firstFree == m_allocated.size())
 		{
-			id = m_freeIds.back();
-			m_freeIds.pop_back();
+			setSize(m_data.size() * 2);
 		}
-		else
-		{
-			m_data.emplace_back();
-		}
+		uint32_t id = m_allocated[m_firstFree++];
 		return id;
+	}
+
+	template<typename T>
+	template<typename F> uint32_t ObjectContainer<T>::getID(const F& fn) const
+	{
+		return fn(m_data);
 	}
 
 	template<typename T> T& ObjectContainer<T>::get(uint32_t id)
@@ -53,6 +60,27 @@ namespace Core
 
 	template<typename T> void ObjectContainer<T>::remove(uint32_t id)
 	{
-		m_freeIds.emplace_back(id);
+		auto it = std::find(m_allocated.begin(), m_allocated.end(), id);
+		auto index = std::distance(m_allocated.begin(), it);
+		if(index < m_firstFree)
+		{
+			--m_firstFree;
+			std::swap(m_allocated[index], m_allocated[m_firstFree]);
+		}
+	}
+
+	template<typename T> void ObjectContainer<T>::removeAll()
+	{
+		m_firstFree
+	}
+
+	template<typename T> void ObjectContainer<T>::setSize(uint32_t size)
+	{
+		if(size > m_data.size())
+		{
+			m_data.resize(size);
+			uint32_t i = m_allocated.size();
+			std::generate_n(std::back_inserter(m_allocated), size, [&]() { return i++; });
+		}
 	}
 }

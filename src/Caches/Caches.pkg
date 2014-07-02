@@ -7,16 +7,23 @@ $#include <Caches/TextureCache.h>
 
 namespace Core
 {
+	class FileLoader
+	{
+		bool loadFile(const char* filename);
+		bool reloadFile(const char* filename);
+		bool unloadFile(const char* filename);
+	};
+
 	class AnimationCache
 	{
-		uint32_t getAnimationID(const char* name) const;
-		const Animation& getAnimation(uint32_t id) const;
+		uint32_t getResourceID(const char* name) const;
+		const Animation& getResource(uint32_t id);
 	};
 	
 	class ImageCache
 	{
-		uint32_t getImageID(const char* name) const;
-		const Image& getImage(uint32_t id) const;
+		uint32_t getResourceID(const char* name) const;
+		const Image& getResource(uint32_t id);
 	};
 
 	class ScriptCache
@@ -26,13 +33,14 @@ namespace Core
 
 	class SpritesheetCache
 	{
-		uint32_t getSpritesheetID(const char* name) const;
-		const Spritesheet& getSpritesheet(uint32_t id) const;
+		uint32_t getResourceID(const char* name) const;
+		const Spritesheet& getResource(uint32_t id);
 	};
 
 	class TextureCache
 	{
-		uint32_t getTextureID(const char* path);
+		uint32_t getResourceID(const char* name) const;
+		const Texture& getResource(uint32_t id);
 		Vec2 getTextureDimensions(uint32_t texID) const;
 	};
 }
