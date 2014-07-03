@@ -18,7 +18,7 @@ namespace Core
 	public:
 		bool loadFile(const char* filename);
 		bool reloadFile(const char* filename);
-		bool unloadFile(const char* filename);
+		void unloadFile(const char* filename);
 
 		template<typename H>
 		void registerHandler(const char* ext, H& handler, bool replaceExisting = true);

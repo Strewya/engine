@@ -15,9 +15,11 @@ namespace Core
 	class Image
 	{
 	public:
+		std::string m_name;
+		uint32_t m_fileID;
+
 		uint32_t m_textureID;
 		float m_ratio;
 		Vec2 m_texCoords[4];
-		std::string m_name;
 	};
 }

@@ -21,21 +21,22 @@ namespace Core
 	class TextureLoader
 	{
 	public:
-		typedef std::vector<Texture> TextureVector;
+		typedef ObjectContainer<Texture> TextureData;
 		
 		TextureLoader() = default;
 		TextureLoader(GraphicsSystem& graphics);
 
-		bool load(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const;
-		bool reload(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const;
-		bool unload(TextureVector& textures, uint32_t ID);
-		bool unloadAll(TextureVector& textures) const;
+		bool load(TextureData& textures, const std::string& texturePath, uint32_t fileID) const;
+		bool reload(TextureData& textures, const std::string& texturePath, uint32_t fileID) const;
+		void unloadOne(TextureData& textures, uint32_t resourceID) const;
+		void unloadFile(TextureData& textures, uint32_t fileID) const;
+		void unloadAll(TextureData& textures) const;
 
 	private:
 		friend class TextureCache;
 		GraphicsSystem* m_graphics;
 
-		bool processLoading(Texture& tex, const std::string& texturePath) const;
+		bool processLoading(Texture& tex, const std::string& texturePath, uint32_t fileID) const;
 	};
 
 
@@ -44,7 +45,5 @@ namespace Core
 	{
 	public:
 		Vec2 getTextureDimensions(uint32_t texID) const;
-		
-		bool onFileModified(const std::string& path);
 	};
 }

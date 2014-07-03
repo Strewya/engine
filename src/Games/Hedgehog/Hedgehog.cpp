@@ -68,6 +68,12 @@ namespace Core
 
 		if(m_isRunning)
 		{
+			m_fileLoader.registerHandler("png", m_textureCache);
+			m_fileLoader.registerHandler("tif", m_textureCache);
+			m_fileLoader.registerHandler("sheet", m_spritesheetCache);
+
+			m_isRunning = m_isRunning && m_fileLoader.loadFile(RESOURCE("Textures/hedgehog.png"));
+
 			m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/hedgehog_game.lua"), false);
 			//m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/lib.lua"), false);
 			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");

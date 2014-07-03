@@ -16,6 +16,8 @@ namespace Core
 	{
 	public:
 		std::string m_name;
-		uint32_t m_index;
+		uint32_t m_fileID;
+
+		uint32_t m_rawTextureID;
 	};
 }

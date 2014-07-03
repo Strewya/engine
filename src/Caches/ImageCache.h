@@ -15,27 +15,30 @@
 
 namespace Core
 {
+	class FileLoader;
 	class TextureCache;
 
 	class ImageLoader
 	{
 	public:
-		typedef std::vector<Image> ImageVector;
-		typedef std::function<bool(const Image&)> Inserter;
+		typedef ObjectContainer<Image> ImageData;
+		typedef std::function<uint32_t(const char*)> Filter;
 
 		ImageLoader() = default;
-		ImageLoader(TextureCache& textures);
+		ImageLoader(FileLoader& fileLoader, TextureCache& textures);
 
-		bool load(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const;
-		bool reload(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const;
-		bool unload(ImageVector& images, uint32_t id) const;
-		bool unloadAll(ImageVector& images) const;
+		bool load(ImageData& images, DataFile& filename, uint32_t fileID) const;
+		bool reload(ImageData& images, DataFile& filename, uint32_t fileID) const;
+		void unloadOne(ImageData& images, uint32_t imgID) const;
+		void unloadFile(ImageData& images, uint32_t fileID) const;
+		void unloadAll(ImageData& images) const;
 
 	private:
+		FileLoader* m_fileLoader;
 		TextureCache* m_textures;
 
-		bool processLoading(ImageVector& images, DataFile& file, const Inserter& inserter) const;
-		bool parseImage(Image& img, DataFile& file, float textureW, float textureH, uint32_t defaultW, uint32_t defaultH) const;
+		bool processLoading(ImageData& images, DataFile& file, uint32_t fileID, const Filter& filter) const;
+		bool parseImage(Image& img, DataFile& file, uint32_t fileID, const char* textureName, uint32_t defaultW, uint32_t defaultH) const;
 	};
 
 	class ImageCache : public ResourceCache < Image, ImageLoader > {};

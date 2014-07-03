@@ -10,7 +10,7 @@
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
-#include <Caches/FileTracker.h>
+#include <Caches/FileLoader.h>
 #include <Caches/ImageCache.h>
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
@@ -62,8 +62,8 @@ namespace Core
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
 		//caches
+		FileLoader m_fileLoader;
 		AnimationCache m_animationCache;
-		FileTracker m_fileTracker;
 		ImageCache m_imageCache;
 		ScriptCache m_scriptCache;
 		SpritesheetCache m_spritesheetCache;

@@ -5,6 +5,7 @@
 #include <Caches/ImageCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Caches/FileLoader.h>
 #include <Caches/TextureCache.h>
 #include <Util/DataFile.h>
 #include <Util/Utility.h>
@@ -12,72 +13,88 @@
 
 namespace Core
 {
-	ImageLoader::ImageLoader(TextureCache& textures)
-		: m_textures(&textures)
-	{}
-
-	bool ImageLoader::load(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const
+	ImageLoader::ImageLoader(FileLoader& fileLoader, TextureCache& textures)
+		: m_fileLoader(&fileLoader), m_textures(&textures)
 	{
-		auto inserter = [&](const Image& img)
+	}
+
+	bool ImageLoader::load(ImageData& images, DataFile& file, uint32_t fileID) const
+	{
+		auto loadFilter = [&](const char* name) -> uint32_t
 		{
-			auto id = findResourceByName(images, img.m_name.c_str());
+			auto id = findResourceByName(images, name);
 			if(id == INVALID_ID)
 			{
-				if(outIDs != nullptr)
-				{
-					outIDs->emplace_back(images.size());
-				}
-				images.emplace_back(img);
-				return true;
+				return images.create();
 			}
-			DEBUG_INFO("Image couldn't be loaded, name '", img.m_name, "' already exists!");
-			return false;
+			DEBUG_INFO("Image '", name, "' already loaded, skipping...");
+			return INVALID_ID;
 		};
-		return processLoading(images, file, inserter);
+		return processLoading(images, file, fileID, loadFilter);
 	}
 
-	bool ImageLoader::reload(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const
+	bool ImageLoader::reload(ImageData& images, DataFile& file, uint32_t fileID) const
 	{
-		auto inserter = [&](const Image& img)
+		auto loadFilter = [&](const char* name) -> uint32_t
 		{
-			auto id = findResourceByName(images, img.m_name.c_str());
-			if(id != INVALID_ID)
+			auto id = findResourceByName(images, name);
+			if(id == INVALID_ID)
 			{
-				images[id] = img;
-				//it's a reload, so no need to touch the outID, it's the same
-				return true;
+				id = images.create();
 			}
-			DEBUG_INFO("Image couldn't be reloaded, name '", img.m_name, "' doesn't exists!");
-			return false;
+			return id;
 		};
-		return processLoading(images, file, inserter);
+		return processLoading(images, file, fileID, loadFilter);
 	}
 
-	bool ImageLoader::unload(ImageVector& images, uint32_t id) const
+	void ImageLoader::unloadOne(ImageData& images, uint32_t id) const
 	{
-		return true;
+		auto& img = images.get(id);
+		img.m_name.clear();
+		img.m_fileID = INVALID_ID;
+		img.m_ratio = 0;
+		img.m_textureID = INVALID_ID;
+		for(auto i = 0; i < 4; ++i)
+		{
+			img.m_texCoords[i].set(0, 0);
+		}
 	}
 
-	bool ImageLoader::unloadAll(ImageVector& images) const
+	void ImageLoader::unloadAll(ImageData& images) const
 	{
-		return true;
+		auto filter = [](const Image& i)
+		{
+			return true;
+		};
+		for(auto id = images.getID(filter); id != INVALID_ID; id = images.getID(filter))
+		{
+			unloadOne(images, id);
+		}
 	}
 
-	bool ImageLoader::processLoading(ImageVector& images, DataFile& file, const Inserter& inserter) const
+	void ImageLoader::unloadFile(ImageData& images, uint32_t fileID) const
+	{
+		auto filter = [=](const Image& i)
+		{
+			return i.m_fileID == fileID;
+		};
+		for(auto id = images.getID(filter); id != INVALID_ID; id = images.getID(filter))
+		{
+			unloadOne(images, id);
+			images.remove(id);
+		}
+	}
+
+	bool ImageLoader::processLoading(ImageData& images, DataFile& file, uint32_t fileID, const Filter& filter) const
 	{
 		assert(m_textures != nullptr);
 		bool status = false;
 		auto textureName = file.getString("texture", "");
-		uint32_t textureID = INVALID_ID;
-		if(m_textures->loadFromFile(false, &textureID, textureName))
+		if(m_fileLoader->loadFile(textureName.c_str()))
 		{
-			Vec2 td = m_textures->getTextureDimensions(textureID);
-			auto tw = td.x;
-			auto th = td.y;
 			auto defaultWidth = file.getInt("defaultWidth", 0);
 			auto defaultHeight = file.getInt("defaultHeight", 0);
 			auto imageCount = file.getListSize("list");
-			images.reserve(images.size() + imageCount);
 			if(file.getList("list"))
 			{
 				status = true;
@@ -85,11 +102,10 @@ namespace Core
 				{
 					if(file.getList(i + 1))
 					{
-						Image img;
-						img.m_textureID = textureID;
-						if(parseImage(img, file, tw, th, defaultWidth, defaultHeight))
+						auto imgID = filter(file.getString("name", "").c_str());
+						if(imgID != INVALID_ID)
 						{
-							status &= inserter(img);
+							status = status && parseImage(images.get(imgID), file, fileID, textureName.c_str(), defaultWidth, defaultHeight);
 						}
 						file.popList();
 					}
@@ -112,33 +128,38 @@ namespace Core
 		return status;
 	}
 
-	bool ImageLoader::parseImage(Image& img, DataFile& file, float textureW, float textureH, uint32_t defaultW, uint32_t defaultH) const
+	bool ImageLoader::parseImage(Image& img, DataFile& file, uint32_t fileID, const char* textureName, uint32_t defaultW, uint32_t defaultH) const
 	{
 		bool parseOK = false;
-		img.m_name.assign(file.getString("name", ""));
+		auto imgName = file.getString("name", "");
 		auto imgWidth = file.getInt("width", defaultW);
 		auto imgHeight = file.getInt("height", defaultH);
 		auto pos = file.getVec2("pos", Vec2(-1, -1));
-		if(!img.m_name.empty() && imgWidth > 0 && imgHeight > 0 && pos.x >= 0 && pos.y >= 0)
+		if(!imgName.empty() && imgWidth > 0 && imgHeight > 0 && pos.x >= 0 && pos.y >= 0)
 		{
 			float w = static_cast<float>(imgWidth);
 			float h = static_cast<float>(imgHeight);
+			auto textureID = m_textures->getResourceID(textureName);
+			auto textureDim = m_textures->getTextureDimensions(textureID);
+			auto textureDimensions = m_textures->getTextureDimensions(textureID);
 
 			//image is valid, fill and add it
+			img.m_name = imgName;
+			img.m_fileID = fileID; 
 			img.m_ratio = w / h;
-			Vec2 wh = pos + Vec2(w, h);
-
+			img.m_textureID = textureID;
+			
 			/* the vertices are in the following order:
 			0--1
 			|  |
 			3--2
 			*/
+			Vec2 wh = pos + Vec2(w, h);
+			img.m_texCoords[0].x = pos.x / textureDimensions.x;
+			img.m_texCoords[0].y = pos.y / textureDimensions.y;
 
-			img.m_texCoords[0].x = pos.x / textureW;
-			img.m_texCoords[0].y = pos.y / textureH;
-
-			img.m_texCoords[2].x = wh.x / textureW;
-			img.m_texCoords[2].y = wh.y / textureH;
+			img.m_texCoords[2].x = wh.x / textureDimensions.x;
+			img.m_texCoords[2].y = wh.y / textureDimensions.y;
 
 			img.m_texCoords[1].x = img.m_texCoords[2].x;
 			img.m_texCoords[1].y = img.m_texCoords[0].y;
@@ -146,6 +167,7 @@ namespace Core
 			img.m_texCoords[3].x = img.m_texCoords[0].x;
 			img.m_texCoords[3].y = img.m_texCoords[2].y;
 
+			
 			parseOK = true;
 		}
 		else
