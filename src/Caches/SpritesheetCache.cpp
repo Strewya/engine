@@ -16,69 +16,78 @@
 
 namespace Core
 {
-	SpritesheetLoader::SpritesheetLoader(AnimationCache& animations, ImageCache& images)
-		: m_animations(&animations), 
-		  m_images(&images)
+	SpritesheetLoader::SpritesheetLoader(AnimationCache& animations, FileLoader& fileLoader, ImageCache& images, ScriptingSystem& scriptSystem)
+		: m_animations(&animations), m_fileLoader(&fileLoader), m_images(&images), m_scriptSystem(&scriptSystem)
 	{}
 
-	bool SpritesheetLoader::load(SpritesheetVector& spritesheets, uint32_t* outID, DataFile& file) const
+	bool SpritesheetLoader::load(SpritesheetData& spritesheets, const std::string& filename, uint32_t fileID) const
 	{
-		auto sheetName = file.getFilename();
-		auto id = findResourceByName(spritesheets, sheetName.c_str());
-			
-		if(id == INVALID_ID)
+		auto filter = [&](const char* name) -> uint32_t
 		{
-			if(outID != nullptr)
+			auto id = findResourceByName(spritesheets, name);
+			if(id == INVALID_ID)
 			{
-				*outID = spritesheets.size();
+				return spritesheets.create();
 			}
-			spritesheets.emplace_back();
-			return parseSpritesheet(spritesheets.back(), file, false, outID);
-		}
-
-		DEBUG_INFO("Spritesheet couldn't be loaded, name '", sheetName, "' already exists!");
-		return false;
+			DEBUG_INFO("Spritesheet ", name, " already loaded, skipping...");
+			return INVALID_ID;
+		};
+		DataFile file(*m_scriptSystem);
+		return file.open(filename.c_str()) && processLoading(spritesheets, file, fileID, filter);
 	}
 
-	bool SpritesheetLoader::reload(SpritesheetVector& spritesheets, uint32_t* outID, DataFile& file) const
+	bool SpritesheetLoader::reload(SpritesheetData& spritesheets, const std::string& filename, uint32_t fileID) const
 	{
-		auto sheetName = file.getFilename();
-		auto id = findResourceByName(spritesheets, sheetName.c_str());
-
-		if(id != INVALID_ID)
+		auto filter = [&](const char* name) -> uint32_t
 		{
-			if(outID != nullptr)
+			auto id = findResourceByName(spritesheets, name);
+			if(id == INVALID_ID)
 			{
-				*outID = id;
+				id = spritesheets.create();
 			}
-			return parseSpritesheet(spritesheets[id], file, true, outID);
-		}
-
-		DEBUG_INFO("Spritesheet couldn't be reloaded, name '", sheetName, "' doesn't exists!");
-		return false;
+			else
+			{
+				unloadOne(spritesheets, id);
+			}
+			return id;
+		};
+		DataFile file(*m_scriptSystem);
+		return file.open(filename.c_str()) && processLoading(spritesheets, file, fileID, filter);
 	}
 
-	bool SpritesheetLoader::unload(SpritesheetVector& spritesheets, uint32_t id) const
+	void SpritesheetLoader::unloadOne(SpritesheetData& spritesheets, uint32_t id) const
 	{
-		Spritesheet& ss = spritesheets[id];
-		for(auto anim : ss.m_animations)
+		Spritesheet& sheet = spritesheets.get(id);
+		sheet.m_name.clear();
+		sheet.m_textureID
+		for(auto anim : sheet.m_animations)
 		{
 			m_animations->destroyResource(anim);
 		}
-		for(auto img : ss.m_images)
+		for(auto img : sheet.m_images)
 		{
 			m_images->destroyResource(img);
 		}
-		return true;
 	}
 
-	bool SpritesheetLoader::unloadAll(SpritesheetVector& spritesheets) const
+	void SpritesheetLoader::unloadAll(SpritesheetData& spritesheets) const
 	{
-		while(!spritesheets.empty())
+		auto filter = [](const Spritesheet& s) { return true; };
+
+		for(auto id = spritesheets.getID(filter); id != INVALID_ID; id = spritesheets.getID(filter))
 		{
-			unload(spritesheets, 0);
+			unloadOne(spritesheets, id);
 		}
-		return true;
+	}
+
+	void SpritesheetLoader::unloadFile(SpritesheetData& spritesheets, uint32_t fileID) const
+	{
+
+	}
+
+	bool SpritesheetLoader::processLoading(SpritesheetData& spritesheets, DataFile& file, uint32_t fileID, const Filter& filter)
+	{
+
 	}
 
 	bool SpritesheetLoader::parseSpritesheet(Spritesheet& sheet, DataFile& file, bool isReload, uint32_t* outID) const

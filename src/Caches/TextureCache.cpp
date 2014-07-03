@@ -36,13 +36,13 @@ namespace Core
 	bool TextureLoader::reload(TextureData& textures, const std::string& texturePath, uint32_t fileID) const
 	{
 		auto id = findResourceByName(textures, texturePath.c_str());
-		if(id != INVALID_ID)
+		if(id == INVALID_ID)
 		{
-			unloadOne(textures, id);
+			id = textures.create();
 		}
 		else
 		{
-			id = textures.create();
+			unloadOne(textures, id); 
 		}
 		return processLoading(textures.get(id), texturePath, fileID);
 	}
@@ -58,10 +58,8 @@ namespace Core
 
 	void TextureLoader::unloadAll(TextureData& textures) const
 	{
-		auto anyFilter = [](const Texture& tex)
-		{
-			return true;
-		};
+		auto anyFilter = [](const Texture& tex) { return true; };
+
 		for(auto id = textures.getID(anyFilter); id != INVALID_ID; id = textures.getID(anyFilter))
 		{
 			unloadOne(textures, id);
