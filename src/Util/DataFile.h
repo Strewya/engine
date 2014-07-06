@@ -14,7 +14,7 @@
 
 namespace Core
 {
-	//we are using the scripting system as the interface for our configurations
+	class ResourceFile;
 	class ScriptingSystem;
 
 	class DataFile
@@ -22,7 +22,7 @@ namespace Core
 	public:
 		DataFile(ScriptingSystem& state);
 
-		bool open(const char* filename);
+		bool open(const ResourceFile& filename);
 		void close();
 		const std::string& getFilename() const;
 		

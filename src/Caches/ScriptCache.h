@@ -12,6 +12,7 @@
 
 namespace Core
 {
+	class ResourceFile;
 	class ScriptingSystem;
 
 	class ScriptCache
@@ -20,7 +21,7 @@ namespace Core
 		bool init(ScriptingSystem& scripting);
 		bool shutdown();
 
-		bool loadFromFile(const char* file, bool reload);
+		bool loadFromFile(const ResourceFile& file, bool reload);
 
 	private:
 		ScriptingSystem* m_scripting;

@@ -12,19 +12,6 @@
 namespace Core
 {
 
-#define RESOURCE_PATH "../resources/"
-#define RESOURCE(name) RESOURCE_PATH##name
-
-	inline std::string ResourcePath(const char* path)
-	{
-		return std::string(RESOURCE_PATH).append(path);
-	}
-
-	inline std::string ResourcePath(std::string& path)
-	{
-		return std::string(RESOURCE_PATH).append(path);
-	}
-
 #define CLASS(x) "Core::"#x
 
 #define DEBUG_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL")
@@ -71,5 +58,15 @@ namespace Core
 			value = high;
 		}
 		return value;
+	}
+
+	inline std::string& replace(std::string& str, const std::string& from, const std::string& to)
+	{
+		size_t start_pos = str.find(from);
+		if(start_pos != std::string::npos)
+		{
+			str.replace(start_pos, from.length(), to);
+		}
+		return str;
 	}
 }

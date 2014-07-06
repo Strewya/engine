@@ -11,6 +11,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <DataStructs/Font.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -21,28 +22,10 @@ namespace Core
 	class DataFile;
 	class Image;
 	class Rect;
+	class ResourceFile;
 	class TextureCache;
 	class Transform;
 	class Window;
-
-	class Glyph
-	{
-	public:
-		uint32_t m_ascii;
-		uint32_t m_left;
-		uint32_t m_right;
-		uint32_t m_top;
-		char m_character;
-	};
-
-	class Font
-	{
-	public:
-		uint32_t m_size;
-		std::string m_name;
-		std::string m_texture;
-		std::vector<Glyph> m_glyphs;
-	};
 
 	class GraphicsSystem
 	{
@@ -58,8 +41,8 @@ namespace Core
 		bool initDevice();
 		bool initSwapChain();
 		bool initRenderTarget();
-		bool initVertexShader(const char* shaderFile);
-		bool initPixelShader(const char* shaderFile);
+		bool initVertexShader(const ResourceFile& shaderFile);
+		bool initPixelShader(const ResourceFile& shaderFile);
 		bool initViewport();
 		bool initSamplerState();
 		bool initDepthBuffer();
@@ -86,7 +69,7 @@ namespace Core
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 
-		uint32_t loadTextureFromFile(const char* filename);
+		uint32_t loadTextureFromFile(const ResourceFile& filename);
 		void releaseTexture(uint32_t id);
 
 	private:
@@ -118,7 +101,6 @@ namespace Core
 		XMMATRIX m_world;
 		
 		//this shouldn't be explicit like this, refactor later
-		uint32_t m_fontTextureID;
 		Font m_font;
 		TextureCache* m_textureCache;
 

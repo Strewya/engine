@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Scripting/ScriptingSystem.h>
+#include <Util/ResourceFile.h>
 /******* end headers *******/
 
 namespace Core
@@ -22,14 +23,13 @@ namespace Core
 		: m_scripting(&scripting), m_isOpen(false), m_filename("")
 	{}
 
-	bool DataFile::open(const char* filename)
+	bool DataFile::open(const ResourceFile& file)
 	{
-		assert(filename != nullptr);
 		uint32_t resetPoint = m_scripting->getTop();
-		if(m_isOpen == false && m_scripting->doFile(filename, 1))
+		if(m_isOpen == false && m_scripting->doFile(file.getPath().c_str(), 1))
 		{
 			m_isOpen = true;
-			m_filename.assign(filename);
+			m_filename.assign(file.getPath());
 			return true;
 		}
 		m_scripting->pop(m_scripting->getTop() - resetPoint);

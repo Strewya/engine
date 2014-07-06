@@ -2,6 +2,7 @@
 $#include <Util/Color.h>
 $#include <Util/Random.h>
 $#include <Util/Rect.h>
+$#include <Util/ResourceFile.h>
 $#include <Util/Time.h>
 $#include <Util/Transform.h>
 $#include <Util/Utility.h>
@@ -10,9 +11,6 @@ $#include <Util/Vec3.h>
 
 namespace Core
 {
-	inline std::string ResourcePath(const char* path);
-	inline std::string ResourcePath(std::string& path);
-	
 	class Color
 	{
 		float r;

@@ -212,6 +212,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
@@ -246,6 +247,7 @@
     <ClCompile Include="..\..\..\src\Util\DataFile.cpp" />
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
+    <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp" />
     <ClCompile Include="..\..\..\src\Util\Time.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
     <ClCompile Include="..\..\..\src\Util\Vec2.cpp" />
@@ -259,13 +261,16 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h" />
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Font.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h" />
+    <ClInclude Include="..\..\..\src\DataStructs\Texture.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
     <ClInclude Include="..\..\..\src\Games\GameSelector.h" />
@@ -291,6 +296,7 @@
     <ClInclude Include="..\..\..\src\Util\DataFile.h" />
     <ClInclude Include="..\..\..\src\Util\ObjectContainer.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />
+    <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
     <ClInclude Include="..\..\..\src\Util\Random.h" />
     <ClInclude Include="..\..\..\src\Util\Time.h" />

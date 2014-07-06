@@ -8,6 +8,7 @@
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
 #include <Util/DataFile.h>
+#include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
@@ -68,30 +69,72 @@ namespace Core
 
 		if(m_isRunning)
 		{
-			m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/hedgehog_game.lua"), false);
-			//m_isRunning &= m_scriptCache.loadFromFile(RESOURCE("Scripts/lib.lua"), false);
+			m_reloadRegistry.registerHandler("tif", std::bind(&TextureCache::onFileModified, &m_textureCache, std::placeholders::_1));
+			m_reloadRegistry.registerHandler("lua", std::bind(&ScriptCache::loadFromFile, &m_scriptCache, std::placeholders::_1, true));
+
+			m_reloadRegistry.registerHandler("hlsl", [&](const ResourceFile& file)
+			{
+				if(m_graphics.initVertexShader(file) &&
+					m_graphics.initPixelShader(file))
+				{
+					DEBUG_INFO("Reloaded shader file ", file);
+					return true;
+				}
+				return false;
+			});
+
+			m_reloadRegistry.registerHandler("sheet", [&](const ResourceFile& file)
+			{
+				DataFile config(m_scripter);
+				if(config.open(file))
+				{
+					if(m_spritesheetCache.loadFromFile(config, true))
+						DEBUG_INFO("Reloaded spritesheet file ", file);
+					config.close();
+					return true;
+				}
+				return false;
+			});
+
+			m_reloadRegistry.registerHandler("font", [&](const ResourceFile& file)
+			{
+				DataFile config(m_scripter);
+				if(config.open(file))
+				{
+					if(m_graphics.initFont(config))
+						DEBUG_INFO("Reloaded font file ", file);
+					config.close();
+					return true;
+				}
+				return false;
+			});
+		}
+
+		if(m_isRunning)
+		{
+			m_isRunning &= m_scriptCache.loadFromFile("Scripts/hedgehog_game.lua", false);
 			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
 		}
 
 		if(m_isRunning)
 		{
-			m_isRunning &= m_graphics.initVertexShader(RESOURCE("Shaders/shader.hlsl"));
-			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
+			m_isRunning &= m_graphics.initVertexShader("Shaders/shader.hlsl");
+			m_isRunning &= m_graphics.initPixelShader("Shaders/shader.hlsl");
 
 			DataFile dataFile(m_scripter);
-			if(dataFile.open(RESOURCE("Defs/font.font")))
+			if(dataFile.open("Defs/font.font"))
 			{
 				m_isRunning &= m_graphics.initFont(dataFile);
 				dataFile.close();
 			}
 			
-			if(dataFile.open(RESOURCE("Defs/hedgehog.sheet")))
+			if(dataFile.open("Defs/hedgehog.sheet"))
 			{
 				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
 				dataFile.close();
 			}
 
-			if(dataFile.open(RESOURCE("Defs/apples.sheet")))
+			if(dataFile.open("Defs/apples.sheet"))
 			{
 				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
 				dataFile.close();
@@ -202,88 +245,24 @@ namespace Core
 		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
 
 		static Transform framerateTf;
-		framerateTf.position.set(0.5f*m_window->getSizeX() - 20, 0.5f*m_window->getSizeY() - 10);
+		framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);
 		framerateTf.scale.set(0.5f, 0.5f);
 		m_graphics.setOrthographicProjection();
 		m_graphics.clearCamera();
-		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 2, false);
+		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
 
 		m_graphics.present();
 	}
 
 
 
-	uint32_t HedgehogGame::createProp()
-	{
-		return m_props.create();
-	}
-
-	Prop& HedgehogGame::getProp(uint32_t id)
-	{
-		return m_props.get(id);
-	}
-
-	void HedgehogGame::removeProp(uint32_t id)
-	{
-		m_props.remove(id);
-	}
-
 	void HedgehogGame::onFileChanged(uint32_t index)
 	{
 		uint32_t action;
 		std::string file;
-		if(m_window->getChangedFile(index, action, file))
+		if(m_window->getChangedFile(index, action, file) && action == Core::FILE_MODIFIED)
 		{
-			auto pos = file.find_last_of('.');
-			auto ext = file.substr(pos + 1);
-			if(ext == "lua" && action == Core::FILE_MODIFIED)
-			{
-				if(m_scriptCache.loadFromFile(ResourcePath(file).c_str(), true))
-					DEBUG_INFO("Reloaded script ", file);
-			}
-			else if(ext == "sheet" && action == Core::FILE_MODIFIED)
-			{
-				DataFile config(m_scripter);
-				if(config.open(ResourcePath(file).c_str()))
-				{
-					if(m_spritesheetCache.loadFromFile(config, true))
-						DEBUG_INFO("Reloaded spritesheet file ", file);
-					config.close();
-				}
-			}
-			else if(ext == "font" && action == Core::FILE_MODIFIED)
-			{
-				DataFile config(m_scripter);
-				if(config.open(ResourcePath(file).c_str()))
-				{
-					if(m_graphics.initFont(config))
-						DEBUG_INFO("Reloaded font file ", file);
-					config.close();
-				}
-			}
-			else if(ext == "hlsl" && action == Core::FILE_MODIFIED)
-			{
-				if(m_graphics.initVertexShader(ResourcePath(file).c_str()) &&
-				   m_graphics.initPixelShader(ResourcePath(file).c_str()))
-				{
-					DEBUG_INFO("Reloaded shader file ", file);
-				}
-			}
-			else if(ext == "tif" || ext == "png")
-			{
-				if(action == Core::FILE_MODIFIED)
-				{
-					if(m_textureCache.onFileModified(ResourcePath(file).c_str()))
-						DEBUG_INFO("Reloaded texture file ", file);
-					else
-						DEBUG_INFO("Reload failed for texture file ", file);
-				}
-				else
-				{
-					DEBUG_INFO("Unsupported event type ", action, " for file ", file);
-				}
-			}
-			else
+			if(!m_reloadRegistry.onFileModified(file))
 			{
 				DEBUG_INFO("No reload for file ", file);
 			}

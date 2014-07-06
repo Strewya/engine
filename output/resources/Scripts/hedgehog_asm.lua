@@ -36,8 +36,8 @@ function makeStates(asm)
 	s = State("walk");
 	function s.fenter(game)
 		game.m_animation:startAnimation(game.m_player.m_animationPlayerID, game.m_animationCache:getAnimationID("walk"), 1);
-		game.m_player.m_collisionRect.center:set(0,-0.25);
-		game.m_player.m_collisionRect.halfWidth = 0.7;
+		game.m_player.m_collisionRect.center:set(0,0.05);
+		game.m_player.m_collisionRect.halfWidth = 1;
 		game.m_player.m_collisionRect.halfHeight = 0.4;
 	end;
 	function s.fevent(event, asm)

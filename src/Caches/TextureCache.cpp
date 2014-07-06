@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Graphics/GraphicsSystem.h>
+#include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -33,22 +34,22 @@ namespace Core
 		return status;
 	}
 
-	uint32_t TextureCache::getTextureID(const char* path)
+	uint32_t TextureCache::getTextureID(const char* name)
 	{
 		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const std::pair<std::string, uint32_t>& tex)
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
 		{
-			return path == tex.first;
+			return name == tex.m_name;
 		});
 		uint32_t textureID = -1;
 		if(it != end(m_loadedTextures))
 		{
-			textureID = it->second;
+			textureID = std::distance(m_loadedTextures.begin(), it);
 		}
 		else
 		{
-			textureID = m_graphics->loadTextureFromFile(path);
-			m_loadedTextures.emplace_back(path, textureID);
+			textureID = m_graphics->loadTextureFromFile(name);
+			m_loadedTextures.emplace_back(Texture{name, textureID});
 		}
 		return textureID;
 	}
@@ -60,31 +61,32 @@ namespace Core
 
 	bool TextureCache::releaseTexture(uint32_t texID)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const std::pair<std::string, uint32_t>& tex)
+		if(texID < m_loadedTextures.size())
 		{
-			return tex.second == texID;
-		});
-		if(it != end(m_loadedTextures))
-		{
-			m_graphics->releaseTexture(texID);
-			m_loadedTextures.erase(it);
-			return true;
+			Texture& t = m_loadedTextures[texID];
+			if(t.m_rawTextureID != -1)
+			{
+				m_graphics->releaseTexture(t.m_rawTextureID);
+				t.m_name.clear();
+				t.m_rawTextureID = -1;
+				return true;
+			}
 		}
 		return false;
 	}
 
-	bool TextureCache::onFileModified(const std::string& path)
+	bool TextureCache::onFileModified(const ResourceFile& file)
 	{
 		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const std::pair<std::string, uint32_t>& tex)
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
 		{
-			return ResourcePath(tex.first.c_str()) == path;
+			return tex.m_name == file.getName();
 		});
 		if(it != end(m_loadedTextures))
 		{
-			m_graphics->releaseTexture(it->second);
-			it->second = m_graphics->loadTextureFromFile(it->first.c_str());
+			m_graphics->releaseTexture(it->m_rawTextureID);
+			it->m_rawTextureID = m_graphics->loadTextureFromFile(it->m_name.c_str());
+			DEBUG_INFO("Reloaded texture '", file, "'.");
 			return true;
 		}
 		return false;

@@ -7,6 +7,7 @@ namespace Core
 
 	class Player
 	{
+		Player();
 		Transform m_transform;
 		Color m_tint;
 		Rect m_collisionRect;
@@ -16,6 +17,7 @@ namespace Core
 
 	class Prop
 	{
+		Prop();
 		Transform m_transform;
 		Color m_tint;
 		Rect m_collisionRect;
@@ -42,9 +44,5 @@ namespace Core
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;
 		tolua_readonly Window* m_window;
-
-		uint32_t createProp();
-		Prop& getProp(uint32_t id);
-		void removeProp(uint32_t id);
 	};
 }

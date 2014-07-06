@@ -9,12 +9,14 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <DataStructs/Texture.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
 	class GraphicsSystem;
+	class ResourceFile;
 
 	class TextureCache
 	{
@@ -26,11 +28,11 @@ namespace Core
 		Vec2 getTextureDimensions(uint32_t texID) const;
 		bool releaseTexture(uint32_t texID);
 		
-		bool onFileModified(const std::string& path);
+		bool onFileModified(const ResourceFile& path);
 		
 	private:
 		GraphicsSystem* m_graphics;
 
-		std::vector<std::pair<std::string, uint32_t>> m_loadedTextures;
+		std::vector<Texture> m_loadedTextures;
 	};
 }

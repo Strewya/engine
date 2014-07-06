@@ -6,13 +6,13 @@ function game_init(game)
 	
 	game.m_window:showCursor(true);
 	
-	local st = game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/lib.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/console.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/asm.lua"), false);
+	local st = game.m_scriptCache:loadFromFile("Scripts/lib.lua", false);
+	st = st and game.m_scriptCache:loadFromFile("Scripts/console.lua", false);
+	st = st and game.m_scriptCache:loadFromFile("Scripts/asm.lua", false);
 	
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_asm.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_globals.lua"), false);
-	st = st and game.m_scriptCache:loadFromFile(Core.ResourcePath("Scripts/hedgehog_input.lua"), false);
+	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_asm.lua", false);
+	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_globals.lua", false);
+	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_input.lua", false);
 	
 	if(st == false) then
 		return st;
@@ -117,10 +117,9 @@ end;
 
 function doCollision(game, player)
 	for i = #gState.propList, 1, -1 do
-		local prop = game:getProp(gState.propList[i]);
+		local prop = gState.propList[i];
 		local collides = intersection(player, prop);
 		if(collides) then
-			game:removeProp(gState.propList[i]);
 			table.remove(gState.propList, i);
 			gState.eatenApples = gState.eatenApples + 1;
 		end;
@@ -134,8 +133,8 @@ function doAppleSpawn(game)
 		if(d == 0) then
 			x = -x;
 		end;
-		table.insert(gState.propList, game:createProp());
-		local prop = game:getProp(gState.propList[#gState.propList]);
+		table.insert(gState.propList, Core.Prop());
+		local prop = gState.propList[#gState.propList];
 		prop.m_transform.scale:set(0.2,0.2);
 		prop.m_transform.position:set(x,y);
 		prop.m_imageID = game.m_imageCache:getImageID("apple_"..tostring(a));
@@ -308,7 +307,7 @@ function game_render(game)
 	
 	
 	for k,v in ipairs(gState.propList) do
-		local prop = game:getProp(v);
+		local prop = v;
 		local img = game.m_imageCache:getImage(prop.m_imageID);
 		if(gState.drawCollisionRect) then
 			game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);

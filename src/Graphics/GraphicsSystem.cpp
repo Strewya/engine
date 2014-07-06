@@ -16,6 +16,7 @@
 #include <Util/Transform.h>
 #include <Util/Utility.h>
 #include <Util/Rect.h>
+#include <Util/ResourceFile.h>
 #include <Util/Vec3.h>
 #include <Window/Window.h>
 /******* end headers *******/
@@ -550,7 +551,7 @@ namespace Core
 	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification, bool isItalic)
 	{
 		ID3D11Resource* res = nullptr;
-		m_textures[m_fontTextureID]->GetResource(&res);
+		m_textures[m_font.m_textureID]->GetResource(&res);
 
 		ID3D11Texture2D* texture = nullptr;
 		HRESULT hr = res->QueryInterface(&texture);
@@ -661,7 +662,7 @@ namespace Core
 			m_devcon->VSSetConstantBuffers(0, 1, &cb);
 			m_devcon->PSSetConstantBuffers(0, 1, &cb);
 			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-			auto srv = m_textures[m_fontTextureID].get();
+			auto srv = m_textures[m_font.m_textureID].get();
 			m_devcon->PSSetShaderResources(0, 1, &srv);
 
 			m_devcon->DrawIndexed(inds.size(), 0, 0);
@@ -748,11 +749,11 @@ namespace Core
 	//*****************************************************************
 	//					INIT VERTEX SHADER
 	//*****************************************************************
-	bool GraphicsSystem::initVertexShader(const char* shaderFile)
+	bool GraphicsSystem::initVertexShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
 		
-		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
 			safeRelease(m_vertexShader);
@@ -782,11 +783,11 @@ namespace Core
 	//*****************************************************************
 	//					INIT PIXEL SHADER
 	//*****************************************************************
-	bool GraphicsSystem::initPixelShader(const char* shaderFile)
+	bool GraphicsSystem::initPixelShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
 
-		HRESULT hr = D3DX11CompileFromFile(shaderFile, nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
 		if(SUCCEEDED(hr))
 		{
 			safeRelease(m_pixelShader);
@@ -885,22 +886,21 @@ namespace Core
 		bool success = false;
 		if(!name.empty() && !texture.empty() && size > 0)
 		{
-			if(!m_font.m_texture.empty() && m_font.m_texture != texture)
+			if(m_font.m_textureID != -1)
 			{
 				//this means the texture for the font has changed, so we first release the existing one
-				m_textureCache->releaseTexture(m_fontTextureID);
+				m_textureCache->releaseTexture(m_font.m_textureID);
 			}
 			m_font.m_name = name;
-			m_font.m_texture = texture;
 			m_font.m_size = size;
 
-			m_fontTextureID = m_textureCache->getTextureID(m_font.m_texture.c_str());
-			success = m_fontTextureID != -1;
+			m_font.m_textureID = m_textureCache->getTextureID(texture.c_str());
+			success = m_font.m_textureID != -1;
 
 			uint32_t glyphCount = file.getListSize("glyphs");
-			m_font.m_glyphs.resize(glyphCount);
 			if(success && file.getList("glyphs"))
 			{
+				uint32_t parsedGlyphsCounter = 0;
 				for(uint32_t i = 0; i < glyphCount; ++i)
 				{
 					if(file.getList(i + 1))
@@ -916,6 +916,8 @@ namespace Core
 							m_font.m_glyphs[i].m_left = left;
 							m_font.m_glyphs[i].m_right = right;
 							m_font.m_glyphs[i].m_top = top;
+
+							++parsedGlyphsCounter;
 						}
 						else
 						{
@@ -925,7 +927,7 @@ namespace Core
 					}
 				}
 				file.popList();
-				success = !m_font.m_glyphs.empty();
+				success = (parsedGlyphsCounter == MAX_GLYPHS);
 			}
 		}
 		return success;
@@ -934,11 +936,10 @@ namespace Core
 	//*****************************************************************
 	//					LOAD TEXTURE FROM FILE
 	//*****************************************************************
-	uint32_t GraphicsSystem::loadTextureFromFile(const char* filename)
+	uint32_t GraphicsSystem::loadTextureFromFile(const ResourceFile& file)
 	{
-		assert(filename != nullptr);
 		ID3D11ShaderResourceView* texturePtr = nullptr;
-		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, ResourcePath(filename).c_str(), nullptr, nullptr, &texturePtr, nullptr);
+		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
 		uint32_t id = -1;
 		if(SUCCEEDED(hr))
 		{

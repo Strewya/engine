@@ -10,6 +10,7 @@
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
+#include <Caches/FileReloadRegistry.h>
 #include <Caches/ImageCache.h>
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
@@ -61,6 +62,7 @@ namespace Core
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
 		//caches
+		FileReloadRegistry m_reloadRegistry;
 		AnimationCache m_animationCache;
 		ImageCache m_imageCache;
 		ScriptCache m_scriptCache;
@@ -85,13 +87,7 @@ namespace Core
 		bool tickLogic(uint64_t updateTime);
 		void tickRender(uint64_t updateTime);
 
-		uint32_t createProp();
-		Prop& getProp(uint32_t id);
-		void removeProp(uint32_t id);
-
 	private:
 		void onFileChanged(uint32_t index);
-
-		ObjectContainer<Prop> m_props;
 	};
 }
