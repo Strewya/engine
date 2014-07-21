@@ -67,6 +67,37 @@ namespace Core
 
 		m_camera.setPosition(Vec3(0, 0, -15));
 
+		/* PSEUDO CODE
+
+		PackageManager m_packages;
+
+		DataFile configFile(m_scripter);
+		if(configFile.open("default.config"))
+		{
+			auto pkgFileName = configFile.getString("packageList", "");
+			if(!pkgFile.empty())
+			{
+				DataFile pkgFile(m_scripter);
+				if(pkgFile.open(pkgFileName))
+				{
+					m_packages.parse(pkgFile);
+				}
+			}
+		}
+		...
+
+		m_packages.loadPackage("base");
+		m_packages.loadPackage("gameplay");
+		...
+		m_packages.loadPackage("level2");
+		m_packages.releasePackage("level1");
+		...
+		m_packages.releasePackage("gameplay");
+		m_packages.releasePackage("base");
+
+
+		*/
+
 		if(m_isRunning)
 		{
 			m_reloadRegistry.registerHandler("tif", std::bind(&TextureCache::onFileModified, &m_textureCache, std::placeholders::_1));

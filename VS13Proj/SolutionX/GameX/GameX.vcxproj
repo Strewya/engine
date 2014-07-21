@@ -214,6 +214,7 @@
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\PackageManager.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
     <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h" />
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\PackageManager.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />

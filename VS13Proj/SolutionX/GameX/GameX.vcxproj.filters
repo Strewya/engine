@@ -149,6 +149,9 @@
     <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\PackageManager.cpp">
+      <Filter>Framework\Caches</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -285,6 +288,9 @@
       <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h">
+      <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\PackageManager.h">
       <Filter>Framework\Caches</Filter>
     </ClInclude>
   </ItemGroup>
