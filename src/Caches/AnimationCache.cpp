@@ -17,73 +17,60 @@ namespace Core
 		: m_images(&images)
 	{}
 
-	bool AnimationLoader::load(AnimationData& animations, DataFile& file, uint32_t fileID) const
+	bool AnimationLoader::load(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const
 	{
-		auto filter = [&](const char* name) -> uint32_t
+		auto inserter = [&](const Animation& anim)
 		{
-			auto id = findResourceByName(animations, name);
+			auto id = findResourceByName(animations, anim.m_name.c_str());
 			if(id == INVALID_ID)
 			{
-				return animations.create();
+				if(outIDs != nullptr)
+				{
+					outIDs->emplace_back(animations.size());
+				}
+				animations.emplace_back(anim);
+				return true;
 			}
-			DEBUG_INFO("Animation '", name, "' already loaded, skipping...");
-			return INVALID_ID;
+			DEBUG_INFO("Animation couldn't be loaded, name '", anim.m_name, "' already exists!");
+			return false;
 		};
-		return processLoading(animations, file, fileID, filter);
+		return processLoading(animations, file, inserter);
 	}
 
-	bool AnimationLoader::reload(AnimationData& animations, DataFile& file, uint32_t fileID) const
+	bool AnimationLoader::reload(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const
 	{
-		auto filter = [&](const char* name)
+		auto inserter = [&](const Animation& anim)
 		{
-			auto id = findResourceByName(animations, name);
+			auto id = findResourceByName(animations, anim.m_name.c_str());
 			if(id == INVALID_ID)
 			{
-				id = animations.create();
+				animations.emplace_back(anim);
+				//reloading, so not touching the outID
+				return true;
 			}
-			else
-			{
-				unloadOne(animations, id);
-			}
-			return id;
+			DEBUG_INFO("Animation couldn't be reloaded, name '", anim.m_name, "' doesn't exists!");
+			return false;
 		};
-		return processLoading(animations, file, fileID, filter);
+		return processLoading(animations, file, inserter);
 	}
 
-	void AnimationLoader::unloadOne(AnimationData& animations, uint32_t id) const
+	bool AnimationLoader::unload(AnimationVector& animations, uint32_t id) const
 	{
-		auto& anim = animations.get(id);
-		anim.m_duration = 0;
-		anim.m_name.clear();
-		anim.m_repeats = false;
-		anim.m_sequence.clear();
+		return true;
 	}
 
-	void AnimationLoader::unloadAll(AnimationData& animations) const
+	bool AnimationLoader::unloadAll(AnimationVector& animations) const
 	{
-		auto filter = [](const Animation& a) { return true; };
-
-		for(auto id = animations.getID(filter); id != INVALID_ID; id = animations.getID(filter))
-		{
-			unloadOne(animations, id);
-		}
+		return true;
 	}
 
-	void AnimationLoader::unloadFile(AnimationData& animations, uint32_t fileID) const
-	{
-		for(auto id = findResourceByFileID(animations, fileID); id != INVALID_ID; id = findResourceByFileID(animations, fileID))
-		{
-			unloadOne(animations, id);
-			animations.remove(id);
-		}
-	}
-
-	bool AnimationLoader::processLoading(AnimationData& animations, DataFile& file, uint32_t fileID, const Filter& filter) const
+	bool AnimationLoader::processLoading(AnimationVector& anims, DataFile& file, const Inserter& inserter) const
 	{
 		bool status = false;
 		auto defaultDuration = file.getFloat("defaultDuration", 0);
 		auto defaultRepeat = file.getBool("defaultRepeat", false);
 		auto animCount = file.getListSize("list");
+		anims.reserve(anims.size() + animCount);
 		if(file.getList("list"))
 		{
 			status = true;
@@ -91,15 +78,10 @@ namespace Core
 			{
 				if(file.getList(i + 1))
 				{
-					auto animID = filter(file.getString("name", "").c_str());
-					if(animID != INVALID_ID)
+					Animation anim;
+					if(parseAnimation(anim, file, defaultDuration, defaultRepeat))
 					{
-						auto success = parseAnimation(animations.get(animID), file, fileID, defaultDuration, defaultRepeat);
-						if(!success)
-						{
-							animations.remove(animID);
-						}
-						status = status && success;
+						status &= inserter(anim);
 					}
 					file.popList();
 				}
@@ -117,11 +99,10 @@ namespace Core
 		return status;
 	}
 
-	bool AnimationLoader::parseAnimation(Animation& anim, DataFile& file, uint32_t fileID, float defaultDuration, bool defaultRepeat) const
+	bool AnimationLoader::parseAnimation(Animation& anim, DataFile& file, float defaultDuration, bool defaultRepeat) const
 	{
 		bool status = false;
 		anim.m_name.assign(file.getString("name", ""));
-		anim.m_fileID = fileID;
 		anim.m_duration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
 		anim.m_repeats = file.getBool("loop", defaultRepeat);
 		auto imageCnt = file.getListSize("images");

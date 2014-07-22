@@ -19,7 +19,6 @@ namespace Core
 		uint64_t m_duration;
 		std::vector<uint32_t> m_sequence;
 		std::string m_name;
-		uint32_t m_fileID;
 		bool m_repeats;
 	};
 }

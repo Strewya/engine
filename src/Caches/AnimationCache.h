@@ -18,23 +18,22 @@ namespace Core
 	class AnimationLoader
 	{
 	public:
-		typedef ObjectContainer<Animation> AnimationData;
-		typedef std::function<uint32_t(const char* name)> Filter;
+		typedef std::vector<Animation> AnimationVector;
+		typedef std::function<bool(const Animation&)> Inserter;
 
 		AnimationLoader() = default;
 		AnimationLoader(ImageCache& images);
 		
-		bool load(AnimationData& animations, DataFile& file, uint32_t fileID) const;
-		bool reload(AnimationData& animations, DataFile& file, uint32_t fileID) const;
-		void unloadOne(AnimationData& animations, uint32_t id) const;
-		void unloadAll(AnimationData& animations) const;
-		void unloadFile(AnimationData& animations, uint32_t fileID) const;
+		bool load(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const;
+		bool reload(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const;
+		bool unload(AnimationVector& animations, uint32_t id) const;
+		bool unloadAll(AnimationVector& animations) const;
 
 	private:
 		ImageCache* m_images;
 
-		bool processLoading(AnimationData& animations, DataFile& file, uint32_t fileID, const Filter& filter) const;
-		bool parseAnimation(Animation& anim, DataFile& file, uint32_t fileID, float defaultDuration, bool defaultRepeat) const;
+		bool processLoading(AnimationVector& animations, DataFile& file, const Inserter& inserter) const;
+		bool parseAnimation(Animation& anim, DataFile& file, float defaultDuration, bool defaultRepeat) const;
 	};
 
 	class AnimationCache : public ResourceCache < Animation, AnimationLoader > {};

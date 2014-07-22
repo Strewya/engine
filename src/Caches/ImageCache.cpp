@@ -42,10 +42,6 @@ namespace Core
 			{
 				id = images.create();
 			}
-			else
-			{
-				unloadOne(images, id);
-			}
 			return id;
 		};
 		return processLoading(images, file, fileID, loadFilter);
@@ -66,8 +62,10 @@ namespace Core
 
 	void ImageLoader::unloadAll(ImageData& images) const
 	{
-		auto filter = [](const Image& i) { return true; };
-
+		auto filter = [](const Image& i)
+		{
+			return true;
+		};
 		for(auto id = images.getID(filter); id != INVALID_ID; id = images.getID(filter))
 		{
 			unloadOne(images, id);
@@ -76,7 +74,11 @@ namespace Core
 
 	void ImageLoader::unloadFile(ImageData& images, uint32_t fileID) const
 	{
-		for(auto id = findResourceByFileID(images, fileID); id != INVALID_ID; id = findResourceByFileID(images, fileID))
+		auto filter = [=](const Image& i)
+		{
+			return i.m_fileID == fileID;
+		};
+		for(auto id = images.getID(filter); id != INVALID_ID; id = images.getID(filter))
 		{
 			unloadOne(images, id);
 			images.remove(id);
@@ -103,12 +105,7 @@ namespace Core
 						auto imgID = filter(file.getString("name", "").c_str());
 						if(imgID != INVALID_ID)
 						{
-							auto success = parseImage(images.get(imgID), file, fileID, textureName.c_str(), defaultWidth, defaultHeight);
-							if(!success)
-							{
-								images.remove(imgID);
-							}
-							status = status && success;
+							status = status && parseImage(images.get(imgID), file, fileID, textureName.c_str(), defaultWidth, defaultHeight);
 						}
 						file.popList();
 					}
