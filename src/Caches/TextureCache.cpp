@@ -15,79 +15,90 @@ namespace Core
 		: m_graphics(&graphics)
 	{}
 
-	bool TextureLoader::load(TextureData& textures, const std::string& texturePath, uint32_t fileID) const
+	bool TextureLoader::load(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const
 	{
 		auto id = findResourceByName(textures, texturePath.c_str());
 		if(id == INVALID_ID)
 		{
-			id = textures.create();
-			bool success = processLoading(textures.get(id), texturePath, fileID);
-			if(!success)
+			if(outID != nullptr)
 			{
-				textures.remove(id);
-				DEBUG_INFO("Failed to load texture ", texturePath);
+				*outID = textures.size();
 			}
-			return success;
+			textures.emplace_back();
+			textures.back().m_name = texturePath;
+			textures.back().m_index = m_graphics->loadTextureFromFile(texturePath.c_str());
+			return textures.back().m_index != INVALID_ID;
+		}
+
+		if(outID != nullptr)
+		{
+			*outID = id;
 		}
 		DEBUG_INFO("Texture already loaded, skipping...");
 		return true;
 	}
 
-	bool TextureLoader::reload(TextureData& textures, const std::string& texturePath, uint32_t fileID) const
+	bool TextureLoader::reload(TextureVector& textures, uint32_t* outID, const std::string& texturePath) const
 	{
 		auto id = findResourceByName(textures, texturePath.c_str());
 		if(id != INVALID_ID)
 		{
-			unloadOne(textures, id);
+			if(outID != nullptr)
+			{
+				*outID = id;
+			}
+			m_graphics->releaseTexture(textures[id].m_index);
+			textures[id].m_name = texturePath;
+			textures[id].m_index = m_graphics->loadTextureFromFile(texturePath.c_str());
+			return textures[id].m_index != INVALID_ID;
 		}
-		else
-		{
-			id = textures.create();
-		}
-		return processLoading(textures.get(id), texturePath, fileID);
+
+		DEBUG_INFO("Texture couldn't be reloaded, name '", texturePath, "' doesn't exist!");
+		return false;
 	}
 
-	void TextureLoader::unloadOne(TextureData& textures, uint32_t id) const
+	bool TextureLoader::unload(TextureVector& textures, uint32_t id)
 	{
-		auto& tex = textures.get(id);
-		m_graphics->releaseTexture(tex.m_rawTextureID);
-		tex.m_name.clear();
-		tex.m_fileID = INVALID_ID;
-		tex.m_rawTextureID = INVALID_ID;
+		m_graphics->releaseTexture(textures[id].m_index);
+		return true;
 	}
 
-	void TextureLoader::unloadAll(TextureData& textures) const
+	bool TextureLoader::unloadAll(TextureVector& textures) const
 	{
-		auto anyFilter = [](const Texture& tex)
+		//for each texture pair, call release? or do i let the graphics system shutdown handle it?
+		// what if i decide to destroy the texture manager, but not the graphics? i get a leak...
+		// when that happens, implement it.
+		for(auto& tex : textures)
 		{
-			return true;
-		};
-		for(auto id = textures.getID(anyFilter); id != INVALID_ID; id = textures.getID(anyFilter))
-		{
-			unloadOne(textures, id);
+			m_graphics->releaseTexture(tex.m_index);
 		}
+		return true;
 	}
 
-	void TextureLoader::unloadFile(TextureData& textures, uint32_t fileID) const
-	{
-		for(auto id = findResourceByFileID(textures, fileID); id != INVALID_ID; id = findResourceByFileID(textures, fileID))
-		{
-			unloadOne(textures, id);
-			textures.remove(id);
-		}
-	}
-
-	bool TextureLoader::processLoading(Texture& tex, const std::string& texturePath, uint32_t fileID) const
+	bool TextureLoader::processLoading(Texture& tex, const std::string& texturePath) const
 	{
 		tex.m_name = texturePath;
-		tex.m_fileID = fileID;
-		tex.m_rawTextureID = m_graphics->loadTextureFromFile(texturePath.c_str());
-		return tex.m_rawTextureID != INVALID_ID;
 	}
 	
 
 	Vec2 TextureCache::getTextureDimensions(uint32_t texID) const
 	{
-		return m_loader.m_graphics->getTextureDimensions(getResource(texID).m_rawTextureID);
+		return m_loader.m_graphics->getTextureDimensions(getResource(texID).m_index);
+	}
+
+	bool TextureCache::onFileModified(const std::string& path)
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_resources), end(m_resources), [&](const Texture& tex)
+		{
+			return ResourcePath(tex.m_name.c_str()) == path;
+		});
+		if(it != end(m_resources))
+		{
+			m_loader.m_graphics->releaseTexture(it->m_index);
+			it->m_index = m_loader.m_graphics->loadTextureFromFile(it->m_name.c_str());
+			return true;
+		}
+		return false;
 	}
 }

@@ -41,34 +41,27 @@ namespace Core
 		template<typename ...ARGS>
 		bool reloadFile(ARGS& ...args);
 		template<typename ...ARGS>
-		void unloadFile(ARGS& ...args);
+		bool unloadFile(ARGS& ...args);
 	};
 
 
 
 
 	template<typename R>
-	uint32_t findResourceByName(const ObjectContainer<R>& data, const char* name)
+	uint32_t findResourceByName(const std::vector<R>& data, const char* name)
 	{
 		assert(name != nullptr);
-		auto filter = [&](const R& resource)
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(data), end(data), [&](const R& resource)
 		{
 			return name == resource.m_name;
-		};
+		});
 
-		return data.getID(filter);
-	}
-
-	template<typename R>
-	uint32_t findResourceByFileID(const ObjectContainer<R>& data, uint32_t fileID)
-	{
-		assert(fileID != INVALID_ID);
-		auto filter = [=](const R& resource)
+		if(it != end(data))
 		{
-			return fileID == resource.m_fileID;
-		};
-
-		return data.getID(filter);
+			return std::distance(begin(data), it);
+		}
+		return INVALID_ID;
 	}
 
 	template<typename R, typename L>
@@ -83,7 +76,7 @@ namespace Core
 	bool ResourceCache<R, L>::shutdown()
 	{
 		m_loader.unloadAll(m_resources);
-		m_resources.clear();
+		m_loader.clear();
 		return true;
 	}
 
@@ -103,15 +96,16 @@ namespace Core
 
 	template<typename R, typename L>
 	template<typename ...ARGS>
-	void ResourceCache<R, L>::unloadFile(ARGS& ...args)
+	bool ResourceCache<R, L>::unloadFile(ARGS& ...args)
 	{
-		m_loader.unloadFile(m_resources, args...);
+		return m_loader.unload(m_resources, args...);
 	}
 
 	template<typename R, typename L>
 	uint32_t ResourceCache<R, L>::getResourceID(const char* name) const
 	{
-		return findResourceByName(m_resources, name);
+		using std::placeholders;
+		return m_resources.getID(std::bind(findResourceByName, _1, name));
 	}
 
 	template<typename R, typename L>
@@ -123,7 +117,7 @@ namespace Core
 	template<typename R, typename L>
 	void ResourceCache<R, L>::destroyResource(uint32_t id)
 	{
-		if(m_loader.unloadOne(m_resources, id))
+		if(m_loader.unload(m_resources, id))
 		{
 			m_resources.remove(id);
 		}

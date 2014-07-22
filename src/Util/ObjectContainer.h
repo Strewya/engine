@@ -11,8 +11,6 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-#define INVALID_ID -1
-
 namespace Core
 {
 	template<typename T> class ObjectContainer
@@ -24,7 +22,6 @@ namespace Core
 		template<typename F> uint32_t getID(const F& fn) const;
 		T& get(uint32_t id);
 		void remove(uint32_t id);
-		void clear();
 
 	private:
 		std::vector<T> m_data;
@@ -53,14 +50,7 @@ namespace Core
 	template<typename T>
 	template<typename F> uint32_t ObjectContainer<T>::getID(const F& fn) const
 	{
-		for(size_t i = 0; i < m_firstFree; ++i)
-		{
-			if(fn(m_data[m_allocated[i]]))
-			{
-				return m_allocated[i];
-			}
-		}
-		return INVALID_ID;
+		return fn(m_data);
 	}
 
 	template<typename T> T& ObjectContainer<T>::get(uint32_t id)
@@ -79,9 +69,9 @@ namespace Core
 		}
 	}
 
-	template<typename T> void ObjectContainer<T>::clear()
+	template<typename T> void ObjectContainer<T>::removeAll()
 	{
-		m_firstFree = 0;
+		m_firstFree
 	}
 
 	template<typename T> void ObjectContainer<T>::setSize(uint32_t size)

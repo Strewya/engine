@@ -28,7 +28,7 @@ namespace Core
 	bool FileLoader::loadFile(const char* filename)
 	{
 		assert(filename && strlen(filename) > 0);
-		bool status = true;
+		bool status = false;
 		auto fileIndex = getIndex(m_files, filename);
 		if(fileIndex == m_files.size())
 		{
@@ -53,16 +53,18 @@ namespace Core
 		return status;
 	}
 
-	void FileLoader::unloadFile(const char* filename)
+	bool FileLoader::unloadFile(const char* filename)
 	{
 		assert(filename && strlen(filename) > 0);
+		bool status = false;
 		auto fileIndex = getIndex(m_files, filename);
 		if(fileIndex != m_files.size())
 		{
 			m_files[fileIndex].clear();
 			//now we need to invoke the unload for the cache...
-			invokeHandler(RequestType::UNLOAD, filename, fileIndex);
+			status = invokeHandler(RequestType::UNLOAD, filename, fileIndex);
 		}
+		return status;
 	}
 
 	uint32_t FileLoader::getIndex(const std::vector<std::string>& container, const char* item)
