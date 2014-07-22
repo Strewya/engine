@@ -55,10 +55,10 @@ namespace Core
 			m_scripter.init() &&
 
 			//caches
-			m_animationCache.init(m_imageCache) &&
-			m_imageCache.init(m_textureCache) &&
+			m_animationCache.init() &&
+			m_imageCache.init() &&
 			m_scriptCache.init(m_scripter) &&
-			m_spritesheetCache.init(m_animationCache, m_imageCache) &&
+			m_spritesheetCache.init(m_animationCache, m_imageCache, m_textureCache) &&
 			m_textureCache.init(m_graphics) &&
 			
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
@@ -79,21 +79,21 @@ namespace Core
 			m_isRunning &= m_graphics.initPixelShader(RESOURCE("Shaders/shader.hlsl"));
 
 			DataFile dataFile(m_scripter);
-			if(dataFile.open(RESOURCE("Descriptors/font.font")))
+			if(dataFile.open(RESOURCE("Defs/font.font")))
 			{
 				m_isRunning &= m_graphics.initFont(dataFile);
 				dataFile.close();
 			}
 			
-			if(dataFile.open(RESOURCE("Descriptors/hedgehog.sheet")))
+			if(dataFile.open(RESOURCE("Defs/hedgehog.sheet")))
 			{
-				m_isRunning &= m_spritesheetCache.loadFromFile(false, static_cast<uint32_t*>(nullptr), dataFile);
+				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
 				dataFile.close();
 			}
 
-			if(dataFile.open(RESOURCE("Descriptors/apples.sheet")))
+			if(dataFile.open(RESOURCE("Defs/apples.sheet")))
 			{
-				m_isRunning &= m_spritesheetCache.loadFromFile(false, static_cast<uint32_t*>(nullptr), dataFile);
+				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
 				dataFile.close();
 			}
 
@@ -228,11 +228,6 @@ namespace Core
 		m_props.remove(id);
 	}
 
-	bool HedgehogGame::loadFile(const char* resourceFile)
-	{
-
-	}
-
 	void HedgehogGame::onFileChanged(uint32_t index)
 	{
 		uint32_t action;
@@ -251,7 +246,7 @@ namespace Core
 				DataFile config(m_scripter);
 				if(config.open(ResourcePath(file).c_str()))
 				{
-					if(m_spritesheetCache.loadFromFile(true, static_cast<uint32_t*>(nullptr), config))
+					if(m_spritesheetCache.loadFromFile(config, true))
 						DEBUG_INFO("Reloaded spritesheet file ", file);
 					config.close();
 				}

@@ -6,6 +6,8 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Caches/ImageCache.h>
+#include <Caches/SpritesheetCache.h>
+#include <DataStructs/Spritesheet.h>
 #include <Util/DataFile.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
@@ -13,132 +15,80 @@
 
 namespace Core
 {
-	AnimationLoader::AnimationLoader(ImageCache& images)
-		: m_images(&images)
-	{}
-
-	bool AnimationLoader::load(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const
+	bool AnimationCache::init()
 	{
-		auto inserter = [&](const Animation& anim)
-		{
-			auto id = findResourceByName(animations, anim.m_name.c_str());
-			if(id == INVALID_ID)
-			{
-				if(outIDs != nullptr)
-				{
-					outIDs->emplace_back(animations.size());
-				}
-				animations.emplace_back(anim);
-				return true;
-			}
-			DEBUG_INFO("Animation couldn't be loaded, name '", anim.m_name, "' already exists!");
-			return false;
-		};
-		return processLoading(animations, file, inserter);
-	}
+		bool status = true;
 
-	bool AnimationLoader::reload(AnimationVector& animations, std::vector<uint32_t>* outIDs, DataFile& file) const
-	{
-		auto inserter = [&](const Animation& anim)
-		{
-			auto id = findResourceByName(animations, anim.m_name.c_str());
-			if(id == INVALID_ID)
-			{
-				animations.emplace_back(anim);
-				//reloading, so not touching the outID
-				return true;
-			}
-			DEBUG_INFO("Animation couldn't be reloaded, name '", anim.m_name, "' doesn't exists!");
-			return false;
-		};
-		return processLoading(animations, file, inserter);
-	}
-
-	bool AnimationLoader::unload(AnimationVector& animations, uint32_t id) const
-	{
-		return true;
-	}
-
-	bool AnimationLoader::unloadAll(AnimationVector& animations) const
-	{
-		return true;
-	}
-
-	bool AnimationLoader::processLoading(AnimationVector& anims, DataFile& file, const Inserter& inserter) const
-	{
-		bool status = false;
-		auto defaultDuration = file.getFloat("defaultDuration", 0);
-		auto defaultRepeat = file.getBool("defaultRepeat", false);
-		auto animCount = file.getListSize("list");
-		anims.reserve(anims.size() + animCount);
-		if(file.getList("list"))
-		{
-			status = true;
-			for(uint32_t i = 0; i < animCount; ++i)
-			{
-				if(file.getList(i + 1))
-				{
-					Animation anim;
-					if(parseAnimation(anim, file, defaultDuration, defaultRepeat))
-					{
-						status &= inserter(anim);
-					}
-					file.popList();
-				}
-				else
-				{
-					DEBUG_INFO("Element at index '", i + 1, "' is either nil or not a list!");
-				}
-			}
-			file.popList();
-		}
-		else
-		{
-			DEBUG_INFO("The animation data contains no animation list!");
-		}
+		DEBUG_INIT(AnimationCache);
 		return status;
 	}
 
-	bool AnimationLoader::parseAnimation(Animation& anim, DataFile& file, float defaultDuration, bool defaultRepeat) const
+	bool AnimationCache::shutdown()
 	{
-		bool status = false;
-		anim.m_name.assign(file.getString("name", ""));
-		anim.m_duration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
-		anim.m_repeats = file.getBool("loop", defaultRepeat);
-		auto imageCnt = file.getListSize("images");
-		if(!anim.m_name.empty() && anim.m_duration > 0 && imageCnt > 0)
+		bool status = true;
+
+		DEBUG_SHUTDOWN(AnimationCache);
+		return status;
+	}
+
+	bool AnimationCache::addAnimations(const Animation& anim, bool reload, uint32_t* outIndex)
+	{
+		bool success = false;
+		uint32_t slot = -1;
+		auto id = getAnimationID(anim.m_name.c_str());
+		if(reload)
 		{
-			status = true;
-			//anim valid, parse images
-			anim.m_sequence.resize(imageCnt);
-			if(file.getList("images"))
+			if(id == -1)
 			{
-				for(uint32_t i = 0; i < imageCnt; ++i)
-				{
-					auto imgName = file.getString(i + 1, "");
-					auto imgID = m_images->getResourceID(imgName.c_str());
-					if(imgID != INVALID_ID)
-					{
-						anim.m_sequence[i] = imgID;
-					}
-					else
-					{
-						DEBUG_INFO("Invalid image name ", imgName, " for animation ", anim.m_name);
-						status = false;
-					}
-				}
-				file.popList();
+				DEBUG_INFO("The animation '", anim.m_name, "' cannot be reloaded, it does not exist!");
 			}
 			else
 			{
-				DEBUG_INFO("Could not get image list, either not exists of not a list!");
-				status = false;
+				slot = id;
 			}
 		}
 		else
 		{
-			DEBUG_INFO("Animation not valid!");
+			if(id != -1)
+			{
+				DEBUG_INFO("Cannot load animation '", anim.m_name, "', name already exists!");
+			}
+			else
+			{
+				slot = m_animations.size();
+				m_animations.emplace_back();
+			}
 		}
-		return status;
+		if(slot != -1)
+		{
+			m_animations[slot] = anim;
+			if(outIndex != nullptr)
+			{
+				*outIndex = slot;
+			}
+			success = true;
+		}
+		return success;
+	}
+	
+	uint32_t AnimationCache::getAnimationID(const char* name) const
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
+		{
+			return name == anim.m_name;
+		});
+
+		if(it != end(m_animations))
+		{
+			return std::distance(begin(m_animations), it);
+		}
+		return -1;
+	}
+
+	const Animation& AnimationCache::getAnimation(uint32_t id) const
+	{
+		assert(id < m_animations.size());
+		return m_animations[id];
 	}
 }

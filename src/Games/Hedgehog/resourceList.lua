@@ -1,8 +1,8 @@
 return 
 { -- resource dependencies
-	"Descriptors/apples.sheet",
-	"Descriptors/font.font",
-	"Descriptors/hedgehog.sheet",
+	"Defs/apples.sheet",
+	"Defs/font.font",
+	"Defs/hedgehog.sheet",
 	"Scripts/asm.lua",
 	"Scripts/console.lua",
 	"Scripts/hedgehog_asm.lua",
@@ -13,7 +13,7 @@ return
 	"Shaders/shader.hlsl",
 	"Textures/apples.png",
 	"Textures/font_t.png",
-	"Textures/harold_hoda_skace.tif"
+	"Textures/hedgehog.png"
 },
 { -- DLL dependencies
 	"tolua++",

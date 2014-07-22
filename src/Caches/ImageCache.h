@@ -1,43 +1,30 @@
 #pragma once
 /********************************************
-*	class:	ImageLoader, ImageCache
+*	class:	ImageCache
 *	usage:
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
-#include <functional>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Caches/ResourceCache.h>
 #include <DataStructs/Image.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class TextureCache;
-
-	class ImageLoader
+	class ImageCache
 	{
 	public:
-		typedef std::vector<Image> ImageVector;
-		typedef std::function<bool(const Image&)> Inserter;
+		bool init();
+		bool shutdown();
 
-		ImageLoader() = default;
-		ImageLoader(TextureCache& textures);
-
-		bool load(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const;
-		bool reload(ImageVector& images, std::vector<uint32_t>* outIDs, DataFile& file) const;
-		bool unload(ImageVector& images, uint32_t id) const;
-		bool unloadAll(ImageVector& images) const;
+		bool addImage(const Image& image, bool reload, uint32_t* outIndex = nullptr);
+		
+		uint32_t getImageID(const char* name) const;
+		const Image& getImage(uint32_t id) const;
 
 	private:
-		TextureCache* m_textures;
-
-		bool processLoading(ImageVector& images, DataFile& file, const Inserter& inserter) const;
-		bool parseImage(Image& img, DataFile& file, float textureW, float textureH, uint32_t defaultW, uint32_t defaultH) const;
+		std::vector<Image> m_images;
 	};
-
-	class ImageCache : public ResourceCache < Image, ImageLoader > {};
-
 }

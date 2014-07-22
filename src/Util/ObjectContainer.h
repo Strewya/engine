@@ -4,7 +4,6 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
-#include <algorithm>
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
@@ -19,38 +18,32 @@ namespace Core
 		ObjectContainer(uint32_t initialSize = 0);
 
 		uint32_t create();
-		template<typename F> uint32_t getID(const F& fn) const;
 		T& get(uint32_t id);
 		void remove(uint32_t id);
 
 	private:
 		std::vector<T> m_data;
-		std::vector<uint32_t> m_allocated;
-		uint32_t m_firstFree;
-
-		void setSize(uint32_t size);
+		std::vector<uint32_t> m_freeIds;
 	};
 
 	template<typename T> ObjectContainer<T>::ObjectContainer(uint32_t initialSize)
-		: m_firstFree(0)
 	{
-		setSize(initialSize);
+		m_data.reserve(initialSize);
 	}
 
 	template<typename T> uint32_t ObjectContainer<T>::create()
 	{
-		if(m_firstFree == m_allocated.size())
+		uint32_t id = m_data.size();
+		if(!m_freeIds.empty())
 		{
-			setSize(m_data.size() * 2);
+			id = m_freeIds.back();
+			m_freeIds.pop_back();
 		}
-		uint32_t id = m_allocated[m_firstFree++];
+		else
+		{
+			m_data.emplace_back();
+		}
 		return id;
-	}
-
-	template<typename T>
-	template<typename F> uint32_t ObjectContainer<T>::getID(const F& fn) const
-	{
-		return fn(m_data);
 	}
 
 	template<typename T> T& ObjectContainer<T>::get(uint32_t id)
@@ -60,27 +53,6 @@ namespace Core
 
 	template<typename T> void ObjectContainer<T>::remove(uint32_t id)
 	{
-		auto it = std::find(m_allocated.begin(), m_allocated.end(), id);
-		auto index = std::distance(m_allocated.begin(), it);
-		if(index < m_firstFree)
-		{
-			--m_firstFree;
-			std::swap(m_allocated[index], m_allocated[m_firstFree]);
-		}
-	}
-
-	template<typename T> void ObjectContainer<T>::removeAll()
-	{
-		m_firstFree
-	}
-
-	template<typename T> void ObjectContainer<T>::setSize(uint32_t size)
-	{
-		if(size > m_data.size())
-		{
-			m_data.resize(size);
-			uint32_t i = m_allocated.size();
-			std::generate_n(std::back_inserter(m_allocated), size, [&]() { return i++; });
-		}
+		m_freeIds.emplace_back(id);
 	}
 }

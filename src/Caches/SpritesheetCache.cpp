@@ -16,95 +16,264 @@
 
 namespace Core
 {
-	SpritesheetLoader::SpritesheetLoader(AnimationCache& animations, ImageCache& images)
-		: m_animations(&animations), 
-		  m_images(&images)
-	{}
+	static bool parseSheetData(Spritesheet& sheet, bool reload, DataFile& file, AnimationCache& animations, ImageCache& images, TextureCache& textures);
+	static bool parseImageData(std::vector<uint32_t>& indices, bool reload, DataFile& file, ImageCache& images, TextureCache& textures);
+	static bool parseAnimationData(std::vector<uint32_t>& indices, bool reload, DataFile& file, AnimationCache& animations, ImageCache& images);
 
-	bool SpritesheetLoader::load(SpritesheetVector& spritesheets, uint32_t* outID, DataFile& file) const
+	bool SpritesheetCache::init(AnimationCache& animations, ImageCache& images, TextureCache& textures)
 	{
-		auto sheetName = file.getFilename();
-		auto id = findResourceByName(spritesheets, sheetName.c_str());
-			
-		if(id == INVALID_ID)
-		{
-			if(outID != nullptr)
-			{
-				*outID = spritesheets.size();
-			}
-			spritesheets.emplace_back();
-			return parseSpritesheet(spritesheets.back(), file, false, outID);
-		}
+		bool status = true;
 
-		DEBUG_INFO("Spritesheet couldn't be loaded, name '", sheetName, "' already exists!");
-		return false;
+		m_animations = &animations;
+		m_images = &images;
+		m_textures = &textures;
+
+		DEBUG_INIT(SpritesheetCache);
+		return status;
 	}
 
-	bool SpritesheetLoader::reload(SpritesheetVector& spritesheets, uint32_t* outID, DataFile& file) const
+	bool SpritesheetCache::shutdown()
 	{
-		auto sheetName = file.getFilename();
-		auto id = findResourceByName(spritesheets, sheetName.c_str());
+		bool status = true;
 
-		if(id != INVALID_ID)
-		{
-			if(outID != nullptr)
-			{
-				*outID = id;
-			}
-			return parseSpritesheet(spritesheets[id], file, true, outID);
-		}
-
-		DEBUG_INFO("Spritesheet couldn't be reloaded, name '", sheetName, "' doesn't exists!");
-		return false;
+		DEBUG_SHUTDOWN(SpritesheetCache);
+		return status;
 	}
 
-	bool SpritesheetLoader::unload(SpritesheetVector& spritesheets, uint32_t id) const
+	bool SpritesheetCache::loadFromFile(DataFile& file, bool reload)
 	{
-		Spritesheet& ss = spritesheets[id];
-		for(auto anim : ss.m_animations)
+		bool status = false;
+		//get sheet id
+		auto id = getSpritesheetID(file.getFilename().c_str());
+
+		//reload && id==-1 : error
+		if(reload && id == -1)
 		{
-			m_animations->destroyResource(anim);
+			DEBUG_INFO("The spritesheet ", file.getFilename(), " cannot be reloaded, it does not exist!");
 		}
-		for(auto img : ss.m_images)
+		//reload && id!=-1 : clean sheet and fill
+		else if(reload && id != -1)
 		{
-			m_images->destroyResource(img);
+			//we need to destroy all images and animations that were loaded by this sheet previously (texture too?)
+			//do destroy...
+			status = parseSheetData(m_sheets[id], reload, file, *m_animations, *m_images, *m_textures);
 		}
-		return true;
+		//!reload && id==-1 : create sheet and fill
+		else if(!reload && id == -1)
+		{
+			id = m_sheets.size();
+			m_sheets.emplace_back();
+			status = parseSheetData(m_sheets[id], reload, file, *m_animations, *m_images, *m_textures);
+		}
+		//!reload && id!=-1 : error
+		else if(!reload && id != -1)
+		{
+			DEBUG_INFO("The spritesheet ", file.getFilename(), " cannot be loaded, another with the same name exists!");
+		}
+		
+		return status;
+	}
+	
+	uint32_t SpritesheetCache::getSpritesheetID(const char* name) const
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_sheets), end(m_sheets), [&](const Spritesheet& sheet)
+		{
+			return name == sheet.m_name;
+		});
+
+		if(it != end(m_sheets))
+		{
+			return std::distance(begin(m_sheets), it);
+		}
+		return -1;
 	}
 
-	bool SpritesheetLoader::unloadAll(SpritesheetVector& spritesheets) const
+	const Spritesheet& SpritesheetCache::getSpritesheet(uint32_t id) const
 	{
-		while(!spritesheets.empty())
-		{
-			unload(spritesheets, 0);
-		}
-		return true;
+		assert(id < m_sheets.size());
+		return m_sheets[id];
 	}
 
-	bool SpritesheetLoader::parseSpritesheet(Spritesheet& sheet, DataFile& file, bool isReload, uint32_t* outID) const
+	bool parseSheetData(Spritesheet& sheet, bool reload, DataFile& file, AnimationCache& animations, ImageCache& images, TextureCache& textures)
 	{
-		assert(m_animations != nullptr && m_images != nullptr);
-
 		bool success = false;
 		sheet.m_name.assign(file.getFilename());
+		success = parseImageData(sheet.m_images, reload, file, images, textures) &&
+			parseAnimationData(sheet.m_animations, reload, file, animations, images);
+		return success;
+	}
+
+	bool parseImageData(std::vector<uint32_t>& indices, bool reload, DataFile& file, ImageCache& images, TextureCache& textures)
+	{
+		bool success = false;
 		if(file.getList("imageData"))
 		{
-			success = m_images->loadFromFile(isReload, &sheet.m_images, file);
+			auto textureName = file.getString("texture", "");
+			if(!textureName.empty())
+			{
+				auto textureID = textures.getTextureID(textureName.c_str());
+				if(textureID != -1)
+				{
+					Vec2 td = textures.getTextureDimensions(textureID);
+					float tw = td.x;
+					float th = td.y;
+					auto defaultWidth = file.getInt("defaultWidth", 0);
+					auto defaultHeight = file.getInt("defaultHeight", 0);
+					auto imageCount = file.getListSize("list");
+					indices.resize(imageCount);
+					if(file.getList("list"))
+					{
+						for(uint32_t i = 0; i < imageCount; ++i)
+						{
+							if(file.getList(i + 1))
+							{
+								Image img;
+								img.m_name.assign(file.getString("name", ""));
+								img.m_textureID = textureID;
+								auto imgWidth = file.getInt("width", defaultWidth);
+								auto imgHeight = file.getInt("height", defaultHeight);
+								auto pos = file.getVec2("pos", Vec2(-1, -1));
+								if(!img.m_name.empty() && imgWidth > 0 && imgHeight > 0 && pos.x >= 0 && pos.y >= 0)
+								{
+									float w = static_cast<float>(imgWidth);
+									float h = static_cast<float>(imgHeight);
+
+									//image is valid, fill and add it
+									img.m_ratio = w / h;
+									Vec2 wh = pos + Vec2(w, h);
+
+									/* the vertices are in the following order:
+									0--1
+									|  |
+									3--2
+									*/
+
+									img.m_texCoords[0].x = pos.x / tw;
+									img.m_texCoords[0].y = pos.y / th;
+									
+									img.m_texCoords[2].x = wh.x / tw;
+									img.m_texCoords[2].y = wh.y / th;
+
+									img.m_texCoords[1].x = img.m_texCoords[2].x;
+									img.m_texCoords[1].y = img.m_texCoords[0].y;
+
+									img.m_texCoords[3].x = img.m_texCoords[0].x;
+									img.m_texCoords[3].y = img.m_texCoords[2].y;
+
+									if(!images.addImage(img, reload, &indices[i]))
+									{
+										DEBUG_INFO("Failed to add image with name ", img.m_name, ", skipping it!");
+									}
+								}
+								else
+								{
+									DEBUG_INFO("Image in ", file.getFilename(), " spritesheet is invalid: ", img.m_name, ",", imgWidth, ",", imgHeight, ",", pos);
+								}
+								file.popList();
+							}
+							else
+							{
+								DEBUG_INFO("Element at index '", i + 1, "' is either nil or not a list!");
+							}
+						}
+						file.popList();
+					}
+					else
+					{
+						DEBUG_INFO("The image data contains no list of images!!");
+					}
+					success = !indices.empty();
+				}
+				else
+				{
+					DEBUG_INFO("The texture ", textureName, " doesn't exist!");
+				}
+			}
+			else
+			{
+				DEBUG_INFO("Texture name is missing in file ", file.getFilename());
+			}
 			file.popList();
 		}
 		else
 		{
 			DEBUG_INFO("Config file '", file.getFilename(), "' contains no images!");
 		}
+		return success;
+	}
 
+	bool parseAnimationData(std::vector<uint32_t>& indices, bool reload, DataFile& file, AnimationCache& animations, ImageCache& images)
+	{
+		bool success = false;
 		if(file.getList("animationData"))
 		{
-			success &= m_animations->loadFromFile(isReload, &sheet.m_animations, file);
+			auto defaultDuration = file.getFloat("defaultDuration", 0);
+			auto defaultRepeat = file.getBool("defaultRepeat", false);
+			auto animCount = file.getListSize("list");
+			indices.resize(animCount);
+			if(file.getList("list"))
+			{
+				for(uint32_t i = 0; i < animCount; ++i)
+				{
+					if(file.getList(i + 1))
+					{
+						Animation anim;
+						anim.m_name.assign(file.getString("name", ""));
+						anim.m_duration = Time::secondsToMicros(file.getFloat("duration", defaultDuration));
+						anim.m_repeats = file.getBool("loop", defaultRepeat);
+						auto imageCnt = file.getListSize("images");
+						anim.m_sequence.resize(imageCnt);
+						if(!anim.m_name.empty() && anim.m_duration > 0 && imageCnt > 0)
+						{
+							//anim valid, parse images
+							if(file.getList("images"))
+							{
+								for(uint32_t j = 0; j < imageCnt; ++j)
+								{
+									auto imgName = file.getString(j + 1, "");
+									auto imgID = images.getImageID(imgName.c_str());
+									if(imgID != -1)
+									{
+										anim.m_sequence[j] = imgID;
+									}
+								}
+								file.popList();
+							}
+							else
+							{
+								DEBUG_INFO("Could not get image list, either not exists of not a list!");
+							}
+
+							if(!animations.addAnimations(anim, reload, &indices[i]))
+							{
+								DEBUG_INFO("Failed to add animation '", anim.m_name, "', skipping it!");
+							}
+						}
+						else
+						{
+							DEBUG_INFO("Animation not valid!");
+						}
+						file.popList();
+					}
+					else
+					{
+						DEBUG_INFO("Element at index '", i + 1, "' is either nil or not a list!");
+					}
+				}
+				file.popList();
+			}
+			else
+			{
+				DEBUG_INFO("The animation data contains no animation list!");
+			}
 			file.popList();
+			success = !indices.empty();
 		}
 		else
 		{
-			DEBUG_INFO("Config file '", file.getFilename(), "' contains no animations.");
+			DEBUG_INFO("Config file '",file.getFilename(),"' contains no animations.");
+			success = true;
 		}
 
 		return success;

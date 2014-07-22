@@ -874,6 +874,64 @@ namespace Core
 	}
 
 	//*****************************************************************
+	//					INIT FONT
+	//*****************************************************************
+	bool GraphicsSystem::initFont(DataFile& file)
+	{
+		auto name = file.getString("name", "");
+		auto texture = file.getString("texture", "");
+		auto size = file.getInt("size", 0);
+
+		bool success = false;
+		if(!name.empty() && !texture.empty() && size > 0)
+		{
+			if(!m_font.m_texture.empty() && m_font.m_texture != texture)
+			{
+				//this means the texture for the font has changed, so we first release the existing one
+				m_textureCache->releaseTexture(m_fontTextureID);
+			}
+			m_font.m_name = name;
+			m_font.m_texture = texture;
+			m_font.m_size = size;
+
+			m_fontTextureID = m_textureCache->getTextureID(m_font.m_texture.c_str());
+			success = m_fontTextureID != -1;
+
+			uint32_t glyphCount = file.getListSize("glyphs");
+			m_font.m_glyphs.resize(glyphCount);
+			if(success && file.getList("glyphs"))
+			{
+				for(uint32_t i = 0; i < glyphCount; ++i)
+				{
+					if(file.getList(i + 1))
+					{
+						auto ascii = file.getChar("char", 0);
+						auto left = file.getInt("left", -1);
+						auto right = file.getInt("right", -1);
+						auto top = file.getInt("top", -1);
+						if(ascii != 0 && left != -1 && right != -1 && top != -1)
+						{
+							m_font.m_glyphs[i].m_ascii = ascii;
+							m_font.m_glyphs[i].m_character = static_cast<char>(m_font.m_glyphs[i].m_ascii);
+							m_font.m_glyphs[i].m_left = left;
+							m_font.m_glyphs[i].m_right = right;
+							m_font.m_glyphs[i].m_top = top;
+						}
+						else
+						{
+							DEBUG_INFO("Glyph in ", file.getFilename(), " font sheet is invalid: ", ascii, ",", left, ",", right, ",", top);
+						}
+						file.popList();
+					}
+				}
+				file.popList();
+				success = !m_font.m_glyphs.empty();
+			}
+		}
+		return success;
+	}
+
+	//*****************************************************************
 	//					LOAD TEXTURE FROM FILE
 	//*****************************************************************
 	uint32_t GraphicsSystem::loadTextureFromFile(const char* filename)

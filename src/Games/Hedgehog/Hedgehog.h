@@ -10,7 +10,6 @@
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
-#include <Caches/FileTracker.h>
 #include <Caches/ImageCache.h>
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
@@ -63,7 +62,6 @@ namespace Core
 		InputSystem m_input;
 		//caches
 		AnimationCache m_animationCache;
-		FileTracker m_fileTracker;
 		ImageCache m_imageCache;
 		ScriptCache m_scriptCache;
 		SpritesheetCache m_spritesheetCache;
@@ -90,8 +88,6 @@ namespace Core
 		uint32_t createProp();
 		Prop& getProp(uint32_t id);
 		void removeProp(uint32_t id);
-
-		bool loadFile(const char* resourceFile);
 
 	private:
 		void onFileChanged(uint32_t index);
