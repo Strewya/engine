@@ -1,6 +1,7 @@
 
 $#include <Caches/AnimationCache.h>
 $#include <Caches/ImageCache.h>
+$#include <Caches/PackageStore.h>
 $#include <Caches/ScriptCache.h>
 $#include <Caches/SpritesheetCache.h>
 $#include <Caches/TextureCache.h>
@@ -17,6 +18,11 @@ namespace Core
 	{
 		uint32_t getImageID(const char* name) const;
 		const Image& getImage(uint32_t id) const;
+	};
+
+	class PackageStore
+	{
+		Package& getPackage(const std::string& pkgName);
 	};
 
 	class ScriptCache

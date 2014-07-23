@@ -31,6 +31,7 @@ namespace Core
 		tolua_readonly GraphicsSystem m_graphics;
 		tolua_readonly InputSystem m_input;
 		//caches
+		tolua_readonly PackageStore m_packages;
 		tolua_readonly AnimationCache m_animationCache;
 		tolua_readonly ImageCache m_imageCache;
 		tolua_readonly ScriptCache m_scriptCache;

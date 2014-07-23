@@ -4,6 +4,17 @@ function game_init(game)
 	gState = {};
 	gActions = {};
 	
+	local projDir = os.getenv("SGPROJECT");
+	local tbl = dofile(projDir .. "/output/resources/Defs/hedgehog.pkg");
+	if( tbl ) then
+		for pkgName, pkgFiles in pairs(tbl) do
+			local pkg = game.m_packages:getPackage(pkgName);
+			for i, file in ipairs(pkgFiles) do
+				pkg:addFile(Core.ResourceFile(file));
+			end;
+		end;
+	end;
+	
 	game.m_window:showCursor(true);
 	
 	local st = game.m_scriptCache:loadFromFile("Scripts/lib.lua", false);
@@ -17,6 +28,8 @@ function game_init(game)
 	if(st == false) then
 		return st;
 	end;
+	
+	
 	
 	gState.propList = {};
 	gState.asm = StateMachine();

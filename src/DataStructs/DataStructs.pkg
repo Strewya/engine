@@ -1,6 +1,7 @@
 
 $#include <DataStructs/Animation.h>
 $#include <DataStructs/Image.h>
+$#include <DataStructs/Package.h>
 $#include <DataStructs/Spritesheet.h>
 
 namespace Core
@@ -18,6 +19,12 @@ namespace Core
 		float m_ratio;
 		Vec2 m_texCoords[4];
 		std::string m_name;
+	};
+
+	class Package
+	{
+		void addFile(ResourceFile file);
+		void removeDuplicateFiles();
 	};
 
 	class Spritesheet

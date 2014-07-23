@@ -149,8 +149,11 @@
     <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Caches\PackageManager.cpp">
+    <ClCompile Include="..\..\..\src\Caches\PackageStore.cpp">
       <Filter>Framework\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\DataStructs\Package.cpp">
+      <Filter>Framework\DataStructs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -290,8 +293,11 @@
     <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h">
       <Filter>Framework\Caches</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Caches\PackageManager.h">
+    <ClInclude Include="..\..\..\src\Caches\PackageStore.h">
       <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\DataStructs\Package.h">
+      <Filter>Framework\DataStructs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

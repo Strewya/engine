@@ -1,0 +1,10 @@
+return
+{
+	base = {
+		"Defs/font.font"
+	},
+	gameplay = {
+		"Defs/hedgehog.sheet",
+		"Defs/apples.sheet"
+	}
+};

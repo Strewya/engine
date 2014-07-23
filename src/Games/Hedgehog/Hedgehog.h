@@ -12,6 +12,7 @@
 #include <Caches/AnimationCache.h>
 #include <Caches/FileReloadRegistry.h>
 #include <Caches/ImageCache.h>
+#include <Caches/PackageStore.h>
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <Caches/TextureCache.h>
@@ -62,6 +63,7 @@ namespace Core
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
 		//caches
+		PackageStore m_packages;
 		FileReloadRegistry m_reloadRegistry;
 		AnimationCache m_animationCache;
 		ImageCache m_imageCache;

@@ -50,6 +50,16 @@ namespace Core
 		float halfHeight;
 	};
 
+	class ResourceFile
+	{
+		ResourceFile(const char* filename);
+	
+		const std::string& getName() const;
+		const std::string& getPath() const;
+
+		bool operator==(const ResourceFile& rhs) const;
+	};
+
 	class Time
 	{
 		static const double STOP_TIME;
