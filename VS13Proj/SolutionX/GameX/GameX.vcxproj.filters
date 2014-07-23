@@ -46,6 +46,9 @@
     <Filter Include="Framework\toluaPackages">
       <UniqueIdentifier>{76c8f24b-ee3d-4d15-8ebf-3e2102e9ac4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\Loaders">
+      <UniqueIdentifier>{719c972b-57f3-464f-99e3-50295f8cfbf1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -146,14 +149,17 @@
     <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp">
-      <Filter>Framework\Caches</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Caches\PackageStore.cpp">
-      <Filter>Framework\Caches</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\DataStructs\Package.cpp">
       <Filter>Framework\DataStructs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Loaders\PackageLoader.cpp">
+      <Filter>Framework\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\PackageCache.cpp">
+      <Filter>Framework\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp">
+      <Filter>Framework\Caches</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,9 +281,6 @@
     <ClInclude Include="..\..\..\src\Util\Vec3.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\ObjectContainer.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Rect.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -290,14 +293,20 @@
     <ClInclude Include="..\..\..\src\DataStructs\Texture.h">
       <Filter>Framework\DataStructs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h">
-      <Filter>Framework\Caches</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Caches\PackageStore.h">
-      <Filter>Framework\Caches</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Package.h">
       <Filter>Framework\DataStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Loaders\PackageLoader.h">
+      <Filter>Framework\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\PackageCache.h">
+      <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\FileHandlerCache.h">
+      <Filter>Framework\Caches</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\ObjectPool.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -347,6 +356,9 @@
     </None>
     <None Include="..\..\..\src\Games\Pong\resourceList.lua">
       <Filter>Design\Pong</Filter>
+    </None>
+    <None Include="..\..\..\src\Loaders\Loaders.pkg">
+      <Filter>Framework\toluaPackages</Filter>
     </None>
   </ItemGroup>
 </Project>

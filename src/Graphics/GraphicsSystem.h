@@ -23,6 +23,7 @@ namespace Core
 	class Image;
 	class Rect;
 	class ResourceFile;
+	class Texture;
 	class TextureCache;
 	class Transform;
 	class Window;
@@ -69,8 +70,9 @@ namespace Core
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 
-		uint32_t loadTextureFromFile(const ResourceFile& filename);
-		void releaseTexture(uint32_t id);
+		bool loadTexture(const ResourceFile& filename, Texture& outTexture);
+		bool reloadTexture(const ResourceFile& filename, Texture& outTexture);
+		void unloadTexture(Texture& texture);
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);

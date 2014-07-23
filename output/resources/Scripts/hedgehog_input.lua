@@ -139,4 +139,10 @@ function setupInput()
 			gState.resetCam = true;
 		end;
 	end);
+	
+	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_Escape ~= event.m_keyboard.m_keyCode) then return false; end;
+		Console:add("YOYO closing the game");
+		gState.close = true;
+	end);
 end;

@@ -4,11 +4,10 @@ function game_init(game)
 	gState = {};
 	gActions = {};
 	
-	local projDir = os.getenv("SGPROJECT");
-	local tbl = dofile(projDir .. "/output/resources/Defs/hedgehog.pkg");
+	local tbl = dofile("../resources/Defs/hedgehog.pkg");
 	if( tbl ) then
 		for pkgName, pkgFiles in pairs(tbl) do
-			local pkg = game.m_packages:getPackage(pkgName);
+			local pkg = game.m_packageCache:getPackage(pkgName);
 			for i, file in ipairs(pkgFiles) do
 				pkg:addFile(Core.ResourceFile(file));
 			end;
@@ -29,7 +28,7 @@ function game_init(game)
 		return st;
 	end;
 	
-	
+	game.m_packageLoader:loadPackage("base");
 	
 	gState.propList = {};
 	gState.asm = StateMachine();
@@ -162,6 +161,13 @@ function game_tick(game)
 	end;
 	
 	parseInput(game.m_input);
+	
+	if(gState.close) then
+		game.m_window:close();
+		game.m_isRunning = false;
+		Console:add("YES, close me");
+		return;
+	end;
 	
 	local player = game.m_player;
 	local gameTimer = game.m_logicTimer;

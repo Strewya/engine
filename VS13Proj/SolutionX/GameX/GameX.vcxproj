@@ -212,9 +212,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\FileReloadRegistry.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\PackageStore.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\PackageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
@@ -237,6 +237,7 @@
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
+    <ClCompile Include="..\..\..\src\Loaders\PackageLoader.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp" />
@@ -263,9 +264,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\FileReloadRegistry.h" />
+    <ClInclude Include="..\..\..\src\Caches\FileHandlerCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\PackageStore.h" />
+    <ClInclude Include="..\..\..\src\Caches\PackageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
     <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
@@ -291,6 +292,7 @@
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
+    <ClInclude Include="..\..\..\src\Loaders\PackageLoader.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
@@ -298,7 +300,7 @@
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
     <ClInclude Include="..\..\..\src\Util\DataFile.h" />
-    <ClInclude Include="..\..\..\src\Util\ObjectContainer.h" />
+    <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />
     <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
@@ -358,6 +360,7 @@
   <ItemGroup>
     <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua" />
     <None Include="..\..\..\src\Games\Pong\resourceList.lua" />
+    <None Include="..\..\..\src\Loaders\Loaders.pkg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,10 +22,15 @@ namespace Core
 		bool status = true;
 		m_animation.releasePlayer(m_player.m_animationPlayerID);
 		status &= m_animationCache.shutdown();
+		status &= m_loadHandlerCache.shutdown();
+		status &= m_reloadHandlerCache.shutdown();
+		status &= m_unloadHandlerCache.shutdown();
 		status &= m_imageCache.shutdown();
+		status &= m_packageCache.shutdown();
 		status &= m_scriptCache.shutdown();
 		status &= m_spritesheetCache.shutdown();
 		status &= m_textureCache.shutdown();
+		status &= m_packageLoader.shutdown();
 		status &= m_animation.shutdown();
 		status &= m_graphics.shutdown();
 		status &= m_input.shutdown();
@@ -57,51 +62,31 @@ namespace Core
 
 			//caches
 			m_animationCache.init() &&
+			m_loadHandlerCache.init() &&
+			m_reloadHandlerCache.init() &&
+			m_unloadHandlerCache.init() &&
 			m_imageCache.init() &&
+			m_packageCache.init() &&
 			m_scriptCache.init(m_scripter) &&
 			m_spritesheetCache.init(m_animationCache, m_imageCache, m_textureCache) &&
 			m_textureCache.init(m_graphics) &&
+
+			//loaders
+			m_packageLoader.init(m_packageCache, m_loadHandlerCache, m_unloadHandlerCache) &&
 			
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
 		m_camera.setPosition(Vec3(0, 0, -15));
 
-		/* PSEUDO CODE
-
-		PackageManager m_packages;
-
-		DataFile configFile(m_scripter);
-		if(configFile.open("default.config"))
-		{
-			auto pkgFileName = configFile.getString("packageList", "");
-			if(!pkgFile.empty())
-			{
-				DataFile pkgFile(m_scripter);
-				if(pkgFile.open(pkgFileName))
-				{
-					m_packages.parse(pkgFile);
-				}
-			}
-		}
-		...
-
-		m_packages.loadPackage("base");
-		m_packages.loadPackage("gameplay");
-		...
-		m_packages.loadPackage("level2");
-		m_packages.releasePackage("level1");
-		...
-		m_packages.releasePackage("gameplay");
-		m_packages.releasePackage("base");
-
-
-		*/
-
 		if(m_isRunning)
 		{
-			m_reloadRegistry.registerHandler("tif", std::bind(&TextureCache::onFileModified, &m_textureCache, std::placeholders::_1));
-			m_reloadRegistry.registerHandler("lua", std::bind(&ScriptCache::loadFromFile, &m_scriptCache, std::placeholders::_1, true));
+			m_reloadHandlerCache.registerHandler("tif", std::bind(&TextureCache::reload, &m_textureCache, std::placeholders::_1));
+			m_reloadHandlerCache.registerHandler("png", std::bind(&TextureCache::reload, &m_textureCache, std::placeholders::_1));
+			
+
+			/*
+			
 
 			m_reloadRegistry.registerHandler("hlsl", [&](const ResourceFile& file)
 			{
@@ -139,6 +124,8 @@ namespace Core
 				}
 				return false;
 			});
+
+			*/
 		}
 
 		if(m_isRunning)
@@ -172,27 +159,21 @@ namespace Core
 			}
 
 			m_messageHandlers.reserve(3);
-			/*m_messageHandlers.emplace_back([&](const WindowEvent& w)
-			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY)
-				{
-					if(w.m_keyboard.m_keyCode == Keyboard::m_Escape)
-					{
-						m_window->close();
-						m_isRunning = false;
-						return true;
-					}
-				}
-				return false;
-			});*/
 			
-
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
 				if(w.m_type == WindowEventType::WE_FILECHANGE)
 				{
-					this->onFileChanged(w.m_fileChange.m_index);
-					return true;
+					uint32_t action;
+					std::string file;
+					if(m_window->getChangedFile(w.m_fileChange.m_index, action, file) && action == Core::FILE_MODIFIED)
+					{
+						if(m_reloadHandlerCache.dispatch(file))
+						{
+							return true;
+						}
+						DEBUG_INFO("No reload for file ", file);
+					}					
 				}
 				return false;
 			});
@@ -283,20 +264,5 @@ namespace Core
 		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
 
 		m_graphics.present();
-	}
-
-
-
-	void HedgehogGame::onFileChanged(uint32_t index)
-	{
-		uint32_t action;
-		std::string file;
-		if(m_window->getChangedFile(index, action, file) && action == Core::FILE_MODIFIED)
-		{
-			if(!m_reloadRegistry.onFileModified(file))
-			{
-				DEBUG_INFO("No reload for file ", file);
-			}
-		}
 	}
 }

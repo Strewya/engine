@@ -10,6 +10,7 @@
 #include <Caches/ImageCache.h>
 #include <Caches/TextureCache.h>
 #include <Util/DataFile.h>
+#include <Util/ResourceFile.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
@@ -112,10 +113,12 @@ namespace Core
 			auto textureName = file.getString("texture", "");
 			if(!textureName.empty())
 			{
-				auto textureID = textures.getTextureID(textureName.c_str());
-				if(textureID != -1)
+				textures.load(textureName);
+				auto texID = textures.getTextureID(textureName.c_str());
+				if(texID != -1)
 				{
-					Vec2 td = textures.getTextureDimensions(textureID);
+					Vec2 td = textures.getTextureDimensions(texID);
+					auto textureID = textures.getTexture(texID).m_rawTextureID;
 					float tw = td.x;
 					float th = td.y;
 					auto defaultWidth = file.getInt("defaultWidth", 0);

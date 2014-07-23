@@ -13,9 +13,12 @@
 
 namespace Core
 {
-	class PackageStore
+	class PackageCache
 	{
 	public:
+		bool init();
+		bool shutdown();
+
 		Package& getPackage(const std::string& pkgName);
 		
 	private:

@@ -3,6 +3,7 @@ $#include <DataStructs/Animation.h>
 $#include <DataStructs/Image.h>
 $#include <DataStructs/Package.h>
 $#include <DataStructs/Spritesheet.h>
+$#include <DataStructs/Texture.h>
 
 namespace Core
 {
@@ -30,5 +31,11 @@ namespace Core
 	class Spritesheet
 	{
 		std::string m_name;
+	};
+
+	class Texture
+	{
+		std::string m_name;
+		uint32_t m_rawTextureID;
 	};
 }

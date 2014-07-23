@@ -9,6 +9,7 @@
 /******* extra headers *******/
 #include <Caches/TextureCache.h>
 #include <DataStructs/Image.h>
+#include <DataStructs/Texture.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
@@ -889,7 +890,7 @@ namespace Core
 			if(m_font.m_textureID != -1)
 			{
 				//this means the texture for the font has changed, so we first release the existing one
-				m_textureCache->releaseTexture(m_font.m_textureID);
+				//m_textureCache->releaseTexture(m_font.m_textureID);
 			}
 			m_font.m_name = name;
 			m_font.m_size = size;
@@ -934,38 +935,51 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					LOAD TEXTURE FROM FILE
+	//					LOAD TEXTURE
 	//*****************************************************************
-	uint32_t GraphicsSystem::loadTextureFromFile(const ResourceFile& file)
+	bool GraphicsSystem::loadTexture(const ResourceFile& file, Texture& outTexture)
 	{
 		ID3D11ShaderResourceView* texturePtr = nullptr;
 		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
-		uint32_t id = -1;
+		bool loaded = false;
 		if(SUCCEEDED(hr))
 		{
 			DxTexturePtr loadedTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>);
 			auto it = std::find_if(m_textures.begin(), m_textures.end(), [](const DxTexturePtr& ptr) { return ptr == nullptr; });
 			if(it == m_textures.end())
 			{
-				id = m_textures.size();
+				outTexture.m_rawTextureID = m_textures.size();
 				m_textures.emplace_back(std::move(loadedTexturePtr));
 			}
 			else
 			{
-				id = std::distance(m_textures.begin(), it);
+				outTexture.m_rawTextureID = std::distance(m_textures.begin(), it);
 				it->swap(loadedTexturePtr);
 			}
+			outTexture.m_name = file.getName();
+			loaded = true;
 		}
-		return id;
+		return loaded;
 	}
 
 	//*****************************************************************
-	//					RELEASE TEXTURE
+	//					RELOAD TEXTURE
 	//*****************************************************************
-	void GraphicsSystem::releaseTexture(uint32_t id)
+	bool GraphicsSystem::reloadTexture(const ResourceFile& file, Texture& outTexture)
 	{
-		assert(id < m_textures.size());
-		m_textures[id].reset(nullptr);
+		unloadTexture(outTexture);
+		return loadTexture(file, outTexture);
+	}
+
+	//*****************************************************************
+	//					UNLOAD TEXTURE
+	//*****************************************************************
+	void GraphicsSystem::unloadTexture(Texture& texture)
+	{
+		assert(texture.m_rawTextureID < m_textures.size());
+		m_textures[texture.m_rawTextureID].reset(nullptr);
+		texture.m_rawTextureID = 0;
+		texture.m_name.clear();
 	}
 	
 	//*****************************************************************

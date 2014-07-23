@@ -34,48 +34,51 @@ namespace Core
 		return status;
 	}
 
-	uint32_t TextureCache::getTextureID(const char* name)
+	uint32_t TextureCache::getTextureID(const char* name) const
 	{
 		using std::begin; using std::end;
 		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
 		{
 			return name == tex.m_name;
 		});
-		uint32_t textureID = -1;
 		if(it != end(m_loadedTextures))
 		{
-			textureID = std::distance(m_loadedTextures.begin(), it);
+			return std::distance(m_loadedTextures.begin(), it) + 1;
 		}
-		else
-		{
-			textureID = m_graphics->loadTextureFromFile(name);
-			m_loadedTextures.emplace_back(Texture{name, textureID});
-		}
-		return textureID;
+		return 0;
+	}
+
+	const Texture& TextureCache::getTexture(uint32_t id) const
+	{
+		--id;
+		assert(id < m_loadedTextures.size());
+		return m_loadedTextures[id];
 	}
 
 	Vec2 TextureCache::getTextureDimensions(uint32_t texID) const
 	{
-		return m_graphics->getTextureDimensions(texID);
+		const auto& t = getTexture(texID);
+		return m_graphics->getTextureDimensions(t.m_rawTextureID);
 	}
 
-	bool TextureCache::releaseTexture(uint32_t texID)
+	bool TextureCache::load(const ResourceFile& file)
 	{
-		if(texID < m_loadedTextures.size())
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [](const Texture& tex)
 		{
-			Texture& t = m_loadedTextures[texID];
-			if(t.m_rawTextureID != -1)
-			{
-				m_graphics->releaseTexture(t.m_rawTextureID);
-				t.m_name.clear();
-				t.m_rawTextureID = -1;
-				return true;
-			}
+			return tex.m_name.empty();
+		});
+		if(it == end(m_loadedTextures))
+		{
+			m_loadedTextures.emplace_back();
+			m_graphics->loadTexture(file, m_loadedTextures.back());
+			DEBUG_INFO("Loaded texture '", file, "'.");
+			return true;
 		}
 		return false;
 	}
 
-	bool TextureCache::onFileModified(const ResourceFile& file)
+	bool TextureCache::reload(const ResourceFile& file)
 	{
 		using std::begin; using std::end;
 		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
@@ -84,9 +87,24 @@ namespace Core
 		});
 		if(it != end(m_loadedTextures))
 		{
-			m_graphics->releaseTexture(it->m_rawTextureID);
-			it->m_rawTextureID = m_graphics->loadTextureFromFile(it->m_name.c_str());
+			m_graphics->reloadTexture(file, *it);
 			DEBUG_INFO("Reloaded texture '", file, "'.");
+			return true;
+		}
+		return false;
+	}
+
+	bool TextureCache::unload(const ResourceFile& file)
+	{
+		using std::begin; using std::end;
+		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
+		{
+			return tex.m_name == file.getName();
+		});
+		if(it != end(m_loadedTextures))
+		{
+			m_graphics->unloadTexture(*it);
+			DEBUG_INFO("Unloaded texture '", file, "'.");
 			return true;
 		}
 		return false;

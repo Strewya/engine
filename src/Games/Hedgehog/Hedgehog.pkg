@@ -4,7 +4,6 @@ $#include <Games/Hedgehog/Hedgehog.h>
 
 namespace Core
 {
-
 	class Player
 	{
 		Player();
@@ -31,12 +30,14 @@ namespace Core
 		tolua_readonly GraphicsSystem m_graphics;
 		tolua_readonly InputSystem m_input;
 		//caches
-		tolua_readonly PackageStore m_packages;
+		tolua_readonly PackageCache m_packageCache;
 		tolua_readonly AnimationCache m_animationCache;
 		tolua_readonly ImageCache m_imageCache;
 		tolua_readonly ScriptCache m_scriptCache;
 		tolua_readonly SpritesheetCache m_spritesheetCache;
 		tolua_readonly TextureCache m_textureCache;
+		//loader
+		tolua_readonly PackageLoader m_packageLoader;
 
 		tolua_readonly Camera m_camera;
 
@@ -45,5 +46,7 @@ namespace Core
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;
 		tolua_readonly Window* m_window;
+
+		bool m_isRunning;
 	};
 }

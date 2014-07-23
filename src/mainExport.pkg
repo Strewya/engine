@@ -17,6 +17,7 @@ $pfile "Caches/Caches.pkg"
 $pfile "DataStructs/DataStructs.pkg"
 $pfile "Graphics/Graphics.pkg"
 $pfile "Input/Input.pkg"
+$pfile "Loaders/Loaders.pkg"
 $pfile "Util/Util.pkg"
 $pfile "Window/Window.pkg"
 

@@ -87,6 +87,7 @@ namespace Core
 
 	class Window
 	{
+		void close();
 		void showMessagebox(const char* title, const char* text);
 		void resize(uint32_t x, uint32_t y);
 		void move(int32_t x, int32_t y);

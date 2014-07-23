@@ -10,18 +10,18 @@
 /******* extra headers *******/
 #include <Animation/AnimationSystem.h>
 #include <Caches/AnimationCache.h>
-#include <Caches/FileReloadRegistry.h>
+#include <Caches/FileHandlerCache.h>
 #include <Caches/ImageCache.h>
-#include <Caches/PackageStore.h>
+#include <Caches/PackageCache.h>
 #include <Caches/ScriptCache.h>
 #include <Caches/SpritesheetCache.h>
 #include <Caches/TextureCache.h>
 #include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
+#include <Loaders/PackageLoader.h>
 #include <Scripting/ScriptingSystem.h>
 #include <Util/Color.h>
-#include <Util/ObjectContainer.h>
 #include <Util/Time.h>
 #include <Util/Transform.h>
 #include <Util/Rect.h>
@@ -63,13 +63,17 @@ namespace Core
 		GraphicsSystem m_graphics;
 		InputSystem m_input;
 		//caches
-		PackageStore m_packages;
-		FileReloadRegistry m_reloadRegistry;
+		PackageCache m_packageCache;
+		FileHandlerCache m_loadHandlerCache;
+		FileHandlerCache m_reloadHandlerCache;
+		FileHandlerCache m_unloadHandlerCache;
 		AnimationCache m_animationCache;
 		ImageCache m_imageCache;
 		ScriptCache m_scriptCache;
 		SpritesheetCache m_spritesheetCache;
 		TextureCache m_textureCache;
+		//loaders
+		PackageLoader m_packageLoader;
 
 		Camera m_camera;
 		
@@ -90,6 +94,5 @@ namespace Core
 		void tickRender(uint64_t updateTime);
 
 	private:
-		void onFileChanged(uint32_t index);
 	};
 }

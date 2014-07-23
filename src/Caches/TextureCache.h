@@ -10,6 +10,7 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include <DataStructs/Texture.h>
+#include <Util/ObjectPool.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -24,11 +25,13 @@ namespace Core
 		bool init(GraphicsSystem& graphics);
 		bool shutdown();
 
-		uint32_t getTextureID(const char* path);
+		uint32_t getTextureID(const char* path) const;
+		const Texture& getTexture(uint32_t id) const;
 		Vec2 getTextureDimensions(uint32_t texID) const;
-		bool releaseTexture(uint32_t texID);
 		
-		bool onFileModified(const ResourceFile& path);
+		bool load(const ResourceFile& path);
+		bool reload(const ResourceFile& path);
+		bool unload(const ResourceFile& path);
 		
 	private:
 		GraphicsSystem* m_graphics;

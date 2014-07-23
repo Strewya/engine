@@ -1,0 +1,11 @@
+
+$#include <Loaders/PackageLoader.h>
+
+namespace Core
+{
+	class PackageLoader
+	{
+		bool loadPackage(const std::string& packageName);
+		bool releasePackage(const std::string& packageName);
+	};
+}
