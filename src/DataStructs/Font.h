@@ -12,6 +12,9 @@
 
 namespace Core
 {
+	class DataFile;
+	class TextureCache;
+
 	const uint32_t MAX_GLYPHS = 95;
 
 	class Glyph
@@ -32,4 +35,6 @@ namespace Core
 		Glyph m_glyphs[MAX_GLYPHS];
 		std::string m_name;
 	};
+
+	bool parseFont(Font& outFont, DataFile& file, TextureCache& textureCache);
 }

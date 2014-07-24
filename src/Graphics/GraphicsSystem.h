@@ -47,7 +47,6 @@ namespace Core
 		bool initViewport();
 		bool initSamplerState();
 		bool initDepthBuffer();
-		bool initFont(DataFile& file);
 
 		Vec2 getTextureDimensions(uint32_t texID) const;
 		void setBackgroundColor(float red, float green, float blue);

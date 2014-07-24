@@ -213,11 +213,13 @@
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp" />
+    <ClCompile Include="..\..\..\src\Caches\FontCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\PackageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
+    <ClCompile Include="..\..\..\src\DataStructs\Font.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Package.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <ClCompile Include="..\..\..\src\Games\Game.cpp">
@@ -265,6 +267,7 @@
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
     <ClInclude Include="..\..\..\src\Caches\FileHandlerCache.h" />
+    <ClInclude Include="..\..\..\src\Caches\FontCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\PackageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />

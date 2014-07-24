@@ -161,6 +161,12 @@
     <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Caches\FontCache.cpp">
+      <Filter>Framework\Caches</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\DataStructs\Font.cpp">
+      <Filter>Framework\DataStructs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -307,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\ObjectPool.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Caches\FontCache.h">
+      <Filter>Framework\Caches</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
