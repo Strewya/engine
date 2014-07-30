@@ -179,6 +179,15 @@
     <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -329,6 +338,12 @@
     <ClInclude Include="..\..\..\src\Loaders\FontLoader.h">
       <Filter>Framework\Loaders</Filter>
 	</ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
       <Filter>Framework\Scripting</Filter>
     </ClInclude>
