@@ -219,7 +219,9 @@
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
+    <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Font.cpp" />
+    <ClCompile Include="..\..\..\src\DataStructs\Image.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Package.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <ClCompile Include="..\..\..\src\Games\Game.cpp">
@@ -295,6 +297,7 @@
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
+    <ClInclude Include="..\..\..\src\Loaders\FontLoader.h" />
     <ClInclude Include="..\..\..\src\Loaders\PackageLoader.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />

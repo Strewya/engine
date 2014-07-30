@@ -40,15 +40,25 @@ namespace Core
 		bool getBool(const char* key, bool valueIfNotPresent);
 		bool getBool(uint32_t index, bool defaultValue);
 		
-		uint32_t getListSize(const char* list);
-		bool getList(const char* list);
-		bool getList(uint32_t index);
-		void popList();
+		uint32_t getTableSize(const char* list);
+		bool getTable(const char* list);
+		bool getTable(uint32_t index);
+		void popTable();
 
+		void pairs(const char* table);
+		void ipairs(const char* table);
+		bool next();
+		
 	private:
 		ScriptingSystem* m_scripting;
 		bool m_isOpen;
 		std::string m_filename;
-		
+		enum class IterateType
+		{
+			NONE,
+			PAIRS,
+			IPAIRS
+		};
+		IterateType m_iteration;
 	};
 }

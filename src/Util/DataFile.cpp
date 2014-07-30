@@ -175,16 +175,19 @@ namespace Core
 		return defaultValue;
 	}
 
-	bool DataFile::getList(const char* list)
+	bool DataFile::getTable(const char* list)
 	{
 		if(m_scripting->getValue(list, -1))
 		{
-			return true;
+			if(m_scripting->isTable())
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
-	bool DataFile::getList(uint32_t index)
+	bool DataFile::getTable(uint32_t index)
 	{
 		if(m_scripting->getValue(index, -1))
 		{
@@ -192,12 +195,11 @@ namespace Core
 			{
 				return true;
 			}
-			m_scripting->pop();
 		}
 		return false;
 	}
 
-	uint32_t DataFile::getListSize(const char* list)
+	uint32_t DataFile::getTableSize(const char* list)
 	{
 		uint32_t size = 0;
 		if(m_scripting->getValue(list, -1))
@@ -208,9 +210,25 @@ namespace Core
 		return size;
 	}
 
-	void DataFile::popList()
+	void DataFile::popTable()
 	{
 		m_scripting->pop(1);
+	}
+
+	void DataFile::pairs(const char* table)
+	{
+		m_iteration = IterateType::PAIRS;
+
+	}
+
+	void DataFile::ipairs(const char* table)
+	{
+		m_iteration = IterateType::IPAIRS;
+	}
+
+	bool DataFile::next()
+	{
+
 	}
 
 	void fillValue(ScriptingSystem& script, std::string& v)

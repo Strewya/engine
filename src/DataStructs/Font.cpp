@@ -13,7 +13,7 @@ namespace Core
 {
 	bool parseFont(Font& outFont, DataFile& file, TextureCache& textureCache)
 	{
-		auto name = file.getString("name", "");
+		auto name = file.getString(-2, "");
 		auto texture = file.getString("texture", "");
 		auto size = file.getInt("size", 0);
 
@@ -23,38 +23,32 @@ namespace Core
 			outFont.m_name = name;
 			outFont.m_size = size;
 			outFont.m_textureID = textureCache.getTextureID(texture.c_str());
-			success = outFont.m_textureID != 0;
-
-			uint32_t glyphCount = file.getListSize("glyphs");
-			if(success && file.getList("glyphs"))
+			
+			if(outFont.m_textureID != 0)
 			{
 				uint32_t parsedGlyphsCounter = 0;
-				for(uint32_t i = 0; i < glyphCount; ++i)
+				for(file.ipairs("glyphs"); file.next(); )
 				{
-					if(file.getList(i + 1))
+					auto ascii = file.getChar("char", 0);
+					auto left = file.getInt("left", -1);
+					auto right = file.getInt("right", -1);
+					auto top = file.getInt("top", -1);
+					if(ascii != 0 && left != -1 && right != -1 && top != -1)
 					{
-						auto ascii = file.getChar("char", 0);
-						auto left = file.getInt("left", -1);
-						auto right = file.getInt("right", -1);
-						auto top = file.getInt("top", -1);
-						if(ascii != 0 && left != -1 && right != -1 && top != -1)
-						{
-							outFont.m_glyphs[i].m_ascii = ascii;
-							outFont.m_glyphs[i].m_character = static_cast<char>(outFont.m_glyphs[i].m_ascii);
-							outFont.m_glyphs[i].m_left = left;
-							outFont.m_glyphs[i].m_right = right;
-							outFont.m_glyphs[i].m_top = top;
-
-							++parsedGlyphsCounter;
-						}
-						else
-						{
-							DEBUG_INFO("Glyph in ", file.getFilename(), " font sheet is invalid: ", ascii, ",", left, ",", right, ",", top);
-						}
-						file.popList();
+						auto i = ascii - 32;
+						outFont.m_glyphs[i].m_ascii = ascii;
+						outFont.m_glyphs[i].m_character = static_cast<char>(outFont.m_glyphs[i].m_ascii);
+						outFont.m_glyphs[i].m_left = left;
+						outFont.m_glyphs[i].m_right = right;
+						outFont.m_glyphs[i].m_top = top;
+					
+						++parsedGlyphsCounter;
+					}
+					else
+					{
+						DEBUG_INFO("Glyph in ", file.getFilename(), " font sheet is invalid: ", ascii, ",", left, ",", right, ",", top);
 					}
 				}
-				file.popList();
 				success = (parsedGlyphsCounter == MAX_GLYPHS);
 			}
 		}

@@ -165,7 +165,6 @@ function game_tick(game)
 	if(gState.close) then
 		game.m_window:close();
 		game.m_isRunning = false;
-		Console:add("YES, close me");
 		return;
 	end;
 	
