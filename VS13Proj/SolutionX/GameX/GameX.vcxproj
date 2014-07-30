@@ -244,6 +244,8 @@
     <ClCompile Include="..\..\..\src\Loaders\PackageLoader.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -302,6 +304,7 @@
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
+    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />

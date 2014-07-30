@@ -89,9 +89,6 @@
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp">
       <Filter>Framework\Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
-      <Filter>Framework\Scripting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
@@ -172,6 +169,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp">
       <Filter>Framework\DataStructs</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
+      <Filter>Framework\Scripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -225,9 +231,6 @@
       <Filter>Framework\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h">
-      <Filter>Framework\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
       <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Utility.h">
@@ -325,6 +328,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Loaders\FontLoader.h">
       <Filter>Framework\Loaders</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
+      <Filter>Framework\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -65,15 +65,16 @@ namespace Core
 			}
 			
 		}
+		return true;
 	}
 
 	bool FontCache::reload(const ResourceFile& file, DataFile& dataFile)
 	{
-
+		return true;
 	}
 
 	bool FontCache::unload(const ResourceFile& file)
 	{
-
+		return true;
 	}
 }

@@ -14,6 +14,10 @@
 #include <Window/WindowEvent.h>
 /******* end headers *******/
 
+/******* TESTING ***********/
+#include <Scripting/LuaSystem.h>
+/******* END TESTING *******/
+
 namespace Core
 {
 	void HedgehogGame::shutdown()
@@ -53,6 +57,8 @@ namespace Core
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
+		runPlayground();
+		
 		m_isRunning =
 			//systems
 			m_animation.init(m_animationCache) &&
@@ -142,7 +148,7 @@ namespace Core
 			DataFile dataFile(m_scripter);
 			if(dataFile.open("Defs/font.font"))
 			{
-				m_isRunning &= m_graphics.initFont(dataFile);
+				//m_isRunning &= m_graphics.initFont(dataFile);
 				dataFile.close();
 			}
 			
