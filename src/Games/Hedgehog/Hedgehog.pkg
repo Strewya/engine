@@ -26,15 +26,14 @@ namespace Core
 	class HedgehogGame
 	{
 		//systems
-		tolua_readonly AnimationSystem m_animation;
-		tolua_readonly GraphicsSystem m_graphics;
-		tolua_readonly InputSystem m_input;
+		tolua_readonly AnimationSystem m_animationSystem;
+		tolua_readonly GraphicsSystem m_graphicsSystem;
+		tolua_readonly InputSystem m_inputSystem;
 		//caches
 		tolua_readonly PackageCache m_packageCache;
 		tolua_readonly AnimationCache m_animationCache;
 		tolua_readonly ImageCache m_imageCache;
 		tolua_readonly ScriptCache m_scriptCache;
-		tolua_readonly SpritesheetCache m_spritesheetCache;
 		tolua_readonly TextureCache m_textureCache;
 		//loader
 		tolua_readonly PackageLoader m_packageLoader;
@@ -46,7 +45,7 @@ namespace Core
 		tolua_readonly Time m_logicTimer;
 		tolua_readonly Time m_renderTimer;
 		tolua_readonly Window* m_window;
-
+		uint32_t m_defaultFont;
 		bool m_isRunning;
 	};
 }

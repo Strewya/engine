@@ -32,7 +32,7 @@ namespace Core
 		bool initVertexShader(const char* shaderFile);
 		bool initPixelShader(const char* shaderFile);
 		
-		Vec2 getTextureDimensions(uint32_t texID);
+		Vec2 getTextureDimensions(const Texture& texture);
 		void setBackgroundColor(float red, float green, float blue);
 		void setCulling(bool isEnabled);
 		void setTransparencyMode(bool isEnabled);
@@ -49,6 +49,6 @@ namespace Core
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
-		void drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justify, bool italic);
+		void drawText(uint32_t fontID, const std::string& text, const Transform& tf, const Color& tint, uint32_t justify, bool italic);
 	};
 }

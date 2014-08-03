@@ -3,6 +3,8 @@ reloaded = true;
 function game_init(game)
 	gState = {};
 	gActions = {};
+
+	print("test");
 	
 	local tbl = dofile("../resources/Defs/hedgehog.pkg");
 	if( tbl ) then
@@ -13,22 +15,23 @@ function game_init(game)
 			end;
 		end;
 	end;
-	
+
 	game.m_window:showCursor(true);
 	
-	local st = game.m_scriptCache:loadFromFile("Scripts/lib.lua", false);
-	st = st and game.m_scriptCache:loadFromFile("Scripts/console.lua", false);
-	st = st and game.m_scriptCache:loadFromFile("Scripts/asm.lua", false);
+	local st = game.m_scriptCache:load(Core.ResourceFile("Scripts/lib.lua"));
+	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/console.lua"));
+	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/asm.lua"));
 	
-	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_asm.lua", false);
-	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_globals.lua", false);
-	st = st and game.m_scriptCache:loadFromFile("Scripts/hedgehog_input.lua", false);
+	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_asm.lua"));
+	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_globals.lua"));
+	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_input.lua"));
 	
 	if(st == false) then
 		return st;
 	end;
 	
 	game.m_packageLoader:loadPackage("base");
+	game.m_packageLoader:loadPackage("gameplay");
 	
 	gState.propList = {};
 	gState.asm = StateMachine();
@@ -47,8 +50,8 @@ function onReload(game)
 	
 	setupInput();
 	
-	game.m_graphics:setBackgroundColor(0.92, 0.94, 0.87);
-	game.m_graphics:setCulling(false);
+	game.m_graphicsSystem:setBackgroundColor(0.92, 0.94, 0.87);
+	game.m_graphicsSystem:setCulling(false);
 	
 	game.m_camera:setSpeed(0.01);
 	
@@ -149,7 +152,7 @@ function doAppleSpawn(game)
 		local prop = gState.propList[#gState.propList];
 		prop.m_transform.scale:set(0.2,0.2);
 		prop.m_transform.position:set(x,y);
-		prop.m_imageID = game.m_imageCache:getImageID("apple_"..tostring(a));
+		prop.m_imageID = game.m_imageCache:getResourceID("apple_"..tostring(a));
 		prop.m_collisionRect.halfWidth = 1;
 		prop.m_collisionRect.halfHeight = 1;
 	end;
@@ -160,7 +163,7 @@ function game_tick(game)
 		onReload(game);
 	end;
 	
-	parseInput(game.m_input);
+	parseInput(game.m_inputSystem);
 	
 	if(gState.close) then
 		game.m_window:close();
@@ -305,90 +308,90 @@ function game_render(game)
 	local textTf = Core.Transform();
 	textTf.scale:set(0.7,0.7);
 	
-	game.m_graphics:setPerspectiveProjection();
-	game.m_graphics:applyCamera(game.m_camera);
-	game.m_graphics:setTransparencyMode(true);
+	game.m_graphicsSystem:setPerspectiveProjection();
+	game.m_graphicsSystem:applyCamera(game.m_camera);
+	game.m_graphicsSystem:setTransparencyMode(true);
 	local tf = Core.Transform();
 	tf.position:set(0,-4.5);
 	col:set(70/255, 0, 0);
-	game.m_graphics:drawQuad(tf, Core.Vec2(20,2), col);
+	game.m_graphicsSystem:drawQuad(tf, Core.Vec2(20,2), col);
 	
 	tf.position = gState.treePos;
-	game.m_graphics:drawQuad(tf, gState.treeHS, gState.treeCol);
+	game.m_graphicsSystem:drawQuad(tf, gState.treeHS, gState.treeCol);
 	tf.position.x = -tf.position.x;
-	game.m_graphics:drawQuad(tf, gState.treeHS, gState.treeCol);
+	game.m_graphicsSystem:drawQuad(tf, gState.treeHS, gState.treeCol);
 	
 	tf.position = gState.treeTopPos;
-	game.m_graphics:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
+	game.m_graphicsSystem:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
 	tf.position.x = -tf.position.x;
-	game.m_graphics:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
+	game.m_graphicsSystem:drawQuad(tf, gState.treeTopHS, gState.treeTopCol);
 	
 	
 	for k,v in ipairs(gState.propList) do
 		local prop = v;
-		local img = game.m_imageCache:getImage(prop.m_imageID);
+		local img = game.m_imageCache:getResource(prop.m_imageID);
 		if(gState.drawCollisionRect) then
-			game.m_graphics:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
+			game.m_graphicsSystem:drawPolygon(prop.m_transform, prop.m_collisionRect, gState.bboxColor);
 		end;
 		col:set(1,1,1);
-		game.m_graphics:drawTexturedQuad(prop.m_transform, col, img);
+		game.m_graphicsSystem:drawTexturedQuad(prop.m_transform, col, img);
 		col:set(0,0,0);
 		if(gState.drawPositions) then
-			game.m_graphics:setOrthographicProjection();
+			game.m_graphicsSystem:setOrthographicProjection();
 			textTf.position = prop.m_transform.position;
 			textTf.position.x = textTf.position.x*100;
 			textTf.position.y = textTf.position.y*100;
-			game.m_graphics:drawText(tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y),
+			game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y),
 									 textTf, col, 0, false);
-			game.m_graphics:setPerspectiveProjection();
+			game.m_graphicsSystem:setPerspectiveProjection();
 		end;
 	end;
 	
-	img = game.m_imageCache:getImage(game.m_player.m_imageID);
+	img = game.m_imageCache:getResource(game.m_player.m_imageID);
 	if(gState.drawCollisionRect) then
-		game.m_graphics:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
+		game.m_graphicsSystem:drawPolygon(game.m_player.m_transform, game.m_player.m_collisionRect, gState.bboxColor);
 	end;
 	col:set(1,1,1);
-	game.m_graphics:drawTexturedQuad(game.m_player.m_transform, col, img);
+	game.m_graphicsSystem:drawTexturedQuad(game.m_player.m_transform, col, img);
 	
 	if(gState.drawPositions) then
-		game.m_graphics:setOrthographicProjection();
+		game.m_graphicsSystem:setOrthographicProjection();
 		textTf.position = game.m_player.m_transform.position;
 		textTf.position.x = textTf.position.x*100;
 		textTf.position.y = textTf.position.y*100;
 		col:set(0,0,0);
-		game.m_graphics:drawText(tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y),
+		game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y),
 								 textTf, col, 0, false);
-		game.m_graphics:setPerspectiveProjection();
+		game.m_graphicsSystem:setPerspectiveProjection();
 	end;
 	
-	game.m_graphics:clearCamera();
-	game.m_graphics:setOrthographicProjection();
+	game.m_graphicsSystem:clearCamera();
+	game.m_graphicsSystem:setOrthographicProjection();
 	local text = "Eat "..gState.targetApples.." apples as fast as you can! You ate " .. gState.eatenApples .. " apples";
 	textTf.position:set(-game.m_window:getSizeX()/2+5,game.m_window:getSizeY()/2-20);
 	col:set(0,0,0);
-	game.m_graphics:drawText(text, textTf, col, 0, false);
+	game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 	textTf.position.y = textTf.position.y - 20;
 	text = "Best time: " .. makeTimeStringFromMicros(gState.bestTime);
-	game.m_graphics:drawText(text, textTf, col, 0, false);
+	game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 	textTf.position.y = textTf.position.y - 20;
 	local currentTime = gState.timer:getCurMicros();
 	text = "Your time: " .. makeTimeStringFromMicros(currentTime);
 	if(gState.gameOver and currentTime == gState.bestTime) then
 		text = text .. "   NEW BEST!";
 	end;
-	game.m_graphics:drawText(text, textTf, col, 0, false);
+	game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 	if(gState.gameOver) then
 		textTf.position.y = textTf.position.y - 20;
 		text = "Press R to try again!";
-		game.m_graphics:drawText(text, textTf, col, 0, false);
+		game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 		
 		textTf.position.y = textTf.position.y - 20;
 		text = "Press Q to reset the score!";
-		game.m_graphics:drawText(text, textTf, col, 0, false);
+		game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 	end;
 	
-	Console:draw(game.m_graphics);
+	Console:draw(game.m_graphics, game.m_defaultFont);
 end;
 
 function makeTimeStringFromMicros(micros)

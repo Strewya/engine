@@ -130,7 +130,7 @@ namespace Core
 			}
 			stack.pop(1); //either nil or table
 		}
-		stack.pop(1); //images table
+		assert(stack.getTop() == 1);
 
 		for( stack.pairs("animations"); stack.next(); stack.pop(1) )
 		{
@@ -164,7 +164,7 @@ namespace Core
 			}
 			stack.pop(1);
 		}
-		stack.pop(1); //animations table
+		assert(stack.getTop() == 1);
 
 		stack.pop(1); //hedgehog.sheet
 
@@ -210,7 +210,6 @@ namespace Core
 				DEBUG_INFO("top: ", top);
 				stack.pop(1); //top number
 			}
-			stack.pop(1); //glyphs table
 		}
 		stack.pop(1); //font.font table
 

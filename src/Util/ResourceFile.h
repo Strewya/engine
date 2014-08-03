@@ -19,6 +19,7 @@ namespace Core
 
 		const std::string& getName() const;
 		const std::string& getPath() const;
+		size_t getHash() const;
 
 		bool operator==(const ResourceFile& rhs) const;
 		bool operator!=(const ResourceFile& rhs) const;
@@ -26,6 +27,7 @@ namespace Core
 	private:
 		std::string m_resourceName;
 		std::string m_resourcePath;
+		size_t m_hash;
 	};
 
 	std::ostream& operator<<(std::ostream& os, const ResourceFile& file);

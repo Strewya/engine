@@ -5,7 +5,7 @@
 #include <Caches/FontCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Util/DataFile.h>
+#include <Scripting/LuaStack.h>
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 /******* end headers *******/
@@ -30,51 +30,105 @@ namespace Core
 		return status;
 	}
 
-	uint32_t FontCache::getFontID(const char* name) const
+	uint32_t FontCache::getResourceID(const char* name)
 	{
-		auto it = std::find_if(m_fonts.begin(), m_fonts.end(), [&](const Font& f)
+		for( auto id : m_allocated )
 		{
-			return f.m_name == name;
-		});
-		if(it != m_fonts.end())
-		{
-			return std::distance(m_fonts.begin(), it) + 1;
-		}
-		return 0;
-	}
-
-	const Font& FontCache::getFont(uint32_t id) const
-	{
-		--id;
-		assert(id < m_fonts.size());
-		return m_fonts[id];
-	}
-
-	bool FontCache::load(const ResourceFile& file, DataFile& dataFile)
-	{
-		auto it = std::find_if(m_fonts.begin(), m_fonts.end(), [&](const Font& f)
-		{
-			return f.m_name == file.getName();
-		});
-		if(it == m_fonts.end())
-		{
-			if(dataFile.open(file.getPath()))
+			auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_name == name )
 			{
-				m_fonts.emplace_back();
-				parseFont(m_fonts.back(), dataFile, *m_textures);
+				return id;
 			}
-			
 		}
-		return true;
+		return INVALID_ID;
 	}
 
-	bool FontCache::reload(const ResourceFile& file, DataFile& dataFile)
+	const Font* FontCache::getResource(uint32_t id)
 	{
-		return true;
+		return m_data.get(id);
 	}
 
-	bool FontCache::unload(const ResourceFile& file)
+	LoadResult FontCache::process(const ResourceFile& file, LuaStack& lua, std::function<LoadResult(void)> fn)
 	{
-		return true;
+		if( !lua.doFile(file) )
+		{
+			auto str = lua.toString();
+			lua.pop();
+			return{LoadResultFlag::Fail, str};
+		}
+
+		LoadResult res{LoadResultFlag::Success};
+		for( lua.pairs(); lua.next(); lua.pop(1) )
+		{
+			if( lua.isString(-2) )
+			{
+				res = fn();
+				if( !res )
+				{
+					lua.pop(2);
+					break;
+				}
+			}
+		}
+		lua.pop();
+		m_allocated = m_data.getActiveIDs();
+		return res;
+	}
+
+	LoadResult FontCache::load(const ResourceFile& file, LuaStack& lua)
+	{
+		return process(file, lua, [&]() -> LoadResult
+		{
+			auto id = getResourceID(lua.toString(-2).c_str());
+			if( id == INVALID_ID )
+			{
+				id = m_data.create();
+				auto res = loadFont(*m_data.get(id), lua, file.getHash(), *m_textures);
+				if( !res )
+				{
+					m_data.release(id);
+					return res;
+				}
+			}
+			return{LoadResultFlag::Success};
+		});
+	}
+
+	LoadResult FontCache::reload(const ResourceFile& file, LuaStack& lua)
+	{
+		return process(file, lua, [&]() -> LoadResult
+		{
+			auto new_id = m_data.create();
+			auto res = loadFont(*m_data.get(new_id), lua, file.getHash(), *m_textures);
+			if( !res )
+			{
+				m_data.release(new_id);
+				return res;
+			}
+
+			auto id = getResourceID(lua.toString(-2).c_str());
+			if( id != INVALID_ID )
+			{
+				m_data.swapData(id, new_id);
+				unloadFont(*m_data.get(new_id));
+				m_data.release(new_id);
+			}
+			return{LoadResultFlag::Success};
+		});
+	}
+
+	LoadResult FontCache::unload(const ResourceFile& file)
+	{
+		for( auto id : m_allocated )
+		{
+			auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_fileHash == file.getHash() )
+			{
+				unloadFont(*m_data.get(id));
+				m_data.release(id);
+			}
+		}
+		m_allocated = m_data.getActiveIDs();
+		return{LoadResultFlag::Success};
 	}
 }

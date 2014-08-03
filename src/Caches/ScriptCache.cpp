@@ -5,18 +5,18 @@
 #include <Caches/ScriptCache.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Scripting/ScriptingSystem.h>
+#include <Scripting/LuaSystem.h>
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	bool ScriptCache::init(ScriptingSystem& scripting)
+	bool ScriptCache::init(LuaSystem& luaSystem)
 	{
 		bool status = true;
 
-		m_scripting = &scripting;
+		m_luaSystem = &luaSystem;
 
 		DEBUG_INIT(ScriptCache);
 		return status;
@@ -30,34 +30,48 @@ namespace Core
 		return status;
 	}
 
-	bool ScriptCache::loadFromFile(const ResourceFile& file, bool reload)
+	LoadResult ScriptCache::load(const ResourceFile& file)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedScripts), end(m_loadedScripts), [&](const std::string& script)
+		auto index = valueFind(m_data, file.getPath());
+		if( index != m_data.size() )
 		{
-			return script == file.getPath();
-		});
+			return{LoadResultFlag::Success, "Script already loaded"};
+		}
+		auto lua = m_luaSystem->getStack();
+		m_data.emplace_back(file.getPath());
+		auto status = lua.doFile(file.getPath().c_str());
+		if( !status )
+		{
+			auto str = lua.toString();
+			lua.pop();
+			return{LoadResultFlag::Fail, str};
+		}
+		return{LoadResultFlag::Success};
+	}
 
-		bool status = false;
-		if(it == end(m_loadedScripts) && !reload)
+
+	LoadResult ScriptCache::reload(const ResourceFile& file)
+	{
+		auto index = valueFind(m_data, file.getPath());
+		if( index == m_data.size() )
 		{
-			m_loadedScripts.emplace_back(file.getPath());
-			status = m_scripting->doFile(file.getPath().c_str());
-			if(status) DEBUG_INFO("Loaded script '", file, "'.");
+			return{LoadResultFlag::Fail, "Script not loaded"};
 		}
-		else if(it == end(m_loadedScripts) && reload)
+		auto lua = m_luaSystem->getStack();
+		auto status = lua.doFile(file.getPath().c_str());
+		if( !status )
 		{
-			DEBUG_INFO("Cannot reload script ", file, " as it wasn't loaded.");
+			auto str = lua.toString();
+			lua.pop();
+			return{LoadResultFlag::Fail, str};
 		}
-		else if(it != end(m_loadedScripts) && !reload)
-		{
-			DEBUG_INFO("Cannot load script ", file, ", already exists.");
-		}
-		else if(it != end(m_loadedScripts) && reload)
-		{
-			status = m_scripting->doFile(file.getPath().c_str());
-			if(status) DEBUG_INFO("Reloaded script '", file, "'.");
-		}
-		return status;
+		return{LoadResultFlag::Success};
+	}
+
+	LoadResult ScriptCache::unload(const ResourceFile& file)
+	{
+		auto index = valueFind(m_data, file.getPath());
+		m_data.erase(m_data.begin() + index);
+		return{LoadResultFlag::Success};
 	}
 }

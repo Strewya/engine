@@ -19,7 +19,7 @@ namespace Core
 {
 	class Camera;
 	class Color;
-	class DataFile;
+	class FontCache;
 	class Image;
 	class Rect;
 	class ResourceFile;
@@ -31,7 +31,7 @@ namespace Core
 	class GraphicsSystem
 	{
 	public:
-		bool init(TextureCache& texCache, Window& window);
+		bool init(FontCache& fontCache, TextureCache& textureCache, Window& window);
 		bool shutdown();
 
 		void update();
@@ -48,7 +48,7 @@ namespace Core
 		bool initSamplerState();
 		bool initDepthBuffer();
 
-		Vec2 getTextureDimensions(uint32_t texID) const;
+		Vec2 getTextureDimensions(const Texture& texture) const;
 		void setBackgroundColor(float red, float green, float blue);
 
 		void setCulling(bool isEnabled);
@@ -67,7 +67,7 @@ namespace Core
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
-		void drawText(const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
+		void drawText(uint32_t fontID, const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 
 		bool loadTexture(const ResourceFile& filename, Texture& outTexture);
 		bool reloadTexture(const ResourceFile& filename, Texture& outTexture);
@@ -101,8 +101,7 @@ namespace Core
 		XMMATRIX m_camProjection;
 		XMMATRIX m_world;
 		
-		//this shouldn't be explicit like this, refactor later
-		Font m_font;
+		FontCache* m_fontCache;
 		TextureCache* m_textureCache;
 
 		//this is for automatic cleanup of all named DX objects

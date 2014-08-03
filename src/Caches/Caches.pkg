@@ -1,45 +1,37 @@
 
 $#include <Caches/AnimationCache.h>
 $#include <Caches/ImageCache.h>
-$#include <Caches/PackageCache.h>
+//$#include <Caches/PackageCache.h>
 $#include <Caches/ScriptCache.h>
-$#include <Caches/SpritesheetCache.h>
 $#include <Caches/TextureCache.h>
 
 namespace Core
 {
 	class AnimationCache
 	{
-		uint32_t getAnimationID(const char* name) const;
-		const Animation& getAnimation(uint32_t id) const;
+		uint32_t getResourceID(const char* name);
+		const Animation* getResource(uint32_t id);
 	};
 	
 	class ImageCache
 	{
-		uint32_t getImageID(const char* name) const;
-		const Image& getImage(uint32_t id) const;
+		uint32_t getResourceID(const char* name);
+		const Image* getResource(uint32_t id);
 	};
-
+	
 	class PackageCache
 	{
 		Package& getPackage(const std::string& pkgName);
 	};
-
+	
 	class ScriptCache
 	{
-		bool loadFromFile(const char* file, bool reload);
-	};
-
-	class SpritesheetCache
-	{
-		uint32_t getSpritesheetID(const char* name) const;
-		const Spritesheet& getSpritesheet(uint32_t id) const;
+		bool load(const ResourceFile& file);
 	};
 
 	class TextureCache
 	{
-		uint32_t getTextureID(const char* path) const;
-		const Texture& getTexture(uint32_t id) const;
-		Vec2 getTextureDimensions(uint32_t texID) const;
+		uint32_t getResourceID(const char* name);
+		const Texture* getResource(uint32_t id);
 	};
 }

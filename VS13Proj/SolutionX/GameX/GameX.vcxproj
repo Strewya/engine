@@ -217,7 +217,6 @@
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\PackageCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Font.cpp" />
@@ -244,16 +243,21 @@
     <ClCompile Include="..\..\..\src\Loaders\PackageLoader.cpp" />
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\LuaStack.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
-    <ClCompile Include="..\..\..\src\Util\DataFile.cpp" />
+    <ClCompile Include="..\..\..\src\Util\DataFile.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
     <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp" />
@@ -275,13 +279,11 @@
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\PackageCache.h" />
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h" />
     <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Font.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Package.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Texture.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
@@ -299,16 +301,22 @@
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
-    <ClInclude Include="..\..\..\src\Loaders\FontLoader.h" />
+    <ClInclude Include="..\..\..\src\Loaders\Defines.h" />
     <ClInclude Include="..\..\..\src\Loaders\PackageLoader.h" />
     <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
+    <ClInclude Include="..\..\..\src\Scripting\LuaStack.h" />
+    <ClInclude Include="..\..\..\src\Scripting\LuaStackImpl.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h" />
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h" />
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
-    <ClInclude Include="..\..\..\src\Util\DataFile.h" />
+    <ClInclude Include="..\..\..\src\Util\DataFile.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />
     <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />

@@ -6,18 +6,19 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Caches/ImageCache.h>
-#include <Caches/SpritesheetCache.h>
-#include <DataStructs/Spritesheet.h>
-#include <Util/DataFile.h>
+#include <Scripting/LuaStack.h>
+#include <Util/ResourceFile.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	bool AnimationCache::init()
+	bool AnimationCache::init(ImageCache& imageCache)
 	{
 		bool status = true;
+
+		m_imageCache = &imageCache;
 
 		DEBUG_INIT(AnimationCache);
 		return status;
@@ -31,64 +32,119 @@ namespace Core
 		return status;
 	}
 
-	bool AnimationCache::addAnimations(const Animation& anim, bool reload, uint32_t* outIndex)
+	uint32_t AnimationCache::getResourceID(const char* name)
 	{
-		bool success = false;
-		uint32_t slot = -1;
-		auto id = getAnimationID(anim.m_name.c_str());
-		if(reload)
+		for( auto id : m_allocated )
 		{
-			if(id == -1)
+			auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_name == name )
 			{
-				DEBUG_INFO("The animation '", anim.m_name, "' cannot be reloaded, it does not exist!");
-			}
-			else
-			{
-				slot = id;
+				return id;
 			}
 		}
-		else
+		return INVALID_ID;
+	}
+
+	const Animation* AnimationCache::getResource(uint32_t id)
+	{
+		return m_data.get(id);
+	}
+
+	LoadResult AnimationCache::process(const ResourceFile& file, LuaStack& lua, std::function<LoadResult(const AnimationDefaults&)> fn)
+	{
+		if( !lua.doFile(file) )
 		{
-			if(id != -1)
+			auto str = lua.toString();
+			lua.pop();
+			return{LoadResultFlag::Fail, str};
+		}
+
+		AnimationDefaults defaults;
+		std::string texture = "";
+		lua.pull("defaults");
+		if( lua.isTable() )
+		{
+			defaults.loops = getBool(lua, "animationLoop", false);
+			defaults.duration = getFloat(lua, "animationDuration", 0);
+		}
+		lua.pop();
+
+		LoadResult res{LoadResultFlag::Success};
+		for( lua.pairs("animations"); lua.next(); lua.pop(1) )
+		{
+			if( lua.isString(-2) )
 			{
-				DEBUG_INFO("Cannot load animation '", anim.m_name, "', name already exists!");
-			}
-			else
-			{
-				slot = m_animations.size();
-				m_animations.emplace_back();
+				res = fn(defaults);
+				if( !res )
+				{
+					lua.pop(3);
+					break;
+				}
 			}
 		}
-		if(slot != -1)
-		{
-			m_animations[slot] = anim;
-			if(outIndex != nullptr)
-			{
-				*outIndex = slot;
-			}
-			success = true;
-		}
-		return success;
+		lua.pop(1); //.sheet file table
+		m_allocated = m_data.getActiveIDs();
+		return res;
 	}
 	
-	uint32_t AnimationCache::getAnimationID(const char* name) const
+	LoadResult AnimationCache::load(const ResourceFile& file, LuaStack& lua)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_animations), end(m_animations), [&](const Animation& anim)
+		return process(file, lua, [&](const AnimationDefaults& defaults) -> LoadResult
 		{
-			return name == anim.m_name;
+			auto id = getResourceID(lua.toString(-2).c_str());
+			if( id == INVALID_ID )
+			{
+				id = m_data.create();
+				auto res = loadAnimation(*m_data.get(id), lua, file.getHash(), defaults, *m_imageCache);
+				if( !res )
+				{
+					m_data.release(id);
+					return res;
+				}
+			}
+			else
+			{
+				DEBUG_INFO("Skipping image ", lua.toString(-2), ", already loaded");
+			}
+			return{LoadResultFlag::Success};
 		});
-
-		if(it != end(m_animations))
-		{
-			return std::distance(begin(m_animations), it);
-		}
-		return -1;
 	}
 
-	const Animation& AnimationCache::getAnimation(uint32_t id) const
+	LoadResult AnimationCache::reload(const ResourceFile& file, LuaStack& lua)
 	{
-		assert(id < m_animations.size());
-		return m_animations[id];
+		return process(file, lua, [&](const AnimationDefaults& defaults) -> LoadResult
+		{
+			auto new_id = m_data.create();
+			auto res = loadAnimation(*m_data.get(new_id), lua, file.getHash(), defaults, *m_imageCache);
+			if( !res )
+			{
+				m_data.release(new_id);
+				return res;
+			}
+
+			auto id = getResourceID(lua.toString(-2).c_str());
+			if( id != INVALID_ID )
+			{
+				m_data.swapData(id, new_id);
+				unloadAnimation(*m_data.get(new_id));
+				m_data.release(new_id);
+			}
+			return{LoadResultFlag::Success};
+		});
+	}
+
+	LoadResult AnimationCache::unload(const ResourceFile& file)
+	{
+		for( auto id : m_allocated )
+		{
+			auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_fileHash == file.getHash() )
+			{
+				unloadAnimation(*m_data.get(id));
+				m_data.release(id);
+			}
+		}
+		m_allocated = m_data.getActiveIDs();
+		return{LoadResultFlag::Success};
 	}
 }

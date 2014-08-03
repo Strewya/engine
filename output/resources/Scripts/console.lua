@@ -92,7 +92,7 @@ function Console:clearCommand()
 	self.command = "";
 end;
 
-function Console:draw(gfx)
+function Console:draw(gfx, fontID)
 	if(self.isOpen or self.isCmdMode) then
 		gfx:clearCamera();
 		gfx:setOrthographicProjection();
@@ -104,12 +104,12 @@ function Console:draw(gfx)
 		tf.position.x = self.tf.position.x - self.size.x + 5;
 		for i,text in ipairs(self.content) do
 			tf.position.y = self.tf.position.y - self.size.y + 25 + i*15
-			gfx:drawText(text, tf, tint, 0, false);
+			gfx:drawText(fontID, text, tf, tint, 0, false);
 		end;
 		if(self.isCmdMode) then
 			tf.position.y = self.tf.position.y - self.size.y + 10;
 			local s = self.command:sub(0, self.carret-1) .. "|" .. self.command:sub(self.carret);
-			gfx:drawText(s, tf, tint, 0, false);
+			gfx:drawText(fontID, s, tf, tint, 0, false);
 		end;
 	end;
 end;

@@ -17,9 +17,12 @@ namespace Core
 		return file.substr(pos + 1);
 	}
 
-	bool FileHandlerCache::init()
+	bool FileHandlerCache::init(std::string successMsg, std::string failureMsg)
 	{
 		bool status = true;
+
+		m_successMessage = std::move(successMsg);
+		m_failureMessage = std::move(failureMsg);
 
 		DEBUG_INIT(FileHandlerCache);
 		return status;
@@ -38,7 +41,7 @@ namespace Core
 		uint32_t id = getIndex(fileExtension);
 		if(id == m_handlers.size())
 		{
-			m_handlers.emplace_back(std::make_pair(fileExtension, handler));
+			m_handlers.emplace_back(fileExtension, handler);
 		}
 		else if(replaceExisting)
 		{
@@ -56,24 +59,33 @@ namespace Core
 		}
 	}
 
-	bool FileHandlerCache::dispatch(const ResourceFile& file)
+	LoadResult FileHandlerCache::dispatch(const ResourceFile& file)
 	{
+		LoadResult res;
 		uint32_t index = getIndex(getExtension(file.getName()).c_str());
 		if(index != m_handlers.size())
 		{
-			return m_handlers[index].second(file);
+			res = m_handlers[index].second(file);
+			std::string* pstr = &m_failureMessage;
+			if( res )
+			{
+				pstr = &m_successMessage;
+			}
+			DEBUG_INFO(*pstr, " ", file.getName(), " ", res);
 		}
-		return false;
+		else
+		{
+			DEBUG_INFO("No handler for file ", file.getName());
+		}
+		return res;
 	}
 
 	uint32_t FileHandlerCache::getIndex(const char* ext)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_handlers), end(m_handlers),
+		return filterFind(m_handlers,
 			[&](const Entry& handler)
 		{
 			return handler.first == ext;
 		});
-		return std::distance(begin(m_handlers), it);
 	}
 }

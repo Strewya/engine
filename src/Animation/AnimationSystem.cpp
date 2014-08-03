@@ -50,8 +50,8 @@ namespace Core
 		{
 			if(player.m_state == AnimationPlayer::RUNNING)
 			{
-				const auto& animation = m_animations->getAnimation(player.m_animationID);
-				uint32_t frameCount = animation.m_sequence.size();
+				const auto* animation = m_animations->getResource(player.m_animationID);
+				uint32_t frameCount = animation->m_sequence.size();
 				uint64_t current = m_timer.getCurMicros() - player.m_startTime;
 				uint64_t length = player.m_endTime - player.m_startTime;
 				float time = static_cast<float>(current) / static_cast<float>(length);
@@ -68,10 +68,10 @@ namespace Core
 
 				if(referenceTime >= player.m_endTime)
 				{
-					if(animation.m_repeats)
+					if(animation->m_loops)
 					{
-						player.m_startTime += animation.m_duration;
-						player.m_endTime += animation.m_duration;
+						player.m_startTime += animation->m_duration;
+						player.m_endTime += animation->m_duration;
 					}
 					else
 					{
@@ -90,7 +90,7 @@ namespace Core
 					if(index == frameCount - 1)
 						break;
 				}
-				*player.m_outImageID = animation.m_sequence[index];
+				*player.m_outImageID = animation->m_sequence[index];
 			}
 		}
 	}
@@ -115,11 +115,11 @@ namespace Core
 
 	void AnimationSystem::startAnimation(uint32_t playerID, uint32_t animationID, float playbackRate)
 	{
-		const auto& animation = m_animations->getAnimation(animationID);
+		const auto* animation = m_animations->getResource(animationID);
 		auto& player = m_runningAnimations[findPlayer(playerID)];
 		player.m_animationID = animationID;
 		player.m_startTime = m_timer.getCurMicros();
-		player.m_endTime = player.m_startTime + animation.m_duration;
+		player.m_endTime = player.m_startTime + animation->m_duration;
 		player.m_playbackRate = playbackRate;
 		player.m_state = AnimationPlayer::RUNNING;
 	}

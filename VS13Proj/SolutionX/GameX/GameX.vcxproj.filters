@@ -113,9 +113,6 @@
     <ClCompile Include="..\..\..\src\Util\Vec2.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Caches\SpritesheetCache.cpp">
-      <Filter>Framework\Caches</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
@@ -169,7 +166,16 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp">
       <Filter>Framework\DataStructs</Filter>
-	</ClCompile>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
@@ -179,13 +185,7 @@
     <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
-      <Filter>Framework\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
-      <Filter>Framework\Scripting</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
+    <ClCompile Include="..\..\..\src\Scripting\LuaStack.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
   </ItemGroup>
@@ -269,17 +269,11 @@
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h">
       <Filter>Framework\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Caches\SpritesheetCache.h">
-      <Filter>Framework\Caches</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Image.h">
       <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Vec2.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\DataStructs\Spritesheet.h">
-      <Filter>Framework\DataStructs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\DataStructs\Animation.h">
       <Filter>Framework\DataStructs</Filter>
@@ -335,20 +329,26 @@
     <ClInclude Include="..\..\..\src\Caches\FontCache.h">
       <Filter>Framework\Caches</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Loaders\FontLoader.h">
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaStack.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Scripting\LuaStackImpl.h">
+      <Filter>Framework\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Loaders\Defines.h">
       <Filter>Framework\Loaders</Filter>
-	</ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
-      <Filter>Framework\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
-      <Filter>Framework\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
-      <Filter>Framework\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
-      <Filter>Framework\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

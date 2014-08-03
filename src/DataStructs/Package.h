@@ -13,14 +13,14 @@
 namespace Core
 {
 	using PackageFileList = std::vector < ResourceFile >;
-
+	
 	class Package
 	{
 	public:
 		void addFile(ResourceFile file);
 		void removeDuplicateFiles();
 		
-		const PackageFileList& getFiles() const;
+		PackageFileList getFiles() const;
 
 	private:
 		PackageFileList m_files;

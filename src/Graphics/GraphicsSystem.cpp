@@ -7,13 +7,14 @@
 #include <cassert>
 #include <iostream>
 /******* extra headers *******/
+#include <Caches/FontCache.h>
 #include <Caches/TextureCache.h>
+#include <DataStructs/Font.h>
 #include <DataStructs/Image.h>
 #include <DataStructs/Texture.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
-#include <Util/DataFile.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
 #include <Util/Rect.h>
@@ -40,7 +41,7 @@ namespace Core
 	//*****************************************************************
 	//					INIT
 	//*****************************************************************
-	bool GraphicsSystem::init(TextureCache& texCache, Window& window)
+	bool GraphicsSystem::init(FontCache& fontCache, TextureCache& textureCache, Window& window)
 	{
 		bool status = true;
 
@@ -57,10 +58,11 @@ namespace Core
 		declare(&m_depthStencilBuffer);
 		declare(&m_transparency);
 
-		m_textureCache = &texCache;
+		m_fontCache = &fontCache;
+		m_textureCache = &textureCache;
 		m_window = &window;
 		m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
-		
+
 		status = initDevice() &&
 			initSwapChain() &&
 			//initDepthBuffer() &&
@@ -69,7 +71,7 @@ namespace Core
 			initSamplerState();
 
 		m_camView = XMMatrixIdentity();
-		
+
 		setPerspectiveProjection();
 
 		D3D11_BLEND_DESC blendDesc;
@@ -102,12 +104,12 @@ namespace Core
 	{
 		bool status = true;
 
-		if(m_swapchain != nullptr)
+		if( m_swapchain != nullptr )
 		{
 			m_swapchain->SetFullscreenState(false, nullptr);
 		}
 
-		for(auto** ptr : m_dxInterfaces)
+		for( auto** ptr : m_dxInterfaces )
 		{
 			safeRelease(*ptr);
 		}
@@ -163,8 +165,8 @@ namespace Core
 	{
 		D3D11_RASTERIZER_DESC rd;
 		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-		
-		if(isEnabled)
+
+		if( isEnabled )
 		{
 			rd.CullMode = D3D11_CULL_BACK;
 		}
@@ -173,12 +175,12 @@ namespace Core
 			rd.CullMode = D3D11_CULL_NONE;
 		}
 		rd.FillMode = D3D11_FILL_SOLID;
-		
+
 
 		ID3D11RasterizerState* state = nullptr;
-		
+
 		HRESULT hr = m_dev->CreateRasterizerState(&rd, &state);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			m_devcon->RSSetState(state);
 			DEBUG_INFO("Culling is now ", isEnabled ? "on" : "off");
@@ -196,7 +198,7 @@ namespace Core
 	void GraphicsSystem::setTransparencyMode(bool isEnabled)
 	{
 		auto transpEnabled = m_transparency;
-		if(!isEnabled)
+		if( !isEnabled )
 		{
 			transpEnabled = nullptr;
 		}
@@ -247,27 +249,27 @@ namespace Core
 	//*****************************************************************
 	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
-	Vec2 GraphicsSystem::getTextureDimensions(uint32_t texID) const
+	Vec2 GraphicsSystem::getTextureDimensions(const Texture& texture) const
 	{
 		ID3D11Resource* res = nullptr;
-		m_textures[texID]->GetResource(&res);
+		m_textures[texture.m_rawTextureID]->GetResource(&res);
 
-		ID3D11Texture2D* texture = nullptr;
-		HRESULT hr = res->QueryInterface(&texture);
+		ID3D11Texture2D* texture2d = nullptr;
+		HRESULT hr = res->QueryInterface(&texture2d);
 
 		Vec2 dim(0, 0);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			D3D11_TEXTURE2D_DESC desc;
-			texture->GetDesc(&desc);
+			texture2d->GetDesc(&desc);
 			dim.x = static_cast<float>(desc.Width);
 			dim.y = static_cast<float>(desc.Height);
 		}
-		safeRelease(texture);
+		safeRelease(texture2d);
 		safeRelease(res);
 		return dim;
-	}	
-	
+	}
+
 	//*****************************************************************
 	//					DRAW LINE
 	//*****************************************************************
@@ -277,7 +279,7 @@ namespace Core
 
 		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(count);
-		for(uint32_t i = 0; i < count; ++i)
+		for( uint32_t i = 0; i < count; ++i )
 		{
 			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
 			vertices[i].setDiffuse(1, 1, 1, 1);
@@ -333,7 +335,7 @@ namespace Core
 
 		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(count);
-		for(uint32_t i = 0; i < count; ++i)
+		for( uint32_t i = 0; i < count; ++i )
 		{
 			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
 			vertices[i].setDiffuse(1, 1, 1, 1);
@@ -390,7 +392,7 @@ namespace Core
 		vertices[2].set(rect.center.x + rect.halfWidth, rect.center.y + rect.halfHeight);
 		vertices[3].set(rect.center.x - rect.halfWidth, rect.center.y + rect.halfHeight);
 		vertices[4].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
-		
+
 		drawLine(tf, vertices.data(), count, c);
 	}
 
@@ -405,16 +407,16 @@ namespace Core
 		Vertex vertices[]
 		{
 			Vertex(-hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0),
-			Vertex( hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0),
-			Vertex(-hs.x,-hs.y, 0, 1, 1, 1, 1, 0, 0),
-			Vertex( hs.x,-hs.y, 0, 1, 1, 1, 1, 0, 0),
+				Vertex(hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0),
+				Vertex(-hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0),
+				Vertex(hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0),
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
-		
+
 		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices, 4*sizeof(Vertex));
+		memcpy(ms.pData, vertices, 4 * sizeof(Vertex));
 		m_devcon->Unmap(vb, 0);
 
 		uint32_t stride = sizeof(Vertex);
@@ -426,14 +428,14 @@ namespace Core
 		/****** INDEX BUFER ******/
 		uint32_t indices[]
 		{
-			0,1,2,
-			1,3,2,
+			0, 1, 2,
+				1, 3, 2,
 		};
 
 		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
 		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
 		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, indices, 6*sizeof(uint32_t));
+		memcpy(ms.pData, indices, 6 * sizeof(uint32_t));
 		m_devcon->Unmap(ib, 0);
 
 		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
@@ -447,7 +449,7 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		
+
 
 		cbPerObject cbpo;
 		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
@@ -475,14 +477,14 @@ namespace Core
 	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, const Image& img)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
-		
+
 		/****** VERTEX BUFFER ******/
 		Vertex vertices[]
 		{
-			Vertex(-img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
-			Vertex( img.m_ratio,  1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
-			Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y),
-			Vertex( img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y)
+			Vertex(-img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
+				Vertex(img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
+				Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y),
+				Vertex(img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y)
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
@@ -501,7 +503,7 @@ namespace Core
 		/****** INDEX BUFER ******/
 		uint32_t indices[]
 		{
-			0, 1, 2,   1, 3, 2
+			0, 1, 2, 1, 3, 2
 		};
 
 		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
@@ -535,7 +537,8 @@ namespace Core
 		m_devcon->VSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetConstantBuffers(0, 1, &cb);
 		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		auto srv = m_textures[img.m_textureID].get();
+		const auto* texture = m_textureCache->getResource(img.m_textureID);
+		auto srv = m_textures[texture->m_rawTextureID].get();
 		m_devcon->PSSetShaderResources(0, 1, &srv);
 
 		//m_devcon->Draw(4, 0);
@@ -545,138 +548,134 @@ namespace Core
 		ib->Release();
 		vb->Release();
 	}
-	
+
 	//*****************************************************************
 	//					DRAW TEXT
 	//*****************************************************************
-	void GraphicsSystem::drawText(const std::string& text, const Transform& tf, const Color& tint, uint32_t justification, bool isItalic)
+	void GraphicsSystem::drawText(uint32_t fontID, const std::string& text, const Transform& tf, const Color& tint, uint32_t justification, bool isItalic)
 	{
-		ID3D11Resource* res = nullptr;
-		m_textures[m_font.m_textureID]->GetResource(&res);
-
-		ID3D11Texture2D* texture = nullptr;
-		HRESULT hr = res->QueryInterface(&texture);
-
-		if(SUCCEEDED(hr))
+		const auto* font = m_fontCache->getResource(fontID);
+		if( !font )
 		{
-			D3D11_TEXTURE2D_DESC desc;
-			texture->GetDesc(&desc);
-			float w = static_cast<float>(desc.Width);
-			float h = static_cast<float>(desc.Height);
-			std::vector<Vertex> verts(text.size() * 4);
-			std::vector<uint32_t> inds(text.size() * 6);
-			uint32_t v = 0;
-			uint32_t i = 0;
-			float xPos = 0;
-			float yPos = m_font.m_size * 0.5f;
-			
-			for(char c : text)
-			{
-				Glyph& glyph = m_font.m_glyphs[c - 32];
-				float tv_top = (float)glyph.m_top / h;
-				float tv_bot = (float)(glyph.m_top + m_font.m_size) / h;
-				float tu_left = (float)glyph.m_left / w;
-				float tu_rght = (float)glyph.m_right / w;
+			return;
+		}
+		const auto* texture = m_textureCache->getResource(font->m_textureID);
+		if( !texture )
+		{
+			return;
+		}
+		float w = texture->m_dimensions.x;
+		float h = texture->m_dimensions.y;
+		std::vector<Vertex> verts(text.size() * 4);
+		std::vector<uint32_t> inds(text.size() * 6);
+		uint32_t v = 0;
+		uint32_t i = 0;
+		float xPos = 0;
+		float yPos = font->m_size * 0.5f;
 
-				inds[i++] = v + 0;
-				inds[i++] = v + 1;
-				inds[i++] = v + 2;
-				inds[i++] = v + 2;
-				inds[i++] = v + 3;
-				inds[i++] = v + 0;
+		for( char c : text )
+		{
+			const Glyph& glyph = font->m_glyphs[c - 32];
+			float tv_top = (float)glyph.m_top / h;
+			float tv_bot = (float)(glyph.m_top + font->m_size) / h;
+			float tu_left = (float)glyph.m_left / w;
+			float tu_rght = (float)glyph.m_right / w;
 
-				float italicOffset = isItalic ? 2.5f : 0;
+			inds[i++] = v + 0;
+			inds[i++] = v + 1;
+			inds[i++] = v + 2;
+			inds[i++] = v + 2;
+			inds[i++] = v + 3;
+			inds[i++] = v + 0;
 
-				verts[v].setPosition(xPos - italicOffset, -yPos, 0);
-				verts[v].setDiffuse(1,1,1,1);
-				verts[v].setTextureCoords(tu_left, tv_bot);
-				++v;
-				verts[v].setPosition(xPos + italicOffset, yPos, 0);
-				verts[v].setDiffuse(1, 1, 1, 1);
-				verts[v].setTextureCoords(tu_left, tv_top);
-				++v;
-				xPos += (glyph.m_right - glyph.m_left);
-				verts[v].setPosition(xPos + italicOffset, yPos, 0);
-				verts[v].setDiffuse(1, 1, 1, 1);
-				verts[v].setTextureCoords(tu_rght, tv_top);
-				++v;
-				verts[v].setPosition(xPos - italicOffset, -yPos, 0);
-				verts[v].setDiffuse(1, 1, 1, 1);
-				verts[v].setTextureCoords(tu_rght, tv_bot);
-				++v;
-			}
-			D3D11_MAPPED_SUBRESOURCE ms;
+			float italicOffset = isItalic ? 2.5f : 0;
 
-			auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), verts.size());
+			verts[v].setPosition(xPos - italicOffset, -yPos, 0);
+			verts[v].setDiffuse(1, 1, 1, 1);
+			verts[v].setTextureCoords(tu_left, tv_bot);
+			++v;
+			verts[v].setPosition(xPos + italicOffset, yPos, 0);
+			verts[v].setDiffuse(1, 1, 1, 1);
+			verts[v].setTextureCoords(tu_left, tv_top);
+			++v;
+			xPos += (glyph.m_right - glyph.m_left);
+			verts[v].setPosition(xPos + italicOffset, yPos, 0);
+			verts[v].setDiffuse(1, 1, 1, 1);
+			verts[v].setTextureCoords(tu_rght, tv_top);
+			++v;
+			verts[v].setPosition(xPos - italicOffset, -yPos, 0);
+			verts[v].setDiffuse(1, 1, 1, 1);
+			verts[v].setTextureCoords(tu_rght, tv_bot);
+			++v;
+		}
+		D3D11_MAPPED_SUBRESOURCE ms;
 
-			HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-			assert(SUCCEEDED(hr));
-			memcpy(ms.pData, verts.data(), verts.size() * sizeof(Vertex));
-			m_devcon->Unmap(vb, 0);
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), verts.size());
 
-			uint32_t stride = sizeof(Vertex);
-			uint32_t offset = 0;
-			m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-			m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, verts.data(), verts.size() * sizeof(Vertex));
+		m_devcon->Unmap(vb, 0);
 
-
-			/****** INDEX BUFER ******/
-			auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), inds.size());
-			hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-			assert(SUCCEEDED(hr));
-			memcpy(ms.pData, inds.data(), inds.size() * sizeof(uint32_t));
-			m_devcon->Unmap(ib, 0);
-
-			m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-			/****** CONSTANT BUFFER ******/
-			auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
-
-			m_world = XMMatrixIdentity();
-			m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-			//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-			//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-			m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-
-			float move = 0;
-			if (justification == 1)
-			{
-				move = xPos*0.5f*tf.scale.x;
-			}
-			else if (justification == 2)
-			{
-				move = xPos*tf.scale.x;
-			}
-
-			m_world *= XMMatrixTranslation(tf.position.x - move, tf.position.y, 0);
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 
-			cbPerObject cbpo;
-			cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
-			cbpo.FillColor.x = tint.r;
-			cbpo.FillColor.y = tint.g;
-			cbpo.FillColor.z = tint.b;
-			cbpo.FillColor.w = tint.a;
-			cbpo.isTexture.x = 1;
+		/****** INDEX BUFER ******/
+		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), inds.size());
+		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, inds.data(), inds.size() * sizeof(uint32_t));
+		m_devcon->Unmap(ib, 0);
 
-			m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
-			m_devcon->VSSetConstantBuffers(0, 1, &cb);
-			m_devcon->PSSetConstantBuffers(0, 1, &cb);
-			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-			auto srv = m_textures[m_font.m_textureID].get();
-			m_devcon->PSSetShaderResources(0, 1, &srv);
+		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
-			m_devcon->DrawIndexed(inds.size(), 0, 0);
+		/****** CONSTANT BUFFER ******/
+		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
 
+		m_world = XMMatrixIdentity();
+		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
+		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 
-
-			safeRelease(cb);
-			safeRelease(ib);
-			safeRelease(vb);
+		float move = 0;
+		if( justification == 1 )
+		{
+			move = xPos*0.5f*tf.scale.x;
+		}
+		else if( justification == 2 )
+		{
+			move = xPos*tf.scale.x;
 		}
 
-		safeRelease(res);
-		safeRelease(texture);
+		m_world *= XMMatrixTranslation(tf.position.x - move, tf.position.y, 0);
+
+
+		cbPerObject cbpo;
+		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+		cbpo.FillColor.x = tint.r;
+		cbpo.FillColor.y = tint.g;
+		cbpo.FillColor.z = tint.b;
+		cbpo.FillColor.w = tint.a;
+		cbpo.isTexture.x = 1;
+
+		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
+		auto srv = m_textures[texture->m_rawTextureID].get();
+		m_devcon->PSSetShaderResources(0, 1, &srv);
+
+		m_devcon->DrawIndexed(inds.size(), 0, 0);
+
+
+
+		safeRelease(cb);
+		safeRelease(ib);
+		safeRelease(vb);
 	}
 
 	//*****************************************************************
@@ -686,11 +685,11 @@ namespace Core
 	{
 		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&m_dxgiFactory);
 
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			IDXGIAdapter* adapter = nullptr;
 			hr = m_dxgiFactory->EnumAdapters(0, &adapter);
-			if(SUCCEEDED(hr))
+			if( SUCCEEDED(hr) )
 			{
 				auto driverType = D3D_DRIVER_TYPE_UNKNOWN;
 				uint32_t flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
@@ -699,18 +698,18 @@ namespace Core
 					flags |= D3D11_CREATE_DEVICE_DEBUG;
 				DEBUG_CODE_END
 
-				hr = D3D11CreateDevice(adapter, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &m_dev, nullptr, &m_devcon);
+					hr = D3D11CreateDevice(adapter, driverType, nullptr, flags, nullptr, 0, D3D11_SDK_VERSION, &m_dev, nullptr, &m_devcon);
 
 				adapter->Release();
 			}
 		}
 
 		DEBUG_CODE_START
-			if(FAILED(hr))
+			if( FAILED(hr) )
 				DEBUG_INFO("\tinitDevice failed");
 		DEBUG_CODE_END
 
-		return SUCCEEDED(hr);
+			return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -731,20 +730,20 @@ namespace Core
 	{
 		ID3D11Texture2D* bbTexture = nullptr;
 		HRESULT hr = m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			hr = m_dev->CreateRenderTargetView(bbTexture, nullptr, &m_renderTarget);
-			if(SUCCEEDED(hr))
+			if( SUCCEEDED(hr) )
 			{
 				m_devcon->OMSetRenderTargets(1, &m_renderTarget, m_depthStencilView);
 			}
 			bbTexture->Release();
 		}
 		DEBUG_CODE_START
-			if(FAILED(hr))
+			if( FAILED(hr) )
 				DEBUG_INFO("\tinitRenderTarget failed");
 		DEBUG_CODE_END
-		return SUCCEEDED(hr);
+			return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -753,20 +752,20 @@ namespace Core
 	bool GraphicsSystem::initVertexShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-		
+
 		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			safeRelease(m_vertexShader);
 			hr = m_dev->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_vertexShader);
-			
-			if(SUCCEEDED(hr))
+
+			if( SUCCEEDED(hr) )
 			{
 				auto& ied = Vertex::getDescription();
 				safeRelease(m_inputLayout);
 				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), &m_inputLayout);
 
-				if(SUCCEEDED(hr))
+				if( SUCCEEDED(hr) )
 				{
 					m_devcon->VSSetShader(m_vertexShader, nullptr, 0);
 					m_devcon->IASetInputLayout(m_inputLayout);
@@ -775,12 +774,12 @@ namespace Core
 			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
-			if(FAILED(hr))
+			if( FAILED(hr) )
 				DEBUG_INFO("\tinitVertexShader failed");
 		DEBUG_CODE_END
-		return SUCCEEDED(hr);
+			return SUCCEEDED(hr);
 	}
-	
+
 	//*****************************************************************
 	//					INIT PIXEL SHADER
 	//*****************************************************************
@@ -789,21 +788,21 @@ namespace Core
 		ID3D10Blob* m_shaderBlob = nullptr;
 
 		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			safeRelease(m_pixelShader);
 			hr = m_dev->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_pixelShader);
-			if(SUCCEEDED(hr))
+			if( SUCCEEDED(hr) )
 			{
 				m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
 			}
 			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
-			if(FAILED(hr))
+			if( FAILED(hr) )
 				DEBUG_INFO("\tinitPixelShader failed");
 		DEBUG_CODE_END
-		return SUCCEEDED(hr);
+			return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -841,7 +840,7 @@ namespace Core
 		sampd.MaxLOD = D3D11_FLOAT32_MAX;
 
 		HRESULT hr = m_dev->CreateSamplerState(&sampd, &m_samplerState);
-		
+
 		return SUCCEEDED(hr);
 	}
 
@@ -868,7 +867,7 @@ namespace Core
 		sd.Quality = 0;
 
 		auto hr = m_dev->CreateTexture2D(&dsd, nullptr, &m_depthStencilBuffer);
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			hr = m_dev->CreateDepthStencilView(m_depthStencilBuffer, nullptr, &m_depthStencilView);
 		}
@@ -883,11 +882,11 @@ namespace Core
 		ID3D11ShaderResourceView* texturePtr = nullptr;
 		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
 		bool loaded = false;
-		if(SUCCEEDED(hr))
+		if( SUCCEEDED(hr) )
 		{
 			DxTexturePtr loadedTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>);
 			auto it = std::find_if(m_textures.begin(), m_textures.end(), [](const DxTexturePtr& ptr) { return ptr == nullptr; });
-			if(it == m_textures.end())
+			if( it == m_textures.end() )
 			{
 				outTexture.m_rawTextureID = m_textures.size();
 				m_textures.emplace_back(std::move(loadedTexturePtr));
@@ -898,6 +897,8 @@ namespace Core
 				it->swap(loadedTexturePtr);
 			}
 			outTexture.m_name = file.getName();
+			outTexture.m_fileHash = file.getHash();
+			outTexture.m_dimensions = getTextureDimensions(outTexture);
 			loaded = true;
 		}
 		return loaded;
@@ -922,7 +923,7 @@ namespace Core
 		texture.m_rawTextureID = 0;
 		texture.m_name.clear();
 	}
-	
+
 	//*****************************************************************
 	//					MAKE INDEX BUFFER
 	//*****************************************************************
@@ -981,7 +982,7 @@ namespace Core
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
-		
+
 		ID3D11Buffer* buffer = nullptr;
 		HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
 		assert(SUCCEEDED(hr));

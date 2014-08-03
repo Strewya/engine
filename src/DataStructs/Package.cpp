@@ -14,7 +14,7 @@ namespace Core
 		m_files.emplace_back(file);
 	}
 
-	const PackageFileList& Package::getFiles() const
+	PackageFileList Package::getFiles() const
 	{
 		return m_files;
 	}

@@ -1,8 +1,7 @@
 
 $#include <DataStructs/Animation.h>
 $#include <DataStructs/Image.h>
-$#include <DataStructs/Package.h>
-$#include <DataStructs/Spritesheet.h>
+//$#include <DataStructs/Package.h>
 $#include <DataStructs/Texture.h>
 
 namespace Core
@@ -11,7 +10,7 @@ namespace Core
 	{
 		uint32_t m_duration;
 		std::string m_name;
-		bool m_repeats;
+		bool m_loops;
 	};
 
 	class Image
@@ -21,21 +20,16 @@ namespace Core
 		Vec2 m_texCoords[4];
 		std::string m_name;
 	};
-
+	
 	class Package
 	{
 		void addFile(ResourceFile file);
 		void removeDuplicateFiles();
 	};
-
-	class Spritesheet
-	{
-		std::string m_name;
-	};
-
+	
 	class Texture
 	{
 		std::string m_name;
-		uint32_t m_rawTextureID;
+		Vec2 m_dimensions;
 	};
 }

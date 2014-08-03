@@ -8,11 +8,12 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Loaders/Defines.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class DataFile;
+	class LuaStack;
 	class TextureCache;
 
 	const uint32_t MAX_GLYPHS = 95;
@@ -32,9 +33,11 @@ namespace Core
 	public:
 		uint32_t m_size;
 		uint32_t m_textureID;
+		size_t m_fileHash;
 		Glyph m_glyphs[MAX_GLYPHS];
 		std::string m_name;
 	};
 
-	bool parseFont(Font& outFont, DataFile& file, TextureCache& textureCache);
+	LoadResult loadFont(Font& outFont, LuaStack& file, size_t fileHash, TextureCache& textureCache);
+	void unloadFont(Font& font);
 }

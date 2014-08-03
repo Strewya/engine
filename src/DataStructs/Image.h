@@ -7,21 +7,23 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Loaders/Defines.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class DataFile;
+	class LuaStack;
 	class TextureCache;
 
 	class Image
 	{
 	public:
+		Vec2 m_texCoords[4];
 		uint32_t m_textureID;
 		float m_ratio;
-		Vec2 m_texCoords[4];
 		std::string m_name;
+		size_t m_fileHash;
 	};
 
 	class ImageDefaults
@@ -32,5 +34,6 @@ namespace Core
 		uint32_t height;
 	};
 
-	bool parseImage(Image& outImage, DataFile& file, const ImageDefaults& defaults, TextureCache& textures);
+	LoadResult loadImage(Image& outImage, LuaStack& lua, size_t fileHash, const ImageDefaults& defaults, TextureCache& textures);
+	void unloadImage(Image& image);
 }

@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <Util/ResourceFile.h>
 /******* C++ headers *******/
+#include <functional>
 /******* extra headers *******/
 #include <Util/Utility.h>
 /******* end headers *******/
@@ -15,6 +16,7 @@ namespace Core
 	{
 		replace(replace(m_resourceName, "../", ""), "resources/", "");
 		m_resourcePath = "../resources/" + m_resourceName;
+		m_hash = std::hash<std::string>()(m_resourcePath);
 	}
 
 	ResourceFile::ResourceFile(const std::string& filename)
@@ -32,9 +34,14 @@ namespace Core
 		return m_resourcePath;
 	}
 
+	size_t ResourceFile::getHash() const
+	{
+		return m_hash;
+	}
+
 	bool ResourceFile::operator==(const ResourceFile& rhs) const
 	{
-		return (m_resourcePath == rhs.m_resourcePath);
+		return m_hash == rhs.m_hash;
 	}
 
 	bool ResourceFile::operator!=(const ResourceFile& rhs) const

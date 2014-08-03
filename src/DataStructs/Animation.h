@@ -9,12 +9,13 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Loaders/Defines.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class DataFile;
 	class ImageCache;
+	class LuaStack;
 
 	class Animation
 	{
@@ -22,6 +23,7 @@ namespace Core
 		uint64_t m_duration;
 		std::vector<uint32_t> m_sequence;
 		std::string m_name;
+		size_t m_fileHash;
 		bool m_loops;
 	};
 
@@ -32,5 +34,6 @@ namespace Core
 		bool loops;
 	};
 
-	bool parseAnimation(Animation& outAnimation, DataFile& file, const AnimationDefaults& defaults, const ImageCache& images);
+	LoadResult loadAnimation(Animation& outAnimation, LuaStack& lua, size_t fileHash, const AnimationDefaults& defaults, ImageCache& images);
+	void unloadAnimation(Animation& outAnimation);
 }

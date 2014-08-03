@@ -36,11 +36,11 @@ namespace Core
 	template<typename T> T& wrap(const T& low, const T& high, T& value)
 	{
 		auto d = high - low;
-		if(value < low)
+		if( value < low )
 		{
 			value += d;
 		}
-		else if(value > high)
+		else if( value > high )
 		{
 			value -= d;
 		}
@@ -49,11 +49,11 @@ namespace Core
 
 	template<typename T> T& clamp(const T& low, const T& high, T& value)
 	{
-		if(value < low)
+		if( value < low )
 		{
 			value = low;
 		}
-		else if(value > high)
+		else if( value > high )
 		{
 			value = high;
 		}
@@ -63,10 +63,20 @@ namespace Core
 	inline std::string& replace(std::string& str, const std::string& from, const std::string& to)
 	{
 		size_t start_pos = str.find(from);
-		if(start_pos != std::string::npos)
+		if( start_pos != std::string::npos )
 		{
 			str.replace(start_pos, from.length(), to);
 		}
 		return str;
+	}
+
+	template<typename C, typename F> size_t filterFind(const C& container, const F& filter)
+	{
+		return std::distance(std::begin(container), std::find_if(std::begin(container), std::end(container), filter));
+	}
+
+	template<typename C, typename T> size_t valueFind(const C& container, const T& value)
+	{
+		return std::distance(std::begin(container), std::find(std::begin(container), std::end(container), value));
 	}
 }

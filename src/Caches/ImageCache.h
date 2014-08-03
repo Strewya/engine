@@ -5,37 +5,39 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include <DataStructs/Image.h>
+#include <Loaders/Defines.h>
 #include <Util/ObjectPool.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
+	class LuaStack;
 	class ResourceFile;
-	class ScriptingSystem;
 	class TextureCache;
 
 	class ImageCache
 	{
 	public:
-		bool init(ScriptingSystem& scripting, TextureCache& textures);
+		bool init(TextureCache& textures);
 		bool shutdown();
 
-		uint32_t getImageID(const char* name) const;
-		const Image& getImage(uint32_t id) const;
+		uint32_t getResourceID(const char* name);
+		const Image* getResource(uint32_t id);
 
-		bool load(const ResourceFile& file);
-		bool reload(const ResourceFile& file);
-		bool unload(const ResourceFile& file);
+		LoadResult load(const ResourceFile& file, LuaStack& lua);
+		LoadResult reload(const ResourceFile& file, LuaStack& lua);
+		LoadResult unload(const ResourceFile& file);
 
 	private:
-		ScriptingSystem* m_scripting;
 		TextureCache* m_textures;
+		ObjectPool<Image> m_data;
+		std::vector<uint32_t> m_allocated;
 
-		ObjectPool<Image> m_images;
-		
+		LoadResult process(const ResourceFile& file, LuaStack& lua, std::function<LoadResult(const ImageDefaults&)> fn);
 	};
 }

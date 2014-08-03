@@ -34,79 +34,76 @@ namespace Core
 		return status;
 	}
 
-	uint32_t TextureCache::getTextureID(const char* name) const
+	uint32_t TextureCache::getResourceID(const char* name)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
+		for( auto id : m_allocated )
 		{
-			return name == tex.m_name;
-		});
-		if(it != end(m_loadedTextures))
-		{
-			return std::distance(m_loadedTextures.begin(), it) + 1;
+			const auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_name == name )
+			{
+				return id;
+			}
 		}
-		return 0;
+		return INVALID_ID;
 	}
 
-	const Texture& TextureCache::getTexture(uint32_t id) const
+	const Texture* TextureCache::getResource(uint32_t id)
 	{
-		--id;
-		assert(id < m_loadedTextures.size());
-		return m_loadedTextures[id];
+		return m_data.get(id);
 	}
 
-	Vec2 TextureCache::getTextureDimensions(uint32_t texID) const
+	LoadResult TextureCache::load(const ResourceFile& file)
 	{
-		const auto& t = getTexture(texID);
-		return m_graphics->getTextureDimensions(t.m_rawTextureID);
-	}
-
-	bool TextureCache::load(const ResourceFile& file)
-	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [](const Texture& tex)
+		auto id = getResourceID(file.getName().c_str());
+		if( id == INVALID_ID )
 		{
-			return tex.m_name.empty();
-		});
-		if(it == end(m_loadedTextures))
-		{
-			m_loadedTextures.emplace_back();
-			m_graphics->loadTexture(file, m_loadedTextures.back());
-			DEBUG_INFO("Loaded texture '", file, "'.");
-			return true;
+			id = m_data.create();
+			auto* ptr = m_data.get(id);
+			if( ptr )
+			{
+				m_graphics->loadTexture(file, *ptr);
+			}
+			else
+			{
+				m_data.release(id);
+				return{LoadResultFlag::Fail, std::string("Failed to load texture ") + file.getName()};
+			}
 		}
-		return false;
+		m_allocated = m_data.getActiveIDs();
+		return{LoadResultFlag::Success};
 	}
 
-	bool TextureCache::reload(const ResourceFile& file)
+	LoadResult TextureCache::reload(const ResourceFile& file)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
+		auto id = getResourceID(file.getName().c_str());
+		if( id != INVALID_ID )
 		{
-			return tex.m_name == file.getName();
-		});
-		if(it != end(m_loadedTextures))
-		{
-			m_graphics->reloadTexture(file, *it);
-			DEBUG_INFO("Reloaded texture '", file, "'.");
-			return true;
+			auto* ptr = m_data.get(id);
+			if( ptr )
+			{
+				m_graphics->reloadTexture(file, *ptr);
+			}
+			else
+			{
+				return{LoadResultFlag::Fail, std::string("Failed to load texture ") + file.getName()};
+			}
 		}
-		return false;
+		m_allocated = m_data.getActiveIDs();
+		return{LoadResultFlag::Success};
 	}
 
-	bool TextureCache::unload(const ResourceFile& file)
+	LoadResult TextureCache::unload(const ResourceFile& file)
 	{
-		using std::begin; using std::end;
-		auto it = std::find_if(begin(m_loadedTextures), end(m_loadedTextures), [&](const Texture& tex)
+		for( auto id : m_allocated )
 		{
-			return tex.m_name == file.getName();
-		});
-		if(it != end(m_loadedTextures))
-		{
-			m_graphics->unloadTexture(*it);
-			DEBUG_INFO("Unloaded texture '", file, "'.");
-			return true;
+			auto* ptr = m_data.get(id);
+			if( ptr && ptr->m_fileHash == file.getHash() )
+			{
+				m_graphics->unloadTexture(*ptr);
+				m_data.release(id);
+			}
 		}
-		return false;
+		m_allocated = m_data.getActiveIDs();
+		return{LoadResultFlag::Success};
 	}
 }

@@ -8,23 +8,26 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Loaders/Defines.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
 	class ResourceFile;
-	class ScriptingSystem;
+	class LuaSystem;
 
 	class ScriptCache
 	{
 	public:
-		bool init(ScriptingSystem& scripting);
+		bool init(LuaSystem& scripting);
 		bool shutdown();
 
-		bool loadFromFile(const ResourceFile& file, bool reload);
+		LoadResult load(const ResourceFile& file);
+		LoadResult reload(const ResourceFile& file);
+		LoadResult unload(const ResourceFile& file);
 
 	private:
-		ScriptingSystem* m_scripting;
-		std::vector<std::string> m_loadedScripts;
+		LuaSystem* m_luaSystem;
+		std::vector<std::string> m_data;
 	};
 }

@@ -2,22 +2,12 @@ return
 {
 	base =
 	{
-		"Defs/font.font",
-			"Textures/font_t.png",
-		"Shaders/shader.hlsl"
+		"Defs/font.font"
 	},
 	gameplay =
 	{
 		"Defs/hedgehog.sheet",
-			"Textures/harold_hoda_skace.tif",
 		"Defs/apples.sheet",
-			"Textures/apples.png",
 		"Scripts/hedgehog_game.lua",
-			"Scripts/lib.lua",
-			"Scripts/console.lua",
-			"Scripts/asm.lua",
-			"Scripts/hedgehog_asm.lua",
-			"Scripts/hedgehog_globals.lua",
-			"Scripts/hedgehog_input.lua"
 	}
 };

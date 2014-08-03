@@ -33,6 +33,5 @@ float4 PShader(VOut input) : SV_TARGET
     float4 diffuse = input.diffuse;
 	if(isTexture.x != 0)
 		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
-	//clip(diffuse.a-0.1f);
 	return diffuse;
 }

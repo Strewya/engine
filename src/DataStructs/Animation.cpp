@@ -6,45 +6,42 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Caches/ImageCache.h>
-#include <Util/DataFile.h>
+#include <Scripting/LuaStack.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	bool parseAnimation(Animation& outAnimation, DataFile& file, const AnimationDefaults& defaults, const ImageCache& images)
+	LoadResult loadAnimation(Animation& outAnimation, LuaStack& lua, size_t fileHash, const AnimationDefaults& defaults, ImageCache& images)
 	{
-		auto success = false;
-
-		auto name = file.getString(-2, "");
-		auto duration = Time::secondsToMicros(file.getFloat("duration", defaults.duration));
-		auto loops = file.getBool("loop", defaults.loops);
-
-		for( file.ipairs("images"); file.next(); )
+		if( !lua.isString(-2) || !lua.isTable(-1) )
 		{
-			auto imgName = file.getString(-1, "");
-			auto imgID = images.getImageID(imgName.c_str());
-			if( imgID != 0 )
+			return {LoadResultFlag::Fail, "Invalid animation format"};
+		}
+
+		outAnimation.m_name = lua.toString(-2);
+		outAnimation.m_duration = Time::secondsToMicros(getFloat(lua, "duration", defaults.duration));
+		outAnimation.m_loops = getBool(lua, "loop", defaults.loops);
+
+		for( lua.ipairs("images"); lua.next(); lua.pop(1) )
+		{
+			auto imgName = lua.toString(-1);
+			auto imgID = images.getResourceID(imgName.c_str());
+			if( imgID != INVALID_ID )
 			{
 				outAnimation.m_sequence.emplace_back(imgID);
 			}
 		}
 
-		if( !name.empty() && duration > 0 && !outAnimation.m_sequence.empty() )
-		{
-			//anim valid, parse images
-			outAnimation.m_name = name;
-			outAnimation.m_duration = duration;
-			outAnimation.m_loops = loops;
+		return {LoadResultFlag::Success};
+	}
 
-			success = true;
-		}
-		else
-		{
-			DEBUG_INFO("Animation in ", file.getFilename(), " spritesheet is invalid: ", name, ",", duration, ",", outAnimation.m_sequence.size());
-		}
-
-		return success;
+	void unloadAnimation(Animation& animation)
+	{
+		animation.m_duration = 0;
+		animation.m_loops = false;
+		animation.m_name.clear();
+		animation.m_sequence.clear();
 	}
 }

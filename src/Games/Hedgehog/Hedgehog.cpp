@@ -7,7 +7,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
-#include <Util/DataFile.h>
+#include <Scripting/LuaStack.h>
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
@@ -15,7 +15,7 @@
 /******* end headers *******/
 
 /******* TESTING ***********/
-#include <Scripting/LuaSystem.h>
+
 /******* END TESTING *******/
 
 namespace Core
@@ -24,22 +24,22 @@ namespace Core
 	{
 		DEBUG_INFO("---------------------------------");
 		bool status = true;
-		m_animation.releasePlayer(m_player.m_animationPlayerID);
+		m_animationSystem.releasePlayer(m_player.m_animationPlayerID);
 		status &= m_animationCache.shutdown();
 		status &= m_loadHandlerCache.shutdown();
 		status &= m_reloadHandlerCache.shutdown();
 		status &= m_unloadHandlerCache.shutdown();
+		status &= m_fontCache.shutdown();
 		status &= m_imageCache.shutdown();
 		status &= m_packageCache.shutdown();
 		status &= m_scriptCache.shutdown();
-		status &= m_spritesheetCache.shutdown();
 		status &= m_textureCache.shutdown();
 		status &= m_packageLoader.shutdown();
-		status &= m_animation.shutdown();
-		status &= m_graphics.shutdown();
-		status &= m_input.shutdown();
-		status &= m_scripter.shutdown();
-		if(!status)
+		status &= m_animationSystem.shutdown();
+		status &= m_graphicsSystem.shutdown();
+		status &= m_inputSystem.shutdown();
+		status &= m_luaSystem.shutdown();
+		if( !status )
 		{
 			DEBUG_INFO("\nShutdown has failed! Bugs...");
 		}
@@ -57,144 +57,137 @@ namespace Core
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
-		runPlayground();
-		
+		//runPlayground();
+
 		m_isRunning =
 			//systems
-			m_animation.init(m_animationCache) &&
-			m_graphics.init(m_textureCache, window) &&
-			m_input.init(window) &&
-			m_scripter.init() &&
+			m_animationSystem.init(m_animationCache) &&
+			m_graphicsSystem.init(m_fontCache, m_textureCache, window) &&
+			m_inputSystem.init(window) &&
+			m_luaSystem.init() &&
 
 			//caches
-			m_animationCache.init() &&
-			m_loadHandlerCache.init() &&
-			m_reloadHandlerCache.init() &&
-			m_unloadHandlerCache.init() &&
-			m_imageCache.init() &&
+			m_animationCache.init(m_imageCache) &&
+			m_loadHandlerCache.init("Loaded file", "File not loaded") &&
+			m_reloadHandlerCache.init("Reloaded file", "File not reloaded") &&
+			m_unloadHandlerCache.init("Unloaded file", "File not unloaded") &&
+			m_fontCache.init(m_textureCache) &&
+			m_imageCache.init(m_textureCache) &&
 			m_packageCache.init() &&
-			m_scriptCache.init(m_scripter) &&
-			m_spritesheetCache.init(m_animationCache, m_imageCache, m_textureCache) &&
-			m_textureCache.init(m_graphics) &&
+			m_scriptCache.init(m_luaSystem) &&
+			m_textureCache.init(m_graphicsSystem) &&
 
 			//loaders
 			m_packageLoader.init(m_packageCache, m_loadHandlerCache, m_unloadHandlerCache) &&
-			
+
 			//last statement is a fixed 'true' so all previous can have '&&' at the end
 			true;
 
 		m_camera.setPosition(Vec3(0, 0, -15));
 
-		if(m_isRunning)
+		if( m_isRunning )
 		{
+			m_loadHandlerCache.registerHandler("tif", std::bind(&TextureCache::load, &m_textureCache, std::placeholders::_1));
+			m_loadHandlerCache.registerHandler("png", std::bind(&TextureCache::load, &m_textureCache, std::placeholders::_1));
+			m_loadHandlerCache.registerHandler("lua", std::bind(&ScriptCache::load, &m_scriptCache, std::placeholders::_1));
+			m_loadHandlerCache.registerHandler("font", std::bind(&FontCache::load, &m_fontCache, std::placeholders::_1, m_luaSystem.getStack()));
+			m_loadHandlerCache.registerHandler("sheet", [&](const ResourceFile& f)
+			{
+				auto res = m_imageCache.load(f, m_luaSystem.getStack());
+				if(res) res = m_animationCache.load(f, m_luaSystem.getStack());
+				return res;
+			});
+
 			m_reloadHandlerCache.registerHandler("tif", std::bind(&TextureCache::reload, &m_textureCache, std::placeholders::_1));
 			m_reloadHandlerCache.registerHandler("png", std::bind(&TextureCache::reload, &m_textureCache, std::placeholders::_1));
-			
+			m_reloadHandlerCache.registerHandler("lua", std::bind(&ScriptCache::reload, &m_scriptCache, std::placeholders::_1));
+			m_reloadHandlerCache.registerHandler("font", std::bind(&FontCache::reload, &m_fontCache, std::placeholders::_1, m_luaSystem.getStack()));
+			m_reloadHandlerCache.registerHandler("sheet", [&](const ResourceFile& f)
+			{
+				auto res = m_imageCache.reload(f, m_luaSystem.getStack());
+				if( res ) res = m_animationCache.reload(f, m_luaSystem.getStack());
+				return res;
+			});
+
+			m_unloadHandlerCache.registerHandler("tif", std::bind(&TextureCache::unload, &m_textureCache, std::placeholders::_1));
+			m_unloadHandlerCache.registerHandler("png", std::bind(&TextureCache::unload, &m_textureCache, std::placeholders::_1));
+			m_unloadHandlerCache.registerHandler("lua", std::bind(&ScriptCache::unload, &m_scriptCache, std::placeholders::_1));
+			m_unloadHandlerCache.registerHandler("font", std::bind(&FontCache::unload, &m_fontCache, std::placeholders::_1));
+			m_unloadHandlerCache.registerHandler("sheet", [&](const ResourceFile& f)
+			{
+				auto res = m_imageCache.unload(f);
+				if( res ) res = m_animationCache.unload(f);
+				return res;
+			});
+		}
+
+		if( m_isRunning )
+		{
+			m_isRunning &= m_scriptCache.load("Scripts/hedgehog_game.lua");
+			auto lua = m_luaSystem.getStack();
+			lua.pull("game_tick");
+			m_isRunning &= lua.isFunction();
+			lua.pop();
+			lua.pull("game_render");
+			m_isRunning &= lua.isFunction();
+			lua.pop();
+		}
+
+		if( m_isRunning )
+		{
+			auto lua = m_luaSystem.getStack();
+
+			m_isRunning &= m_graphicsSystem.initVertexShader("Shaders/shader.hlsl");
+			m_isRunning &= m_graphicsSystem.initPixelShader("Shaders/shader.hlsl");
 
 			/*
+			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
+			m_isRunning &= (bool)m_textureCache.load("Textures/harold_hoda_skace.tif");
+			m_isRunning &= (bool)m_textureCache.load("Textures/apples.png");
+
+			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			
+			m_isRunning &= (bool)m_imageCache.load("Defs/hedgehog.sheet", m_luaSystem.getStack());
+			m_isRunning &= (bool)m_animationCache.load("Defs/hedgehog.sheet", m_luaSystem.getStack());
 
-			m_reloadRegistry.registerHandler("hlsl", [&](const ResourceFile& file)
-			{
-				if(m_graphics.initVertexShader(file) &&
-					m_graphics.initPixelShader(file))
-				{
-					DEBUG_INFO("Reloaded shader file ", file);
-					return true;
-				}
-				return false;
-			});
-
-			m_reloadRegistry.registerHandler("sheet", [&](const ResourceFile& file)
-			{
-				DataFile config(m_scripter);
-				if(config.open(file))
-				{
-					if(m_spritesheetCache.loadFromFile(config, true))
-						DEBUG_INFO("Reloaded spritesheet file ", file);
-					config.close();
-					return true;
-				}
-				return false;
-			});
-
-			m_reloadRegistry.registerHandler("font", [&](const ResourceFile& file)
-			{
-				DataFile config(m_scripter);
-				if(config.open(file))
-				{
-					if(m_graphics.initFont(config))
-						DEBUG_INFO("Reloaded font file ", file);
-					config.close();
-					return true;
-				}
-				return false;
-			});
-
+			m_isRunning &= (bool)m_imageCache.load("Defs/apples.sheet", m_luaSystem.getStack());
+			m_isRunning &= (bool)m_animationCache.load("Defs/apples.sheet", m_luaSystem.getStack());
 			*/
-		}
-
-		if(m_isRunning)
-		{
-			m_isRunning &= m_scriptCache.loadFromFile("Scripts/hedgehog_game.lua", false);
-			m_isRunning &= m_scripter.functionExists("game_tick") && m_scripter.functionExists("game_render");
-		}
-
-		if(m_isRunning)
-		{
-			m_isRunning &= m_graphics.initVertexShader("Shaders/shader.hlsl");
-			m_isRunning &= m_graphics.initPixelShader("Shaders/shader.hlsl");
-
-			DataFile dataFile(m_scripter);
-			if(dataFile.open("Defs/font.font"))
-			{
-				//m_isRunning &= m_graphics.initFont(dataFile);
-				dataFile.close();
-			}
-			
-			if(dataFile.open("Defs/hedgehog.sheet"))
-			{
-				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
-				dataFile.close();
-			}
-
-			if(dataFile.open("Defs/apples.sheet"))
-			{
-				m_isRunning &= m_spritesheetCache.loadFromFile(dataFile, false);
-				dataFile.close();
-			}
 
 			m_messageHandlers.reserve(3);
-			
+
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_FILECHANGE)
+				if( w.m_type == WindowEventType::WE_FILECHANGE )
 				{
 					uint32_t action;
 					std::string file;
-					if(m_window->getChangedFile(w.m_fileChange.m_index, action, file) && action == Core::FILE_MODIFIED)
+					if( m_window->getChangedFile(w.m_fileChange.m_index, action, file) && action == Core::FILE_MODIFIED )
 					{
-						if(m_reloadHandlerCache.dispatch(file))
-						{
-							return true;
-						}
-						DEBUG_INFO("No reload for file ", file);
-					}					
+						m_reloadHandlerCache.dispatch(file);
+						return true;
+					}
 				}
 				return false;
 			});
 
-			m_player.m_animationPlayerID = m_animation.createPlayer(m_player.m_imageID);
+			m_player.m_animationPlayerID = m_animationSystem.createPlayer(m_player.m_imageID);
 
-			if(m_scripter.functionExists("game_init"))
+			lua.pull("game_init");
+			if( lua.isFunction() )
 			{
-				m_isRunning &= m_scripter.doFunction("game_init", this, CLASS(HedgehogGame), 1);
-				if(m_isRunning)
+				bool called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &m_isRunning);
+				m_isRunning &= called;
+				if( !called )
 				{
-					m_isRunning &= m_scripter.toBool();
-					m_scripter.pop();
+					DEBUG_INFO(lua.toString());
+					lua.pop();
 				}
 			}
+			lua.dumpStack();
+
+			
+			m_defaultFont = m_fontCache.getResourceID("font");
 		}
 		m_framerateTimer.update();
 
@@ -210,10 +203,10 @@ namespace Core
 		uint64_t unusedMicros = 0;
 		uint64_t droppedTime = 0;
 		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
-		
-		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime); l--;)
-		{			
-			if(!tickLogic(microsPerFrame))
+
+		for( uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime); l--; )
+		{
+			if( !tickLogic(microsPerFrame) )
 			{
 				m_isRunning = false;
 				break;
@@ -223,7 +216,7 @@ namespace Core
 
 		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);
-		m_scripter.update();
+		m_luaSystem.update();
 		m_framerateTimer.update();
 		return m_isRunning;
 	}
@@ -235,19 +228,30 @@ namespace Core
 		bool continueRunning = true;
 		m_logicTimer.updateBy(updateTime);
 
-		m_input.update(m_logicTimer);
-		auto& evs = m_input.getEvents();
-		for(auto& e : evs)
+		m_inputSystem.update(m_logicTimer);
+		auto& evs = m_inputSystem.getEvents();
+		for( auto& e : evs )
 		{
-			for(auto& f : m_messageHandlers)
+			for( auto& f : m_messageHandlers )
 			{
 				f(e);
 			}
 		}
 
-		m_animation.update(m_logicTimer.getDeltaMicros());
+		m_animationSystem.update(m_logicTimer.getDeltaMicros());
 
-		m_scripter.doFunction("game_tick", this, CLASS(HedgehogGame));
+		auto lua = m_luaSystem.getStack();
+		lua.pull("game_tick");
+		if( lua.isFunction() )
+		{
+			auto called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &continueRunning);
+			if( !called )
+			{
+				DEBUG_INFO(lua.toString());
+				lua.pop();
+				continueRunning = called;
+			}
+		}
 
 		return continueRunning;
 	}
@@ -258,17 +262,22 @@ namespace Core
 	{
 		m_renderTimer.updateBy(updateTime);
 
-		m_graphics.begin();
+		m_graphicsSystem.begin();
 
-		m_scripter.doFunction("game_render", this, CLASS(HedgehogGame));
+		auto lua = m_luaSystem.getStack();
+		lua.pull("game_render");
+		if( lua.isFunction() )
+		{
+			lua.call(CustomType{this, CLASS(HedgehogGame)});
+		}
 
 		static Transform framerateTf;
 		framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);
 		framerateTf.scale.set(0.5f, 0.5f);
-		m_graphics.setOrthographicProjection();
-		m_graphics.clearCamera();
-		m_graphics.drawText("ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
+		m_graphicsSystem.setOrthographicProjection();
+		m_graphicsSystem.clearCamera();
+		m_graphicsSystem.drawText(m_defaultFont, "ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
 
-		m_graphics.present();
+		m_graphicsSystem.present();
 	}
 }

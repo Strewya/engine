@@ -8,6 +8,8 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Loaders/Defines.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -16,6 +18,8 @@ namespace Core
 	{
 	public:
 		std::string m_name;
+		size_t m_fileHash;
+		Vec2 m_dimensions;
 		uint32_t m_rawTextureID;
 	};
 }

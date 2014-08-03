@@ -6,57 +6,80 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Caches/TextureCache.h>
-#include <Util/DataFile.h>
+#include <Scripting/LuaStack.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
 namespace Core
 {
-	bool parseImage(Image& outImage, DataFile& file, const ImageDefaults& defaults, const TextureCache& textures)
+	LoadResult loadImage(Image& outImage, LuaStack& lua, size_t fileHash, const ImageDefaults& defaults, TextureCache& textures)
 	{
-		auto success = false;
-		auto name = file.getString(-2, "");
-		auto pos = file.getVec2("pos", Vec2(-1, -1));
-		auto imgWidth = file.getInt("width", defaults.width);
-		auto imgHeight = file.getInt("height", defaults.height);
-		auto texture = file.getString("texture", "");
-		auto textureID = texture.empty() ? defaults.textureID : textures.getTextureID(texture.c_str());
-
-		if( !name.empty() && pos.x >= 0 && pos.y >= 0 && imgWidth > 0 && imgHeight > 0 && textureID != 0 )
+		if( !lua.isString(-2) || !lua.isTable(-1) )
 		{
-			auto w = static_cast<float>(imgWidth);
-			auto h = static_cast<float>(imgHeight);
-			auto wh = pos + Vec2(w, h);
-			auto dimensions = textures.getTextureDimensions(textureID);
-
-			/* the vertices are in the following order:
-			0--1
-			|  |
-			3--2
-			*/
-
-			outImage.m_name = name;
-			outImage.m_textureID = textureID;
-			outImage.m_ratio = w / h;
-
-			outImage.m_texCoords[0].x = pos.x / dimensions.x;
-			outImage.m_texCoords[0].y = pos.y / dimensions.y;
-
-			outImage.m_texCoords[2].x = wh.x / dimensions.x;
-			outImage.m_texCoords[2].y = wh.y / dimensions.y;
-
-			outImage.m_texCoords[1].x = outImage.m_texCoords[2].x;
-			outImage.m_texCoords[1].y = outImage.m_texCoords[0].y;
-
-			outImage.m_texCoords[3].x = outImage.m_texCoords[0].x;
-			outImage.m_texCoords[3].y = outImage.m_texCoords[2].y;
-
-			success = true;
+			return{LoadResultFlag::Fail, "Invalid image format"};
 		}
-		else
+
+		outImage.m_name = lua.toString(-2);
+		outImage.m_textureID = defaults.textureID;
+
+		Vec2 pos(-1, -1);
+		lua.pull("pos");
+		if( lua.isTable() )
 		{
-			DEBUG_INFO("Image in ", file.getFilename(), " spritesheet is invalid: ", name, ",", imgWidth, ",", imgHeight, ",", pos);
+			pos.x = getFloat(lua, "x", pos.x);
+			if( pos.x < 0 ) pos.x = getFloat(lua, 1, pos.x);
+			pos.y = getFloat(lua, "y", pos.y);
+			if( pos.y < 0 ) pos.y = getFloat(lua, 2, pos.y);
 		}
-		return success;
+		lua.pop();
+		auto imgWidth = getInt(lua, "width", defaults.width);
+		auto imgHeight = getInt(lua, "height", defaults.height);
+
+		if( outImage.m_name.empty() || pos.x < 0 || pos.y < 0 || imgWidth == 0 || imgHeight == 0 )
+		{
+			return{LoadResultFlag::Fail, "Invalid image format"};
+		}
+
+		auto w = static_cast<float>(imgWidth);
+		auto h = static_cast<float>(imgHeight);
+		auto wh = pos + Vec2(w, h);
+		const auto* texture = textures.getResource(outImage.m_textureID);
+		//i'm assuming texture is not nullptr, because ImageCache takes care of loading the dependency
+		auto& dimensions = texture->m_dimensions;
+
+		/* the vertices are in the following order:
+		0--1
+		|  |
+		3--2
+		*/
+
+		outImage.m_ratio = w / h;
+
+		outImage.m_texCoords[0].x = pos.x / dimensions.x;
+		outImage.m_texCoords[0].y = pos.y / dimensions.y;
+
+		outImage.m_texCoords[2].x = wh.x / dimensions.x;
+		outImage.m_texCoords[2].y = wh.y / dimensions.y;
+
+		outImage.m_texCoords[1].x = outImage.m_texCoords[2].x;
+		outImage.m_texCoords[1].y = outImage.m_texCoords[0].y;
+
+		outImage.m_texCoords[3].x = outImage.m_texCoords[0].x;
+		outImage.m_texCoords[3].y = outImage.m_texCoords[2].y;
+
+		outImage.m_fileHash = fileHash;
+		return{LoadResultFlag::Success};
+	}
+
+	void unloadImage(Image& image)
+	{
+		image.m_name.clear();
+		image.m_ratio = 0;
+		for( uint32_t i = 0; i < 4;++i )
+		{
+			image.m_texCoords[i].set(-1, -1);
+		}
+		image.m_textureID = INVALID_ID;
+		image.m_fileHash = 0;
 	}
 }
