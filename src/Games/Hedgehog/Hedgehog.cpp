@@ -123,12 +123,18 @@ namespace Core
 
 		if( m_isRunning )
 		{
-			m_isRunning &= m_scriptCache.load("Scripts/hedgehog_game.lua");
+			auto& pkg = m_packageCache.getPackage("base");
+			pkg.addFile("Scripts/hedgehog_game.lua");
+			m_isRunning &= m_packageLoader.loadPackage("base");
+		}
+
+		if( m_isRunning )
+		{
 			auto lua = m_luaSystem.getStack();
-			lua.pull("game_tick");
+			lua.pull("game_tick", 0);
 			m_isRunning &= lua.isFunction();
 			lua.pop();
-			lua.pull("game_render");
+			lua.pull("game_render", 0);
 			m_isRunning &= lua.isFunction();
 			lua.pop();
 		}
@@ -139,21 +145,7 @@ namespace Core
 
 			m_isRunning &= m_graphicsSystem.initVertexShader("Shaders/shader.hlsl");
 			m_isRunning &= m_graphicsSystem.initPixelShader("Shaders/shader.hlsl");
-
-			/*
-			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
-			m_isRunning &= (bool)m_textureCache.load("Textures/harold_hoda_skace.tif");
-			m_isRunning &= (bool)m_textureCache.load("Textures/apples.png");
-
-			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			
-			m_isRunning &= (bool)m_imageCache.load("Defs/hedgehog.sheet", m_luaSystem.getStack());
-			m_isRunning &= (bool)m_animationCache.load("Defs/hedgehog.sheet", m_luaSystem.getStack());
-
-			m_isRunning &= (bool)m_imageCache.load("Defs/apples.sheet", m_luaSystem.getStack());
-			m_isRunning &= (bool)m_animationCache.load("Defs/apples.sheet", m_luaSystem.getStack());
-			*/
-
 			m_messageHandlers.reserve(3);
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
@@ -173,7 +165,7 @@ namespace Core
 
 			m_player.m_animationPlayerID = m_animationSystem.createPlayer(m_player.m_imageID);
 
-			lua.pull("game_init");
+			lua.pull("game_init", 0);
 			if( lua.isFunction() )
 			{
 				bool called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &m_isRunning);
@@ -241,7 +233,7 @@ namespace Core
 		m_animationSystem.update(m_logicTimer.getDeltaMicros());
 
 		auto lua = m_luaSystem.getStack();
-		lua.pull("game_tick");
+		lua.pull("game_tick", 0);
 		if( lua.isFunction() )
 		{
 			auto called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &continueRunning);
@@ -265,7 +257,7 @@ namespace Core
 		m_graphicsSystem.begin();
 
 		auto lua = m_luaSystem.getStack();
-		lua.pull("game_render");
+		lua.pull("game_render", 0);
 		if( lua.isFunction() )
 		{
 			lua.call(CustomType{this, CLASS(HedgehogGame)});

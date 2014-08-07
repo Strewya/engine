@@ -60,7 +60,6 @@ namespace Core
 				"global_dependency_table = {}; "
 				"global_dependency_missing = nil; "
 				"function depend(filename) "
-					"global_dependency_missing = nil; "
 					"if(not global_dependency_table[filename]) then "
 						"global_dependency_missing = filename; "
 						"error('Missing dependency'); "

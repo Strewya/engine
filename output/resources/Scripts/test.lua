@@ -20,5 +20,3 @@ end;
 function test5(v)
 	v:set(1, 1);
 end;
-
-error("Scripts/asm.lua", 0);

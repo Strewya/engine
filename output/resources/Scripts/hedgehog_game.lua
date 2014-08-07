@@ -1,7 +1,12 @@
-
+depend("Scripts/lib.lua");
+depend("Scripts/console.lua");
+depend("Scripts/asm.lua");
+depend("Scripts/hedgehog_asm.lua");
+depend("Scripts/hedgehog_globals.lua");
+depend("Scripts/hedgehog_input.lua");
+	
 reloaded = true;
 function game_init(game)
-	gState = {};
 	gActions = {};
 
 	print("test");
@@ -17,18 +22,6 @@ function game_init(game)
 	end;
 
 	game.m_window:showCursor(true);
-	
-	local st = game.m_scriptCache:load(Core.ResourceFile("Scripts/lib.lua"));
-	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/console.lua"));
-	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/asm.lua"));
-	
-	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_asm.lua"));
-	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_globals.lua"));
-	st = st and game.m_scriptCache:load(Core.ResourceFile("Scripts/hedgehog_input.lua"));
-	
-	if(st == false) then
-		return st;
-	end;
 	
 	game.m_packageLoader:loadPackage("base");
 	game.m_packageLoader:loadPackage("gameplay");

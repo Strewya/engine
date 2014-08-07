@@ -38,14 +38,28 @@ namespace Core
 			return{LoadResultFlag::Success, "Script already loaded"};
 		}
 		auto lua = m_luaSystem->getStack();
-		m_data.emplace_back(file.getPath());
 		auto status = lua.doFile(file.getPath().c_str());
 		if( !status )
 		{
 			auto str = lua.toString();
 			lua.pop();
+			lua.pull("global_dependency_missing", 0);
+			if( lua.isString() )
+			{
+				auto str = lua.toString();
+				lua.pop();
+				lua.push();
+				lua.setValue("global_dependency_missing", 0);
+				return{LoadResultFlag::DependencyMissing, str};
+			}
+			lua.pop();
 			return{LoadResultFlag::Fail, str};
 		}
+		m_data.emplace_back(file.getPath());
+		lua.pull("global_dependency_table", 0);
+		lua.push(true);
+		lua.setValue(file.getName(), -2);
+		lua.pop(); //table
 		return{LoadResultFlag::Success};
 	}
 
@@ -62,6 +76,16 @@ namespace Core
 		if( !status )
 		{
 			auto str = lua.toString();
+			lua.pop();
+			lua.pull("global_dependency_missing", 0);
+			if( lua.isString() )
+			{
+				auto str = lua.toString();
+				lua.pop();
+				lua.push();
+				lua.setValue("global_dependency_missing", 0);
+				return{LoadResultFlag::DependencyMissing, str};
+			}
 			lua.pop();
 			return{LoadResultFlag::Fail, str};
 		}

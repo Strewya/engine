@@ -1,4 +1,6 @@
 
+gState = {};
+
 gState.moveCamRight = false;
 gState.moveCamLeft = false;
 gState.moveCamUp = false;

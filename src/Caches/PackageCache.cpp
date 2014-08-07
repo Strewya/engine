@@ -35,7 +35,7 @@ namespace Core
 		});
 		if(it == m_packages.end())
 		{
-			m_packages.emplace_back(std::make_pair(pkgName, Package{}));
+			m_packages.emplace_back(pkgName, Package{});
 			return m_packages.back().second;
 		}
 		return it->second;

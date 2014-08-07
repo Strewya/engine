@@ -122,9 +122,6 @@
     <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\DataFile.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp">
       <Filter>Framework\Caches</Filter>
     </ClCompile>
@@ -166,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp">
       <Filter>Framework\DataStructs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
-      <Filter>Framework\Scripting</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
       <Filter>Framework\Scripting</Filter>
@@ -287,9 +281,6 @@
     <ClInclude Include="..\..\..\src\Caches\ImageCache.h">
       <Filter>Framework\Caches</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\DataFile.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\ScriptCache.h">
       <Filter>Framework\Caches</Filter>
     </ClInclude>
@@ -328,9 +319,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Caches\FontCache.h">
       <Filter>Framework\Caches</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
-      <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
       <Filter>Framework\Scripting</Filter>

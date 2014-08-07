@@ -34,22 +34,29 @@ namespace Core
 		lua_pop(m_L, howMany);
 	}
 
-	void LuaStack::pull(int32_t key)
+	void LuaStack::pull(uint32_t key, int32_t stackIndex)
 	{
-		int32_t index = getTop() == 0 ? LUA_GLOBALSINDEX : -2;
+		if( stackIndex < 0 )
+		{
+			--stackIndex;
+		}
+		else if( stackIndex == 0 )
+		{
+			stackIndex = LUA_GLOBALSINDEX;
+		}
 		lua_pushinteger(m_L, key);
-		lua_gettable(m_L, index);
+		lua_gettable(m_L, stackIndex);
 	}
 
-	void LuaStack::pull(const std::string& key)
+	void LuaStack::pull(const std::string& key, int32_t stackIndex)
 	{
-		int32_t index = getTop() == 0 ? LUA_GLOBALSINDEX : -1;
-		lua_getfield(m_L, index, key.c_str());
+		stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
+		lua_getfield(m_L, stackIndex, key.c_str());
 	}
 
-	void LuaStack::pairs(int32_t index)
+	void LuaStack::pairs(int32_t stackIndex)
 	{
-		m_iters.emplace_back(Iteration{index < 0 ? getTop() + 1 + index : index, true, false});
+		m_iters.emplace_back(Iteration{stackIndex < 0 ? getTop() + 1 + stackIndex : stackIndex, true, false});
 		if( isTable(m_iters.back().m_iterateTableIndex) )
 		{
 			lua_pushnil(m_L);
@@ -66,9 +73,9 @@ namespace Core
 		}
 	}
 
-	void LuaStack::ipairs(int32_t index)
+	void LuaStack::ipairs(int32_t stackIndex)
 	{
-		pairs(index);
+		pairs(stackIndex);
 		m_iters.back().m_iterateAll = false;
 	}
 
@@ -107,64 +114,108 @@ namespace Core
 		return res != 0;
 	}
 
-	std::string LuaStack::toString(int32_t index)
+	void LuaStack::setValue(const std::string& key, int32_t stackIndex)
 	{
-		return lua_tostring(m_L, index);
+		stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
+		if( isTable(stackIndex) )
+		{
+			lua_setfield(m_L, stackIndex, key.c_str());
+		}
 	}
 
-	uint32_t LuaStack::toUint(int32_t index)
+	void LuaStack::push(const std::string& arg)
 	{
-		return lua_tointeger(m_L, index);
+		lua_pushstring(m_L, arg.c_str());
 	}
 
-	int32_t LuaStack::toInt(int32_t index)
+	void LuaStack::push(int32_t arg)
 	{
-		return lua_tointeger(m_L, index);
+		lua_pushinteger(m_L, arg);
 	}
 
-	float LuaStack::toFloat(int32_t index)
+	void LuaStack::push(uint32_t arg)
 	{
-		return (float)lua_tonumber(m_L, index);
+		lua_pushinteger(m_L, arg);
 	}
 
-	double LuaStack::toDouble(int32_t index)
+	void LuaStack::push(bool arg)
 	{
-		return (double)lua_tonumber(m_L, index);
+		lua_pushboolean(m_L, arg);
 	}
 
-	bool LuaStack::toBool(int32_t index)
+	void LuaStack::push(float arg)
 	{
-		return lua_toboolean(m_L, index) == 1;
+		lua_pushnumber(m_L, arg);
 	}
 
-	bool LuaStack::isNil(int32_t index)
+	void LuaStack::push(double arg)
 	{
-		return lua_isnil(m_L, index);
+		lua_pushnumber(m_L, arg);
 	}
 
-	bool LuaStack::isString(int32_t index)
+	void LuaStack::push()
 	{
-		return (lua_isstring(m_L, index) == 1);
+		lua_pushnil(m_L);
 	}
 
-	bool LuaStack::isFunction(int32_t index)
+	std::string LuaStack::toString(int32_t stackIndex)
 	{
-		return lua_isfunction(m_L, index);
+		return lua_tostring(m_L, stackIndex);
 	}
 
-	bool LuaStack::isTable(int32_t index)
+	uint32_t LuaStack::toUint(int32_t stackIndex)
 	{
-		return lua_istable(m_L, index);
+		return lua_tointeger(m_L, stackIndex);
 	}
 
-	bool LuaStack::isNumber(int32_t index)
+	int32_t LuaStack::toInt(int32_t stackIndex)
 	{
-		return lua_isnumber(m_L, index) == 1;
+		return lua_tointeger(m_L, stackIndex);
 	}
 
-	bool LuaStack::isBool(int32_t index)
+	float LuaStack::toFloat(int32_t stackIndex)
 	{
-		return lua_isboolean(m_L, index);
+		return (float)lua_tonumber(m_L, stackIndex);
+	}
+
+	double LuaStack::toDouble(int32_t stackIndex)
+	{
+		return (double)lua_tonumber(m_L, stackIndex);
+	}
+
+	bool LuaStack::toBool(int32_t stackIndex)
+	{
+		return lua_toboolean(m_L, stackIndex) == 1;
+	}
+
+	bool LuaStack::isNil(int32_t stackIndex)
+	{
+		return lua_isnil(m_L, stackIndex);
+	}
+
+	bool LuaStack::isString(int32_t stackIndex)
+	{
+		return (lua_isstring(m_L, stackIndex) == 1);
+	}
+
+	bool LuaStack::isFunction(int32_t stackIndex)
+	{
+		return lua_isfunction(m_L, stackIndex);
+	}
+
+	bool LuaStack::isTable(int32_t stackIndex)
+	{
+		return lua_istable(m_L, stackIndex);
+	}
+
+	bool LuaStack::isNumber(int32_t stackIndex)
+	{
+		return lua_isnumber(m_L, stackIndex) == 1;
+	}
+
+	bool LuaStack::isBool(int32_t stackIndex)
+	{
+		return lua_isboolean(m_L, stackIndex);
 	}
 
 	bool LuaStack::call()
@@ -251,9 +302,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	std::string getString(LuaStack& lua, int32_t index, std::string valueIfMissing)
+	std::string getString(LuaStack& lua, int32_t stackIndex, std::string valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isString() )
 		{
 			valueIfMissing = lua.toString();
@@ -262,9 +313,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	double getDouble(LuaStack& lua, int32_t index, double valueIfMissing)
+	double getDouble(LuaStack& lua, int32_t stackIndex, double valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isNumber() )
 		{
 			valueIfMissing = lua.toDouble();
@@ -273,9 +324,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	float getFloat(LuaStack& lua, int32_t index, float valueIfMissing)
+	float getFloat(LuaStack& lua, int32_t stackIndex, float valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isNumber() )
 		{
 			valueIfMissing = lua.toFloat();
@@ -284,9 +335,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	uint32_t getUint(LuaStack& lua, int32_t index, uint32_t valueIfMissing)
+	uint32_t getUint(LuaStack& lua, int32_t stackIndex, uint32_t valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isNumber() )
 		{
 			valueIfMissing = lua.toUint();
@@ -295,9 +346,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	int32_t getInt(LuaStack& lua, int32_t index, int32_t valueIfMissing)
+	int32_t getInt(LuaStack& lua, int32_t stackIndex, int32_t valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isNumber() )
 		{
 			valueIfMissing = lua.toInt();
@@ -306,9 +357,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	bool getBool(LuaStack& lua, int32_t index, bool valueIfMissing)
+	bool getBool(LuaStack& lua, int32_t stackIndex, bool valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isBool() )
 		{
 			valueIfMissing = lua.toBool();
@@ -317,9 +368,9 @@ namespace Core
 		return valueIfMissing;
 	}
 
-	char getChar(LuaStack& lua, int32_t index, char valueIfMissing)
+	char getChar(LuaStack& lua, int32_t stackIndex, char valueIfMissing)
 	{
-		lua.pull(index);
+		lua.pull(stackIndex);
 		if( lua.isString() )
 		{
 			valueIfMissing = lua.toString().at(0);
