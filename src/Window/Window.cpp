@@ -10,6 +10,7 @@
 	/*** extra headers ***/
 #include <Input/KeyCodes.h>
 #include <Util/Utility.h>
+#include <Util/Vec2.h>
 #include <Window/WindowClass.h>
 	/*** end headers ***/
 
@@ -53,7 +54,7 @@ namespace Core
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
 		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
-		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(256),
+		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(256), m_gamepadEmptyUpdateDelay(2000),
 		m_hwnd(nullptr),
 		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),
@@ -74,6 +75,20 @@ namespace Core
 		for(auto i = 0; i < count; ++i)
 		{
 			 m_fileChanges.emplace_back(FileChangeInfo(i));
+		}
+
+		memset(m_gamepadState, 0, sizeof(XINPUT_STATE) * MAX_GAMEPADS);
+
+		m_timer.update();
+		for(auto i = 0; i < MAX_GAMEPADS; ++i)
+		{
+			m_gamepadConnected[i] = false;
+			DWORD connected = XInputGetState(i, &m_gamepadState[i]);
+			m_gamepadLastUpdateTime[i] = m_timer.getCurMicros();
+			if(connected == ERROR_SUCCESS)
+			{
+				m_gamepadConnected[i] = true;
+			}
 		}
 
 		m_events.resize(m_eventQueueSize);
@@ -251,6 +266,261 @@ namespace Core
 		ZeroMemory(&we, sizeof(WindowEvent));
 		we.m_timestamp = m_timer.getCurMicros();
 		return we;
+	}
+
+	void Window::processGamepads()
+	{
+		m_timer.update();
+		uint64_t currentTime = m_timer.getCurMicros();
+		uint64_t delay = Time::milisToMicros(m_gamepadEmptyUpdateDelay);
+		for(uint32_t i = 0; i < MAX_GAMEPADS; ++i)
+		{
+			if(m_gamepadConnected[i] || (currentTime >= m_gamepadLastUpdateTime[i] + delay))
+			{
+				m_gamepadLastUpdateTime[i] = currentTime;
+				XINPUT_STATE state{0};
+				XINPUT_STATE& oldState = m_gamepadState[i];
+				auto connected = XInputGetState(i, &state);
+				if(connected == ERROR_SUCCESS)
+				{
+					if(state.dwPacketNumber != oldState.dwPacketNumber)
+					{
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadUp;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadDown;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadLeft;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadRight;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_START) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_START))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_Start;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_START) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_Back;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_LeftThumb;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_RightThumb;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_LeftShoulder;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_RightShoulder;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_A) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_A))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_BottomButton;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_A) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_B) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_B))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_RightButton;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_X) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_X))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_LeftButton;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_X) != 0;
+							writeEvent();
+						}
+						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) !=
+						   (oldState.Gamepad.wButtons & XINPUT_GAMEPAD_Y))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADBUTTON;
+							we.m_gamepadButton.m_gamepad = i;
+							we.m_gamepadButton.m_button = Gamepad::Keys::m_TopButton;
+							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0;
+							writeEvent();
+						}
+						if(state.Gamepad.bLeftTrigger <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
+							state.Gamepad.bLeftTrigger = 0;
+						if(state.Gamepad.bLeftTrigger > 255)
+						{
+							state.Gamepad.bLeftTrigger = 255;
+							state.Gamepad.bLeftTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+						}
+
+						if(state.Gamepad.bRightTrigger <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
+							state.Gamepad.bRightTrigger = 0;
+						if(state.Gamepad.bRightTrigger > 255)
+						{
+							state.Gamepad.bRightTrigger = 255;
+							state.Gamepad.bRightTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+						}
+						
+						if(state.Gamepad.sThumbLX <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+							state.Gamepad.sThumbLX = 0;
+						if(state.Gamepad.sThumbLX > 32767)
+						{
+							state.Gamepad.sThumbLX = 32767;
+							state.Gamepad.sThumbLX -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+						}
+						if(state.Gamepad.sThumbLY <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+							state.Gamepad.sThumbLY = 0;
+						if(state.Gamepad.sThumbLY > 32767)
+						{
+							state.Gamepad.sThumbLY = 32767;
+							state.Gamepad.sThumbLY -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+						}
+
+						if(state.Gamepad.sThumbRX <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+							state.Gamepad.sThumbRX = 0;
+						if(state.Gamepad.sThumbRX > 32767)
+						{
+							state.Gamepad.sThumbRX = 32767;
+							state.Gamepad.sThumbRX -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+						}
+						if(state.Gamepad.sThumbRY <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+							state.Gamepad.sThumbRY = 0;
+						if(state.Gamepad.sThumbRY > 32767)
+						{
+							state.Gamepad.sThumbRY = 32767;
+							state.Gamepad.sThumbRY -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+						}
+
+						if(state.Gamepad.bLeftTrigger != oldState.Gamepad.bLeftTrigger)
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADAXIS;
+							we.m_gamepadAxis.m_gamepad = i;
+							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_LeftTrigger;
+							we.m_gamepadAxis.m_x = state.Gamepad.bLeftTrigger;
+							writeEvent();
+						}
+						if(state.Gamepad.bRightTrigger != oldState.Gamepad.bRightTrigger)
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADAXIS;
+							we.m_gamepadAxis.m_gamepad = i;
+							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_RightTrigger;
+							we.m_gamepadAxis.m_x = state.Gamepad.bRightTrigger;
+							writeEvent();
+						}
+						if((state.Gamepad.sThumbLX != oldState.Gamepad.sThumbLX) ||
+						   (state.Gamepad.sThumbLY != oldState.Gamepad.sThumbLY))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADAXIS;
+							we.m_gamepadAxis.m_gamepad = i;
+							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_LeftStick;
+							we.m_gamepadAxis.m_x = state.Gamepad.sThumbLX;
+							we.m_gamepadAxis.m_y = state.Gamepad.sThumbLY;
+							writeEvent();
+						}
+						if((state.Gamepad.sThumbRX != oldState.Gamepad.sThumbRX) ||
+						   (state.Gamepad.sThumbRY != oldState.Gamepad.sThumbRY))
+						{
+							auto& we = newEvent();
+							we.m_type = WE_GAMEPADAXIS;
+							we.m_gamepadAxis.m_gamepad = i;
+							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_RightStick;
+							we.m_gamepadAxis.m_x = state.Gamepad.sThumbRX;
+							we.m_gamepadAxis.m_y = state.Gamepad.sThumbRY;
+							writeEvent();
+						}
+						
+						oldState = state;
+					}
+				}
+				else
+				{
+					m_gamepadConnected[i] = false;
+				}
+			}
+		}
 	}
 
 	void Window::processFileChanges()

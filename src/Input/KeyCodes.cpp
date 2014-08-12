@@ -11,11 +11,53 @@ namespace Core
 {
 	Keyboard::Map Keyboard::m_map;
 	Mouse::Map Mouse::m_map;
+	Gamepad::Map Gamepad::m_map;
 
 	void InitializeInputConstants()
 	{
 		Keyboard::Init();
 		Mouse::Init();
+		Gamepad::Init();
+	}
+
+	int32_t Gamepad::Code(const std::string& name)
+	{
+		Map::iterator it = m_map.begin();
+		Map::iterator end = m_map.end();
+		for(; it != end; ++it)
+		{
+			if(it->second == name)
+				return it->first;
+		}
+		return m_Unknown;
+	}
+
+	std::string Gamepad::Name(uint32_t code)
+	{
+		Map::iterator it = m_map.find(code);
+		return (it != m_map.end() ? it->second : "");
+	}
+
+	void Gamepad::Init()
+	{
+		m_map.emplace(Gamepad::m_DPadUp, "DPadUp");
+		m_map.emplace(Gamepad::m_DPadDown, "DPadDown");
+		m_map.emplace(Gamepad::m_DPadLeft, "DPadLeft");
+		m_map.emplace(Gamepad::m_DPadRight, "DPadRight");
+		m_map.emplace(Gamepad::m_LeftButton, "LeftButton");
+		m_map.emplace(Gamepad::m_TopButton, "TopButton");
+		m_map.emplace(Gamepad::m_RightButton, "RightButton");
+		m_map.emplace(Gamepad::m_BottomButton, "BottomButton");
+		m_map.emplace(Gamepad::m_LeftThumb, "LeftThumb");
+		m_map.emplace(Gamepad::m_RightThumb, "RightThumb");
+		m_map.emplace(Gamepad::m_LeftShoulder, "LeftShoulder");
+		m_map.emplace(Gamepad::m_RightShoulder, "RightShoulder");
+		m_map.emplace(Gamepad::m_Start, "Start");
+		m_map.emplace(Gamepad::m_Back, "Back");
+		m_map.emplace(Gamepad::m_LeftStick, "LeftStick");
+		m_map.emplace(Gamepad::m_RightStick, "RightStick");
+		m_map.emplace(Gamepad::m_LeftTrigger, "LeftTrigger");
+		m_map.emplace(Gamepad::m_RightTrigger, "RightTrigger");
 	}
 
 	int32_t Mouse::Code(const std::string& name)

@@ -14,6 +14,47 @@ namespace Core
 {
 	void InitializeInputConstants();
 
+	class Gamepad
+	{
+	private:
+		typedef std::unordered_map<uint32_t, std::string> Map;
+		static Map m_map;
+
+		friend void InitializeInputConstants();
+		static void Init();
+
+	public:
+		static int32_t Code(const std::string& name);
+		static std::string Name(uint32_t code);
+
+		static const int32_t m_Unknown = -1;
+		enum Keys
+		{
+			m_DPadUp,
+			m_DPadDown,
+			m_DPadLeft,
+			m_DPadRight,
+			m_LeftButton,
+			m_TopButton,
+			m_RightButton,
+			m_BottomButton,
+			m_LeftThumb,
+			m_RightThumb,
+			m_LeftShoulder,
+			m_RightShoulder,
+			m_Start,
+			m_Back
+		};
+
+		enum Axis
+		{
+			m_LeftStick = m_Back + 1,
+			m_RightStick,
+			m_LeftTrigger,
+			m_RightTrigger
+		};
+	};
+
 	class Mouse
 	{
 	private:

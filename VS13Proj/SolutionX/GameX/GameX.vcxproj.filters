@@ -170,9 +170,6 @@
     <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Scripting\ScriptingSystem.cpp">
-      <Filter>Framework\Scripting</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
@@ -321,9 +318,6 @@
       <Filter>Framework\Caches</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">
-      <Filter>Framework\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Scripting\ScriptingSystem.h">
       <Filter>Framework\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h">

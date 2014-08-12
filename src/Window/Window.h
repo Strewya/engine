@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <Window/myWindows.h>
+#include <XInput.h>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Time.h>
@@ -17,6 +18,7 @@
 namespace Core
 {
 	class Window;
+#define MAX_GAMEPADS 4
 
 	enum WindowResult
 	{
@@ -52,6 +54,7 @@ namespace Core
 		bool getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr);
 
 		void processFileChanges();
+		void processGamepads();
 		
 		void showCursor(bool isShown);
 		void setFullscreen(bool isFullscreen);
@@ -86,6 +89,9 @@ namespace Core
 		void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
 		void writeEvent();
 
+		XINPUT_STATE m_gamepadState[MAX_GAMEPADS];
+		uint64_t m_gamepadLastUpdateTime[MAX_GAMEPADS];
+		bool m_gamepadConnected[MAX_GAMEPADS];
 		DWORD m_trackedChanges;
 		int32_t m_xPos;
 		int32_t m_yPos;
@@ -99,6 +105,7 @@ namespace Core
 		uint32_t m_headIndex;
 		uint32_t m_tailIndex;
 		const uint32_t m_eventQueueSize;
+		const uint32_t m_gamepadEmptyUpdateDelay;
 
 		HWND m_hwnd;
 
