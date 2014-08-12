@@ -69,6 +69,15 @@ function setupInput()
 		end;
 	end);
 	
+	addInput(gInput.GAMEPLAY, Core.WE_GAMEPADBUTTON, function(event)
+		if(Core.Gamepad.m_DPadLeft ~= event.m_gamepadButton.m_button) then return false; end;
+		if(event.m_gamepadButton.m_isDown) then
+			gActions.moveLeft = true;
+		else
+			gActions.moveLeft = nil;
+		end;
+	end);
+	
 	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
 		if(Core.Keyboard.m_ArrowRight ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown) then
@@ -78,9 +87,25 @@ function setupInput()
 		end;
 	end);
 	
+	addInput(gInput.GAMEPLAY, Core.WE_GAMEPADBUTTON, function(event)
+		if(Core.Gamepad.m_DPadRight ~= event.m_gamepadButton.m_button) then return false; end;
+		if(event.m_gamepadButton.m_isDown) then
+			gActions.moveRight = true;
+		else
+			gActions.moveRight = nil;
+		end;
+	end);
+	
 	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
 		if(Core.Keyboard.m_ArrowUp ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then
+			gActions.jump = true;
+		end;
+	end);
+	
+	addInput(gInput.GAMEPLAY, Core.WE_GAMEPADBUTTON, function(event)
+		if(Core.Gamepad.m_BottomButton ~= event.m_gamepadButton.m_button) then return false; end;
+		if(event.m_gamepadButton.m_isDown) then
 			gActions.jump = true;
 		end;
 	end);

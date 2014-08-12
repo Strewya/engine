@@ -15,6 +15,9 @@ namespace Core
 		WE_MOUSEBUTTON,
 		WE_MOUSEWHEEL,
 
+		WE_GAMEPADBUTTON,
+		WE_GAMEPADAXIS,
+
 		WE_CLOSE,
 		WE_LOSTFOCUS,
 		WE_GAINFOCUS,
@@ -56,6 +59,21 @@ namespace Core
 		int32_t m_scroll;
 	};
 
+	struct GamepadButtonEvent
+	{
+		uint8_t m_gamepad;
+		uint8_t m_button;
+		bool m_isDown;
+	};
+
+	struct GamepadAxisEvent
+	{
+		int16_t m_x;
+		int16_t m_y;
+		uint8_t m_gamepad;
+		uint8_t m_axis;
+	};
+
 	enum FileChangeType
 	{
 		FILE_ADDED,
@@ -82,6 +100,8 @@ namespace Core
 		MouseButtonEvent m_mouseButton;
 		MouseWheelEvent m_mouseWheel;
 		FileChangeEvent m_fileChange;
+		GamepadButtonEvent m_gamepadButton;
+		GamepadAxisEvent m_gamepadAxis;
 	};
 
 

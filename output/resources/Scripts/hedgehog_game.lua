@@ -9,8 +9,6 @@ reloaded = true;
 function game_init(game)
 	gActions = {};
 
-	print("test");
-	
 	local tbl = dofile("../resources/Defs/hedgehog.pkg");
 	if( tbl ) then
 		for pkgName, pkgFiles in pairs(tbl) do
@@ -384,7 +382,7 @@ function game_render(game)
 		game.m_graphicsSystem:drawText(game.m_defaultFont, text, textTf, col, 0, false);
 	end;
 	
-	Console:draw(game.m_graphics, game.m_defaultFont);
+	Console:draw(game.m_graphicsSystem, game.m_defaultFont);
 end;
 
 function makeTimeStringFromMicros(micros)

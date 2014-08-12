@@ -283,6 +283,7 @@ namespace Core
 				auto connected = XInputGetState(i, &state);
 				if(connected == ERROR_SUCCESS)
 				{
+					m_gamepadConnected[i] = true;
 					if(state.dwPacketNumber != oldState.dwPacketNumber)
 					{
 						if((state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP) !=

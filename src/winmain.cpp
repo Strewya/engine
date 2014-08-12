@@ -35,6 +35,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 		{
 			window.update();
 			window.processFileChanges();
+			window.processGamepads();
 		}
 		logicThread.join();
 		result = window.getExitCode();
