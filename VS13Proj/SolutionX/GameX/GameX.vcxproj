@@ -141,7 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
@@ -182,7 +182,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;d3dx10.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>

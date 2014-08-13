@@ -37,15 +37,13 @@ namespace Core
 			m_LeftShoulder,
 			m_RightShoulder,
 			m_Start,
-			m_Back
-		};
-
-		enum Axis
-		{
+			m_Back,
 			m_LeftStick,
 			m_RightStick,
 			m_LeftTrigger,
-			m_RightTrigger
+			m_RightTrigger,
+
+			m_KeyCount
 		};
 	};
 

@@ -4,6 +4,8 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/

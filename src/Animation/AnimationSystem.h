@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Time.h>

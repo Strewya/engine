@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <Scripting/LuaSystem.h>
 /******* C++ headers *******/
+#include <cassert>
 /******* extra headers *******/
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>

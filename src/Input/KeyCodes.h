@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 /******* common headers *******/
@@ -43,15 +44,13 @@ namespace Core
 			m_LeftShoulder,
 			m_RightShoulder,
 			m_Start,
-			m_Back
-		};
-
-		enum Axis
-		{
-			m_LeftStick = m_Back + 1,
+			m_Back,
+			m_LeftStick,
 			m_RightStick,
 			m_LeftTrigger,
-			m_RightTrigger
+			m_RightTrigger,
+
+			m_KeyCount
 		};
 	};
 

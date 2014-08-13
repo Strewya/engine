@@ -96,6 +96,21 @@ function setupInput()
 		end;
 	end);
 	
+	addInput(gInput.GAMEPLAY, Core.WE_GAMEPADAXIS, function(event)
+		if(Core.Gamepad.m_LeftStick ~= event.m_gamepadAxis.m_axis) then return false; end;
+		print(event.m_gamepadAxis.m_x);
+		if(event.m_gamepadAxis.m_x > 15000) then
+			gActions.moveRight = true;
+		else
+			gActions.moveRight = nil;
+		end;
+		if(event.m_gamepadAxis.m_x < -15000) then
+			gActions.moveLeft = true;
+		else
+			gActions.moveLeft = nil;
+		end;
+	end);
+	
 	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
 		if(Core.Keyboard.m_ArrowUp ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown and event.m_keyboard.m_previouslyDown == false) then

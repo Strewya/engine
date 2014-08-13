@@ -3,6 +3,7 @@ return
 	"Defs/apples.sheet",
 	"Defs/font.font",
 	"Defs/hedgehog.sheet",
+	"Defs/hedgehog.pkg",
 	"Scripts/asm.lua",
 	"Scripts/console.lua",
 	"Scripts/hedgehog_asm.lua",
@@ -13,7 +14,7 @@ return
 	"Shaders/shader.hlsl",
 	"Textures/apples.png",
 	"Textures/font_t.png",
-	"Textures/hedgehog.png"
+	"Textures/harold_hoda_skace.tif"
 },
 { -- DLL dependencies
 	"tolua++",

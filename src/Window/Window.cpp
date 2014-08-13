@@ -442,34 +442,34 @@ namespace Core
 							state.Gamepad.bRightTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
 						}
 						
-						if(state.Gamepad.sThumbLX <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+						if(std::abs(state.Gamepad.sThumbLX) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 							state.Gamepad.sThumbLX = 0;
-						if(state.Gamepad.sThumbLX > 32767)
+						if(std::abs(state.Gamepad.sThumbLX) > 32767)
 						{
-							state.Gamepad.sThumbLX = 32767;
-							state.Gamepad.sThumbLX -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+							auto sign = (state.Gamepad.sThumbLX < 0 ? -1 : 1);
+							state.Gamepad.sThumbLX = 0x7fff * sign;
 						}
-						if(state.Gamepad.sThumbLY <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+						if(std::abs(state.Gamepad.sThumbLY) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 							state.Gamepad.sThumbLY = 0;
-						if(state.Gamepad.sThumbLY > 32767)
+						if(std::abs(state.Gamepad.sThumbLY) > 32767)
 						{
-							state.Gamepad.sThumbLY = 32767;
-							state.Gamepad.sThumbLY -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+							auto sign = (state.Gamepad.sThumbLY < 0 ? -1 : 1);
+							state.Gamepad.sThumbLY = 0x7fff * sign;
 						}
 
-						if(state.Gamepad.sThumbRX <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+						if(std::abs(state.Gamepad.sThumbRX) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 							state.Gamepad.sThumbRX = 0;
-						if(state.Gamepad.sThumbRX > 32767)
+						if(std::abs(state.Gamepad.sThumbRX) > 32767)
 						{
-							state.Gamepad.sThumbRX = 32767;
-							state.Gamepad.sThumbRX -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+							auto sign = (state.Gamepad.sThumbRX < 0 ? -1 : 1);
+							state.Gamepad.sThumbRX = 0x7fff * sign;
 						}
-						if(state.Gamepad.sThumbRY <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+						if(std::abs(state.Gamepad.sThumbRY) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 							state.Gamepad.sThumbRY = 0;
-						if(state.Gamepad.sThumbRY > 32767)
+						if(std::abs(state.Gamepad.sThumbRY) > 32767)
 						{
-							state.Gamepad.sThumbRY = 32767;
-							state.Gamepad.sThumbRY -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+							auto sign = (state.Gamepad.sThumbRY < 0 ? -1 : 1);
+							state.Gamepad.sThumbRY = 0x7fff * sign;
 						}
 
 						if(state.Gamepad.bLeftTrigger != oldState.Gamepad.bLeftTrigger)
@@ -477,7 +477,7 @@ namespace Core
 							auto& we = newEvent();
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_LeftTrigger;
+							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftTrigger;
 							we.m_gamepadAxis.m_x = state.Gamepad.bLeftTrigger;
 							writeEvent();
 						}
@@ -486,7 +486,7 @@ namespace Core
 							auto& we = newEvent();
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_RightTrigger;
+							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightTrigger;
 							we.m_gamepadAxis.m_x = state.Gamepad.bRightTrigger;
 							writeEvent();
 						}
@@ -496,7 +496,7 @@ namespace Core
 							auto& we = newEvent();
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_LeftStick;
+							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftStick;
 							we.m_gamepadAxis.m_x = state.Gamepad.sThumbLX;
 							we.m_gamepadAxis.m_y = state.Gamepad.sThumbLY;
 							writeEvent();
@@ -507,7 +507,7 @@ namespace Core
 							auto& we = newEvent();
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Axis::m_RightStick;
+							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightStick;
 							we.m_gamepadAxis.m_x = state.Gamepad.sThumbRX;
 							we.m_gamepadAxis.m_y = state.Gamepad.sThumbRY;
 							writeEvent();

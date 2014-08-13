@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/

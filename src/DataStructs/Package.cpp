@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <DataStructs/Package.h>
 /******* C++ headers *******/
+#include <algorithm>
 /******* extra headers *******/
 /******* end headers *******/
 
