@@ -244,6 +244,7 @@
     <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\LuaStack.cpp" />
+    <ClCompile Include="..\..\..\src\Scripting\LuaStackImpl.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp" />
     <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">

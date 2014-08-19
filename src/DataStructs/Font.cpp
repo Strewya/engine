@@ -13,20 +13,20 @@ namespace Core
 {
 	LoadResult loadFont(Font& outFont, LuaStack& lua, size_t fileHash, TextureCache& textureCache)
 	{
-		if( !lua.isString(-2) || !lua.isTable(-1) )
+		if( !lua.is<std::string>(-2) || !lua.is<luaTable>(-1) )
 		{
 			return {LoadResultFlag::Fail, "Invalid font format"};
 		}
 
-		outFont.m_name = lua.toString(-2);
-		auto texture = getString(lua, "texture", "");
+		outFont.m_name = lua.to<std::string>(-2);
+		auto texture = get(lua, "texture", std::string());
 		outFont.m_textureID = textureCache.getResourceID(texture.c_str());
 		if( outFont.m_textureID == INVALID_ID )
 		{
 			return {LoadResultFlag::DependencyMissing, texture};
 		}
 
-		outFont.m_size = getInt(lua, "size", 0);
+		outFont.m_size = get(lua, "size", 0);
 		if( outFont.m_size == 0 )
 		{
 			return {LoadResultFlag::Fail, "Invalid font size"};
@@ -34,12 +34,12 @@ namespace Core
 
 		for( lua.ipairs("glyphs"); lua.next(); lua.pop(1) )
 		{
-			if( lua.isNumber(-2) && lua.isTable(-1) )
+			if( lua.is<uint32_t>(-2) && lua.is<luaTable>(-1) )
 			{
-				auto ascii = getChar(lua, "char", 0);
-				auto left = getInt(lua, "left", -1);
-				auto right = getInt(lua, "right", -1);
-				auto top = getInt(lua, "top", -1);
+				auto ascii = get<char>(lua, "char", 0);
+				auto left = get(lua, "left", -1);
+				auto right = get(lua, "right", -1);
+				auto top = get(lua, "top", -1);
 				if( ascii != 0 && left != -1 && right != -1 && top != -1 )
 				{
 					auto i = ascii - 32;

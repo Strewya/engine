@@ -179,6 +179,9 @@
     <ClCompile Include="..\..\..\src\Scripting\LuaStack.cpp">
       <Filter>Framework\Scripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Scripting\LuaStackImpl.cpp">
+      <Filter>Framework\Scripting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">

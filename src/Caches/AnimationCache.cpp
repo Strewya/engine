@@ -54,7 +54,7 @@ namespace Core
 	{
 		if( !lua.doFile(file) )
 		{
-			auto str = lua.toString();
+			auto str = lua.to<std::string>();
 			lua.pop();
 			return{LoadResultFlag::Fail, str};
 		}
@@ -62,17 +62,17 @@ namespace Core
 		AnimationDefaults defaults;
 		std::string texture = "";
 		lua.pull("defaults");
-		if( lua.isTable() )
+		if( lua.is<luaTable>() )
 		{
-			defaults.loops = getBool(lua, "animationLoop", false);
-			defaults.duration = getFloat(lua, "animationDuration", 0);
+			defaults.loops = get(lua, "animationLoop", false);
+			defaults.duration = get(lua, "animationDuration", 0.0f);
 		}
 		lua.pop();
 
 		LoadResult res{LoadResultFlag::Success};
 		for( lua.pairs("animations"); lua.next(); lua.pop(1) )
 		{
-			if( lua.isString(-2) )
+			if( lua.is<std::string>(-2) )
 			{
 				res = fn(defaults);
 				if( !res )
@@ -91,7 +91,7 @@ namespace Core
 	{
 		return process(file, lua, [&](const AnimationDefaults& defaults) -> LoadResult
 		{
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id == INVALID_ID )
 			{
 				id = m_data.create();
@@ -104,7 +104,7 @@ namespace Core
 			}
 			else
 			{
-				DEBUG_INFO("Skipping image ", lua.toString(-2), ", already loaded");
+				DEBUG_INFO("Skipping image ", lua.to<std::string>(-2), ", already loaded");
 			}
 			return{LoadResultFlag::Success};
 		});
@@ -122,7 +122,7 @@ namespace Core
 				return res;
 			}
 
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id != INVALID_ID )
 			{
 				m_data.swapData(id, new_id);

@@ -184,4 +184,11 @@ function setupInput()
 		if(Core.Keyboard.m_Escape ~= event.m_keyboard.m_keyCode) then return false; end;
 		gState.close = true;
 	end);
+	
+	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_Space ~= event.m_keyboard.m_keyCode) then return false; end;
+		if(event.m_keyboard.m_isDown) then
+			gState.pause = not gState.pause
+		end;
+	end);
 end;

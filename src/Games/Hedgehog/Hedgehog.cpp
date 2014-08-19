@@ -132,10 +132,10 @@ namespace Core
 		{
 			auto lua = m_luaSystem.getStack();
 			lua.pull("game_tick", 0);
-			m_isRunning &= lua.isFunction();
+			m_isRunning &= lua.is<luaFunction>();
 			lua.pop();
 			lua.pull("game_render", 0);
-			m_isRunning &= lua.isFunction();
+			m_isRunning &= lua.is<luaFunction>();
 			lua.pop();
 		}
 
@@ -166,13 +166,13 @@ namespace Core
 			m_player.m_animationPlayerID = m_animationSystem.createPlayer(m_player.m_imageID);
 
 			lua.pull("game_init", 0);
-			if( lua.isFunction() )
+			if( lua.is<luaFunction>() )
 			{
-				bool called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &m_isRunning);
+				bool called = lua.call(luaCustom{this, CLASS(HedgehogGame)}, &m_isRunning);
 				m_isRunning &= called;
 				if( !called )
 				{
-					DEBUG_INFO(lua.toString());
+					DEBUG_INFO(lua.to<std::string>());
 					lua.pop();
 				}
 			}
@@ -234,12 +234,12 @@ namespace Core
 
 		auto lua = m_luaSystem.getStack();
 		lua.pull("game_tick", 0);
-		if( lua.isFunction() )
+		if( lua.is<luaFunction>() )
 		{
-			auto called = lua.call(CustomType{this, CLASS(HedgehogGame)}, &continueRunning);
+			auto called = lua.call(luaCustom{this, CLASS(HedgehogGame)}, &continueRunning);
 			if( !called )
 			{
-				DEBUG_INFO(lua.toString());
+				DEBUG_INFO(lua.to<std::string>());
 				lua.pop();
 				continueRunning = called;
 			}
@@ -258,9 +258,9 @@ namespace Core
 
 		auto lua = m_luaSystem.getStack();
 		lua.pull("game_render", 0);
-		if( lua.isFunction() )
+		if( lua.is<luaFunction>() )
 		{
-			lua.call(CustomType{this, CLASS(HedgehogGame)});
+			lua.call(luaCustom{this, CLASS(HedgehogGame)});
 		}
 
 		static Transform framerateTf;

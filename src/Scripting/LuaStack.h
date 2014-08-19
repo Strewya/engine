@@ -16,11 +16,14 @@ namespace Core
 {
 	class ResourceFile;
 
-	struct CustomType
+	struct luaCustom
 	{
 		void* ptr;
 		const char* name;
 	};
+
+	class luaTable {};
+	class luaFunction {};
 
 	class LuaStack
 	{
@@ -44,44 +47,16 @@ namespace Core
 		bool next();
 
 		void setValue(const std::string& key, int32_t stackIndex = -1);
-		void push(const std::string& arg);
-		void push(int32_t arg);
-		void push(uint32_t arg);
-		void push(bool arg);
-		void push(float arg);
-		void push(double arg);
-		void push();
 
-		std::string toString(int32_t stackIndex = -1);
-		uint32_t toUint(int32_t stackIndex = -1);
-		int32_t toInt(int32_t stackIndex = -1);
-		float toFloat(int32_t stackIndex = -1);
-		double toDouble(int32_t stackIndex = -1);
-		bool toBool(int32_t stackIndex = -1);
-
-		bool isNil(int32_t stackIndex = -1);
-		bool isString(int32_t stackIndex = -1);
-		bool isFunction(int32_t stackIndex = -1);
-		bool isTable(int32_t stackIndex = -1);
-		bool isNumber(int32_t stackIndex = -1);
-		bool isBool(int32_t stackIndex = -1);
-
+		template<typename T> void push(T arg);
+		
+		template<typename T> T to(int32_t stackIndex = -1);
+		
+		template<typename T> bool is(int32_t stackIndex = -1);
+		
 		bool call();
-		template<typename ...Args> bool call(int32_t arg, Args... rest);
-		template<typename ...Args> bool call(uint32_t arg, Args... rest);
-		template<typename ...Args> bool call(bool arg, Args... rest);
-		template<typename ...Args> bool call(float arg, Args... rest);
-		template<typename ...Args> bool call(double arg, Args... rest);
-		template<typename ...Args> bool call(char arg, Args... rest);
-		template<typename ...Args> bool call(const std::string& arg, Args... rest);
-		template<typename ...Args> bool call(const CustomType& arg, Args... rest);
-		template<typename ...Args> bool call(int32_t* arg, Args... rest);
-		template<typename ...Args> bool call(uint32_t* arg, Args... rest);
-		template<typename ...Args> bool call(bool* arg, Args... rest);
-		template<typename ...Args> bool call(float* arg, Args... rest);
-		template<typename ...Args> bool call(double* arg, Args... rest);
-		template<typename ...Args> bool call(std::string* arg, Args... rest);
-
+		template<typename T, typename ...Args> bool call(T&& arg, Args... rest);
+		template<typename T, typename ...Args> bool call(T* arg, Args... rest);
 
 	private:
 		lua_State* m_L;
@@ -96,21 +71,38 @@ namespace Core
 		std::vector<Iteration> m_iters;
 	};
 
-	std::string getString(LuaStack& lua, const std::string& id, std::string valueIfMissing);
-	double getDouble(LuaStack& lua, const std::string& id, double valueIfMissing);
-	float getFloat(LuaStack& lua, const std::string& id, float valueIfMissing);
-	uint32_t getUint(LuaStack& lua, const std::string& id, uint32_t valueIfMissing);
-	int32_t getInt(LuaStack& lua, const std::string& id, int32_t valueIfMissing);
-	bool getBool(LuaStack& lua, const std::string& id, bool valueIfMissing);
-	char getChar(LuaStack& lua, const std::string& id, char valueIfMissing);
+	template<> void LuaStack::push<std::string>(std::string arg);
+	template<> void LuaStack::push<int32_t>(int32_t arg);
+	template<> void LuaStack::push<uint32_t>(uint32_t arg);
+	template<> void LuaStack::push<bool>(bool arg);
+	template<> void LuaStack::push<float>(float arg);
+	template<> void LuaStack::push<double>(double arg);
+	template<> void LuaStack::push<luaCustom>(luaCustom arg);
+	template<> void LuaStack::push<nullptr_t>(nullptr_t arg);
 
-	std::string getString(LuaStack& lua, int32_t stackIndex, std::string valueIfMissing);
-	double getDouble(LuaStack& lua, int32_t stackIndex, double valueIfMissing);
-	float getFloat(LuaStack& lua, int32_t stackIndex, float valueIfMissing);
-	uint32_t getUint(LuaStack& lua, int32_t stackIndex, uint32_t valueIfMissing);
-	int32_t getInt(LuaStack& lua, int32_t stackIndex, int32_t valueIfMissing);
-	bool getBool(LuaStack& lua, int32_t stackIndex, bool valueIfMissing);
-	char getChar(LuaStack& lua, int32_t stackIndex, char valueIfMissing);
+	template<> std::string LuaStack::to<std::string>(int32_t stackIndex);
+	template<> uint32_t LuaStack::to<uint32_t>(int32_t stackIndex);
+	template<> int32_t LuaStack::to<int32_t>(int32_t stackIndex);
+	template<> float LuaStack::to<float>(int32_t stackIndex);
+	template<> double LuaStack::to<double>(int32_t stackIndex);
+	template<> bool LuaStack::to<bool>(int32_t stackIndex);
+
+	template<> bool LuaStack::is<nullptr_t>(int32_t stackIndex);
+	template<> bool LuaStack::is<bool>(int32_t stackIndex);
+	template<> bool LuaStack::is<int32_t>(int32_t stackIndex);
+	template<> bool LuaStack::is<uint32_t>(int32_t stackIndex);
+	template<> bool LuaStack::is<float>(int32_t stackIndex);
+	template<> bool LuaStack::is<double>(int32_t stackIndex);
+	template<> bool LuaStack::is<std::string>(int32_t stackIndex);
+	template<> bool LuaStack::is<luaTable>(int32_t stackIndex);
+	template<> bool LuaStack::is<luaFunction>(int32_t stackIndex);
+
+
+	template<typename T> T get(LuaStack& lua, const std::string& id, T valueIfMissing);
+	template<typename T> T get(LuaStack& lua, int32_t stackIndex, T valueIfMissing);
+
+	template<> char get<char>(LuaStack& lua, const std::string& id, char valueIfMissing);
+	template<> char get<char>(LuaStack& lua, int32_t stackIndex, char valueIfMissing);
 }
 
 #include <Scripting/LuaStackImpl.h>

@@ -53,7 +53,7 @@ namespace Core
 	{
 		if( !lua.doFile(file) )
 		{
-			auto str = lua.toString();
+			auto str = lua.to<std::string>();
 			lua.pop();
 			return{LoadResultFlag::Fail, str};
 		}
@@ -61,11 +61,11 @@ namespace Core
 		ImageDefaults defaults;
 		std::string texture = "";
 		lua.pull("defaults");
-		if( lua.isTable() )
+		if( lua.is<luaTable>() )
 		{
-			defaults.height = getInt(lua, "imageHeight", 0);
-			defaults.width = getInt(lua, "imageWidth", 0);
-			texture = getString(lua, "imageTexture", "");
+			defaults.height = get(lua, "imageHeight", 0);
+			defaults.width = get(lua, "imageWidth", 0);
+			texture = get(lua, "imageTexture", std::string());
 			defaults.textureID = m_textures->getResourceID(texture.c_str());
 		}
 		lua.pop();
@@ -78,7 +78,7 @@ namespace Core
 		LoadResult res{LoadResultFlag::Success};
 		for( lua.pairs("images"); lua.next(); lua.pop(1) )
 		{
-			if( lua.isString(-2) )
+			if( lua.is<std::string>(-2) )
 			{
 				res = fn(defaults);
 				if( !res )
@@ -97,7 +97,7 @@ namespace Core
 	{
 		return process(file, lua, [&](const ImageDefaults& defaults) -> LoadResult
 		{
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id == INVALID_ID )
 			{
 				id = m_data.create();
@@ -110,7 +110,7 @@ namespace Core
 			}
 			else
 			{
-				DEBUG_INFO("Skipping image ", lua.toString(-2), ", already loaded");
+				DEBUG_INFO("Skipping image ", lua.to<std::string>(-2), ", already loaded");
 			}
 			return{LoadResultFlag::Success};
 		});
@@ -128,7 +128,7 @@ namespace Core
 				return res;
 			}
 
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id != INVALID_ID )
 			{
 				m_data.swapData(id, new_id);

@@ -56,18 +56,29 @@ namespace Core
 				lua_register(m_L, "print", luaPrint);
 			DEBUG_CODE_END;
 
-			const char* depend =
-				"global_dependency_table = {}; "
-				"global_dependency_missing = nil; "
-				"function depend(filename) "
-					"if(not global_dependency_table[filename]) then "
-						"global_dependency_missing = filename; "
-						"error('Missing dependency'); "
-					"end; "
-				"end;";
+			const char* depend = R"rawLuaCode(
+Lua = {};
+global_dependency_table = {};
+global_dependency_missing = nil;
 
-			luaL_dostring(m_L, depend);
-			status = true;
+function depend(filename)
+	if(not global_dependency_table[filename]) then
+		global_dependency_missing = filename;
+		error('Missing dependency');
+	end;
+end;
+
+function class(name)
+	Lua[name] = {};
+	Lua[name].__index = Lua[name];
+	setmetatable(Lua[name], { __call = function(cls, ...) return cls.new(...); end; });
+	Lua[name].new = function()
+		return {};
+	end;
+end
+)rawLuaCode";
+
+			status = luaL_dostring(m_L, depend) == 0;
 		}
 
 		DEBUG_INIT(LuaSystem);

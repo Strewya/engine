@@ -41,14 +41,14 @@ namespace Core
 		auto status = lua.doFile(file.getPath().c_str());
 		if( !status )
 		{
-			auto str = lua.toString();
+			auto str = lua.to<std::string>();
 			lua.pop();
 			lua.pull("global_dependency_missing", 0);
-			if( lua.isString() )
+			if( lua.is<std::string>() )
 			{
-				auto str = lua.toString();
+				auto str = lua.to<std::string>();
 				lua.pop();
-				lua.push();
+				lua.push(nullptr);
 				lua.setValue("global_dependency_missing", 0);
 				return{LoadResultFlag::DependencyMissing, str};
 			}
@@ -75,14 +75,14 @@ namespace Core
 		auto status = lua.doFile(file.getPath().c_str());
 		if( !status )
 		{
-			auto str = lua.toString();
+			auto str = lua.to<std::string>();
 			lua.pop();
 			lua.pull("global_dependency_missing", 0);
-			if( lua.isString() )
+			if( lua.is<std::string>() )
 			{
-				auto str = lua.toString();
+				auto str = lua.to<std::string>();
 				lua.pop();
-				lua.push();
+				lua.push(nullptr);
 				lua.setValue("global_dependency_missing", 0);
 				return{LoadResultFlag::DependencyMissing, str};
 			}

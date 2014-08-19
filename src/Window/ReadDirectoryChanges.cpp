@@ -16,8 +16,10 @@ namespace Core
 
 	CReadDirectoryChanges::CReadDirectoryChanges()
 		: m_notifications(), m_threadHandle(nullptr), m_threadId(0),
-		m_pServer(std::make_unique<RDCPrivate::CReadChangesServer>(this))
+		m_pServer(std::make_unique<RDCPrivate::CReadChangesServer>(this)),
+		m_notificationQueueSize(128), m_head(1), m_tail(0)
 	{
+		m_notifications.resize(m_notificationQueueSize);
 	}
 
 	CReadDirectoryChanges::~CReadDirectoryChanges()
@@ -64,28 +66,29 @@ namespace Core
 
 	void CReadDirectoryChanges::Push(DWORD action, const std::string& filename)
 	{
-		m_notifications.push_back(TDirectoryChangeNotification(action, filename));
+		m_head = (m_head + 1) % m_notificationQueueSize;
+
+		m_notifications[m_head].first = action;
+		m_notifications[m_head].second = filename;
 	}
 
 	bool CReadDirectoryChanges::Pop(DWORD& outAction, std::string& outFilename)
 	{
-		bool found = false;
-		if(!m_notifications.empty())
+		bool eventExists = false;
+		auto readIndex = (m_tail + 1) % m_notificationQueueSize;
+		if( readIndex != m_head )
 		{
-			found = true;
-			outAction = m_notifications.front().first;
-			outFilename = m_notifications.front().second;
-			m_notifications.pop_front();
+			eventExists = true;
+			outAction = m_notifications[readIndex].first;
+			outFilename = m_notifications[readIndex].second;
+			m_tail = readIndex;
 		}
-		return found;
+		return eventExists;
 	}
 
 	bool CReadDirectoryChanges::CheckOverflow()
 	{
-		bool b = false;
-		if(b)
-			m_notifications.clear();
-		return b;
+		return false;
 	}
 
 	uint32_t CReadDirectoryChanges::GetThreadId()

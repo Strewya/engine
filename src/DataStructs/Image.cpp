@@ -14,26 +14,26 @@ namespace Core
 {
 	LoadResult loadImage(Image& outImage, LuaStack& lua, size_t fileHash, const ImageDefaults& defaults, TextureCache& textures)
 	{
-		if( !lua.isString(-2) || !lua.isTable(-1) )
+		if( !lua.is<std::string>(-2) || !lua.is<luaTable>(-1) )
 		{
 			return{LoadResultFlag::Fail, "Invalid image format"};
 		}
 
-		outImage.m_name = lua.toString(-2);
+		outImage.m_name = lua.to<std::string>(-2);
 		outImage.m_textureID = defaults.textureID;
 
 		Vec2 pos(-1, -1);
 		lua.pull("pos");
-		if( lua.isTable() )
+		if( lua.is<luaTable>() )
 		{
-			pos.x = getFloat(lua, "x", pos.x);
-			if( pos.x < 0 ) pos.x = getFloat(lua, 1, pos.x);
-			pos.y = getFloat(lua, "y", pos.y);
-			if( pos.y < 0 ) pos.y = getFloat(lua, 2, pos.y);
+			pos.x = get(lua, "x", pos.x);
+			if( pos.x < 0 ) pos.x = get(lua, 1, pos.x);
+			pos.y = get(lua, "y", pos.y);
+			if( pos.y < 0 ) pos.y = get(lua, 2, pos.y);
 		}
 		lua.pop();
-		auto imgWidth = getInt(lua, "width", defaults.width);
-		auto imgHeight = getInt(lua, "height", defaults.height);
+		auto imgWidth = get(lua, "width", defaults.width);
+		auto imgHeight = get(lua, "height", defaults.height);
 
 		if( outImage.m_name.empty() || pos.x < 0 || pos.y < 0 || imgWidth == 0 || imgHeight == 0 )
 		{

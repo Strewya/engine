@@ -47,6 +47,9 @@ namespace Core
 
 		uint32_t m_threadId;
 
-		std::list<TDirectoryChangeNotification> m_notifications;
+		std::vector<TDirectoryChangeNotification> m_notifications;
+		uint32_t m_notificationQueueSize;
+		uint32_t m_head;
+		uint32_t m_tail;
 	};
 }

@@ -530,7 +530,7 @@ namespace Core
 		DWORD action;
 		while(m_monitor.Pop(action, file))
 		{
-			if(!file.empty())
+			if(!file.empty() && file.find(".") != file.npos)
 			{
 				m_timer.update();
 				newFileChange(m_timer.getCurMicros(), action, file);

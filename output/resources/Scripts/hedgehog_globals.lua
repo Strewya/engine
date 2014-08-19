@@ -1,5 +1,7 @@
 
-gState = {};
+if(gState == nil) then
+	gState = {};
+end;
 
 gState.moveCamRight = false;
 gState.moveCamLeft = false;
@@ -19,7 +21,7 @@ gState.yVel = 0;
 gState.yAcc = 0;
 gState.maxJumpsAvailable = 1;
 gState.jumpsAvailable = gState.maxJumpsAvailable;
-gState.gravity = -31;
+gState.gravity = -11;
 gState.minY = -2.15;
 gState.velocity = 0;
 gState.maxVelocity = 5;
@@ -32,6 +34,7 @@ gState.bestTime = 0;
 gState.bboxColor = Core.Color(0,0,0);
 gState.drawPositions = false;
 gState.drawCollisionRect = false;
+gState.pause = false;
 
 gState.treeHS = Core.Vec2(0.4, 2);
 gState.treeCol = Core.Color(127/255, 63/255, 63/255);

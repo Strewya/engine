@@ -4,6 +4,7 @@ depend("Scripts/asm.lua");
 depend("Scripts/hedgehog_asm.lua");
 depend("Scripts/hedgehog_globals.lua");
 depend("Scripts/hedgehog_input.lua");
+depend("Scripts/hedgehog_types.lua");
 	
 reloaded = true;
 function game_init(game)
@@ -32,12 +33,12 @@ function game_init(game)
 	game.m_player.m_transform.position:set(0,0);
 	game.m_player.m_transform.scale:set(1,1);
 	
-	st = st and onReload(game);
-	return st;
+	return onReload(game);
 end;
 
 function onReload(game)
 	reloaded = false;
+	gState.ground = Lua.Ground();
 	
 	setupInput();
 	
@@ -164,7 +165,7 @@ function game_tick(game)
 	
 	local player = game.m_player;
 	local gameTimer = game.m_logicTimer;
-	local dt = gameTimer:getDeltaTime();
+	local dt = gameTimer:getDeltaTime()*gameTimer:getTimeScale();
 	
 	if(gActions.moveLeft) then
 		gState.asm:transition("walk");
@@ -189,7 +190,6 @@ function game_tick(game)
 	end;
 	doMovement(dt, player.m_transform.position);
 	local px, py = player.m_transform.position.x, player.m_transform.position.y;
-	--game.m_camera:setPosition(Core.Vec3(px, py, -10));
 	
 	if(gActions.jump == true) then
 		gActions.jump = nil;
@@ -207,10 +207,10 @@ function game_tick(game)
 	player.m_transform.position.y = player.m_transform.position.y + gState.yVel*dt;
 	
 		
-	if(player.m_transform.position.y < gState.minY) then
+	if(intersection(player, gState.ground)) then
 		gState.yAcc = 0;
 		gState.yVel = 0;
-		player.m_transform.position.y = gState.minY;
+		player.m_transform.position.y = gState.ground.m_transform.position.y + gState.ground.m_collisionRect.halfHeight + player.m_collisionRect.halfHeight;
 		gState.jumpsAvailable = gState.maxJumpsAvailable;
 	end;
 	
@@ -224,6 +224,18 @@ function game_tick(game)
 		if(gActions.resetScore) then
 			gActions.resetScore = nil;
 			gState.bestTime = 0;
+		end;
+	end;
+	
+	if(gState.pause) then
+		local ts = gameTimer:getTimeScale();
+		if(ts > Core.Time.STOP_TIME) then
+			gameTimer:setTimeScale(Core.Time.STOP_TIME);
+		end;
+	else
+		local ts = gameTimer:getTimeScale();
+		if(ts < Core.Time.NORMAL_TIME) then
+			gameTimer:setTimeScale(Core.Time.NORMAL_TIME);
 		end;
 	end;
 	
@@ -270,7 +282,7 @@ function game_tick(game)
 	doCollision(game, player);
 	
 	if(gState.eatenApples < gState.targetApples) then
-		gState.timer:updateBy(gameTimer:getDeltaMicros());
+		gState.timer:updateBy(gameTimer:getDeltaMicros()*gameTimer:getTimeScale());
 	end;
 	
 	if(gState.eatenApples >= gState.targetApples and gState.gameOver == false) then
@@ -297,15 +309,23 @@ function game_render(game)
 	
 	local col = Core.Color();
 	local textTf = Core.Transform();
-	textTf.scale:set(0.7,0.7);
+	local tf = Core.Transform();
+	textTf.scale:set(0.01,0.01);
 	
 	game.m_graphicsSystem:setPerspectiveProjection();
 	game.m_graphicsSystem:applyCamera(game.m_camera);
 	game.m_graphicsSystem:setTransparencyMode(true);
-	local tf = Core.Transform();
-	tf.position:set(0,-4.5);
-	col:set(70/255, 0, 0);
-	game.m_graphicsSystem:drawQuad(tf, Core.Vec2(20,2), col);
+	
+	game.m_graphicsSystem:drawQuad(gState.ground.m_transform, gState.ground.halfSize, gState.ground.col);
+	if(gState.drawCollisionRect) then
+		game.m_graphicsSystem:drawPolygon(gState.ground.m_transform, gState.ground.m_collisionRect, gState.bboxColor);
+	end;
+	if(gState.drawPositions) then
+		col:set(0,0,0);
+		textTf.position = gState.ground.m_transform.position;
+		game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(gState.ground.m_transform.position.x .. "/" .. gState.ground.m_transform.position.y), textTf, col, 0, false);
+		col:set(1,1,1);
+	end;
 	
 	tf.position = gState.treePos;
 	game.m_graphicsSystem:drawQuad(tf, gState.treeHS, gState.treeCol);
@@ -328,13 +348,8 @@ function game_render(game)
 		game.m_graphicsSystem:drawTexturedQuad(prop.m_transform, col, img);
 		col:set(0,0,0);
 		if(gState.drawPositions) then
-			game.m_graphicsSystem:setOrthographicProjection();
 			textTf.position = prop.m_transform.position;
-			textTf.position.x = textTf.position.x*100;
-			textTf.position.y = textTf.position.y*100;
-			game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y),
-									 textTf, col, 0, false);
-			game.m_graphicsSystem:setPerspectiveProjection();
+			game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(prop.m_transform.position.x .. "/" .. prop.m_transform.position.y), textTf, col, 0, false);
 		end;
 	end;
 	
@@ -346,16 +361,12 @@ function game_render(game)
 	game.m_graphicsSystem:drawTexturedQuad(game.m_player.m_transform, col, img);
 	
 	if(gState.drawPositions) then
-		game.m_graphicsSystem:setOrthographicProjection();
 		textTf.position = game.m_player.m_transform.position;
-		textTf.position.x = textTf.position.x*100;
-		textTf.position.y = textTf.position.y*100;
 		col:set(0,0,0);
-		game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y),
-								 textTf, col, 0, false);
-		game.m_graphicsSystem:setPerspectiveProjection();
+		game.m_graphicsSystem:drawText(game.m_defaultFont, tostring(game.m_player.m_transform.position.x .. "/" .. game.m_player.m_transform.position.y), textTf, col, 0, false);
 	end;
 	
+	textTf.scale:set(0.7,0.7);
 	game.m_graphicsSystem:clearCamera();
 	game.m_graphicsSystem:setOrthographicProjection();
 	local text = "Eat "..gState.targetApples.." apples as fast as you can! You ate " .. gState.eatenApples .. " apples";

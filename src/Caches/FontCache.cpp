@@ -52,7 +52,7 @@ namespace Core
 	{
 		if( !lua.doFile(file) )
 		{
-			auto str = lua.toString();
+			auto str = lua.to<std::string>();
 			lua.pop();
 			return{LoadResultFlag::Fail, str};
 		}
@@ -60,7 +60,7 @@ namespace Core
 		LoadResult res{LoadResultFlag::Success};
 		for( lua.pairs(); lua.next(); lua.pop(1) )
 		{
-			if( lua.isString(-2) )
+			if( lua.is<std::string>(-2) )
 			{
 				res = fn();
 				if( !res )
@@ -79,7 +79,7 @@ namespace Core
 	{
 		return process(file, lua, [&]() -> LoadResult
 		{
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id == INVALID_ID )
 			{
 				id = m_data.create();
@@ -106,7 +106,7 @@ namespace Core
 				return res;
 			}
 
-			auto id = getResourceID(lua.toString(-2).c_str());
+			auto id = getResourceID(lua.to<std::string>(-2).c_str());
 			if( id != INVALID_ID )
 			{
 				m_data.swapData(id, new_id);
