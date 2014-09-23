@@ -188,7 +188,14 @@ function setupInput()
 	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
 		if(Core.Keyboard.m_Space ~= event.m_keyboard.m_keyCode) then return false; end;
 		if(event.m_keyboard.m_isDown) then
-			gState.pause = not gState.pause
+			gState.pause = not gState.pause;
+		end;
+	end);
+	
+	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_F11 ~= event.m_keyboard.m_keyCode) then return false; end;
+		if(event.m_keyboard.m_isDown and not event.m_keyboard.m_previouslyDown) then
+			gState.step = true;
 		end;
 	end);
 end;

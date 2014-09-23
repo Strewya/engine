@@ -167,6 +167,23 @@ function game_tick(game)
 	local gameTimer = game.m_logicTimer;
 	local dt = gameTimer:getDeltaTime()*gameTimer:getTimeScale();
 	
+	if(gState.pause) then
+		local ts = gameTimer:getTimeScale();
+		if(ts > Core.Time.STOP_TIME) then
+			gameTimer:setTimeScale(Core.Time.STOP_TIME);
+		end;
+	else
+		local ts = gameTimer:getTimeScale();
+		if(ts < Core.Time.NORMAL_TIME) then
+			gameTimer:setTimeScale(Core.Time.NORMAL_TIME);
+		end;
+	end;
+	
+	if(gState.pause and gState.step) then
+		gState.step = false;
+		gameTimer:setTimeScale(Core.Time.NORMAL_TIME);
+	end;
+	
 	if(gActions.moveLeft) then
 		gState.asm:transition("walk");
 		if(player.m_transform.scale.x > 0) then
@@ -206,11 +223,10 @@ function game_tick(game)
 	gState.yVel = gState.yVel + gState.gravity*dt;
 	player.m_transform.position.y = player.m_transform.position.y + gState.yVel*dt;
 	
-		
 	if(intersection(player, gState.ground)) then
 		gState.yAcc = 0;
 		gState.yVel = 0;
-		player.m_transform.position.y = gState.ground.m_transform.position.y + gState.ground.m_collisionRect.halfHeight + player.m_collisionRect.halfHeight;
+		player.m_transform.position.y = gState.ground.m_transform.position.y + gState.ground.m_collisionRect.halfHeight + gState.ground.m_collisionRect.center.y + player.m_collisionRect.halfHeight - player.m_collisionRect.center.y;
 		gState.jumpsAvailable = gState.maxJumpsAvailable;
 	end;
 	
@@ -224,18 +240,6 @@ function game_tick(game)
 		if(gActions.resetScore) then
 			gActions.resetScore = nil;
 			gState.bestTime = 0;
-		end;
-	end;
-	
-	if(gState.pause) then
-		local ts = gameTimer:getTimeScale();
-		if(ts > Core.Time.STOP_TIME) then
-			gameTimer:setTimeScale(Core.Time.STOP_TIME);
-		end;
-	else
-		local ts = gameTimer:getTimeScale();
-		if(ts < Core.Time.NORMAL_TIME) then
-			gameTimer:setTimeScale(Core.Time.NORMAL_TIME);
 		end;
 	end;
 	

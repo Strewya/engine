@@ -21,7 +21,7 @@ gState.yVel = 0;
 gState.yAcc = 0;
 gState.maxJumpsAvailable = 1;
 gState.jumpsAvailable = gState.maxJumpsAvailable;
-gState.gravity = -11;
+gState.gravity = -31;
 gState.minY = -2.15;
 gState.velocity = 0;
 gState.maxVelocity = 5;
@@ -35,6 +35,7 @@ gState.bboxColor = Core.Color(0,0,0);
 gState.drawPositions = false;
 gState.drawCollisionRect = false;
 gState.pause = false;
+gState.step = false;
 
 gState.treeHS = Core.Vec2(0.4, 2);
 gState.treeCol = Core.Color(127/255, 63/255, 63/255);
