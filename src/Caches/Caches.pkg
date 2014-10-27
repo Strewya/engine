@@ -1,7 +1,7 @@
 
 $#include <Caches/AnimationCache.h>
 $#include <Caches/ImageCache.h>
-//$#include <Caches/PackageCache.h>
+$#include <Caches/PackageCache.h>
 $#include <Caches/ScriptCache.h>
 $#include <Caches/TextureCache.h>
 

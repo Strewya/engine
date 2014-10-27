@@ -234,6 +234,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
@@ -289,6 +290,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
@@ -366,6 +368,8 @@
   <ItemGroup>
     <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua" />
     <None Include="..\..\..\src\Games\Pong\resourceList.lua" />
+    <None Include="..\..\..\src\Games\Rainbowland\Rainbowland.pkg" />
+    <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua" />
     <None Include="..\..\..\src\Loaders\Loaders.pkg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -49,6 +49,9 @@
     <Filter Include="Framework\Loaders">
       <UniqueIdentifier>{719c972b-57f3-464f-99e3-50295f8cfbf1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Design\Rainbowland">
+      <UniqueIdentifier>{98560073-d057-4945-bcde-ea1e6a437678}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Scripting\LuaStackImpl.cpp">
       <Filter>Framework\Scripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp">
+      <Filter>Design\Rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +341,9 @@
     <ClInclude Include="..\..\..\src\Loaders\Defines.h">
       <Filter>Framework\Loaders</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Input\Input.pkg">
@@ -386,6 +395,12 @@
     </None>
     <None Include="..\..\..\src\Loaders\Loaders.pkg">
       <Filter>Framework\toluaPackages</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\Rainbowland\Rainbowland.pkg">
+      <Filter>Design\Rainbowland</Filter>
+    </None>
+    <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua">
+      <Filter>Design\Rainbowland</Filter>
     </None>
   </ItemGroup>
 </Project>
