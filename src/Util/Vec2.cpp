@@ -29,6 +29,13 @@ namespace Core
 		return Vec2(x + v.x, y + v.y);
 	}
 
+	Vec2& Vec2::operator+=(const Vec2& v)
+	{
+		x += v.x;
+		y += v.y;
+		return *this;
+	}
+
 	Vec2 Vec2::operator-() const
 	{
 		return Vec2(-x, -y);
@@ -57,6 +64,11 @@ namespace Core
 	Vec2 operator/(float f, const Vec2& v)
 	{
 		return v/f;
+	}
+
+	float length(const Vec2& v)
+	{
+		return sqrtf(v.x*v.x + v.y*v.y);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Vec2& v)

@@ -50,7 +50,7 @@ namespace Core
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
 		
-		m_graphics->drawLine(t, polygonData.data(), vertexCount, c);
+		m_graphics->drawMultiline(t, polygonData.data(), vertexCount, c);
 	}
 
 	void Box2dDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -112,7 +112,7 @@ namespace Core
 		Transform t;
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
-		m_graphics->drawLine(t, pos, 2, c);
+		m_graphics->drawMultiline(t, pos, 2, c);
 	}
 
 	void Box2dDebugDraw::DrawTransform(const b2Transform& xf)

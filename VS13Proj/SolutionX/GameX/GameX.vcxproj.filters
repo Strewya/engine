@@ -344,6 +344,9 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h">
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Input\Input.pkg">

@@ -20,6 +20,9 @@ namespace Core
 		float right() const;
 		float top() const;
 		float bottom() const;
+		Vec2 halfSize() const;
+
+		void set(float cx, float cy, float hw, float hh);
 
 		Vec2 center;
 		float halfWidth;

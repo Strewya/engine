@@ -10,7 +10,7 @@
 namespace Core
 {
 	Camera::Camera()
-		: m_position(0, 0, 0), m_lookAtAxis(0, 0, 1), m_upAxis(0, 1, 0)
+		: m_position(0, 0, 0), m_lookAtAxis(0, 0, 1), m_upAxis(0, 1, 0), m_speed(0)
 	{}
 
 	void Camera::move(const Vec3& translation)

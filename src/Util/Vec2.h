@@ -23,6 +23,7 @@ namespace Core
 
 		/* these are inside the class for tolua++ binding compatibility */
 		Vec2 operator+(const Vec2& v) const;
+		Vec2& operator+=(const Vec2& v);
 		Vec2 operator-() const;
 		Vec2 operator-(const Vec2& v) const;
 		Vec2 operator*(float f) const;
@@ -32,6 +33,7 @@ namespace Core
 
 	Vec2 operator*(float f, const Vec2& v);
 	Vec2 operator/(float f, const Vec2& v);
+	float length(const Vec2& v);
 	std::ostream& operator<<(std::ostream& os, const Vec2& v);
 }
 

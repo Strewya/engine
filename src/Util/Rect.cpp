@@ -32,6 +32,18 @@ namespace Core
 	{
 		return center.y - halfHeight;
 	}
+
+	Vec2 Rect::halfSize() const
+	{
+		return Vec2(halfWidth, halfHeight);
+	}
+
+	void Rect::set(float cx, float cy, float hw, float hh)
+	{
+		center.set(cx, cy);
+		halfWidth = hw;
+		halfHeight = hh;
+	}
 }
 
 

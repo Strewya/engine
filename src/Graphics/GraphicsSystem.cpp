@@ -271,9 +271,64 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					DRAW LINE
+	//					DRAW ILINE
 	//*****************************************************************
-	void GraphicsSystem::drawLine(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
+	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Vec2& p2, const Color& c)
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+
+		/****** VERTEX BUFFER ******/
+		std::vector<Vertex> vertices(2);
+		vertices[0].setPosition(p1.x, p1.y, 0);
+		vertices[0].setDiffuse(1, 1, 1, 1);
+		vertices[1].setPosition(p2.x, p2.y, 0);
+		vertices[1].setDiffuse(1, 1, 1, 1);
+		
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 2);
+
+		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, vertices.data(), 2 * sizeof(Vertex));
+		m_devcon->Unmap(vb, 0);
+
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+		/****** CONSTANT BUFFER ******/
+		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
+
+		m_world = XMMatrixIdentity();
+		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
+		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+
+
+		cbPerObject cbpo;
+		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+		cbpo.FillColor.x = c.r;
+		cbpo.FillColor.y = c.g;
+		cbpo.FillColor.z = c.b;
+		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 0;
+
+		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
+
+		m_devcon->Draw(2, 0);
+
+		cb->Release();
+		vb->Release();
+	}
+
+	//*****************************************************************
+	//					DRAW MULTILINE
+	//*****************************************************************
+	void GraphicsSystem::drawMultiline(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
 	{
 		D3D11_MAPPED_SUBRESOURCE ms;
 
@@ -382,7 +437,7 @@ namespace Core
 		vb->Release();
 	}
 
-	void GraphicsSystem::drawPolygon(const Transform& tf, const Rect& rect, const Color& c)
+	void GraphicsSystem::drawQuadPolygon(const Transform& tf, const Rect& rect, const Color& c)
 	{
 		/****** VERTEX BUFFER ******/
 		uint32_t count = 5;
@@ -393,7 +448,7 @@ namespace Core
 		vertices[3].set(rect.center.x - rect.halfWidth, rect.center.y + rect.halfHeight);
 		vertices[4].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
 
-		drawLine(tf, vertices.data(), count, c);
+		drawMultiline(tf, vertices.data(), count, c);
 	}
 
 	//*****************************************************************
