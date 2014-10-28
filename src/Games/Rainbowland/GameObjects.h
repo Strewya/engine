@@ -19,6 +19,8 @@ namespace Core
 		Transform transform;
 		Color color;
 		Rect boundingBox;
+		Vec2 velocity;
+		Vec2 acceleration;
 		uint32_t m_imageID;
 	};
 
@@ -43,5 +45,6 @@ namespace Core
 		Vec2 origin;
 		Vec2 position;
 		Vec2 velocity;
+		float travelled;
 	};
 }

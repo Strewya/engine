@@ -271,7 +271,7 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					DRAW ILINE
+	//					DRAW LINE
 	//*****************************************************************
 	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Vec2& p2, const Color& c)
 	{
@@ -294,7 +294,7 @@ namespace Core
 		uint32_t stride = sizeof(Vertex);
 		uint32_t offset = 0;
 		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		/****** CONSTANT BUFFER ******/
 		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));

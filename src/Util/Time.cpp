@@ -134,7 +134,7 @@ namespace Core
 	{
 	}
 
-	uint64_t Time::getRealTimeMicros() const
+	uint64_t Time::getRealTimeMicros()
 	{
 		TimeSource source;
 		return source.getSystemMicroseconds();

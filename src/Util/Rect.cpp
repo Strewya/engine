@@ -13,6 +13,11 @@ namespace Core
 		: halfWidth(0), halfHeight(0)
 	{}
 
+	Rect::Rect(Vec2 c, float hw, float hh)
+		: center(c), halfWidth(hw), halfHeight(hh)
+	{
+	}
+
 	float Rect::left() const
 	{
 		return center.x - halfWidth;

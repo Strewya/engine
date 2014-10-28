@@ -8,6 +8,7 @@
 #include <Games/GameLoopParams.h>
 #include <Graphics/Camera.h>
 #include <Input/KeyCodes.h>
+#include <Util/Random.h>
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
@@ -17,9 +18,13 @@ namespace Core
 {
 	void generateBullets(std::vector<RayBullet>& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& direction)
 	{
+
+		Vec2 target = Vec2::normalize(origin + direction) * 10;
+		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
 		for(uint32_t i = 0; i < count; ++i)
 		{
-			bullets.emplace_back(RayBullet{origin, origin, direction});
+			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
+			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(target+t-origin)});
 		}
 	}
 
@@ -42,6 +47,9 @@ namespace Core
 	{
 		m_window = &window;
 
+		window.resize(1024, 768);
+		window.showCursor(true);
+
 		m_isRunning =
 			m_graphicsSystem.init(m_fontCache, m_textureCache, window) &&
 			m_inputSystem.init(window) &&
@@ -49,9 +57,6 @@ namespace Core
 			m_imageCache.init(m_textureCache) &&
 			m_textureCache.init(m_graphicsSystem) &&
 			true;
-
-		window.resize(800, 600);
-		window.showCursor(true);
 
 		if(m_isRunning)
 		{
@@ -73,9 +78,85 @@ namespace Core
 					float y = w.m_mouseButton.m_y;
 					x -= m_window->getSizeX() / 2;
 					y -= m_window->getSizeY() / 2;
-					x /= m_window->getSizeX();
-					y /= m_window->getSizeX();
-					generateBullets(m_rayBullets, 1, 0, m_players[0].transform.position, {x, -y}); //y is inverted because screen is 0,0 at top left, while the graphics are bottom left
+					Vec2 normalized = Vec2::normalize({x, -y}); //y is inverted because screen is 0,0 at top left, while the graphics are bottom left
+					generateBullets(m_rayBullets, 1, 0, m_players[0].transform.position, normalized);
+					return true;
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_RightButton && w.m_mouseButton.m_isDown)
+				{
+					float x = w.m_mouseButton.m_x;
+					float y = w.m_mouseButton.m_y;
+					x -= m_window->getSizeX() / 2;
+					y -= m_window->getSizeY() / 2;
+					Vec2 normalized = Vec2::normalize({x, -y}); //y is inverted because screen is 0,0 at top left, while the graphics are bottom left
+					generateBullets(m_rayBullets, 5, 0.5f, m_players[0].transform.position, normalized);
+					return true;
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown)
+				{
+					float spdAdd = 0.5f;
+					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
+					{
+						m_players[0].acceleration.y += spdAdd;
+						m_players[0].acceleration.y = std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
+						clamp(-1.0f, 1.0f, m_players[0].acceleration.y);
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
+					{
+						m_players[0].acceleration.y -= spdAdd;
+						m_players[0].acceleration.y = -std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
+						clamp(-1.0f, 1.0f, m_players[0].acceleration.y);
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
+					{
+						m_players[0].acceleration.x -= spdAdd;
+						m_players[0].acceleration.x = -std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
+						clamp(-1.0f, 1.0f, m_players[0].acceleration.x);
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
+					{
+						m_players[0].acceleration.x += spdAdd;
+						m_players[0].acceleration.x = std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
+						clamp(-1.0f, 1.0f, m_players[0].acceleration.x);
+						
+						return true;
+					}
+				}
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown)
+				{
+					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
+					{
+						m_players[0].acceleration.y = 0;
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
+					{
+						m_players[0].acceleration.y = 0;
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
+					{
+						m_players[0].acceleration.x = 0;
+						return true;
+					}
+					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
+					{
+						m_players[0].acceleration.x = 0;
+						return true;
+					}
 				}
 				return false;
 			});
@@ -91,12 +172,23 @@ namespace Core
 		m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
 		//player
-		m_numPlayers = 1;
-		m_players[0].transform.position.set(0, 0);
-		m_players[0].transform.scale.set(1, 1);
-		m_players[0].transform.rotation = 0;
-		m_players[0].color.set(1, 0, 0);
-		m_players[0].boundingBox.set(0, 0, 0.5f, 0.5f);
+		m_numPlayers = 2;
+		uint32_t p = 0;
+		m_players[p].transform.position.set(0, 0);
+		m_players[p].transform.scale.set(1, 1);
+		m_players[p].transform.rotation = 0;
+		m_players[p].color.set(1, 0, 0);
+		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
+		m_players[p].velocity.set(0.1f, 0.1f);
+		m_players[p].acceleration.set(0, 0);
+		++p;
+		m_players[p].transform.position.set(3, 3);
+		m_players[p].transform.scale.set(1, 1);
+		m_players[p].transform.rotation = 0;
+		m_players[p].color.set(1, 1, 0);
+		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
+		m_players[p].velocity.set(0.1f, 0.1f);
+		m_players[p].acceleration.set(0, 0);
 
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -140,12 +232,23 @@ namespace Core
 			}
 		}
 
+		for(uint32_t i = 0; i < m_numPlayers; ++i)
+		{
+			Player& player = m_players[i];
+			player.transform.position += (player.velocity*player.acceleration);
+		}
+
 		for(uint32_t i = 0; i < m_rayBullets.size(); )
 		{
+			auto travel = Vec2::length(m_rayBullets[i].velocity);
 			m_rayBullets[i].position += m_rayBullets[i].velocity;
-			auto l = length(m_rayBullets[i].position - m_rayBullets[i].origin);
+			if(Vec2::length(m_rayBullets[i].position - m_rayBullets[i].origin) > 7)
+			{
+				m_rayBullets[i].origin += m_rayBullets[i].velocity;
+			}
+			m_rayBullets[i].travelled += travel;
 			
-			if(l > 30)
+			if(m_rayBullets[i].travelled > 30)
 			{
 				m_rayBullets[i] = m_rayBullets.back();
 				m_rayBullets.pop_back();
@@ -180,7 +283,7 @@ namespace Core
 		m_graphicsSystem.begin();
 
 		Camera camera;
-		camera.setPosition({0, 0, -50});
+		camera.setPosition({0, 0, -30});
 
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(camera);

@@ -29,11 +29,13 @@ namespace Core
 		Vec2 operator*(float f) const;
 		Vec2 operator/(float f) const;
 		
+		static float length(const Vec2& v);
+		static Vec2 normalize(const Vec2& v);
 	};
 
 	Vec2 operator*(float f, const Vec2& v);
+	Vec2 operator*(const Vec2& l, const Vec2& r);
 	Vec2 operator/(float f, const Vec2& v);
-	float length(const Vec2& v);
 	std::ostream& operator<<(std::ostream& os, const Vec2& v);
 }
 

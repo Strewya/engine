@@ -38,7 +38,7 @@ namespace Core
 		uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
 
 		uint64_t getLastRealTimeMicros() const;
-		uint64_t getRealTimeMicros() const;
+		static uint64_t getRealTimeMicros();
 		
 		uint64_t getCurMicros() const;
 		uint32_t getDeltaMicros() const;

@@ -15,6 +15,7 @@ namespace Core
 	{
 	public:
 		Rect();
+		Rect(Vec2, float, float);
 
 		float left() const;
 		float right() const;
