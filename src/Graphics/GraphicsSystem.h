@@ -60,6 +60,8 @@ namespace Core
 		void applyCamera(const Camera& camera);
 		void clearCamera();
 
+		Vec2 screenToWorld(const Vec2& screen, const Camera& camera);
+
 		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
 		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);

@@ -6,7 +6,6 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
-#include <Graphics/Camera.h>
 #include <Input/KeyCodes.h>
 #include <Util/Random.h>
 #include <Util/ResourceFile.h>
@@ -19,7 +18,7 @@ namespace Core
 	void generateBullets(std::vector<RayBullet>& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& direction)
 	{
 
-		Vec2 target = Vec2::normalize(origin + direction) * 10;
+		Vec2 target = origin + direction;
 		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
 		for(uint32_t i = 0; i < count; ++i)
 		{
@@ -76,9 +75,7 @@ namespace Core
 				{
 					float x = w.m_mouseButton.m_x;
 					float y = w.m_mouseButton.m_y;
-					x -= m_window->getSizeX() / 2;
-					y -= m_window->getSizeY() / 2;
-					Vec2 normalized = Vec2::normalize({x, -y}); //y is inverted because screen is 0,0 at top left, while the graphics are bottom left
+					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
 					generateBullets(m_rayBullets, 1, 0, m_players[0].transform.position, normalized);
 					return true;
 				}
@@ -167,7 +164,9 @@ namespace Core
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
-			
+		
+		m_camera.setPosition({0, 0, -50});
+
 		//background
 		m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
@@ -181,6 +180,7 @@ namespace Core
 		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
 		m_players[p].velocity.set(0.1f, 0.1f);
 		m_players[p].acceleration.set(0, 0);
+		
 		++p;
 		m_players[p].transform.position.set(3, 3);
 		m_players[p].transform.scale.set(1, 1);
@@ -282,11 +282,13 @@ namespace Core
 
 		m_graphicsSystem.begin();
 
-		Camera camera;
-		camera.setPosition({0, 0, -30});
-
 		m_graphicsSystem.setPerspectiveProjection();
-		m_graphicsSystem.applyCamera(camera);
+		m_graphicsSystem.applyCamera(m_camera);
+
+		Transform tf;
+		Vec2 p1{0, 0}, p2{0, 1}, p3{1, 0};
+		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1, 1});
+		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1, 1});
 		
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
 		{
@@ -295,7 +297,6 @@ namespace Core
 
 		for(auto& rayBullet : m_rayBullets)
 		{
-			Transform tf;
 			m_graphicsSystem.drawLine(tf, rayBullet.origin, rayBullet.position, {1, 1, 1, 1});
 		}
 

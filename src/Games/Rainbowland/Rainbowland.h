@@ -14,6 +14,7 @@
 #include <Caches/ImageCache.h>
 #include <Caches/TextureCache.h>
 #include <Games/Rainbowland/GameObjects.h>
+#include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Util/Time.h>
@@ -36,6 +37,8 @@ namespace Core
 		
 		Time m_logicTimer;
 		Time m_renderTimer;
+
+		Camera m_camera;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
 
