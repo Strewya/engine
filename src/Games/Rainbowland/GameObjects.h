@@ -23,7 +23,9 @@ namespace Core
 		Color color;
 		Rect boundingBox;
 		Vec2 velocity;
+		Vec2 maxVelocity;
 		Vec2 acceleration;
+		Vec2 direction;
 		uint32_t m_imageID;
 	};
 
@@ -62,4 +64,5 @@ namespace Core
 	typedef std::vector<RayBullet> VRayBullets;
 
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
+	void moveBullets(const Time& timer, VRayBullets& bullets);
 }

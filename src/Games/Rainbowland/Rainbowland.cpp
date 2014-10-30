@@ -90,33 +90,24 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown)
 				{
-					float spdAdd = 0.5f;
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
-						m_players[0].acceleration.y += spdAdd;
-						m_players[0].acceleration.y = std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
-						clamp(-1.0f, 1.0f, m_players[0].acceleration.y);
+						m_players[0].direction.y += 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
 					{
-						m_players[0].acceleration.y -= spdAdd;
-						m_players[0].acceleration.y = -std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
-						clamp(-1.0f, 1.0f, m_players[0].acceleration.y);
+						m_players[0].direction.y -= 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
 					{
-						m_players[0].acceleration.x -= spdAdd;
-						m_players[0].acceleration.x = -std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
-						clamp(-1.0f, 1.0f, m_players[0].acceleration.x);
+						m_players[0].direction.x -= 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
 					{
-						m_players[0].acceleration.x += spdAdd;
-						m_players[0].acceleration.x = std::max(std::abs(m_players[0].acceleration.x), std::abs(m_players[0].acceleration.y));
-						clamp(-1.0f, 1.0f, m_players[0].acceleration.x);
+						m_players[0].direction.x += 1;
 						
 						return true;
 					}
@@ -125,22 +116,22 @@ namespace Core
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
-						m_players[0].acceleration.y = 0;
+						m_players[0].direction.y -= 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
 					{
-						m_players[0].acceleration.y = 0;
+						m_players[0].direction.y += 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
 					{
-						m_players[0].acceleration.x = 0;
+						m_players[0].direction.x += 1;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
 					{
-						m_players[0].acceleration.x = 0;
+						m_players[0].direction.x -= 1;
 						return true;
 					}
 				}
@@ -166,12 +157,13 @@ namespace Core
 		m_players[p].transform.rotation = 0;
 		m_players[p].color.set(1, 0, 0);
 		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
-		m_players[p].velocity.set(5.0f, 5.0f);
-		m_players[p].acceleration.set(0, 0);
+		m_players[p].velocity.set(0.0f, 0.0f);
+		m_players[p].maxVelocity.set(5.0f, 5.0f);
+		m_players[p].acceleration.set(0.2f, 0.2f);
 		
 		m_graphicsSystem.setPerspectiveProjection();
 		
-		m_camera.setPosition({-15.0f, 10.0f, -50.0f});
+		m_camera.setPosition({-5.0f, 2.0f, -50.0f});
 		m_graphicsSystem.applyCamera(m_camera);
 		Vec2 topleft = m_graphicsSystem.screenToWorld({0, 0}, m_camera);
 		m_playingField.halfWidth = std::abs(topleft.x);
@@ -232,30 +224,11 @@ namespace Core
 		auto pos = m_camera.getPosition();
 		pos.x = averagePos.x;
 		pos.y = averagePos.y;
-		clamp(-15.0f, 15.0f, pos.x);
-		clamp(-10.0f, 10.0f, pos.y);
+		clamp(-5.0f, 5.0f, pos.x);
+		clamp(-2.0f, 2.0f, pos.y);
 		m_camera.setPosition(pos);
 
-		for(uint32_t i = 0; i < m_rayBullets.size(); )
-		{
-			auto travel = Vec2::length(m_rayBullets[i].velocity);
-			m_rayBullets[i].position += m_rayBullets[i].velocity;
-			if(Vec2::length(m_rayBullets[i].position - m_rayBullets[i].origin) > 7)
-			{
-				m_rayBullets[i].origin += m_rayBullets[i].velocity;
-			}
-			m_rayBullets[i].travelled += travel;
-			
-			if(m_rayBullets[i].travelled > 50)
-			{
-				m_rayBullets[i] = m_rayBullets.back();
-				m_rayBullets.pop_back();
-			}
-			else
-			{
-				++i;
-			}
-		}
+		moveBullets(m_logicTimer, m_rayBullets);
 
 		/*
 		auto lua = m_luaSystem.getStack();
@@ -288,11 +261,6 @@ namespace Core
 		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1});
 		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});
 
-		Vec2 tl{-40, 30}, tr{40, 30}, bl{-40, -30}, br{40, -30};
-		m_graphicsSystem.drawLine(tf, tl, tr, {1, 1, 1});
-		m_graphicsSystem.drawLine(tf, tr, br, {1, 1, 1});
-		m_graphicsSystem.drawLine(tf, br, bl, {1, 1, 1});
-		m_graphicsSystem.drawLine(tf, bl, tl, {1, 1, 1});
 		
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
 		{

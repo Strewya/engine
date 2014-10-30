@@ -51,6 +51,13 @@ namespace Core
 		return Vec2(x * f, y * f);
 	}
 
+	Vec2& Vec2::operator*=(const Vec2& v)
+	{
+		x *= v.x;
+		y *= v.y;
+		return *this;
+	}
+
 	Vec2 Vec2::operator/(float f) const
 	{
 		return Vec2(x / f, y / f);

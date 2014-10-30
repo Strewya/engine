@@ -12,6 +12,26 @@
 
 namespace Core
 {
+	void movePlayers(const Time& timer, VPlayers& players, uint32_t activePlayerCount, const Rect& playingField)
+	{
+		for(uint32_t i = 0; i < activePlayerCount; ++i)
+		{
+			Player& player = players[i];
+			player.velocity += (player.acceleration);
+			player.velocity *= player.direction;
+			clamp(-player.maxVelocity.x, player.maxVelocity.x, player.velocity.x);
+			clamp(-player.maxVelocity.y, player.maxVelocity.y, player.velocity.y);
+			player.transform.position += (timer.getDeltaTime()*player.velocity);
+			Rect playerBBox = player.boundingBox;
+			playerBBox.center = player.transform.position;
+			if(!isRectInsideRect(playerBBox, playingField))
+			{
+				clamp(playingField.left() + player.boundingBox.halfWidth, playingField.right() - player.boundingBox.halfWidth, player.transform.position.x);
+				clamp(playingField.bottom() + player.boundingBox.halfHeight, playingField.top() - player.boundingBox.halfHeight, player.transform.position.y);
+			}
+		}
+	}
+
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target)
 	{
 
@@ -21,22 +41,31 @@ namespace Core
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t)});
+			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t)*30, 0});
 		}
 	}
 
-	void movePlayers(const Time& timer, VPlayers& players, uint32_t activePlayerCount, const Rect& playingField)
+	void moveBullets(const Time& timer, VRayBullets& bullets)
 	{
-		for(uint32_t i = 0; i < activePlayerCount; ++i)
+		for(uint32_t i = 0; i < bullets.size();) 
 		{
-			Player& player = players[i];
-			player.transform.position += (timer.getDeltaTime()*player.velocity*player.acceleration);
-			Rect playerBBox = player.boundingBox;
-			playerBBox.center = player.transform.position;
-			if(!isRectInsideRect(playerBBox, playingField))
+			auto displacement = timer.getDeltaTime()*bullets[i].velocity;
+			auto travel = Vec2::length(displacement);
+			bullets[i].position += displacement;
+			bullets[i].travelled += travel;
+			if(bullets[i].travelled > 1)
 			{
-				clamp(playingField.left() + player.boundingBox.halfWidth, playingField.right() - player.boundingBox.halfWidth, player.transform.position.x);
-				clamp(playingField.bottom() + player.boundingBox.halfHeight, playingField.top() - player.boundingBox.halfHeight, player.transform.position.y);
+				bullets[i].origin += displacement;
+			}
+
+			if(bullets[i].travelled > 50)
+			{
+				bullets[i] = bullets.back();
+				bullets.pop_back();
+			}
+			else
+			{
+				++i;
 			}
 		}
 	}
