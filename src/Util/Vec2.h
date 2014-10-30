@@ -28,6 +28,7 @@ namespace Core
 		Vec2 operator-(const Vec2& v) const;
 		Vec2 operator*(float f) const;
 		Vec2 operator/(float f) const;
+		Vec2& operator/=(float f);
 		
 		static float length(const Vec2& v);
 		static Vec2 normalize(const Vec2& v);

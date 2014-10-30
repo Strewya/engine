@@ -4,9 +4,9 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
-#include <list>
 #include <memory>
 #include <string>
+#include <vector>
 #include <Window/myWindows.h>
 /******* common headers *******/
 /******* extra headers *******/

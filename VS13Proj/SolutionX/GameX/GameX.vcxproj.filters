@@ -188,6 +188,9 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">

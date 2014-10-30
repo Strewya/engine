@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include <Games/Rainbowland/Rainbowland.h>
 /******* C++ headers *******/
+#include <algorithm>
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
@@ -15,18 +16,6 @@
 
 namespace Core
 {
-	void generateBullets(std::vector<RayBullet>& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& direction)
-	{
-
-		Vec2 target = origin + direction;
-		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
-		for(uint32_t i = 0; i < count; ++i)
-		{
-			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(target+t-origin)});
-		}
-	}
-
 	void RainbowlandGame::shutdown()
 	{
 		DEBUG_INFO("---------------------------------");
@@ -35,7 +24,7 @@ namespace Core
 		status &= m_fontCache.shutdown();
 		status &= m_inputSystem.shutdown();
 		status &= m_graphicsSystem.shutdown();
-
+		m_window->setFullscreen(false);
 		if(!status)
 		{
 			DEBUG_INFO("\nShutdown has failed! Bugs...");
@@ -57,6 +46,8 @@ namespace Core
 			m_textureCache.init(m_graphicsSystem) &&
 			true;
 
+		window.setFullscreen(true);
+
 		if(m_isRunning)
 		{
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
@@ -73,8 +64,8 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton && w.m_mouseButton.m_isDown)
 				{
-					float x = w.m_mouseButton.m_x;
-					float y = w.m_mouseButton.m_y;
+					float x = (float)w.m_mouseButton.m_x;
+					float y = (float)w.m_mouseButton.m_y;
 					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
 					generateBullets(m_rayBullets, 1, 0, m_players[0].transform.position, normalized);
 					return true;
@@ -86,11 +77,9 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_RightButton && w.m_mouseButton.m_isDown)
 				{
-					float x = w.m_mouseButton.m_x;
-					float y = w.m_mouseButton.m_y;
-					x -= m_window->getSizeX() / 2;
-					y -= m_window->getSizeY() / 2;
-					Vec2 normalized = Vec2::normalize({x, -y}); //y is inverted because screen is 0,0 at top left, while the graphics are bottom left
+					float x = (float)w.m_mouseButton.m_x;
+					float y = (float)w.m_mouseButton.m_y;
+					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
 					generateBullets(m_rayBullets, 5, 0.5f, m_players[0].transform.position, normalized);
 					return true;
 				}
@@ -165,30 +154,30 @@ namespace Core
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 		
-		m_camera.setPosition({0, 0, -50});
-
 		//background
 		m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
-		//player
-		m_numPlayers = 2;
+		//players
+		m_numPlayers = 1;
 		uint32_t p = 0;
+		m_players.emplace_back();
 		m_players[p].transform.position.set(0, 0);
 		m_players[p].transform.scale.set(1, 1);
 		m_players[p].transform.rotation = 0;
 		m_players[p].color.set(1, 0, 0);
 		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
-		m_players[p].velocity.set(0.1f, 0.1f);
+		m_players[p].velocity.set(5.0f, 5.0f);
 		m_players[p].acceleration.set(0, 0);
 		
-		++p;
-		m_players[p].transform.position.set(3, 3);
-		m_players[p].transform.scale.set(1, 1);
-		m_players[p].transform.rotation = 0;
-		m_players[p].color.set(1, 1, 0);
-		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
-		m_players[p].velocity.set(0.1f, 0.1f);
-		m_players[p].acceleration.set(0, 0);
+		m_graphicsSystem.setPerspectiveProjection();
+		
+		m_camera.setPosition({-15.0f, 10.0f, -50.0f});
+		m_graphicsSystem.applyCamera(m_camera);
+		Vec2 topleft = m_graphicsSystem.screenToWorld({0, 0}, m_camera);
+		m_playingField.halfWidth = std::abs(topleft.x);
+		m_playingField.halfHeight = std::abs(topleft.y);
+
+		m_camera.setPosition({0, 0, -50});
 
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -232,11 +221,20 @@ namespace Core
 			}
 		}
 
+		movePlayers(m_logicTimer, m_players, m_numPlayers, m_playingField);
+
+		Vec2 averagePos;
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
 		{
-			Player& player = m_players[i];
-			player.transform.position += (player.velocity*player.acceleration);
+			averagePos += m_players[i].transform.position;
 		}
+		averagePos /= (float)m_numPlayers;
+		auto pos = m_camera.getPosition();
+		pos.x = averagePos.x;
+		pos.y = averagePos.y;
+		clamp(-15.0f, 15.0f, pos.x);
+		clamp(-10.0f, 10.0f, pos.y);
+		m_camera.setPosition(pos);
 
 		for(uint32_t i = 0; i < m_rayBullets.size(); )
 		{
@@ -248,7 +246,7 @@ namespace Core
 			}
 			m_rayBullets[i].travelled += travel;
 			
-			if(m_rayBullets[i].travelled > 30)
+			if(m_rayBullets[i].travelled > 50)
 			{
 				m_rayBullets[i] = m_rayBullets.back();
 				m_rayBullets.pop_back();
@@ -287,8 +285,14 @@ namespace Core
 
 		Transform tf;
 		Vec2 p1{0, 0}, p2{0, 1}, p3{1, 0};
-		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1, 1});
-		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1, 1});
+		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1});
+		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});
+
+		Vec2 tl{-40, 30}, tr{40, 30}, bl{-40, -30}, br{40, -30};
+		m_graphicsSystem.drawLine(tf, tl, tr, {1, 1, 1});
+		m_graphicsSystem.drawLine(tf, tr, br, {1, 1, 1});
+		m_graphicsSystem.drawLine(tf, br, bl, {1, 1, 1});
+		m_graphicsSystem.drawLine(tf, bl, tl, {1, 1, 1});
 		
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
 		{
@@ -309,12 +313,12 @@ namespace Core
 		}
 		*/
 
-		//static Transform framerateTf;
-		//framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);
-		//framerateTf.scale.set(0.5f, 0.5f);
-		//m_graphicsSystem.setOrthographicProjection();
-		//m_graphicsSystem.clearCamera();
-		//m_graphicsSystem.drawText(m_defaultFont, "ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
+		/*static Transform framerateTf;
+		framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);
+		framerateTf.scale.set(0.5f, 0.5f);
+		m_graphicsSystem.setOrthographicProjection();
+		m_graphicsSystem.clearCamera();
+		m_graphicsSystem.drawText(m_defaultFont, "ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);*/
 		
 
 		m_graphicsSystem.present();

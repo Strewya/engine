@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Color.h>
@@ -14,6 +15,8 @@
 
 namespace Core
 {
+	class Time;
+
 	struct Player
 	{
 		Transform transform;
@@ -24,6 +27,10 @@ namespace Core
 		uint32_t m_imageID;
 	};
 
+	typedef std::vector<Player> VPlayers;
+
+	void movePlayers(const Time& timer, VPlayers& players, uint32_t activePlayerCount, const Rect& playingField);
+
 	struct Monster
 	{
 		Transform transform;
@@ -31,6 +38,8 @@ namespace Core
 		Rect boundingBox;
 		uint32_t m_imageID;
 	};
+
+	typedef std::vector<Monster> VMonsters;
 
 	struct Bonus
 	{
@@ -40,6 +49,8 @@ namespace Core
 		uint32_t m_imageID;
 	};
 
+	typedef std::vector<Bonus> VBonuses;
+
 	struct RayBullet
 	{
 		Vec2 origin;
@@ -47,4 +58,8 @@ namespace Core
 		Vec2 velocity;
 		float travelled;
 	};
+
+	typedef std::vector<RayBullet> VRayBullets;
+
+	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
 }

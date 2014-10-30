@@ -253,7 +253,8 @@ namespace Core
 	{
 		auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window->getSizeX(), (float)m_window->getSizeY(), 0.0f, 1.0f, m_camProjection, m_camView, XMMatrixIdentity());
 		auto camPos = convert(camera.getPosition());
-		auto loc = XMPlaneIntersectLine(convert(Vec3{1, 1, 0}), objectSpace, camPos);
+		auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
+		auto loc = XMPlaneIntersectLine(plane, objectSpace, camPos);
 		return Vec2{loc.m128_f32[0], loc.m128_f32[1]};
 	}
 

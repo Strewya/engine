@@ -29,6 +29,9 @@ namespace Core
 		float halfWidth;
 		float halfHeight;
 	};
+
+	bool isPointInsideRect(const Vec2& point, const Rect& rect);
+	bool isRectInsideRect(const Rect& innerRect, const Rect& outerRect);
 }
 
 //#include <iostream>
