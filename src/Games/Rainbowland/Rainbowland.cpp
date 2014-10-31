@@ -88,7 +88,7 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
@@ -112,7 +112,7 @@ namespace Core
 						return true;
 					}
 				}
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
@@ -159,7 +159,7 @@ namespace Core
 		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
 		m_players[p].velocity.set(0.0f, 0.0f);
 		m_players[p].maxVelocity.set(5.0f, 5.0f);
-		m_players[p].acceleration.set(0.2f, 0.2f);
+		m_players[p].acceleration.set(1.0f, 1.0f);
 		
 		m_graphicsSystem.setPerspectiveProjection();
 		

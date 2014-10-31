@@ -17,8 +17,11 @@ namespace Core
 		for(uint32_t i = 0; i < activePlayerCount; ++i)
 		{
 			Player& player = players[i];
-			player.velocity += (player.acceleration);
-			player.velocity *= player.direction;
+			player.velocity += (player.acceleration*player.direction);
+			Vec2 dir;
+			dir.x = std::fabs(player.direction.x);
+			dir.y = std::fabs(player.direction.y);
+			player.velocity *= dir;
 			clamp(-player.maxVelocity.x, player.maxVelocity.x, player.velocity.x);
 			clamp(-player.maxVelocity.y, player.maxVelocity.y, player.velocity.y);
 			player.transform.position += (timer.getDeltaTime()*player.velocity);
