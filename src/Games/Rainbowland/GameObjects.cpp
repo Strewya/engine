@@ -35,6 +35,34 @@ namespace Core
 		}
 	}
 
+	void fireWeapon(Player& player, VRayBullets& bullets)
+	{
+		switch(player.currentWeapon)
+		{
+			case Pistol:
+				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(0.5f))
+				{
+					player.weaponTimer.reset();
+					generateBullets(bullets, 1, 0, player.transform.position, player.aim);
+				}
+				break;
+			case Shotgun:
+				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(1))
+				{
+					player.weaponTimer.reset();
+					generateBullets(bullets, 6, 2.0f, player.transform.position, player.aim);
+				}
+				break;
+			case Uzi:
+				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(0.1f))
+				{
+					player.weaponTimer.reset();
+					generateBullets(bullets, 1, 1.0f, player.transform.position, player.aim);
+				}
+				break;
+		}
+	}
+
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
 	{
 		if(monsters.size() > 150) return;
@@ -44,7 +72,7 @@ namespace Core
 		auto& monster = monsters.back();
 		monster.boundingBox.set(0, 0, 1, 1);
 		monster.color.set(0, 0, 0);
-		monster.maxVelocity.set(1 + gen.randFloat() * 2, 5 + gen.randFloat() * 2);
+		monster.maxVelocity = 1 + gen.randFloat() * 2;
 		monster.transform.position = position;
 		monster.targetPlayer = target;
 	}
@@ -54,10 +82,7 @@ namespace Core
 		for(auto& monster : monsters)
 		{
 			monster.direction = Vec2::normalize(players[monster.targetPlayer].transform.position - monster.transform.position);
-			monster.velocity += monster.direction;
-			clamp(-monster.maxVelocity.x, monster.maxVelocity.x, monster.velocity.x);
-			clamp(-monster.maxVelocity.y, monster.maxVelocity.y, monster.velocity.y);
-			monster.transform.position += (monster.velocity*timer.getDeltaTime());
+			monster.transform.position += (monster.direction*monster.maxVelocity*timer.getDeltaTime());
 		}
 	}
 

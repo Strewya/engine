@@ -18,6 +18,14 @@ namespace Core
 {
 	class Time;
 
+	enum Weapon
+	{
+		Pistol,
+		Shotgun,
+		Uzi
+	};
+
+
 	struct Player
 	{
 		Transform transform;
@@ -27,6 +35,10 @@ namespace Core
 		Vec2 maxVelocity;
 		Vec2 acceleration;
 		Vec2 direction;
+		Time weaponTimer;
+		Vec2 aim;
+		Weapon currentWeapon;
+		bool isShooting;
 	};
 
 	typedef std::vector<Player> VPlayers;
@@ -38,9 +50,8 @@ namespace Core
 		Transform transform;
 		Color color;
 		Rect boundingBox;
-		Vec2 velocity;
-		Vec2 maxVelocity;
 		Vec2 direction;
+		float maxVelocity;
 		uint32_t targetPlayer;
 	};
 
@@ -84,4 +95,5 @@ namespace Core
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
 	void moveBullets(const Time& timer, VRayBullets& bullets);
 	void killMonsters(VRayBullets& bullets, VMonsters& monsters);
+	void fireWeapon(Player& player, VRayBullets& bullets);
 }

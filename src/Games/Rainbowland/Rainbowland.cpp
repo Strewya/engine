@@ -62,12 +62,12 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton && w.m_mouseButton.m_isDown)
+				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative)
 				{
-					float x = (float)w.m_mouseButton.m_x;
-					float y = (float)w.m_mouseButton.m_y;
+					float x = (float)w.m_mouseMove.m_x;
+					float y = (float)w.m_mouseMove.m_y;
 					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
-					generateBullets(m_rayBullets, 1, 0, m_players[0].transform.position, normalized);
+					m_players[0].aim = normalized;
 					return true;
 				}
 				return false;
@@ -75,13 +75,43 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_RightButton && w.m_mouseButton.m_isDown)
+				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton)
 				{
-					float x = (float)w.m_mouseButton.m_x;
-					float y = (float)w.m_mouseButton.m_y;
-					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
-					generateBullets(m_rayBullets, 5, 0.5f, m_players[0].transform.position, normalized);
+					if(w.m_mouseButton.m_isDown)
+					{
+						m_players[0].isShooting = true;
+					}
+					else
+					{
+						m_players[0].isShooting = false;
+					}
 					return true;
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
+				{
+					switch(w.m_keyboard.m_keyCode)
+					{
+						case Keyboard::m_1:
+							m_players[0].currentWeapon = Pistol;
+							return true;
+
+						case Keyboard::m_2:
+							m_players[0].currentWeapon = Shotgun;
+							return true;
+
+						case Keyboard::m_3:
+							m_players[0].currentWeapon = Uzi;
+							return true;
+
+						case Keyboard::m_R:
+							m_monsters.clear();
+							break;
+					}
 				}
 				return false;
 			});
@@ -160,6 +190,9 @@ namespace Core
 		m_players[p].velocity.set(0.0f, 0.0f);
 		m_players[p].maxVelocity.set(5.0f, 5.0f);
 		m_players[p].acceleration.set(1.0f, 1.0f);
+		m_players[p].weaponTimer.updateBy(Time::secondsToMicros(100));
+		m_players[p].currentWeapon = Pistol;
+		m_players[p].isShooting = false;
 		
 		//playing field boundary
 		m_graphicsSystem.setPerspectiveProjection();
@@ -175,7 +208,7 @@ namespace Core
 		//spawners
 		Rect spawnerLocations{{0, 0}, m_playingField.halfWidth - 3, m_playingField.halfHeight - 3};
 		uint32_t spawnerCount = 8;
-		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth / spawnerCount, spawnerLocations.halfHeight / spawnerCount};
+		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
 		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
 		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
 		for(uint32_t i = 0; i < spawnerCount; ++i)
@@ -266,6 +299,14 @@ namespace Core
 		}
 
 		movePlayers(m_logicTimer, m_players, m_numPlayers, m_playingField);
+		for(auto& player : m_players)
+		{
+			player.weaponTimer.updateBy(m_logicTimer.getDeltaMicros());
+			if(player.isShooting)
+			{
+				fireWeapon(player, m_rayBullets);
+			}
+		}
 		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_numPlayers);
 		moveMonsters(m_logicTimer, m_monsters, m_players);
 
