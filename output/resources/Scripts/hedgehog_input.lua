@@ -198,4 +198,11 @@ function setupInput()
 			gState.step = true;
 		end;
 	end);
+	
+	addInput(gInput.GAMEPLAY, Core.WE_KEYBOARDKEY, function(event)
+		if(Core.Keyboard.m_L ~= event.m_keyboard.m_keyCode) then return false; end;
+		if(event.m_keyboard.m_isDown and not event.m_keyboard.m_previouslyDown) then
+			gState.resetHog = true;
+		end;
+	end);
 end;

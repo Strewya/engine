@@ -184,6 +184,11 @@ function game_tick(game)
 		gameTimer:setTimeScale(Core.Time.NORMAL_TIME);
 	end;
 	
+	if(gState.resetHog) then
+		gState.resetHog = false;
+		player.m_transform.position:set(0,0);
+	end;
+	
 	if(gActions.moveLeft) then
 		gState.asm:transition("walk");
 		if(player.m_transform.scale.x > 0) then
