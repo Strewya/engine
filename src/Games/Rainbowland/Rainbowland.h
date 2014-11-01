@@ -37,16 +37,17 @@ namespace Core
 		
 		Time m_logicTimer;
 		Time m_renderTimer;
-
+		
 		Camera m_camera;
 		Rect m_playingField;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
 
-		std::vector<Player> m_players;
-		std::vector<Monster> m_monsters;
-		std::vector<Bonus> m_bonuses;
-		std::vector<RayBullet> m_rayBullets;
+		VPlayers m_players;
+		VMonsters m_monsters;
+		VMonsterSpawners m_monsterSpawners;
+		VBonuses m_bonuses;
+		VRayBullets m_rayBullets;
 		
 		Window* m_window;
 		uint32_t m_numPlayers;

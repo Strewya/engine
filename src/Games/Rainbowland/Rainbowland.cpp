@@ -161,6 +161,7 @@ namespace Core
 		m_players[p].maxVelocity.set(5.0f, 5.0f);
 		m_players[p].acceleration.set(1.0f, 1.0f);
 		
+		//playing field boundary
 		m_graphicsSystem.setPerspectiveProjection();
 		
 		m_camera.setPosition({-5.0f, 2.0f, -50.0f});
@@ -170,6 +171,57 @@ namespace Core
 		m_playingField.halfHeight = std::abs(topleft.y);
 
 		m_camera.setPosition({0, 0, -50});
+
+		//spawners
+		Rect spawnerLocations{{0, 0}, m_playingField.halfWidth - 3, m_playingField.halfHeight - 3};
+		uint32_t spawnerCount = 8;
+		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth / spawnerCount, spawnerLocations.halfHeight / spawnerCount};
+		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
+		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		for(uint32_t i = 0; i < spawnerCount; ++i)
+		{
+			m_monsterSpawners.emplace_back();
+			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			m_monsterSpawners.back().spawnRadius = 1;
+			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
+			m_monsterSpawners.back().timer.reset();
+			m_monsterSpawners.back().transform.position = pos;
+
+			pos.x += distanceBetweenSpawners.x;
+		}
+		for(uint32_t i = 0; i < spawnerCount; ++i)
+		{
+			m_monsterSpawners.emplace_back();
+			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			m_monsterSpawners.back().spawnRadius = 1;
+			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
+			m_monsterSpawners.back().timer.reset();
+			m_monsterSpawners.back().transform.position = pos;
+
+			pos.y -= distanceBetweenSpawners.y;
+		}
+		for(uint32_t i = 0; i < spawnerCount; ++i)
+		{
+			m_monsterSpawners.emplace_back();
+			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			m_monsterSpawners.back().spawnRadius = 1;
+			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
+			m_monsterSpawners.back().timer.reset();
+			m_monsterSpawners.back().transform.position = pos;
+
+			pos.x -= distanceBetweenSpawners.x;
+		}
+		for(uint32_t i = 0; i < spawnerCount; ++i)
+		{
+			m_monsterSpawners.emplace_back();
+			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			m_monsterSpawners.back().spawnRadius = 1;
+			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
+			m_monsterSpawners.back().timer.reset();
+			m_monsterSpawners.back().transform.position = pos;
+
+			pos.y += distanceBetweenSpawners.y;
+		}
 
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -214,6 +266,8 @@ namespace Core
 		}
 
 		movePlayers(m_logicTimer, m_players, m_numPlayers, m_playingField);
+		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_numPlayers);
+		moveMonsters(m_logicTimer, m_monsters, m_players);
 
 		Vec2 averagePos;
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
@@ -229,6 +283,7 @@ namespace Core
 		m_camera.setPosition(pos);
 
 		moveBullets(m_logicTimer, m_rayBullets);
+		killMonsters(m_rayBullets, m_monsters);
 
 		/*
 		auto lua = m_luaSystem.getStack();
@@ -265,6 +320,16 @@ namespace Core
 		for(uint32_t i = 0; i < m_numPlayers; ++i)
 		{
 			m_graphicsSystem.drawQuad(m_players[i].transform, m_players[i].boundingBox.halfSize(), m_players[i].color);
+		}
+
+		for(auto& spawner : m_monsterSpawners)
+		{
+			m_graphicsSystem.drawQuad(spawner.transform, {1, 1}, {1,0,1});
+		}
+
+		for(auto& monster : m_monsters)
+		{
+			m_graphicsSystem.drawQuad(monster.transform, monster.boundingBox.halfSize(), monster.color);
 		}
 
 		for(auto& rayBullet : m_rayBullets)

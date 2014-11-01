@@ -17,7 +17,7 @@ namespace Core
 		for(uint32_t i = 0; i < activePlayerCount; ++i)
 		{
 			Player& player = players[i];
-			player.velocity += (player.acceleration*player.direction);
+			player.velocity += (player.acceleration*Vec2::normalize(player.direction));
 			Vec2 dir;
 			dir.x = std::fabs(player.direction.x);
 			dir.y = std::fabs(player.direction.y);
@@ -31,6 +31,46 @@ namespace Core
 			{
 				clamp(playingField.left() + player.boundingBox.halfWidth, playingField.right() - player.boundingBox.halfWidth, player.transform.position.x);
 				clamp(playingField.bottom() + player.boundingBox.halfHeight, playingField.top() - player.boundingBox.halfHeight, player.transform.position.y);
+			}
+		}
+	}
+
+	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
+	{
+		if(monsters.size() > 150) return;
+
+		monsters.emplace_back();
+		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		auto& monster = monsters.back();
+		monster.boundingBox.set(0, 0, 1, 1);
+		monster.color.set(0, 0, 0);
+		monster.maxVelocity.set(1 + gen.randFloat() * 2, 5 + gen.randFloat() * 2);
+		monster.transform.position = position;
+		monster.targetPlayer = target;
+	}
+
+	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players)
+	{
+		for(auto& monster : monsters)
+		{
+			monster.direction = Vec2::normalize(players[monster.targetPlayer].transform.position - monster.transform.position);
+			monster.velocity += monster.direction;
+			clamp(-monster.maxVelocity.x, monster.maxVelocity.x, monster.velocity.x);
+			clamp(-monster.maxVelocity.y, monster.maxVelocity.y, monster.velocity.y);
+			monster.transform.position += (monster.velocity*timer.getDeltaTime());
+		}
+	}
+
+	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount)
+	{
+		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		for(auto& spawner : spawners)
+		{
+			spawner.timer.updateBy(timer.getDeltaMicros());
+			if(spawner.timer.getCurMicros() > spawner.spawnCooldown)
+			{
+				spawner.timer.reset();
+				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0,playerCount-1));
 			}
 		}
 	}
@@ -56,7 +96,7 @@ namespace Core
 			auto travel = Vec2::length(displacement);
 			bullets[i].position += displacement;
 			bullets[i].travelled += travel;
-			if(bullets[i].travelled > 1)
+			if(bullets[i].travelled > 10)
 			{
 				bullets[i].origin += displacement;
 			}
@@ -69,6 +109,38 @@ namespace Core
 			else
 			{
 				++i;
+			}
+		}
+	}
+
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters)
+	{
+		std::map<uint32_t, uint32_t> kills;
+		for(uint32_t b = 0; b < bullets.size();)
+		{
+			RayBullet& bullet = bullets[b];
+			uint32_t monsterKilled = -1;
+			for(uint32_t m = 0; m < monsters.size(); ++m)
+			{
+				Rect bbox = monsters[m].boundingBox;
+				bbox.center = monsters[m].transform.position;
+				if(isPointInsideRect(bullet.position, bbox))
+				{
+					monsterKilled = m;
+					break;
+				}
+			}
+			if(monsterKilled != -1)
+			{
+				monsters[monsterKilled] = monsters.back();
+				monsters.pop_back();
+				bullets[b] = bullets.back();
+				bullets.pop_back();
+				monsterKilled = -1;
+			}
+			else
+			{
+				++b;
 			}
 		}
 	}

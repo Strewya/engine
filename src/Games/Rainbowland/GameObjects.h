@@ -10,6 +10,7 @@
 /******* extra headers *******/
 #include <Util/Color.h>
 #include <Util/Rect.h>
+#include <Util/Time.h>
 #include <Util/Transform.h>
 /******* end header inclusion *******/
 
@@ -26,7 +27,6 @@ namespace Core
 		Vec2 maxVelocity;
 		Vec2 acceleration;
 		Vec2 direction;
-		uint32_t m_imageID;
 	};
 
 	typedef std::vector<Player> VPlayers;
@@ -38,10 +38,28 @@ namespace Core
 		Transform transform;
 		Color color;
 		Rect boundingBox;
-		uint32_t m_imageID;
+		Vec2 velocity;
+		Vec2 maxVelocity;
+		Vec2 direction;
+		uint32_t targetPlayer;
 	};
 
 	typedef std::vector<Monster> VMonsters;
+
+	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
+	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
+
+	struct MonsterSpawner
+	{
+		Transform transform;
+		Time timer;
+		uint64_t spawnCooldown;
+		float spawnRadius;
+	};
+
+	typedef std::vector<MonsterSpawner> VMonsterSpawners;
+
+	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 
 	struct Bonus
 	{
@@ -65,4 +83,5 @@ namespace Core
 
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
 	void moveBullets(const Time& timer, VRayBullets& bullets);
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters);
 }
