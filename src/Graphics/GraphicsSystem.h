@@ -60,7 +60,7 @@ namespace Core
 		void applyCamera(const Camera& camera);
 		void clearCamera();
 
-		Vec2 screenToWorld(const Vec2& screen, const Camera& camera);
+		Vec2 screenToWorld(const Vec2& screen, const Camera& camera) const;
 
 		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
 		void drawLine(const Transform& transform, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color);

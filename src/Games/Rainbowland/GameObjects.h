@@ -16,6 +16,8 @@
 
 namespace Core
 {
+	class Camera;
+	class GraphicsSystem;
 	class Time;
 
 	enum Weapon
@@ -39,6 +41,8 @@ namespace Core
 		Time weaponTimer;
 		Time bonusTimer;
 		uint64_t weaponDelay;
+		uint32_t rateOfFireMultiplier;
+		uint64_t bonusDuration;
 		Vec2 aim;
 		Weapon currentWeapon;
 		bool isShooting;
@@ -47,7 +51,9 @@ namespace Core
 
 	typedef std::vector<Player> VPlayers;
 
+	void initPlayer(Player& player);
 	void movePlayers(const Time& timer, VPlayers& players, uint32_t activePlayerCount, const Rect& playingField);
+	void selectWeapon(Player& player, Weapon weapon);
 
 	struct Monster
 	{
@@ -103,5 +109,5 @@ namespace Core
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
 	void moveBullets(const Time& timer, VRayBullets& bullets);
 	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations);
-	void fireWeapon(Player& player, VRayBullets& bullets);
+	void fireWeapon(Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
 }

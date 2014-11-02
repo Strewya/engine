@@ -64,10 +64,7 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative)
 				{
-					float x = (float)w.m_mouseMove.m_x;
-					float y = (float)w.m_mouseMove.m_y;
-					Vec2 normalized = m_graphicsSystem.screenToWorld({x, y}, m_camera);
-					m_players[0].aim = normalized;
+					m_players[0].aim.set((float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y);
 					return true;
 				}
 				return false;
@@ -97,18 +94,15 @@ namespace Core
 					switch(w.m_keyboard.m_keyCode)
 					{
 						case Keyboard::m_1:
-							m_players[0].currentWeapon = Pistol;
-							m_players[0].weaponDelay = Time::secondsToMicros(0.5f);
+							selectWeapon(m_players[0], Pistol);
 							return true;
 
 						case Keyboard::m_2:
-							m_players[0].currentWeapon = Shotgun;
-							m_players[0].weaponDelay = Time::secondsToMicros(1.0f);
+							selectWeapon(m_players[0], Shotgun);
 							return true;
 
 						case Keyboard::m_3:
-							m_players[0].currentWeapon = Uzi;
-							m_players[0].weaponDelay = Time::secondsToMicros(0.1f);
+							selectWeapon(m_players[0], Uzi);
 							return true;
 
 						case Keyboard::m_R:
@@ -183,19 +177,8 @@ namespace Core
 
 		//players
 		m_numPlayers = 1;
-		uint32_t p = 0;
 		m_players.emplace_back();
-		m_players[p].transform.position.set(0, 0);
-		m_players[p].transform.scale.set(1, 1);
-		m_players[p].transform.rotation = 0;
-		m_players[p].color.set(1, 0, 0);
-		m_players[p].boundingBox.set(0, 0, 0.5f, 0.5f);
-		m_players[p].velocity.set(0.0f, 0.0f);
-		m_players[p].maxVelocity.set(5.0f, 5.0f);
-		m_players[p].acceleration.set(1.0f, 1.0f);
-		m_players[p].weaponTimer.updateBy(Time::secondsToMicros(100));
-		m_players[p].currentWeapon = Pistol;
-		m_players[p].isShooting = false;
+		initPlayer(m_players.back());
 		
 		//playing field boundary
 		m_graphicsSystem.setPerspectiveProjection();
@@ -307,7 +290,7 @@ namespace Core
 			player.weaponTimer.updateBy(m_logicTimer.getDeltaMicros());
 			if(player.isShooting)
 			{
-				fireWeapon(player, m_rayBullets);
+				fireWeapon(player, m_rayBullets, m_graphicsSystem, m_camera);
 			}
 		}
 		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_numPlayers);

@@ -249,7 +249,7 @@ namespace Core
 	//*****************************************************************
 	//					SCREEN TO WORLD COORDS
 	//*****************************************************************
-	Vec2 GraphicsSystem::screenToWorld(const Vec2& screen, const Camera& camera)
+	Vec2 GraphicsSystem::screenToWorld(const Vec2& screen, const Camera& camera) const
 	{
 		auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window->getSizeX(), (float)m_window->getSizeY(), 0.0f, 1.0f, m_camProjection, m_camView, XMMatrixIdentity());
 		auto camPos = convert(camera.getPosition());

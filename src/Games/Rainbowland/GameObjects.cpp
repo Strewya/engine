@@ -5,6 +5,8 @@
 #include <Games/Rainbowland/GameObjects.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Graphics/Camera.h>
+#include <Graphics/GraphicsSystem.h>
 #include <Util/Random.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
@@ -12,6 +14,42 @@
 
 namespace Core
 {
+	/*
+		Transform transform;
+		Color color;
+		Rect boundingBox;
+		Vec2 velocity;
+		Vec2 maxVelocity;
+		Vec2 acceleration;
+		Vec2 direction;
+		Time weaponTimer;
+		Time bonusTimer;
+		uint64_t weaponDelay;
+		Vec2 aim;
+		Weapon currentWeapon;
+		bool isShooting;
+		bool hasBonus;
+	*/
+	void initPlayer(Player& player)
+	{
+		player.transform.position.set(0, 0);
+		player.transform.scale.set(1, 1);
+		player.transform.rotation = 0;
+		player.color.set(1, 0, 0);
+		player.boundingBox.set(0, 0, 0.5f, 0.5f);
+		player.velocity.set(0.0f, 0.0f);
+		player.maxVelocity.set(5.0f, 5.0f);
+		player.acceleration.set(1.0f, 1.0f);
+		player.direction.set(0, 0);
+		selectWeapon(player, Pistol);
+		player.aim.set(0, 0);
+		player.rateOfFireMultiplier = 1;
+		player.bonusDuration = 0;
+		player.isShooting = false;
+		player.hasBonus = false;
+		player.bonusTimer.reset();
+	}
+
 	void movePlayers(const Time& timer, VPlayers& players, uint32_t activePlayerCount, const Rect& playingField)
 	{
 		for(uint32_t i = 0; i < activePlayerCount; ++i)
@@ -35,21 +73,44 @@ namespace Core
 		}
 	}
 
-	void fireWeapon(Player& player, VRayBullets& bullets)
+	void selectWeapon(Player& player, Weapon weapon)
 	{
-		if(player.weaponTimer.getCurMicros() > player.weaponDelay)
+		player.currentWeapon = weapon;
+		player.weaponTimer.updateBy(Time::secondsToMicros(50));
+		switch(weapon)
+		{
+			case Pistol:
+				player.weaponDelay = Time::secondsToMicros(0.5f);
+				break;
+
+			case Shotgun:
+				player.weaponDelay = Time::secondsToMicros(1.0f);
+				break;
+
+			case Uzi:
+				player.weaponDelay = Time::secondsToMicros(0.1f);
+				break;
+		}
+	}
+
+	void fireWeapon(Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
+	{
+		if(player.weaponTimer.getCurMicros() > (player.weaponDelay/player.rateOfFireMultiplier))
 		{
 			player.weaponTimer.reset();
+			Vec2 normalizedAim = graphicsSystem.screenToWorld({player.aim.x, player.aim.y}, camera);
 			switch(player.currentWeapon)
 			{
 				case Pistol:
-					generateBullets(bullets, 1, 0, player.transform.position, player.aim);
+					generateBullets(bullets, 1, 0, player.transform.position, normalizedAim);
 					break;
+
 				case Shotgun:
-					generateBullets(bullets, 6, 2.0f, player.transform.position, player.aim);
+					generateBullets(bullets, 6, 2.0f, player.transform.position, normalizedAim);
 					break;
+
 				case Uzi:
-					generateBullets(bullets, 1, 1.0f, player.transform.position, player.aim);
+					generateBullets(bullets, 1, 1.0f, player.transform.position, normalizedAim);
 					break;
 			}
 		}
@@ -87,7 +148,7 @@ namespace Core
 			if(spawner.timer.getCurMicros() > spawner.spawnCooldown)
 			{
 				spawner.timer.reset();
-				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0,playerCount-1));
+				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0, playerCount - 1));
 			}
 		}
 	}
@@ -101,13 +162,13 @@ namespace Core
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t)*30, 0});
+			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0});
 		}
 	}
 
 	void moveBullets(const Time& timer, VRayBullets& bullets)
 	{
-		for(uint32_t i = 0; i < bullets.size();) 
+		for(uint32_t i = 0; i < bullets.size();)
 		{
 			auto displacement = timer.getDeltaTime()*bullets[i].velocity;
 			auto travel = Vec2::length(displacement);
@@ -161,10 +222,10 @@ namespace Core
 					bonuses.pop_back();
 					if(!player.hasBonus)
 					{
-						player.weaponDelay /= 2;
+						player.rateOfFireMultiplier = 2;
 						player.hasBonus = true;
 					}
-					player.bonusTimer.reset();
+					player.bonusDuration += Time::secondsToMicros(3);
 				}
 			}
 		}
@@ -177,11 +238,12 @@ namespace Core
 			if(player.hasBonus)
 			{
 				player.bonusTimer.updateBy(timer.getDeltaMicros());
-				if(player.bonusTimer.getCurMicros() > Time::secondsToMicros(3))
+				if(player.bonusTimer.getCurMicros() > player.bonusDuration)
 				{
 					player.bonusTimer.reset();
+					player.bonusDuration = 0;
 					player.hasBonus = false;
-					player.weaponDelay *= 2;
+					player.rateOfFireMultiplier = 1;
 				}
 			}
 		}
