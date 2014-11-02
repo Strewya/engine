@@ -98,14 +98,17 @@ namespace Core
 					{
 						case Keyboard::m_1:
 							m_players[0].currentWeapon = Pistol;
+							m_players[0].weaponDelay = Time::secondsToMicros(0.5f);
 							return true;
 
 						case Keyboard::m_2:
 							m_players[0].currentWeapon = Shotgun;
+							m_players[0].weaponDelay = Time::secondsToMicros(1.0f);
 							return true;
 
 						case Keyboard::m_3:
 							m_players[0].currentWeapon = Uzi;
+							m_players[0].weaponDelay = Time::secondsToMicros(0.1f);
 							return true;
 
 						case Keyboard::m_R:
@@ -324,7 +327,11 @@ namespace Core
 		m_camera.setPosition(pos);
 
 		moveBullets(m_logicTimer, m_rayBullets);
-		killMonsters(m_rayBullets, m_monsters);
+		VKillLocations locations;
+		killMonsters(m_rayBullets, m_monsters, locations);
+		generateBonuses(locations, m_bonuses);
+		checkBonusPickup(m_players, m_bonuses);
+		updateBonuses(m_logicTimer, m_players);
 
 		/*
 		auto lua = m_luaSystem.getStack();
@@ -373,10 +380,19 @@ namespace Core
 			m_graphicsSystem.drawQuad(monster.transform, monster.boundingBox.halfSize(), monster.color);
 		}
 
+		for(auto& bonus : m_bonuses)
+		{
+			m_graphicsSystem.drawQuad(bonus.transform, bonus.boundingBox.halfSize(), bonus.color);
+		}
+
+		m_graphicsSystem.setTransparencyMode(true);
+
 		for(auto& rayBullet : m_rayBullets)
 		{
-			m_graphicsSystem.drawLine(tf, rayBullet.origin, rayBullet.position, {1, 1, 1, 1});
+			m_graphicsSystem.drawLine(tf, rayBullet.origin, {1, 1, 1, 0}, rayBullet.position, {1, 1, 1, 1});
 		}
+
+		m_graphicsSystem.setTransparencyMode(false);
 
 		/*
 		auto lua = m_luaSystem.getStack();

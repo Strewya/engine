@@ -63,6 +63,7 @@ namespace Core
 		Vec2 screenToWorld(const Vec2& screen, const Camera& camera);
 
 		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
+		void drawLine(const Transform& transform, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color);
 		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuadPolygon(const Transform& transform, const Rect& rect, const Color& color);

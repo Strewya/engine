@@ -287,14 +287,22 @@ namespace Core
 	//*****************************************************************
 	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Vec2& p2, const Color& c)
 	{
+		drawLine(tf, p1, c, p2, c);
+	}
+
+	//*****************************************************************
+	//					DRAW LINE
+	//*****************************************************************
+	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color)
+	{
 		D3D11_MAPPED_SUBRESOURCE ms;
 
 		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(2);
 		vertices[0].setPosition(p1.x, p1.y, 0);
-		vertices[0].setDiffuse(1, 1, 1, 1);
+		vertices[0].setDiffuse(p1Color.r, p1Color.g, p1Color.b, p1Color.a);
 		vertices[1].setPosition(p2.x, p2.y, 0);
-		vertices[1].setDiffuse(1, 1, 1, 1);
+		vertices[1].setDiffuse(p2Color.r, p2Color.g, p2Color.b, p2Color.a);
 		
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 2);
 
@@ -321,10 +329,10 @@ namespace Core
 
 		cbPerObject cbpo;
 		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
-		cbpo.FillColor.x = c.r;
-		cbpo.FillColor.y = c.g;
-		cbpo.FillColor.z = c.b;
-		cbpo.FillColor.w = c.a;
+		cbpo.FillColor.x = 1;
+		cbpo.FillColor.y = 1;
+		cbpo.FillColor.z = 1;
+		cbpo.FillColor.w = 1;
 		cbpo.isTexture.x = 0;
 
 		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);

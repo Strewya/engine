@@ -32,6 +32,7 @@ namespace Core
 
 	bool isPointInsideRect(const Vec2& point, const Rect& rect);
 	bool isRectInsideRect(const Rect& innerRect, const Rect& outerRect);
+	bool isRectTouchingRect(const Rect& r1, const Rect& r2);
 }
 
 //#include <iostream>

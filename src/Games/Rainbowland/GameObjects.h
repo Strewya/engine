@@ -22,7 +22,8 @@ namespace Core
 	{
 		Pistol,
 		Shotgun,
-		Uzi
+		Uzi,
+		Atombomb
 	};
 
 
@@ -36,9 +37,12 @@ namespace Core
 		Vec2 acceleration;
 		Vec2 direction;
 		Time weaponTimer;
+		Time bonusTimer;
+		uint64_t weaponDelay;
 		Vec2 aim;
 		Weapon currentWeapon;
 		bool isShooting;
+		bool hasBonus;
 	};
 
 	typedef std::vector<Player> VPlayers;
@@ -77,10 +81,14 @@ namespace Core
 		Transform transform;
 		Color color;
 		Rect boundingBox;
-		uint32_t m_imageID;
 	};
 
 	typedef std::vector<Bonus> VBonuses;
+	typedef std::vector<Vec2> VKillLocations;
+
+	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
+	void checkBonusPickup(VPlayers& players, VBonuses& bonuses);
+	void updateBonuses(const Time& timer, VPlayers& players);
 
 	struct RayBullet
 	{
@@ -94,6 +102,6 @@ namespace Core
 
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target);
 	void moveBullets(const Time& timer, VRayBullets& bullets);
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters);
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations);
 	void fireWeapon(Player& player, VRayBullets& bullets);
 }

@@ -37,35 +37,27 @@ namespace Core
 
 	void fireWeapon(Player& player, VRayBullets& bullets)
 	{
-		switch(player.currentWeapon)
+		if(player.weaponTimer.getCurMicros() > player.weaponDelay)
 		{
-			case Pistol:
-				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(0.5f))
-				{
-					player.weaponTimer.reset();
+			player.weaponTimer.reset();
+			switch(player.currentWeapon)
+			{
+				case Pistol:
 					generateBullets(bullets, 1, 0, player.transform.position, player.aim);
-				}
-				break;
-			case Shotgun:
-				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(1))
-				{
-					player.weaponTimer.reset();
+					break;
+				case Shotgun:
 					generateBullets(bullets, 6, 2.0f, player.transform.position, player.aim);
-				}
-				break;
-			case Uzi:
-				if(player.weaponTimer.getCurMicros() > Time::secondsToMicros(0.1f))
-				{
-					player.weaponTimer.reset();
+					break;
+				case Uzi:
 					generateBullets(bullets, 1, 1.0f, player.transform.position, player.aim);
-				}
-				break;
+					break;
+			}
 		}
 	}
 
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
 	{
-		if(monsters.size() > 150) return;
+		if(monsters.size() > 20) return;
 
 		monsters.emplace_back();
 		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
@@ -138,7 +130,64 @@ namespace Core
 		}
 	}
 
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters)
+	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses)
+	{
+		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+		for(auto& loc : killLocations)
+		{
+			if(gen.randInt(0, 10000) < 1000)
+			{
+				bonuses.emplace_back();
+				bonuses.back().transform.position = loc;
+				bonuses.back().color.set(0, 0, 1);
+				bonuses.back().boundingBox.set(0, 0, 0.75f, 0.75f);
+			}
+		}
+	}
+
+	void checkBonusPickup(VPlayers& players, VBonuses& bonuses)
+	{
+		for(auto& player : players)
+		{
+			for(uint32_t b = 0; b < bonuses.size(); ++b)
+			{
+				Rect pbox = player.boundingBox;
+				pbox.center = player.transform.position;
+				Rect bbox = bonuses[b].boundingBox;
+				bbox.center = bonuses[b].transform.position;
+				if(isRectTouchingRect(pbox, bbox))
+				{
+					bonuses[b] = bonuses.back();
+					bonuses.pop_back();
+					if(!player.hasBonus)
+					{
+						player.weaponDelay /= 2;
+						player.hasBonus = true;
+					}
+					player.bonusTimer.reset();
+				}
+			}
+		}
+	}
+
+	void updateBonuses(const Time& timer, VPlayers& players)
+	{
+		for(auto& player : players)
+		{
+			if(player.hasBonus)
+			{
+				player.bonusTimer.updateBy(timer.getDeltaMicros());
+				if(player.bonusTimer.getCurMicros() > Time::secondsToMicros(3))
+				{
+					player.bonusTimer.reset();
+					player.hasBonus = false;
+					player.weaponDelay *= 2;
+				}
+			}
+		}
+	}
+
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations)
 	{
 		std::map<uint32_t, uint32_t> kills;
 		for(uint32_t b = 0; b < bullets.size();)
@@ -157,6 +206,7 @@ namespace Core
 			}
 			if(monsterKilled != -1)
 			{
+				killLocations.emplace_back(monsters[monsterKilled].transform.position);
 				monsters[monsterKilled] = monsters.back();
 				monsters.pop_back();
 				bullets[b] = bullets.back();
