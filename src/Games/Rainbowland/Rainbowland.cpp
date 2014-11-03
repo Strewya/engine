@@ -22,6 +22,7 @@ namespace Core
 		bool status = true;
 		status &= m_textureCache.shutdown();
 		status &= m_fontCache.shutdown();
+		status &= m_luaSystem.shutdown();
 		status &= m_inputSystem.shutdown();
 		status &= m_graphicsSystem.shutdown();
 		m_window->setFullscreen(false);
@@ -41,6 +42,7 @@ namespace Core
 		m_isRunning =
 			m_graphicsSystem.init(m_fontCache, m_textureCache, window) &&
 			m_inputSystem.init(window) &&
+			m_luaSystem.init() &&
 			m_fontCache.init(m_textureCache) &&
 			m_imageCache.init(m_textureCache) &&
 			m_textureCache.init(m_graphicsSystem) &&
@@ -62,7 +64,7 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative)
+				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative && m_players.size() >= 1)
 				{
 					m_players[0].aim.set((float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y);
 					return true;
@@ -72,7 +74,7 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton)
+				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
 				{
 					if(w.m_mouseButton.m_isDown)
 					{
@@ -89,7 +91,7 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					switch(w.m_keyboard.m_keyCode)
 					{
@@ -115,50 +117,49 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
-						m_players[0].direction.y += 1;
+						m_players[0].directions[Up] = true;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
 					{
-						m_players[0].direction.y -= 1;
+						m_players[0].directions[Down] = true;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
 					{
-						m_players[0].direction.x -= 1;
+						m_players[0].directions[Left] = true;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
 					{
-						m_players[0].direction.x += 1;
-						
+						m_players[0].directions[Right] = true;
 						return true;
 					}
 				}
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
-						m_players[0].direction.y -= 1;
+						m_players[0].directions[Up] = false;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
 					{
-						m_players[0].direction.y += 1;
+						m_players[0].directions[Down] = false;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
 					{
-						m_players[0].direction.x += 1;
+						m_players[0].directions[Left] = false;
 						return true;
 					}
 					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
 					{
-						m_players[0].direction.x -= 1;
+						m_players[0].directions[Right] = false;
 						return true;
 					}
 				}
@@ -167,80 +168,16 @@ namespace Core
 
 			m_isRunning &= m_graphicsSystem.initVertexShader("Shaders/shader.hlsl");
 			m_isRunning &= m_graphicsSystem.initPixelShader("Shaders/shader.hlsl");
+
+			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
+			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
+			m_defaultFont = m_fontCache.getResourceID("font");
 		}
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 		
-		//background
-		m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
-
-		//players
-		m_numPlayers = 1;
-		m_players.emplace_back();
-		initPlayer(m_players.back());
-		
-		//playing field boundary
-		m_graphicsSystem.setPerspectiveProjection();
-		
-		m_camera.setPosition({-5.0f, 2.0f, -50.0f});
-		m_graphicsSystem.applyCamera(m_camera);
-		Vec2 topleft = m_graphicsSystem.screenToWorld({0, 0}, m_camera);
-		m_playingField.halfWidth = std::abs(topleft.x);
-		m_playingField.halfHeight = std::abs(topleft.y);
-
-		m_camera.setPosition({0, 0, -50});
-
-		//spawners
-		Rect spawnerLocations{{0, 0}, m_playingField.halfWidth - 3, m_playingField.halfHeight - 3};
-		uint32_t spawnerCount = 8;
-		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
-		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
-		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
-		for(uint32_t i = 0; i < spawnerCount; ++i)
-		{
-			m_monsterSpawners.emplace_back();
-			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
-			m_monsterSpawners.back().spawnRadius = 1;
-			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
-			m_monsterSpawners.back().timer.reset();
-			m_monsterSpawners.back().transform.position = pos;
-
-			pos.x += distanceBetweenSpawners.x;
-		}
-		for(uint32_t i = 0; i < spawnerCount; ++i)
-		{
-			m_monsterSpawners.emplace_back();
-			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
-			m_monsterSpawners.back().spawnRadius = 1;
-			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
-			m_monsterSpawners.back().timer.reset();
-			m_monsterSpawners.back().transform.position = pos;
-
-			pos.y -= distanceBetweenSpawners.y;
-		}
-		for(uint32_t i = 0; i < spawnerCount; ++i)
-		{
-			m_monsterSpawners.emplace_back();
-			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
-			m_monsterSpawners.back().spawnRadius = 1;
-			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
-			m_monsterSpawners.back().timer.reset();
-			m_monsterSpawners.back().transform.position = pos;
-
-			pos.x -= distanceBetweenSpawners.x;
-		}
-		for(uint32_t i = 0; i < spawnerCount; ++i)
-		{
-			m_monsterSpawners.emplace_back();
-			m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
-			m_monsterSpawners.back().spawnRadius = 1;
-			m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
-			m_monsterSpawners.back().timer.reset();
-			m_monsterSpawners.back().transform.position = pos;
-
-			pos.y += distanceBetweenSpawners.y;
-		}
+		initGame(*this);
 
 		DEBUG_INFO("---------------------------------");
 		return m_isRunning;
@@ -284,7 +221,7 @@ namespace Core
 			}
 		}
 
-		movePlayers(m_logicTimer, m_players, m_numPlayers, m_playingField);
+		movePlayers(m_logicTimer, m_players, m_playingField);
 		for(auto& player : m_players)
 		{
 			player.weaponTimer.updateBy(m_logicTimer.getDeltaMicros());
@@ -293,28 +230,44 @@ namespace Core
 				fireWeapon(player, m_rayBullets, m_graphicsSystem, m_camera);
 			}
 		}
-		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_numPlayers);
+		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_logicTimer, m_monsters, m_players);
+		checkMonsterHurtingPlayer(m_monsters, m_players);
 
-		Vec2 averagePos;
-		for(uint32_t i = 0; i < m_numPlayers; ++i)
+		if(m_players.size() > 0)
 		{
-			averagePos += m_players[i].transform.position;
+			Vec2 averagePos;
+			for(auto& player : m_players)
+			{
+				averagePos += player.transform.position;
+			}
+			averagePos /= (float)m_players.size();
+			auto pos = m_camera.getPosition();
+			pos.x = averagePos.x;
+			pos.y = averagePos.y;
+			clamp(-5.0f, 5.0f, pos.x);
+			clamp(-2.0f, 2.0f, pos.y);
+			m_camera.setPosition(pos);
 		}
-		averagePos /= (float)m_numPlayers;
-		auto pos = m_camera.getPosition();
-		pos.x = averagePos.x;
-		pos.y = averagePos.y;
-		clamp(-5.0f, 5.0f, pos.x);
-		clamp(-2.0f, 2.0f, pos.y);
-		m_camera.setPosition(pos);
 
 		moveBullets(m_logicTimer, m_rayBullets);
 		VKillLocations locations;
 		killMonsters(m_rayBullets, m_monsters, locations);
 		generateBonuses(locations, m_bonuses);
 		checkBonusPickup(m_players, m_bonuses);
-		updateBonuses(m_logicTimer, m_players);
+		updateBonusEffects(m_logicTimer, m_players);
+
+		checkPlayerDeath(m_players);
+
+		if(m_players.size() == 0)
+		{
+			m_deathTimer.updateBy(m_logicTimer.getDeltaMicros());
+			if(m_deathTimer.getCurMicros() > Time::secondsToMicros(5))
+			{
+				cleanGame(*this);
+				initGame(*this);
+			}
+		}
 
 		/*
 		auto lua = m_luaSystem.getStack();
@@ -341,41 +294,50 @@ namespace Core
 
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
-
+		
+/*
 		Transform tf;
 		Vec2 p1{0, 0}, p2{0, 1}, p3{1, 0};
 		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1});
-		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});
+		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});*/
 
 		
-		for(uint32_t i = 0; i < m_numPlayers; ++i)
+		for(auto& obj : m_players)
 		{
-			m_graphicsSystem.drawQuad(m_players[i].transform, m_players[i].boundingBox.halfSize(), m_players[i].color);
+			Color c = obj.color;
+			c.a = (float)obj.health / (float)obj.maxHealth;
+			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
 		}
 
-		for(auto& spawner : m_monsterSpawners)
+		for(auto& obj : m_monsterSpawners)
 		{
-			m_graphicsSystem.drawQuad(spawner.transform, {1, 1}, {1,0,1});
+			m_graphicsSystem.drawQuad(obj.transform, {1, 1}, {1, 0, 1});
 		}
 
-		for(auto& monster : m_monsters)
+		for(auto& obj : m_monsters)
 		{
-			m_graphicsSystem.drawQuad(monster.transform, monster.boundingBox.halfSize(), monster.color);
+			Color c = obj.color;
+			c.a = (float)obj.health / (float)obj.maxHealth;
+			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
 		}
 
-		for(auto& bonus : m_bonuses)
+		for(auto& obj : m_bonuses)
 		{
-			m_graphicsSystem.drawQuad(bonus.transform, bonus.boundingBox.halfSize(), bonus.color);
+			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), obj.color);
 		}
 
-		m_graphicsSystem.setTransparencyMode(true);
-
-		for(auto& rayBullet : m_rayBullets)
+		for(auto& obj : m_rayBullets)
 		{
-			m_graphicsSystem.drawLine(tf, rayBullet.origin, {1, 1, 1, 0}, rayBullet.position, {1, 1, 1, 1});
+			m_graphicsSystem.drawLine({}, obj.origin, {1, 1, 1, 0}, obj.position, {1, 1, 1, 1});
 		}
 
-		m_graphicsSystem.setTransparencyMode(false);
+		//gui from now on
+		m_graphicsSystem.setOrthographicProjection();
+		if(m_players.size() == 0)
+		{
+			m_graphicsSystem.drawText(m_defaultFont, "HAHA YOU ARE DEAD", {}, {}, 1, false);
+		}
+
 
 		/*
 		auto lua = m_luaSystem.getStack();

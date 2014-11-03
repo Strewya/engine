@@ -17,6 +17,7 @@
 #include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
+#include <Scripting/LuaSystem.h>
 #include <Util/Time.h>
 /******* end header inclusion *******/
 
@@ -30,6 +31,7 @@ namespace Core
 	public:
 		GraphicsSystem m_graphicsSystem;
 		InputSystem m_inputSystem;
+		LuaSystem m_luaSystem;
 
 		FontCache m_fontCache;
 		ImageCache m_imageCache;
@@ -37,6 +39,7 @@ namespace Core
 		
 		Time m_logicTimer;
 		Time m_renderTimer;
+		Time m_deathTimer;
 		
 		Camera m_camera;
 		Rect m_playingField;
@@ -49,8 +52,8 @@ namespace Core
 		VBonuses m_bonuses;
 		VRayBullets m_rayBullets;
 		
+		uint32_t m_defaultFont;
 		Window* m_window;
-		uint32_t m_numPlayers;
 		bool m_isRunning;
 		
 

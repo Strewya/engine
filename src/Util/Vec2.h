@@ -28,6 +28,7 @@ namespace Core
 		Vec2 operator-(const Vec2& v) const;
 		Vec2 operator*(float f) const;
 		Vec2& operator*=(const Vec2& v);
+		Vec2& operator*=(float f);
 		Vec2 operator/(float f) const;
 		Vec2& operator/=(float f);
 		
