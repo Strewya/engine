@@ -104,12 +104,12 @@ namespace Core
 	{
 		bool status = true;
 
-		if( m_swapchain != nullptr )
+		if(m_swapchain != nullptr)
 		{
 			m_swapchain->SetFullscreenState(false, nullptr);
 		}
 
-		for( auto** ptr : m_dxInterfaces )
+		for(auto** ptr : m_dxInterfaces)
 		{
 			safeRelease(*ptr);
 		}
@@ -166,7 +166,7 @@ namespace Core
 		D3D11_RASTERIZER_DESC rd;
 		ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
 
-		if( isEnabled )
+		if(isEnabled)
 		{
 			rd.CullMode = D3D11_CULL_BACK;
 		}
@@ -180,15 +180,10 @@ namespace Core
 		ID3D11RasterizerState* state = nullptr;
 
 		HRESULT hr = m_dev->CreateRasterizerState(&rd, &state);
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			m_devcon->RSSetState(state);
-			DEBUG_INFO("Culling is now ", isEnabled ? "on" : "off");
 			safeRelease(state);
-		}
-		else
-		{
-			DEBUG_INFO("Failed to create rasterizer state! Code: ", hr);
 		}
 	}
 
@@ -198,7 +193,7 @@ namespace Core
 	void GraphicsSystem::setTransparencyMode(bool isEnabled)
 	{
 		auto transpEnabled = m_transparency;
-		if( !isEnabled )
+		if(!isEnabled)
 		{
 			transpEnabled = nullptr;
 		}
@@ -270,7 +265,7 @@ namespace Core
 		HRESULT hr = res->QueryInterface(&texture2d);
 
 		Vec2 dim(0, 0);
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			D3D11_TEXTURE2D_DESC desc;
 			texture2d->GetDesc(&desc);
@@ -303,7 +298,7 @@ namespace Core
 		vertices[0].setDiffuse(p1Color.r, p1Color.g, p1Color.b, p1Color.a);
 		vertices[1].setPosition(p2.x, p2.y, 0);
 		vertices[1].setDiffuse(p2Color.r, p2Color.g, p2Color.b, p2Color.a);
-		
+
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 2);
 
 		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
@@ -354,7 +349,7 @@ namespace Core
 
 		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(count);
-		for( uint32_t i = 0; i < count; ++i )
+		for(uint32_t i = 0; i < count; ++i)
 		{
 			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
 			vertices[i].setDiffuse(1, 1, 1, 1);
@@ -410,7 +405,7 @@ namespace Core
 
 		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(count);
-		for( uint32_t i = 0; i < count; ++i )
+		for(uint32_t i = 0; i < count; ++i)
 		{
 			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
 			vertices[i].setDiffuse(1, 1, 1, 1);
@@ -479,12 +474,17 @@ namespace Core
 		D3D11_MAPPED_SUBRESOURCE ms;
 
 		/****** VERTEX BUFFER ******/
+		/*
+		0-1
+		| |
+		2-3
+		*/
 		Vertex vertices[]
 		{
-			Vertex(-hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0),
-				Vertex(hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0),
-				Vertex(-hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0),
-				Vertex(hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0),
+			{-hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0},
+			{hs.x, hs.y, 0, 1, 1, 1, 1, 0, 0},
+			{-hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0},
+			{hs.x, -hs.y, 0, 1, 1, 1, 1, 0, 0},
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
@@ -503,8 +503,7 @@ namespace Core
 		/****** INDEX BUFER ******/
 		uint32_t indices[]
 		{
-			0, 1, 2,
-				1, 3, 2,
+			0, 1, 2,     1, 3, 2,
 		};
 
 		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
@@ -554,12 +553,17 @@ namespace Core
 		D3D11_MAPPED_SUBRESOURCE ms;
 
 		/****** VERTEX BUFFER ******/
+		/*
+			0-1
+			| |
+			2-3
+		*/
 		Vertex vertices[]
 		{
-			Vertex(-img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y),
-				Vertex(img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y),
-				Vertex(-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y),
-				Vertex(img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y)
+			{-img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y},
+			{img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y},
+			{-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y},
+			{img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y}
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
@@ -630,12 +634,12 @@ namespace Core
 	void GraphicsSystem::drawText(uint32_t fontID, const std::string& text, const Transform& tf, const Color& tint, uint32_t justification, bool isItalic)
 	{
 		const auto* font = m_fontCache->getResource(fontID);
-		if( !font )
+		if(!font)
 		{
 			return;
 		}
 		const auto* texture = m_textureCache->getResource(font->m_textureID);
-		if( !texture )
+		if(!texture)
 		{
 			return;
 		}
@@ -648,7 +652,7 @@ namespace Core
 		float xPos = 0;
 		float yPos = font->m_size * 0.5f;
 
-		for( char c : text )
+		for(char c : text)
 		{
 			const Glyph& glyph = font->m_glyphs[c - 32];
 			float tv_top = (float)glyph.m_top / h;
@@ -717,11 +721,11 @@ namespace Core
 		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 
 		float move = 0;
-		if( justification == 1 )
+		if(justification == 1)
 		{
 			move = xPos*0.5f*tf.scale.x;
 		}
-		else if( justification == 2 )
+		else if(justification == 2)
 		{
 			move = xPos*tf.scale.x;
 		}
@@ -760,11 +764,11 @@ namespace Core
 	{
 		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&m_dxgiFactory);
 
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			IDXGIAdapter* adapter = nullptr;
 			hr = m_dxgiFactory->EnumAdapters(0, &adapter);
-			if( SUCCEEDED(hr) )
+			if(SUCCEEDED(hr))
 			{
 				auto driverType = D3D_DRIVER_TYPE_UNKNOWN;
 				uint32_t flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
@@ -780,7 +784,7 @@ namespace Core
 		}
 
 		DEBUG_CODE_START
-			if( FAILED(hr) )
+			if(FAILED(hr))
 				DEBUG_INFO("\tinitDevice failed");
 		DEBUG_CODE_END
 
@@ -805,21 +809,60 @@ namespace Core
 	{
 		ID3D11Texture2D* bbTexture = nullptr;
 		HRESULT hr = m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&bbTexture);
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			hr = m_dev->CreateRenderTargetView(bbTexture, nullptr, &m_renderTarget);
-			if( SUCCEEDED(hr) )
+			if(SUCCEEDED(hr))
 			{
 				m_devcon->OMSetRenderTargets(1, &m_renderTarget, m_depthStencilView);
 			}
 			bbTexture->Release();
 		}
 		DEBUG_CODE_START
-			if( FAILED(hr) )
+			if(FAILED(hr))
 				DEBUG_INFO("\tinitRenderTarget failed");
 		DEBUG_CODE_END
 			return SUCCEEDED(hr);
 	}
+
+	static const char* shaderContent = R"rawShaderFile(
+	struct VOut
+	{
+		float4 position : SV_POSITION;
+		float4 diffuse : DIFFUSE;
+		float2 texCoord : TEXCOORD;
+	};
+
+	cbuffer cbPerObject
+	{
+		float4x4 WVP;
+		float4 FillColor;
+		float4 isTexture;
+	};
+
+	Texture2D ObjTexture;
+	SamplerState ObjSamplerState;
+
+	VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diffuse : DIFFUSE)
+	{
+		VOut output;
+
+		output.position = mul(position, WVP);
+		output.texCoord = texCoord;
+		output.diffuse = diffuse * FillColor;
+
+		return output;
+	}
+
+
+	float4 PShader(VOut input) : SV_TARGET
+	{
+		float4 diffuse = input.diffuse;
+		if(isTexture.x != 0)
+			diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
+		return diffuse;
+	}
+)rawShaderFile";
 
 	//*****************************************************************
 	//					INIT VERTEX SHADER
@@ -827,20 +870,24 @@ namespace Core
 	bool GraphicsSystem::initVertexShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-
-		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		if( SUCCEEDED(hr) )
+		ID3D10Blob* errorBlob = nullptr;
+		DEBUG_INFO("Compiling vertex shader from file ", shaderFile);
+		HRESULT hr = S_OK;// D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, &errorBlob, nullptr);
+		
+		//DEBUG_INFO((int32_t)hr);
+		//if(SUCCEEDED(hr))
 		{
 			safeRelease(m_vertexShader);
-			hr = m_dev->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_vertexShader);
-
-			if( SUCCEEDED(hr) )
+#include	<Graphics/vshader.h>
+			hr = m_dev->CreateVertexShader(g_VShader, sizeof(g_VShader), nullptr, &m_vertexShader);
+			DEBUG_INFO((int32_t)hr);
+			if(SUCCEEDED(hr))
 			{
 				auto& ied = Vertex::getDescription();
 				safeRelease(m_inputLayout);
-				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), &m_inputLayout);
-
-				if( SUCCEEDED(hr) )
+				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), g_VShader, sizeof(g_VShader), &m_inputLayout);
+				DEBUG_INFO((int32_t)hr);
+				if(SUCCEEDED(hr))
 				{
 					m_devcon->VSSetShader(m_vertexShader, nullptr, 0);
 					m_devcon->IASetInputLayout(m_inputLayout);
@@ -849,8 +896,10 @@ namespace Core
 			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
-			if( FAILED(hr) )
-				DEBUG_INFO("\tinitVertexShader failed");
+			if(FAILED(hr))
+			{
+				DEBUG_INFO("\tinitVertexShader failed: ", hr);
+			}
 		DEBUG_CODE_END
 			return SUCCEEDED(hr);
 	}
@@ -861,21 +910,27 @@ namespace Core
 	bool GraphicsSystem::initPixelShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-
-		HRESULT hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		if( SUCCEEDED(hr) )
+		ID3D10Blob* errorBlob = nullptr;
+		DEBUG_INFO("Compiling pixel shader from file ", shaderFile);
+		HRESULT hr = S_OK;// D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, &errorBlob, nullptr);
+		//DEBUG_INFO((int32_t)hr);
+		//if(SUCCEEDED(hr))
 		{
 			safeRelease(m_pixelShader);
-			hr = m_dev->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, &m_pixelShader);
-			if( SUCCEEDED(hr) )
+#include	<Graphics/pshader.h>
+			hr = m_dev->CreatePixelShader(g_PShader, sizeof(g_PShader), nullptr, &m_pixelShader);
+			DEBUG_INFO((int32_t)hr);
+			if(SUCCEEDED(hr))
 			{
 				m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
 			}
 			safeRelease(m_shaderBlob);
 		}
 		DEBUG_CODE_START
-			if( FAILED(hr) )
-				DEBUG_INFO("\tinitPixelShader failed");
+			if(FAILED(hr))
+			{
+				DEBUG_INFO("\tinitPixelShader failed:", hr);
+			}
 		DEBUG_CODE_END
 			return SUCCEEDED(hr);
 	}
@@ -942,7 +997,7 @@ namespace Core
 		sd.Quality = 0;
 
 		auto hr = m_dev->CreateTexture2D(&dsd, nullptr, &m_depthStencilBuffer);
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			hr = m_dev->CreateDepthStencilView(m_depthStencilBuffer, nullptr, &m_depthStencilView);
 		}
@@ -957,11 +1012,11 @@ namespace Core
 		ID3D11ShaderResourceView* texturePtr = nullptr;
 		HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
 		bool loaded = false;
-		if( SUCCEEDED(hr) )
+		if(SUCCEEDED(hr))
 		{
 			DxTexturePtr loadedTexturePtr(texturePtr, releasePtr<ID3D11ShaderResourceView>);
 			auto it = std::find_if(m_textures.begin(), m_textures.end(), [](const DxTexturePtr& ptr) { return ptr == nullptr; });
-			if( it == m_textures.end() )
+			if(it == m_textures.end())
 			{
 				outTexture.m_rawTextureID = m_textures.size();
 				m_textures.emplace_back(std::move(loadedTexturePtr));
@@ -1091,7 +1146,7 @@ namespace Core
 		sd.Quality = 0;
 	}
 
-	static XMVECTOR convert(const Vec3& v)
+	XMVECTOR convert(const Vec3& v)
 	{
 		return XMVectorSet(v.x, v.y, v.z, 0);
 	}

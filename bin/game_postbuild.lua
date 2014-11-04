@@ -56,4 +56,6 @@ if(buildName == "Final") then
 	gameName = game;
 	resourceList = resList;
 	dofile(gProjDir.."/bin/game_deploy.lua");
+	doDeployment(dropboxTarget());
+	doDeployment(deployTarget());
 end;

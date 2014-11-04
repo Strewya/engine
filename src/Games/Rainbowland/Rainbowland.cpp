@@ -38,7 +38,7 @@ namespace Core
 
 		window.resize(1024, 768);
 		window.showCursor(true);
-
+		
 		m_isRunning =
 			m_graphicsSystem.init(m_fontCache, m_textureCache, window) &&
 			m_inputSystem.init(window) &&
@@ -76,6 +76,7 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
 				{
+					m_players[0].aim.set((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
 					if(w.m_mouseButton.m_isDown)
 					{
 						m_players[0].isShooting = true;
@@ -304,9 +305,7 @@ namespace Core
 		
 		for(auto& obj : m_players)
 		{
-			Color c = obj.color;
-			c.a = (float)obj.health / (float)obj.maxHealth;
-			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
+			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), obj.color);
 		}
 
 		for(auto& obj : m_monsterSpawners)
@@ -317,7 +316,7 @@ namespace Core
 		for(auto& obj : m_monsters)
 		{
 			Color c = obj.color;
-			c.a = (float)obj.health / (float)obj.maxHealth;
+			c.a = 0.2f + (float)obj.health / (float)obj.maxHealth;
 			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
 		}
 
@@ -332,12 +331,26 @@ namespace Core
 		}
 
 		//gui from now on
+		m_graphicsSystem.clearCamera();
+		m_graphicsSystem.setCulling(false);
 		m_graphicsSystem.setOrthographicProjection();
 		if(m_players.size() == 0)
 		{
 			m_graphicsSystem.drawText(m_defaultFont, "HAHA YOU ARE DEAD", {}, {}, 1, false);
 		}
 
+		Transform tf;
+		tf.position.set(5-0.5f*m_window->getSizeX(), 0.5f*m_window->getSizeY() - 20);
+		tf.scale.set(0.75f, 0.75f);
+		for(auto& player : m_players)
+		{
+			auto str = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
+			tf.position.y += 20;
+		}
+		m_graphicsSystem.setCulling(true);
+		m_graphicsSystem.setPerspectiveProjection();
+		m_graphicsSystem.applyCamera(m_camera);
 
 		/*
 		auto lua = m_luaSystem.getStack();
@@ -347,14 +360,14 @@ namespace Core
 			lua.call(luaCustom{this, CLASS(HedgehogGame)});
 		}
 		*/
-
-		/*static Transform framerateTf;
+		/*
+		static Transform framerateTf;
 		framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);
 		framerateTf.scale.set(0.5f, 0.5f);
 		m_graphicsSystem.setOrthographicProjection();
 		m_graphicsSystem.clearCamera();
-		m_graphicsSystem.drawText(m_defaultFont, "ms per frame: " + std::to_string(Time::microsToMilis(m_framerateTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);*/
-		
+		m_graphicsSystem.drawText(m_defaultFont, "ms per frame: " + std::to_string(Time::microsToMilis(m_logicTimer.getDeltaMicros())), framerateTf, Color(0, 0, 0), 0, false);
+		*/
 
 		m_graphicsSystem.present();
 	}

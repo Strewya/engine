@@ -191,6 +191,12 @@ namespace Core
 				player.movementSpeedMultiplier = 2;
 				b.duration += Time::secondsToMicros(3);
 				break;
+
+			case Heal:
+				player.health += 20;
+				clamp(0, 100, player.health);
+				player.bonuses.pop_back();
+				break;
 		}
 	}
 
@@ -382,9 +388,20 @@ namespace Core
 				bonuses.emplace_back();
 				auto effect = (EffectType)gen.randInt(0, EffectTypeCount - 1);
 				bonuses.back().transform.position = loc;
-				bonuses.back().color.set(0, (float)effect, 1);
 				bonuses.back().boundingBox.set(0, 0, 0.75f, 0.75f);
 				bonuses.back().effect = effect;
+				switch(effect)
+				{
+					case IncreasedRateOfFire:
+						bonuses.back().color.set(0, 0, 1);
+						break;
+					case IncreasedMovementSpeed:
+						bonuses.back().color.set(0, 1, 1);
+						break;
+					case Heal:
+						bonuses.back().color.set(0, 1, 0);
+						break;
+				}
 			}
 		}
 	}

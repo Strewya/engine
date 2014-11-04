@@ -33,6 +33,7 @@ namespace Core
 	{
 		IncreasedRateOfFire,
 		IncreasedMovementSpeed,
+		Heal,
 		EffectTypeCount
 	};
 

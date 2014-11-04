@@ -35,58 +35,75 @@ local function cleanUnusedFiles(path, file, usedFilesList, deletedFiles)
 	end;
 end;
 
-local game = gameName or extractGameName();
-local resFile = gProjDir .. "/src/Games/" .. game .. "/resourceList.lua";
-local resDir = gProjDir .. "/output/resources";
-
-local resList = resourceList and resourceList or dofile(resFile);
-local resOK = allResourcesPresent or assertResourcesPresent(resList, resDir);
-
-ensure(resOK, "Some resource dependencies are missing! Fix those first!");
-
-local dropboxDir = os.getenv("USERPROFILE").."/AppData/Roaming/Dropbox/host.db";
-ensure(checkFileExists(dropboxDir), "Dropbox not installed!");
-dropboxDir = findLineContaining(dropboxDir, 2);
-
-local dstRootDir = b64dec(dropboxDir) .. "/Games/" .. game;
-local dstBinDir = dstRootDir .. "/bin";
-local dstResDir = dstRootDir .. "/resources";
-local srcBinDir = gProjDir .. "/output/Final";
-local srcResDir = gProjDir .. "/output/resources";
-	
-print("Deploying " .. game .. " game to " .. nixPath(dstRootDir));
-local files = {};
---copy bin folder: exe and DLLs
-forEachDir(srcBinDir, function(p, f, c)
-	local src = p..'/'..f;
-	local dst = dstBinDir..'/'..f;
-	local file = copyIfNewer(src, dst);
-	if(file) then
-		table.insert(c, file);
+function dropboxTarget()
+	local dropboxDir = os.getenv("USERPROFILE").."/AppData/Roaming/Dropbox/host.db";
+	if(checkFileExists(dropboxDir)) then
+		dropboxDir = findLineContaining(dropboxDir, 2);
+		dropboxDir = b64dec(dropboxDir) .. "/Games/";
+	else
+		dropboxDir = nil;
 	end;
-end, files);
-
---copy required resource files
-for i,v in ipairs(resList) do
-	local src = srcResDir..'/'..v;
-	local dst = dstResDir..'/'..v;
-	local file = copyIfNewer(src, dst);
-	if(file) then
-		table.insert(files, file);
-	end;
+	return dropboxDir;
 end;
-if(#files > 0) then
-	print("Files copied: " .. #files);
-	for _,v in ipairs(files) do
-		print(v);
-	end;
+
+function deployTarget()
+	return gProjDir .. "/deploy/";
 end;
-files = {};
---clean unused resource files
-forEachDir(dstResDir, cleanUnusedFiles, prefixNames(resList, dstResDir.."/"), files);
-if(#files > 0) then
-	print("Files deleted: " .. #files);
-	for _,v in ipairs(files) do
-		print(v);
+
+function doDeployment(target)
+	if(target == nil) then
+		print("Invalid deploy target");
+		return;
+	end;
+	local game = gameName or extractGameName();
+	local resFile = gProjDir .. "/src/Games/" .. game .. "/resourceList.lua";
+	local resDir = gProjDir .. "/output/resources";
+
+	local resList = resourceList and resourceList or dofile(resFile);
+	local resOK = allResourcesPresent or assertResourcesPresent(resList, resDir);
+
+	ensure(resOK, "Some resource dependencies are missing! Fix those first!");
+
+	local dstRootDir = target .. game;
+	local dstBinDir = dstRootDir .. "/bin";
+	local dstResDir = dstRootDir .. "/resources";
+	local srcBinDir = gProjDir .. "/output/Final";
+	local srcResDir = gProjDir .. "/output/resources";
+		
+	print("Deploying " .. game .. " game to " .. nixPath(dstRootDir));
+	local files = {};
+	--copy bin folder: exe and DLLs
+	forEachDir(srcBinDir, function(p, f, c)
+		local src = p..'/'..f;
+		local dst = dstBinDir..'/'..f;
+		local file = copyIfNewer(src, dst);
+		if(file) then
+			table.insert(c, file);
+		end;
+	end, files);
+
+	--copy required resource files
+	for i,v in ipairs(resList) do
+		local src = srcResDir..'/'..v;
+		local dst = dstResDir..'/'..v;
+		local file = copyIfNewer(src, dst);
+		if(file) then
+			table.insert(files, file);
+		end;
+	end;
+	if(#files > 0) then
+		print("Files copied: " .. #files);
+		for _,v in ipairs(files) do
+			print(v);
+		end;
+	end;
+	files = {};
+	--clean unused resource files
+	forEachDir(dstResDir, cleanUnusedFiles, prefixNames(resList, dstResDir.."/"), files);
+	if(#files > 0) then
+		print("Files deleted: " .. #files);
+		for _,v in ipairs(files) do
+			print(v);
+		end;
 	end;
 end;
