@@ -91,6 +91,9 @@ namespace Core
 
 		HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
 
+		setCulling(true);
+		setTransparencyMode(false);
+
 		status &= SUCCEEDED(hr);
 
 		DEBUG_INIT(GraphicsSystem);
@@ -824,45 +827,6 @@ namespace Core
 		DEBUG_CODE_END
 			return SUCCEEDED(hr);
 	}
-
-	static const char* shaderContent = R"rawShaderFile(
-	struct VOut
-	{
-		float4 position : SV_POSITION;
-		float4 diffuse : DIFFUSE;
-		float2 texCoord : TEXCOORD;
-	};
-
-	cbuffer cbPerObject
-	{
-		float4x4 WVP;
-		float4 FillColor;
-		float4 isTexture;
-	};
-
-	Texture2D ObjTexture;
-	SamplerState ObjSamplerState;
-
-	VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diffuse : DIFFUSE)
-	{
-		VOut output;
-
-		output.position = mul(position, WVP);
-		output.texCoord = texCoord;
-		output.diffuse = diffuse * FillColor;
-
-		return output;
-	}
-
-
-	float4 PShader(VOut input) : SV_TARGET
-	{
-		float4 diffuse = input.diffuse;
-		if(isTexture.x != 0)
-			diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
-		return diffuse;
-	}
-)rawShaderFile";
 
 	//*****************************************************************
 	//					INIT VERTEX SHADER

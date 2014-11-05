@@ -256,6 +256,7 @@ namespace Core
 		killMonsters(m_rayBullets, m_monsters, locations);
 		generateBonuses(locations, m_bonuses);
 		checkBonusPickup(m_players, m_bonuses);
+		updateBonuses(m_logicTimer, m_bonuses);
 		updateBonusEffects(m_logicTimer, m_players);
 
 		checkPlayerDeath(m_players);
@@ -322,7 +323,29 @@ namespace Core
 
 		for(auto& obj : m_bonuses)
 		{
-			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), obj.color);
+			auto c = obj.color;
+			auto diff = obj.duration - obj.timer.getCurMicros();
+			c.a = 0.2f + (float)diff / (float)obj.duration;
+			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
+			if(obj.effect == WeaponDrop)
+			{
+				std::string weaponText;
+				switch(obj.weapon)
+				{
+					case Pistol:
+						weaponText = "P";
+						break;
+					case Shotgun:
+						weaponText = "S";
+						break;
+					case Uzi:
+						weaponText = "U";
+						break;
+				}
+				auto textTf = obj.transform;
+				textTf.scale.set(0.04f, 0.04f);
+				m_graphicsSystem.drawText(m_defaultFont, weaponText, textTf, {0,0,0}, 1, false);
+			}
 		}
 
 		for(auto& obj : m_rayBullets)
@@ -332,7 +355,6 @@ namespace Core
 
 		//gui from now on
 		m_graphicsSystem.clearCamera();
-		m_graphicsSystem.setCulling(false);
 		m_graphicsSystem.setOrthographicProjection();
 		if(m_players.size() == 0)
 		{
@@ -348,7 +370,6 @@ namespace Core
 			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
 			tf.position.y += 20;
 		}
-		m_graphicsSystem.setCulling(true);
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 

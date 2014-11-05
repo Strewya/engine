@@ -147,7 +147,7 @@ namespace Core
 		}
 	}
 
-	void selectWeapon(Player& player, Weapon weapon)
+	void selectWeapon(Player& player, WeaponType weapon)
 	{
 		if(weapon == player.currentWeapon) return;
 
@@ -169,18 +169,18 @@ namespace Core
 		}
 	}
 
-	void enableEffect(Player& player, EffectType effect)
+	void enableEffect(Player& player, Bonus& bonus)
 	{
-		auto index = filterFind(player.bonuses, [=](const BonusEffect& e){return effect == e.type; });
+		auto index = filterFind(player.bonuses, [=](const BonusEffect& e){return bonus.effect == e.type; });
 		if(index == player.bonuses.size())
 		{
 			player.bonuses.emplace_back();
 			player.bonuses[index].duration = 0;
 			player.bonuses[index].timer.reset();
-			player.bonuses[index].type = effect;
+			player.bonuses[index].type = bonus.effect;
 		}
 		auto& b = player.bonuses[index];
-		switch(effect)
+		switch(bonus.effect)
 		{
 			case IncreasedRateOfFire:
 				player.rateOfFireMultiplier = 2;
@@ -196,6 +196,11 @@ namespace Core
 				player.health += 20;
 				clamp(0, 100, player.health);
 				player.bonuses.pop_back();
+				break;
+
+			case WeaponDrop:
+				player.bonuses.pop_back();
+				selectWeapon(player, bonus.weapon);
 				break;
 		}
 	}
@@ -284,10 +289,10 @@ namespace Core
 		auto& monster = monsters.back();
 		monster.boundingBox.set(0, 0, 1, 1);
 		monster.color.set(0, 0, 0);
-		monster.maxVelocity = 1 + gen.randFloat() * 2;
+		monster.maxVelocity = 1 + gen.randFloat() * 3;
 		monster.transform.position = position;
 		monster.targetPlayer = target;
-		monster.maxHealth = monster.health = gen.randInt(20, 100);
+		monster.maxHealth = monster.health = gen.randInt(20, 70);
 	}
 
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players)
@@ -383,13 +388,15 @@ namespace Core
 		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
 		for(auto& loc : killLocations)
 		{
-			if(gen.randInt(0, 10000) < 1000)
+			if(gen.randInt(1, 10000) < 1000)
 			{
 				bonuses.emplace_back();
 				auto effect = (EffectType)gen.randInt(0, EffectTypeCount - 1);
 				bonuses.back().transform.position = loc;
 				bonuses.back().boundingBox.set(0, 0, 0.75f, 0.75f);
 				bonuses.back().effect = effect;
+				bonuses.back().timer.reset();
+				bonuses.back().duration = Time::secondsToMicros(15);
 				switch(effect)
 				{
 					case IncreasedRateOfFire:
@@ -400,6 +407,10 @@ namespace Core
 						break;
 					case Heal:
 						bonuses.back().color.set(0, 1, 0);
+						break;
+					case WeaponDrop:
+						bonuses.back().weapon = (WeaponType)gen.randInt(0, WeaponCount - 1);
+						bonuses.back().color.set(1, 1, 0);
 						break;
 				}
 			}
@@ -418,10 +429,27 @@ namespace Core
 				bbox.center = bonuses[b].transform.position;
 				if(isRectTouchingRect(pbox, bbox))
 				{
-					enableEffect(player, bonuses[b].effect);
+					enableEffect(player, bonuses[b]);
 					bonuses[b] = bonuses.back();
 					bonuses.pop_back();
 				}
+			}
+		}
+	}
+
+	void updateBonuses(const Time& timer, VBonuses& bonuses)
+	{
+		for(uint32_t b = 0; b < bonuses.size();)
+		{
+			bonuses[b].timer.updateBy(timer.getDeltaMicros());
+			if(bonuses[b].timer.getCurMicros() > bonuses[b].duration)
+			{
+				bonuses[b] = bonuses.back();
+				bonuses.pop_back();
+			}
+			else
+			{
+				++b;
 			}
 		}
 	}

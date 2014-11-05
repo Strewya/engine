@@ -21,7 +21,7 @@ namespace Core
 	class RainbowlandGame;
 	class GraphicsSystem;
 	
-	enum Weapon
+	enum WeaponType
 	{
 		Pistol,
 		Shotgun,
@@ -34,6 +34,7 @@ namespace Core
 		IncreasedRateOfFire,
 		IncreasedMovementSpeed,
 		Heal,
+		WeaponDrop,
 		EffectTypeCount
 	};
 
@@ -68,16 +69,16 @@ namespace Core
 		uint32_t maxHealth;
 		int32_t health;
 		uint32_t regeneration;
-		Weapon currentWeapon;
+		WeaponType currentWeapon;
 		bool isShooting;
 	};
 
 	typedef std::vector<Player> VPlayers;
-
+	struct Bonus;
 	void initPlayer(Player& player);
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
-	void selectWeapon(Player& player, Weapon weapon);
-	void enableEffect(Player& player, EffectType effect);
+	void selectWeapon(Player& player, WeaponType weapon);
+	void enableEffect(Player& player, Bonus& bonus);
 	void disableEffect(Player& player, EffectType effect);
 	void updateBonusEffects(const Time& timer, VPlayers& players);
 	void checkPlayerDeath(VPlayers& players);
@@ -118,6 +119,9 @@ namespace Core
 		Color color;
 		Rect boundingBox;
 		EffectType effect;
+		WeaponType weapon;
+		Time timer;
+		uint64_t duration;
 	};
 
 	typedef std::vector<Bonus> VBonuses;
@@ -125,6 +129,7 @@ namespace Core
 
 	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
 	void checkBonusPickup(VPlayers& players, VBonuses& bonuses);
+	void updateBonuses(const Time& timer, VBonuses& bonuses);
 
 	struct RayBullet
 	{
