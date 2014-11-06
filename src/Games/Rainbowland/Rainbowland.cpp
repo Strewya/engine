@@ -36,7 +36,7 @@ namespace Core
 	{
 		m_window = &window;
 
-		window.resize(1024, 768);
+		window.resize(1200, 900);
 		window.showCursor(true);
 		
 		m_isRunning =
@@ -74,38 +74,62 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEBUTTON && w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
+				if(!perkMode && w.m_type == WindowEventType::WE_MOUSEBUTTON)
 				{
-					m_players[0].aim.set((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
-					if(w.m_mouseButton.m_isDown)
+					if(w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
 					{
-						m_players[0].isShooting = true;
+						m_players[0].aim.set((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
+						if(w.m_mouseButton.m_isDown)
+						{
+							m_players[0].isShooting = true;
+						}
+						else
+						{
+							m_players[0].isShooting = false;
+						}
+						return true;
 					}
-					else
+					else if(w.m_mouseButton.m_button == Mouse::m_RightButton && w.m_mouseButton.m_isDown && m_players.size() >= 1)
 					{
-						m_players[0].isShooting = false;
+						return enterPerkMode(*this);
 					}
-					return true;
 				}
 				return false;
 			});
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
+				if(perkMode && w.m_type == WindowEventType::WE_MOUSEBUTTON)
+				{
+					if(w.m_mouseButton.m_button == Mouse::m_LeftButton && w.m_mouseButton.m_isDown)
+					{
+						Vec2 screenCoord((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
+						screenCoord.x -= (window.getSizeX() / 2);
+						screenCoord.y -= (window.getSizeY() / 2);
+						screenCoord.y = -screenCoord.y;
+						mouseClickPerkMode(*this, screenCoord);
+						return true;
+					}
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					switch(w.m_keyboard.m_keyCode)
 					{
 						case Keyboard::m_1:
-							selectWeapon(m_players[0], Pistol);
+							selectWeapon(m_players[0], Pistol, m_weaponDatabase);
 							return true;
 
 						case Keyboard::m_2:
-							selectWeapon(m_players[0], Shotgun);
+							selectWeapon(m_players[0], Shotgun, m_weaponDatabase);
 							return true;
 
 						case Keyboard::m_3:
-							selectWeapon(m_players[0], Uzi);
+							selectWeapon(m_players[0], Uzi, m_weaponDatabase);
 							return true;
 
 						case Keyboard::m_R:
@@ -118,7 +142,7 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
+				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
@@ -141,7 +165,7 @@ namespace Core
 						return true;
 					}
 				}
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
+				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
@@ -222,18 +246,17 @@ namespace Core
 			}
 		}
 
-		movePlayers(m_logicTimer, m_players, m_playingField);
+		m_gameplayTimer.updateBy(m_logicTimer.getDeltaMicros());
+
+		movePlayers(m_gameplayTimer, m_players, m_playingField);
 		for(auto& player : m_players)
 		{
-			player.weaponTimer.updateBy(m_logicTimer.getDeltaMicros());
-			if(player.isShooting)
-			{
-				fireWeapon(player, m_rayBullets, m_graphicsSystem, m_camera);
-			}
+			fireWeapon(m_gameplayTimer, player, m_rayBullets, m_graphicsSystem, m_camera);
 		}
-		updateMonsterSpawners(m_logicTimer, m_monsterSpawners, m_monsters, m_players.size());
-		moveMonsters(m_logicTimer, m_monsters, m_players);
+		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
+		moveMonsters(m_gameplayTimer, m_monsters, m_players);
 		checkMonsterHurtingPlayer(m_monsters, m_players);
+		checkLevelup(m_players);
 
 		if(m_players.size() > 0)
 		{
@@ -251,13 +274,13 @@ namespace Core
 			m_camera.setPosition(pos);
 		}
 
-		moveBullets(m_logicTimer, m_rayBullets);
+		moveBullets(m_gameplayTimer, m_rayBullets);
 		VKillLocations locations;
-		killMonsters(m_rayBullets, m_monsters, locations);
+		killMonsters(m_rayBullets, m_monsters, locations, m_players);
 		generateBonuses(locations, m_bonuses);
-		checkBonusPickup(m_players, m_bonuses);
-		updateBonuses(m_logicTimer, m_bonuses);
-		updateBonusEffects(m_logicTimer, m_players);
+		checkBonusPickup(m_players, m_bonuses, m_weaponDatabase);
+		updateBonuses(m_gameplayTimer, m_bonuses);
+		updateBonusEffects(m_gameplayTimer, m_players);
 
 		checkPlayerDeath(m_players);
 
@@ -293,7 +316,7 @@ namespace Core
 		m_renderTimer.updateBy(updateTime);
 
 		m_graphicsSystem.begin();
-
+	
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 		
@@ -302,11 +325,16 @@ namespace Core
 		Vec2 p1{0, 0}, p2{0, 1}, p3{1, 0};
 		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1});
 		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});*/
-
 		
 		for(auto& obj : m_players)
 		{
 			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), obj.color);
+			if(obj.currentWeapon.ammo == 0)
+			{
+				auto textTf = obj.transform;
+				textTf.scale.set(0.03f, 0.03f);
+				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
+			}
 		}
 
 		for(auto& obj : m_monsterSpawners)
@@ -353,7 +381,9 @@ namespace Core
 			m_graphicsSystem.drawLine({}, obj.origin, {1, 1, 1, 0}, obj.position, {1, 1, 1, 1});
 		}
 
-		//gui from now on
+		//****************************
+		//			gui from now on
+		//****************************
 		m_graphicsSystem.clearCamera();
 		m_graphicsSystem.setOrthographicProjection();
 		if(m_players.size() == 0)
@@ -367,20 +397,21 @@ namespace Core
 		for(auto& player : m_players)
 		{
 			auto str = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+			str += "   Experience(level): " + std::to_string(player.experience) + "(" + std::to_string(player.level) + ")";
+			str += "   Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
+			str += "   Weapon: " + player.currentWeapon.name;
 			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
 			tf.position.y += 20;
 		}
+
+		drawPerkModeGui(*this);
+
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 
-		/*
-		auto lua = m_luaSystem.getStack();
-		lua.pull("game_render", 0);
-		if(lua.is<luaFunction>())
-		{
-			lua.call(luaCustom{this, CLASS(HedgehogGame)});
-		}
-		*/
+		
+
+
 		/*
 		static Transform framerateTf;
 		framerateTf.position.set(0.5f*m_window->getSizeX() - 170, 0.5f*m_window->getSizeY() - 10);

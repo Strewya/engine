@@ -51,37 +51,20 @@ namespace Core
 		EffectType type;
 	};
 
-	struct Player
+	struct Weapon
 	{
-		Transform transform;
-		Color color;
-		Rect boundingBox;
-		Vec2 velocity;
-		Vec2 maxVelocity;
-		Vec2 acceleration;
-		bool directions[4];
-		Vec2 aim;
-		Time weaponTimer;
-		std::vector<BonusEffect> bonuses;
-		uint64_t weaponDelay;
-		uint32_t rateOfFireMultiplier;
-		uint32_t movementSpeedMultiplier;
-		uint32_t maxHealth;
-		int32_t health;
-		uint32_t regeneration;
-		WeaponType currentWeapon;
-		bool isShooting;
+		WeaponType type;
+		std::string name;
+		uint64_t fireDelay;
+		uint64_t reloadDelay;
+		uint32_t damage;
+		uint32_t ammo;
+		uint32_t maxAmmo;
+		uint32_t bulletsPerShot;
+		float spread;
 	};
 
-	typedef std::vector<Player> VPlayers;
-	struct Bonus;
-	void initPlayer(Player& player);
-	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
-	void selectWeapon(Player& player, WeaponType weapon);
-	void enableEffect(Player& player, Bonus& bonus);
-	void disableEffect(Player& player, EffectType effect);
-	void updateBonusEffects(const Time& timer, VPlayers& players);
-	void checkPlayerDeath(VPlayers& players);
+	typedef std::vector<Weapon> VWeapons;
 
 	struct Monster
 	{
@@ -97,10 +80,6 @@ namespace Core
 
 	typedef std::vector<Monster> VMonsters;
 
-	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
-	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
-	void checkMonsterHurtingPlayer(VMonsters& monsters, VPlayers& players);
-
 	struct MonsterSpawner
 	{
 		Transform transform;
@@ -110,8 +89,6 @@ namespace Core
 	};
 
 	typedef std::vector<MonsterSpawner> VMonsterSpawners;
-
-	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 
 	struct Bonus
 	{
@@ -127,10 +104,6 @@ namespace Core
 	typedef std::vector<Bonus> VBonuses;
 	typedef std::vector<Vec2> VKillLocations;
 
-	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
-	void checkBonusPickup(VPlayers& players, VBonuses& bonuses);
-	void updateBonuses(const Time& timer, VBonuses& bonuses);
-
 	struct RayBullet
 	{
 		Vec2 origin;
@@ -142,13 +115,90 @@ namespace Core
 
 	typedef std::vector<RayBullet> VRayBullets;
 
-	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage);
-	void moveBullets(const Time& timer, VRayBullets& bullets);
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations);
-	void fireWeapon(Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
+	enum PerkType
+	{
+		Regeneration,
+		PoisonBullets,
+		Radioactive,
+		AmmoManiac,
+		Greaser,
+		Fastloader,
+		MeanLeanExpMachine,
+		HeavyRunner,
+		Dodger,
+		HotTempered,
+		StationaryReloader,
+		PerkTypeCount
+	};
 
+	struct Perk
+	{
+		PerkType type;
+		std::string name;
+		Rect button;
+	};
+
+	typedef std::vector<Perk> VPerks;
+
+	struct Player
+	{
+		Transform transform;
+		Color color;
+		Rect boundingBox;
+		Vec2 velocity;
+		Vec2 maxVelocity;
+		Vec2 acceleration;
+		bool directions[4];
+		Vec2 aim;
+		std::vector<BonusEffect> bonuses;
+		Time weaponTimer;
+		Weapon currentWeapon;
+		uint32_t bonusDamage;
+		uint32_t rateOfFireMultiplier;
+		uint32_t movementSpeedMultiplier;
+		uint32_t maxHealth;
+		int32_t health;
+		Time regenTimer;
+		uint32_t regeneration;
+		uint32_t experience;
+		uint32_t experienceForNextLevel;
+		uint32_t level;
+		uint32_t perkPoints;
+		bool isShooting;
+	};
+
+	typedef std::vector<Player> VPlayers;
 
 	//waaaaaaa
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
+	void initPlayer(Player& player, const VWeapons& weaponDb);
+	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
+	void checkPlayerDeath(VPlayers& players);
+	void checkLevelup(VPlayers& players);
+
+	void enableEffect(Player& player, Bonus& bonus, const VWeapons& weaponDb);
+	void disableEffect(Player& player, EffectType effect);
+	void updateBonusEffects(const Time& timer, VPlayers& players);
+	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
+	void checkBonusPickup(VPlayers& players, VBonuses& bonuses, const VWeapons& weaponDb);
+	void updateBonuses(const Time& timer, VBonuses& bonuses);
+
+	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
+	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
+	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage);
+	void moveBullets(const Time& timer, VRayBullets& bullets);
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
+
+	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
+	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
+	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
+	void checkMonsterHurtingPlayer(VMonsters& monsters, VPlayers& players);
+
+	bool enterPerkMode(RainbowlandGame& game);
+	void exitPerkMode(RainbowlandGame& game);
+	void generatePerks(VPerks& perks, const VPerks& perkDb);
+	void mouseClickPerkMode(RainbowlandGame& game, Vec2 clickPos);
+	void applyPerk(Player& player, Perk& perk);
+	void drawPerkModeGui(RainbowlandGame& game);
 }

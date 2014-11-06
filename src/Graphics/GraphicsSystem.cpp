@@ -834,22 +834,28 @@ namespace Core
 	bool GraphicsSystem::initVertexShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-		ID3D10Blob* errorBlob = nullptr;
-		DEBUG_INFO("Compiling vertex shader from file ", shaderFile);
-		HRESULT hr = S_OK;// D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, &errorBlob, nullptr);
-		
-		//DEBUG_INFO((int32_t)hr);
-		//if(SUCCEEDED(hr))
+		HRESULT hr = S_OK;
+#ifndef _DEBUG
+#include <Graphics/vshader.h>
+		const LPVOID shaderBuffer = (LPVOID)g_VShader;
+		SIZE_T shaderSize = sizeof(g_VShader);
+#else
+		hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		LPVOID shaderBuffer = m_shaderBlob->GetBufferPointer();
+		SIZE_T shaderSize = m_shaderBlob->GetBufferSize();
+
+		DEBUG_INFO((int32_t)hr);
+		if(SUCCEEDED(hr))
+#endif
 		{
 			safeRelease(m_vertexShader);
-#include	<Graphics/vshader.h>
-			hr = m_dev->CreateVertexShader(g_VShader, sizeof(g_VShader), nullptr, &m_vertexShader);
+			hr = m_dev->CreateVertexShader(shaderBuffer, shaderSize, nullptr, &m_vertexShader);
 			DEBUG_INFO((int32_t)hr);
 			if(SUCCEEDED(hr))
 			{
 				auto& ied = Vertex::getDescription();
 				safeRelease(m_inputLayout);
-				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), g_VShader, sizeof(g_VShader), &m_inputLayout);
+				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), shaderBuffer, shaderSize, &m_inputLayout);
 				DEBUG_INFO((int32_t)hr);
 				if(SUCCEEDED(hr))
 				{
@@ -874,15 +880,21 @@ namespace Core
 	bool GraphicsSystem::initPixelShader(const ResourceFile& shaderFile)
 	{
 		ID3D10Blob* m_shaderBlob = nullptr;
-		ID3D10Blob* errorBlob = nullptr;
-		DEBUG_INFO("Compiling pixel shader from file ", shaderFile);
-		HRESULT hr = S_OK;// D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, &errorBlob, nullptr);
-		//DEBUG_INFO((int32_t)hr);
-		//if(SUCCEEDED(hr))
+		HRESULT hr = S_OK;
+#ifndef _DEBUG
+#include <Graphics/pshader.h>
+		const LPVOID shaderBuffer = (LPVOID)g_PShader;
+		SIZE_T shaderSize = sizeof(g_PShader);
+#else
+		hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
+		LPVOID shaderBuffer = m_shaderBlob->GetBufferPointer();
+		SIZE_T shaderSize = m_shaderBlob->GetBufferSize();
+		DEBUG_INFO((int32_t)hr);
+		if(SUCCEEDED(hr))
+#endif
 		{
 			safeRelease(m_pixelShader);
-#include	<Graphics/pshader.h>
-			hr = m_dev->CreatePixelShader(g_PShader, sizeof(g_PShader), nullptr, &m_pixelShader);
+			hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_pixelShader);
 			DEBUG_INFO((int32_t)hr);
 			if(SUCCEEDED(hr))
 			{

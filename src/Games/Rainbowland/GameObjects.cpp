@@ -22,10 +22,6 @@ namespace Core
 		//background
 		game.m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
-		//players
-		game.m_players.emplace_back();
-		initPlayer(game.m_players.back());
-
 		game.m_deathTimer.reset();
 
 		//playing field boundary
@@ -90,6 +86,36 @@ namespace Core
 
 			pos.y += distanceBetweenSpawners.y;
 		}
+
+		game.m_weaponDatabase = {
+				{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0},
+				{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f},
+				{Uzi, "Spammer", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.75f}
+		};
+
+		game.m_perkDatabase = {
+				{Regeneration, "Regeneration"},
+				{PoisonBullets, "PoisonBullets"},
+				{Radioactive, "Radioactive"},
+				{AmmoManiac, "AmmoManiac"},
+				{Greaser, "Greaser"},
+				{Fastloader, "Fastloader"},
+				{MeanLeanExpMachine, "MeanLeanExpMachine"},
+				{HeavyRunner, "HeavyRunner"},
+				{Dodger, "Dodger"},
+				{HotTempered, "HotTempered"},
+				{StationaryReloader, "StationaryReloader"}
+		};
+
+		//players
+		game.m_players.emplace_back();
+		initPlayer(game.m_players.back(), game.m_weaponDatabase);
+
+		game.perkMode = false;
+		
+		
+		game.m_players[0].perkPoints = 1;
+		enterPerkMode(game);
 	}
 
 	void cleanGame(RainbowlandGame& game)
@@ -99,9 +125,12 @@ namespace Core
 		game.m_monsterSpawners.clear();
 		game.m_players.clear();
 		game.m_rayBullets.clear();
+		game.m_weaponDatabase.clear();
+		game.m_perkDatabase.clear();
+		game.m_perks.clear();
 	}
 
-	void initPlayer(Player& player)
+	void initPlayer(Player& player, const VWeapons& weaponDb)
 	{
 		player.transform.position.set(0, 0);
 		player.transform.scale.set(1, 1);
@@ -113,10 +142,14 @@ namespace Core
 		player.acceleration.set(1.0f, 1.0f);
 		player.directions[Up] = player.directions[Down] = player.directions[Left] = player.directions[Right] = false;
 		player.aim.set(0, 0);
-		selectWeapon(player, Pistol);
+		selectWeapon(player, Pistol, weaponDb);
 		player.rateOfFireMultiplier = 1;
 		player.movementSpeedMultiplier = 1;
 		player.maxHealth = player.health = 100;
+		player.experience = 0;
+		player.experienceForNextLevel = 200;
+		player.level = 1;
+		player.perkPoints = 0;
 		player.regeneration = 0;
 		player.isShooting = false;
 	}
@@ -147,29 +180,36 @@ namespace Core
 		}
 	}
 
-	void selectWeapon(Player& player, WeaponType weapon)
+	void checkPlayerDeath(VPlayers& players)
 	{
-		if(weapon == player.currentWeapon) return;
-
-		player.currentWeapon = weapon;
-		player.weaponTimer.updateBy(Time::secondsToMicros(50));
-		switch(weapon)
+		for(uint32_t p = 0; p < players.size(); ++p)
 		{
-			case Pistol:
-				player.weaponDelay = Time::secondsToMicros(0.5f);
-				break;
-
-			case Shotgun:
-				player.weaponDelay = Time::secondsToMicros(1.0f);
-				break;
-
-			case Uzi:
-				player.weaponDelay = Time::secondsToMicros(0.1f);
-				break;
+			if(players[p].health <= 0)
+			{
+				players[p] = players.back();
+				players.pop_back();
+			}
+			else
+			{
+				++p;
+			}
 		}
 	}
 
-	void enableEffect(Player& player, Bonus& bonus)
+	void checkLevelup(VPlayers& players)
+	{
+		for(auto& player : players)
+		{
+			if(player.experience >= player.experienceForNextLevel)
+			{
+				player.experienceForNextLevel += 100 * player.level;
+				++player.level;
+				++player.perkPoints;
+			}
+		}
+	}
+
+	void enableEffect(Player& player, Bonus& bonus, const VWeapons& weaponDb)
 	{
 		auto index = filterFind(player.bonuses, [=](const BonusEffect& e){return bonus.effect == e.type; });
 		if(index == player.bonuses.size())
@@ -184,12 +224,12 @@ namespace Core
 		{
 			case IncreasedRateOfFire:
 				player.rateOfFireMultiplier = 2;
-				b.duration += Time::secondsToMicros(3);
+				b.duration += Time::secondsToMicros(10);
 				break;
 
 			case IncreasedMovementSpeed:
 				player.movementSpeedMultiplier = 2;
-				b.duration += Time::secondsToMicros(3);
+				b.duration += Time::secondsToMicros(5);
 				break;
 
 			case Heal:
@@ -200,7 +240,7 @@ namespace Core
 
 			case WeaponDrop:
 				player.bonuses.pop_back();
-				selectWeapon(player, bonus.weapon);
+				selectWeapon(player, bonus.weapon, weaponDb);
 				break;
 		}
 	}
@@ -212,7 +252,7 @@ namespace Core
 			case IncreasedRateOfFire:
 				player.rateOfFireMultiplier = 1;
 				break;
-
+	
 			case IncreasedMovementSpeed:
 				player.movementSpeedMultiplier = 1;
 				break;
@@ -241,45 +281,207 @@ namespace Core
 		}
 	}
 
-	void checkPlayerDeath(VPlayers& players)
+	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses)
 	{
-		for(uint32_t p = 0; p < players.size(); ++p)
+		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+		for(auto& loc : killLocations)
 		{
-			if(players[p].health <= 0)
+			if(gen.randInt(1, 10000) < 1000)
 			{
-				players[p] = players.back();
-				players.pop_back();
+				bonuses.emplace_back();
+				auto effect = (EffectType)gen.randInt(0, EffectTypeCount - 1);
+				bonuses.back().transform.position = loc;
+				bonuses.back().boundingBox.set(0, 0, 0.75f, 0.75f);
+				bonuses.back().effect = effect;
+				bonuses.back().timer.reset();
+				bonuses.back().duration = Time::secondsToMicros(15);
+				switch(effect)
+				{
+					case IncreasedRateOfFire:
+						bonuses.back().color.set(0, 0, 1);
+						break;
+					case IncreasedMovementSpeed:
+						bonuses.back().color.set(0, 1, 1);
+						break;
+					case Heal:
+						bonuses.back().color.set(0, 1, 0);
+						break;
+					case WeaponDrop:
+						bonuses.back().weapon = (WeaponType)gen.randInt(0, WeaponCount - 1);
+						bonuses.back().color.set(1, 1, 0);
+						break;
+				}
+			}
+		}
+	}
+
+	void checkBonusPickup(VPlayers& players, VBonuses& bonuses, const VWeapons& weaponDb)
+	{
+		for(auto& player : players)
+		{
+			for(uint32_t b = 0; b < bonuses.size(); ++b)
+			{
+				Rect pbox = player.boundingBox;
+				pbox.center = player.transform.position;
+				Rect bbox = bonuses[b].boundingBox;
+				bbox.center = bonuses[b].transform.position;
+				if(isRectTouchingRect(pbox, bbox))
+				{
+					enableEffect(player, bonuses[b], weaponDb);
+					bonuses[b] = bonuses.back();
+					bonuses.pop_back();
+				}
+			}
+		}
+	}
+
+	void updateBonuses(const Time& timer, VBonuses& bonuses)
+	{
+		for(uint32_t b = 0; b < bonuses.size();)
+		{
+			bonuses[b].timer.updateBy(timer.getDeltaMicros());
+			if(bonuses[b].timer.getCurMicros() > bonuses[b].duration)
+			{
+				bonuses[b] = bonuses.back();
+				bonuses.pop_back();
 			}
 			else
 			{
-				++p;
+				++b;
 			}
 		}
 	}
 
-	void fireWeapon(Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
+	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb)
 	{
-		if(player.weaponTimer.getCurMicros() > (player.weaponDelay / player.rateOfFireMultiplier))
+		if(weapon == player.currentWeapon.type) return;
+
+		player.currentWeapon = weaponDb[weapon];
+		player.weaponTimer.updateBy(Time::secondsToMicros(50));
+	}
+
+	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
+	{
+		player.weaponTimer.updateBy(timer.getDeltaMicros());
+		if(player.isShooting)
 		{
-			player.weaponTimer.reset();
-			Vec2 normalizedAim = graphicsSystem.screenToWorld({player.aim.x, player.aim.y}, camera);
-			switch(player.currentWeapon)
+			auto& w = player.currentWeapon;
+			if(w.ammo > 0)
 			{
-				case Pistol:
-					generateBullets(bullets, 1, 0, player.transform.position, normalizedAim, 10);
-					break;
-
-				case Shotgun:
-					generateBullets(bullets, 6, 2.0f, player.transform.position, normalizedAim, 20);
-					break;
-
-				case Uzi:
-					generateBullets(bullets, 1, 1.0f, player.transform.position, normalizedAim, 5);
-					break;
+				if(player.weaponTimer.getCurMicros() > (w.fireDelay / player.rateOfFireMultiplier))
+				{
+					player.weaponTimer.reset();
+					--w.ammo;
+					Vec2 normalizedAim = graphicsSystem.screenToWorld({player.aim.x, player.aim.y}, camera);
+					generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position, normalizedAim, w.damage);
+				}
+			}
+			else
+			{
+				if(player.weaponTimer.getCurMicros() > (w.reloadDelay/player.rateOfFireMultiplier))
+				{
+					w.ammo = w.maxAmmo;
+					player.weaponTimer.updateBy(Time::secondsToMicros(50));
+				}
 			}
 		}
 	}
 
+	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage)
+	{
+
+		Vec2 direction = Vec2::normalize(target - origin);
+		Vec2 targetDistance = direction * 15;
+		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
+		for(uint32_t i = 0; i < count; ++i)
+		{
+			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
+			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0, damage});
+		}
+	}
+
+	void moveBullets(const Time& timer, VRayBullets& bullets)
+	{
+		for(uint32_t i = 0; i < bullets.size();)
+		{
+			auto displacement = timer.getDeltaTime()*bullets[i].velocity;
+			auto travel = Vec2::length(displacement);
+			bullets[i].position += displacement;
+			bullets[i].travelled += travel;
+			if(bullets[i].travelled > 10)
+			{
+				bullets[i].origin += displacement;
+			}
+
+			if(bullets[i].travelled > 50)
+			{
+				bullets[i] = bullets.back();
+				bullets.pop_back();
+			}
+			else
+			{
+				++i;
+			}
+		}
+	}
+
+	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations, VPlayers& players)
+	{
+		std::map<uint32_t, uint32_t> kills;
+		for(uint32_t b = 0; b < bullets.size();)
+		{
+			RayBullet& bullet = bullets[b];
+			uint32_t monsterHit = -1;
+			for(uint32_t m = 0; m < monsters.size(); ++m)
+			{
+				Rect bbox = monsters[m].boundingBox;
+				bbox.center = monsters[m].transform.position;
+				if(isPointInsideRect(bullet.position, bbox))
+				{
+					monsterHit = m;
+					break;
+				}
+			}
+			if(monsterHit != -1)
+			{
+				monsters[monsterHit].health -= bullets[b].damage;
+				if(monsters[monsterHit].health <= 0)
+				{
+					for(auto& player : players)
+					{
+						player.experience += monsters[monsterHit].maxHealth;
+					}
+					killLocations.emplace_back(monsters[monsterHit].transform.position);
+					monsters[monsterHit] = monsters.back();
+					monsters.pop_back();
+				}
+				bullets[b] = bullets.back();
+				bullets.pop_back();
+				monsterHit = -1;
+			}
+			else
+			{
+				++b;
+			}
+		}
+	}
+
+	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount)
+	{
+		if(playerCount == 0) return;
+
+		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		for(auto& spawner : spawners)
+		{
+			spawner.timer.updateBy(timer.getDeltaMicros());
+			if(spawner.timer.getCurMicros() > spawner.spawnCooldown)
+			{
+				spawner.timer.reset();
+				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0, playerCount - 1));
+			}
+		}
+	}
+	
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
 	{
 		if(monsters.size() > 20) return;
@@ -329,52 +531,36 @@ namespace Core
 		}
 	}
 
-	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount)
+	bool enterPerkMode(RainbowlandGame& game)
 	{
-		if(playerCount == 0) return;
-
-		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
-		for(auto& spawner : spawners)
+		if(std::any_of(game.m_players.begin(), game.m_players.end(), [](const Player& p){return p.perkPoints > 0; }))
 		{
-			spawner.timer.updateBy(timer.getDeltaMicros());
-			if(spawner.timer.getCurMicros() > spawner.spawnCooldown)
-			{
-				spawner.timer.reset();
-				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0, playerCount - 1));
-			}
+			game.perkMode = true;
+			generatePerks(game.m_perks, game.m_perkDatabase);
+			game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+			return true;
 		}
+		return false;
 	}
 
-	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage)
+	void exitPerkMode(RainbowlandGame& game)
 	{
-
-		Vec2 direction = Vec2::normalize(target - origin);
-		Vec2 targetDistance = direction * 15;
-		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
-		for(uint32_t i = 0; i < count; ++i)
-		{
-			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0, damage});
-		}
+		game.m_perks.clear();
+		game.perkMode = false;
+		game.m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
 	}
 
-	void moveBullets(const Time& timer, VRayBullets& bullets)
+	void generatePerks(VPerks& perks, const VPerks& perkDb)
 	{
-		for(uint32_t i = 0; i < bullets.size();)
+		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+		for(uint32_t i = 0; i < 3; ++i)
 		{
-			auto displacement = timer.getDeltaTime()*bullets[i].velocity;
-			auto travel = Vec2::length(displacement);
-			bullets[i].position += displacement;
-			bullets[i].travelled += travel;
-			if(bullets[i].travelled > 10)
+			uint32_t perkIndex = gen.randInt(0, perkDb.size() - 1);
+			auto exists = filterFind(perks, [&](const Perk& p){return p.type == perkDb[perkIndex].type; });
+			if(exists == perks.size())
 			{
-				bullets[i].origin += displacement;
-			}
-
-			if(bullets[i].travelled > 50)
-			{
-				bullets[i] = bullets.back();
-				bullets.pop_back();
+				perks.emplace_back(perkDb[perkIndex]);
+				perks.back().button = {{0.0f, 170.0f - i * 45.0f}, 180, 20};
 			}
 			else
 			{
@@ -383,110 +569,48 @@ namespace Core
 		}
 	}
 
-	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses)
+	void mouseClickPerkMode(RainbowlandGame& game, Vec2 clickPos)
 	{
-		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
-		for(auto& loc : killLocations)
+		uint32_t i = 0;
+		for(; i < game.m_perks.size(); ++i)
 		{
-			if(gen.randInt(1, 10000) < 1000)
+			if(isPointInsideRect(clickPos, game.m_perks[i].button))
 			{
-				bonuses.emplace_back();
-				auto effect = (EffectType)gen.randInt(0, EffectTypeCount - 1);
-				bonuses.back().transform.position = loc;
-				bonuses.back().boundingBox.set(0, 0, 0.75f, 0.75f);
-				bonuses.back().effect = effect;
-				bonuses.back().timer.reset();
-				bonuses.back().duration = Time::secondsToMicros(15);
-				switch(effect)
+				auto perk = game.m_perks[i];
+				for(auto& p : game.m_players)
 				{
-					case IncreasedRateOfFire:
-						bonuses.back().color.set(0, 0, 1);
-						break;
-					case IncreasedMovementSpeed:
-						bonuses.back().color.set(0, 1, 1);
-						break;
-					case Heal:
-						bonuses.back().color.set(0, 1, 0);
-						break;
-					case WeaponDrop:
-						bonuses.back().weapon = (WeaponType)gen.randInt(0, WeaponCount - 1);
-						bonuses.back().color.set(1, 1, 0);
-						break;
+					applyPerk(p, perk);
 				}
+				exitPerkMode(game);
+				break;
 			}
 		}
 	}
 
-	void checkBonusPickup(VPlayers& players, VBonuses& bonuses)
+	void applyPerk(Player& player, Perk& perk)
 	{
-		for(auto& player : players)
+		switch(perk.type)
 		{
-			for(uint32_t b = 0; b < bonuses.size(); ++b)
-			{
-				Rect pbox = player.boundingBox;
-				pbox.center = player.transform.position;
-				Rect bbox = bonuses[b].boundingBox;
-				bbox.center = bonuses[b].transform.position;
-				if(isRectTouchingRect(pbox, bbox))
-				{
-					enableEffect(player, bonuses[b]);
-					bonuses[b] = bonuses.back();
-					bonuses.pop_back();
-				}
-			}
+			case PoisonBullets:
+				player.bonusDamage = 10;
+				break;
 		}
 	}
 
-	void updateBonuses(const Time& timer, VBonuses& bonuses)
+	void drawPerkModeGui(RainbowlandGame& game)
 	{
-		for(uint32_t b = 0; b < bonuses.size();)
+		if(game.perkMode)
 		{
-			bonuses[b].timer.updateBy(timer.getDeltaMicros());
-			if(bonuses[b].timer.getCurMicros() > bonuses[b].duration)
+			Transform tf;
+			tf.position.set(0, 0);
+			tf.scale.set(1, 1);
+			game.m_graphicsSystem.drawQuad(tf, {200, 200}, {0.1f, 0.1f, 0.1f});
+			tf.scale.set(0.75f, 0.75f);
+			for(auto& perk : game.m_perks)
 			{
-				bonuses[b] = bonuses.back();
-				bonuses.pop_back();
-			}
-			else
-			{
-				++b;
-			}
-		}
-	}
-
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations)
-	{
-		std::map<uint32_t, uint32_t> kills;
-		for(uint32_t b = 0; b < bullets.size();)
-		{
-			RayBullet& bullet = bullets[b];
-			uint32_t monsterHit = -1;
-			for(uint32_t m = 0; m < monsters.size(); ++m)
-			{
-				Rect bbox = monsters[m].boundingBox;
-				bbox.center = monsters[m].transform.position;
-				if(isPointInsideRect(bullet.position, bbox))
-				{
-					monsterHit = m;
-					break;
-				}
-			}
-			if(monsterHit != -1)
-			{
-				monsters[monsterHit].health -= bullets[b].damage;
-				if(monsters[monsterHit].health <= 0)
-				{
-					killLocations.emplace_back(monsters[monsterHit].transform.position);
-					monsters[monsterHit] = monsters.back();
-					monsters.pop_back();
-				}
-				bullets[b] = bullets.back();
-				bullets.pop_back();
-				monsterHit = -1;
-			}
-			else
-			{
-				++b;
+				tf.position = perk.button.center;
+				game.m_graphicsSystem.drawQuadPolygon({}, perk.button, {});
+				game.m_graphicsSystem.drawText(game.m_defaultFont, perk.name, tf, {}, 1, false);
 			}
 		}
 	}

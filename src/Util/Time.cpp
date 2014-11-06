@@ -184,12 +184,12 @@ namespace Core
 
 	uint32_t Time::getDeltaMicros() const
 	{
-		return static_cast<uint32_t>(m_deltaMicros);
+		return static_cast<uint32_t>(static_cast<double>(m_deltaMicros)*m_timeScale);
 	}
 
 	float Time::getDeltaTime() const
 	{
-		return m_deltaTime;
+		return static_cast<float>(static_cast<double>(m_deltaTime)*m_timeScale);
 	}
 
 	void Time::setTimeScale(double timeScale)

@@ -40,6 +40,7 @@ namespace Core
 		Time m_logicTimer;
 		Time m_renderTimer;
 		Time m_deathTimer;
+		Time m_gameplayTimer;
 		
 		Camera m_camera;
 		Rect m_playingField;
@@ -51,10 +52,14 @@ namespace Core
 		VMonsterSpawners m_monsterSpawners;
 		VBonuses m_bonuses;
 		VRayBullets m_rayBullets;
+		VWeapons m_weaponDatabase;
+		VPerks m_perkDatabase;
+		VPerks m_perks;
 		
 		uint32_t m_defaultFont;
 		Window* m_window;
 		bool m_isRunning;
+		bool perkMode;
 		
 
 		bool init(Window& window);
