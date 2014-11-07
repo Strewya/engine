@@ -14,6 +14,10 @@ namespace Core
 	class Rect
 	{
 	public:
+		Vec2 center;
+		float halfWidth;
+		float halfHeight;
+
 		Rect();
 		Rect(Vec2, float, float);
 
@@ -24,15 +28,7 @@ namespace Core
 		Vec2 halfSize() const;
 
 		void set(float cx, float cy, float hw, float hh);
-
-		Vec2 center;
-		float halfWidth;
-		float halfHeight;
 	};
-
-	bool isPointInsideRect(const Vec2& point, const Rect& rect);
-	bool isRectInsideRect(const Rect& innerRect, const Rect& outerRect);
-	bool isRectTouchingRect(const Rect& r1, const Rect& r2);
 }
 
 //#include <iostream>

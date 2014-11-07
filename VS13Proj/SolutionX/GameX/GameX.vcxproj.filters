@@ -191,6 +191,12 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Circle.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\CollisionChecks.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -349,6 +355,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h">
       <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Circle.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\CollisionChecks.h">
+      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@
 #include <Games/Rainbowland/Rainbowland.h>
 #include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
+#include <Util/CollisionChecks.h>
 #include <Util/Random.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
@@ -92,6 +93,11 @@ namespace Core
 				{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f},
 				{Uzi, "Spammer", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.75f}
 		};
+		std::sort(game.m_weaponDatabase.begin(), game.m_weaponDatabase.end(),
+				  [](const Weapon& l, const Weapon& r)
+		{
+			return l.type < r.type;
+		});
 
 		game.m_perkDatabase = {
 				{Regeneration, "Regeneration"},
@@ -106,10 +112,15 @@ namespace Core
 				{HotTempered, "HotTempered"},
 				{StationaryReloader, "StationaryReloader"}
 		};
+		std::sort(game.m_perkDatabase.begin(), game.m_perkDatabase.end(),
+				  [](const Perk& l, const Perk& r)
+		{
+			return l.type < r.type;
+		});
 
 		//players
 		game.m_players.emplace_back();
-		initPlayer(game.m_players.back(), game.m_weaponDatabase);
+		initPlayer(game.m_players.back(), game.m_weaponDatabase, game.m_perkDatabase);
 
 		game.perkMode = false;
 		
@@ -130,7 +141,7 @@ namespace Core
 		game.m_perks.clear();
 	}
 
-	void initPlayer(Player& player, const VWeapons& weaponDb)
+	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb)
 	{
 		player.transform.position.set(0, 0);
 		player.transform.scale.set(1, 1);
@@ -152,6 +163,10 @@ namespace Core
 		player.perkPoints = 0;
 		player.regeneration = 0;
 		player.isShooting = false;
+		for(auto& p : perkDb)
+		{
+			player.availablePerks.emplace_back(p.type);
+		}
 	}
 
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField)
@@ -553,7 +568,7 @@ namespace Core
 	void generatePerks(VPerks& perks, const VPerks& perkDb)
 	{
 		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
-		for(uint32_t i = 0; i < 3; ++i)
+		for(uint32_t i = 0; i < 3;)
 		{
 			uint32_t perkIndex = gen.randInt(0, perkDb.size() - 1);
 			auto exists = filterFind(perks, [&](const Perk& p){return p.type == perkDb[perkIndex].type; });
@@ -561,9 +576,6 @@ namespace Core
 			{
 				perks.emplace_back(perkDb[perkIndex]);
 				perks.back().button = {{0.0f, 170.0f - i * 45.0f}, 180, 20};
-			}
-			else
-			{
 				++i;
 			}
 		}
@@ -580,6 +592,7 @@ namespace Core
 				for(auto& p : game.m_players)
 				{
 					applyPerk(p, perk);
+					--p.perkPoints;
 				}
 				exitPerkMode(game);
 				break;

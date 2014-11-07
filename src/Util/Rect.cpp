@@ -49,33 +49,6 @@ namespace Core
 		halfWidth = hw;
 		halfHeight = hh;
 	}
-
-	bool isPointInsideRect(const Vec2& point, const Rect& rect)
-	{
-		if(point.x < rect.center.x - rect.halfWidth) return false;
-		if(point.x > rect.center.x + rect.halfWidth) return false;
-		if(point.y < rect.center.y - rect.halfHeight) return false;
-		if(point.y > rect.center.y + rect.halfHeight) return false;
-		return true;
-	}
-
-	bool isRectInsideRect(const Rect& innerRect, const Rect& outerRect)
-	{
-		if(!isPointInsideRect({innerRect.left(), innerRect.top()}, outerRect)) return false;
-		if(!isPointInsideRect({innerRect.left(), innerRect.bottom()}, outerRect)) return false;
-		if(!isPointInsideRect({innerRect.right(), innerRect.top()}, outerRect)) return false;
-		if(!isPointInsideRect({innerRect.right(), innerRect.bottom()}, outerRect)) return false;
-		return true;
-	}
-
-	bool isRectTouchingRect(const Rect& r1, const Rect& r2)
-	{
-		if(r1.left() > r2.right()) return false;
-		if(r1.right() < r2.left()) return false;
-		if(r1.top() < r2.bottom()) return false;
-		if(r1.bottom() > r2.top()) return false;
-		return true;
-	}
 }
 
 

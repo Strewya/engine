@@ -330,6 +330,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Circle.cpp" />
+    <ClCompile Include="..\..\..\src\Util\CollisionChecks.cpp" />
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
@@ -388,6 +390,8 @@
     <ClInclude Include="..\..\..\src\Scripting\LuaStackImpl.h" />
     <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
+    <ClInclude Include="..\..\..\src\Util\Circle.h" />
+    <ClInclude Include="..\..\..\src\Util\CollisionChecks.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
     <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />

@@ -164,6 +164,8 @@ namespace Core
 		uint32_t experienceForNextLevel;
 		uint32_t level;
 		uint32_t perkPoints;
+		std::vector<PerkType> availablePerks;
+		std::vector<PerkType> acquiredPerks;
 		bool isShooting;
 	};
 
@@ -172,7 +174,7 @@ namespace Core
 	//waaaaaaa
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
-	void initPlayer(Player& player, const VWeapons& weaponDb);
+	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb);
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
 	void checkPlayerDeath(VPlayers& players);
 	void checkLevelup(VPlayers& players);
