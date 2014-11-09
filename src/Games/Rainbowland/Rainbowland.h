@@ -14,6 +14,7 @@
 #include <Caches/ImageCache.h>
 #include <Caches/TextureCache.h>
 #include <Games/Rainbowland/GameObjects.h>
+#include <Games/Rainbowland/GuiSystem.h>
 #include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
@@ -32,6 +33,7 @@ namespace Core
 		GraphicsSystem m_graphicsSystem;
 		InputSystem m_inputSystem;
 		LuaSystem m_luaSystem;
+		GuiSystem m_guiSystem;
 
 		FontCache m_fontCache;
 		ImageCache m_imageCache;
@@ -46,6 +48,7 @@ namespace Core
 		Rect m_playingField;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
+		std::vector<std::function<void(GraphicsSystem&)>> m_guiDrawCalls;
 
 		VPlayers m_players;
 		VMonsters m_monsters;
@@ -54,7 +57,6 @@ namespace Core
 		VRayBullets m_rayBullets;
 		VWeapons m_weaponDatabase;
 		VPerks m_perkDatabase;
-		VPerks m_perks;
 		
 		uint32_t m_defaultFont;
 		Window* m_window;

@@ -23,7 +23,7 @@ namespace Core
 	bool isCircleInsideRect(const Circle& circle, const Rect& rect);
 
 	bool isRectTouchingCircle(const Rect& rect, const Circle& circle);
-	bool isCircleTouchingRect(const Rect& rect, const Circle& circle);
+	bool isCircleTouchingRect(const Circle& circle, const Rect& rect);
 	bool isRectTouchingRect(const Rect& l, const Rect& r);
 	bool isCircleTouchingCircle(const Circle& l, const Circle& r);
 

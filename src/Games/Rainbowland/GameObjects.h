@@ -164,8 +164,11 @@ namespace Core
 		uint32_t experienceForNextLevel;
 		uint32_t level;
 		uint32_t perkPoints;
+		uint32_t perksPerLevel;
 		std::vector<PerkType> availablePerks;
 		std::vector<PerkType> acquiredPerks;
+		std::vector<PerkType> selectablePerks;
+		PerkType chosenPerk;
 		bool isShooting;
 	};
 
@@ -199,8 +202,7 @@ namespace Core
 
 	bool enterPerkMode(RainbowlandGame& game);
 	void exitPerkMode(RainbowlandGame& game);
-	void generatePerks(VPerks& perks, const VPerks& perkDb);
-	void mouseClickPerkMode(RainbowlandGame& game, Vec2 clickPos);
-	void applyPerk(Player& player, Perk& perk);
-	void drawPerkModeGui(RainbowlandGame& game);
+	void generatePerks(VPlayers& players, const VPerks& perkDb);
+	bool allPlayersChosePerk(VPlayers& players);
+	void applyPerksForPlayers(RainbowlandGame& game);
 }

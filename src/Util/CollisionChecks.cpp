@@ -53,7 +53,41 @@ namespace Core
 	bool isCircleInsideRect(const Circle& circle, const Rect& rect)
 	{
 		if(!isPointInsideRect(circle.center, rect)) return false;
-		if(rect.left() > circle.center.x - circle.radius) return false;
+		Vec2 pts[4]{circle.center, circle.center, circle.center, circle.center};
+		pts[0].x -= circle.radius;
+		pts[1].x += circle.radius;
+		pts[2].y -= circle.radius;
+		pts[3].y += circle.radius;
+		for(auto i = 0; i < 4; ++i)
+		{
+			if(!isPointInsideRect(pts[i], rect))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool isRectTouchingCircle(const Rect& rect, const Circle& circle)
+	{
+		return isCircleTouchingRect(circle, rect);
+	}
+
+	bool isCircleTouchingRect(const Circle& circle, const Rect& rect)
+	{
+		Vec2 pts[4]{circle.center, circle.center, circle.center, circle.center};
+		pts[0].x -= circle.radius;
+		pts[1].x += circle.radius;
+		pts[2].y -= circle.radius;
+		pts[3].y += circle.radius;
+		for(auto i = 0; i < 4; ++i)
+		{
+			if(isPointInsideRect(pts[i], rect))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	bool isRectTouchingRect(const Rect& l, const Rect& r)

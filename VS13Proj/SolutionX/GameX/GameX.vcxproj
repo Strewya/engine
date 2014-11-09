@@ -310,6 +310,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
@@ -373,6 +374,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />

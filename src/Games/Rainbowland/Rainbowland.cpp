@@ -99,23 +99,6 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(perkMode && w.m_type == WindowEventType::WE_MOUSEBUTTON)
-				{
-					if(w.m_mouseButton.m_button == Mouse::m_LeftButton && w.m_mouseButton.m_isDown)
-					{
-						Vec2 screenCoord((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
-						screenCoord.x -= (window.getSizeX() / 2);
-						screenCoord.y -= (window.getSizeY() / 2);
-						screenCoord.y = -screenCoord.y;
-						mouseClickPerkMode(*this, screenCoord);
-						return true;
-					}
-				}
-				return false;
-			});
-
-			m_messageHandlers.emplace_back([&](const WindowEvent& w)
-			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					switch(w.m_keyboard.m_keyCode)
@@ -237,12 +220,15 @@ namespace Core
 		m_logicTimer.updateBy(updateTime);
 
 		m_inputSystem.update(m_logicTimer);
-		auto& evs = m_inputSystem.getEvents();
+		auto evs = m_inputSystem.getEvents();
 		for(auto& e : evs)
 		{
-			for(auto& f : m_messageHandlers)
+			if(!m_guiSystem.handleEvent(e))
 			{
-				f(e);
+				for(auto& f : m_messageHandlers)
+				{
+					f(e);
+				}
 			}
 		}
 
@@ -404,7 +390,7 @@ namespace Core
 			tf.position.y += 20;
 		}
 
-		drawPerkModeGui(*this);
+		m_guiSystem.draw(m_graphicsSystem);
 
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);

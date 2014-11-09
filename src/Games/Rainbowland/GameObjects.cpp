@@ -138,7 +138,6 @@ namespace Core
 		game.m_rayBullets.clear();
 		game.m_weaponDatabase.clear();
 		game.m_perkDatabase.clear();
-		game.m_perks.clear();
 	}
 
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb)
@@ -163,6 +162,7 @@ namespace Core
 		player.perkPoints = 0;
 		player.regeneration = 0;
 		player.isShooting = false;
+		player.perksPerLevel = 3;
 		for(auto& p : perkDb)
 		{
 			player.availablePerks.emplace_back(p.type);
@@ -551,8 +551,35 @@ namespace Core
 		if(std::any_of(game.m_players.begin(), game.m_players.end(), [](const Player& p){return p.perkPoints > 0; }))
 		{
 			game.perkMode = true;
-			generatePerks(game.m_perks, game.m_perkDatabase);
+			generatePerks(game.m_players, game.m_perkDatabase);
 			game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+			//setup the gui system and add the required buttons
+			game.m_guiSystem.canvas("perkWindow", "root", {}, {100, 100}, {0.1f, 0.1f, 0.1f});
+			uint32_t playerIndex = 0, perkIndex = 0;
+			float row = 170;
+			for(auto& player : game.m_players)
+			{
+				float column = -100;
+				for(auto& perk : player.selectablePerks)
+				{
+					auto name = "player" + std::to_string(playerIndex) + "perk" + std::to_string(perkIndex);
+					game.m_guiSystem.button(name, "perkWindow", {}, {}, {0,0,0,0}, Mouse::m_LeftButton, [&]()
+					{
+						player.chosenPerk = perk;
+						player.selectablePerks.clear();
+						if(allPlayersChosePerk(game.m_players))
+						{
+							applyPerksForPlayers(game);
+							exitPerkMode(game);
+						}
+					});
+					game.m_guiSystem.label(name + "Label", name, game.m_perkDatabase[perk].name, {}, {1, 1, 1}, 1, false);
+					++perkIndex;
+					column += 50;
+				}
+				++playerIndex;
+				row -= 50;
+			}
 			return true;
 		}
 		return false;
@@ -560,71 +587,44 @@ namespace Core
 
 	void exitPerkMode(RainbowlandGame& game)
 	{
-		game.m_perks.clear();
 		game.perkMode = false;
 		game.m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
+		game.m_guiSystem.removeElement("perkWindow");
 	}
 
-	void generatePerks(VPerks& perks, const VPerks& perkDb)
+	void generatePerks(VPlayers& players, const VPerks& perkDb)
 	{
 		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
-		for(uint32_t i = 0; i < 3;)
+
+		for(auto& player : players)
 		{
-			uint32_t perkIndex = gen.randInt(0, perkDb.size() - 1);
-			auto exists = filterFind(perks, [&](const Perk& p){return p.type == perkDb[perkIndex].type; });
-			if(exists == perks.size())
+			player.chosenPerk = PerkTypeCount;
+			auto perks = player.availablePerks;
+			for(uint32_t i = 0; i < player.perksPerLevel; ++i)
 			{
-				perks.emplace_back(perkDb[perkIndex]);
-				perks.back().button = {{0.0f, 170.0f - i * 45.0f}, 180, 20};
-				++i;
+				uint32_t perkIndex = gen.randInt(0, perks.size() - 1);
+				player.selectablePerks.emplace_back(perks[perkIndex]);
+				perks[perkIndex] = perks.back();
+				perks.pop_back();
 			}
 		}
 	}
 
-	void mouseClickPerkMode(RainbowlandGame& game, Vec2 clickPos)
+	bool allPlayersChosePerk(VPlayers& players)
 	{
-		uint32_t i = 0;
-		for(; i < game.m_perks.size(); ++i)
+		bool allChose = true;
+		for(auto& player : players)
 		{
-			if(isPointInsideRect(clickPos, game.m_perks[i].button))
-			{
-				auto perk = game.m_perks[i];
-				for(auto& p : game.m_players)
-				{
-					applyPerk(p, perk);
-					--p.perkPoints;
-				}
-				exitPerkMode(game);
-				break;
-			}
+			allChose = allChose && (player.chosenPerk != PerkTypeCount);
 		}
+		return allChose;
 	}
 
-	void applyPerk(Player& player, Perk& perk)
+	void applyPerksForPlayers(RainbowlandGame& game)
 	{
-		switch(perk.type)
+		for(auto& player : game.m_players)
 		{
-			case PoisonBullets:
-				player.bonusDamage = 10;
-				break;
-		}
-	}
 
-	void drawPerkModeGui(RainbowlandGame& game)
-	{
-		if(game.perkMode)
-		{
-			Transform tf;
-			tf.position.set(0, 0);
-			tf.scale.set(1, 1);
-			game.m_graphicsSystem.drawQuad(tf, {200, 200}, {0.1f, 0.1f, 0.1f});
-			tf.scale.set(0.75f, 0.75f);
-			for(auto& perk : game.m_perks)
-			{
-				tf.position = perk.button.center;
-				game.m_graphicsSystem.drawQuadPolygon({}, perk.button, {});
-				game.m_graphicsSystem.drawText(game.m_defaultFont, perk.name, tf, {}, 1, false);
-			}
 		}
 	}
 }
