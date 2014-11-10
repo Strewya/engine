@@ -257,6 +257,28 @@ namespace Core
 	}
 
 	//*****************************************************************
+	//					TEXT SIZE
+	//*****************************************************************
+	Vec2 GraphicsSystem::textSize(uint32_t fontID, const std::string& text) const
+	{
+		const auto* font = m_fontCache->getResource(fontID);
+		if(!font)
+		{
+			return{};
+		}
+		float width = 0;
+		auto height = (float)font->m_size;
+
+		for(char c : text)
+		{
+			const Glyph& glyph = font->m_glyphs[c - 32];
+			
+			width += (float)(glyph.m_right - glyph.m_left);
+		}
+		return{width*0.5f, height*0.5f};
+	}
+
+	//*****************************************************************
 	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
 	Vec2 GraphicsSystem::getTextureDimensions(const Texture& texture) const

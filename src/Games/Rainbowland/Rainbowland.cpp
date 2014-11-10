@@ -22,6 +22,7 @@ namespace Core
 		bool status = true;
 		status &= m_textureCache.shutdown();
 		status &= m_fontCache.shutdown();
+		status &= m_guiSystem.shutdown();
 		status &= m_luaSystem.shutdown();
 		status &= m_inputSystem.shutdown();
 		status &= m_graphicsSystem.shutdown();
@@ -43,6 +44,7 @@ namespace Core
 			m_graphicsSystem.init(m_fontCache, m_textureCache, window) &&
 			m_inputSystem.init(window) &&
 			m_luaSystem.init() &&
+			m_guiSystem.init({(float)window.getSizeX(), (float)window.getSizeY()});
 			m_fontCache.init(m_textureCache) &&
 			m_imageCache.init(m_textureCache) &&
 			m_textureCache.init(m_graphicsSystem) &&

@@ -48,7 +48,6 @@ namespace Core
 		Rect m_playingField;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
-		std::vector<std::function<void(GraphicsSystem&)>> m_guiDrawCalls;
 
 		VPlayers m_players;
 		VMonsters m_monsters;

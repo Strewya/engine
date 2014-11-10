@@ -554,31 +554,35 @@ namespace Core
 			generatePerks(game.m_players, game.m_perkDatabase);
 			game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
 			//setup the gui system and add the required buttons
-			game.m_guiSystem.canvas("perkWindow", "root", {}, {100, 100}, {0.1f, 0.1f, 0.1f});
+			game.m_guiSystem.panel("perkWindow", "root", {}, {300, 300}, {0.1f, 0.1f, 0.1f});
 			uint32_t playerIndex = 0, perkIndex = 0;
-			float row = 170;
+			float row = 250;
 			for(auto& player : game.m_players)
 			{
-				float column = -100;
+				float distance = 600.0f / (float)player.selectablePerks.size();
+				float column = -300 + distance*0.5f;
 				for(auto& perk : player.selectablePerks)
 				{
 					auto name = "player" + std::to_string(playerIndex) + "perk" + std::to_string(perkIndex);
-					game.m_guiSystem.button(name, "perkWindow", {}, {}, {0,0,0,0}, Mouse::m_LeftButton, [&]()
+					auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, game.m_perkDatabase[perk].name);
+					game.m_guiSystem.button(name, "perkWindow", {column, row}, {(distance - 10)*0.5f, textSize.y + 10}, {1, 1, 1}, Mouse::m_LeftButton, [=, &game]()
 					{
+						/*
 						player.chosenPerk = perk;
 						player.selectablePerks.clear();
 						if(allPlayersChosePerk(game.m_players))
 						{
 							applyPerksForPlayers(game);
 							exitPerkMode(game);
-						}
+						}*/
+						game.m_guiSystem.removeElement(name);
 					});
-					game.m_guiSystem.label(name + "Label", name, game.m_perkDatabase[perk].name, {}, {1, 1, 1}, 1, false);
+					game.m_guiSystem.label(name + "Label", name, game.m_defaultFont, game.m_perkDatabase[perk].name, {}, {1, 1, 1}, 1, false);
 					++perkIndex;
-					column += 50;
+					column += distance;
 				}
 				++playerIndex;
-				row -= 50;
+				row -= 80;
 			}
 			return true;
 		}
