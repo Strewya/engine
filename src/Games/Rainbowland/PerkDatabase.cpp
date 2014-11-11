@@ -49,16 +49,21 @@ namespace Core
 			{
 				Radioactive, "Radioactive",
 				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game)
+				[=](Player& player, RainbowlandGame& game) mutable
 				{
-					Circle radioactiveArea{player.transform.position, 5};
-					for(auto& monsta : game.m_monsters)
+					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+					if(timer.getCurMicros() > Time::secondsToMicros(0.5f))
 					{
-						Rect bbox = monsta.boundingBox;
-						bbox.center = monsta.transform.position;
-						if(isRectTouchingCircle(bbox, radioactiveArea))
+						timer.reset();
+						Circle radioactiveArea{player.transform.position, 5};
+						for(auto& monsta : game.m_monsters)
 						{
-							monsta.health -= 1;
+							Rect bbox = monsta.boundingBox;
+							bbox.center = monsta.transform.position;
+							if(isRectTouchingCircle(bbox, radioactiveArea))
+							{
+								monsta.health -= 1;
+							}
 						}
 					}
 				}
@@ -68,44 +73,16 @@ namespace Core
 				[](Player& player, RainbowlandGame& game)
 				{
 					player.ammoMultiplier = 1.2f;
-					player.currentWeapon.ammo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.ammo));
-					player.currentWeapon.maxAmmo = player.currentWeapon.ammo;
+					player.currentWeapon.maxAmmo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.maxAmmo));
 				},
 					[](Player& player, RainbowlandGame& game) {}
 			},
 			{
-				Greaser, "Greaser",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				Fastloader, "Fastloader",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				MeanLeanExpMachine, "Lean Mean Exp Machine",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				HeavyRunner, "Heavy Runner",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				Dodger, "Dodger",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				HotTempered, "Hot Tempered",
-				[](Player& player, RainbowlandGame& game) {},
-				[](Player& player, RainbowlandGame& game) {}
-			},
-			{
-				StationaryReloader, "Stationary Reloader",
-				[](Player& player, RainbowlandGame& game) {},
+				InstantWinner, "Instant winner",
+				[](Player& player, RainbowlandGame& game)
+				{
+					grantExperience(5000, game.m_players);
+				},
 				[](Player& player, RainbowlandGame& game) {}
 			}
 		};

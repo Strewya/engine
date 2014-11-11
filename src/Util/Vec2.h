@@ -22,6 +22,7 @@ namespace Core
 		void set(float x, float y);
 
 		/* these are inside the class for tolua++ binding compatibility */
+		Vec2 operator+(float f) const;
 		Vec2 operator+(const Vec2& v) const;
 		Vec2& operator+=(const Vec2& v);
 		Vec2 operator-() const;

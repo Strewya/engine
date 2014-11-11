@@ -100,7 +100,7 @@ namespace Core
 				}
 				return false;
 			});
-
+#ifdef _DEBUG
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
@@ -130,7 +130,28 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
+				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
+				{
+					switch(w.m_keyboard.m_keyCode)
+					{
+						case Keyboard::m_Space:
+							if(m_gameplayTimer.getTimeScale() > 0.5f)
+							{
+								m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+							}
+							else
+							{
+								m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
+							}
+							return true;
+					}
+				}
+				return false;
+			});
+#endif
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
 				{
 					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
 					{
@@ -247,8 +268,8 @@ namespace Core
 		if(g_spawnEnabled)
 		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_gameplayTimer, m_monsters, m_players);
-		checkMonsterHurtingPlayer(m_monsters, m_players);
-		checkLevelup(m_players);
+		checkMonsterHurtingPlayer(m_gameplayTimer, m_monsters, m_players);
+		checkLevelup(m_players, *this);
 		
 		if(m_players.size() > 0)
 		{
@@ -395,7 +416,7 @@ namespace Core
 		for(auto& player : m_players)
 		{
 			auto str = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
-			str += "   Experience(level): " + std::to_string(player.experience) + "(" + std::to_string(player.level) + ")";
+			str += "   Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
 			str += "   Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
 			str += "   Weapon: " + player.currentWeapon.name;
 			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);

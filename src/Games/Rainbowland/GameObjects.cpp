@@ -15,6 +15,7 @@
 #include <Util/Random.h>
 #include <Util/Time.h>
 #include <Util/Utility.h>
+#include <Window/Window.h>
 /******* end headers *******/
 
 namespace Core
@@ -92,7 +93,7 @@ namespace Core
 		game.m_weaponDatabase = {
 				{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0},
 				{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f},
-				{Uzi, "Spammer", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.75f}
+				{Uzi, "Spammer", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.5f}
 		};
 		std::sort(game.m_weaponDatabase.begin(), game.m_weaponDatabase.end(),
 				  [](const Weapon& l, const Weapon& r)
@@ -108,9 +109,9 @@ namespace Core
 
 		game.perkMode = false;
 		
-		
-		game.m_players[0].perkPoints = 1;
-		enterPerkMode(game);
+#ifdef _DEBUG
+		grantExperience(1000, game.m_players);
+#endif
 	}
 
 	void cleanGame(RainbowlandGame& game)
@@ -145,7 +146,7 @@ namespace Core
 		player.maxHealth = player.health = 100;
 		player.regenDelayForOneHealth = 0;
 		player.experience = 0;
-		player.experienceForNextLevel = 200;
+		player.experienceForNextLevel = 1000;
 		player.level = 1;
 		player.perkPoints = 0;
 		player.perksPerLevel = 3;
@@ -200,16 +201,35 @@ namespace Core
 		}
 	}
 
-	void checkLevelup(VPlayers& players)
+	void checkLevelup(VPlayers& players, RainbowlandGame& game)
 	{
 		for(auto& player : players)
 		{
 			if(player.experience >= player.experienceForNextLevel)
 			{
-				player.experienceForNextLevel += 100 * player.level;
 				++player.level;
 				++player.perkPoints;
+				player.experienceForNextLevel += 1000 * player.level;
+				if(player.perkPoints == 1)
+				{
+					auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, "Level");
+					textSize *= 0.5f;
+					Rect r;
+					r.center.set(game.m_window->getSizeX()*0.5f - textSize.x - 10, 200);
+					r.halfHeight = textSize.y;
+					r.halfWidth = textSize.x + 10;
+					game.m_guiSystem.panel("lvlup", "root", r.center, {r.halfWidth, r.halfHeight}, {0, 0, 0});
+					game.m_guiSystem.label("lvlupLabel", "lvlup", game.m_defaultFont, "Level", {}, {0.5f, 0.5f}, {}, 1, false);
+				}
 			}
+		}
+	}
+
+	void grantExperience(uint32_t exp, VPlayers& players)
+	{
+		for(auto& player : players)
+		{
+			player.experience += exp;
 		}
 	}
 
@@ -290,7 +310,7 @@ namespace Core
 		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
 		for(auto& loc : killLocations)
 		{
-			if(gen.randInt(1, 10000) < 1000)
+			if(gen.randInt(1, 10000) < 2000)
 			{
 				bonuses.emplace_back();
 				auto effect = (EffectType)gen.randInt(0, EffectTypeCount - 1);
@@ -359,8 +379,8 @@ namespace Core
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb)
 	{
 		player.currentWeapon = weaponDb[weapon];
-		player.currentWeapon.ammo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.ammo));
-		player.currentWeapon.maxAmmo = player.currentWeapon.ammo;
+		player.currentWeapon.maxAmmo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.maxAmmo));
+		player.currentWeapon.ammo = player.currentWeapon.maxAmmo;
 		player.currentWeapon.damage += player.bonusDamage;
 		player.weaponTimer.updateBy(Time::secondsToMicros(50));
 	}
@@ -478,17 +498,18 @@ namespace Core
 	
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
 	{
-		if(monsters.size() > 20) return;
+		if(monsters.size() > 40) return;
 
 		monsters.emplace_back();
 		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
 		auto& monster = monsters.back();
 		monster.boundingBox.set(0, 0, 1, 1);
 		monster.color.set(0, 0, 0);
-		monster.maxVelocity = 1 + gen.randFloat() * 2;
+		monster.maxVelocity = 1 + gen.randFloat() * 3.5f;
 		monster.transform.position = position;
 		monster.targetPlayer = target;
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
+		monster.attackTimer.updateBy(Time::secondsToMicros(5));
 	}
 
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players)
@@ -507,7 +528,7 @@ namespace Core
 		}
 	}
 
-	void checkMonsterHurtingPlayer(VMonsters& monsters, VPlayers& players)
+	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players)
 	{
 		for(auto& player : players)
 		{
@@ -519,7 +540,16 @@ namespace Core
 				mbox.center = monster.transform.position;
 				if(isRectTouchingRect(mbox, pbox))
 				{
-					player.health -= 1;
+					monster.attackTimer.updateBy(timer.getDeltaMicros());
+					if(monster.attackTimer.getCurMicros() >= Time::secondsToMicros(0.3f))
+					{
+						player.health -= 1;
+						monster.attackTimer.reset();
+					}
+				}
+				else
+				{
+					monster.attackTimer.updateBy(Time::secondsToMicros(5));
 				}
 			}
 		}
@@ -531,10 +561,7 @@ namespace Core
 		{
 			if(monsters[m].health <= 0)
 			{
-				for(auto& player : players)
-				{
-					player.experience += monsters[m].maxHealth;
-				}
+				grantExperience(monsters[m].maxHealth, players);
 				killLocations.emplace_back(monsters[m].transform.position);
 				monsters[m] = monsters.back();
 				monsters.pop_back();
@@ -606,6 +633,10 @@ namespace Core
 		game.perkMode = false;
 		game.m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
 		game.m_guiSystem.removeElement("perkWindow");
+		if(std::all_of(game.m_players.begin(), game.m_players.end(), [](const Player& p) { return p.perkPoints == 0; }))
+		{
+			game.m_guiSystem.removeElement("lvlup");
+		}
 	}
 
 	void generatePerks(VPlayers& players, const VPerks& perkDb)
@@ -623,10 +654,17 @@ namespace Core
 			auto perks = player.availablePerks;
 			for(uint32_t i = 0; i < player.perksPerLevel; ++i)
 			{
-				uint32_t perkIndex = gen.randInt(0, perks.size() - 1);
-				player.selectablePerks.emplace_back(perks[perkIndex]);
-				perks[perkIndex] = perks.back();
-				perks.pop_back();
+				if(perks.size() != 0)
+				{
+					uint32_t perkIndex = gen.randInt(0, perks.size() - 1);
+					player.selectablePerks.emplace_back(perks[perkIndex]);
+					perks[perkIndex] = perks.back();
+					perks.pop_back();
+				}
+				else
+				{
+					player.selectablePerks.emplace_back(InstantWinner);
+				}
 			}
 		}
 	}
@@ -648,8 +686,11 @@ namespace Core
 			--player.perkPoints;
 			player.selectablePerks.clear();
 			player.acquiredPerks.emplace_back(player.chosenPerk);
-			auto index = valueFind(player.availablePerks, player.chosenPerk);
-			player.availablePerks.erase(player.availablePerks.begin() + index);
+			if(player.availablePerks.size() > 0)
+			{
+				auto index = valueFind(player.availablePerks, player.chosenPerk);
+				player.availablePerks.erase(player.availablePerks.begin() + index);
+			}
 			game.m_perkDatabase[player.chosenPerk].acquireLogic(player, game);
 		}
 	}

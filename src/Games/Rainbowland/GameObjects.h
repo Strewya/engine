@@ -77,6 +77,7 @@ namespace Core
 		uint32_t targetPlayer;
 		int32_t maxHealth;
 		int32_t health;
+		Time attackTimer;
 	};
 
 	typedef std::vector<Monster> VMonsters;
@@ -122,13 +123,7 @@ namespace Core
 		PoisonBullets,
 		Radioactive,
 		AmmoManiac,
-		Greaser,
-		Fastloader,
-		MeanLeanExpMachine,
-		HeavyRunner,
-		Dodger,
-		HotTempered,
-		StationaryReloader,
+		InstantWinner,
 		PerkTypeCount
 	};
 
@@ -184,7 +179,8 @@ namespace Core
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb);
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
 	void checkPlayerDeath(VPlayers& players);
-	void checkLevelup(VPlayers& players);
+	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
+	void grantExperience(uint32_t exp, VPlayers& players);
 
 	void enableEffect(Player& player, Bonus& bonus, const VWeapons& weaponDb);
 	void disableEffect(Player& player, EffectType effect);
@@ -202,7 +198,7 @@ namespace Core
 	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
-	void checkMonsterHurtingPlayer(VMonsters& monsters, VPlayers& players);
+	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players);
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
 
 	bool enterPerkMode(RainbowlandGame& game);

@@ -24,9 +24,14 @@ namespace Core
 	}
 
 
+	Vec2 Vec2::operator+(float f) const
+	{
+		return{x + f, y + f};
+	}
+
 	Vec2 Vec2::operator+(const Vec2& v) const
 	{
-		return Vec2(x + v.x, y + v.y);
+		return{x + v.x, y + v.y};
 	}
 
 	Vec2& Vec2::operator+=(const Vec2& v)
@@ -38,17 +43,17 @@ namespace Core
 
 	Vec2 Vec2::operator-() const
 	{
-		return Vec2(-x, -y);
+		return{-x, -y};
 	}
 
 	Vec2 Vec2::operator-(const Vec2& v) const
 	{
-		return Vec2(x - v.x, y - v.y);
+		return{x - v.x, y - v.y};
 	}
 
 	Vec2 Vec2::operator*(float f) const
 	{
-		return Vec2(x * f, y * f);
+		return{x * f, y * f};
 	}
 
 	Vec2& Vec2::operator*=(const Vec2& v)
@@ -67,7 +72,7 @@ namespace Core
 
 	Vec2 Vec2::operator/(float f) const
 	{
-		return Vec2(x / f, y / f);
+		return{x / f, y / f};
 	}
 
 	Vec2& Vec2::operator /= (float f)
@@ -84,7 +89,7 @@ namespace Core
 
 	Vec2 operator*(const Vec2& l, const Vec2& r)
 	{
-		return Vec2{l.x*r.x, l.y*r.y};
+		return{l.x*r.x, l.y*r.y};
 	}
 
 	Vec2 operator/(float f, const Vec2& v)
@@ -102,7 +107,7 @@ namespace Core
 		float length = Vec2::length(v);
 		if(length == 0)
 			return Vec2(0,0);
-		return Vec2(v.x / length, v.y / length);
+		return{v.x / length, v.y / length};
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Vec2& v)

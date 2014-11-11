@@ -51,7 +51,7 @@ assertResourcesPresent(resList, resDir);
 
 
 
-if(buildName == "Final") then
+if(buildName == "Deploy" or buildName == "Final") then
 	allResourcesPresent = resOK;
 	gameName = game;
 	resourceList = resList;
