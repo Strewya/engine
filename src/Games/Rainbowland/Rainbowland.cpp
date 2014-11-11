@@ -16,6 +16,8 @@
 
 namespace Core
 {
+	bool g_spawnEnabled = true;
+
 	void RainbowlandGame::shutdown()
 	{
 		DEBUG_INFO("---------------------------------");
@@ -119,6 +121,7 @@ namespace Core
 
 						case Keyboard::m_R:
 							m_monsters.clear();
+							g_spawnEnabled = !g_spawnEnabled;
 							break;
 					}
 				}
@@ -241,11 +244,12 @@ namespace Core
 		{
 			fireWeapon(m_gameplayTimer, player, m_rayBullets, m_graphicsSystem, m_camera);
 		}
+		if(g_spawnEnabled)
 		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_gameplayTimer, m_monsters, m_players);
 		checkMonsterHurtingPlayer(m_monsters, m_players);
 		checkLevelup(m_players);
-
+		
 		if(m_players.size() > 0)
 		{
 			Vec2 averagePos;
@@ -262,9 +266,11 @@ namespace Core
 			m_camera.setPosition(pos);
 		}
 
+		updatePerks(*this);
 		moveBullets(m_gameplayTimer, m_rayBullets);
+		checkBulletHits(m_rayBullets, m_monsters);
 		VKillLocations locations;
-		killMonsters(m_rayBullets, m_monsters, locations, m_players);
+		killMonsters(m_monsters, locations, m_players);
 		generateBonuses(locations, m_bonuses);
 		checkBonusPickup(m_players, m_bonuses, m_weaponDatabase);
 		updateBonuses(m_gameplayTimer, m_bonuses);
@@ -335,6 +341,10 @@ namespace Core
 			Color c = obj.color;
 			c.a = 0.2f + (float)obj.health / (float)obj.maxHealth;
 			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
+			Transform t;
+			t.position = obj.transform.position;
+			t.scale.set(0.03f, 0.03f);
+			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}
 
 		for(auto& obj : m_bonuses)

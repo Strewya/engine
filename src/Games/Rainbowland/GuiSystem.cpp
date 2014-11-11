@@ -19,7 +19,11 @@ namespace Core
 		bool status = true;
 
 		m_windowSize = windowSize;
-		m_elements.emplace_back(std::make_unique<GuiElement>(new Panel{"root", {}, {}, windowSize / 2, {0, 0, 0, 0}}));
+		std::unique_ptr<Panel> ptr{new Panel{}};
+		ptr->name = "root";
+		ptr->halfSize = windowSize / 2;
+		ptr->color.set(0, 0, 0, 0);
+		m_elements.emplace_back(std::move(ptr));
 		
 		DEBUG_INIT(GuiSystem);
 		return status;
@@ -37,7 +41,7 @@ namespace Core
 	{
 		for(auto& element : m_elements)
 		{
-			if(element->handleEvent(we))
+			if(element->handleEvent(we, m_windowSize))
 			{
 				return true;
 			}
@@ -50,85 +54,119 @@ namespace Core
 		m_elements[0]->draw(graphics);
 	}
 
-	void GuiSystem::draw(GraphicsSystem& graphics, GuiElement& element)
+	void GuiSystem::GuiElement::draw(GraphicsSystem& graphics)
 	{
-		switch(element.type)
+		drawSelf(graphics);
+		for(auto* child : children)
 		{
-			case GuiElement::PanelType:
-				draw(graphics, m_panels[element.data], element.pos);
-				break;
-			case GuiElement::ButtonType:
-				draw(graphics, m_buttons[element.data], element.pos);
-				break;
-			case GuiElement::LabelType:
-				draw(graphics, m_labels[element.data], element.pos);
-				break;
+			child->draw(graphics);
 		}
-		
 	}
 
-	void GuiSystem::draw(GraphicsSystem& graphics, Panel& panel, Vec2 pos)
+	void GuiSystem::Panel::drawSelf(GraphicsSystem& graphics)
 	{
 		Transform t;
 		t.position = pos;
-		graphics.drawQuad(t, panel.halfSize, panel.color);
+		graphics.drawQuad(t, halfSize, color);
 	}
 	
-	void GuiSystem::draw(GraphicsSystem& graphics, Button& button, Vec2 pos)
+	bool GuiSystem::Button::handleEvent(const WindowEvent& we, Vec2 windowSize)
 	{
-		Transform t;
-		t.position = pos;
-		graphics.drawQuadPolygon(t, {{}, button.halfSize.x, button.halfSize.y}, button.color);
+		if(we.m_type == WE_MOUSEBUTTON &&
+		   we.m_mouseButton.m_isDown &&
+		   we.m_mouseButton.m_button == activator)
+		{
+			Vec2 clickedPoint{(float)we.m_mouseButton.m_x, (float)we.m_mouseButton.m_y};
+			clickedPoint.x -= windowSize.x*0.5f;
+			clickedPoint.y -= windowSize.y*0.5f;
+			clickedPoint.y = -clickedPoint.y;
+			Rect buttonRect{pos, halfSize.x, halfSize.y};
+			if(isPointInsideRect(clickedPoint, buttonRect))
+			{
+				onClick();
+				return true;
+			}
+		}
+		return false;
 	}
 
-	void GuiSystem::draw(GraphicsSystem& graphics, Label& label, Vec2 pos)
+	void GuiSystem::Button::drawSelf(GraphicsSystem& graphics)
 	{
 		Transform t;
 		t.position = pos;
-		graphics.drawText(label.font, label.text, t, label.color, label.justification, label.italic);
+		graphics.drawQuadPolygon(t, {{}, halfSize.x, halfSize.y}, color);
+	}
+
+	void GuiSystem::Label::drawSelf(GraphicsSystem& graphics)
+	{
+		Transform t;
+		t.position = pos;
+		t.scale = scale;
+		graphics.drawText(font, text, t, color, justification, italic);
 	}
 	
 	void GuiSystem::panel(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color)
 	{
-		auto uniqueName = filterFind(m_elements, [&](const GuiElement& ge){return ge.name == name; });
+		auto uniqueName = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){return ge->name == name; });
 		if(uniqueName == m_elements.size())
 		{
-			auto parentIndex = filterFind(m_elements, [&](const GuiElement& ge){ return ge.name == parent; });
+			auto parentIndex = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){ return ge->name == parent; });
 			if(parentIndex != m_elements.size())
 			{
-				m_elements[parentIndex].children.emplace_back(m_elements.size());
-				m_elements.emplace_back(GuiElement{GuiElement::PanelType, m_panels.size(), parentIndex, name, pos + m_elements[parentIndex].pos});
-				m_panels.emplace_back(Panel{m_elements.size() - 1, halfSize, color});
+				std::unique_ptr<Panel> ptr{new Panel{}};
+				ptr->name = name;
+				ptr->pos = pos + m_elements[parentIndex]->pos;
+				ptr->parent = m_elements[parentIndex].get();
+				ptr->halfSize = halfSize;
+				ptr->color = color;
+				m_elements[parentIndex]->children.emplace_back(ptr.get());
+				m_elements.emplace_back(std::move(ptr));
 			}
 		}
 	}
 
 	void GuiSystem::button(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color, Mouse::Keys activator, OnClickFunction onClick)
 	{
-		auto uniqueName = filterFind(m_elements, [&](const GuiElement& ge){return ge.name == name; });
+		auto uniqueName = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){return ge->name == name; });
 		if(uniqueName == m_elements.size())
 		{
-			auto parentIndex = filterFind(m_elements, [&](const GuiElement& ge){ return ge.name == parent; });
+			auto parentIndex = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){ return ge->name == parent; });
 			if(parentIndex != m_elements.size())
 			{
-				m_elements[parentIndex].children.emplace_back(m_elements.size());
-				m_elements.emplace_back(GuiElement{GuiElement::ButtonType, m_buttons.size(), parentIndex, name, pos + m_elements[parentIndex].pos});
-				m_buttons.emplace_back(Button{m_elements.size() - 1, halfSize, color, onClick, activator});
+				std::unique_ptr<Button> ptr{new Button{}};
+				ptr->name = name;
+				ptr->pos = pos + m_elements[parentIndex]->pos;
+				ptr->parent = m_elements[parentIndex].get();
+				ptr->halfSize = halfSize;
+				ptr->color = color;
+				ptr->activator = activator;
+				ptr->onClick = onClick;
+				m_elements[parentIndex]->children.emplace_back(ptr.get());
+				m_elements.emplace_back(std::move(ptr));
 			}
 		}
 	}
 
-	void GuiSystem::label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Color color, uint32_t justification, bool italic)
+	void GuiSystem::label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Vec2 scale, Color color, uint32_t justification, bool italic)
 	{
-		auto uniqueName = filterFind(m_elements, [&](const GuiElement& ge){return ge.name == name; });
+		auto uniqueName = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){return ge->name == name; });
 		if(uniqueName == m_elements.size())
 		{
-			auto parentIndex = filterFind(m_elements, [&](const GuiElement& ge){ return ge.name == parent; });
+			auto parentIndex = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){ return ge->name == parent; });
 			if(parentIndex != m_elements.size())
 			{
-				m_elements[parentIndex].children.emplace_back(m_elements.size());
-				m_elements.emplace_back(GuiElement{GuiElement::LabelType, m_labels.size(), parentIndex, name, pos + m_elements[parentIndex].pos});
-				m_labels.emplace_back(Label{m_elements.size() - 1, text, color, font, justification, italic});
+				std::unique_ptr<Label> ptr{new Label{}};
+				ptr->name = name;
+				ptr->pos = pos + m_elements[parentIndex]->pos;
+				ptr->parent = m_elements[parentIndex].get();
+				ptr->text = text;
+				ptr->color = color;
+				ptr->scale = scale;
+				ptr->font = font;
+				ptr->justification = justification;
+				ptr->italic = italic;
+				m_elements[parentIndex]->children.emplace_back(ptr.get());
+				m_elements.emplace_back(std::move(ptr));
 			}
 		}
 	}
@@ -137,28 +175,26 @@ namespace Core
 	{
 		if(name == "root") return;
 
-		auto rIndex = filterFind(m_elements, [&](const GuiElement& ge){return name == ge.name; });
+		auto rIndex = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge){return name == ge->name; });
 		if(rIndex != m_elements.size())
 		{
-			auto pIndex = m_elements[rIndex].parent;
-			auto cIndex = valueFind(m_elements[pIndex].children, rIndex);
-			m_elements[pIndex].children.erase(m_elements[pIndex].children.begin() + cIndex);
-			std::vector<uint32_t> removeList{rIndex};
-			for(uint32_t i = 0; i < removeList.size(); ++i)
-			{
-				removeList.insert(removeList.end(), m_elements[removeList[i]].children.begin(), m_elements[removeList[i]].children.end());
-			}
-			std::sort(removeList.begin(), removeList.end(), std::greater<uint32_t>());
-			std::vector<GuiElement> removedElements;
-			for(auto r : removeList)
-			{
-				removedElements.emplace_back(GuiElement{m_elements[r].type, m_elements[r].data});
-			}
-			
-			for(auto elem : removeList)
-			{
-				removeElement(elem);
-			}
+			auto* element = m_elements[rIndex].get();
+			auto& parent = *element->parent;
+			auto childIndex = valueFind(parent.children, element);
+			parent.children.erase(parent.children.begin() + childIndex);
+
+			removeElement(element);
 		}
+	}
+
+	void GuiSystem::removeElement(GuiElement* ge)
+	{
+		for(auto* child : ge->children)
+		{
+			removeElement(child);
+		}
+		auto index = filterFind(m_elements, [=](const std::unique_ptr<GuiElement>& elem){return elem.get() == ge; });
+		m_elements[index].swap(m_elements.back());
+		m_elements.pop_back();
 	}
 }

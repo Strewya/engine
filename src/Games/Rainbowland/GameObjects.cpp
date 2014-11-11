@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <map>
 /******* extra headers *******/
+#include <Games/Rainbowland/PerkDatabase.h>
 #include <Games/Rainbowland/Rainbowland.h>
 #include <Graphics/Camera.h>
 #include <Graphics/GraphicsSystem.h>
@@ -99,24 +100,7 @@ namespace Core
 			return l.type < r.type;
 		});
 
-		game.m_perkDatabase = {
-				{Regeneration, "Regeneration"},
-				{PoisonBullets, "PoisonBullets"},
-				{Radioactive, "Radioactive"},
-				{AmmoManiac, "AmmoManiac"},
-				{Greaser, "Greaser"},
-				{Fastloader, "Fastloader"},
-				{MeanLeanExpMachine, "MeanLeanExpMachine"},
-				{HeavyRunner, "HeavyRunner"},
-				{Dodger, "Dodger"},
-				{HotTempered, "HotTempered"},
-				{StationaryReloader, "StationaryReloader"}
-		};
-		std::sort(game.m_perkDatabase.begin(), game.m_perkDatabase.end(),
-				  [](const Perk& l, const Perk& r)
-		{
-			return l.type < r.type;
-		});
+		initPerkDatabase(game.m_perkDatabase);
 
 		//players
 		game.m_players.emplace_back();
@@ -152,21 +136,26 @@ namespace Core
 		player.acceleration.set(1.0f, 1.0f);
 		player.directions[Up] = player.directions[Down] = player.directions[Left] = player.directions[Right] = false;
 		player.aim.set(0, 0);
-		selectWeapon(player, Pistol, weaponDb);
+		//player.weaponTimer set in selectWeapon
+		//player.currentWeapon set in selectWeapon
+		player.bonusDamage = 0;
 		player.rateOfFireMultiplier = 1;
 		player.movementSpeedMultiplier = 1;
+		player.ammoMultiplier = 1;
 		player.maxHealth = player.health = 100;
+		player.regenDelayForOneHealth = 0;
 		player.experience = 0;
 		player.experienceForNextLevel = 200;
 		player.level = 1;
 		player.perkPoints = 0;
-		player.regeneration = 0;
-		player.isShooting = false;
 		player.perksPerLevel = 3;
 		for(auto& p : perkDb)
 		{
 			player.availablePerks.emplace_back(p.type);
 		}
+		player.chosenPerk = PerkTypeCount;
+		player.isShooting = false;
+		selectWeapon(player, Pistol, weaponDb);
 	}
 
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField)
@@ -369,9 +358,10 @@ namespace Core
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb)
 	{
-		if(weapon == player.currentWeapon.type) return;
-
 		player.currentWeapon = weaponDb[weapon];
+		player.currentWeapon.ammo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.ammo));
+		player.currentWeapon.maxAmmo = player.currentWeapon.ammo;
+		player.currentWeapon.damage += player.bonusDamage;
 		player.weaponTimer.updateBy(Time::secondsToMicros(50));
 	}
 
@@ -440,9 +430,8 @@ namespace Core
 		}
 	}
 
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations, VPlayers& players)
+	void checkBulletHits(VRayBullets& bullets, VMonsters& monsters)
 	{
-		std::map<uint32_t, uint32_t> kills;
 		for(uint32_t b = 0; b < bullets.size();)
 		{
 			RayBullet& bullet = bullets[b];
@@ -460,16 +449,6 @@ namespace Core
 			if(monsterHit != -1)
 			{
 				monsters[monsterHit].health -= bullets[b].damage;
-				if(monsters[monsterHit].health <= 0)
-				{
-					for(auto& player : players)
-					{
-						player.experience += monsters[monsterHit].maxHealth;
-					}
-					killLocations.emplace_back(monsters[monsterHit].transform.position);
-					monsters[monsterHit] = monsters.back();
-					monsters.pop_back();
-				}
 				bullets[b] = bullets.back();
 				bullets.pop_back();
 				monsterHit = -1;
@@ -506,7 +485,7 @@ namespace Core
 		auto& monster = monsters.back();
 		monster.boundingBox.set(0, 0, 1, 1);
 		monster.color.set(0, 0, 0);
-		monster.maxVelocity = 1 + gen.randFloat() * 3;
+		monster.maxVelocity = 1 + gen.randFloat() * 2;
 		monster.transform.position = position;
 		monster.targetPlayer = target;
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
@@ -546,10 +525,35 @@ namespace Core
 		}
 	}
 
+	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players)
+	{
+		for(uint32_t m = 0; m < monsters.size(); )
+		{
+			if(monsters[m].health <= 0)
+			{
+				for(auto& player : players)
+				{
+					player.experience += monsters[m].maxHealth;
+				}
+				killLocations.emplace_back(monsters[m].transform.position);
+				monsters[m] = monsters.back();
+				monsters.pop_back();
+			}
+			else
+			{
+				++m;
+			}
+		}
+	}
+
 	bool enterPerkMode(RainbowlandGame& game)
 	{
 		if(std::any_of(game.m_players.begin(), game.m_players.end(), [](const Player& p){return p.perkPoints > 0; }))
 		{
+			for(auto& player : game.m_players)
+			{
+				player.directions[Up] = player.directions[Down] = player.directions[Left] = player.directions[Right] = false;
+			}
 			game.perkMode = true;
 			generatePerks(game.m_players, game.m_perkDatabase);
 			game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
@@ -565,25 +569,33 @@ namespace Core
 				{
 					auto name = "player" + std::to_string(playerIndex) + "perk" + std::to_string(perkIndex);
 					auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, game.m_perkDatabase[perk].name);
-					game.m_guiSystem.button(name, "perkWindow", {column, row}, {(distance - 10)*0.5f, textSize.y + 10}, {1, 1, 1}, Mouse::m_LeftButton, [=, &game]()
+					textSize *= Vec2{0.5f, 0.5f};
+					game.m_guiSystem.button(name, "perkWindow", {column, row}, {(distance - 10)*0.5f, textSize.y + 10}, {1, 1, 1},
+											Mouse::m_LeftButton, [=, &player, &game]()
 					{
-						/*
 						player.chosenPerk = perk;
-						player.selectablePerks.clear();
 						if(allPlayersChosePerk(game.m_players))
 						{
 							applyPerksForPlayers(game);
 							exitPerkMode(game);
-						}*/
-						game.m_guiSystem.removeElement(name);
+						}
 					});
-					game.m_guiSystem.label(name + "Label", name, game.m_defaultFont, game.m_perkDatabase[perk].name, {}, {1, 1, 1}, 1, false);
+					game.m_guiSystem.label(name + "Label", name, game.m_defaultFont, game.m_perkDatabase[perk].name, {}, {0.5f, 0.5f}, {1, 1, 1}, 1, false);
 					++perkIndex;
 					column += distance;
 				}
 				++playerIndex;
 				row -= 80;
 			}
+			auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, "cancel");
+			Vec2 textScale{0.5f, 0.5f};
+			textSize *= textScale;
+			game.m_guiSystem.button("close", "perkWindow", {300 - textSize.x - 10, -300 + textSize.y + 10}, textSize, {1,1,1,1},
+									Mouse::m_LeftButton, [&game]()
+			{
+				exitPerkMode(game);
+			});
+			game.m_guiSystem.label("closeLabel", "close", game.m_defaultFont, "close", {}, textScale, {1, 1, 1}, 1, false);
 			return true;
 		}
 		return false;
@@ -602,6 +614,11 @@ namespace Core
 
 		for(auto& player : players)
 		{
+#ifdef _DEBUG
+			player.selectablePerks.clear();
+#else
+			if(!player.selectablePerks.empty()) continue;
+#endif
 			player.chosenPerk = PerkTypeCount;
 			auto perks = player.availablePerks;
 			for(uint32_t i = 0; i < player.perksPerLevel; ++i)
@@ -628,7 +645,23 @@ namespace Core
 	{
 		for(auto& player : game.m_players)
 		{
+			--player.perkPoints;
+			player.selectablePerks.clear();
+			player.acquiredPerks.emplace_back(player.chosenPerk);
+			auto index = valueFind(player.availablePerks, player.chosenPerk);
+			player.availablePerks.erase(player.availablePerks.begin() + index);
+			game.m_perkDatabase[player.chosenPerk].acquireLogic(player, game);
+		}
+	}
 
+	void updatePerks(RainbowlandGame& game)
+	{
+		for(auto& player : game.m_players)
+		{
+			for(auto perk : player.acquiredPerks)
+			{
+				game.m_perkDatabase[perk].updateLogic(player, game);
+			}
 		}
 	}
 }

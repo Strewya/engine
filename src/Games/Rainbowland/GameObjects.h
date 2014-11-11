@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
@@ -131,15 +132,6 @@ namespace Core
 		PerkTypeCount
 	};
 
-	struct Perk
-	{
-		PerkType type;
-		std::string name;
-		Rect button;
-	};
-
-	typedef std::vector<Perk> VPerks;
-
 	struct Player
 	{
 		Transform transform;
@@ -154,12 +146,12 @@ namespace Core
 		Time weaponTimer;
 		Weapon currentWeapon;
 		uint32_t bonusDamage;
-		uint32_t rateOfFireMultiplier;
-		uint32_t movementSpeedMultiplier;
+		float rateOfFireMultiplier;
+		float movementSpeedMultiplier;
+		float ammoMultiplier;
 		uint32_t maxHealth;
 		int32_t health;
-		Time regenTimer;
-		uint32_t regeneration;
+		uint32_t regenDelayForOneHealth;
 		uint32_t experience;
 		uint32_t experienceForNextLevel;
 		uint32_t level;
@@ -173,6 +165,18 @@ namespace Core
 	};
 
 	typedef std::vector<Player> VPlayers;
+
+	typedef std::function<void(Player&, RainbowlandGame&)> PerkUpdateLogic;
+	
+	struct Perk
+	{
+		PerkType type;
+		std::string name;
+		PerkUpdateLogic acquireLogic;
+		PerkUpdateLogic updateLogic;
+	};
+
+	typedef std::vector<Perk> VPerks;
 
 	//waaaaaaa
 	void initGame(RainbowlandGame& game);
@@ -193,16 +197,18 @@ namespace Core
 	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage);
 	void moveBullets(const Time& timer, VRayBullets& bullets);
-	void killMonsters(VRayBullets& bullets, VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
+	void checkBulletHits(VRayBullets& bullets, VMonsters& monsters);
 
 	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
 	void checkMonsterHurtingPlayer(VMonsters& monsters, VPlayers& players);
+	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
 
 	bool enterPerkMode(RainbowlandGame& game);
 	void exitPerkMode(RainbowlandGame& game);
 	void generatePerks(VPlayers& players, const VPerks& perkDb);
 	bool allPlayersChosePerk(VPlayers& players);
 	void applyPerksForPlayers(RainbowlandGame& game);
+	void updatePerks(RainbowlandGame& game);
 }

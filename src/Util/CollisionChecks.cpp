@@ -75,19 +75,11 @@ namespace Core
 
 	bool isCircleTouchingRect(const Circle& circle, const Rect& rect)
 	{
-		Vec2 pts[4]{circle.center, circle.center, circle.center, circle.center};
-		pts[0].x -= circle.radius;
-		pts[1].x += circle.radius;
-		pts[2].y -= circle.radius;
-		pts[3].y += circle.radius;
-		for(auto i = 0; i < 4; ++i)
-		{
-			if(isPointInsideRect(pts[i], rect))
-			{
-				return true;
-			}
-		}
-		return false;
+		if(circle.center.x + circle.radius < rect.left()) return false;
+		if(circle.center.x - circle.radius > rect.right()) return false;
+		if(circle.center.y + circle.radius < rect.bottom()) return false;
+		if(circle.center.y - circle.radius > rect.top()) return false;
+		return true;
 	}
 
 	bool isRectTouchingRect(const Rect& l, const Rect& r)
