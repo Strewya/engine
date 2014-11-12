@@ -58,9 +58,9 @@ namespace Core
 						Circle radioactiveArea{player.transform.position, 5};
 						for(auto& monsta : game.m_monsters)
 						{
-							Rect bbox = monsta.boundingBox;
-							bbox.center = monsta.transform.position;
-							if(isRectTouchingCircle(bbox, radioactiveArea))
+							auto bCollider = monsta.collisionData;
+							bCollider.center = monsta.transform.position;
+							if(isCircleTouchingCircle(bCollider, radioactiveArea))
 							{
 								monsta.health -= 1;
 							}
@@ -84,6 +84,22 @@ namespace Core
 					grantExperience(5000, game.m_players);
 				},
 				[](Player& player, RainbowlandGame& game) {}
+			},
+			{
+				Fastloader, "Fastloader",
+				[](Player& player, RainbowlandGame& game)
+				{
+					player.reloadMultiplier *= 0.7f;
+				},
+					[](Player& player, RainbowlandGame& game) {}
+			},
+			{
+				ReflexBoosted, "Reflex boosted",
+				[](Player& player, RainbowlandGame& game)
+				{
+					game.m_gameplayTimer.setTimeScale(0.9f);
+				},
+					[](Player& player, RainbowlandGame& game) {}
 			}
 		};
 

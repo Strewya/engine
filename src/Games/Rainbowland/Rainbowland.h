@@ -19,6 +19,7 @@
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/LuaSystem.h>
+#include <Util/Rect.h>
 #include <Util/Time.h>
 /******* end header inclusion *******/
 
@@ -43,6 +44,7 @@ namespace Core
 		Time m_renderTimer;
 		Time m_deathTimer;
 		Time m_gameplayTimer;
+		double m_restoreTimeScaleAfterPerkMode;
 		
 		Camera m_camera;
 		Rect m_playingField;

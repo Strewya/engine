@@ -16,7 +16,11 @@
 
 namespace Core
 {
+#ifdef _DEBUG
 	bool g_spawnEnabled = true;
+	uint32_t mx = 0;
+	uint32_t my = 0;
+#endif
 
 	void RainbowlandGame::shutdown()
 	{
@@ -71,6 +75,10 @@ namespace Core
 				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative && m_players.size() >= 1)
 				{
 					m_players[0].aim.set((float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y);
+#ifdef _DEBUG
+					mx = w.m_mouseMove.m_x;
+					my = w.m_mouseMove.m_y;
+#endif
 					return true;
 				}
 				return false;
@@ -132,6 +140,8 @@ namespace Core
 			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
 				{
+					Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+					Vec2 loc = m_graphicsSystem.screenToWorld({(float)mx, (float)my}, m_camera);
 					switch(w.m_keyboard.m_keyCode)
 					{
 						case Keyboard::m_Space:
@@ -144,6 +154,29 @@ namespace Core
 								m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
 							}
 							return true;
+
+						case Keyboard::m_F1:
+							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedMovementSpeed);
+							return true;
+						case Keyboard::m_F2:
+							placeBonus(m_bonuses, gen, loc, EffectType::Heal);
+							return true;
+						case Keyboard::m_F3:
+							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedRateOfFire);
+							return true;
+						case Keyboard::m_F4:
+							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Pistol);
+							return true;
+						case Keyboard::m_F5:
+							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Shotgun);
+							return true;
+						case Keyboard::m_F6:
+							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Uzi);
+							return true;
+						case Keyboard::m_F7:
+							placeBonus(m_bonuses, gen, loc, EffectType::SlowTime);
+							return true;
+
 					}
 				}
 				return false;
@@ -261,11 +294,9 @@ namespace Core
 		m_gameplayTimer.updateBy(m_logicTimer.getDeltaMicros());
 
 		movePlayers(m_gameplayTimer, m_players, m_playingField);
-		for(auto& player : m_players)
-		{
-			fireWeapon(m_gameplayTimer, player, m_rayBullets, m_graphicsSystem, m_camera);
-		}
+#ifdef _DEBUG
 		if(g_spawnEnabled)
+#endif
 		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_gameplayTimer, m_monsters, m_players);
 		checkMonsterHurtingPlayer(m_gameplayTimer, m_monsters, m_players);
@@ -286,6 +317,10 @@ namespace Core
 			clamp(-2.0f, 2.0f, pos.y);
 			m_camera.setPosition(pos);
 		}
+		for(auto& player : m_players)
+		{
+			fireWeapon(m_gameplayTimer, player, m_rayBullets, m_graphicsSystem, m_camera);
+		}
 
 		updatePerks(*this);
 		moveBullets(m_gameplayTimer, m_rayBullets);
@@ -293,9 +328,9 @@ namespace Core
 		VKillLocations locations;
 		killMonsters(m_monsters, locations, m_players);
 		generateBonuses(locations, m_bonuses);
-		checkBonusPickup(m_players, m_bonuses, m_weaponDatabase);
-		updateBonuses(m_gameplayTimer, m_bonuses);
-		updateBonusEffects(m_gameplayTimer, m_players);
+		checkBonusPickup(m_players, *this);
+		updateBonuses(m_gameplayTimer, *this);
+		updateBonusEffects(m_gameplayTimer, *this);
 
 		checkPlayerDeath(m_players);
 
@@ -343,12 +378,15 @@ namespace Core
 		
 		for(auto& obj : m_players)
 		{
-			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), obj.color);
+			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, obj.color);
 			if(obj.currentWeapon.ammo == 0)
 			{
 				auto textTf = obj.transform;
 				textTf.scale.set(0.03f, 0.03f);
 				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
+				textTf.position.y -= 1;
+				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurMicros());
+				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
 			}
 		}
 
@@ -361,7 +399,7 @@ namespace Core
 		{
 			Color c = obj.color;
 			c.a = 0.2f + (float)obj.health / (float)obj.maxHealth;
-			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
+			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
 			Transform t;
 			t.position = obj.transform.position;
 			t.scale.set(0.03f, 0.03f);
@@ -373,26 +411,23 @@ namespace Core
 			auto c = obj.color;
 			auto diff = obj.duration - obj.timer.getCurMicros();
 			c.a = 0.2f + (float)diff / (float)obj.duration;
-			m_graphicsSystem.drawQuad(obj.transform, obj.boundingBox.halfSize(), c);
-			if(obj.effect == WeaponDrop)
+			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
+			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
+			switch(obj.effect)
 			{
-				std::string weaponText;
-				switch(obj.weapon)
-				{
-					case Pistol:
-						weaponText = "P";
-						break;
-					case Shotgun:
-						weaponText = "S";
-						break;
-					case Uzi:
-						weaponText = "U";
-						break;
-				}
-				auto textTf = obj.transform;
-				textTf.scale.set(0.04f, 0.04f);
-				m_graphicsSystem.drawText(m_defaultFont, weaponText, textTf, {0,0,0}, 1, false);
+				case WeaponDrop_Pistol:
+					text += " P";
+					break;
+				case WeaponDrop_Shotgun:
+					text += " S";
+					break;
+				case WeaponDrop_Uzi:
+					text += " U";
+					break;
 			}
+			auto textTf = obj.transform;
+			textTf.scale.set(0.03f, 0.03f);
+			m_graphicsSystem.drawText(m_defaultFont, text, textTf, {0,0,0}, 1, false);
 		}
 
 		for(auto& obj : m_rayBullets)
@@ -422,6 +457,28 @@ namespace Core
 			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
 			tf.position.y += 20;
 		}
+		tf.position.set(10-(float)m_window->getSizeX()*0.5f, 300);
+		for(auto& player : m_players)
+		{
+			for(auto& b : player.bonuses)
+			{
+				std::string str;
+				switch(b.type)
+				{
+					case IncreasedMovementSpeed:
+						str = "Runner: ";
+						break;
+					case IncreasedRateOfFire:
+						str = "Shooter: ";
+						break;
+				}
+				auto remaining = b.duration - b.timer.getCurMicros();
+				str += std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
+				m_graphicsSystem.drawText(m_defaultFont, str, tf, {0, 0, 0}, 0, false);
+				tf.position.y += 20;
+			}
+		}
+		m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
 
 		m_guiSystem.draw(m_graphicsSystem);
 

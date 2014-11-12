@@ -220,9 +220,9 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					APPLY CAMERA
+	//					CALCULATE CAM VIEW
 	//*****************************************************************
-	void GraphicsSystem::applyCamera(const Camera& cam)
+	XMMATRIX GraphicsSystem::calculateCamView(const Camera& cam) const
 	{
 		auto pos = convert(cam.getPosition());
 		auto lookAt = convert(cam.getLookAtAxis());
@@ -233,7 +233,15 @@ namespace Core
 		rot = XMVector3Transform(lookAt, rotMat);
 		lookAt = rot + pos;
 
-		m_camView = XMMatrixLookAtLH(pos, lookAt, up);
+		return XMMatrixLookAtLH(pos, lookAt, up);
+	}
+
+	//*****************************************************************
+	//					APPLY CAMERA
+	//*****************************************************************
+	void GraphicsSystem::applyCamera(const Camera& cam)
+	{
+		m_camView = calculateCamView(cam);
 	}
 
 	//*****************************************************************
@@ -247,10 +255,12 @@ namespace Core
 	//*****************************************************************
 	//					SCREEN TO WORLD COORDS
 	//*****************************************************************
-	Vec2 GraphicsSystem::screenToWorld(const Vec2& screen, const Camera& camera) const
+	Vec2 GraphicsSystem::screenToWorld(const Vec2& screen, const Camera& cam) const
 	{
-		auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window->getSizeX(), (float)m_window->getSizeY(), 0.0f, 1.0f, m_camProjection, m_camView, XMMatrixIdentity());
-		auto camPos = convert(camera.getPosition());
+		auto camView = calculateCamView(cam);
+		
+		auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window->getSizeX(), (float)m_window->getSizeY(), 0.0f, 1.0f, m_camProjection, camView, XMMatrixIdentity());
+		auto camPos = convert(cam.getPosition());
 		auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
 		auto loc = XMPlaneIntersectLine(plane, objectSpace, camPos);
 		return Vec2{loc.m128_f32[0], loc.m128_f32[1]};

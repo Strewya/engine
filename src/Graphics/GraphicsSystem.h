@@ -82,7 +82,7 @@ namespace Core
 		template<typename T> static void releasePtr(T* ptr);
 		template<typename T> static void safeRelease(T*& ptr);
 		template<typename T> void declare(T** ptr);
-
+		XMMATRIX calculateCamView(const Camera& cam) const;
 		
 
 		DXGI_SWAP_CHAIN_DESC m_swapChainDesc;

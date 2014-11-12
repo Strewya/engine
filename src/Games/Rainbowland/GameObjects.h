@@ -9,8 +9,8 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Circle.h>
 #include <Util/Color.h>
-#include <Util/Rect.h>
 #include <Util/Time.h>
 #include <Util/Transform.h>
 #include <Util/Vec2.h>
@@ -20,6 +20,8 @@ namespace Core
 {
 	class Camera;
 	class RainbowlandGame;
+	class Random;
+	class Rect;
 	class GraphicsSystem;
 	
 	enum WeaponType
@@ -35,7 +37,10 @@ namespace Core
 		IncreasedRateOfFire,
 		IncreasedMovementSpeed,
 		Heal,
-		WeaponDrop,
+		SlowTime,
+		WeaponDrop_Pistol,
+		WeaponDrop_Shotgun,
+		WeaponDrop_Uzi,
 		EffectTypeCount
 	};
 
@@ -71,7 +76,7 @@ namespace Core
 	{
 		Transform transform;
 		Color color;
-		Rect boundingBox;
+		Circle collisionData;
 		Vec2 direction;
 		float maxVelocity;
 		uint32_t targetPlayer;
@@ -96,7 +101,7 @@ namespace Core
 	{
 		Transform transform;
 		Color color;
-		Rect boundingBox;
+		Circle collisionData;
 		EffectType effect;
 		WeaponType weapon;
 		Time timer;
@@ -124,6 +129,8 @@ namespace Core
 		Radioactive,
 		AmmoManiac,
 		InstantWinner,
+		Fastloader,
+		ReflexBoosted,
 		PerkTypeCount
 	};
 
@@ -131,7 +138,7 @@ namespace Core
 	{
 		Transform transform;
 		Color color;
-		Rect boundingBox;
+		Circle collisionData;
 		Vec2 velocity;
 		Vec2 maxVelocity;
 		Vec2 acceleration;
@@ -142,7 +149,7 @@ namespace Core
 		Weapon currentWeapon;
 		uint32_t bonusDamage;
 		float rateOfFireMultiplier;
-		float movementSpeedMultiplier;
+		float reloadMultiplier;
 		float ammoMultiplier;
 		uint32_t maxHealth;
 		int32_t health;
@@ -182,12 +189,13 @@ namespace Core
 	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
 	void grantExperience(uint32_t exp, VPlayers& players);
 
-	void enableEffect(Player& player, Bonus& bonus, const VWeapons& weaponDb);
-	void disableEffect(Player& player, EffectType effect);
-	void updateBonusEffects(const Time& timer, VPlayers& players);
+	void enableEffect(Player& player, Bonus& bonus, RainbowlandGame& game);
+	void disableEffect(Player& player, EffectType effect, RainbowlandGame& game);
+	void updateBonusEffects(const Time& timer, RainbowlandGame& game);
 	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
-	void checkBonusPickup(VPlayers& players, VBonuses& bonuses, const VWeapons& weaponDb);
-	void updateBonuses(const Time& timer, VBonuses& bonuses);
+	void placeBonus(VBonuses& bonuses, Random& gen, Vec2 location, EffectType effect);
+	void checkBonusPickup(VPlayers& players, RainbowlandGame& game);
+	void updateBonuses(const Time& timer, RainbowlandGame& game);
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
 	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
