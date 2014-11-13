@@ -10,7 +10,7 @@
 #include <XInput.h>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Clock.h>
+#include <Util/Time.h>
 #include <Window/WindowEvent.h>
 #include <Window/ReadDirectoryChanges.h>
 /******* end header inclusion *******/
@@ -142,7 +142,7 @@ namespace Core
 		std::vector<FileChangeInfo> m_fileChanges;
 		uint32_t m_nextFreeSlot;
 
-		Clock m_clock;
+		Time m_timer;
 		CReadDirectoryChanges m_monitor;
 	};
 

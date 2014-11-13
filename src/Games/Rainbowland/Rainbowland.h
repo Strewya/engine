@@ -19,9 +19,8 @@
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/LuaSystem.h>
-#include <Util/Clock.h>
 #include <Util/Rect.h>
-#include <Util/Timers.h>
+#include <Util/Time.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -41,12 +40,11 @@ namespace Core
 		ImageCache m_imageCache;
 		TextureCache m_textureCache;
 		
-		Clock m_logicClock; //drives the global logic time
-		Clock m_renderClock; //drives the global render time
-		IncrementingTimer m_gameplayTimer; //drives the general gameplay
-		DecrementingTimer m_deathTimer; //decrementing timer for the deatch scenario
+		Time m_logicTimer;
+		Time m_renderTimer;
+		Time m_deathTimer;
+		Time m_gameplayTimer;
 		double m_restoreTimeScaleAfterPerkMode;
-		std::vector<double> m_timeScaleForGameplayTimer;
 		
 		Camera m_camera;
 		Rect m_playingField;
@@ -56,11 +54,10 @@ namespace Core
 		VPlayers m_players;
 		VMonsters m_monsters;
 		VMonsterSpawners m_monsterSpawners;
-		VPickups m_pickups;
+		VBonuses m_bonuses;
 		VRayBullets m_rayBullets;
 		VWeapons m_weaponDatabase;
 		VPerks m_perkDatabase;
-		VBonuses m_bonusDatabase;
 		
 		uint32_t m_defaultFont;
 		Window* m_window;

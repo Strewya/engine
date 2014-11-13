@@ -63,6 +63,9 @@
     <ClCompile Include="..\..\..\src\Window\WindowClass.cpp">
       <Filter>Framework\Window</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Time.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp">
@@ -200,15 +203,6 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp">
-      <Filter>Design\Rainbowland</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\Clock.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\Timers.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -228,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h">
       <Filter>Framework\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Time.h">
+      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h">
@@ -376,15 +373,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
       <Filter>Design\Rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h">
-      <Filter>Design\Rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Clock.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Timers.h">
-      <Filter>Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

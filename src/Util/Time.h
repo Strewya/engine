@@ -11,7 +11,7 @@
 
 namespace Core
 {
-	class Clock
+	class Time
 	{
 	public:
 		static const double STOP_TIME;
@@ -31,21 +31,28 @@ namespace Core
 
 		static uint32_t microsDelta(uint64_t start, uint64_t end);
 
-		static uint64_t getRealTimeMicros();
-		
-		Clock();
+		Time();
 
 		void update();
 		void updateBy(uint64_t delta);
 		uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
 
 		uint64_t getLastRealTimeMicros() const;
+		static uint64_t getRealTimeMicros();
 		
 		uint64_t getCurMicros() const;
 		uint32_t getDeltaMicros() const;
 		float getDeltaTime() const;
 
+		//use only for countup related timers
+		void reset();
+
+		void setTimeScale(double timeScale);
+		double getTimeScale() const;
+
 	protected:
+		static const float m_microToSec;
+
 		uint64_t m_oldRealTime;
 		
 		uint64_t m_lastMicros;
@@ -53,5 +60,6 @@ namespace Core
 		uint64_t m_deltaMicros;
 		
 		float m_deltaTime;
+		double m_timeScale;
 	};
 }

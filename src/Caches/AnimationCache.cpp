@@ -8,6 +8,7 @@
 #include <Caches/ImageCache.h>
 #include <Scripting/LuaStack.h>
 #include <Util/ResourceFile.h>
+#include <Util/Time.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 

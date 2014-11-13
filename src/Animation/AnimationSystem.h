@@ -8,7 +8,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Timers.h>
+#include <Util/Time.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -53,7 +53,7 @@ namespace Core
 		bool isRunning(uint32_t playerID);
 		
 	private:
-		IncrementingTimer m_timer;
+		Time m_timer;
 		std::vector<AnimationPlayer> m_runningAnimations;
 		AnimationCache* m_animations;
 		uint32_t m_idCounter;

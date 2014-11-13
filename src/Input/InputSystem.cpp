@@ -7,7 +7,7 @@
 #include <iostream>
 /******* extra headers *******/
 #include <Input/KeyCodes.h>
-#include <Util/Clock.h>
+#include <Util/Time.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 #include <Window/WindowEvent.h>
@@ -36,7 +36,7 @@ namespace Core
 		return status;
 	}
 
-	void InputSystem::update(const Clock& timer)
+	void InputSystem::update(const Time& timer)
 	{
 		m_inputEvents.clear();
 		WindowEvent we;

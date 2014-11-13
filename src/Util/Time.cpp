@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Clock.h>
+#include <Util/Time.h>
 /******* C++ headers *******/
 #include <chrono>
 #include <Window/myWindows.h>
@@ -68,83 +68,84 @@ namespace Core
 	*		TIME CLASS
 	********************************************************/
 
-	const double Clock::STOP_TIME = 0;
-	const double Clock::NORMAL_TIME = 1;
+	const double Time::STOP_TIME = 0;
+	const double Time::NORMAL_TIME = 1;
+	const float Time::m_microToSec = static_cast<float>(1.0 / 1000000.0);
 	
-	uint64_t Clock::secondsToMicros(float sec)
+	uint64_t Time::secondsToMicros(float sec)
 	{
 		return static_cast<uint64_t>(sec * 1000.0f * 1000.0f);
 	}
 
-	uint64_t Clock::milisToMicros(uint32_t mili)
+	uint64_t Time::milisToMicros(uint32_t mili)
 	{
 		return static_cast<uint64_t>(mili) * 1000ULL;
 	}
 
-	float Clock::milisToSeconds(uint32_t mili)
+	float Time::milisToSeconds(uint32_t mili)
 	{
 		return static_cast<float>(mili)*0.001f;
 	}
 
-	float Clock::microsToSeconds(uint64_t micros)
+	float Time::microsToSeconds(uint64_t micros)
 	{
 		return static_cast<float>(micros)*0.001f*0.001f;
 	}
 	
-	uint32_t Clock::secondsToMilis(float sec)
+	uint32_t Time::secondsToMilis(float sec)
 	{
 		return static_cast<uint32_t>(sec * 1000ULL);
 	}
 	
-	uint32_t Clock::microsToMilis(uint64_t micros)
+	uint32_t Time::microsToMilis(uint64_t micros)
 	{
 		return static_cast<uint32_t>(micros / 1000ULL);
 	}
 
-	uint32_t Clock::microsDelta(uint64_t start, uint64_t end)
+	uint32_t Time::microsDelta(uint64_t start, uint64_t end)
 	{
 		return static_cast<uint32_t>(end - start);
 	}
 
-	uint32_t Clock::countMilisInMicros(uint64_t micros)
+	uint32_t Time::countMilisInMicros(uint64_t micros)
 	{
 		return static_cast<uint32_t>(micros / 1000ULL);
 	}
 
-	uint32_t Clock::countSecondsInMicros(uint64_t micros)
+	uint32_t Time::countSecondsInMicros(uint64_t micros)
 	{
 		return static_cast<uint32_t>(micros / 1000000ULL);
 	}
 
-	uint32_t Clock::countMinutesInMicros(uint64_t micros)
+	uint32_t Time::countMinutesInMicros(uint64_t micros)
 	{
 		return static_cast<uint32_t>(micros / (60ULL * 1000000ULL));
 	}
 
-	uint32_t Clock::countHoursInMicros(uint64_t micros)
+	uint32_t Time::countHoursInMicros(uint64_t micros)
 	{
 		return static_cast<uint32_t>(micros / (60ULL * 60ULL * 1000000ULL));
 	}
 
-	Clock::Clock()
+	Time::Time()
 		: m_oldRealTime(getRealTimeMicros()),
 		m_lastMicros(m_oldRealTime), m_curMicros(m_oldRealTime), m_deltaMicros(0),
-		m_deltaTime(0)
+		m_deltaTime(0), m_timeScale(NORMAL_TIME)
 	{
 	}
 
-	uint64_t Clock::getRealTimeMicros()
+	uint64_t Time::getRealTimeMicros()
 	{
 		TimeSource source;
 		return source.getSystemMicroseconds();
 	}
 
-	uint64_t Clock::getLastRealTimeMicros() const
+	uint64_t Time::getLastRealTimeMicros() const
 	{
 		return m_oldRealTime;
 	}
 
-	void Clock::update()
+	void Time::update()
 	{
 		uint64_t now = getRealTimeMicros();
 		uint64_t delta = now - m_oldRealTime;
@@ -154,15 +155,15 @@ namespace Core
 			updateBy(delta);
 	}
 
-	void Clock::updateBy(uint64_t deltaMicros)
+	void Time::updateBy(uint64_t deltaMicros)
 	{
 		m_lastMicros = m_curMicros;
 		m_curMicros += deltaMicros;
 		m_deltaMicros = m_curMicros - m_lastMicros;
-		m_deltaTime = microsToSeconds(m_deltaMicros);
+		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
 	}
 
-	uint32_t Clock::getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime)
+	uint32_t Time::getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime)
 	{
 		uint64_t now = getRealTimeMicros();
 		uint64_t delta = now - m_oldRealTime;
@@ -176,18 +177,36 @@ namespace Core
 		return count;
 	}
 
-	uint64_t Clock::getCurMicros() const
+	uint64_t Time::getCurMicros() const
 	{
 		return m_curMicros;
 	}
 
-	uint32_t Clock::getDeltaMicros() const
+	uint32_t Time::getDeltaMicros() const
 	{
-		return static_cast<uint32_t>(m_deltaMicros);
+		return static_cast<uint32_t>(static_cast<double>(m_deltaMicros)*m_timeScale);
 	}
 
-	float Clock::getDeltaTime() const
+	float Time::getDeltaTime() const
 	{
-		return m_deltaTime;
+		return static_cast<float>(static_cast<double>(m_deltaTime)*m_timeScale);
+	}
+
+	void Time::setTimeScale(double timeScale)
+	{
+		m_timeScale = timeScale;
+	}
+
+	double Time::getTimeScale() const
+	{
+		return m_timeScale;
+	}
+
+	void Time::reset()
+	{
+		m_curMicros = 0;
+		m_deltaMicros = 0;
+		m_deltaTime = 0;
+		m_lastMicros = 0;
 	}
 }
