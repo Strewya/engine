@@ -8,7 +8,8 @@
 #include <Games/Rainbowland/Rainbowland.h>
 #include <Util/Circle.h>
 #include <Util/CollisionChecks.h>
-#include <Util/Time.h>
+#include <Util/Clock.h>
+#include <Util/Timers.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -16,8 +17,7 @@ namespace Core
 {
 	void initPerkDatabase(VPerks& perkDb)
 	{
-		Time timer;
-		timer.reset();
+		IncrementingTimer timer;
 		perkDb =
 		{
 			{
@@ -29,7 +29,7 @@ namespace Core
 					[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurMicros() >= Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
+					if(timer.getCurrentMicros() >= Clock::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
 					{
 						timer.reset();
 						player.health += 1;
@@ -52,7 +52,7 @@ namespace Core
 				[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurMicros() > Time::secondsToMicros(0.5f))
+					if(timer.getCurrentMicros() > Clock::secondsToMicros(0.5f))
 					{
 						timer.reset();
 						Circle radioactiveArea{player.transform.position, 5};

@@ -11,7 +11,7 @@
 /******* extra headers *******/
 #include <Util/Circle.h>
 #include <Util/Color.h>
-#include <Util/Time.h>
+#include <Util/Timers.h>
 #include <Util/Transform.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
@@ -23,6 +23,10 @@ namespace Core
 	class Random;
 	class Rect;
 	class GraphicsSystem;
+
+	struct Player;
+
+	typedef std::function<void(Player&, RainbowlandGame&)> UpdateLogic;
 	
 	enum WeaponType
 	{
@@ -32,29 +36,22 @@ namespace Core
 		WeaponCount
 	};
 
-	enum EffectType
+	enum BonusType
 	{
 		IncreasedRateOfFire,
 		IncreasedMovementSpeed,
 		Heal,
 		SlowTime,
-		WeaponDrop_Pistol,
-		WeaponDrop_Shotgun,
-		WeaponDrop_Uzi,
-		EffectTypeCount
+		Weapon_Pistol,
+		Weapon_Shotgun,
+		Weapon_Uzi,
+		BonusTypeCount
 	};
 
 	enum DirectionalMovement
 	{
 		Up, Down,
 		Left, Right
-	};
-
-	struct BonusEffect
-	{
-		Time timer;
-		uint64_t duration;
-		EffectType type;
 	};
 
 	struct Weapon
@@ -82,7 +79,7 @@ namespace Core
 		uint32_t targetPlayer;
 		int32_t maxHealth;
 		int32_t health;
-		Time attackTimer;
+		IntervalTimer attackTimer;
 	};
 
 	typedef std::vector<Monster> VMonsters;
@@ -90,26 +87,44 @@ namespace Core
 	struct MonsterSpawner
 	{
 		Transform transform;
-		Time timer;
-		uint64_t spawnCooldown;
+		IntervalTimer spawnTimer;
 		float spawnRadius;
 	};
 
 	typedef std::vector<MonsterSpawner> VMonsterSpawners;
 
-	struct Bonus
+	typedef std::function<void()> OnAcquireLogic;
+
+	struct Pickup
 	{
 		Transform transform;
 		Color color;
 		Circle collisionData;
-		EffectType effect;
-		WeaponType weapon;
-		Time timer;
+		DecrementingTimer timer;
+		BonusType type;
+	};
+
+	typedef std::vector<Pickup> VPickups;
+
+	struct Bonus
+	{
+		BonusType type;
+		std::string name;
 		uint64_t duration;
+		UpdateLogic acquireLogic;
+		UpdateLogic updateLogic;
+		UpdateLogic timeoutLogic;
 	};
 
 	typedef std::vector<Bonus> VBonuses;
-	typedef std::vector<Vec2> VKillLocations;
+
+	struct ActiveBonus
+	{
+		BonusType type;
+		DecrementingTimer timer;
+	};
+
+	typedef std::vector<ActiveBonus> VActiveBonuses;
 
 	struct RayBullet
 	{
@@ -120,6 +135,7 @@ namespace Core
 		uint32_t damage;
 	};
 
+	typedef std::vector<Vec2> VKillLocations;
 	typedef std::vector<RayBullet> VRayBullets;
 
 	enum PerkType
@@ -144,8 +160,9 @@ namespace Core
 		Vec2 acceleration;
 		bool directions[4];
 		Vec2 aim;
-		std::vector<BonusEffect> bonuses;
-		Time weaponTimer;
+		VActiveBonuses bonuses;
+		IntervalTimer attackTimer;
+		DecrementingTimer reloadTimer;
 		Weapon currentWeapon;
 		uint32_t bonusDamage;
 		float rateOfFireMultiplier;
@@ -168,14 +185,12 @@ namespace Core
 
 	typedef std::vector<Player> VPlayers;
 
-	typedef std::function<void(Player&, RainbowlandGame&)> PerkUpdateLogic;
-	
 	struct Perk
 	{
 		PerkType type;
 		std::string name;
-		PerkUpdateLogic acquireLogic;
-		PerkUpdateLogic updateLogic;
+		UpdateLogic acquireLogic;
+		UpdateLogic updateLogic;
 	};
 
 	typedef std::vector<Perk> VPerks;
@@ -184,29 +199,29 @@ namespace Core
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb);
-	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
+	void movePlayers(const IncrementingTimer& timer, VPlayers& players, const Rect& playingField);
 	void checkPlayerDeath(VPlayers& players);
 	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
 	void grantExperience(uint32_t exp, VPlayers& players);
 
-	void enableEffect(Player& player, Bonus& bonus, RainbowlandGame& game);
-	void disableEffect(Player& player, EffectType effect, RainbowlandGame& game);
-	void updateBonusEffects(const Time& timer, RainbowlandGame& game);
-	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
-	void placeBonus(VBonuses& bonuses, Random& gen, Vec2 location, EffectType effect);
-	void checkBonusPickup(VPlayers& players, RainbowlandGame& game);
-	void updateBonuses(const Time& timer, RainbowlandGame& game);
+	void enableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
+	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
+	void updateBonuses(const IncrementingTimer& timer, RainbowlandGame& game);
+	void generatePickups(VKillLocations& killLocations, VPickups& pickups);
+	void placePickup(VPickups& bonuses, Random& gen, Vec2 location, BonusType bonus);
+	void checkPickups(VPlayers& players, RainbowlandGame& game);
+	void updatePickups(const IncrementingTimer& timer, RainbowlandGame& game);
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
-	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
+	void fireWeapon(const IncrementingTimer& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
 	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage);
-	void moveBullets(const Time& timer, VRayBullets& bullets);
+	void moveBullets(const IncrementingTimer& timer, VRayBullets& bullets);
 	void checkBulletHits(VRayBullets& bullets, VMonsters& monsters);
 
-	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
+	void updateMonsterSpawners(const IncrementingTimer& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
-	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
-	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players);
+	void moveMonsters(const IncrementingTimer& timer, VMonsters& monsters, const VPlayers& players);
+	void checkMonsterHurtingPlayer(const IncrementingTimer& timer, VMonsters& monsters, VPlayers& players);
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
 
 	bool enterPerkMode(RainbowlandGame& game);

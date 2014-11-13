@@ -309,6 +309,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp" />
@@ -338,7 +339,8 @@
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
     <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Time.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Clock.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Timers.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
     <ClCompile Include="..\..\..\src\Util\Vec2.cpp" />
     <ClCompile Include="..\..\..\src\Util\Vec3.cpp" />
@@ -374,6 +376,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h" />
@@ -400,9 +403,10 @@
     <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />
     <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />
+    <ClInclude Include="..\..\..\src\Util\Timers.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
     <ClInclude Include="..\..\..\src\Util\Random.h" />
-    <ClInclude Include="..\..\..\src\Util\Time.h" />
+    <ClInclude Include="..\..\..\src\Util\Clock.h" />
     <ClInclude Include="..\..\..\src\Util\Transform.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2.h" />
     <ClInclude Include="..\..\..\src\Util\Vec3.h" />

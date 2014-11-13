@@ -7,7 +7,7 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Time.h>
+#include <Util/Clock.h>
 #include <Util/Utility.h>
 /******* end header inclusion *******/
 
@@ -27,12 +27,12 @@
 
 namespace Core
 {
-	inline uint32_t getLogicUpdateCount(Time& timer, const uint64_t& microsPerFrame, float& outFraction, uint64_t& outUnusedMicros, uint64_t& outDroppedTime)
+	inline uint32_t getLogicUpdateCount(Clock& clock, const uint64_t& microsPerFrame, float& outFraction, uint64_t& outUnusedMicros, uint64_t& outDroppedTime)
 	{
 		static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
 
 		const uint32_t maxUpdateCount = static_cast<uint32_t>(maxUpdateTime / microsPerFrame);
-		const uint32_t updateCount = timer.getFixedStepUpdateCount(microsPerFrame, outFraction, outUnusedMicros);
+		const uint32_t updateCount = clock.getFixedStepUpdateCount(microsPerFrame, outFraction, outUnusedMicros);
 		outDroppedTime = updateCount > maxUpdateCount ? updateCount - maxUpdateCount : 0;
 		outDroppedTime *= microsPerFrame;
 		return updateCount <= maxUpdateCount ? updateCount : maxUpdateCount;

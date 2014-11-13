@@ -12,7 +12,7 @@
 
 namespace Core
 {
-	class Time;
+	class Clock;
 	class Window;
 
 	typedef std::vector<WindowEvent> EventVector_t;
@@ -23,7 +23,7 @@ namespace Core
 		bool init(Window& window);
 		bool shutdown();
 
-		void update(const Time& timer);
+		void update(const Clock& timer);
 
 		const EventVector_t& getEvents() const;
 

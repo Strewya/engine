@@ -7,7 +7,7 @@
 /******* extra headers *******/
 #include <Caches/ImageCache.h>
 #include <Scripting/LuaStack.h>
-#include <Util/Time.h>
+#include <Util/Clock.h>
 #include <Util/Utility.h>
 /******* end headers *******/
 
@@ -21,7 +21,7 @@ namespace Core
 		}
 
 		outAnimation.m_name = lua.to<std::string>(-2);
-		outAnimation.m_duration = Time::secondsToMicros(get(lua, "duration", defaults.duration));
+		outAnimation.m_duration = Clock::secondsToMicros(get(lua, "duration", defaults.duration));
 		outAnimation.m_loops = get(lua, "loop", defaults.loops);
 
 		for( lua.ipairs("images"); lua.next(); lua.pop(1) )

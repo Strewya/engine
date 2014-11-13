@@ -17,9 +17,18 @@ namespace Core
 		: m_randEngine(seed)
 	{}
 
+	Random::Random(uint64_t seed)
+		: m_randEngine(static_cast<uint32_t>(seed))
+	{}
+
 	void Random::reseed(uint32_t seed)
 	{
 		m_randEngine.seed(seed);
+	}
+
+	void Random::reseed(uint64_t seed)
+	{
+		m_randEngine.seed(static_cast<uint32_t>(seed));
 	}
 
 	int32_t Random::randInt(int32_t lowerBound, int32_t upperBound)

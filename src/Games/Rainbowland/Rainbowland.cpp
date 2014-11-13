@@ -140,41 +140,41 @@ namespace Core
 			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
 				{
-					Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+					Random gen(Clock::getRealTimeMicros());
 					Vec2 loc = m_graphicsSystem.screenToWorld({(float)mx, (float)my}, m_camera);
 					switch(w.m_keyboard.m_keyCode)
 					{
 						case Keyboard::m_Space:
-							if(m_gameplayTimer.getTimeScale() > 0.5f)
+							if(m_gameplayTimer.getTimeScale() > 0.5)
 							{
-								m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+								m_gameplayTimer.setTimeScale(Clock::STOP_TIME);
 							}
 							else
 							{
-								m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
+								m_gameplayTimer.setTimeScale(Clock::NORMAL_TIME);
 							}
 							return true;
 
 						case Keyboard::m_F1:
-							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedMovementSpeed);
+							placePickup(m_pickups, gen, loc, BonusType::IncreasedMovementSpeed);
 							return true;
 						case Keyboard::m_F2:
-							placeBonus(m_bonuses, gen, loc, EffectType::Heal);
+							placePickup(m_pickups, gen, loc, BonusType::Heal);
 							return true;
 						case Keyboard::m_F3:
-							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedRateOfFire);
+							placePickup(m_pickups, gen, loc, BonusType::IncreasedRateOfFire);
 							return true;
 						case Keyboard::m_F4:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Pistol);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Pistol);
 							return true;
 						case Keyboard::m_F5:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Shotgun);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Shotgun);
 							return true;
 						case Keyboard::m_F6:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Uzi);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Uzi);
 							return true;
 						case Keyboard::m_F7:
-							placeBonus(m_bonuses, gen, loc, EffectType::SlowTime);
+							placePickup(m_pickups, gen, loc, BonusType::SlowTime);
 							return true;
 
 					}
@@ -241,9 +241,6 @@ namespace Core
 			m_defaultFont = m_fontCache.getResourceID("font");
 		}
 
-		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
-		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
-		
 		initGame(*this);
 
 		DEBUG_INFO("---------------------------------");
@@ -257,7 +254,7 @@ namespace Core
 		uint64_t droppedTime = 0;
 		static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
 
-		for(uint32_t l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime); l--;)
+		for(uint32_t l = getLogicUpdateCount(m_logicClock, microsPerFrame, fraction, unusedMicros, droppedTime); l--;)
 		{
 			if(!tickLogic(microsPerFrame))
 			{
@@ -265,9 +262,9 @@ namespace Core
 				break;
 			}
 		}
-		m_logicTimer.updateBy(droppedTime);
+		m_logicClock.updateBy(droppedTime);
 
-		uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
+		uint64_t fullUpdateTime = m_logicClock.getLastRealTimeMicros() + unusedMicros - m_renderClock.getLastRealTimeMicros();
 		tickRender(fullUpdateTime);
 		
 		return m_isRunning;
@@ -276,9 +273,9 @@ namespace Core
 	bool RainbowlandGame::tickLogic(uint64_t updateTime)
 	{
 		bool continueRunning = true;
-		m_logicTimer.updateBy(updateTime);
+		m_logicClock.updateBy(updateTime);
 
-		m_inputSystem.update(m_logicTimer);
+		m_inputSystem.update(m_logicClock);
 		auto evs = m_inputSystem.getEvents();
 		for(auto& e : evs)
 		{
@@ -290,8 +287,12 @@ namespace Core
 				}
 			}
 		}
-
-		m_gameplayTimer.updateBy(m_logicTimer.getDeltaMicros());
+		if(!m_timeScaleForGameplayTimer.empty())
+		{
+			m_gameplayTimer.setTimeScale(m_timeScaleForGameplayTimer.back());
+			m_timeScaleForGameplayTimer.pop_back();
+		}
+		m_gameplayTimer.updateBy(m_logicClock.getDeltaMicros());
 
 		movePlayers(m_gameplayTimer, m_players, m_playingField);
 #ifdef _DEBUG
@@ -327,17 +328,17 @@ namespace Core
 		checkBulletHits(m_rayBullets, m_monsters);
 		VKillLocations locations;
 		killMonsters(m_monsters, locations, m_players);
-		generateBonuses(locations, m_bonuses);
-		checkBonusPickup(m_players, *this);
+		generatePickups(locations, m_pickups);
+		checkPickups(m_players, *this);
+		updatePickups(m_gameplayTimer, *this);
 		updateBonuses(m_gameplayTimer, *this);
-		updateBonusEffects(m_gameplayTimer, *this);
 
 		checkPlayerDeath(m_players);
 
 		if(m_players.size() == 0)
 		{
-			m_deathTimer.updateBy(m_logicTimer.getDeltaMicros());
-			if(m_deathTimer.getCurMicros() > Time::secondsToMicros(5))
+			m_deathTimer.updateBy(m_logicClock.getDeltaMicros());
+			if(m_deathTimer.isDone())
 			{
 				cleanGame(*this);
 				initGame(*this);
@@ -363,7 +364,7 @@ namespace Core
 
 	void RainbowlandGame::tickRender(uint64_t updateTime)
 	{
-		m_renderTimer.updateBy(updateTime);
+		m_renderClock.updateBy(updateTime);
 
 		m_graphicsSystem.begin();
 	
@@ -385,7 +386,7 @@ namespace Core
 				textTf.scale.set(0.03f, 0.03f);
 				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
 				textTf.position.y -= 1;
-				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurMicros());
+				auto timeRemaining = Clock::microsToSeconds(obj.reloadTimer.getRemainingMicros());
 				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
 			}
 		}
@@ -406,22 +407,22 @@ namespace Core
 			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}
 
-		for(auto& obj : m_bonuses)
+		for(auto& obj : m_pickups)
 		{
 			auto c = obj.color;
-			auto diff = obj.duration - obj.timer.getCurMicros();
-			c.a = 0.2f + (float)diff / (float)obj.duration;
+			auto diff = obj.timer.getRemainingMicros();
+			c.a = 0.2f + (float)diff / (float)obj.timer.getStartingValue();
 			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
-			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
-			switch(obj.effect)
+			std::string text = std::to_string(static_cast<int32_t>(Clock::microsToSeconds(diff)+1));
+			switch(obj.type)
 			{
-				case WeaponDrop_Pistol:
+				case Weapon_Pistol:
 					text += " P";
 					break;
-				case WeaponDrop_Shotgun:
+				case Weapon_Shotgun:
 					text += " S";
 					break;
-				case WeaponDrop_Uzi:
+				case Weapon_Uzi:
 					text += " U";
 					break;
 			}
@@ -462,18 +463,10 @@ namespace Core
 		{
 			for(auto& b : player.bonuses)
 			{
-				std::string str;
-				switch(b.type)
-				{
-					case IncreasedMovementSpeed:
-						str = "Runner: ";
-						break;
-					case IncreasedRateOfFire:
-						str = "Shooter: ";
-						break;
-				}
-				auto remaining = b.duration - b.timer.getCurMicros();
-				str += std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
+				std::string str = m_bonusDatabase[b.type].name;
+				
+				auto remaining = b.timer.getRemainingMicros();
+				str += std::to_string(static_cast<uint32_t>(Clock::microsToSeconds(remaining) + 1));
 				m_graphicsSystem.drawText(m_defaultFont, str, tf, {0, 0, 0}, 0, false);
 				tf.position.y += 20;
 			}
