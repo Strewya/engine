@@ -54,10 +54,11 @@ namespace Core
 		VPlayers m_players;
 		VMonsters m_monsters;
 		VMonsterSpawners m_monsterSpawners;
-		VBonuses m_bonuses;
-		VRayBullets m_rayBullets;
+		VPickups m_pickups;
+		VBullets m_bullets;
 		VWeapons m_weaponDatabase;
 		VPerks m_perkDatabase;
+		VBonuses m_bonusDatabase;
 		
 		uint32_t m_defaultFont;
 		Window* m_window;

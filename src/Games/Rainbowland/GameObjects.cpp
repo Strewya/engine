@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <map>
 /******* extra headers *******/
+#include <Games/Rainbowland/BonusDatabase.h>
 #include <Games/Rainbowland/PerkDatabase.h>
 #include <Games/Rainbowland/Rainbowland.h>
 #include <Graphics/Camera.h>
@@ -41,7 +42,7 @@ namespace Core
 		game.m_graphicsSystem.setTransparencyMode(true);
 
 		//spawners
-		Rect spawnerLocations{{0, 0}, game.m_playingField.halfWidth - 3, game.m_playingField.halfHeight - 3};
+		Rect spawnerLocations{{0, 0}, game.m_playingField.halfWidth + 3, game.m_playingField.halfHeight + 3};
 		uint32_t spawnerCount = 8;
 		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
 		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
@@ -91,10 +92,12 @@ namespace Core
 			pos.y += distanceBetweenSpawners.y;
 		}
 
-		game.m_weaponDatabase = {
-				{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0},
-				{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f},
-				{Uzi, "Spammer", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.5f}
+		game.m_weaponDatabase =
+		{
+			{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0, false},
+			{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f, false},
+			{Uzi, "Urban cleaner", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.5f, false},
+			{Sniper, "One shot piercer", Time::secondsToMicros(1.4f), Time::secondsToMicros(2), 50, 8, 8, 1, 0, true},
 		};
 		std::sort(game.m_weaponDatabase.begin(), game.m_weaponDatabase.end(),
 				  [](const Weapon& l, const Weapon& r)
@@ -103,6 +106,7 @@ namespace Core
 		});
 
 		initPerkDatabase(game.m_perkDatabase);
+		initBonusDatabase(game.m_bonusDatabase);
 
 		//players
 		game.m_players.emplace_back();
@@ -119,13 +123,14 @@ namespace Core
 
 	void cleanGame(RainbowlandGame& game)
 	{
-		game.m_bonuses.clear();
+		game.m_pickups.clear();
 		game.m_monsters.clear();
 		game.m_monsterSpawners.clear();
 		game.m_players.clear();
-		game.m_rayBullets.clear();
+		game.m_bullets.clear();
 		game.m_weaponDatabase.clear();
 		game.m_perkDatabase.clear();
+		game.m_bonusDatabase.clear();
 	}
 
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb)
@@ -236,89 +241,27 @@ namespace Core
 		}
 	}
 
-	void enableEffect(Player& player, Bonus& bonus, RainbowlandGame& game)
+	void enableBonus(Player& player, BonusType bonus, RainbowlandGame& game)
 	{
-		auto index = filterFind(player.bonuses, [=](const BonusEffect& e){return bonus.effect == e.type; });
-		bool exists = index != player.bonuses.size();
-		if(!exists)
-		{
-			player.bonuses.emplace_back();
-			player.bonuses[index].duration = 0;
-			player.bonuses[index].timer.reset();
-			player.bonuses[index].type = bonus.effect;
-		}
-		auto& b = player.bonuses[index];
-		switch(bonus.effect)
-		{
-			case IncreasedRateOfFire:
-				if(!exists)
-				{
-					player.rateOfFireMultiplier *= 0.5f;
-					player.reloadMultiplier *= 0.5f;
-					player.currentWeapon.fireDelay = static_cast<uint64_t>(0.5f*static_cast<float>(player.currentWeapon.fireDelay));
-					player.currentWeapon.reloadDelay = static_cast<uint64_t>(0.5f*static_cast<float>(player.currentWeapon.reloadDelay));
-				}
-				b.duration += Time::secondsToMicros(10);
-				break;
-
-			case IncreasedMovementSpeed:
-				if(!exists) player.maxVelocity *= 2;
-				b.duration += Time::secondsToMicros(5);
-				break;
-
-			case Heal:
-				player.health += 20;
-				clamp(0, 100, player.health);
-				player.bonuses.pop_back();
-				break;
-
-			case SlowTime:
-				game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale() * 0.2);
-				break;
-
-			case WeaponDrop_Pistol:
-			case WeaponDrop_Shotgun:
-			case WeaponDrop_Uzi:
-				player.bonuses.pop_back();
-				selectWeapon(player, bonus.weapon, game.m_weaponDatabase);
-				break;
-		}
+		game.m_bonusDatabase[bonus].acquireLogic(player, game);
 	}
 
-	void disableEffect(Player& player, EffectType effect, RainbowlandGame& game)
+	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game)
 	{
-		switch(effect)
-		{
-			case IncreasedRateOfFire:
-				player.rateOfFireMultiplier *= 2;
-				player.reloadMultiplier *= 2;
-				player.currentWeapon.fireDelay = static_cast<uint64_t>(2*static_cast<float>(player.currentWeapon.fireDelay));
-				player.currentWeapon.reloadDelay = static_cast<uint64_t>(2*static_cast<float>(player.currentWeapon.reloadDelay));
-				break;
-	
-			case IncreasedMovementSpeed:
-				player.maxVelocity *= 0.5f;
-				break;
-
-			case SlowTime:
-				game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale() / 0.2);
-				break;
-		}
+		game.m_bonusDatabase[bonus].timeoutLogic(player, game);
 	}
 
-	void updateBonusEffects(const Time& timer, RainbowlandGame& game)
+	void updateBonuses(const Time& timer, RainbowlandGame& game)
 	{
 		for(auto& player : game.m_players)
 		{
 			for(uint32_t b = 0; b < player.bonuses.size();)
 			{
 				auto& bonus = player.bonuses[b];
-				bonus.timer.updateBy(timer.getDeltaMicros());
-				if(bonus.timer.getCurMicros() > bonus.duration)
+				player.bonuses[b].timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+				if(bonus.timer.getCurrentMicros() > bonus.duration)
 				{
-					disableEffect(player, bonus.type, game);
-					player.bonuses[b] = player.bonuses.back();
-					player.bonuses.pop_back();
+					disableBonus(player, bonus.type, game);
 				}
 				else
 				{
@@ -328,84 +271,78 @@ namespace Core
 		}
 	}
 
-	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses)
+	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb)
 	{
 		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
 		for(auto& loc : killLocations)
 		{
 			if(gen.randInt(1, 10000) < 2000)
 			{
-				placeBonus(bonuses, gen, loc, (EffectType)gen.randInt(0, EffectTypeCount - 1));
+				placePickup(pickups, gen, loc, (BonusType)gen.randInt(0, bonusDb.size()-1));
 			}
 		}
 	}
 
-	void placeBonus(VBonuses& bonuses, Random& gen, Vec2 location, EffectType effect)
+	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus)
 	{
-		bonuses.emplace_back();
-		bonuses.back().transform.position = location;
-		bonuses.back().collisionData.set(0, 0, 0.75f);
-		bonuses.back().effect = effect;
-		bonuses.back().timer.reset();
-		bonuses.back().duration = Time::secondsToMicros(15);
-		switch(effect)
+		pickups.emplace_back();
+		pickups.back().transform.position = location;
+		pickups.back().collisionData.set(0, 0, 0.75f);
+		pickups.back().bonus = bonus;
+		pickups.back().timer.reset();
+		pickups.back().duration = Time::secondsToMicros(15);
+		switch(bonus)
 		{
 			case IncreasedRateOfFire:
-				bonuses.back().color.set(0, 0, 1);
+				pickups.back().color.set(0, 0, 1);
 				break;
 			case IncreasedMovementSpeed:
-				bonuses.back().color.set(0, 1, 1);
+				pickups.back().color.set(0, 1, 1);
 				break;
 			case Heal:
-				bonuses.back().color.set(0, 1, 0);
+				pickups.back().color.set(0, 1, 0);
 				break;
 			case SlowTime:
-				bonuses.back().color.set(1, 0.5f, 1);
+				pickups.back().color.set(1, 0.5f, 1);
 				break;
-			case WeaponDrop_Pistol:
-				bonuses.back().weapon = Pistol;
-				bonuses.back().color.set(1, 1, 0);
-				break;
-			case WeaponDrop_Shotgun:
-				bonuses.back().weapon = Shotgun;
-				bonuses.back().color.set(1, 1, 0);
-				break;
-			case WeaponDrop_Uzi:
-				bonuses.back().weapon = Uzi;
-				bonuses.back().color.set(1, 1, 0);
+			case Weapon_Pistol:
+			case Weapon_Shotgun:
+			case Weapon_Uzi:
+			case Weapon_Sniper:
+				pickups.back().color.set(1, 1, 0);
 				break;
 		}
 	}
 
-	void checkBonusPickup(VPlayers& players, RainbowlandGame& game)
+	void checkPickups(VPlayers& players, RainbowlandGame& game)
 	{
 		for(auto& player : players)
 		{
-			for(uint32_t b = 0; b < game.m_bonuses.size(); ++b)
+			for(uint32_t b = 0; b < game.m_pickups.size(); ++b)
 			{
 				Circle pCollider = player.collisionData;
 				pCollider.center = player.transform.position;
-				Circle bCollider = game.m_bonuses[b].collisionData;
-				bCollider.center = game.m_bonuses[b].transform.position;
+				Circle bCollider = game.m_pickups[b].collisionData;
+				bCollider.center = game.m_pickups[b].transform.position;
 				if(isCircleTouchingCircle(pCollider, bCollider))
 				{
-					enableEffect(player, game.m_bonuses[b], game);
-					game.m_bonuses[b] = game.m_bonuses.back();
-					game.m_bonuses.pop_back();
+					enableBonus(player, game.m_pickups[b].bonus, game);
+					game.m_pickups[b] = game.m_pickups.back();
+					game.m_pickups.pop_back();
 				}
 			}
 		}
 	}
 
-	void updateBonuses(const Time& timer, RainbowlandGame& game)
+	void updatePickups(const Time& timer, RainbowlandGame& game)
 	{
-		for(uint32_t b = 0; b < game.m_bonuses.size();)
+		for(uint32_t b = 0; b < game.m_pickups.size();)
 		{
-			game.m_bonuses[b].timer.updateBy(timer.getDeltaMicros());
-			if(game.m_bonuses[b].timer.getCurMicros() > game.m_bonuses[b].duration)
+			game.m_pickups[b].timer.updateBy(timer.getDeltaMicros());
+			if(game.m_pickups[b].timer.getCurrentMicros() > game.m_pickups[b].duration)
 			{
-				game.m_bonuses[b] = game.m_bonuses.back();
-				game.m_bonuses.pop_back();
+				game.m_pickups[b] = game.m_pickups.back();
+				game.m_pickups.pop_back();
 			}
 			else
 			{
@@ -425,23 +362,23 @@ namespace Core
 		player.weaponTimer.updateBy(Time::secondsToMicros(50));
 	}
 
-	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
+	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
 	{
 		player.weaponTimer.updateBy(timer.getDeltaMicros());
 		auto& w = player.currentWeapon;
 		if(w.ammo > 0)
 		{
-			if(player.isShooting && player.weaponTimer.getCurMicros() > w.fireDelay)
+			if(player.isShooting && player.weaponTimer.getCurrentMicros() > w.fireDelay)
 			{
 				player.weaponTimer.reset();
 				--w.ammo;
 				Vec2 worldPosAim = graphicsSystem.screenToWorld({player.aim.x, player.aim.y}, camera);
-				generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position, worldPosAim, w.damage);
+				generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position, worldPosAim, w.damage, w.bulletPierce);
 			}
 		}
 		else
 		{
-			if(player.weaponTimer.getCurMicros() > w.reloadDelay)
+			if(player.weaponTimer.getCurrentMicros() > w.reloadDelay)
 			{
 				w.ammo = w.maxAmmo;
 				player.weaponTimer.updateBy(Time::secondsToMicros(50));
@@ -449,7 +386,7 @@ namespace Core
 		}
 	}
 
-	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage)
+	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce)
 	{
 
 		Vec2 direction = Vec2::normalize(target - origin);
@@ -458,11 +395,11 @@ namespace Core
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(RayBullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0, damage});
+			bullets.emplace_back(Bullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0, damage, pierce});
 		}
 	}
 
-	void moveBullets(const Time& timer, VRayBullets& bullets)
+	void moveBullets(const Time& timer, VBullets& bullets)
 	{
 		for(uint32_t i = 0; i < bullets.size();)
 		{
@@ -487,28 +424,50 @@ namespace Core
 		}
 	}
 
-	void checkBulletHits(VRayBullets& bullets, VMonsters& monsters)
+	void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<uint32_t>& outMonsters)
 	{
-		for(uint32_t b = 0; b < bullets.size();)
+		for(uint32_t m = 0; m < monsters.size(); ++m)
 		{
-			RayBullet& bullet = bullets[b];
-			uint32_t monsterHit = -1;
-			for(uint32_t m = 0; m < monsters.size(); ++m)
+			if(monsters[m].health > 0)
 			{
 				Circle bCollider = monsters[m].collisionData;
 				bCollider.center = monsters[m].transform.position;
 				if(isPointInsideCircle(bullet.position, bCollider))
 				{
-					monsterHit = m;
-					break;
+					outMonsters.push_back(m);
 				}
 			}
-			if(monsterHit != -1)
+		}
+	}
+
+	void updateBullets(VBullets& bullets, VMonsters& monsters)
+	{
+		for(uint32_t b = 0; b < bullets.size();)
+		{
+			auto& bullet = bullets[b];
+			std::vector<uint32_t> hitMonsters;
+			findBulletHits(bullet, monsters, hitMonsters);
+			if(!hitMonsters.empty())
 			{
-				monsters[monsterHit].health -= bullets[b].damage;
+				std::sort(hitMonsters.begin(), hitMonsters.end(), [&](uint32_t l, uint32_t r)
+				{
+					auto ll = Vec2::length(monsters[l].transform.position - bullet.origin);
+					auto rl = Vec2::length(monsters[r].transform.position - bullet.origin);
+					return ll < rl;
+				});
+				for(auto mid : hitMonsters)
+				{
+					hurtMonster(monsters[mid], bullet.damage);
+					if(!bullet.pierce)
+					{
+						break;
+					}
+				}
+			}
+			if(!hitMonsters.empty() && !bullet.pierce)
+			{
 				bullets[b] = bullets.back();
 				bullets.pop_back();
-				monsterHit = -1;
 			}
 			else
 			{
@@ -525,7 +484,7 @@ namespace Core
 		for(auto& spawner : spawners)
 		{
 			spawner.timer.updateBy(timer.getDeltaMicros());
-			if(spawner.timer.getCurMicros() > spawner.spawnCooldown)
+			if(spawner.timer.getCurrentMicros() > spawner.spawnCooldown)
 			{
 				spawner.timer.reset();
 				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0, playerCount - 1));
@@ -565,6 +524,11 @@ namespace Core
 		}
 	}
 
+	void hurtMonster(Monster& monster, uint32_t amount)
+	{
+		monster.health -= amount;
+	}
+
 	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players)
 	{
 		for(auto& player : players)
@@ -578,7 +542,7 @@ namespace Core
 				if(isCircleTouchingCircle(mCollider, pCollider))
 				{
 					monster.attackTimer.updateBy(timer.getDeltaMicros());
-					if(monster.attackTimer.getCurMicros() >= Time::secondsToMicros(0.3f))
+					if(monster.attackTimer.getCurrentMicros() >= Time::secondsToMicros(0.3f))
 					{
 						player.health -= 1;
 						monster.attackTimer.reset();

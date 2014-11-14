@@ -29,7 +29,7 @@ namespace Core
 					[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurMicros() >= Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
+					if(timer.getCurrentMicros() >= Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
 					{
 						timer.reset();
 						player.health += 1;
@@ -52,7 +52,7 @@ namespace Core
 				[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurMicros() > Time::secondsToMicros(0.5f))
+					if(timer.getCurrentMicros() > Time::secondsToMicros(0.5f))
 					{
 						timer.reset();
 						Circle radioactiveArea{player.transform.position, 5};
@@ -97,7 +97,7 @@ namespace Core
 				ReflexBoosted, "Reflex boosted",
 				[](Player& player, RainbowlandGame& game)
 				{
-					game.m_gameplayTimer.setTimeScale(0.9f);
+					game.m_restoreTimeScaleAfterPerkMode *= 0.9;
 				},
 					[](Player& player, RainbowlandGame& game) {}
 			}

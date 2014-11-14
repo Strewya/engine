@@ -34,14 +34,14 @@ namespace Core
 		Time();
 
 		void update();
-		void updateBy(uint64_t delta);
+		void updateBy(int64_t delta);
 		uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
 
 		uint64_t getLastRealTimeMicros() const;
 		static uint64_t getRealTimeMicros();
 		
-		uint64_t getCurMicros() const;
-		uint32_t getDeltaMicros() const;
+		uint64_t getCurrentMicros() const;
+		int32_t getDeltaMicros() const;
 		float getDeltaTime() const;
 
 		//use only for countup related timers
@@ -51,13 +51,11 @@ namespace Core
 		double getTimeScale() const;
 
 	protected:
-		static const float m_microToSec;
-
 		uint64_t m_oldRealTime;
 		
 		uint64_t m_lastMicros;
 		uint64_t m_curMicros;
-		uint64_t m_deltaMicros;
+		int64_t m_deltaMicros;
 		
 		float m_deltaTime;
 		double m_timeScale;

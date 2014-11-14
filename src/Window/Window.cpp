@@ -84,7 +84,7 @@ namespace Core
 		{
 			m_gamepadConnected[i] = false;
 			DWORD connected = XInputGetState(i, &m_gamepadState[i]);
-			m_gamepadLastUpdateTime[i] = m_timer.getCurMicros();
+			m_gamepadLastUpdateTime[i] = m_timer.getCurrentMicros();
 			if(connected == ERROR_SUCCESS)
 			{
 				m_gamepadConnected[i] = true;
@@ -264,14 +264,14 @@ namespace Core
 		m_timer.update();
 		WindowEvent& we = m_events[m_headIndex];
 		ZeroMemory(&we, sizeof(WindowEvent));
-		we.m_timestamp = m_timer.getCurMicros();
+		we.m_timestamp = m_timer.getCurrentMicros();
 		return we;
 	}
 
 	void Window::processGamepads()
 	{
 		m_timer.update();
-		uint64_t currentTime = m_timer.getCurMicros();
+		uint64_t currentTime = m_timer.getCurrentMicros();
 		uint64_t delay = Time::milisToMicros(m_gamepadEmptyUpdateDelay);
 		for(uint32_t i = 0; i < MAX_GAMEPADS; ++i)
 		{
@@ -533,7 +533,7 @@ namespace Core
 			if(!file.empty() && file.find(".") != file.npos)
 			{
 				m_timer.update();
-				newFileChange(m_timer.getCurMicros(), action, file);
+				newFileChange(m_timer.getCurrentMicros(), action, file);
 			}
 		}
 
@@ -543,7 +543,7 @@ namespace Core
 		std::for_each(begin(m_fileChanges), end(m_fileChanges), [&](FileChangeInfo& info)
 		{
 			if(info.m_state == FileChangeInfo::EVENT_PENDING &&
-			   m_timer.getCurMicros() > info.m_timestamp + Time::milisToMicros(m_fileChangeDelay))
+			   m_timer.getCurrentMicros() > info.m_timestamp + Time::milisToMicros(m_fileChangeDelay))
 			{
 				info.m_state = FileChangeInfo::READ_PENDING;
 				auto& we = newEvent();

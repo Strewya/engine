@@ -29,19 +29,21 @@ namespace Core
 		Pistol,
 		Shotgun,
 		Uzi,
+		Sniper,
 		WeaponCount
 	};
 
-	enum EffectType
+	enum BonusType
 	{
 		IncreasedRateOfFire,
 		IncreasedMovementSpeed,
 		Heal,
 		SlowTime,
-		WeaponDrop_Pistol,
-		WeaponDrop_Shotgun,
-		WeaponDrop_Uzi,
-		EffectTypeCount
+		Weapon_Pistol,
+		Weapon_Shotgun,
+		Weapon_Uzi,
+		Weapon_Sniper,
+		BonusTypeCount
 	};
 
 	enum DirectionalMovement
@@ -50,12 +52,9 @@ namespace Core
 		Left, Right
 	};
 
-	struct BonusEffect
-	{
-		Time timer;
-		uint64_t duration;
-		EffectType type;
-	};
+	struct Player;
+
+	typedef std::function<void(Player&, RainbowlandGame&)> UpdateLogic;
 
 	struct Weapon
 	{
@@ -68,6 +67,7 @@ namespace Core
 		uint32_t maxAmmo;
 		uint32_t bulletsPerShot;
 		float spread;
+		bool bulletPierce;
 	};
 
 	typedef std::vector<Weapon> VWeapons;
@@ -97,30 +97,50 @@ namespace Core
 
 	typedef std::vector<MonsterSpawner> VMonsterSpawners;
 
-	struct Bonus
+	struct Pickup
 	{
 		Transform transform;
 		Color color;
 		Circle collisionData;
-		EffectType effect;
-		WeaponType weapon;
 		Time timer;
 		uint64_t duration;
+		BonusType bonus;
+	};
+
+	typedef std::vector<Pickup> VPickups;
+
+	struct Bonus
+	{
+		BonusType type;
+		std::string name;
+		uint64_t durationMicros;
+		UpdateLogic acquireLogic;
+		UpdateLogic timeoutLogic;
 	};
 
 	typedef std::vector<Bonus> VBonuses;
+
+	struct ActiveBonus
+	{
+		Time timer;
+		uint64_t duration;
+		BonusType type;
+	};
+
+	typedef std::vector<ActiveBonus> VActiveBonuses;
 	typedef std::vector<Vec2> VKillLocations;
 
-	struct RayBullet
+	struct Bullet
 	{
 		Vec2 origin;
 		Vec2 position;
 		Vec2 velocity;
 		float travelled;
 		uint32_t damage;
+		bool pierce;
 	};
 
-	typedef std::vector<RayBullet> VRayBullets;
+	typedef std::vector<Bullet> VBullets;
 
 	enum PerkType
 	{
@@ -144,7 +164,7 @@ namespace Core
 		Vec2 acceleration;
 		bool directions[4];
 		Vec2 aim;
-		std::vector<BonusEffect> bonuses;
+		VActiveBonuses bonuses;
 		Time weaponTimer;
 		Weapon currentWeapon;
 		uint32_t bonusDamage;
@@ -168,14 +188,12 @@ namespace Core
 
 	typedef std::vector<Player> VPlayers;
 
-	typedef std::function<void(Player&, RainbowlandGame&)> PerkUpdateLogic;
-	
 	struct Perk
 	{
 		PerkType type;
 		std::string name;
-		PerkUpdateLogic acquireLogic;
-		PerkUpdateLogic updateLogic;
+		UpdateLogic acquireLogic;
+		UpdateLogic updateLogic;
 	};
 
 	typedef std::vector<Perk> VPerks;
@@ -189,23 +207,25 @@ namespace Core
 	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
 	void grantExperience(uint32_t exp, VPlayers& players);
 
-	void enableEffect(Player& player, Bonus& bonus, RainbowlandGame& game);
-	void disableEffect(Player& player, EffectType effect, RainbowlandGame& game);
-	void updateBonusEffects(const Time& timer, RainbowlandGame& game);
-	void generateBonuses(VKillLocations& killLocations, VBonuses& bonuses);
-	void placeBonus(VBonuses& bonuses, Random& gen, Vec2 location, EffectType effect);
-	void checkBonusPickup(VPlayers& players, RainbowlandGame& game);
+	void enableBonus(Player& player, Bonus& bonus, RainbowlandGame& game);
+	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
 	void updateBonuses(const Time& timer, RainbowlandGame& game);
+	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb);
+	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus);
+	void checkPickups(VPlayers& players, RainbowlandGame& game);
+	void updatePickups(const Time& timer, RainbowlandGame& game);
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
-	void fireWeapon(const Time& timer, Player& player, VRayBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
-	void generateBullets(VRayBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage);
-	void moveBullets(const Time& timer, VRayBullets& bullets);
-	void checkBulletHits(VRayBullets& bullets, VMonsters& monsters);
+	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
+	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
+	void moveBullets(const Time& timer, VBullets& bullets);
+	void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<Monster*>& outMonsters);
+	void updateBullets(VBullets& bullets, VMonsters& monsters);
 
 	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
+	void hurtMonster(Monster& monster, uint32_t amount);
 	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players);
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
 

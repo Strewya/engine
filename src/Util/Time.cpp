@@ -70,7 +70,6 @@ namespace Core
 
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
-	const float Time::m_microToSec = static_cast<float>(1.0 / 1000000.0);
 	
 	uint64_t Time::secondsToMicros(float sec)
 	{
@@ -155,12 +154,12 @@ namespace Core
 			updateBy(delta);
 	}
 
-	void Time::updateBy(uint64_t deltaMicros)
+	void Time::updateBy(int64_t deltaMicros)
 	{
 		m_lastMicros = m_curMicros;
-		m_curMicros += deltaMicros;
+		m_curMicros += static_cast<int64_t>(static_cast<double>(deltaMicros)*m_timeScale);
 		m_deltaMicros = m_curMicros - m_lastMicros;
-		m_deltaTime = static_cast<float>(m_deltaMicros) * m_microToSec;
+		m_deltaTime = microsToSeconds(m_deltaMicros);
 	}
 
 	uint32_t Time::getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime)
@@ -177,19 +176,19 @@ namespace Core
 		return count;
 	}
 
-	uint64_t Time::getCurMicros() const
+	uint64_t Time::getCurrentMicros() const
 	{
 		return m_curMicros;
 	}
 
-	uint32_t Time::getDeltaMicros() const
+	int32_t Time::getDeltaMicros() const
 	{
-		return static_cast<uint32_t>(static_cast<double>(m_deltaMicros)*m_timeScale);
+		return static_cast<int32_t>(m_deltaMicros);
 	}
 
 	float Time::getDeltaTime() const
 	{
-		return static_cast<float>(static_cast<double>(m_deltaTime)*m_timeScale);
+		return m_deltaTime;
 	}
 
 	void Time::setTimeScale(double timeScale)

@@ -18,6 +18,7 @@ namespace Core
 {
 #ifdef _DEBUG
 	bool g_spawnEnabled = true;
+	double debugPauseTime = Time::STOP_TIME;
 	uint32_t mx = 0;
 	uint32_t my = 0;
 #endif
@@ -127,6 +128,10 @@ namespace Core
 							selectWeapon(m_players[0], Uzi, m_weaponDatabase);
 							return true;
 
+						case Keyboard::m_4:
+							selectWeapon(m_players[0], Sniper, m_weaponDatabase);
+							return true;
+
 						case Keyboard::m_R:
 							m_monsters.clear();
 							g_spawnEnabled = !g_spawnEnabled;
@@ -145,38 +150,37 @@ namespace Core
 					switch(w.m_keyboard.m_keyCode)
 					{
 						case Keyboard::m_Space:
-							if(m_gameplayTimer.getTimeScale() > 0.5f)
-							{
-								m_gameplayTimer.setTimeScale(Time::STOP_TIME);
-							}
-							else
-							{
-								m_gameplayTimer.setTimeScale(Time::NORMAL_TIME);
-							}
+						{
+							auto currentScale = m_logicTimer.getTimeScale();
+							m_logicTimer.setTimeScale(debugPauseTime);
+							debugPauseTime = currentScale;
+						}
 							return true;
 
 						case Keyboard::m_F1:
-							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedMovementSpeed);
+							placePickup(m_pickups, gen, loc, BonusType::IncreasedMovementSpeed);
 							return true;
 						case Keyboard::m_F2:
-							placeBonus(m_bonuses, gen, loc, EffectType::Heal);
+							placePickup(m_pickups, gen, loc, BonusType::Heal);
 							return true;
 						case Keyboard::m_F3:
-							placeBonus(m_bonuses, gen, loc, EffectType::IncreasedRateOfFire);
+							placePickup(m_pickups, gen, loc, BonusType::IncreasedRateOfFire);
 							return true;
 						case Keyboard::m_F4:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Pistol);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Pistol);
 							return true;
 						case Keyboard::m_F5:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Shotgun);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Shotgun);
 							return true;
 						case Keyboard::m_F6:
-							placeBonus(m_bonuses, gen, loc, EffectType::WeaponDrop_Uzi);
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Uzi);
 							return true;
 						case Keyboard::m_F7:
-							placeBonus(m_bonuses, gen, loc, EffectType::SlowTime);
+							placePickup(m_pickups, gen, loc, BonusType::SlowTime);
 							return true;
-
+						case Keyboard::m_F8:
+							placePickup(m_pickups, gen, loc, BonusType::Weapon_Sniper);
+							break;
 					}
 				}
 				return false;
@@ -319,25 +323,25 @@ namespace Core
 		}
 		for(auto& player : m_players)
 		{
-			fireWeapon(m_gameplayTimer, player, m_rayBullets, m_graphicsSystem, m_camera);
+			fireWeapon(m_gameplayTimer, player, m_bullets, m_graphicsSystem, m_camera);
 		}
 
 		updatePerks(*this);
-		moveBullets(m_gameplayTimer, m_rayBullets);
-		checkBulletHits(m_rayBullets, m_monsters);
+		moveBullets(m_gameplayTimer, m_bullets);
+		updateBullets(m_bullets, m_monsters);
 		VKillLocations locations;
 		killMonsters(m_monsters, locations, m_players);
-		generateBonuses(locations, m_bonuses);
-		checkBonusPickup(m_players, *this);
+		generatePickups(locations, m_pickups, m_bonusDatabase);
+		checkPickups(m_players, *this);
 		updateBonuses(m_gameplayTimer, *this);
-		updateBonusEffects(m_gameplayTimer, *this);
+		updatePickups(m_gameplayTimer, *this);
 
 		checkPlayerDeath(m_players);
 
 		if(m_players.size() == 0)
 		{
 			m_deathTimer.updateBy(m_logicTimer.getDeltaMicros());
-			if(m_deathTimer.getCurMicros() > Time::secondsToMicros(5))
+			if(m_deathTimer.getCurrentMicros() > Time::secondsToMicros(5))
 			{
 				cleanGame(*this);
 				initGame(*this);
@@ -385,7 +389,7 @@ namespace Core
 				textTf.scale.set(0.03f, 0.03f);
 				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
 				textTf.position.y -= 1;
-				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurMicros());
+				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
 				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
 			}
 		}
@@ -406,23 +410,26 @@ namespace Core
 			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}
 
-		for(auto& obj : m_bonuses)
+		for(auto& obj : m_pickups)
 		{
 			auto c = obj.color;
-			auto diff = obj.duration - obj.timer.getCurMicros();
+			auto diff = obj.duration - obj.timer.getCurrentMicros();
 			c.a = 0.2f + (float)diff / (float)obj.duration;
 			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
 			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
-			switch(obj.effect)
+			switch(obj.bonus)
 			{
-				case WeaponDrop_Pistol:
+				case Weapon_Pistol:
 					text += " P";
 					break;
-				case WeaponDrop_Shotgun:
+				case Weapon_Shotgun:
 					text += " S";
 					break;
-				case WeaponDrop_Uzi:
+				case Weapon_Uzi:
 					text += " U";
+					break;
+				case Weapon_Sniper:
+					text += " R";
 					break;
 			}
 			auto textTf = obj.transform;
@@ -430,7 +437,7 @@ namespace Core
 			m_graphicsSystem.drawText(m_defaultFont, text, textTf, {0,0,0}, 1, false);
 		}
 
-		for(auto& obj : m_rayBullets)
+		for(auto& obj : m_bullets)
 		{
 			m_graphicsSystem.drawLine({}, obj.origin, {1, 1, 1, 0}, obj.position, {1, 1, 1, 1});
 		}
@@ -462,18 +469,9 @@ namespace Core
 		{
 			for(auto& b : player.bonuses)
 			{
-				std::string str;
-				switch(b.type)
-				{
-					case IncreasedMovementSpeed:
-						str = "Runner: ";
-						break;
-					case IncreasedRateOfFire:
-						str = "Shooter: ";
-						break;
-				}
-				auto remaining = b.duration - b.timer.getCurMicros();
-				str += std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
+				std::string str = m_bonusDatabase[b.type].name;
+				auto remaining = b.duration - b.timer.getCurrentMicros();
+				str += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
 				m_graphicsSystem.drawText(m_defaultFont, str, tf, {0, 0, 0}, 0, false);
 				tf.position.y += 20;
 			}

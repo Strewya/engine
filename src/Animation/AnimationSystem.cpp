@@ -52,7 +52,7 @@ namespace Core
 			{
 				const auto* animation = m_animations->getResource(player.m_animationID);
 				uint32_t frameCount = animation->m_sequence.size();
-				uint64_t current = m_timer.getCurMicros() - player.m_startTime;
+				uint64_t current = m_timer.getCurrentMicros() - player.m_startTime;
 				uint64_t length = player.m_endTime - player.m_startTime;
 				float time = static_cast<float>(current) / static_cast<float>(length);
 				auto startTime = player.m_startTime;
@@ -118,7 +118,7 @@ namespace Core
 		const auto* animation = m_animations->getResource(animationID);
 		auto& player = m_runningAnimations[findPlayer(playerID)];
 		player.m_animationID = animationID;
-		player.m_startTime = m_timer.getCurMicros();
+		player.m_startTime = m_timer.getCurrentMicros();
 		player.m_endTime = player.m_startTime + animation->m_duration;
 		player.m_playbackRate = playbackRate;
 		player.m_state = AnimationPlayer::RUNNING;

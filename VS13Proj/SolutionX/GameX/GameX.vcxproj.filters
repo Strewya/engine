@@ -203,6 +203,9 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -372,6 +375,9 @@
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h">
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
