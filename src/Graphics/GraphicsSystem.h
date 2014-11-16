@@ -69,6 +69,7 @@ namespace Core
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuadPolygon(const Transform& transform, const Rect& rect, const Color& color);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
+		void drawCircle(const Transform& transform, float radius, uint32_t points, const Color& color);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
@@ -114,6 +115,7 @@ namespace Core
 
 		typedef std::unique_ptr<ID3D11ShaderResourceView, void(*)(ID3D11ShaderResourceView*)> DxTexturePtr;
 		std::vector<DxTexturePtr> m_textures;
+		std::vector<Vec2> m_circleData;
 	};
 
 	template<typename T> void GraphicsSystem::safeRelease(T*& ptr)

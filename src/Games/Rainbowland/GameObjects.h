@@ -203,6 +203,7 @@ namespace Core
 	void cleanGame(RainbowlandGame& game);
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb);
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
+	void orientPlayers(VPlayers& players);
 	void checkPlayerDeath(VPlayers& players);
 	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
 	void grantExperience(uint32_t exp, VPlayers& players);
@@ -225,6 +226,7 @@ namespace Core
 	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
+	void orientMonsters(VMonsters& monsters);
 	void hurtMonster(Monster& monster, uint32_t amount);
 	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players);
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);

@@ -136,7 +136,7 @@ namespace Core
 	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb)
 	{
 		player.transform.position.set(0, 0);
-		player.transform.scale.set(1, 1);
+		player.transform.scale.set(0.5f, 0.5f);
 		player.transform.rotation = 0;
 		player.color.set(1, 0, 0);
 		player.collisionData.set(0, 0, 0.5f);
@@ -190,6 +190,15 @@ namespace Core
 				clamp(playingField.left() + player.collisionData.radius, playingField.right() - player.collisionData.radius, player.transform.position.x);
 				clamp(playingField.bottom() + player.collisionData.radius, playingField.top() - player.collisionData.radius, player.transform.position.y);
 			}
+		}
+	}
+
+	void orientPlayers(VPlayers& players)
+	{
+		for(auto& player : players)
+		{
+			auto aimDir = Vec2::normalize(player.aim-player.transform.position);
+			player.transform.rotation = std::atan2(aimDir.y, aimDir.x);
 		}
 	}
 
@@ -318,7 +327,7 @@ namespace Core
 	{
 		for(auto& player : players)
 		{
-			for(uint32_t b = 0; b < game.m_pickups.size(); ++b)
+			for(uint32_t b = 0; b < game.m_pickups.size();)
 			{
 				Circle pCollider = player.collisionData;
 				pCollider.center = player.transform.position;
@@ -329,6 +338,10 @@ namespace Core
 					enableBonus(player, game.m_pickups[b].bonus, game);
 					game.m_pickups[b] = game.m_pickups.back();
 					game.m_pickups.pop_back();
+				}
+				else
+				{
+					++b;
 				}
 			}
 		}
@@ -372,8 +385,8 @@ namespace Core
 			{
 				player.weaponTimer.reset();
 				--w.ammo;
-				Vec2 worldPosAim = graphicsSystem.screenToWorld({player.aim.x, player.aim.y}, camera);
-				generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position, worldPosAim, w.damage, w.bulletPierce);
+				auto p = Vec2::normalize(player.aim-player.transform.position)*player.collisionData.radius;
+				generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position+p, player.aim, w.damage, w.bulletPierce);
 			}
 		}
 		else
@@ -521,6 +534,15 @@ namespace Core
 				monster.direction = Vec2::normalize(players[monster.targetPlayer].transform.position - monster.transform.position);
 			}
 			monster.transform.position += (monster.direction*monster.maxVelocity*timer.getDeltaTime());
+		}
+	}
+
+	void orientMonsters(VMonsters& monsters)
+	{
+		for(auto& monster : monsters)
+		{
+			
+			monster.transform.rotation = std::atan2(monster.direction.y, monster.direction.x);
 		}
 	}
 

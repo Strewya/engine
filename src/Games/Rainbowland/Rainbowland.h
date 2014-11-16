@@ -50,6 +50,7 @@ namespace Core
 		Rect m_playingField;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
+		std::vector<Vec2> m_triangle;
 
 		VPlayers m_players;
 		VMonsters m_monsters;

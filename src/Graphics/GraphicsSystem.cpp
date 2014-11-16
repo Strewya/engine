@@ -94,6 +94,13 @@ namespace Core
 		setCulling(true);
 		setTransparencyMode(false);
 
+		m_circleData.reserve(360 * 2);
+		for(float degree = 0; degree < 360.0f; degree += 0.5f)
+		{
+			auto rad = XMConvertToRadians(degree);
+			m_circleData.emplace_back(std::cosf(rad), std::sinf(rad));
+		}
+
 		status &= SUCCEEDED(hr);
 
 		DEBUG_INIT(GraphicsSystem);
@@ -465,7 +472,7 @@ namespace Core
 		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
 		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+		m_world *= XMMatrixRotationZ(tf.rotation);
 		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
 
 
@@ -574,6 +581,89 @@ namespace Core
 
 		//m_devcon->Draw(4, 0);
 		m_devcon->DrawIndexed(6, 0, 0);
+
+		cb->Release();
+		ib->Release();
+		vb->Release();
+	}
+
+	//*****************************************************************
+	//					DRAW TEXTURED QUAD
+	//*****************************************************************
+	void GraphicsSystem::drawCircle(const Transform& tf, float r, uint32_t p, const Color& c)
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+		if((p & 1) == 1) //if it's odd
+		{
+			++p; //make it even
+		}
+		/****** VERTEX BUFFER ******/
+		uint32_t dist = m_circleData.size() / p;
+		std::vector<Vertex> vertices;
+		vertices.reserve(p + 1);
+		vertices.emplace_back(Vertex{0, 0, 0, 1, 1, 1, 1, 0, 0});
+		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
+		{
+			auto& v = m_circleData[i];
+			vertices.emplace_back(Vertex{v.x*r, v.y*r, 0, 1, 1, 1, 1, 0, 0});
+		}
+
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), vertices.size());
+
+		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(Vertex));
+		m_devcon->Unmap(vb, 0);
+
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+		/****** INDEX BUFER ******/
+		std::vector<uint32_t> indices;
+		indices.reserve(p * 3);
+		for(uint32_t i = 1; i <= p; ++i)
+		{
+			indices.push_back(i);
+			indices.push_back(0);
+			indices.push_back((i % p) + 1);
+		}
+
+		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
+		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, indices.data(), indices.size() * sizeof(uint32_t));
+		m_devcon->Unmap(ib, 0);
+
+		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+		/****** CONSTANT BUFFER ******/
+		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
+
+		m_world = XMMatrixIdentity();
+		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
+		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+
+
+		cbPerObject cbpo;
+		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+		cbpo.FillColor.x = c.r;
+		cbpo.FillColor.y = c.g;
+		cbpo.FillColor.z = c.b;
+		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = 0;
+
+		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
+
+		//m_devcon->Draw(4, 0);
+		m_devcon->DrawIndexed(indices.size(), 0, 0);
 
 		cb->Release();
 		ib->Release();

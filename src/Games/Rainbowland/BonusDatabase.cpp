@@ -57,7 +57,7 @@ namespace Core
 			},
 
 			{
-				BonusType::IncreasedMovementSpeed, "Speedy", Time::secondsToMicros(5), 
+				BonusType::IncreasedMovementSpeed, "Runner", Time::secondsToMicros(5), 
 				[](Player& player, RainbowlandGame& game)
 				{
 					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedMovementSpeed == e.type; });
@@ -81,7 +81,7 @@ namespace Core
 			},
 
 			{
-				BonusType::SlowTime, "Slow time", Time::secondsToMicros(8),
+				BonusType::SlowTime, "Time slower", Time::secondsToMicros(8),
 				[](Player& player, RainbowlandGame& game)
 				{
 					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return SlowTime == e.type; });
@@ -132,7 +132,7 @@ namespace Core
 			},
 
 			{
-				BonusType::Weapon_Sniper, "Sniper", 0,
+				BonusType::Weapon_Sniper, "Gauss", 0,
 					[](Player& player, RainbowlandGame& game)
 				{
 					selectWeapon(player, Sniper, game.m_weaponDatabase);

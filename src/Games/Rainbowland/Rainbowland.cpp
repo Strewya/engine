@@ -75,7 +75,7 @@ namespace Core
 			{
 				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative && m_players.size() >= 1)
 				{
-					m_players[0].aim.set((float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y);
+					m_players[0].aim = m_graphicsSystem.screenToWorld({(float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y}, m_camera);
 #ifdef _DEBUG
 					mx = w.m_mouseMove.m_x;
 					my = w.m_mouseMove.m_y;
@@ -91,7 +91,7 @@ namespace Core
 				{
 					if(w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
 					{
-						m_players[0].aim.set((float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y);
+						m_players[0].aim = m_graphicsSystem.screenToWorld({(float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y}, m_camera);
 						if(w.m_mouseButton.m_isDown)
 						{
 							m_players[0].isShooting = true;
@@ -151,8 +151,8 @@ namespace Core
 					{
 						case Keyboard::m_Space:
 						{
-							auto currentScale = m_logicTimer.getTimeScale();
-							m_logicTimer.setTimeScale(debugPauseTime);
+							auto currentScale = m_gameplayTimer.getTimeScale();
+							m_gameplayTimer.setTimeScale(debugPauseTime);
 							debugPauseTime = currentScale;
 						}
 							return true;
@@ -247,6 +247,13 @@ namespace Core
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
+
+		m_triangle =
+		{
+			Vec2{1.5f,0},
+			Vec2{0,-1},
+			Vec2{0,1}
+		};
 		
 		initGame(*this);
 
@@ -303,6 +310,7 @@ namespace Core
 #endif
 		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_gameplayTimer, m_monsters, m_players);
+		orientMonsters(m_monsters);
 		checkMonsterHurtingPlayer(m_gameplayTimer, m_monsters, m_players);
 		checkLevelup(m_players, *this);
 		
@@ -315,12 +323,18 @@ namespace Core
 			}
 			averagePos /= (float)m_players.size();
 			auto pos = m_camera.getPosition();
-			pos.x = averagePos.x;
-			pos.y = averagePos.y;
-			clamp(-5.0f, 5.0f, pos.x);
-			clamp(-2.0f, 2.0f, pos.y);
-			m_camera.setPosition(pos);
+			Vec2 pos2{pos.x, pos.y};
+			clamp(-5.0f, 5.0f, averagePos.x);
+			clamp(-2.0f, 2.0f, averagePos.y);
+			auto diff = averagePos - pos2;
+			if(Vec2::length(diff) > 0)
+			{
+				pos.set(averagePos.x, averagePos.y, pos.z);
+				m_camera.move({diff.x, diff.y, 0});
+				m_players[0].aim += diff;
+			}
 		}
+		orientPlayers(m_players);
 		for(auto& player : m_players)
 		{
 			fireWeapon(m_gameplayTimer, player, m_bullets, m_graphicsSystem, m_camera);
@@ -382,11 +396,13 @@ namespace Core
 		
 		for(auto& obj : m_players)
 		{
-			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, obj.color);
+			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
+			auto t = obj.transform;
+			t.scale.set(1, 1);
+			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
 			if(obj.currentWeapon.ammo == 0)
 			{
-				auto textTf = obj.transform;
-				textTf.scale.set(0.03f, 0.03f);
+				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0.0f};
 				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
 				textTf.position.y -= 1;
 				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
@@ -401,11 +417,9 @@ namespace Core
 
 		for(auto& obj : m_monsters)
 		{
-			Color c = obj.color;
-			c.a = 0.2f + (float)obj.health / (float)obj.maxHealth;
-			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
-			Transform t;
-			t.position = obj.transform.position;
+			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
+			Transform t{obj.transform.position, {1, 1}, 0};
+			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
 			t.scale.set(0.03f, 0.03f);
 			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}
@@ -417,21 +431,7 @@ namespace Core
 			c.a = 0.2f + (float)diff / (float)obj.duration;
 			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
 			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
-			switch(obj.bonus)
-			{
-				case Weapon_Pistol:
-					text += " P";
-					break;
-				case Weapon_Shotgun:
-					text += " S";
-					break;
-				case Weapon_Uzi:
-					text += " U";
-					break;
-				case Weapon_Sniper:
-					text += " R";
-					break;
-			}
+			text += " " + m_bonusDatabase[obj.bonus].name.substr(0, 1);
 			auto textTf = obj.transform;
 			textTf.scale.set(0.03f, 0.03f);
 			m_graphicsSystem.drawText(m_defaultFont, text, textTf, {0,0,0}, 1, false);

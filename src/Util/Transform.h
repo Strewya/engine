@@ -15,6 +15,7 @@ namespace Core
 	{
 	public:
 		Transform();
+		Transform(Vec2 p, Vec2 s, float r);
 
 		Vec2 position;
 		Vec2 scale;
