@@ -46,7 +46,7 @@ namespace Core
 		uint32_t spawnerCount = 8;
 		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
 		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
-		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		Random gen{Time::getRealTimeMicros()};
 		for(uint32_t i = 0; i < spawnerCount; ++i)
 		{
 			game.m_monsterSpawners.emplace_back();
@@ -139,7 +139,8 @@ namespace Core
 		player.transform.scale.set(0.5f, 0.5f);
 		player.transform.rotation = 0;
 		player.color.set(1, 0, 0);
-		player.collisionData.set(0, 0, 0.5f);
+		player.collisionData.set(0, 0, 1.0f);
+		player.collisionData.radius *= player.transform.scale.x;
 		player.velocity.set(0.0f, 0.0f);
 		player.maxVelocity.set(5.0f, 5.0f);
 		player.acceleration.set(1.0f, 1.0f);
@@ -282,7 +283,7 @@ namespace Core
 
 	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb)
 	{
-		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+		Random gen{Time::getRealTimeMicros()};
 		for(auto& loc : killLocations)
 		{
 			if(gen.randInt(1, 10000) < 2000)
@@ -367,12 +368,18 @@ namespace Core
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb)
 	{
 		player.currentWeapon = weaponDb[weapon];
-		player.currentWeapon.maxAmmo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.maxAmmo));
+		calculateWeaponBonuses(player, weaponDb);
 		player.currentWeapon.ammo = player.currentWeapon.maxAmmo;
-		player.currentWeapon.damage += player.bonusDamage;
-		player.currentWeapon.fireDelay = static_cast<uint64_t>(player.rateOfFireMultiplier*static_cast<float>(player.currentWeapon.fireDelay));
-		player.currentWeapon.reloadDelay = static_cast<uint64_t>(player.reloadMultiplier*static_cast<float>(player.currentWeapon.reloadDelay));
 		player.weaponTimer.updateBy(Time::secondsToMicros(50));
+	}
+
+	void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb)
+	{
+		const auto& dbw = weaponDb[player.currentWeapon.type];
+		player.currentWeapon.damage = player.bonusDamage + dbw.damage;
+		player.currentWeapon.fireDelay = static_cast<uint64_t>(player.rateOfFireMultiplier*static_cast<float>(dbw.fireDelay));
+		player.currentWeapon.maxAmmo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(dbw.maxAmmo));
+		player.currentWeapon.reloadDelay = static_cast<uint64_t>(player.reloadMultiplier*static_cast<float>(dbw.reloadDelay));
 	}
 
 	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
@@ -404,11 +411,11 @@ namespace Core
 
 		Vec2 direction = Vec2::normalize(target - origin);
 		Vec2 targetDistance = direction * 30;
-		Random gen(Time::countMilisInMicros(Time::getRealTimeMicros()));
+		Random gen{Time::getRealTimeMicros()};
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(Bullet{origin, origin, Vec2::normalize(targetDistance + t) * 30, 0, damage, pierce});
+			bullets.emplace_back(Bullet{origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, pierce});
 		}
 	}
 
@@ -493,7 +500,7 @@ namespace Core
 	{
 		if(playerCount == 0) return;
 
-		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		Random gen{Time::getRealTimeMicros()};
 		for(auto& spawner : spawners)
 		{
 			spawner.timer.updateBy(timer.getDeltaMicros());
@@ -510,7 +517,7 @@ namespace Core
 		if(monsters.size() > 40) return;
 
 		monsters.emplace_back();
-		Random gen{Time::microsToMilis(Time::getRealTimeMicros())};
+		Random gen{Time::getRealTimeMicros()};
 		auto& monster = monsters.back();
 		monster.collisionData.set(0, 0, 1);
 		monster.color.set(0, 0, 0);
@@ -529,7 +536,7 @@ namespace Core
 			{
 				if(monster.targetPlayer >= players.size())
 				{
-					monster.targetPlayer = Random(Time::microsToMilis(Time::getRealTimeMicros())).randInt(0, players.size() - 1);
+					monster.targetPlayer = Random{Time::getRealTimeMicros()}.randInt(0, players.size() - 1);
 				}
 				monster.direction = Vec2::normalize(players[monster.targetPlayer].transform.position - monster.transform.position);
 			}
@@ -564,7 +571,7 @@ namespace Core
 				if(isCircleTouchingCircle(mCollider, pCollider))
 				{
 					monster.attackTimer.updateBy(timer.getDeltaMicros());
-					if(monster.attackTimer.getCurrentMicros() >= Time::secondsToMicros(0.3f))
+					if(monster.attackTimer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(0.1f))
 					{
 						player.health -= 1;
 						monster.attackTimer.reset();
@@ -665,7 +672,7 @@ namespace Core
 
 	void generatePerks(VPlayers& players, const VPerks& perkDb)
 	{
-		Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+		Random gen{Time::getRealTimeMicros()};
 
 		for(auto& player : players)
 		{

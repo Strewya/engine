@@ -39,8 +39,7 @@ namespace Core
 						player.bonuses[index].type = IncreasedRateOfFire;
 						player.rateOfFireMultiplier *= 0.5f;
 						player.reloadMultiplier *= 0.5f;
-						player.currentWeapon.fireDelay = static_cast<uint64_t>(0.5f*static_cast<float>(player.currentWeapon.fireDelay));
-						player.currentWeapon.reloadDelay = static_cast<uint64_t>(0.5f*static_cast<float>(player.currentWeapon.reloadDelay));
+						calculateWeaponBonuses(player, game.m_weaponDatabase);
 					}
 					player.bonuses[index].duration += game.m_bonusDatabase[IncreasedRateOfFire].durationMicros;
 				},
@@ -48,8 +47,7 @@ namespace Core
 				{
 					player.rateOfFireMultiplier *= 2;
 					player.reloadMultiplier *= 2;
-					player.currentWeapon.fireDelay = static_cast<uint64_t>(2 * static_cast<float>(player.currentWeapon.fireDelay));
-					player.currentWeapon.reloadDelay = static_cast<uint64_t>(2 * static_cast<float>(player.currentWeapon.reloadDelay));
+					calculateWeaponBonuses(player, game.m_weaponDatabase);
 					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedRateOfFire == e.type; });
 					player.bonuses[index] = player.bonuses.back();
 					player.bonuses.pop_back();

@@ -14,6 +14,7 @@
 #include <DataStructs/Texture.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
+#include <Util/Circle.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
 #include <Util/Utility.h>
@@ -494,20 +495,43 @@ namespace Core
 		vb->Release();
 	}
 
+	//*****************************************************************
+	//					DRAW QUAD POLYGON
+	//*****************************************************************
 	void GraphicsSystem::drawQuadPolygon(const Transform& tf, const Rect& rect, const Color& c)
 	{
-		/****** VERTEX BUFFER ******/
 		uint32_t count = 5;
 		std::vector<Vec2> vertices(count);
 		vertices[0].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
 		vertices[1].set(rect.center.x + rect.halfWidth, rect.center.y - rect.halfHeight);
 		vertices[2].set(rect.center.x + rect.halfWidth, rect.center.y + rect.halfHeight);
 		vertices[3].set(rect.center.x - rect.halfWidth, rect.center.y + rect.halfHeight);
-		vertices[4].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
+		vertices[4] = vertices[0];
 
 		drawMultiline(tf, vertices.data(), count, c);
 	}
 
+	//*****************************************************************
+	//					DRAW CIRCLE POLYGON
+	//*****************************************************************
+	void GraphicsSystem::drawCirclePolygon(const Transform& tf, const Circle& circle, uint32_t p, const Color& c)
+	{
+		if((p & 1) == 1) //if it's odd
+		{
+			++p; //make it even
+		}
+		std::vector<Vec2> vertices;
+		vertices.reserve(p + 1);
+		auto dist = m_circleData.size() / p;
+		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
+		{
+			vertices.emplace_back(m_circleData[i] * circle.radius);
+		}
+		vertices.emplace_back(vertices.front());
+		
+		drawMultiline(tf, vertices.data(), vertices.size(), c);
+	}
+	
 	//*****************************************************************
 	//					DRAW QUAD
 	//*****************************************************************
@@ -588,7 +612,7 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					DRAW TEXTURED QUAD
+	//					DRAW CIRCLE
 	//*****************************************************************
 	void GraphicsSystem::drawCircle(const Transform& tf, float r, uint32_t p, const Color& c)
 	{

@@ -18,6 +18,8 @@ namespace Core
 {
 #ifdef _DEBUG
 	bool g_spawnEnabled = true;
+	bool step = false;
+	bool stepBack = false;
 	double debugPauseTime = Time::STOP_TIME;
 	uint32_t mx = 0;
 	uint32_t my = 0;
@@ -145,7 +147,7 @@ namespace Core
 			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown)
 				{
-					Random gen(Time::microsToMilis(Time::getRealTimeMicros()));
+					Random gen{Time::getRealTimeMicros()};
 					Vec2 loc = m_graphicsSystem.screenToWorld({(float)mx, (float)my}, m_camera);
 					switch(w.m_keyboard.m_keyCode)
 					{
@@ -156,6 +158,12 @@ namespace Core
 							debugPauseTime = currentScale;
 						}
 							return true;
+						case Keyboard::m_Enter:
+							step = true;
+							break;
+						case Keyboard::m_Backspace:
+							stepBack = true;
+							break;
 
 						case Keyboard::m_F1:
 							placePickup(m_pickups, gen, loc, BonusType::IncreasedMovementSpeed);
@@ -301,9 +309,37 @@ namespace Core
 				}
 			}
 		}
-
+#ifdef _DEBUG
+		if(step)
+		{
+			auto currentScale = m_gameplayTimer.getTimeScale();
+			m_gameplayTimer.setTimeScale(debugPauseTime);
+			debugPauseTime = currentScale;
+		}
+		if(stepBack)
+		{
+			auto currentScale = m_gameplayTimer.getTimeScale();
+			m_gameplayTimer.setTimeScale(-debugPauseTime);
+			debugPauseTime = currentScale;
+		}
+#endif
 		m_gameplayTimer.updateBy(m_logicTimer.getDeltaMicros());
-
+#ifdef _DEBUG
+		if(step)
+		{
+			step = false;
+			auto currentScale = m_gameplayTimer.getTimeScale();
+			m_gameplayTimer.setTimeScale(debugPauseTime);
+			debugPauseTime = currentScale;
+		}
+		if(stepBack)
+		{
+			stepBack = false;
+			auto currentScale = -m_gameplayTimer.getTimeScale();
+			m_gameplayTimer.setTimeScale(debugPauseTime);
+			debugPauseTime = currentScale;
+		}
+#endif
 		movePlayers(m_gameplayTimer, m_players, m_playingField);
 #ifdef _DEBUG
 		if(g_spawnEnabled)
@@ -355,7 +391,7 @@ namespace Core
 		if(m_players.size() == 0)
 		{
 			m_deathTimer.updateBy(m_logicTimer.getDeltaMicros());
-			if(m_deathTimer.getCurrentMicros() > Time::secondsToMicros(5))
+			if(m_deathTimer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(5))
 			{
 				cleanGame(*this);
 				initGame(*this);
@@ -419,7 +455,7 @@ namespace Core
 		{
 			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
 			Transform t{obj.transform.position, {1, 1}, 0};
-			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
+			m_graphicsSystem.drawCirclePolygon(t, obj.collisionData, 24, obj.color);
 			t.scale.set(0.03f, 0.03f);
 			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}

@@ -18,6 +18,7 @@
 namespace Core
 {
 	class Camera;
+	class Circle;
 	class Color;
 	class FontCache;
 	class Image;
@@ -68,6 +69,7 @@ namespace Core
 		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
 		void drawQuadPolygon(const Transform& transform, const Rect& rect, const Color& color);
+		void drawCirclePolygon(const Transform& transform, const Circle& circle, uint32_t points, const Color& color);
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 		void drawCircle(const Transform& transform, float radius, uint32_t points, const Color& color);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);

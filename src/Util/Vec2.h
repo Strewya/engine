@@ -34,7 +34,10 @@ namespace Core
 		Vec2& operator/=(float f);
 		
 		static float length(const Vec2& v);
+		static float length2(const Vec2& v);
 		static Vec2 normalize(const Vec2& v);
+		static float dotProduct(const Vec2& l, const Vec2& r);
+		static Vec2 projection(const Vec2& vec, const Vec2& target);
 	};
 
 	Vec2 operator*(float f, const Vec2& v);

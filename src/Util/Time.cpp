@@ -71,59 +71,59 @@ namespace Core
 	const double Time::STOP_TIME = 0;
 	const double Time::NORMAL_TIME = 1;
 	
-	uint64_t Time::secondsToMicros(float sec)
+	int64_t Time::secondsToMicros(float sec)
 	{
-		return static_cast<uint64_t>(sec * 1000.0f * 1000.0f);
+		return static_cast<int64_t>(sec * 1000.0f * 1000.0f);
 	}
 
-	uint64_t Time::milisToMicros(uint32_t mili)
+	int64_t Time::milisToMicros(int32_t mili)
 	{
-		return static_cast<uint64_t>(mili) * 1000ULL;
+		return static_cast<int64_t>(mili) * 1000ULL;
 	}
 
-	float Time::milisToSeconds(uint32_t mili)
+	float Time::milisToSeconds(int32_t mili)
 	{
 		return static_cast<float>(mili)*0.001f;
 	}
 
-	float Time::microsToSeconds(uint64_t micros)
+	float Time::microsToSeconds(int64_t micros)
 	{
 		return static_cast<float>(micros)*0.001f*0.001f;
 	}
 	
-	uint32_t Time::secondsToMilis(float sec)
+	int32_t Time::secondsToMilis(float sec)
 	{
-		return static_cast<uint32_t>(sec * 1000ULL);
+		return static_cast<int32_t>(sec * 1000ULL);
 	}
 	
-	uint32_t Time::microsToMilis(uint64_t micros)
+	int32_t Time::microsToMilis(int64_t micros)
 	{
-		return static_cast<uint32_t>(micros / 1000ULL);
+		return static_cast<int32_t>(micros / 1000ULL);
 	}
 
-	uint32_t Time::microsDelta(uint64_t start, uint64_t end)
+	int32_t Time::microsDelta(int64_t start, int64_t end)
 	{
-		return static_cast<uint32_t>(end - start);
+		return static_cast<int32_t>(end - start);
 	}
 
-	uint32_t Time::countMilisInMicros(uint64_t micros)
+	int32_t Time::countMilisInMicros(int64_t micros)
 	{
-		return static_cast<uint32_t>(micros / 1000ULL);
+		return static_cast<int32_t>(micros / 1000ULL);
 	}
 
-	uint32_t Time::countSecondsInMicros(uint64_t micros)
+	int32_t Time::countSecondsInMicros(int64_t micros)
 	{
-		return static_cast<uint32_t>(micros / 1000000ULL);
+		return static_cast<int32_t>(micros / 1000000ULL);
 	}
 
-	uint32_t Time::countMinutesInMicros(uint64_t micros)
+	int32_t Time::countMinutesInMicros(int64_t micros)
 	{
-		return static_cast<uint32_t>(micros / (60ULL * 1000000ULL));
+		return static_cast<int32_t>(micros / (60ULL * 1000000ULL));
 	}
 
-	uint32_t Time::countHoursInMicros(uint64_t micros)
+	int32_t Time::countHoursInMicros(int64_t micros)
 	{
-		return static_cast<uint32_t>(micros / (60ULL * 60ULL * 1000000ULL));
+		return static_cast<int32_t>(micros / (60ULL * 60ULL * 1000000ULL));
 	}
 
 	Time::Time()

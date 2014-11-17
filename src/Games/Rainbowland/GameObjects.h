@@ -217,6 +217,7 @@ namespace Core
 	void updatePickups(const Time& timer, RainbowlandGame& game);
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
+	void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb);
 	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
 	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
 	void moveBullets(const Time& timer, VBullets& bullets);

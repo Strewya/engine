@@ -17,19 +17,19 @@ namespace Core
 		static const double STOP_TIME;
 		static const double NORMAL_TIME;
 
-		static uint64_t secondsToMicros(float sec);
-		static uint64_t milisToMicros(uint32_t mili);
-		static float milisToSeconds(uint32_t mili);
-		static float microsToSeconds(uint64_t micros);
-		static uint32_t secondsToMilis(float sec);
-		static uint32_t microsToMilis(uint64_t micros);
+		static int64_t secondsToMicros(float sec);
+		static int64_t milisToMicros(int32_t mili);
+		static float milisToSeconds(int32_t mili);
+		static float microsToSeconds(int64_t micros);
+		static int32_t secondsToMilis(float sec);
+		static int32_t microsToMilis(int64_t micros);
 		
-		static uint32_t countMilisInMicros(uint64_t micros);
-		static uint32_t countSecondsInMicros(uint64_t micros);
-		static uint32_t countMinutesInMicros(uint64_t micros);
-		static uint32_t countHoursInMicros(uint64_t micros);
+		static int32_t countMilisInMicros(int64_t micros);
+		static int32_t countSecondsInMicros(int64_t micros);
+		static int32_t countMinutesInMicros(int64_t micros);
+		static int32_t countHoursInMicros(int64_t micros);
 
-		static uint32_t microsDelta(uint64_t start, uint64_t end);
+		static int32_t microsDelta(int64_t start, int64_t end);
 
 		Time();
 

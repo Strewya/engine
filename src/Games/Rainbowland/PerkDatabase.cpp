@@ -29,7 +29,7 @@ namespace Core
 					[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurrentMicros() >= Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
+					if(timer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)))
 					{
 						timer.reset();
 						player.health += 1;
@@ -42,7 +42,7 @@ namespace Core
 				[](Player& player, RainbowlandGame& game)
 				{
 					player.bonusDamage += 5;
-					player.currentWeapon.damage += player.bonusDamage;
+					calculateWeaponBonuses(player, game.m_weaponDatabase);
 				},
 					[](Player& player, RainbowlandGame& game){}
 			},
@@ -52,7 +52,7 @@ namespace Core
 				[=](Player& player, RainbowlandGame& game) mutable
 				{
 					timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-					if(timer.getCurrentMicros() > Time::secondsToMicros(0.5f))
+					if(timer.getCurrentMicros() > (uint64_t)Time::secondsToMicros(0.5f))
 					{
 						timer.reset();
 						Circle radioactiveArea{player.transform.position, 5};
@@ -73,7 +73,7 @@ namespace Core
 				[](Player& player, RainbowlandGame& game)
 				{
 					player.ammoMultiplier = 1.2f;
-					player.currentWeapon.maxAmmo = static_cast<uint32_t>(player.ammoMultiplier*static_cast<float>(player.currentWeapon.maxAmmo));
+					calculateWeaponBonuses(player, game.m_weaponDatabase);
 				},
 					[](Player& player, RainbowlandGame& game) {}
 			},
@@ -90,6 +90,7 @@ namespace Core
 				[](Player& player, RainbowlandGame& game)
 				{
 					player.reloadMultiplier *= 0.7f;
+					calculateWeaponBonuses(player, game.m_weaponDatabase);
 				},
 					[](Player& player, RainbowlandGame& game) {}
 			},

@@ -99,7 +99,12 @@ namespace Core
 
 	float Vec2::length(const Vec2& v)
 	{
-		return sqrtf(v.x*v.x + v.y*v.y);
+		return sqrtf(length2(v));
+	}
+
+	float Vec2::length2(const Vec2& v)
+	{
+		return v.x*v.x + v.y*v.y;
 	}
 
 	Vec2 Vec2::normalize(const Vec2& v)
@@ -108,6 +113,18 @@ namespace Core
 		if(length == 0)
 			return Vec2(0,0);
 		return{v.x / length, v.y / length};
+	}
+
+	float Vec2::dotProduct(const Vec2& l, const Vec2& r)
+	{
+		return l.x*r.x + l.y*r.y;
+	}
+
+	Vec2 Vec2::projection(const Vec2& vec, const Vec2& target)
+	{
+		auto dpv = Vec2::dotProduct(vec, target);
+		auto dpt = Vec2::dotProduct(target, target);
+		return (dpv / dpt)*target;
 	}
 
 	std::ostream& operator<<(std::ostream& os, const Vec2& v)
