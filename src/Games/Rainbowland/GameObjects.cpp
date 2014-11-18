@@ -115,6 +115,11 @@ namespace Core
 		game.perkMode = false;
 		game.m_gameplayTimer.reset();
 		game.m_restoreTimeScaleAfterPerkMode = game.m_gameplayTimer.getTimeScale();
+
+		game.m_defenseMatrixActive = false;
+		game.m_defenseMatrixLocation.set(0, 0);
+		game.m_defenseMatrixMicros = 0;
+		game.m_defenseMatrixTimer.reset();
 		
 #ifdef _DEBUG
 		grantExperience(1000, game.m_players);
@@ -520,12 +525,18 @@ namespace Core
 		Random gen{Time::getRealTimeMicros()};
 		auto& monster = monsters.back();
 		monster.collisionData.set(0, 0, 1);
-		monster.color.set(0, 0, 0);
 		monster.maxVelocity = 1 + gen.randFloat() * 3.5f;
 		monster.transform.position = position;
 		monster.targetPlayer = target;
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
 		monster.attackTimer.updateBy(Time::secondsToMicros(5));
+		auto f = gen.randFloat() - 0.7f;
+		if(f < 0)
+		{
+			f = 0;
+		}
+		monster.expModifier = 1 + f * 15;
+		monster.color.set(f*1.2f, f*1.6f, f*1.7f);
 	}
 
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players)
@@ -587,11 +598,12 @@ namespace Core
 
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players)
 	{
-		for(uint32_t m = 0; m < monsters.size(); )
+		for(uint32_t m = 0; m < monsters.size(); ) 
 		{
 			if(monsters[m].health <= 0)
 			{
-				grantExperience(monsters[m].maxHealth, players);
+				auto exp = static_cast<uint32_t>(static_cast<float>(monsters[m].maxHealth)*monsters[m].expModifier);
+				grantExperience(exp, players);
 				killLocations.emplace_back(monsters[m].transform.position);
 				monsters[m] = monsters.back();
 				monsters.pop_back();
@@ -733,6 +745,43 @@ namespace Core
 			for(auto perk : player.acquiredPerks)
 			{
 				game.m_perkDatabase[perk].updateLogic(player, game);
+			}
+		}
+	}
+
+	void activateDefenseMatrix(RainbowlandGame& game)
+	{
+		if(!game.m_defenseMatrixActive && game.m_defenseMatrixTimer.getCurrentMicros() >= game.m_defenseMatrixMicros)
+		{
+			game.m_defenseMatrixActive = true;
+			game.m_defenseMatrixLocation = game.m_players[0].transform.position;
+			game.m_defenseMatrixMicros = Time::secondsToMicros(10);
+			game.m_defenseMatrixTimer.reset();
+		}
+	}
+
+	void updateDefenseMatrix(RainbowlandGame& game)
+	{
+		game.m_defenseMatrixTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+		if(game.m_defenseMatrixActive)
+		{
+			Circle matrix{game.m_defenseMatrixLocation, 4};
+			//push monsters out
+			for(auto& monster : game.m_monsters)
+			{
+				Circle monstaCollider{monster.transform.position, monster.collisionData.radius};
+				if(isCircleTouchingCircle(matrix, monstaCollider))
+				{
+					auto dir = Vec2::normalize(monstaCollider.center - matrix.center);
+					monster.transform.position = matrix.center + dir*(matrix.radius + monstaCollider.radius);
+				}
+			}
+			//check if over
+			if(game.m_defenseMatrixTimer.getCurrentMicros() >= game.m_defenseMatrixMicros)
+			{
+				game.m_defenseMatrixTimer.reset();
+				game.m_defenseMatrixMicros = Time::secondsToMicros(15);
+				game.m_defenseMatrixActive = false;
 			}
 		}
 	}

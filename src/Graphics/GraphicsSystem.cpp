@@ -512,7 +512,7 @@ namespace Core
 	//*****************************************************************
 	//					DRAW CIRCLE POLYGON
 	//*****************************************************************
-	void GraphicsSystem::drawCirclePolygon(const Transform& tf, const Circle& circle, uint32_t p, const Color& c)
+	void GraphicsSystem::drawCirclePolygon(const Transform& tf, float radius, uint32_t p, const Color& c)
 	{
 		if((p & 1) == 1) //if it's odd
 		{
@@ -523,7 +523,7 @@ namespace Core
 		auto dist = m_circleData.size() / p;
 		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
 		{
-			vertices.emplace_back(m_circleData[i] * circle.radius);
+			vertices.emplace_back(m_circleData[i] * radius);
 		}
 		vertices.emplace_back(vertices.front());
 		

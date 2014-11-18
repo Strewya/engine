@@ -196,50 +196,40 @@ namespace Core
 #endif
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
+				if(w.m_type == WindowEventType::WE_KEYBOARDKEY && m_players.size() >= 1)
 				{
-					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
+					auto firstDown = w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown;
+					auto up = !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown;
+					switch(w.m_keyboard.m_keyCode)
 					{
-						m_players[0].directions[Up] = true;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
-					{
-						m_players[0].directions[Down] = true;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
-					{
-						m_players[0].directions[Left] = true;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
-					{
-						m_players[0].directions[Right] = true;
-						return true;
-					}
-				}
-				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && !w.m_keyboard.m_isDown && w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
-				{
-					if(w.m_keyboard.m_keyCode == Keyboard::m_W)
-					{
-						m_players[0].directions[Up] = false;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_S)
-					{
-						m_players[0].directions[Down] = false;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_A)
-					{
-						m_players[0].directions[Left] = false;
-						return true;
-					}
-					else if(w.m_keyboard.m_keyCode == Keyboard::m_D)
-					{
-						m_players[0].directions[Right] = false;
-						return true;
+						case Keyboard::m_W:
+							if(firstDown)
+								m_players[0].directions[Up] = true;
+							if(up)
+								m_players[0].directions[Up] = false;
+							break;
+						case Keyboard::m_S:
+							if(firstDown)
+								m_players[0].directions[Down] = true;
+							if(up)
+								m_players[0].directions[Down] = false;
+							break;
+						case Keyboard::m_A:
+							if(firstDown)
+								m_players[0].directions[Left] = true;
+							if(up)
+								m_players[0].directions[Left] = false;
+							break;
+						case Keyboard::m_D:
+							if(firstDown)
+								m_players[0].directions[Right] = true;
+							if(up)
+								m_players[0].directions[Right] = false;
+							break;
+						case Keyboard::m_E:
+							if(firstDown)
+								activateDefenseMatrix(*this);
+							break;
 					}
 				}
 				return false;
@@ -385,7 +375,7 @@ namespace Core
 		checkPickups(m_players, *this);
 		updateBonuses(m_gameplayTimer, *this);
 		updatePickups(m_gameplayTimer, *this);
-
+		updateDefenseMatrix(*this);
 		checkPlayerDeath(m_players);
 
 		if(m_players.size() == 0)
@@ -478,6 +468,12 @@ namespace Core
 			m_graphicsSystem.drawLine({}, obj.origin, {1, 1, 1, 0}, obj.position, {1, 1, 1, 1});
 		}
 
+		if(m_defenseMatrixActive)
+		{
+			Transform t{m_defenseMatrixLocation, {1,1}, 0};
+			m_graphicsSystem.drawCircle(t, 4, 36, {0.25f, 0.42f, 0.76f, 0.2f});
+		}
+
 		//****************************
 		//			gui from now on
 		//****************************
@@ -512,7 +508,14 @@ namespace Core
 				tf.position.y += 20;
 			}
 		}
-		//m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
+#ifdef _DEBUG
+		m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
+		tf.position.y += 20;
+#endif
+		int64_t timeLeft = m_defenseMatrixMicros - m_defenseMatrixTimer.getCurrentMicros();
+		uint32_t displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+		if(timeLeft < 0) displayTime = 0;
+		m_graphicsSystem.drawText(m_defaultFont, "Defense matrix: " + std::to_string(displayTime), tf, {0, 0, 0}, 0, false);
 
 		m_guiSystem.draw(m_graphicsSystem);
 

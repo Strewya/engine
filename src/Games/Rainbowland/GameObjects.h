@@ -83,6 +83,7 @@ namespace Core
 		int32_t maxHealth;
 		int32_t health;
 		Time attackTimer;
+		float expModifier;
 	};
 
 	typedef std::vector<Monster> VMonsters;
@@ -240,4 +241,5 @@ namespace Core
 	void updatePerks(RainbowlandGame& game);
 
 	void activateDefenseMatrix(RainbowlandGame& game);
+	void updateDefenseMatrix(RainbowlandGame& game);
 }

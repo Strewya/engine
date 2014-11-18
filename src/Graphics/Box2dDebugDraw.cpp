@@ -71,14 +71,13 @@ namespace Core
 			return;
 
 		Color c(color.r, color.g, color.b);
-		Circle circle{{}, radius};
 
 		Transform t;
 		t.position.set(center.x, center.y);
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
 
-		m_graphics->drawCirclePolygon(t, circle, 24, c);
+		m_graphics->drawCirclePolygon(t, radius, 24, c);
 	}
 	
 	void Box2dDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
