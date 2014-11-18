@@ -317,6 +317,7 @@
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\RenderQueue.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
@@ -384,6 +385,7 @@
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
+    <ClInclude Include="..\..\..\src\Graphics\RenderQueue.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />

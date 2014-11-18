@@ -18,22 +18,20 @@ namespace Core
 	//************************************ INPUT SYSTEM ************************************//
 	bool InputSystem::init(Window& window)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_window = &window;
 
 		InitializeInputConstants();
 
 		DEBUG_INIT(InputSystem);
-		return status;
 	}
 
 	bool InputSystem::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(InputSystem);
-		return status;
 	}
 
 	void InputSystem::update(const Time& timer)

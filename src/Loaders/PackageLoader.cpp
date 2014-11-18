@@ -15,22 +15,20 @@ namespace Core
 {
 	bool PackageLoader::init(PackageCache& packages, FileHandlerCache& loadHandlers, FileHandlerCache& unloadHandlers)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_packages = &packages;
 		m_loadHandlers = &loadHandlers;
 		m_unloadHandlers = &unloadHandlers;
 
 		DEBUG_INIT(PackageLoader);
-		return status;
 	}
 
 	bool PackageLoader::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(PackageLoader);
-		return status;
 	}
 
 	bool PackageLoader::loadPackage(const std::string& pkgName)

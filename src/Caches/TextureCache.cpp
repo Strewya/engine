@@ -14,24 +14,22 @@ namespace Core
 {
 	bool TextureCache::init(GraphicsSystem& graphics)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_graphics = &graphics;
 
 		DEBUG_INIT(TextureCache);
-		return status;
 	}
 
 	bool TextureCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		//for each texture pair, call release? or do i let the graphics system shutdown handle it?
 		// what if i decide to destroy the texture manager, but not the graphics? i get a leak...
 		// when that happens, implement it.
 
 		DEBUG_SHUTDOWN(TextureCache);
-		return status;
 	}
 
 	uint32_t TextureCache::getResourceID(const char* name)

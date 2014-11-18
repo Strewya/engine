@@ -7,6 +7,7 @@
 #include <vector>
 /******* extra headers *******/
 #include <Graphics/GraphicsSystem.h>
+#include <Util/Circle.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
 #include <Util/Vec2.h>
@@ -39,11 +40,7 @@ namespace Core
 		if(m_graphics == nullptr)
 			return;
 
-		std::vector<Vec2> polygonData(vertexCount);
-		for(int32_t i = vertexCount-1; i >= 0; --i)
-		{
-			polygonData[i].set(vertices[i].x, vertices[i].y);
-		}
+		std::vector<Vec2> polygonData = reverseDirection(vertices, vertexCount);
 		Color c(color.r, color.g, color.b);
 
 		Transform t;
@@ -55,57 +52,54 @@ namespace Core
 
 	void Box2dDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
 	{
-		DrawPolygon(vertices, vertexCount, color);
-		/*if(m_renderer == nullptr) return;
+		if(m_graphics == nullptr)
+			return;
 
-		std::vector<Util::Vec2> polygonData(vertexCount);
-		for(int32_t i = vertexCount-1; i >= 0; --i)
-		{
-			polygonData[i].set(vertices[i].x, vertices[i].y);
-		}
-		Util::Color c(color.r, color.g, color.b);
+		std::vector<Vec2> polygonData = reverseDirection(vertices, vertexCount);
+		Color c(color.r, color.g, color.b);
 
-		Graphics::Polygon polygon;
-		
-		polygon.setColor(c);
-		polygon.setSolid(true);
-		polygon.setEdgeThickness(2);
-		polygon.setScale(m_lengthScale);
-		polygon.setManual(polygonData);
-		polygon.draw(*m_renderer);*/
+		Transform t;
+		t.scale.set(m_lengthScale, m_lengthScale);
+		t.rotation = 0;
+
+		m_graphics->drawPolygon(t, polygonData.data(), polygonData.size(), c);
 	}
 
 	void Box2dDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 	{
-		/*if(m_renderer == nullptr) return;
+		if(m_graphics == nullptr)
+			return;
 
-		Util::Color c(color.r, color.g, color.b);
-		Graphics::Polygon circle;
-		circle.setColor(c);
-		circle.setSolid(false);
-		circle.setScale(m_lengthScale);
-		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, (uint32_t)radius * 4);
-		circle.draw(*m_renderer);*/
+		Color c(color.r, color.g, color.b);
+		Circle circle{{}, radius};
+
+		Transform t;
+		t.position.set(center.x, center.y);
+		t.scale.set(m_lengthScale, m_lengthScale);
+		t.rotation = 0;
+
+		m_graphics->drawCirclePolygon(t, circle, 24, c);
 	}
 	
 	void Box2dDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 	{
-		/*if(m_renderer == nullptr) return;
-        (void)axis;
+		if(m_graphics == nullptr)
+			return;
 
-		Util::Color c(color.r, color.g, color.b);
-		Graphics::Polygon circle;
-		circle.setColor(c);
-		circle.setEdgeThickness(2);
-		circle.setSolid(true);
-		circle.setScale(m_lengthScale);
-		circle.setAsCircle(Util::Vec2(center.x, center.y), radius, 36);
-		circle.draw(*m_renderer);*/
+		Color c(color.r, color.g, color.b);
+
+		Transform t;
+		t.position.set(center.x, center.y);
+		t.scale.set(m_lengthScale, m_lengthScale);
+		t.rotation = 0;
+
+		m_graphics->drawCircle(t, radius, 24, c);
 	}
 	
 	void Box2dDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 	{
-		if(m_graphics == nullptr) return;
+		if(m_graphics == nullptr)
+			return;
 
 		Color c(color.r, color.g, color.b);
 		Vec2 pos[] { Vec2(p1.x, p1.y), Vec2(p2.x, p2.y) };
@@ -128,5 +122,16 @@ namespace Core
 		c.Set(0, 0, 1.0f);
 		p2 = p1 + scale*xf.q.GetYAxis();
 		DrawSegment(p1, p2, c);
+	}
+
+	std::vector<Vec2> Box2dDebugDraw::reverseDirection(const b2Vec2* vertices, int32 vertexCount) const
+	{
+		std::vector<Vec2> out;
+		out.reserve(vertexCount);
+		for(int32_t i = vertexCount; i--;)
+		{
+			out.emplace_back(vertices[i].x, vertices[i].y);
+		}
+		return out;
 	}
 }

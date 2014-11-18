@@ -238,4 +238,6 @@ namespace Core
 	bool allPlayersChosePerk(VPlayers& players);
 	void applyPerksForPlayers(RainbowlandGame& game);
 	void updatePerks(RainbowlandGame& game);
+
+	void activateDefenseMatrix(RainbowlandGame& game);
 }

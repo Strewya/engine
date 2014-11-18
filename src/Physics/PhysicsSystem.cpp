@@ -21,7 +21,7 @@ namespace Core
 
 	bool PhysicsSystem::init(const Vec2& gravity, b2Draw* debugDraw)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_world.SetGravity(convert(gravity));
 		if(debugDraw != nullptr)
@@ -29,12 +29,11 @@ namespace Core
 		m_world.SetContactListener(this);
 
 		DEBUG_INIT(PhysicsSystem);
-		return status;
 	}
 
 	bool PhysicsSystem::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		for(auto* joint : m_joints)
 		{
@@ -51,7 +50,6 @@ namespace Core
 		m_bodies.clear();
 
 		DEBUG_SHUTDOWN(PhysicsSystem);
-		return status;
 	}
 
 	void PhysicsSystem::update(float dt)

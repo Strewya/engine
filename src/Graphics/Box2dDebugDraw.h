@@ -4,6 +4,7 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <vector>
 /******* common headers *******/
 #include <Box2D/Box2D.h>
 /******* extra headers *******/
@@ -12,6 +13,7 @@
 namespace Core
 {
 	class GraphicsSystem;
+	class Vec2;
 
 	class Box2dDebugDraw : public b2Draw
 	{
@@ -43,5 +45,7 @@ namespace Core
 	private:
 		float m_lengthScale;
 		GraphicsSystem* m_graphics;
+
+		std::vector<Vec2> reverseDirection(const b2Vec2* vertices, int32 vertexCount) const;
 	};
 }

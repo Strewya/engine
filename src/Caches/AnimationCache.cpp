@@ -16,20 +16,18 @@ namespace Core
 {
 	bool AnimationCache::init(ImageCache& imageCache)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_imageCache = &imageCache;
 
 		DEBUG_INIT(AnimationCache);
-		return status;
 	}
 
 	bool AnimationCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(AnimationCache);
-		return status;
 	}
 
 	uint32_t AnimationCache::getResourceID(const char* name)

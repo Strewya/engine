@@ -455,7 +455,7 @@ namespace Core
 		{
 			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
 			Transform t{obj.transform.position, {1, 1}, 0};
-			m_graphicsSystem.drawCirclePolygon(t, obj.collisionData, 24, obj.color);
+			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
 			t.scale.set(0.03f, 0.03f);
 			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
 		}
@@ -512,7 +512,7 @@ namespace Core
 				tf.position.y += 20;
 			}
 		}
-		m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
+		//m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
 
 		m_guiSystem.draw(m_graphicsSystem);
 

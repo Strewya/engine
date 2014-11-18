@@ -15,8 +15,9 @@ namespace Core
 
 #define CLASS(x) "Core::"#x
 
-#define DEBUG_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL")
-#define DEBUG_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL")
+#define DEBUG_STATUS(x) bool status = x
+#define DEBUG_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL"); return status
+#define DEBUG_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
 
 
 #ifdef _DEBUG

@@ -19,21 +19,19 @@ namespace Core
 
 	bool FileHandlerCache::init(std::string successMsg, std::string failureMsg)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_successMessage = std::move(successMsg);
 		m_failureMessage = std::move(failureMsg);
 
 		DEBUG_INIT(FileHandlerCache);
-		return status;
 	}
 	
 	bool FileHandlerCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(FileHandlerCache);
-		return status;
 	}
 
 	void FileHandlerCache::registerHandler(const char* fileExtension, FileHandler handler, bool replaceExisting)

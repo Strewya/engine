@@ -45,7 +45,7 @@ namespace Core
 
 	bool LuaSystem::init()
 	{
-		bool status = false;
+		DEBUG_STATUS(false);
 		m_L = luaL_newstate();
 		if( m_L )
 		{
@@ -82,7 +82,6 @@ end
 		}
 
 		DEBUG_INIT(LuaSystem);
-		return status;
 	}
 
 	bool LuaSystem::shutdown()

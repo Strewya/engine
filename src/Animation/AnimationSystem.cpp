@@ -25,21 +25,19 @@ namespace Core
 
 	bool AnimationSystem::init(AnimationCache& animations)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_animations = &animations;
 		m_idCounter = 0;
 
 		DEBUG_INIT(AnimationSystem);
-		return status;
 	}
 
 	bool AnimationSystem::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(AnimationSystem);
-		return status;
 	}
 
 	void AnimationSystem::update(uint64_t deltaTime)

@@ -14,20 +14,18 @@ namespace Core
 {
 	bool FontCache::init(TextureCache& textures)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_textures = &textures;
 
 		DEBUG_INIT(FontCache);
-		return status;
 	}
 
 	bool FontCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(FontCache);
-		return status;
 	}
 
 	uint32_t FontCache::getResourceID(const char* name)

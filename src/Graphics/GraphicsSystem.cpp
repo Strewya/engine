@@ -44,7 +44,7 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::init(FontCache& fontCache, TextureCache& textureCache, Window& window)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		declare(&m_dxgiFactory);
 		declare(&m_dev);
@@ -105,7 +105,6 @@ namespace Core
 		status &= SUCCEEDED(hr);
 
 		DEBUG_INIT(GraphicsSystem);
-		return status;
 	}
 
 	//*****************************************************************
@@ -113,7 +112,7 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		if(m_swapchain != nullptr)
 		{
@@ -126,7 +125,6 @@ namespace Core
 		}
 
 		DEBUG_SHUTDOWN(GraphicsSystem);
-		return status;
 	}
 
 	//*****************************************************************

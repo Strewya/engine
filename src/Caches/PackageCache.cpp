@@ -13,18 +13,16 @@ namespace Core
 {
 	bool PackageCache::init()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_INIT(PackageStore);
-		return status;
 	}
 
 	bool PackageCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(PackageStore);
-		return status;
 	}
 	
 	Package& PackageCache::getPackage(const std::string& pkgName)

@@ -15,20 +15,18 @@ namespace Core
 {
 	bool ImageCache::init(TextureCache& textures)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_textures = &textures;
 
 		DEBUG_INIT(ImageCache);
-		return status;
 	}
 
 	bool ImageCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(ImageCache);
-		return status;
 	}
 
 	uint32_t ImageCache::getResourceID(const char* name)

@@ -14,20 +14,18 @@ namespace Core
 {
 	bool ScriptCache::init(LuaSystem& luaSystem)
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		m_luaSystem = &luaSystem;
 
 		DEBUG_INIT(ScriptCache);
-		return status;
 	}
 
 	bool ScriptCache::shutdown()
 	{
-		bool status = true;
+		DEBUG_STATUS(true);
 
 		DEBUG_SHUTDOWN(ScriptCache);
-		return status;
 	}
 
 	LoadResult ScriptCache::load(const ResourceFile& file)
