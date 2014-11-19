@@ -66,6 +66,7 @@ namespace Core
 		uint64_t m_defenseMatrixMicros;
 		
 		uint32_t m_defaultFont;
+		uint32_t m_backgroundTexture;
 		Window* m_window;
 		bool m_isRunning;
 		bool perkMode;

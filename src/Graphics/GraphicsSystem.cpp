@@ -709,8 +709,8 @@ namespace Core
 		{
 			{-img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y},
 			{img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y},
-			{-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y},
-			{img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y}
+			{-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y},
+			{img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y}
 		};
 
 		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
@@ -773,6 +773,74 @@ namespace Core
 		cb->Release();
 		ib->Release();
 		vb->Release();
+	}
+
+	//*****************************************************************
+	//					THE NEW DRAW CALL
+	//*****************************************************************
+	void GraphicsSystem::theNewDrawCall(const Transform& tf, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& c, uint32_t tId)
+	{
+		D3D11_MAPPED_SUBRESOURCE ms;
+
+		/****** VERTEX BUFFER ******/
+		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), vertices.size());
+
+		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(Vertex));
+		m_devcon->Unmap(vb, 0);
+
+		uint32_t stride = sizeof(Vertex);
+		uint32_t offset = 0;
+		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+		
+		/****** PRIMITIVE TOPOLOGY ******/
+		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+		/****** INDEX BUFER ******/
+		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
+		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+		assert(SUCCEEDED(hr));
+		memcpy(ms.pData, indices.data(), indices.size() * sizeof(uint32_t));
+		m_devcon->Unmap(ib, 0);
+
+		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+		/****** CONSTANT BUFFER ******/
+		auto* cb = makeConstantBuffer(m_dev, sizeof(cbPerObject));
+
+		m_world = XMMatrixIdentity();
+		m_world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
+		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+		m_world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
+		m_world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+
+		cbPerObject cbpo;
+		cbpo.WVP = XMMatrixTranspose(m_world * m_camView * m_camProjection);
+		cbpo.FillColor.x = c.r;
+		cbpo.FillColor.y = c.g;
+		cbpo.FillColor.z = c.b;
+		cbpo.FillColor.w = c.a;
+		cbpo.isTexture.x = tId != INVALID_ID ? 1.0f : 0.0f;
+
+		m_devcon->UpdateSubresource(cb, 0, nullptr, &cbpo, 0, 0);
+		m_devcon->VSSetConstantBuffers(0, 1, &cb);
+		m_devcon->PSSetConstantBuffers(0, 1, &cb);
+		if(tId != INVALID_ID)
+		{
+			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
+			const auto* texture = m_textureCache->getResource(tId);
+			auto srv = m_textures[texture->m_rawTextureID].get();
+			m_devcon->PSSetShaderResources(0, 1, &srv);
+		}
+
+		m_devcon->DrawIndexed(indices.size(), 0, 0);
+
+		safeRelease(cb);
+		safeRelease(ib);
+		safeRelease(vb);
 	}
 
 	//*****************************************************************

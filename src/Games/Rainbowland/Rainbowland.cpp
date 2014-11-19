@@ -239,8 +239,10 @@ namespace Core
 			m_isRunning &= m_graphicsSystem.initPixelShader("Shaders/shader.hlsl");
 
 			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
+			m_isRunning &= (bool)m_textureCache.load("Textures/moss.png");
 			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			m_defaultFont = m_fontCache.getResourceID("font");
+			m_backgroundTexture = m_textureCache.getResourceID("Textures/moss.png");
 		}
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
@@ -388,22 +390,15 @@ namespace Core
 			}
 		}
 
-		/*
-		auto lua = m_luaSystem.getStack();
-		lua.pull("game_tick", 0);
-		if(lua.is<luaFunction>())
-		{
-			auto called = lua.call(luaCustom{this, CLASS(HedgehogGame)}, &continueRunning);
-			if(!called)
-			{
-				DEBUG_INFO(lua.to<std::string>());
-				lua.pop();
-				continueRunning = called;
-			}
-		}
-		*/
 		return continueRunning;
 	}
+
+
+
+
+
+
+
 
 	void RainbowlandGame::tickRender(uint64_t updateTime)
 	{
@@ -414,11 +409,18 @@ namespace Core
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 		
-/*
-		Transform tf;
-		Vec2 p1{0, 0}, p2{0, 1}, p3{1, 0};
-		m_graphicsSystem.drawLine(tf, p1, p2, {1, 1, 1});
-		m_graphicsSystem.drawLine(tf, p1, p3, {1, 1, 1});*/
+		Image img;
+		img.m_texCoords[0].set(0, 0);
+		img.m_texCoords[1].set(1, 0);
+		img.m_texCoords[2].set(0, 1);
+		img.m_texCoords[3].set(1, 1);
+		img.m_textureID = m_backgroundTexture;
+		img.m_ratio = 1;
+		Transform textureTf;
+		textureTf.position.set(0, 0);
+		textureTf.scale = Vec2{12, 9}*3;
+		m_graphicsSystem.drawTexturedQuad(textureTf, {0.6f, 0.6f, 0.6f}, img);
+
 		
 		for(auto& obj : m_players)
 		{

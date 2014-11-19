@@ -12,6 +12,7 @@
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
 #include <DataStructs/Font.h>
+#include <Graphics/Vertex.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -73,6 +74,8 @@ namespace Core
 		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
 		void drawCircle(const Transform& transform, float radius, uint32_t points, const Color& color);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
+		
+		void theNewDrawCall(const Transform& transform, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& globalColor, uint32_t tId);
 
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(uint32_t fontID, const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
@@ -80,6 +83,8 @@ namespace Core
 		bool loadTexture(const ResourceFile& filename, Texture& outTexture);
 		bool reloadTexture(const ResourceFile& filename, Texture& outTexture);
 		void unloadTexture(Texture& texture);
+
+
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);

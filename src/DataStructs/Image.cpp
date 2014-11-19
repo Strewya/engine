@@ -50,7 +50,7 @@ namespace Core
 		/* the vertices are in the following order:
 		0--1
 		|  |
-		3--2
+		2--3
 		*/
 
 		outImage.m_ratio = w / h;
@@ -58,14 +58,14 @@ namespace Core
 		outImage.m_texCoords[0].x = pos.x / dimensions.x;
 		outImage.m_texCoords[0].y = pos.y / dimensions.y;
 
-		outImage.m_texCoords[2].x = wh.x / dimensions.x;
-		outImage.m_texCoords[2].y = wh.y / dimensions.y;
+		outImage.m_texCoords[3].x = wh.x / dimensions.x;
+		outImage.m_texCoords[3].y = wh.y / dimensions.y;
 
-		outImage.m_texCoords[1].x = outImage.m_texCoords[2].x;
+		outImage.m_texCoords[1].x = outImage.m_texCoords[3].x;
 		outImage.m_texCoords[1].y = outImage.m_texCoords[0].y;
 
-		outImage.m_texCoords[3].x = outImage.m_texCoords[0].x;
-		outImage.m_texCoords[3].y = outImage.m_texCoords[2].y;
+		outImage.m_texCoords[2].x = outImage.m_texCoords[0].x;
+		outImage.m_texCoords[2].y = outImage.m_texCoords[3].y;
 
 		outImage.m_fileHash = fileHash;
 		return{LoadResultFlag::Success};
