@@ -443,13 +443,29 @@ namespace Core
 			m_graphicsSystem.drawQuad(obj.transform, {1, 1}, {1, 0, 1});
 		}
 
+		std::vector<Transform> tfs;
+		std::vector<Color> fills;
+		tfs.reserve(m_monsters.size());
+		fills.reserve(m_monsters.size());
 		for(auto& obj : m_monsters)
 		{
-			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
-			Transform t{obj.transform.position, {1, 1}, 0};
-			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
-			t.scale.set(0.03f, 0.03f);
-			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
+			tfs.emplace_back(obj.transform);
+			fills.emplace_back(obj.color);
+			//m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
+			//Transform t{obj.transform.position, {1, 1}, 0};
+			//m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
+			//t.scale.set(0.03f, 0.03f);
+			//m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
+		}
+		if(tfs.size() > 0)
+		{
+			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, 1, 32);
+			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(32);
+			m_graphicsSystem.v3_setVertices(verts);
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData(tfs, fills);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_draw(inds.size(), tfs.size());
 		}
 
 		for(auto& obj : m_pickups)

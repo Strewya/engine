@@ -1,4 +1,13 @@
 
+struct VIn
+{
+	float4 position : POSITION;
+	float2 texCoord : TEXCOORD;
+	float4 diffuse : DIFFUSE;
+	float4 fill : FILL;
+	matrix world : WORLD;
+};
+
 struct VOut
 {
     float4 position : SV_POSITION;
@@ -6,23 +15,23 @@ struct VOut
 	float2 texCoord : TEXCOORD;
 };
 
-cbuffer cbPerObject
+cbuffer dataPerScene
 {
-	float4x4 WVP;
-	float4 FillColor;
-	float4 isTexture;
+	matrix view;
+	matrix projection;
 };
 
 Texture2D ObjTexture;
 SamplerState ObjSamplerState;
 
-VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diffuse : DIFFUSE)
+VOut VShader(VIn input)
 {
     VOut output;
-
-    output.position = mul(position, WVP);
-	output.texCoord = texCoord;
-	output.diffuse = diffuse * FillColor;
+    output.position = mul(input.position, input.world);
+	//output.position = mul(output.position, view);
+	//output.position = mul(output.position, projection);
+	output.texCoord = input.texCoord;
+	output.diffuse = input.diffuse * input.fill;
 	
     return output;
 }
@@ -31,7 +40,7 @@ VOut VShader(float4 position : POSITION, float2 texCoord : TEXCOORD, float4 diff
 float4 PShader(VOut input) : SV_TARGET
 {
     float4 diffuse = input.diffuse;
-	if(isTexture.x != 0)
+	if(input.texCoord.x >= 0 && input.texCoord.y >= 0)
 		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
 	return diffuse;
 }

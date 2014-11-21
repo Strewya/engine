@@ -75,8 +75,6 @@ namespace Core
 		void drawCircle(const Transform& transform, float radius, uint32_t points, const Color& color);
 		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 		
-		void theNewDrawCall(const Transform& transform, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& globalColor, uint32_t tId);
-
 		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
 		void drawText(uint32_t fontID, const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
 
@@ -85,6 +83,23 @@ namespace Core
 		void unloadTexture(Texture& texture);
 
 
+		void theNewDrawCall(const Transform& transform, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& globalColor, uint32_t tId);
+
+		std::vector<Vertex> v3_makeCircleVertices(const Vec2& pos, float radius, uint32_t pts) const;
+		std::vector<Vertex> v3_makeQuadVertices(const Vec2& pos, const Vec2& halfSize) const;
+		std::vector<Vertex> v3_makeTextVertices(uint32_t font, const std::string& text, bool italic);
+		std::vector<uint32_t> v3_makeSolidCircleIndices(uint32_t pts) const;
+		std::vector<uint32_t> v3_makeHollowCircleIndices(uint32_t pts) const;
+		std::vector<uint32_t> v3_makeSolidQuadIndices() const;
+		std::vector<uint32_t> v3_makeHollowQuadVertices() const;
+		std::vector<uint32_t> v3_makeTextIndices(uint32_t letters) const;
+
+		void v3_setVertices(const std::vector<Vertex>& vertices);
+		void v3_setIndices(const std::vector<uint32_t>& indices);
+		void v3_setTopology(D3D_PRIMITIVE_TOPOLOGY topology);
+		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills);
+		void v3_setTexture(uint32_t textureId);
+		void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
 
 	private:
 		template<typename T> static void releasePtr(T* ptr);
@@ -109,10 +124,11 @@ namespace Core
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11Texture2D* m_depthStencilBuffer;
 		ID3D11BlendState* m_transparency;
-		
+		ID3D11Buffer* m_constantBuffer;
+		ID3D11Buffer* m_vertexBuffer;
+
 		XMMATRIX m_camView;
 		XMMATRIX m_camProjection;
-		XMMATRIX m_world;
 		
 		FontCache* m_fontCache;
 		TextureCache* m_textureCache;
