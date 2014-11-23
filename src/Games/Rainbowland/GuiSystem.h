@@ -34,6 +34,8 @@ namespace Core
 		void button(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color, Mouse::Keys activator, OnClickFunction onClick);
 		void label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Vec2 scale, Color color, uint32_t justification, bool italic);
 
+		void editLabel(std::string name, std::string text);
+
 		void removeElement(std::string name);
 
 	private:

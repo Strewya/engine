@@ -110,7 +110,10 @@ namespace Core
 
 		//players
 		game.m_players.emplace_back();
-		initPlayer(game.m_players.back(), game.m_weaponDatabase, game.m_perkDatabase);
+		initPlayer(game.m_players.back(), 0, game);
+		game.m_players.emplace_back();
+		initPlayer(game.m_players.back(), 1, game);
+		game.m_players.back().color.set(0, 0, 1);
 
 		game.perkMode = false;
 		game.m_gameplayTimer.reset();
@@ -120,6 +123,8 @@ namespace Core
 		game.m_defenseMatrixLocation.set(0, 0);
 		game.m_defenseMatrixMicros = 0;
 		game.m_defenseMatrixTimer.reset();
+
+
 		
 #ifdef _DEBUG
 		grantExperience(1000, game.m_players);
@@ -138,12 +143,15 @@ namespace Core
 		game.m_bonusDatabase.clear();
 	}
 
-	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb)
+	void initPlayer(Player& player, uint32_t id, RainbowlandGame& game)
 	{
-		player.transform.position.set(0, 0);
+		player.id = id;
+		player.transform.position.set(0+(float)id, 0);
 		player.transform.scale.set(0.5f, 0.5f);
 		player.transform.rotation = 0;
-		player.color.set(1, 0, 0);
+		player.color.r = id == 0 ? 1.0f : 0.0f;
+		player.color.g = id == 1 ? 1.0f : 0.0f;
+		player.color.b = id == 2 ? 1.0f : 0.0f;
 		player.collisionData.set(0, 0, 1.0f);
 		player.collisionData.radius *= player.transform.scale.x;
 		player.velocity.set(0.0f, 0.0f);
@@ -164,13 +172,36 @@ namespace Core
 		player.level = 1;
 		player.perkPoints = 0;
 		player.perksPerLevel = 3;
-		for(auto& p : perkDb)
+		for(auto& p : game.m_perkDatabase)
 		{
 			player.availablePerks.emplace_back(p.type);
 		}
 		player.chosenPerk = PerkTypeCount;
 		player.isShooting = false;
-		selectWeapon(player, Pistol, weaponDb);
+		selectWeapon(player, Pistol, game.m_weaponDatabase);
+		//gui
+		auto panel = "player" + std::to_string(id);
+
+		auto health = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+		Vec2 healthPos{5 - 0.5f*game.m_window->getSizeX(), 0.5f*game.m_window->getSizeY() - (id+1)*20.0f};
+		
+		auto exp = "Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
+		Vec2 expPos = healthPos;
+		expPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, health).x * 2 * 0.75f + 50;
+		
+		auto ammo = "Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
+		Vec2 ammoPos = expPos;
+		ammoPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, exp).x * 2;
+		
+		auto weapon = "Weapon: " + player.currentWeapon.name;
+		Vec2 weaponPos = ammoPos;
+		weaponPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, ammo).x * 2 * 0.75f + 50;
+		
+		game.m_guiSystem.panel(panel, "root", {0, 0}, {(float)game.m_window->getSizeX(), (float)game.m_window->getSizeY()}, {0, 0, 0, 0});
+		game.m_guiSystem.label(panel + "HP", panel, game.m_defaultFont, health, healthPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
+		game.m_guiSystem.label(panel + "EXP", panel, game.m_defaultFont, exp, expPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
+		game.m_guiSystem.label(panel + "AMMO", panel, game.m_defaultFont, ammo, ammoPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
+		game.m_guiSystem.label(panel + "WEAPON", panel, game.m_defaultFont, weapon, weaponPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
 	}
 
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField)
@@ -208,14 +239,15 @@ namespace Core
 		}
 	}
 
-	void checkPlayerDeath(VPlayers& players)
+	void checkPlayerDeath(RainbowlandGame& game)
 	{
-		for(uint32_t p = 0; p < players.size(); ++p)
+		for(uint32_t p = 0; p < game.m_players.size();)
 		{
-			if(players[p].health <= 0)
+			if(game.m_players[p].health <= 0)
 			{
-				players[p] = players.back();
-				players.pop_back();
+				game.m_guiSystem.removeElement("player" + std::to_string(game.m_players[p].id));
+				game.m_players[p] = game.m_players.back();
+				game.m_players.pop_back();
 			}
 			else
 			{
@@ -245,6 +277,7 @@ namespace Core
 					game.m_guiSystem.label("lvlupLabel", "lvlup", game.m_defaultFont, "Level", {}, {0.5f, 0.5f}, {}, 1, false);
 				}
 			}
+			
 		}
 	}
 
@@ -253,6 +286,24 @@ namespace Core
 		for(auto& player : players)
 		{
 			player.experience += exp;
+		}
+	}
+
+	void updateGuiLabels(RainbowlandGame& game)
+	{
+		for(auto& player : game.m_players)
+		{
+			auto exp = "Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
+			game.m_guiSystem.editLabel("player" + std::to_string(player.id) + "EXP", exp);
+
+			auto weapon = "Weapon: " + player.currentWeapon.name;
+			game.m_guiSystem.editLabel("player" + std::to_string(player.id) + "WEAPON", weapon);
+
+			auto ammo = "Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
+			game.m_guiSystem.editLabel("player" + std::to_string(player.id) + "AMMO", ammo);
+
+			auto health = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+			game.m_guiSystem.editLabel("player" + std::to_string(player.id) + "HP", health);
 		}
 	}
 
@@ -365,6 +416,9 @@ namespace Core
 			}
 			else
 			{
+				auto duration = game.m_pickups[b].duration;
+				auto diff = duration - game.m_pickups[b].timer.getCurrentMicros();
+				game.m_pickups[b].color.a = 0.2f + (float)diff / (float)duration;
 				++b;
 			}
 		}
@@ -387,9 +441,9 @@ namespace Core
 		player.currentWeapon.reloadDelay = static_cast<uint64_t>(player.reloadMultiplier*static_cast<float>(dbw.reloadDelay));
 	}
 
-	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera)
+	void fireWeapon(Player& player, RainbowlandGame& game)
 	{
-		player.weaponTimer.updateBy(timer.getDeltaMicros());
+		player.weaponTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
 		auto& w = player.currentWeapon;
 		if(w.ammo > 0)
 		{
@@ -398,7 +452,7 @@ namespace Core
 				player.weaponTimer.reset();
 				--w.ammo;
 				auto p = Vec2::normalize(player.aim-player.transform.position)*player.collisionData.radius;
-				generateBullets(bullets, w.bulletsPerShot, w.spread, player.transform.position+p, player.aim, w.damage, w.bulletPierce);
+				generateBullets(game.m_bullets, w.bulletsPerShot, w.spread, player.transform.position+p, player.aim, w.damage, w.bulletPierce);
 			}
 		}
 		else
@@ -527,16 +581,18 @@ namespace Core
 		monster.collisionData.set(0, 0, 1);
 		monster.maxVelocity = 1 + gen.randFloat() * 3.5f;
 		monster.transform.position = position;
+		auto scale = 1 + 0.3f - gen.randFloat()*0.6f;
+		monster.transform.scale.set(scale, scale);
 		monster.targetPlayer = target;
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
 		monster.attackTimer.updateBy(Time::secondsToMicros(5));
-		auto f = gen.randFloat() - 0.7f;
-		if(f < 0)
+		monster.expModifier = 1 * scale;
+		monster.color.set(0, 0, 0);
+		if(gen.randInt(0,99999) < 25000)
 		{
-			f = 0;
+			monster.expModifier *= 4;
+			monster.color.set(0.2f, 0.2f, 0.7f);
 		}
-		monster.expModifier = 1 + f * 15;
-		monster.color.set(f*1.2f, f*1.6f, f*1.7f);
 	}
 
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players)
@@ -569,19 +625,19 @@ namespace Core
 		monster.health -= amount;
 	}
 
-	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players)
+	void checkMonsterHurtingPlayer(RainbowlandGame& game)
 	{
-		for(auto& player : players)
+		for(auto& player : game.m_players)
 		{
 			auto pCollider = player.collisionData;
 			pCollider.center = player.transform.position;
-			for(auto& monster : monsters)
+			for(auto& monster : game.m_monsters)
 			{
 				auto mCollider = monster.collisionData;
 				mCollider.center = monster.transform.position;
 				if(isCircleTouchingCircle(mCollider, pCollider))
 				{
-					monster.attackTimer.updateBy(timer.getDeltaMicros());
+					monster.attackTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
 					if(monster.attackTimer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(0.1f))
 					{
 						player.health -= 1;
@@ -769,7 +825,7 @@ namespace Core
 			//push monsters out
 			for(auto& monster : game.m_monsters)
 			{
-				Circle monstaCollider{monster.transform.position, monster.collisionData.radius};
+				Circle monstaCollider{monster.transform.position, monster.collisionData.radius*monster.transform.scale.x};
 				if(isCircleTouchingCircle(matrix, monstaCollider))
 				{
 					auto dir = Vec2::normalize(monstaCollider.center - matrix.center);

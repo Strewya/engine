@@ -171,6 +171,16 @@ namespace Core
 		}
 	}
 
+	void GuiSystem::editLabel(std::string name, std::string text)
+	{
+		auto uniqueName = filterFind(m_elements, [&](const std::unique_ptr<GuiElement>& ge) { return ge->name == name; });
+		if(uniqueName != m_elements.size())
+		{
+			Label& label = static_cast<Label&>(*m_elements[uniqueName]);
+			label.text = text;
+		}
+	}
+
 	void GuiSystem::removeElement(std::string name)
 	{
 		if(name == "root") return;

@@ -56,7 +56,7 @@ namespace Core
 		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
 		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(256), m_gamepadEmptyUpdateDelay(2000),
 		m_hwnd(nullptr),
-		m_fullscreen(false), m_showCursor(false), m_isRunning(true),
+		m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),
 		m_nextFreeSlot(0)
 	{
@@ -138,6 +138,7 @@ namespace Core
 
 	void Window::close()
 	{
+		m_lockCursor = false;
 #ifdef _DEBUG
 		InvalidateRect(m_hwnd, nullptr, true);
 		trackEvents = false;
@@ -659,6 +660,29 @@ namespace Core
 	void Window::showCursor(bool isShown) { m_showCursor = isShown; }
 	void Window::setFileChangeDelay(uint32_t delay) { m_fileChangeDelay = (delay > m_minFileChangeDelay ? delay : m_minFileChangeDelay); }
 	
+	void Window::lockCursor(bool isLocked)
+	{
+		m_lockCursor = isLocked;
+		if(isLocked)
+		{
+			RECT screen{0, 0, m_xSize, m_ySize};
+			ClipCursor(&screen);
+		}
+		else
+		{
+			ClipCursor(nullptr);
+		}
+	}
+
+	void Window::makeMouseRelative(bool isRelative)
+	{
+		m_relativeMouse = isRelative;
+		if(isRelative)
+		{
+			SetCursorPos(m_xSize / 2, m_ySize / 2);
+		}
+	}
+	
 	const std::string&	Window::getClass() const { return m_class; }
 	const std::string&	Window::getTitle() const { return m_title; }
 	HWND			Window::getWindowHandle() const { return m_hwnd; }
@@ -686,10 +710,28 @@ namespace Core
 		{
 			case WM_MOUSEMOVE:
 			{
-				we.m_type = WindowEventType::WE_MOUSEMOVE;
-				we.m_mouseMove.m_x = GET_X_LPARAM(lParam);
-				we.m_mouseMove.m_y = GET_Y_LPARAM(lParam);
-				we.m_mouseMove.m_isRelative = false;
+				if(m_relativeMouse)
+				{
+					auto cx = m_xSize / 2;
+					auto cy = m_ySize / 2;
+					auto x = GET_X_LPARAM(lParam) - cx;
+					auto y = GET_Y_LPARAM(lParam) - cy;
+					if(x != 0 || y != 0)
+					{
+						we.m_type = WindowEventType::WE_MOUSEMOVE;
+						we.m_mouseMove.m_x = x;
+						we.m_mouseMove.m_y = y;
+						we.m_mouseMove.m_isRelative = true;
+						SetCursorPos(cx, cy);
+					}
+				}
+				else
+				{
+					we.m_type = WindowEventType::WE_MOUSEMOVE;
+					we.m_mouseMove.m_x = GET_X_LPARAM(lParam);
+					we.m_mouseMove.m_y = GET_Y_LPARAM(lParam);
+					we.m_mouseMove.m_isRelative = false;
+				}
 			}
 			break;
 

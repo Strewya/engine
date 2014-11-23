@@ -8,6 +8,7 @@
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Input/KeyCodes.h>
+#include <Util/CollisionChecks.h>
 #include <Util/Random.h>
 #include <Util/ResourceFile.h>
 #include <Util/Utility.h>
@@ -75,12 +76,34 @@ namespace Core
 
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
-				if(w.m_type == WindowEventType::WE_MOUSEMOVE && !w.m_mouseMove.m_isRelative && m_players.size() >= 1)
+				if(w.m_type == WindowEventType::WE_MOUSEMOVE && m_players.size() >= 1)
 				{
-					m_players[0].aim = m_graphicsSystem.screenToWorld({(float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y}, m_camera);
+					if(w.m_mouseMove.m_isRelative)
+					{
+						Vec2 screen{m_window->getSizeX() / 2.0f, m_window->getSizeY() / 2.0f};
+						Vec2 mp{(float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y};
+						auto sp = screen + mp;
+						auto wp = m_graphicsSystem.screenToWorld(sp, m_camera);
+						auto spp = m_graphicsSystem.screenToWorld(screen, m_camera);
+						m_players[0].aim += wp-spp;
+					}
+					else
+					{
+						Vec2 sp{(float)w.m_mouseMove.m_x, (float)w.m_mouseMove.m_y};
+						auto wp = m_graphicsSystem.screenToWorld(sp, m_camera);
+						m_players[0].aim = wp;
+					}
 #ifdef _DEBUG
-					mx = w.m_mouseMove.m_x;
-					my = w.m_mouseMove.m_y;
+					if(w.m_mouseMove.m_isRelative)
+					{
+						mx += w.m_mouseMove.m_x;
+						my += w.m_mouseMove.m_y;
+					}
+					else
+					{
+						mx = w.m_mouseMove.m_x;
+						my = w.m_mouseMove.m_y;
+					}
 #endif
 					return true;
 				}
@@ -93,7 +116,12 @@ namespace Core
 				{
 					if(w.m_mouseButton.m_button == Mouse::m_LeftButton && m_players.size() >= 1)
 					{
-						m_players[0].aim = m_graphicsSystem.screenToWorld({(float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y}, m_camera);
+						auto wp = m_graphicsSystem.screenToWorld({(float)w.m_mouseButton.m_x, (float)w.m_mouseButton.m_y}, m_camera);
+						if(w.m_mouseMove.m_isRelative)
+							m_players[0].aim += wp;
+						else
+							m_players[0].aim = wp;
+
 						if(w.m_mouseButton.m_isDown)
 						{
 							m_players[0].isShooting = true;
@@ -165,6 +193,13 @@ namespace Core
 							stepBack = true;
 							break;
 
+						case Keyboard::m_L:
+							m_window->lockCursor(true);
+							break;
+						case Keyboard::m_U:
+							m_window->lockCursor(false);
+							break;
+
 						case Keyboard::m_F1:
 							placePickup(m_pickups, gen, loc, BonusType::IncreasedMovementSpeed);
 							return true;
@@ -231,6 +266,69 @@ namespace Core
 								activateDefenseMatrix(*this);
 							break;
 					}
+				}
+				return false;
+			});
+
+			m_messageHandlers.emplace_back([&](const WindowEvent& w)
+			{
+				if(w.m_type == WindowEventType::WE_GAMEPADAXIS && m_players.size() > w.m_gamepadAxis.m_gamepad+1U)
+				{
+					auto i = w.m_gamepadAxis.m_gamepad+1;
+					if(w.m_gamepadAxis.m_axis == Gamepad::m_LeftStick)
+					{
+						if(w.m_gamepadAxis.m_x > 0)
+						{
+							m_players[i].directions[Right] = true;
+							m_players[i].directions[Left] = false;
+						}
+						else if(w.m_gamepadAxis.m_x < 0)
+						{
+							m_players[i].directions[Left] = true;
+							m_players[i].directions[Right] = false;
+						}
+						else
+						{
+							m_players[i].directions[Left] = false;
+							m_players[i].directions[Right] = false;
+						}
+
+
+						if(w.m_gamepadAxis.m_y > 0)
+						{
+							m_players[i].directions[Up] = true;
+							m_players[i].directions[Down] = false;
+						}
+						else if(w.m_gamepadAxis.m_y < 0)
+						{
+							m_players[i].directions[Down] = true;
+							m_players[i].directions[Up] = false;
+						}
+						else
+						{
+							m_players[i].directions[Up] = false;
+							m_players[i].directions[Down] = false;
+						}
+						return true;
+					}
+					if(w.m_gamepadAxis.m_axis == Gamepad::m_RightStick)
+					{
+						m_players[i].aim = m_graphicsSystem.screenToWorld({(float)w.m_gamepadAxis.m_x, -(float)w.m_gamepadAxis.m_y}, m_camera);
+						return true;
+					}
+				}
+				if(w.m_type == WindowEventType::WE_GAMEPADBUTTON && m_players.size() > w.m_gamepadButton.m_gamepad+1U)
+				{
+					auto i = w.m_gamepadButton.m_gamepad+1;
+					if(w.m_gamepadButton.m_isDown)
+					{
+						m_players[i].isShooting = true;
+					}
+					else
+					{
+						m_players[i].isShooting = false;
+					}
+					return true;
 				}
 				return false;
 			});
@@ -339,7 +437,7 @@ namespace Core
 		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
 		moveMonsters(m_gameplayTimer, m_monsters, m_players);
 		orientMonsters(m_monsters);
-		checkMonsterHurtingPlayer(m_gameplayTimer, m_monsters, m_players);
+		checkMonsterHurtingPlayer(*this);
 		checkLevelup(m_players, *this);
 		
 		if(m_players.size() > 0)
@@ -365,7 +463,7 @@ namespace Core
 		orientPlayers(m_players);
 		for(auto& player : m_players)
 		{
-			fireWeapon(m_gameplayTimer, player, m_bullets, m_graphicsSystem, m_camera);
+			fireWeapon(player, *this);
 		}
 
 		updatePerks(*this);
@@ -378,7 +476,8 @@ namespace Core
 		updateBonuses(m_gameplayTimer, *this);
 		updatePickups(m_gameplayTimer, *this);
 		updateDefenseMatrix(*this);
-		checkPlayerDeath(m_players);
+		checkPlayerDeath(*this);
+		updateGuiLabels(*this);
 
 		if(m_players.size() == 0)
 		{
@@ -421,41 +520,24 @@ namespace Core
 		textureTf.scale = Vec2{12, 9}*3;
 		m_graphicsSystem.drawTexturedQuad(textureTf, {0.6f, 0.6f, 0.6f}, img);
 
-		
-		for(auto& obj : m_players)
-		{
-			m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
-			auto t = obj.transform;
-			t.scale.set(1, 1);
-			m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
-			if(obj.currentWeapon.ammo == 0)
-			{
-				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0.0f};
-				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
-				textTf.position.y -= 1;
-				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
-				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
-			}
-		}
-
-		for(auto& obj : m_monsterSpawners)
-		{
-			m_graphicsSystem.drawQuad(obj.transform, {1, 1}, {1, 0, 1});
-		}
-
 		std::vector<Transform> tfs;
 		std::vector<Color> fills;
-		tfs.reserve(m_monsters.size());
-		fills.reserve(m_monsters.size());
+		tfs.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
+		fills.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
+		for(auto& obj : m_players)
+		{
+			tfs.emplace_back(obj.transform);
+			fills.emplace_back(obj.color);
+		}
 		for(auto& obj : m_monsters)
 		{
 			tfs.emplace_back(obj.transform);
 			fills.emplace_back(obj.color);
-			//m_graphicsSystem.drawPolygon(obj.transform, m_triangle.data(), m_triangle.size(), obj.color);
-			//Transform t{obj.transform.position, {1, 1}, 0};
-			//m_graphicsSystem.drawCircle(t, obj.collisionData.radius, 24, obj.color);
-			//t.scale.set(0.03f, 0.03f);
-			//m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
+		}
+		for(auto& obj : m_pickups)
+		{
+			tfs.emplace_back(obj.transform);
+			fills.emplace_back(obj.color);
 		}
 		if(tfs.size() > 0)
 		{
@@ -463,17 +545,45 @@ namespace Core
 			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(32);
 			m_graphicsSystem.v3_setVertices(verts);
 			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData(tfs, fills);
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, tfs.size());
 			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			m_graphicsSystem.v3_draw(inds.size(), tfs.size());
+			verts =
+			{
+				Vertex{m_triangle[0].x, m_triangle[0].y, 0, 1, 1, 1, 1, -1, -1},
+				Vertex{m_triangle[1].x, m_triangle[1].y, 0, 1, 1, 1, 1, -1, -1},
+				Vertex{m_triangle[2].x, m_triangle[2].y, 0, 1, 1, 1, 1, -1, -1}
+			};
+			inds = {0, 1, 2};
+			
+			m_graphicsSystem.v3_setVertices(verts);
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size() + m_monsters.size());
+			m_graphicsSystem.v3_draw(inds.size(), m_players.size() + m_monsters.size());
+			
 		}
 
+		for(auto& obj : m_players)
+		{
+			if(obj.currentWeapon.ammo == 0)
+			{
+				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0};
+				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
+				textTf.position.y -= 1;
+				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
+				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
+			}
+		}
+		for(auto& obj : m_monsters)
+		{
+			Transform t{obj.transform.position, {0.03f, 0.03f}, 0};
+			t.scale *= obj.transform.scale;
+			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
+		}
+		
 		for(auto& obj : m_pickups)
 		{
-			auto c = obj.color;
 			auto diff = obj.duration - obj.timer.getCurrentMicros();
-			c.a = 0.2f + (float)diff / (float)obj.duration;
-			m_graphicsSystem.drawQuad(obj.transform, {obj.collisionData.radius, obj.collisionData.radius}, c);
 			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
 			text += " " + m_bonusDatabase[obj.bonus].name.substr(0, 1);
 			auto textTf = obj.transform;
@@ -492,6 +602,11 @@ namespace Core
 			m_graphicsSystem.drawCircle(t, 4, 36, {0.25f, 0.42f, 0.76f, 0.2f});
 		}
 
+		Transform cursor;
+		cursor.position = m_players[0].aim;
+		cursor.scale.set(0.5f, 0.5f);
+		m_graphicsSystem.drawCircle(cursor, 1, 18, {1, 1, 1});
+
 		//****************************
 		//			gui from now on
 		//****************************
@@ -505,15 +620,15 @@ namespace Core
 		Transform tf;
 		tf.position.set(5-0.5f*m_window->getSizeX(), 0.5f*m_window->getSizeY() - 20);
 		tf.scale.set(0.75f, 0.75f);
-		for(auto& player : m_players)
+		/*for(auto& player : m_players)
 		{
 			auto str = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
 			str += "   Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
 			str += "   Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
 			str += "   Weapon: " + player.currentWeapon.name;
 			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
-			tf.position.y += 20;
-		}
+			tf.position.y -= 20;
+		}*/
 		tf.position.set(10-(float)m_window->getSizeX()*0.5f, 300);
 		for(auto& player : m_players)
 		{
@@ -523,12 +638,12 @@ namespace Core
 				auto remaining = b.duration - b.timer.getCurrentMicros();
 				str += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
 				m_graphicsSystem.drawText(m_defaultFont, str, tf, {0, 0, 0}, 0, false);
-				tf.position.y += 20;
+				tf.position.y -= 20;
 			}
 		}
 #ifdef _DEBUG
 		m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
-		tf.position.y += 20;
+		tf.position.y -= 20;
 #endif
 		int64_t timeLeft = m_defenseMatrixMicros - m_defenseMatrixTimer.getCurrentMicros();
 		uint32_t displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);

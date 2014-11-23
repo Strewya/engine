@@ -97,7 +97,7 @@ namespace Core
 		void v3_setVertices(const std::vector<Vertex>& vertices);
 		void v3_setIndices(const std::vector<uint32_t>& indices);
 		void v3_setTopology(D3D_PRIMITIVE_TOPOLOGY topology);
-		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills);
+		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, uint32_t startOffset, uint32_t count);
 		void v3_setTexture(uint32_t textureId);
 		void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
 

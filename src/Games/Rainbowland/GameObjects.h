@@ -157,6 +157,7 @@ namespace Core
 
 	struct Player
 	{
+		Time weaponTimer;
 		Transform transform;
 		Color color;
 		Circle collisionData;
@@ -166,7 +167,6 @@ namespace Core
 		bool directions[4];
 		Vec2 aim;
 		VActiveBonuses bonuses;
-		Time weaponTimer;
 		Weapon currentWeapon;
 		uint32_t bonusDamage;
 		float rateOfFireMultiplier;
@@ -180,6 +180,7 @@ namespace Core
 		uint32_t level;
 		uint32_t perkPoints;
 		uint32_t perksPerLevel;
+		uint32_t id;
 		std::vector<PerkType> availablePerks;
 		std::vector<PerkType> acquiredPerks;
 		std::vector<PerkType> selectablePerks;
@@ -202,12 +203,13 @@ namespace Core
 	//waaaaaaa
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
-	void initPlayer(Player& player, const VWeapons& weaponDb, const VPerks& perkDb);
+	void initPlayer(Player& player, uint32_t id, RainbowlandGame& game);
 	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
 	void orientPlayers(VPlayers& players);
-	void checkPlayerDeath(VPlayers& players);
-	void checkLevelup(VPlayers& players, RainbowlandGame& gui);
+	void checkPlayerDeath(RainbowlandGame& game);
+	void checkLevelup(VPlayers& players, RainbowlandGame& game);
 	void grantExperience(uint32_t exp, VPlayers& players);
+	void updateGuiLabels(RainbowlandGame& game);
 
 	void enableBonus(Player& player, Bonus& bonus, RainbowlandGame& game);
 	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
@@ -219,7 +221,7 @@ namespace Core
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
 	void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb);
-	void fireWeapon(const Time& timer, Player& player, VBullets& bullets, const GraphicsSystem& graphicsSystem, const Camera& camera);
+	void fireWeapon(Player& player, RainbowlandGame& game);
 	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
 	void moveBullets(const Time& timer, VBullets& bullets);
 	void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<Monster*>& outMonsters);
@@ -230,7 +232,7 @@ namespace Core
 	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
 	void orientMonsters(VMonsters& monsters);
 	void hurtMonster(Monster& monster, uint32_t amount);
-	void checkMonsterHurtingPlayer(const Time& timer, VMonsters& monsters, VPlayers& players);
+	void checkMonsterHurtingPlayer(RainbowlandGame& game);
 	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
 
 	bool enterPerkMode(RainbowlandGame& game);

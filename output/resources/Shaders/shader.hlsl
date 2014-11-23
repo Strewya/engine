@@ -1,5 +1,5 @@
 
-struct VIn
+struct Vertex
 {
 	float4 position : POSITION;
 	float2 texCoord : TEXCOORD;
@@ -8,7 +8,7 @@ struct VIn
 	matrix world : WORLD;
 };
 
-struct VOut
+struct Pixel
 {
     float4 position : SV_POSITION;
     float4 diffuse : DIFFUSE;
@@ -24,12 +24,10 @@ cbuffer dataPerScene
 Texture2D ObjTexture;
 SamplerState ObjSamplerState;
 
-VOut VShader(VIn input)
+Pixel VShader(Vertex input)
 {
-    VOut output;
+    Pixel output;
     output.position = mul(input.position, input.world);
-	//output.position = mul(output.position, view);
-	//output.position = mul(output.position, projection);
 	output.texCoord = input.texCoord;
 	output.diffuse = input.diffuse * input.fill;
 	
@@ -37,7 +35,7 @@ VOut VShader(VIn input)
 }
 
 
-float4 PShader(VOut input) : SV_TARGET
+float4 PShader(Pixel input) : SV_TARGET
 {
     float4 diffuse = input.diffuse;
 	if(input.texCoord.x >= 0 && input.texCoord.y >= 0)

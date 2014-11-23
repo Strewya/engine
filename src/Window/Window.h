@@ -57,6 +57,8 @@ namespace Core
 		void processGamepads();
 		
 		void showCursor(bool isShown);
+		void lockCursor(bool isLocked);
+		void makeMouseRelative(bool isRelative);
 		void setFullscreen(bool isFullscreen);
 
 		void setExtendedStyle(uint32_t style);
@@ -111,6 +113,8 @@ namespace Core
 
 		bool m_fullscreen;
 		bool m_showCursor;
+		bool m_lockCursor;
+		bool m_relativeMouse;
 		bool m_isRunning;
 		
 		std::string m_class;

@@ -655,7 +655,7 @@ namespace Core
 		uint32_t dist = m_circleData.size() / p;
 		std::vector<Vertex> vertices;
 		vertices.reserve(p + 1);
-		vertices.emplace_back(Vertex{0, 0, 0, 1, 1, 1, 1, 0, 0});
+		vertices.emplace_back(Vertex{0, 0, 0, 1, 1, 1, 1, -1, -1});
 		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
 		{
 			auto& v = m_circleData[i];
@@ -717,7 +717,7 @@ namespace Core
 		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
 		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
 
-		m_devcon->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		m_devcon->DrawIndexedInstanced(indices.size(), 1, 0, 0, 0);
 
 		safeRelease(inst);
 		safeRelease(ib);
@@ -920,22 +920,24 @@ namespace Core
 		m_devcon->IASetPrimitiveTopology(topology);
 	}
 
-	void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills)
+	void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, uint32_t startOffset, uint32_t count)
 	{
-		assert(tfs.size() == fills.size());
-		auto count = tfs.size();
 		if(count == 0)
 			return;
-
+		
+		assert(startOffset < tfs.size());
+		assert(startOffset + count <= tfs.size());
+		assert(tfs.size() == fills.size());
+		
 		std::vector<dataPerInstance> data;
 		data.reserve(count);
-		for(uint32_t i = 0; i < count; ++i)
+		for(uint32_t i = startOffset; i < startOffset+count; ++i)
 		{
 			auto world = XMMatrixIdentity();
 			world *= XMMatrixScaling(tfs[i].scale.x, tfs[i].scale.y, 1.0f);
 			//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
 			//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-			world *= XMMatrixRotationZ(XMConvertToRadians(tfs[i].rotation));
+			world *= XMMatrixRotationZ(tfs[i].rotation);
 			world *= XMMatrixTranslation(tfs[i].position.x, tfs[i].position.y, 0);
 
 			data.emplace_back();
