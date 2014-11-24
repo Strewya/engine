@@ -265,6 +265,10 @@ namespace Core
 							if(firstDown)
 								activateDefenseMatrix(*this);
 							break;
+						case Keyboard::m_Q:
+							if(firstDown)
+								activateTimeCapsule(*this);
+							break;
 					}
 				}
 				return false;
@@ -430,52 +434,53 @@ namespace Core
 			debugPauseTime = currentScale;
 		}
 #endif
-		movePlayers(m_gameplayTimer, m_players, m_playingField);
+
+		for(auto& obj : m_players)
+		{
+			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
+		}
+		for(auto& obj : m_monsters)
+		{
+			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
+		}
+		for(auto& obj : m_monsterSpawners)
+		{
+			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
+		}
+		for(auto& obj : m_bullets)
+		{
+			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
+		}
+		for(auto& obj : m_pickups)
+		{
+			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
+		}
+
+		movePlayers(m_players, m_playingField);
 #ifdef _DEBUG
 		if(g_spawnEnabled)
 #endif
-		updateMonsterSpawners(m_gameplayTimer, m_monsterSpawners, m_monsters, m_players.size());
-		moveMonsters(m_gameplayTimer, m_monsters, m_players);
+		updateMonsterSpawners(m_monsterSpawners, m_monsters, m_players.size());
+		moveMonsters(m_monsters, m_players);
 		orientMonsters(m_monsters);
 		checkMonsterHurtingPlayer(*this);
-		checkLevelup(m_players, *this);
+		checkLevelup(*this);
+		fixupCamera(m_players, m_camera);
 		
-		if(m_players.size() > 0)
-		{
-			Vec2 averagePos;
-			for(auto& player : m_players)
-			{
-				averagePos += player.transform.position;
-			}
-			averagePos /= (float)m_players.size();
-			auto pos = m_camera.getPosition();
-			Vec2 pos2{pos.x, pos.y};
-			clamp(-5.0f, 5.0f, averagePos.x);
-			clamp(-2.0f, 2.0f, averagePos.y);
-			auto diff = averagePos - pos2;
-			if(Vec2::length(diff) > 0)
-			{
-				pos.set(averagePos.x, averagePos.y, pos.z);
-				m_camera.move({diff.x, diff.y, 0});
-				m_players[0].aim += diff;
-			}
-		}
 		orientPlayers(m_players);
-		for(auto& player : m_players)
-		{
-			fireWeapon(player, *this);
-		}
-
+		fireWeapons(*this);
+		
 		updatePerks(*this);
-		moveBullets(m_gameplayTimer, m_bullets);
+		moveBullets(m_bullets);
 		updateBullets(m_bullets, m_monsters);
 		VKillLocations locations;
 		killMonsters(m_monsters, locations, m_players);
 		generatePickups(locations, m_pickups, m_bonusDatabase);
-		checkPickups(m_players, *this);
-		updateBonuses(m_gameplayTimer, *this);
-		updatePickups(m_gameplayTimer, *this);
+		checkPickups(*this);
+		updateBonuses(*this);
+		updatePickups(*this);
 		updateDefenseMatrix(*this);
+		updateTimeCapsule(*this);
 		checkPlayerDeath(*this);
 		updateGuiLabels(*this);
 
@@ -583,7 +588,7 @@ namespace Core
 		
 		for(auto& obj : m_pickups)
 		{
-			auto diff = obj.duration - obj.timer.getCurrentMicros();
+			auto diff = obj.duration - obj.objectTimer.getCurrentMicros();
 			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
 			text += " " + m_bonusDatabase[obj.bonus].name.substr(0, 1);
 			auto textTf = obj.transform;
@@ -598,13 +603,18 @@ namespace Core
 
 		if(m_defenseMatrixActive)
 		{
-			Transform t{m_defenseMatrixLocation, {1,1}, 0};
-			m_graphicsSystem.drawCircle(t, 4, 36, {0.25f, 0.42f, 0.76f, 0.2f});
+			Transform t{m_defenseMatrixArea.center, {1,1}, 0};
+			m_graphicsSystem.drawCircle(t, m_defenseMatrixArea.radius, 36, {0.25f, 0.42f, 0.76f, 0.2f});
+		}
+		if(m_timeCapsuleActive)
+		{
+			Transform t{m_timeCapsuleArea.center, {1, 1}, 0};
+			m_graphicsSystem.drawCircle(t, m_timeCapsuleArea.radius, 36, {0.75f, 0.42f, 0.2f, 0.1f});
 		}
 
 		Transform cursor;
 		cursor.position = m_players[0].aim;
-		cursor.scale.set(0.5f, 0.5f);
+		cursor.scale.set(0.1f, 0.1f);
 		m_graphicsSystem.drawCircle(cursor, 1, 18, {1, 1, 1});
 
 		//****************************
@@ -618,17 +628,7 @@ namespace Core
 		}
 
 		Transform tf;
-		tf.position.set(5-0.5f*m_window->getSizeX(), 0.5f*m_window->getSizeY() - 20);
 		tf.scale.set(0.75f, 0.75f);
-		/*for(auto& player : m_players)
-		{
-			auto str = "Health: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
-			str += "   Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
-			str += "   Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
-			str += "   Weapon: " + player.currentWeapon.name;
-			m_graphicsSystem.drawText(m_defaultFont, str, tf, {0,0,0}, 0, false);
-			tf.position.y -= 20;
-		}*/
 		tf.position.set(10-(float)m_window->getSizeX()*0.5f, 300);
 		for(auto& player : m_players)
 		{
@@ -649,6 +649,12 @@ namespace Core
 		uint32_t displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
 		if(timeLeft < 0) displayTime = 0;
 		m_graphicsSystem.drawText(m_defaultFont, "Defense matrix: " + std::to_string(displayTime), tf, {0, 0, 0}, 0, false);
+		tf.position.y -= 20;
+		
+		timeLeft = m_timeCapsuleMicros - m_timeCapsuleTimer.getCurrentMicros();
+		displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+		if(timeLeft < 0) displayTime = 0;
+		m_graphicsSystem.drawText(m_defaultFont, "Time capsule: " + std::to_string(displayTime), tf, {0, 0, 0}, 0, false);
 
 		m_guiSystem.draw(m_graphicsSystem);
 

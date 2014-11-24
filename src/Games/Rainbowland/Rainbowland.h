@@ -60,10 +60,15 @@ namespace Core
 		VWeapons m_weaponDatabase;
 		VPerks m_perkDatabase;
 		VBonuses m_bonusDatabase;
-		Vec2 m_defenseMatrixLocation;
+		
+		Circle m_defenseMatrixArea;
+		Circle m_timeCapsuleArea;
 		bool m_defenseMatrixActive;
+		bool m_timeCapsuleActive;
 		Time m_defenseMatrixTimer;
+		Time m_timeCapsuleTimer;
 		uint64_t m_defenseMatrixMicros;
+		uint64_t m_timeCapsuleMicros;
 		
 		uint32_t m_defaultFont;
 		uint32_t m_backgroundTexture;

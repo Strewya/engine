@@ -74,6 +74,7 @@ namespace Core
 
 	struct Monster
 	{
+		Time objectTimer;
 		Transform transform;
 		Color color;
 		Circle collisionData;
@@ -90,6 +91,7 @@ namespace Core
 
 	struct MonsterSpawner
 	{
+		Time objectTimer;
 		Transform transform;
 		Time timer;
 		uint64_t spawnCooldown;
@@ -100,10 +102,10 @@ namespace Core
 
 	struct Pickup
 	{
+		Time objectTimer;
 		Transform transform;
 		Color color;
 		Circle collisionData;
-		Time timer;
 		uint64_t duration;
 		BonusType bonus;
 	};
@@ -133,6 +135,7 @@ namespace Core
 
 	struct Bullet
 	{
+		Time objectTimer;
 		Vec2 origin;
 		Vec2 position;
 		Vec2 velocity;
@@ -157,6 +160,7 @@ namespace Core
 
 	struct Player
 	{
+		Time objectTimer;
 		Time weaponTimer;
 		Transform transform;
 		Color color;
@@ -204,32 +208,33 @@ namespace Core
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
 	void initPlayer(Player& player, uint32_t id, RainbowlandGame& game);
-	void movePlayers(const Time& timer, VPlayers& players, const Rect& playingField);
+	void movePlayers(VPlayers& players, const Rect& playingField);
 	void orientPlayers(VPlayers& players);
 	void checkPlayerDeath(RainbowlandGame& game);
-	void checkLevelup(VPlayers& players, RainbowlandGame& game);
+	void checkLevelup(RainbowlandGame& game);
 	void grantExperience(uint32_t exp, VPlayers& players);
 	void updateGuiLabels(RainbowlandGame& game);
+	void fixupCamera(VPlayers& players, Camera& camera);
 
 	void enableBonus(Player& player, Bonus& bonus, RainbowlandGame& game);
 	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
-	void updateBonuses(const Time& timer, RainbowlandGame& game);
+	void updateBonuses(RainbowlandGame& game);
 	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb);
 	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus);
-	void checkPickups(VPlayers& players, RainbowlandGame& game);
-	void updatePickups(const Time& timer, RainbowlandGame& game);
+	void checkPickups(RainbowlandGame& game);
+	void updatePickups(RainbowlandGame& game);
 
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
 	void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb);
-	void fireWeapon(Player& player, RainbowlandGame& game);
+	void fireWeapons(RainbowlandGame& game);
 	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
-	void moveBullets(const Time& timer, VBullets& bullets);
+	void moveBullets(VBullets& bullets);
 	void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<Monster*>& outMonsters);
 	void updateBullets(VBullets& bullets, VMonsters& monsters);
 
-	void updateMonsterSpawners(const Time& timer, VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
+	void updateMonsterSpawners(VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
 	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
-	void moveMonsters(const Time& timer, VMonsters& monsters, const VPlayers& players);
+	void moveMonsters(VMonsters& monsters, const VPlayers& players);
 	void orientMonsters(VMonsters& monsters);
 	void hurtMonster(Monster& monster, uint32_t amount);
 	void checkMonsterHurtingPlayer(RainbowlandGame& game);
@@ -244,4 +249,7 @@ namespace Core
 
 	void activateDefenseMatrix(RainbowlandGame& game);
 	void updateDefenseMatrix(RainbowlandGame& game);
+
+	void activateTimeCapsule(RainbowlandGame& game);
+	void updateTimeCapsule(RainbowlandGame& game);
 }
