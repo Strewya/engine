@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Box2D", "Box2D\Box2D.vcxproj", "{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}"
 EndProject
@@ -20,15 +20,14 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Debug|Win32.Build.0 = Debug|Win32
-		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Deploy|Win32.ActiveCfg = Final|Win32
-		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Deploy|Win32.Build.0 = Final|Win32
-		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Deploy|Win32.Deploy.0 = Final|Win32
+		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Deploy|Win32.ActiveCfg = Deploy|Win32
+		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Deploy|Win32.Build.0 = Deploy|Win32
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Release|Win32.ActiveCfg = Release|Win32
 		{CF33D4CF-5BA6-48AB-BF08-7463C18329B6}.Release|Win32.Build.0 = Release|Win32
 		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Debug|Win32.Build.0 = Debug|Win32
-		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Deploy|Win32.ActiveCfg = Final|Win32
-		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Deploy|Win32.Build.0 = Final|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Deploy|Win32.ActiveCfg = Deploy|Win32
+		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Deploy|Win32.Build.0 = Deploy|Win32
 		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Release|Win32.ActiveCfg = Release|Win32
 		{A0FDD4E0-D78E-495A-A0D9-505A373A349D}.Release|Win32.Build.0 = Release|Win32
 		{E8CCEC27-D88A-439D-86C6-E84E8ACA1D01}.Debug|Win32.ActiveCfg = Release|Win32

@@ -50,7 +50,7 @@ function deployTarget()
 	return gProjDir .. "/deploy/";
 end;
 
-function doDeployment(target)
+function doDeployment(target, build)
 	if(target == nil) then
 		print("Invalid deploy target");
 		return;
@@ -67,9 +67,9 @@ function doDeployment(target)
 	local dstRootDir = target .. game;
 	local dstBinDir = dstRootDir .. "/bin";
 	local dstResDir = dstRootDir .. "/resources";
-	local srcBinDir = gProjDir .. "/output/Final";
+	local srcBinDir = gProjDir .. "/output/" .. build;
 	local srcResDir = gProjDir .. "/output/resources";
-		
+	
 	print("Deploying " .. game .. " game to " .. nixPath(dstRootDir));
 	local files = {};
 	--copy bin folder: exe and DLLs

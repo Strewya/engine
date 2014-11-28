@@ -51,11 +51,16 @@ assertResourcesPresent(resList, resDir);
 
 
 
-if(buildName == "Deploy" or buildName == "Final") then
+if(buildName == "Deploy" or buildName == "Release") then
 	allResourcesPresent = resOK;
 	gameName = game;
 	resourceList = resList;
 	dofile(gProjDir.."/bin/game_deploy.lua");
-	doDeployment(dropboxTarget());
-	doDeployment(deployTarget());
+	print(buildName);
+	if(buildName == "Deploy") then
+		doDeployment(dropboxTarget(), buildName);
+	end;
+	if(buildName == "Release") then
+		doDeployment(deployTarget(), buildName);
+	end;
 end;

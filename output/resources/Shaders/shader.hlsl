@@ -4,8 +4,8 @@ struct Vertex
 	float4 position : POSITION;
 	float2 texCoord : TEXCOORD;
 	float4 diffuse : DIFFUSE;
-	float4 fill : FILL;
 	matrix world : WORLD;
+	float4 fill : FILL;
 };
 
 struct Pixel

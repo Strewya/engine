@@ -5,12 +5,8 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Deploy_dropbox|Win32">
-      <Configuration>Deploy_dropbox</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Final|Win32">
-      <Configuration>Final</Configuration>
+    <ProjectConfiguration Include="Deploy|Win32">
+      <Configuration>Deploy</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -37,14 +33,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
@@ -60,10 +49,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'" Label="PropertySheets">
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -83,15 +69,7 @@
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
-    <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
-    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
     <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
@@ -159,6 +137,7 @@
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,59 +168,14 @@
       <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CORE_USE_PCH;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
-      <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
-      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <TreatWarningAsError>true</TreatWarningAsError>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AssemblyLinkResource>
-      </AssemblyLinkResource>
-      <ForceFileOutput>
-      </ForceFileOutput>
-    </Link>
-    <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
-    </PreBuildEvent>
-    <CustomBuild>
-      <Command>
-      </Command>
-    </CustomBuild>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <CustomBuildStep>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
-    </CustomBuildStep>
-    <CustomBuildStep>
-      <Inputs>
-      </Inputs>
-      <Outputs>dummy</Outputs>
-      <Message />
-    </CustomBuildStep>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CORE_USE_PCH;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEPLOY;CORE_USE_PCH;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -296,8 +230,7 @@
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <ClCompile Include="..\..\..\src\Games\Game.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp">
@@ -305,8 +238,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp" />
@@ -331,8 +263,7 @@
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Circle.cpp" />
     <ClCompile Include="..\..\..\src\Util\CollisionChecks.cpp" />
@@ -372,8 +303,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Pong\Pong.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy_dropbox|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h" />

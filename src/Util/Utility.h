@@ -20,7 +20,7 @@ namespace Core
 #define DEBUG_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
 
 
-#ifdef _DEBUG
+#ifndef DEPLOY
 
 #define DEBUG_CODE_START
 #define DEBUG_CODE_END

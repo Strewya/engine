@@ -882,7 +882,7 @@ namespace Core
 			game.m_timeCapsuleActive = true;
 			game.m_timeCapsuleArea.center = game.m_players[0].transform.position;
 			game.m_timeCapsuleArea.radius = 10;
-			game.m_timeCapsuleMicros = Time::secondsToMicros(10);
+			game.m_timeCapsuleMicros = Time::secondsToMicros(30);
 			game.m_timeCapsuleTimer.reset();
 		}
 	}

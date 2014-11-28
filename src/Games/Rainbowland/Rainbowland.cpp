@@ -612,10 +612,13 @@ namespace Core
 			m_graphicsSystem.drawCircle(t, m_timeCapsuleArea.radius, 36, {0.75f, 0.42f, 0.2f, 0.1f});
 		}
 
-		Transform cursor;
-		cursor.position = m_players[0].aim;
-		cursor.scale.set(0.1f, 0.1f);
-		m_graphicsSystem.drawCircle(cursor, 1, 18, {1, 1, 1});
+		if(m_players.size() > 0)
+		{
+			Transform cursor;
+			cursor.position = m_players[0].aim;
+			cursor.scale.set(0.1f, 0.1f);
+			m_graphicsSystem.drawCircle(cursor, 1, 18, {1, 1, 1});
+		}
 
 		//****************************
 		//			gui from now on

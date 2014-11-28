@@ -34,8 +34,8 @@ namespace Core
 
 	struct dataPerInstance
 	{
+		XMFLOAT4X4 world;
 		XMFLOAT4 fillColor;
-		XMMATRIX world;
 	};
 
 	static void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd, HWND hwnd, uint32_t width, uint32_t height);
@@ -378,9 +378,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = 1;
 		dpi.fillColor.y = 1;
 		dpi.fillColor.z = 1;
@@ -437,9 +438,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -496,9 +498,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(tf.rotation);
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -611,9 +614,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -694,9 +698,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -774,9 +779,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -848,9 +854,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;
@@ -933,20 +940,23 @@ namespace Core
 		data.reserve(count);
 		for(uint32_t i = startOffset; i < startOffset+count; ++i)
 		{
+			data.emplace_back();
+			auto& dpi = data.back();
+			
+			dpi.fillColor.x = fills[i].r;
+			dpi.fillColor.y = fills[i].g;
+			dpi.fillColor.z = fills[i].b;
+			dpi.fillColor.w = fills[i].a;
+
 			auto world = XMMatrixIdentity();
 			world *= XMMatrixScaling(tfs[i].scale.x, tfs[i].scale.y, 1.0f);
 			//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
 			//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 			world *= XMMatrixRotationZ(tfs[i].rotation);
 			world *= XMMatrixTranslation(tfs[i].position.x, tfs[i].position.y, 0);
+			world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
-			data.emplace_back();
-			auto& dpi = data.back();
-			dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
-			dpi.fillColor.x = fills[i].r;
-			dpi.fillColor.y = fills[i].g;
-			dpi.fillColor.z = fills[i].b;
-			dpi.fillColor.w = fills[i].a;
+			XMStoreFloat4x4(&dpi.world, world);
 		}
 
 		D3D11_MAPPED_SUBRESOURCE ms;
@@ -1217,9 +1227,10 @@ namespace Core
 		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
 		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
 		world *= XMMatrixTranslation(tf.position.x - move, tf.position.y, 0);
+		world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
 		dataPerInstance dpi;
-		dpi.world = XMMatrixTranspose(world*m_camView*m_camProjection);
+		XMStoreFloat4x4(&dpi.world, world);
 		dpi.fillColor.x = c.r;
 		dpi.fillColor.y = c.g;
 		dpi.fillColor.z = c.b;

@@ -1,7 +1,8 @@
 return 
 { -- resource dependencies
 	"Defs/font.font",
-	"Textures/font_t.png"
+	"Textures/font_t.png",
+	"Textures/moss.png"
 },
 { -- DLL dependencies
 	"tolua++",
