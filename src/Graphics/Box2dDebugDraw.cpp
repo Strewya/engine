@@ -47,7 +47,7 @@ namespace Core
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
 		
-		m_graphics->drawMultiline(t, polygonData.data(), vertexCount, c);
+		drawHollowPolygon(*m_graphics, t, polygonData.data(), vertexCount, c);
 	}
 
 	void Box2dDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
@@ -63,7 +63,7 @@ namespace Core
 		t.rotation = 0;
 
 
-		//m_graphics->drawPolygon(t, polygonData.data(), polygonData.size(), c);
+		drawSolidPolygon(*m_graphics, t, polygonData.data(), polygonData.size(), c);
 	}
 
 	void Box2dDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
@@ -78,7 +78,7 @@ namespace Core
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
 
-		//m_graphics->drawCirclePolygon(t, radius, 24, c);
+		drawHollowCircle(*m_graphics, t, radius, 24, c);
 	}
 	
 	void Box2dDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
@@ -93,7 +93,7 @@ namespace Core
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
 
-		//m_graphics->drawCircle(t, radius, 24, c);
+		drawSolidCircle(*m_graphics, t, radius, 24, c);
 	}
 	
 	void Box2dDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)

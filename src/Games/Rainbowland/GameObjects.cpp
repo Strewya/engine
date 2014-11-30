@@ -24,6 +24,8 @@ namespace Core
 {
 	void initGame(RainbowlandGame& game)
 	{
+		game.m_window->showCursor(false);
+		game.m_window->lockCursor(true);
 		//background
 		game.m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
@@ -152,7 +154,7 @@ namespace Core
 		player.id = id;
 		player.objectTimer.reset();
 		player.transform.position.set(0+(float)id, 0);
-		player.transform.scale.set(0.5f, 0.5f);
+		player.transform.scale.set(1.0f, 1.0f);
 		player.transform.rotation = 0;
 		player.color.r = id == 0 ? 1.0f : 0.0f;
 		player.color.g = id == 1 ? 1.0f : 0.0f;
@@ -192,15 +194,15 @@ namespace Core
 		
 		auto exp = "Exp/next level: " + std::to_string(player.experience) + "/" + std::to_string(player.experienceForNextLevel);
 		Vec2 expPos = healthPos;
-		expPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, health).x * 2 * 0.75f + 50;
+		expPos.x += game.m_graphicsSystem.textHalfSize(game.m_defaultFont, health).x * 2 * 0.75f + 50;
 		
 		auto ammo = "Ammo: " + std::to_string(player.currentWeapon.ammo) + "/" + std::to_string(player.currentWeapon.maxAmmo);
 		Vec2 ammoPos = expPos;
-		ammoPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, exp).x * 2;
+		ammoPos.x += game.m_graphicsSystem.textHalfSize(game.m_defaultFont, exp).x * 2;
 		
 		auto weapon = "Weapon: " + player.currentWeapon.name;
 		Vec2 weaponPos = ammoPos;
-		weaponPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, ammo).x * 2 * 0.75f + 50;
+		weaponPos.x += game.m_graphicsSystem.textHalfSize(game.m_defaultFont, ammo).x * 2 * 0.75f + 50;
 		
 		game.m_guiSystem.panel(panel, "root", {0, 0}, {(float)game.m_window->getSizeX(), (float)game.m_window->getSizeY()}, {0, 0, 0, 0});
 		game.m_guiSystem.label(panel + "HP", panel, game.m_defaultFont, health, healthPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
@@ -272,7 +274,7 @@ namespace Core
 				player.experienceForNextLevel += 1000 * player.level;
 				if(player.perkPoints == 1)
 				{
-					auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, "Level");
+					auto textSize = game.m_graphicsSystem.textHalfSize(game.m_defaultFont, "Level");
 					textSize *= 0.5f;
 					Rect r;
 					r.center.set(game.m_window->getSizeX()*0.5f - textSize.x - 10, 200);
@@ -726,7 +728,7 @@ namespace Core
 				for(auto& perk : player.selectablePerks)
 				{
 					auto name = "player" + std::to_string(playerIndex) + "perk" + std::to_string(perkIndex);
-					auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, game.m_perkDatabase[perk].name);
+					auto textSize = game.m_graphicsSystem.textHalfSize(game.m_defaultFont, game.m_perkDatabase[perk].name);
 					textSize *= Vec2{0.5f, 0.5f};
 					game.m_guiSystem.button(name, "perkWindow", {column, row}, {(distance - 10)*0.5f, textSize.y + 10}, {1, 1, 1},
 											Mouse::m_LeftButton, [=, &player, &game]()
@@ -745,7 +747,7 @@ namespace Core
 				++playerIndex;
 				row -= 80;
 			}
-			auto textSize = game.m_graphicsSystem.textSize(game.m_defaultFont, "cancel");
+			auto textSize = game.m_graphicsSystem.textHalfSize(game.m_defaultFont, "cancel");
 			Vec2 textScale{0.5f, 0.5f};
 			textSize *= textScale;
 			game.m_guiSystem.button("close", "perkWindow", {300 - textSize.x - 10, -300 + textSize.y + 10}, textSize, {1,1,1,1},

@@ -29,7 +29,10 @@ namespace Core
 	void RainbowlandGame::shutdown()
 	{
 		DEBUG_INFO("---------------------------------");
-		bool status = true;
+		DEBUG_STATUS(true);
+		m_window->lockCursor(false);
+		m_window->showCursor(true);
+
 		status &= m_textureCache.shutdown();
 		status &= m_fontCache.shutdown();
 		status &= m_guiSystem.shutdown();
@@ -200,6 +203,28 @@ namespace Core
 							m_window->lockCursor(false);
 							break;
 
+						case Keyboard::m_Home:
+						{
+							auto p = m_camera.getPosition();
+							p.z = -50;
+							m_camera.setPosition(p);
+						} break;
+
+						case Keyboard::m_PageUp:
+						{
+							auto p = m_camera.getPosition();
+							p.z += 1;
+							m_camera.setPosition(p);
+						} break;
+
+						case Keyboard::m_PageDown:
+						{
+							auto p = m_camera.getPosition();
+							p.z -= 1;
+							m_camera.setPosition(p);
+						} break;
+
+
 						case Keyboard::m_F1:
 							placePickup(m_pickups, gen, loc, BonusType::IncreasedMovementSpeed);
 							return true;
@@ -342,9 +367,11 @@ namespace Core
 
 			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/moss.png");
+			m_isRunning &= (bool)m_textureCache.load("Textures/shoota.png");
 			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			m_defaultFont = m_fontCache.getResourceID("font");
 			m_backgroundTexture = m_textureCache.getResourceID("Textures/moss.png");
+			m_charsTexture = m_textureCache.getResourceID("Textures/shoota.png");
 		}
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
@@ -530,18 +557,8 @@ namespace Core
 		{
 			std::vector<Transform> tfs;
 			std::vector<Color> fills;
-			tfs.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
-			fills.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
-			for( auto& obj : m_players )
-			{
-				tfs.emplace_back(obj.transform);
-				fills.emplace_back(obj.color);
-			}
-			for( auto& obj : m_monsters )
-			{
-				tfs.emplace_back(obj.transform);
-				fills.emplace_back(obj.color);
-			}
+			tfs.reserve(m_pickups.size());
+			fills.reserve(m_pickups.size());
 			for( auto& obj : m_pickups )
 			{
 				tfs.emplace_back(obj.transform);
@@ -573,38 +590,47 @@ namespace Core
 			}
 		}
 
+		float ratio = 225.0f / 165.0f;
+		for( auto& obj : m_monsters )
+		{
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
+			vertices[0].setTextureCoords(002.0f / 986.0f, 783.0f / 971.0f);
+			vertices[1].setTextureCoords(227.0f / 986.0f, 783.0f / 971.0f);
+			vertices[2].setTextureCoords(002.0f / 986.0f, 948.0f / 971.0f);
+			vertices[3].setTextureCoords(227.0f / 986.0f, 948.0f / 971.0f);
+			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({obj.transform}, {{}}, 0, 1);
+			m_graphicsSystem.v3_setTexture(m_charsTexture);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
+		}
+
+		ratio = 176.0f / 88.0f;
 		for(auto& obj : m_players)
 		{
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
+			vertices[0].setTextureCoords(426.0f / 986.0f, 28.0f / 971.0f);
+			vertices[1].setTextureCoords(602.0f / 986.0f, 28.0f / 971.0f);
+			vertices[2].setTextureCoords(426.0f / 986.0f, 116.0f / 971.0f);
+			vertices[3].setTextureCoords(602.0f / 986.0f, 116.0f / 971.0f);
+			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({obj.transform}, {{}}, 0, 1);
+			m_graphicsSystem.v3_setTexture(m_charsTexture);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
+
 			if(obj.currentWeapon.ammo == 0)
 			{
 				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0};
-				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				{
-					std::string reloading = "RELOADING";
-					auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, reloading, false);
-					auto indices = m_graphicsSystem.v3_makeTextIndices(reloading.size());
-
-					m_graphicsSystem.v3_setVertices(vertices);
-					m_graphicsSystem.v3_setIndices(indices);
-					auto justified = m_graphicsSystem.justifyText(textTf, m_graphicsSystem.textSize(m_defaultFont, reloading).x, TJ_Center);
-					m_graphicsSystem.v3_setInstanceData({justified}, {{0, 0, 0}}, 0, 1);
-					m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-					m_graphicsSystem.v3_draw(indices.size(), 1);
-				}
+				drawText(m_graphicsSystem, m_defaultFont, "RELOADING", textTf, {0, 0, 0}, TJ_Center, false);
 				textTf.position.y -= 1;
-				{
-					auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
-					std::string remaining = std::to_string(timeRemaining);
-					auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, remaining, false);
-					auto indices = m_graphicsSystem.v3_makeTextIndices(remaining.size());
-
-					m_graphicsSystem.v3_setVertices(vertices);
-					m_graphicsSystem.v3_setIndices(indices);
-					auto justified = m_graphicsSystem.justifyText(textTf, m_graphicsSystem.textSize(m_defaultFont, remaining).x, TJ_Center);
-					m_graphicsSystem.v3_setInstanceData({justified}, {{0, 0, 0}}, 0, 1);
-					m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-					m_graphicsSystem.v3_draw(indices.size(), 1);
-				}
+				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
+				std::string remaining = std::to_string(timeRemaining);
+				drawText(m_graphicsSystem, m_defaultFont, remaining, textTf, {0, 0, 0}, TJ_Center, false);
 			}
 		}
 		
@@ -616,38 +642,12 @@ namespace Core
 		if(m_defenseMatrixActive)
 		{
 			Transform t{m_defenseMatrixArea.center, {1,1}, 0};
-			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_defenseMatrixArea.radius, 36);
-			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(36);
-			m_graphicsSystem.v3_setVertices(verts);
-			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData({t}, {{0.25f, 0.42f, 0.76f, 0.2f}}, 0, 1);
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_graphicsSystem.v3_draw(inds.size(), 1);
+			drawSolidCircle(m_graphicsSystem, t, m_defenseMatrixArea.radius, 36, {0.25f, 0.42f, 0.76f, 0.2f});
 		}
 		if(m_timeCapsuleActive)
 		{
 			Transform t{m_timeCapsuleArea.center, {1, 1}, 0};
-			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_timeCapsuleArea.radius, 36);
-			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(36);
-			m_graphicsSystem.v3_setVertices(verts);
-			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData({t}, {{0.75f, 0.42f, 0.2f, 0.1f}}, 0, 1);
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_graphicsSystem.v3_draw(inds.size(), 1);
-		}
-
-		if(m_players.size() > 0)
-		{
-			Transform cursor;
-			cursor.position = m_players[0].aim;
-			cursor.scale.set(0.1f, 0.1f);
-			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_timeCapsuleArea.radius, 18);
-			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(18);
-			m_graphicsSystem.v3_setVertices(verts);
-			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData({cursor}, {{}}, 0, 1);
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_graphicsSystem.v3_draw(inds.size(), 1);
+			drawSolidCircle(m_graphicsSystem, t, m_timeCapsuleArea.radius, 36, {0.75f, 0.42f, 0.2f, 0.1f});
 		}
 
 		//****************************
@@ -657,16 +657,7 @@ namespace Core
 		m_graphicsSystem.setOrthographicProjection();
 		if(m_players.size() == 0)
 		{
-			std::string text = "HAHA YOU ARE DEAD";
-			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
-			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
-
-			m_graphicsSystem.v3_setVertices(vertices);
-			m_graphicsSystem.v3_setIndices(indices);
-			auto justified = m_graphicsSystem.justifyText({}, m_graphicsSystem.textSize(m_defaultFont, text).x, TJ_Center);
-			m_graphicsSystem.v3_setInstanceData({justified}, {{}}, 0, 1);
-			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
+			drawText(m_graphicsSystem, m_defaultFont, "HAHA YOU ARE DEAD", {}, {0, 0, 0}, TJ_Center, false);
 		}
 
 		Transform tf;
@@ -679,15 +670,7 @@ namespace Core
 				std::string text = m_bonusDatabase[b.type].name;
 				auto remaining = b.duration - b.timer.getCurrentMicros();
 				text += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
-
-				auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
-				auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
-
-				m_graphicsSystem.v3_setVertices(vertices);
-				m_graphicsSystem.v3_setIndices(indices);
-				m_graphicsSystem.v3_setInstanceData({tf}, {{0,0,0}}, 0, 1);
-				m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-				m_graphicsSystem.v3_draw(indices.size(), 1);
+				drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 
 				tf.position.y -= 20;
 			}
@@ -695,14 +678,7 @@ namespace Core
 #ifdef _DEBUG
 		{
 			auto text = std::to_string(m_gameplayTimer.getTimeScale());
-			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
-			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
-
-			m_graphicsSystem.v3_setVertices(vertices);
-			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setInstanceData({tf}, {{0,0,0}}, 0, 1);
-			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
+			drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 
 			tf.position.y -= 20;
 		}
@@ -712,14 +688,7 @@ namespace Core
 		if(timeLeft < 0) displayTime = 0;
 		{
 			auto text = "Defense matrix: " + std::to_string(displayTime);
-			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
-			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
-
-			m_graphicsSystem.v3_setVertices(vertices);
-			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setInstanceData({tf}, {{0, 0, 0}}, 0, 1);
-			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
+			drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 		}
 		tf.position.y -= 20;
 		
@@ -728,14 +697,7 @@ namespace Core
 		if(timeLeft < 0) displayTime = 0;
 		{
 			auto text = "Time capsule: " + std::to_string(displayTime);
-			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
-			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
-
-			m_graphicsSystem.v3_setVertices(vertices);
-			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setInstanceData({tf}, {{0, 0, 0}}, 0, 1);
-			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
+			drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 		}
 
 		m_guiSystem.draw(m_graphicsSystem);
@@ -743,7 +705,13 @@ namespace Core
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 
-		
+		if( m_players.size() > 0 )
+		{
+			Transform t;
+			t.position = m_players[0].aim;
+			t.scale.set(0.1f, 0.1f);
+			drawSolidCircle(m_graphicsSystem, t, 1, 18, {});
+		}
 
 
 		/*

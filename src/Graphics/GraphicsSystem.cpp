@@ -43,7 +43,8 @@ namespace Core
 	static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
 	static ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize);
 	static ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
-	static XMVECTOR convert(const Vec3& v);
+	static XMVECTOR convert(Vec2 v);
+	static XMVECTOR convert(Vec3 v);
 
 	//*****************************************************************
 	//					INIT
@@ -296,7 +297,7 @@ namespace Core
 	//*****************************************************************
 	//					TEXT SIZE
 	//*****************************************************************
-	Vec2 GraphicsSystem::textSize(uint32_t fontID, const std::string& text) const
+	Vec2 GraphicsSystem::textHalfSize(uint32_t fontID, const std::string& text) const
 	{
 		const auto* font = m_fontCache->getResource(fontID);
 		if(!font)
@@ -523,6 +524,23 @@ namespace Core
 		}
 	}
 
+	std::vector<Vertex> GraphicsSystem::v3_makeCustomVertices(const Vec2* pos, uint32_t pts) const
+	{
+		std::vector<Vertex> vertices;
+		vertices.reserve(pts + 1);
+		vertices.emplace_back(Vertex{0, 0, 0, 1, 1, 1, 1, -1, -1});
+		Vec2 center;
+		for( uint32_t i = 0; i < pts; ++i )
+		{
+			auto& v = pos[i];
+			center += v;
+			vertices.emplace_back(Vertex{v.x, v.y, 0, 1, 1, 1, 1, -1, -1});
+		}
+		center /= (float)pts;
+		vertices[0].setPosition(center.x, center.y, 0);
+		return vertices;
+	}
+
 	std::vector<Vertex> GraphicsSystem::v3_makeCircleVertices(const Vec2& pos, float r, uint32_t pts) const
 	{
 		if((pts & 1) == 1) //if it's odd
@@ -542,11 +560,11 @@ namespace Core
 		return vertices;
 	}
 
-	std::vector<uint32_t> GraphicsSystem::v3_makeSolidCircleIndices(uint32_t p) const
+	std::vector<uint32_t> GraphicsSystem::v3_makeSolidPolygonIndices(uint32_t p) const
 	{
 		std::vector<uint32_t> indices;
 		indices.reserve(p * 3);
-		for(uint32_t i = 1; i <= p; ++i)
+		for( uint32_t i = 1; i <= p; ++i )
 		{
 			indices.push_back(i);
 			indices.push_back(0);
@@ -555,20 +573,44 @@ namespace Core
 		return indices;
 	}
 
-	std::vector<uint32_t> GraphicsSystem::v3_makeHollowCircleIndices(uint32_t p) const
+	std::vector<uint32_t> GraphicsSystem::v3_makeHollowPolygonIndices(uint32_t p) const
 	{
 		std::vector<uint32_t> indices;
 		indices.reserve(p * 2);
-		for(uint32_t i = 1; i <= p; ++i)
+		for( uint32_t i = 1; i <= p; ++i )
 		{
 			indices.push_back(i);
-			indices.push_back((i % p)+1);
+			indices.push_back((i % p) + 1);
 		}
 		return indices;
 	}
 
+	std::vector<uint32_t> GraphicsSystem::v3_makeSolidCircleIndices(uint32_t p) const
+	{
+		if( (p & 1) == 1 ) //if it's odd
+		{
+			++p; //make it even
+		}
+
+		return v3_makeSolidPolygonIndices(p);
+	}
+
+	std::vector<uint32_t> GraphicsSystem::v3_makeHollowCircleIndices(uint32_t p) const
+	{
+		if( (p & 1) == 1 ) //if it's odd
+		{
+			++p; //make it even
+		}
+		return v3_makeHollowPolygonIndices(p);
+	}
+
 	std::vector<Vertex> GraphicsSystem::v3_makeQuadVertices(const Vec2& pos, const Vec2& hs) const
 	{
+		/*
+			0-1
+			| |
+			2-3
+		*/
 		return
 		{
 			{pos.x-hs.x, pos.y+hs.y, 0, 1, 1, 1, 1, -1, -1},
@@ -592,9 +634,9 @@ namespace Core
 		return
 		{
 			0,1,
-			1,2,
-			2,3,
-			3,0
+			1,3,
+			3,2,
+			2,0
 		};
 	}
 
@@ -1027,8 +1069,98 @@ namespace Core
 		sd.Quality = 0;
 	}
 
-	XMVECTOR convert(const Vec3& v)
+	XMVECTOR convert(Vec3 v)
 	{
 		return XMVectorSet(v.x, v.y, v.z, 0);
+	}
+
+	XMVECTOR convert(Vec2 v)
+	{
+		return XMVectorSet(v.x, v.y, 0, 0);
+	}
+
+	void drawHollowPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color)
+	{
+		auto vertices = gfx.v3_makeCustomVertices(positions, count);
+		auto indices = gfx.v3_makeHollowPolygonIndices(count);
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+	
+	void drawSolidPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color)
+	{
+		auto vertices = gfx.v3_makeCustomVertices(positions, count);
+		auto indices = gfx.v3_makeSolidPolygonIndices(count);
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+
+	void drawHollowQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color)
+	{
+		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
+		auto indices = gfx.v3_makeHollowQuadIndices();
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+
+	void drawSolidQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color)
+	{
+		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
+		auto indices = gfx.v3_makeSolidQuadIndices();
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+
+	void drawHollowCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color)
+	{
+		auto vertices = gfx.v3_makeCircleVertices({}, radius, points);
+		auto indices = gfx.v3_makeHollowCircleIndices(points);
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+	
+	void drawSolidCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color)
+	{
+		auto vertices = gfx.v3_makeCircleVertices({}, radius, points);
+		auto indices = gfx.v3_makeSolidCircleIndices(points);
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+	
+	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color color, TextJustification justification, bool isItalic)
+	{
+		auto vertices = gfx.v3_makeTextVertices(fontID, text, isItalic);
+		auto indices = gfx.v3_makeTextIndices(text.size());
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({gfx.justifyText(transform, gfx.textHalfSize(fontID, text).x*2, justification)}, {color}, 0, 1);
+		gfx.v3_setFontTexture(fontID);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_draw(indices.size(), 1);
 	}
 }

@@ -67,12 +67,7 @@ namespace Core
 	{
 		Transform t;
 		t.position = pos;
-		graphics.v3_setVertices(graphics.v3_makeQuadVertices({}, halfSize));
-		auto indices = graphics.v3_makeSolidQuadIndices();
-		graphics.v3_setIndices(indices);
-		graphics.v3_setInstanceData({t}, {color}, 0, 1);
-		graphics.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		graphics.v3_draw(indices.size(), 1);
+		drawSolidQuad(graphics, t, halfSize, color);
 	}
 	
 	bool GuiSystem::Button::handleEvent(const WindowEvent& we, Vec2 windowSize)
@@ -99,12 +94,7 @@ namespace Core
 	{
 		Transform t;
 		t.position = pos;
-		graphics.v3_setVertices(graphics.v3_makeQuadVertices({},halfSize));
-		auto indices = graphics.v3_makeHollowQuadIndices();
-		graphics.v3_setIndices(indices);
-		graphics.v3_setInstanceData({t}, {color}, 0, 1);
-		graphics.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		graphics.v3_draw(indices.size(), 1);
+		drawHollowQuad(graphics, t, halfSize, color);
 	}
 
 	void GuiSystem::Label::drawSelf(GraphicsSystem& graphics)
@@ -112,16 +102,7 @@ namespace Core
 		Transform t;
 		t.position = pos;
 		t.scale = scale;
-		auto vertices = graphics.v3_makeTextVertices(font, text, italic);
-		auto indices = graphics.v3_makeTextIndices(text.size());
-
-		graphics.v3_setVertices(vertices);
-		graphics.v3_setIndices(indices);
-		t = graphics.justifyText(t, graphics.textSize(font, text).x, justification);
-		graphics.v3_setInstanceData({t}, {color}, 0, 1);
-		graphics.v3_setFontTexture(font);
-
-		graphics.v3_draw(indices.size(), 1);
+		drawText(graphics, font, text, t, color, justification, italic);
 	}
 	
 	void GuiSystem::panel(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color)

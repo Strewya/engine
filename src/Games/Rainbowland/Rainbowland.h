@@ -72,6 +72,7 @@ namespace Core
 		
 		uint32_t m_defaultFont;
 		uint32_t m_backgroundTexture;
+		uint32_t m_charsTexture;
 		Window* m_window;
 		bool m_isRunning;
 		bool perkMode;

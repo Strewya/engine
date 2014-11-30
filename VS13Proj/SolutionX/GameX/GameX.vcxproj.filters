@@ -431,6 +431,7 @@
     <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
       <Filter>Design\Pong</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua">
@@ -448,10 +449,5 @@
     <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua">
       <Filter>Design\Rainbowland</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\..\..\output\resources\Shaders\shader.hlsl">
-      <Filter>Framework\Graphics\Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
