@@ -14,7 +14,7 @@
 
 Debug/
 Release/
-Final/
+Deploy/
 ipch/
 *.sdf
 *.opensdf

@@ -95,6 +95,7 @@
       </AssemblyLinkResource>
       <ForceFileOutput>
       </ForceFileOutput>
+      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
@@ -394,6 +395,11 @@
     <None Include="..\..\..\src\Games\Rainbowland\Rainbowland.pkg" />
     <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua" />
     <None Include="..\..\..\src\Loaders\Loaders.pkg" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl">
+      <FileType>Document</FileType>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

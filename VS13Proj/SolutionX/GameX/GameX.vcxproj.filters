@@ -52,6 +52,10 @@
     <Filter Include="Design\Rainbowland">
       <UniqueIdentifier>{98560073-d057-4945-bcde-ea1e6a437678}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\Graphics\Shaders">
+      <UniqueIdentifier>{b60c4e91-ee31-43cf-ba18-e4b5d579d23f}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -444,5 +448,10 @@
     <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua">
       <Filter>Design\Rainbowland</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\..\output\resources\Shaders\shader.hlsl">
+      <Filter>Framework\Graphics\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

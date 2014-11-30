@@ -50,9 +50,6 @@ namespace Core
 		m_window = &window;
 
 		window.resize(1024, 768);
-		DEBUG_CODE_START
-			window.openConsole(1050, 0);
-		DEBUG_CODE_END;
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);

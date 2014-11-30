@@ -316,6 +316,28 @@ namespace Core
 	}
 
 	//*****************************************************************
+	//					JUSTIFY TEXT
+	//*****************************************************************
+	Transform GraphicsSystem::justifyText(Transform tf, float textSizeX, TextJustification justification)
+	{
+		float move = 0;
+		switch( justification )
+		{
+			case TextJustification::TJ_Center:
+			{
+				move = textSizeX*0.5f*tf.scale.x;
+			} break;
+
+			case TextJustification::TJ_Right:
+			{
+				move = textSizeX*tf.scale.x;
+			} break;
+		}
+		tf.position.x -= move;
+		return tf;
+	}
+
+	//*****************************************************************
 	//					GET TEXTURE DIMENSIONS
 	//*****************************************************************
 	Vec2 GraphicsSystem::getTextureDimensions(const Texture& texture) const
@@ -352,9 +374,6 @@ namespace Core
 	//*****************************************************************
 	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color)
 	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(2);
 		vertices[0].setPosition(p1.x, p1.y, 0);
 		vertices[0].setDiffuse(p1Color.r, p1Color.g, p1Color.b, p1Color.a);
@@ -363,49 +382,13 @@ namespace Core
 		vertices[1].setDiffuse(p2Color.r, p2Color.g, p2Color.b, p2Color.a);
 		vertices[1].setTextureCoords(-1, -1);
 
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 2);
+		v3_setVertices(vertices);
 
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices.data(), 2 * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
+		v3_setInstanceData({tf}, {{}}, 0, 1);
 
-
-		/****** INSTANCE BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = 1;
-		dpi.fillColor.y = 1;
-		dpi.fillColor.z = 1;
-		dpi.fillColor.w = 1;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
 		m_devcon->DrawInstanced(2, 1, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(vb);
 	}
 
 	//*****************************************************************
@@ -413,9 +396,6 @@ namespace Core
 	//*****************************************************************
 	void GraphicsSystem::drawMultiline(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
 	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
 		std::vector<Vertex> vertices(count);
 		for(uint32_t i = 0; i < count; ++i)
 		{
@@ -424,472 +404,15 @@ namespace Core
 			vertices[i].setTextureCoords(-1, -1);
 		}
 
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), count);
+		v3_setVertices(vertices);
 
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices.data(), count * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INSTANCE BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
+		v3_setInstanceData({tf}, {c}, 0, 1);
+		v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		m_devcon->DrawInstanced(count, 1, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(vb);
 	}
 
-	//*****************************************************************
-	//					DRAW POLYGON
-	//*****************************************************************
-	void GraphicsSystem::drawPolygon(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
-	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
-		std::vector<Vertex> vertices(count);
-		for(uint32_t i = 0; i < count; ++i)
-		{
-			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
-			vertices[i].setDiffuse(1, 1, 1, 1);
-			vertices[i].setTextureCoords(-1, -1);
-		}
-
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), count);
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices.data(), count * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INSTANCE BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(tf.rotation);
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-		
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
-		m_devcon->DrawInstanced(count, 1, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(vb);
-	}
-
-	//*****************************************************************
-	//					DRAW QUAD POLYGON
-	//*****************************************************************
-	void GraphicsSystem::drawQuadPolygon(const Transform& tf, const Rect& rect, const Color& c)
-	{
-		uint32_t count = 5;
-		std::vector<Vec2> vertices(count);
-		vertices[0].set(rect.center.x - rect.halfWidth, rect.center.y - rect.halfHeight);
-		vertices[1].set(rect.center.x + rect.halfWidth, rect.center.y - rect.halfHeight);
-		vertices[2].set(rect.center.x + rect.halfWidth, rect.center.y + rect.halfHeight);
-		vertices[3].set(rect.center.x - rect.halfWidth, rect.center.y + rect.halfHeight);
-		vertices[4] = vertices[0];
-
-		drawMultiline(tf, vertices.data(), count, c);
-	}
-
-	//*****************************************************************
-	//					DRAW CIRCLE POLYGON
-	//*****************************************************************
-	void GraphicsSystem::drawCirclePolygon(const Transform& tf, float radius, uint32_t p, const Color& c)
-	{
-		if((p & 1) == 1) //if it's odd
-		{
-			++p; //make it even
-		}
-		std::vector<Vec2> vertices;
-		vertices.reserve(p + 1);
-		auto dist = m_circleData.size() / p;
-		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
-		{
-			vertices.emplace_back(m_circleData[i] * radius);
-		}
-		vertices.emplace_back(vertices.front());
-		
-		drawMultiline(tf, vertices.data(), vertices.size(), c);
-	}
 	
-	//*****************************************************************
-	//					DRAW QUAD
-	//*****************************************************************
-	void GraphicsSystem::drawQuad(const Transform& tf, const Vec2& hs, const Color& c)
-	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
-		/*
-		0-1
-		| |
-		2-3
-		*/
-		Vertex vertices[]
-		{
-			{-hs.x, hs.y, 0, 1, 1, 1, 1, -1, -1},
-			{hs.x, hs.y, 0, 1, 1, 1, 1, -1, -1},
-			{-hs.x, -hs.y, 0, 1, 1, 1, 1, -1, -1},
-			{hs.x, -hs.y, 0, 1, 1, 1, 1, -1, -1},
-		};
-
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices, 4 * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INDEX BUFER ******/
-		uint32_t indices[]
-		{
-			0, 1, 2,     1, 3, 2,
-		};
-
-		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
-		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, indices, 6 * sizeof(uint32_t));
-		m_devcon->Unmap(ib, 0);
-
-		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-		/****** INSTANCE BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
-		m_devcon->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(ib);
-		safeRelease(vb);
-	}
-
-	//*****************************************************************
-	//					DRAW CIRCLE
-	//*****************************************************************
-	void GraphicsSystem::drawCircle(const Transform& tf, float r, uint32_t p, const Color& c)
-	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-		if((p & 1) == 1) //if it's odd
-		{
-			++p; //make it even
-		}
-		/****** VERTEX BUFFER ******/
-		uint32_t dist = m_circleData.size() / p;
-		std::vector<Vertex> vertices;
-		vertices.reserve(p + 1);
-		vertices.emplace_back(Vertex{0, 0, 0, 1, 1, 1, 1, -1, -1});
-		for(uint32_t i = 0; i < m_circleData.size(); i += dist)
-		{
-			auto& v = m_circleData[i];
-			vertices.emplace_back(Vertex{v.x*r, v.y*r, 0, 1, 1, 1, 1, -1, -1});
-		}
-
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), vertices.size());
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INDEX BUFER ******/
-		std::vector<uint32_t> indices;
-		indices.reserve(p * 3);
-		for(uint32_t i = 1; i <= p; ++i)
-		{
-			indices.push_back(i);
-			indices.push_back(0);
-			indices.push_back((i % p) + 1);
-		}
-
-		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
-		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, indices.data(), indices.size() * sizeof(uint32_t));
-		m_devcon->Unmap(ib, 0);
-
-		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-		/****** INSTANCE BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
-		m_devcon->DrawIndexedInstanced(indices.size(), 1, 0, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(ib);
-		safeRelease(vb);
-		m_devcon->DrawIndexedInstanced(indices.size(), 1, 0, 0, 0);
-	}
-
-	//*****************************************************************
-	//					DRAW TEXTURED QUAD
-	//*****************************************************************
-	void GraphicsSystem::drawTexturedQuad(const Transform& tf, const Color& c, const Image& img)
-	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
-		/*
-			0-1
-			| |
-			2-3
-		*/
-		Vertex vertices[]
-		{
-			{-img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[0].x, img.m_texCoords[0].y},
-			{img.m_ratio, 1, 0, 1, 1, 1, 1, img.m_texCoords[1].x, img.m_texCoords[1].y},
-			{-img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[2].x, img.m_texCoords[2].y},
-			{img.m_ratio, -1, 0, 1, 1, 1, 1, img.m_texCoords[3].x, img.m_texCoords[3].y}
-		};
-
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), 4);
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices, 4 * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INDEX BUFER ******/
-		uint32_t indices[]
-		{
-			0, 1, 2, 1, 3, 2
-		};
-
-		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), 6);
-		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, indices, 6 * sizeof(uint32_t));
-		m_devcon->Unmap(ib, 0);
-
-		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-		/****** CONSTANT BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		const auto* texture = m_textureCache->getResource(img.m_textureID);
-		auto srv = m_textures[texture->m_rawTextureID].get();
-		m_devcon->PSSetShaderResources(0, 1, &srv);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
-		m_devcon->DrawIndexedInstanced(6, 1, 0, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(ib);
-		safeRelease(vb);
-	}
-
-	//*****************************************************************
-	//					THE NEW DRAW CALL
-	//*****************************************************************
-	void GraphicsSystem::theNewDrawCall(const Transform& tf, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& c, uint32_t tId)
-	{
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		/****** VERTEX BUFFER ******/
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), vertices.size());
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		uint32_t stride = sizeof(Vertex);
-		uint32_t offset = 0;
-		m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-		
-		/****** PRIMITIVE TOPOLOGY ******/
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
-		/****** INDEX BUFER ******/
-		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
-		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, indices.data(), indices.size() * sizeof(uint32_t));
-		m_devcon->Unmap(ib, 0);
-
-		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-		/****** CONSTANT BUFFER ******/
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-		
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-		if(tId != INVALID_ID)
-		{
-			m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-			const auto* texture = m_textureCache->getResource(tId);
-			auto srv = m_textures[texture->m_rawTextureID].get();
-			m_devcon->PSSetShaderResources(0, 1, &srv);
-		}
-
-		m_devcon->DrawIndexedInstanced(indices.size(), 1, 0, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(ib);
-		safeRelease(vb);
-	}
 
 	void GraphicsSystem::v3_setVertices(const std::vector<Vertex>& vertices)
 	{
@@ -983,6 +506,15 @@ namespace Core
 		m_devcon->PSSetShaderResources(0, 1, &srv);
 	}
 
+	void GraphicsSystem::v3_setFontTexture(uint32_t fontId)
+	{
+		const auto* font = m_fontCache->getResource(fontId);
+		if( font )
+		{
+			v3_setTexture(font->m_textureID);
+		}
+	}
+
 	void GraphicsSystem::v3_draw(uint32_t indiceCount, uint32_t instanceCount)
 	{
 		if(instanceCount >= 1)
@@ -990,7 +522,7 @@ namespace Core
 			m_devcon->DrawIndexedInstanced(indiceCount, instanceCount, 0, 0, 0);
 		}
 	}
-	
+
 	std::vector<Vertex> GraphicsSystem::v3_makeCircleVertices(const Vec2& pos, float r, uint32_t pts) const
 	{
 		if((pts & 1) == 1) //if it's odd
@@ -1055,7 +587,7 @@ namespace Core
 		};
 	}
 
-	std::vector<uint32_t> GraphicsSystem::v3_makeHollowQuadVertices() const
+	std::vector<uint32_t> GraphicsSystem::v3_makeHollowQuadIndices() const
 	{
 		return
 		{
@@ -1134,135 +666,6 @@ namespace Core
 	}
 
 	//*****************************************************************
-	//					DRAW TEXT
-	//*****************************************************************
-	void GraphicsSystem::drawText(uint32_t fontID, const std::string& text, const Transform& tf, const Color& c, uint32_t justification, bool isItalic)
-	{
-		const auto* font = m_fontCache->getResource(fontID);
-		if(!font)
-		{
-			return;
-		}
-		const auto* texture = m_textureCache->getResource(font->m_textureID);
-		if(!texture)
-		{
-			return;
-		}
-		float w = texture->m_dimensions.x;
-		float h = texture->m_dimensions.y;
-		std::vector<Vertex> verts(text.size() * 4);
-		std::vector<uint32_t> inds(text.size() * 6);
-		uint32_t v = 0;
-		uint32_t i = 0;
-		float xPos = 0;
-		float yPos = font->m_size * 0.5f;
-
-		for(char c : text)
-		{
-			const Glyph& glyph = font->m_glyphs[c - 32];
-			float tv_top = (float)glyph.m_top / h;
-			float tv_bot = (float)(glyph.m_top + font->m_size) / h;
-			float tu_left = (float)glyph.m_left / w;
-			float tu_rght = (float)glyph.m_right / w;
-
-			inds[i++] = v + 0;
-			inds[i++] = v + 1;
-			inds[i++] = v + 2;
-			inds[i++] = v + 2;
-			inds[i++] = v + 3;
-			inds[i++] = v + 0;
-
-			float italicOffset = isItalic ? 2.5f : 0;
-
-			verts[v].setPosition(xPos - italicOffset, -yPos, 0);
-			verts[v].setDiffuse(1, 1, 1, 1);
-			verts[v].setTextureCoords(tu_left, tv_bot);
-			++v;
-			verts[v].setPosition(xPos + italicOffset, yPos, 0);
-			verts[v].setDiffuse(1, 1, 1, 1);
-			verts[v].setTextureCoords(tu_left, tv_top);
-			++v;
-			xPos += (glyph.m_right - glyph.m_left);
-			verts[v].setPosition(xPos + italicOffset, yPos, 0);
-			verts[v].setDiffuse(1, 1, 1, 1);
-			verts[v].setTextureCoords(tu_rght, tv_top);
-			++v;
-			verts[v].setPosition(xPos - italicOffset, -yPos, 0);
-			verts[v].setDiffuse(1, 1, 1, 1);
-			verts[v].setTextureCoords(tu_rght, tv_bot);
-			++v;
-		}
-		D3D11_MAPPED_SUBRESOURCE ms;
-
-		auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), verts.size());
-
-		HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, verts.data(), verts.size() * sizeof(Vertex));
-		m_devcon->Unmap(vb, 0);
-
-		/****** INDEX BUFER ******/
-		auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), inds.size());
-		hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, inds.data(), inds.size() * sizeof(uint32_t));
-		m_devcon->Unmap(ib, 0);
-
-		m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-		/****** INSTANCE BUFFER ******/
-		float move = 0;
-		if(justification == 1)
-		{
-			move = xPos*0.5f*tf.scale.x;
-		}
-		else if(justification == 2)
-		{
-			move = xPos*tf.scale.x;
-		}
-
-		auto world = XMMatrixIdentity();
-		world *= XMMatrixScaling(tf.scale.x, tf.scale.y, 1.0f);
-		//m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-		//m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-		world *= XMMatrixRotationZ(XMConvertToRadians(tf.rotation));
-		world *= XMMatrixTranslation(tf.position.x - move, tf.position.y, 0);
-		world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-		dataPerInstance dpi;
-		XMStoreFloat4x4(&dpi.world, world);
-		dpi.fillColor.x = c.r;
-		dpi.fillColor.y = c.g;
-		dpi.fillColor.z = c.b;
-		dpi.fillColor.w = c.a;
-
-		auto* inst = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), 1);
-		hr = m_devcon->Map(inst, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-		assert(SUCCEEDED(hr));
-		memcpy(ms.pData, &dpi, sizeof(dataPerInstance));
-		m_devcon->Unmap(inst, 0);
-
-		uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-		uint32_t offsets[2] = {0, 0};
-		ID3D11Buffer* bufferPtrs[2] = {vb, inst};
-		m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
-		m_devcon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		
-		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
-		auto srv = m_textures[texture->m_rawTextureID].get();
-		m_devcon->PSSetShaderResources(0, 1, &srv);
-
-		m_devcon->VSSetConstantBuffers(0, 1, &m_constantBuffer);
-		m_devcon->PSSetConstantBuffers(0, 1, &m_constantBuffer);
-
-		m_devcon->DrawIndexedInstanced(inds.size(), 1, 0, 0, 0);
-
-		safeRelease(inst);
-		safeRelease(ib);
-		safeRelease(vb);
-	}
-
-	//*****************************************************************
 	//					INIT DEVICE
 	//*****************************************************************
 	bool GraphicsSystem::initDevice()
@@ -1288,12 +691,11 @@ namespace Core
 			}
 		}
 
-		DEBUG_CODE_START
-			if(FAILED(hr))
-				DEBUG_INFO("\tinitDevice failed");
-		DEBUG_CODE_END
-
-			return SUCCEEDED(hr);
+		if(FAILED(hr))
+		{
+			DEBUG_INFO("\tinitDevice failed");
+		}
+		return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -1323,11 +725,12 @@ namespace Core
 			}
 			bbTexture->Release();
 		}
-		DEBUG_CODE_START
-			if(FAILED(hr))
-				DEBUG_INFO("\tinitRenderTarget failed");
-		DEBUG_CODE_END
-			return SUCCEEDED(hr);
+		
+		if(FAILED(hr))
+		{
+			DEBUG_INFO("\tinitRenderTarget failed");
+		}
+		return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -1335,45 +738,34 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::initVertexShader(const ResourceFile& shaderFile)
 	{
-		ID3D10Blob* m_shaderBlob = nullptr;
-		HRESULT hr = S_OK;
-#ifndef _DEBUG
-#include <Graphics/vshader.h>
-		const LPVOID shaderBuffer = (LPVOID)g_VShader;
-		SIZE_T shaderSize = sizeof(g_VShader);
-#else
-		hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "VShader", "vs_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		LPVOID shaderBuffer = m_shaderBlob->GetBufferPointer();
-		SIZE_T shaderSize = m_shaderBlob->GetBufferSize();
-
-		DEBUG_INFO((int32_t)hr);
-		if(SUCCEEDED(hr))
-#endif
+		LPVOID shaderBuffer = nullptr;
+		SIZE_T shaderSize = 0;
 		{
-			safeRelease(m_vertexShader);
-			hr = m_dev->CreateVertexShader(shaderBuffer, shaderSize, nullptr, &m_vertexShader);
+			#include <Graphics/vshader.h>
+			shaderBuffer = (LPVOID)g_VShader;
+			shaderSize = sizeof(g_VShader);
+		}
+		
+		safeRelease(m_vertexShader);
+		HRESULT hr = m_dev->CreateVertexShader(shaderBuffer, shaderSize, nullptr, &m_vertexShader);
+		if(SUCCEEDED(hr))
+		{
+			auto& ied = Vertex::getDescription();
+			safeRelease(m_inputLayout);
+			hr = m_dev->CreateInputLayout(ied.data(), ied.size(), shaderBuffer, shaderSize, &m_inputLayout);
 			DEBUG_INFO((int32_t)hr);
 			if(SUCCEEDED(hr))
 			{
-				auto& ied = Vertex::getDescription();
-				safeRelease(m_inputLayout);
-				hr = m_dev->CreateInputLayout(ied.data(), ied.size(), shaderBuffer, shaderSize, &m_inputLayout);
-				DEBUG_INFO((int32_t)hr);
-				if(SUCCEEDED(hr))
-				{
-					m_devcon->VSSetShader(m_vertexShader, nullptr, 0);
-					m_devcon->IASetInputLayout(m_inputLayout);
-				}
+				m_devcon->VSSetShader(m_vertexShader, nullptr, 0);
+				m_devcon->IASetInputLayout(m_inputLayout);
 			}
-			safeRelease(m_shaderBlob);
 		}
-		DEBUG_CODE_START
-			if(FAILED(hr))
-			{
-				DEBUG_INFO("\tinitVertexShader failed: ", hr);
-			}
-		DEBUG_CODE_END
-			return SUCCEEDED(hr);
+		
+		if(FAILED(hr))
+		{
+			DEBUG_INFO("\tinitVertexShader failed: ", hr);
+		}
+		return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************
@@ -1381,36 +773,26 @@ namespace Core
 	//*****************************************************************
 	bool GraphicsSystem::initPixelShader(const ResourceFile& shaderFile)
 	{
-		ID3D10Blob* m_shaderBlob = nullptr;
-		HRESULT hr = S_OK;
-#ifndef _DEBUG
-#include <Graphics/pshader.h>
-		const LPVOID shaderBuffer = (LPVOID)g_PShader;
-		SIZE_T shaderSize = sizeof(g_PShader);
-#else
-		hr = D3DX11CompileFromFile(shaderFile.getPath().c_str(), nullptr, nullptr, "PShader", "ps_4_0", 0, 0, nullptr, &m_shaderBlob, nullptr, nullptr);
-		LPVOID shaderBuffer = m_shaderBlob->GetBufferPointer();
-		SIZE_T shaderSize = m_shaderBlob->GetBufferSize();
-		DEBUG_INFO((int32_t)hr);
-		if(SUCCEEDED(hr))
-#endif
+		LPVOID shaderBuffer = nullptr;
+		SIZE_T shaderSize = 0;
 		{
-			safeRelease(m_pixelShader);
-			hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_pixelShader);
-			DEBUG_INFO((int32_t)hr);
-			if(SUCCEEDED(hr))
-			{
-				m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
-			}
-			safeRelease(m_shaderBlob);
+			#include <Graphics/pshader.h>
+			shaderBuffer = (LPVOID)g_PShader;
+			shaderSize = sizeof(g_PShader);
 		}
-		DEBUG_CODE_START
-			if(FAILED(hr))
-			{
-				DEBUG_INFO("\tinitPixelShader failed:", hr);
-			}
-		DEBUG_CODE_END
-			return SUCCEEDED(hr);
+
+		safeRelease(m_pixelShader);
+		HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_pixelShader);
+		if(SUCCEEDED(hr))
+		{
+			m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
+		}
+		
+		if(FAILED(hr))
+		{
+			DEBUG_INFO("\tinitPixelShader failed:", hr);
+		}
+		return SUCCEEDED(hr);
 	}
 
 	//*****************************************************************

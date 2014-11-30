@@ -512,60 +512,65 @@ namespace Core
 	
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
-		
-		Image img;
-		img.m_texCoords[0].set(0, 0);
-		img.m_texCoords[1].set(1, 0);
-		img.m_texCoords[2].set(0, 1);
-		img.m_texCoords[3].set(1, 1);
-		img.m_textureID = m_backgroundTexture;
-		img.m_ratio = 1;
-		Transform textureTf;
-		textureTf.position.set(0, 0);
-		textureTf.scale = Vec2{12, 9}*3;
-		m_graphicsSystem.drawTexturedQuad(textureTf, {0.6f, 0.6f, 0.6f}, img);
 
-		std::vector<Transform> tfs;
-		std::vector<Color> fills;
-		tfs.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
-		fills.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
-		for(auto& obj : m_players)
 		{
-			tfs.emplace_back(obj.transform);
-			fills.emplace_back(obj.color);
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{12, 9}*3);
+			vertices[0].setTextureCoords(0, 0);
+			vertices[1].setTextureCoords(1, 0);
+			vertices[2].setTextureCoords(0, 1);
+			vertices[3].setTextureCoords(1, 1);
+			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
+			
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}}, 0, 1);
+			m_graphicsSystem.v3_setTexture(m_backgroundTexture);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
-		for(auto& obj : m_monsters)
 		{
-			tfs.emplace_back(obj.transform);
-			fills.emplace_back(obj.color);
-		}
-		for(auto& obj : m_pickups)
-		{
-			tfs.emplace_back(obj.transform);
-			fills.emplace_back(obj.color);
-		}
-		if(tfs.size() > 0)
-		{
-			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, 1, 32);
-			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(32);
-			m_graphicsSystem.v3_setVertices(verts);
-			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, tfs.size());
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_graphicsSystem.v3_draw(inds.size(), tfs.size());
-			verts =
+			std::vector<Transform> tfs;
+			std::vector<Color> fills;
+			tfs.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
+			fills.reserve(m_monsters.size() + m_players.size() + m_pickups.size());
+			for( auto& obj : m_players )
 			{
+				tfs.emplace_back(obj.transform);
+				fills.emplace_back(obj.color);
+			}
+			for( auto& obj : m_monsters )
+			{
+				tfs.emplace_back(obj.transform);
+				fills.emplace_back(obj.color);
+			}
+			for( auto& obj : m_pickups )
+			{
+				tfs.emplace_back(obj.transform);
+				fills.emplace_back(obj.color);
+			}
+			if( tfs.size() > 0 )
+			{
+				auto verts = m_graphicsSystem.v3_makeCircleVertices({}, 1, 32);
+				auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(32);
+				m_graphicsSystem.v3_setVertices(verts);
+				m_graphicsSystem.v3_setIndices(inds);
+				m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, tfs.size());
+				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_graphicsSystem.v3_draw(inds.size(), tfs.size());
+				/*
+				verts =
+				{
 				Vertex{m_triangle[0].x, m_triangle[0].y, 0, 1, 1, 1, 1, -1, -1},
 				Vertex{m_triangle[1].x, m_triangle[1].y, 0, 1, 1, 1, 1, -1, -1},
 				Vertex{m_triangle[2].x, m_triangle[2].y, 0, 1, 1, 1, 1, -1, -1}
-			};
-			inds = {0, 1, 2};
-			
-			m_graphicsSystem.v3_setVertices(verts);
-			m_graphicsSystem.v3_setIndices(inds);
-			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size() + m_monsters.size());
-			m_graphicsSystem.v3_draw(inds.size(), m_players.size() + m_monsters.size());
-			
+				};
+				inds = {0, 1, 2};
+
+				m_graphicsSystem.v3_setVertices(verts);
+				m_graphicsSystem.v3_setIndices(inds);
+				m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size() + m_monsters.size());
+				m_graphicsSystem.v3_draw(inds.size(), m_players.size() + m_monsters.size());
+				*/
+			}
 		}
 
 		for(auto& obj : m_players)
@@ -573,29 +578,36 @@ namespace Core
 			if(obj.currentWeapon.ammo == 0)
 			{
 				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0};
-				m_graphicsSystem.drawText(m_defaultFont, "RELOADING", textTf, {0, 0, 0}, 1, false);
+				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				{
+					std::string reloading = "RELOADING";
+					auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, reloading, false);
+					auto indices = m_graphicsSystem.v3_makeTextIndices(reloading.size());
+
+					m_graphicsSystem.v3_setVertices(vertices);
+					m_graphicsSystem.v3_setIndices(indices);
+					auto justified = m_graphicsSystem.justifyText(textTf, m_graphicsSystem.textSize(m_defaultFont, reloading).x, TJ_Center);
+					m_graphicsSystem.v3_setInstanceData({justified}, {{0, 0, 0}}, 0, 1);
+					m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+					m_graphicsSystem.v3_draw(indices.size(), 1);
+				}
 				textTf.position.y -= 1;
-				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
-				m_graphicsSystem.drawText(m_defaultFont, std::to_string(timeRemaining), textTf, {0, 0, 0}, 1, false);
+				{
+					auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
+					std::string remaining = std::to_string(timeRemaining);
+					auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, remaining, false);
+					auto indices = m_graphicsSystem.v3_makeTextIndices(remaining.size());
+
+					m_graphicsSystem.v3_setVertices(vertices);
+					m_graphicsSystem.v3_setIndices(indices);
+					auto justified = m_graphicsSystem.justifyText(textTf, m_graphicsSystem.textSize(m_defaultFont, remaining).x, TJ_Center);
+					m_graphicsSystem.v3_setInstanceData({justified}, {{0, 0, 0}}, 0, 1);
+					m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+					m_graphicsSystem.v3_draw(indices.size(), 1);
+				}
 			}
 		}
-		for(auto& obj : m_monsters)
-		{
-			Transform t{obj.transform.position, {0.03f, 0.03f}, 0};
-			t.scale *= obj.transform.scale;
-			m_graphicsSystem.drawText(m_defaultFont, std::to_string(obj.health), t, {1, 1, 1}, 1, false);
-		}
 		
-		for(auto& obj : m_pickups)
-		{
-			auto diff = obj.duration - obj.objectTimer.getCurrentMicros();
-			std::string text = std::to_string(static_cast<int32_t>(Time::microsToSeconds(diff)+1));
-			text += " " + m_bonusDatabase[obj.bonus].name.substr(0, 1);
-			auto textTf = obj.transform;
-			textTf.scale.set(0.03f, 0.03f);
-			m_graphicsSystem.drawText(m_defaultFont, text, textTf, {0,0,0}, 1, false);
-		}
-
 		for(auto& obj : m_bullets)
 		{
 			m_graphicsSystem.drawLine({}, obj.origin, {1, 1, 1, 0}, obj.position, {1, 1, 1, 1});
@@ -604,12 +616,24 @@ namespace Core
 		if(m_defenseMatrixActive)
 		{
 			Transform t{m_defenseMatrixArea.center, {1,1}, 0};
-			m_graphicsSystem.drawCircle(t, m_defenseMatrixArea.radius, 36, {0.25f, 0.42f, 0.76f, 0.2f});
+			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_defenseMatrixArea.radius, 36);
+			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(36);
+			m_graphicsSystem.v3_setVertices(verts);
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData({t}, {{0.25f, 0.42f, 0.76f, 0.2f}}, 0, 1);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_draw(inds.size(), 1);
 		}
 		if(m_timeCapsuleActive)
 		{
 			Transform t{m_timeCapsuleArea.center, {1, 1}, 0};
-			m_graphicsSystem.drawCircle(t, m_timeCapsuleArea.radius, 36, {0.75f, 0.42f, 0.2f, 0.1f});
+			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_timeCapsuleArea.radius, 36);
+			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(36);
+			m_graphicsSystem.v3_setVertices(verts);
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData({t}, {{0.75f, 0.42f, 0.2f, 0.1f}}, 0, 1);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_draw(inds.size(), 1);
 		}
 
 		if(m_players.size() > 0)
@@ -617,7 +641,13 @@ namespace Core
 			Transform cursor;
 			cursor.position = m_players[0].aim;
 			cursor.scale.set(0.1f, 0.1f);
-			m_graphicsSystem.drawCircle(cursor, 1, 18, {1, 1, 1});
+			auto verts = m_graphicsSystem.v3_makeCircleVertices({}, m_timeCapsuleArea.radius, 18);
+			auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(18);
+			m_graphicsSystem.v3_setVertices(verts);
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData({cursor}, {{}}, 0, 1);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_draw(inds.size(), 1);
 		}
 
 		//****************************
@@ -627,7 +657,16 @@ namespace Core
 		m_graphicsSystem.setOrthographicProjection();
 		if(m_players.size() == 0)
 		{
-			m_graphicsSystem.drawText(m_defaultFont, "HAHA YOU ARE DEAD", {}, {}, 1, false);
+			std::string text = "HAHA YOU ARE DEAD";
+			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
+			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			auto justified = m_graphicsSystem.justifyText({}, m_graphicsSystem.textSize(m_defaultFont, text).x, TJ_Center);
+			m_graphicsSystem.v3_setInstanceData({justified}, {{}}, 0, 1);
+			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
 
 		Transform tf;
@@ -637,27 +676,67 @@ namespace Core
 		{
 			for(auto& b : player.bonuses)
 			{
-				std::string str = m_bonusDatabase[b.type].name;
+				std::string text = m_bonusDatabase[b.type].name;
 				auto remaining = b.duration - b.timer.getCurrentMicros();
-				str += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
-				m_graphicsSystem.drawText(m_defaultFont, str, tf, {0, 0, 0}, 0, false);
+				text += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
+
+				auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
+				auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
+
+				m_graphicsSystem.v3_setVertices(vertices);
+				m_graphicsSystem.v3_setIndices(indices);
+				m_graphicsSystem.v3_setInstanceData({tf}, {{0,0,0}}, 0, 1);
+				m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+				m_graphicsSystem.v3_draw(indices.size(), 1);
+
 				tf.position.y -= 20;
 			}
 		}
 #ifdef _DEBUG
-		m_graphicsSystem.drawText(m_defaultFont, std::to_string(m_gameplayTimer.getTimeScale()), tf, {0, 0, 0}, 0, false);
-		tf.position.y -= 20;
+		{
+			auto text = std::to_string(m_gameplayTimer.getTimeScale());
+			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
+			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({tf}, {{0,0,0}}, 0, 1);
+			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
+
+			tf.position.y -= 20;
+		}
 #endif
 		int64_t timeLeft = m_defenseMatrixMicros - m_defenseMatrixTimer.getCurrentMicros();
 		uint32_t displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
 		if(timeLeft < 0) displayTime = 0;
-		m_graphicsSystem.drawText(m_defaultFont, "Defense matrix: " + std::to_string(displayTime), tf, {0, 0, 0}, 0, false);
+		{
+			auto text = "Defense matrix: " + std::to_string(displayTime);
+			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
+			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({tf}, {{0, 0, 0}}, 0, 1);
+			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
+		}
 		tf.position.y -= 20;
 		
 		timeLeft = m_timeCapsuleMicros - m_timeCapsuleTimer.getCurrentMicros();
 		displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
 		if(timeLeft < 0) displayTime = 0;
-		m_graphicsSystem.drawText(m_defaultFont, "Time capsule: " + std::to_string(displayTime), tf, {0, 0, 0}, 0, false);
+		{
+			auto text = "Time capsule: " + std::to_string(displayTime);
+			auto vertices = m_graphicsSystem.v3_makeTextVertices(m_defaultFont, text, false);
+			auto indices = m_graphicsSystem.v3_makeTextIndices(text.size());
+
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({tf}, {{0, 0, 0}}, 0, 1);
+			m_graphicsSystem.v3_setFontTexture(m_defaultFont);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
+		}
 
 		m_guiSystem.draw(m_graphicsSystem);
 

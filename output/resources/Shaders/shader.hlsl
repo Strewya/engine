@@ -1,7 +1,7 @@
 
 struct Vertex
 {
-	float4 position : POSITION;
+	float4 position : POSITION; 
 	float2 texCoord : TEXCOORD;
 	float4 diffuse : DIFFUSE;
 	matrix world : WORLD;
@@ -24,21 +24,21 @@ cbuffer dataPerScene
 Texture2D ObjTexture;
 SamplerState ObjSamplerState;
 
-Pixel VShader(Vertex input)
+Pixel VShader(Vertex vx)
 {
-    Pixel output;
-    output.position = mul(input.position, input.world);
-	output.texCoord = input.texCoord;
-	output.diffuse = input.diffuse * input.fill;
+    Pixel px;
+	px.position = mul(vx.position, vx.world);
+	px.texCoord = vx.texCoord;
+	px.diffuse = vx.diffuse * vx.fill;
 	
-    return output;
+	return px;
 }
 
 
-float4 PShader(Pixel input) : SV_TARGET
+float4 PShader(Pixel px) : SV_TARGET
 {
-    float4 diffuse = input.diffuse;
-	if(input.texCoord.x >= 0 && input.texCoord.y >= 0)
-		diffuse = ObjTexture.Sample(ObjSamplerState, input.texCoord) * input.diffuse;
+	float4 diffuse = px.diffuse;
+	if( px.texCoord.x >= 0 && px.texCoord.y >= 0 )
+		diffuse = ObjTexture.Sample(ObjSamplerState, px.texCoord) * px.diffuse;
 	return diffuse;
 }

@@ -18,6 +18,7 @@
 
 namespace Core
 {
+	enum TextJustification;
 	class GraphicsSystem;
 	
 	class GuiSystem
@@ -32,7 +33,7 @@ namespace Core
 
 		void panel(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color);
 		void button(std::string name, std::string parent, Vec2 pos, Vec2 halfSize, Color color, Mouse::Keys activator, OnClickFunction onClick);
-		void label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Vec2 scale, Color color, uint32_t justification, bool italic);
+		void label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Vec2 scale, Color color, TextJustification justification, bool italic);
 
 		void editLabel(std::string name, std::string text);
 
@@ -77,7 +78,7 @@ namespace Core
 			Vec2 scale;
 			Color color;
 			uint32_t font;
-			uint32_t justification;
+			TextJustification justification;
 			bool italic;
 
 			void drawSelf(GraphicsSystem& graphics);

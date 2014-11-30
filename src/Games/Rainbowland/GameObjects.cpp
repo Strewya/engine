@@ -203,10 +203,10 @@ namespace Core
 		weaponPos.x += game.m_graphicsSystem.textSize(game.m_defaultFont, ammo).x * 2 * 0.75f + 50;
 		
 		game.m_guiSystem.panel(panel, "root", {0, 0}, {(float)game.m_window->getSizeX(), (float)game.m_window->getSizeY()}, {0, 0, 0, 0});
-		game.m_guiSystem.label(panel + "HP", panel, game.m_defaultFont, health, healthPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
-		game.m_guiSystem.label(panel + "EXP", panel, game.m_defaultFont, exp, expPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
-		game.m_guiSystem.label(panel + "AMMO", panel, game.m_defaultFont, ammo, ammoPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
-		game.m_guiSystem.label(panel + "WEAPON", panel, game.m_defaultFont, weapon, weaponPos, {0.75f, 0.75f}, {0, 0, 0}, 0, false);
+		game.m_guiSystem.label(panel + "HP", panel, game.m_defaultFont, health, healthPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
+		game.m_guiSystem.label(panel + "EXP", panel, game.m_defaultFont, exp, expPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
+		game.m_guiSystem.label(panel + "AMMO", panel, game.m_defaultFont, ammo, ammoPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
+		game.m_guiSystem.label(panel + "WEAPON", panel, game.m_defaultFont, weapon, weaponPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
 	}
 
 	void movePlayers(VPlayers& players, const Rect& playingField)
@@ -279,7 +279,7 @@ namespace Core
 					r.halfHeight = textSize.y;
 					r.halfWidth = textSize.x + 10;
 					game.m_guiSystem.panel("lvlup", "root", r.center, {r.halfWidth, r.halfHeight}, {0, 0, 0});
-					game.m_guiSystem.label("lvlupLabel", "lvlup", game.m_defaultFont, "Level", {}, {0.5f, 0.5f}, {}, 1, false);
+					game.m_guiSystem.label("lvlupLabel", "lvlup", game.m_defaultFont, "Level", {}, {0.5f, 0.5f}, {}, TJ_Center, false);
 				}
 			}
 			
@@ -738,7 +738,7 @@ namespace Core
 							exitPerkMode(game);
 						}
 					});
-					game.m_guiSystem.label(name + "Label", name, game.m_defaultFont, game.m_perkDatabase[perk].name, {}, {0.5f, 0.5f}, {1, 1, 1}, 1, false);
+					game.m_guiSystem.label(name + "Label", name, game.m_defaultFont, game.m_perkDatabase[perk].name, {}, {0.5f, 0.5f}, {1, 1, 1}, TJ_Center, false);
 					++perkIndex;
 					column += distance;
 				}
@@ -753,7 +753,7 @@ namespace Core
 			{
 				exitPerkMode(game);
 			});
-			game.m_guiSystem.label("closeLabel", "close", game.m_defaultFont, "close", {}, textScale, {1, 1, 1}, 1, false);
+			game.m_guiSystem.label("closeLabel", "close", game.m_defaultFont, "close", {}, textScale, {1, 1, 1}, TJ_Center, false);
 			return true;
 		}
 		return false;

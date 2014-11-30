@@ -22,9 +22,6 @@ namespace Core
 
 #ifndef DEPLOY
 
-#define DEBUG_CODE_START
-#define DEBUG_CODE_END
-
 	inline void debugPrint() { std::cout << std::endl; }
 	template<typename T, typename... Args> void debugPrint(T t, Args... args) { std::cout << t; debugPrint(args...); }
 
@@ -32,8 +29,6 @@ namespace Core
 
 #else
 #define DEBUG_INFO(...) (void)0
-#define DEBUG_CODE_START if(false) {
-#define DEBUG_CODE_END }
 #endif
 
 

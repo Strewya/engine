@@ -52,9 +52,7 @@ namespace Core
 			luaL_openlibs(m_L);
 			tolua_core_open(m_L);
 
-			DEBUG_CODE_START
-				lua_register(m_L, "print", luaPrint);
-			DEBUG_CODE_END;
+			lua_register(m_L, "print", luaPrint);
 
 			const char* depend = R"rawLuaCode(
 Lua = {};

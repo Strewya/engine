@@ -18,6 +18,13 @@
 
 namespace Core
 {
+	enum TextJustification
+	{
+		TJ_Left,
+		TJ_Center,
+		TJ_Right
+	};
+
 	class Camera;
 	class Circle;
 	class Color;
@@ -64,26 +71,15 @@ namespace Core
 
 		Vec2 screenToWorld(const Vec2& screen, const Camera& camera) const;
 		Vec2 textSize(uint32_t fontID, const std::string& text) const;
+		Transform justifyText(Transform textTf, float textSizeX, TextJustification justification);
 
 		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
 		void drawLine(const Transform& transform, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color);
 		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
-		void drawPolygon(const Transform& transform, const Vec2* positions, uint32_t count, const Color& fillColor);
-		void drawQuadPolygon(const Transform& transform, const Rect& rect, const Color& color);
-		void drawCirclePolygon(const Transform& transform, float radius, uint32_t points, const Color& color);
-		void drawQuad(const Transform& transform, const Vec2& halfSize, const Color& fillColor);
-		void drawCircle(const Transform& transform, float radius, uint32_t points, const Color& color);
-		void drawTexturedQuad(const Transform& transform, const Color& fillColor, const Image& image);
 		
-		//justification is 0 for left, 1 for center, 2 for right, all other values are treated as 0
-		void drawText(uint32_t fontID, const std::string& text, const Transform& transform, const Color& tint, uint32_t justification, bool isItalic);
-
 		bool loadTexture(const ResourceFile& filename, Texture& outTexture);
 		bool reloadTexture(const ResourceFile& filename, Texture& outTexture);
 		void unloadTexture(Texture& texture);
-
-
-		void theNewDrawCall(const Transform& transform, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices, const Color& globalColor, uint32_t tId);
 
 		std::vector<Vertex> v3_makeCircleVertices(const Vec2& pos, float radius, uint32_t pts) const;
 		std::vector<Vertex> v3_makeQuadVertices(const Vec2& pos, const Vec2& halfSize) const;
@@ -91,7 +87,7 @@ namespace Core
 		std::vector<uint32_t> v3_makeSolidCircleIndices(uint32_t pts) const;
 		std::vector<uint32_t> v3_makeHollowCircleIndices(uint32_t pts) const;
 		std::vector<uint32_t> v3_makeSolidQuadIndices() const;
-		std::vector<uint32_t> v3_makeHollowQuadVertices() const;
+		std::vector<uint32_t> v3_makeHollowQuadIndices() const;
 		std::vector<uint32_t> v3_makeTextIndices(uint32_t letters) const;
 
 		void v3_setVertices(const std::vector<Vertex>& vertices);
@@ -99,6 +95,7 @@ namespace Core
 		void v3_setTopology(D3D_PRIMITIVE_TOPOLOGY topology);
 		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, uint32_t startOffset, uint32_t count);
 		void v3_setTexture(uint32_t textureId);
+		void v3_setFontTexture(uint32_t fontId);
 		void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
 
 	private:
