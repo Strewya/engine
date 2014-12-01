@@ -95,7 +95,7 @@
       </AssemblyLinkResource>
       <ForceFileOutput>
       </ForceFileOutput>
-      <UACExecutionLevel>HighestAvailable</UACExecutionLevel>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
       <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>

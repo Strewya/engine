@@ -647,7 +647,19 @@ namespace Core
 		if(m_timeCapsuleActive)
 		{
 			Transform t{m_timeCapsuleArea.center, {1, 1}, 0};
-			drawSolidCircle(m_graphicsSystem, t, m_timeCapsuleArea.radius, 36, {0.75f, 0.42f, 0.2f, 0.1f});
+			auto vertices = m_graphicsSystem.v3_makeCircleVertices({}, m_timeCapsuleArea.radius, 36);
+			auto indices = m_graphicsSystem.v3_makeSolidCircleIndices(36);
+			for(auto& v : vertices)
+			{
+				v.setDiffuse(0.75f, 0.42f, 0.2f, 0.0f);
+			}
+			vertices[0].setDiffuse(0.75f, 0.42f, 0.2f, 0.8f);
+			
+			m_graphicsSystem.v3_setVertices(vertices);
+			m_graphicsSystem.v3_setIndices(indices);
+			m_graphicsSystem.v3_setInstanceData({t}, {{}}, 0, 1);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
 
 		//****************************

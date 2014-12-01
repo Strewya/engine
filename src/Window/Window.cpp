@@ -736,24 +736,15 @@ namespace Core
 			break;
 
 			case WM_KEYDOWN:
-			case WM_SYSKEYDOWN:
-			{
-				we.m_type = WindowEventType::WE_KEYBOARDKEY;
-				we.m_keyboard.m_keyCode = wParam;
-				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
-				we.m_keyboard.m_isDown = true;
-				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
-			}
-			break;
-
 			case WM_KEYUP:
+			case WM_SYSKEYDOWN:
 			case WM_SYSKEYUP:
 			{
 				we.m_type = WindowEventType::WE_KEYBOARDKEY;
 				we.m_keyboard.m_keyCode = wParam;
-				we.m_keyboard.m_repeat = 1;
-				we.m_keyboard.m_isDown = false;
-				we.m_keyboard.m_previouslyDown = true;
+				we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
+				we.m_keyboard.m_isDown = (lParam & (1 << 31)) == 0;
+				we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
 			}
 			break;
 
