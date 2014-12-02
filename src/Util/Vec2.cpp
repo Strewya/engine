@@ -29,12 +29,12 @@ namespace Core
 		return{x + f, y + f};
 	}
 
-	Vec2 Vec2::operator+(const Vec2& v) const
+	Vec2 Vec2::operator+(Vec2 v) const
 	{
 		return{x + v.x, y + v.y};
 	}
 
-	Vec2& Vec2::operator+=(const Vec2& v)
+	Vec2& Vec2::operator+=(Vec2 v)
 	{
 		x += v.x;
 		y += v.y;
@@ -46,7 +46,7 @@ namespace Core
 		return{-x, -y};
 	}
 
-	Vec2 Vec2::operator-(const Vec2& v) const
+	Vec2 Vec2::operator-(Vec2 v) const
 	{
 		return{x - v.x, y - v.y};
 	}
@@ -56,7 +56,7 @@ namespace Core
 		return{x * f, y * f};
 	}
 
-	Vec2& Vec2::operator*=(const Vec2& v)
+	Vec2& Vec2::operator*=(Vec2 v)
 	{
 		x *= v.x;
 		y *= v.y;
@@ -82,32 +82,39 @@ namespace Core
 		return *this;
 	}
 
-	Vec2 operator*(float f, const Vec2& v)
+	Vec2& Vec2::operator /= (Vec2 v)
+	{
+		x /= v.x;
+		y /= v.y;
+		return *this;
+	}
+
+	Vec2 operator*(float f, Vec2 v)
 	{
 		return v*f;
 	}
 
-	Vec2 operator*(const Vec2& l, const Vec2& r)
+	Vec2 operator*(Vec2 l, Vec2 r)
 	{
 		return{l.x*r.x, l.y*r.y};
 	}
 
-	Vec2 operator/(float f, const Vec2& v)
+	Vec2 operator/(float f, Vec2 v)
 	{
 		return v/f;
 	}
 
-	float Vec2::length(const Vec2& v)
+	float Vec2::length(Vec2 v)
 	{
 		return sqrtf(length2(v));
 	}
 
-	float Vec2::length2(const Vec2& v)
+	float Vec2::length2(Vec2 v)
 	{
 		return v.x*v.x + v.y*v.y;
 	}
 
-	Vec2 Vec2::normalize(const Vec2& v)
+	Vec2 Vec2::normalize(Vec2 v)
 	{
 		float length = Vec2::length(v);
 		if(length == 0)
@@ -115,19 +122,19 @@ namespace Core
 		return{v.x / length, v.y / length};
 	}
 
-	float Vec2::dotProduct(const Vec2& l, const Vec2& r)
+	float Vec2::dotProduct(Vec2 l, Vec2 r)
 	{
 		return l.x*r.x + l.y*r.y;
 	}
 
-	Vec2 Vec2::projection(const Vec2& vec, const Vec2& target)
+	Vec2 Vec2::projection(Vec2 vec, Vec2 target)
 	{
 		auto dpv = Vec2::dotProduct(vec, target);
 		auto dpt = Vec2::dotProduct(target, target);
 		return (dpv / dpt)*target;
 	}
 
-	std::ostream& operator<<(std::ostream& os, const Vec2& v)
+	std::ostream& operator<<(std::ostream& os, Vec2 v)
 	{
 		os << "{" << v.x << "," << v.y << "}";
 		return os;

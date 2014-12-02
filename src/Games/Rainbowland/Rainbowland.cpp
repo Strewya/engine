@@ -540,6 +540,7 @@ namespace Core
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 
+		m_graphicsSystem.setTransparencyMode(false);
 		{
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{12, 9}*3);
 			vertices[0].setTextureCoords(0, 0);
@@ -554,6 +555,7 @@ namespace Core
 			m_graphicsSystem.v3_setTexture(m_backgroundTexture);
 			m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
+		m_graphicsSystem.setTransparencyMode(true);
 		{
 			std::vector<Transform> tfs;
 			std::vector<Color> fills;
@@ -573,42 +575,48 @@ namespace Core
 				m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, tfs.size());
 				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				m_graphicsSystem.v3_draw(inds.size(), tfs.size());
-				/*
-				verts =
-				{
-				Vertex{m_triangle[0].x, m_triangle[0].y, 0, 1, 1, 1, 1, -1, -1},
-				Vertex{m_triangle[1].x, m_triangle[1].y, 0, 1, 1, 1, 1, -1, -1},
-				Vertex{m_triangle[2].x, m_triangle[2].y, 0, 1, 1, 1, 1, -1, -1}
-				};
-				inds = {0, 1, 2};
-
-				m_graphicsSystem.v3_setVertices(verts);
-				m_graphicsSystem.v3_setIndices(inds);
-				m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size() + m_monsters.size());
-				m_graphicsSystem.v3_draw(inds.size(), m_players.size() + m_monsters.size());
-				*/
 			}
 		}
 
 		float ratio = 225.0f / 165.0f;
-		for( auto& obj : m_monsters )
 		{
+			//monsters
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
-			vertices[0].setTextureCoords(002.0f / 986.0f, 783.0f / 971.0f);
-			vertices[1].setTextureCoords(227.0f / 986.0f, 783.0f / 971.0f);
-			vertices[2].setTextureCoords(002.0f / 986.0f, 948.0f / 971.0f);
-			vertices[3].setTextureCoords(227.0f / 986.0f, 948.0f / 971.0f);
+			Rect r{{122, 866}, 120, 88};
+			r.center /= Vec2{986, 971};
+			r.halfWidth /= 986;
+			r.halfHeight /= 971;
+			vertices[0].setTextureCoords(r.left(), r.top());
+			vertices[1].setTextureCoords(r.right(), r.top());
+			vertices[2].setTextureCoords(r.left(), r.bottom());
+			vertices[3].setTextureCoords(r.right(), r.bottom());
 			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
 
 			m_graphicsSystem.v3_setVertices(vertices);
 			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setInstanceData({obj.transform}, {{}}, 0, 1);
 			m_graphicsSystem.v3_setTexture(m_charsTexture);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
-		}
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+			std::vector<Transform> tfs;
+			std::vector<Color> fills;
+			tfs.reserve(m_monsters.size());
+			fills.reserve(m_monsters.size());
+			for(auto& obj : m_monsters)
+			{
+				tfs.emplace_back(obj.transform);
+				fills.emplace_back(Color{1, 1, 1, 1});
+			}
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_monsters.size());
+			m_graphicsSystem.v3_draw(indices.size(), m_monsters.size());
+
+			auto inds = m_graphicsSystem.v3_makeHollowCircleIndices(18);
+			m_graphicsSystem.v3_setVertices(m_graphicsSystem.v3_makeCircleVertices({}, 0.8f, 18));
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_monsters.size());
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+			m_graphicsSystem.v3_draw(inds.size(), m_monsters.size());
+		}
 		ratio = 176.0f / 88.0f;
-		for(auto& obj : m_players)
 		{
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
 			vertices[0].setTextureCoords(426.0f / 986.0f, 28.0f / 971.0f);
@@ -616,21 +624,42 @@ namespace Core
 			vertices[2].setTextureCoords(426.0f / 986.0f, 116.0f / 971.0f);
 			vertices[3].setTextureCoords(602.0f / 986.0f, 116.0f / 971.0f);
 			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
-
+			
 			m_graphicsSystem.v3_setVertices(vertices);
 			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setInstanceData({obj.transform}, {{}}, 0, 1);
-			m_graphicsSystem.v3_setTexture(m_charsTexture);
-			m_graphicsSystem.v3_draw(indices.size(), 1);
+			//m_graphicsSystem.v3_setTexture(m_charsTexture);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-			if(obj.currentWeapon.ammo == 0)
+			std::vector<Transform> tfs;
+			std::vector<Color> fills;
+			tfs.reserve(m_players.size());
+			fills.reserve(m_players.size());
+			for(auto& obj : m_players)
 			{
-				Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0};
-				drawText(m_graphicsSystem, m_defaultFont, "RELOADING", textTf, {0, 0, 0}, TJ_Center, false);
-				textTf.position.y -= 1;
-				auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
-				std::string remaining = std::to_string(timeRemaining);
-				drawText(m_graphicsSystem, m_defaultFont, remaining, textTf, {0, 0, 0}, TJ_Center, false);
+				tfs.emplace_back(obj.transform);
+				fills.emplace_back();
+			}
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size());
+			m_graphicsSystem.v3_draw(indices.size(), m_players.size());
+
+			auto inds = m_graphicsSystem.v3_makeHollowCircleIndices(18);
+			m_graphicsSystem.v3_setVertices(m_graphicsSystem.v3_makeCircleVertices({}, 1.0f, 18));
+			m_graphicsSystem.v3_setIndices(inds);
+			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size());
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+			m_graphicsSystem.v3_draw(inds.size(), m_players.size());
+
+			for(auto& obj : m_players)
+			{
+				if(obj.currentWeapon.ammo == 0)
+				{
+					Transform textTf{obj.transform.position, {0.03f, 0.03f}, 0};
+					drawText(m_graphicsSystem, m_defaultFont, "RELOADING", textTf, {0, 0, 0}, TJ_Center, false);
+					textTf.position.y -= 1;
+					auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
+					std::string remaining = std::to_string(timeRemaining);
+					drawText(m_graphicsSystem, m_defaultFont, remaining, textTf, {0, 0, 0}, TJ_Center, false);
+				}
 			}
 		}
 		

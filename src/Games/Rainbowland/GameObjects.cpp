@@ -160,7 +160,6 @@ namespace Core
 		player.color.g = id == 1 ? 1.0f : 0.0f;
 		player.color.b = id == 2 ? 1.0f : 0.0f;
 		player.collisionData.set(0, 0, 1.0f);
-		player.collisionData.radius *= player.transform.scale.x;
 		player.velocity.set(0.0f, 0.0f);
 		player.maxVelocity.set(5.0f, 5.0f);
 		player.acceleration.set(1.0f, 1.0f);
@@ -613,7 +612,7 @@ namespace Core
 		Random gen{Time::getRealTimeMicros()};
 		auto& monster = monsters.back();
 		monster.objectTimer.reset();
-		monster.collisionData.set(0, 0, 1);
+		monster.collisionData.set(0, 0, 0.8f);
 		monster.maxVelocity = 1 + gen.randFloat() * 3.5f;
 		monster.transform.position = position;
 		auto scale = 1 + 0.3f - gen.randFloat()*0.6f;
@@ -665,10 +664,12 @@ namespace Core
 		{
 			auto pCollider = player.collisionData;
 			pCollider.center = player.transform.position;
+			pCollider.radius *= player.transform.scale.x;
 			for(auto& monster : game.m_monsters)
 			{
 				auto mCollider = monster.collisionData;
 				mCollider.center = monster.transform.position;
+				mCollider.radius *= monster.transform.scale.x;
 				if(isCircleTouchingCircle(mCollider, pCollider))
 				{
 					monster.attackTimer.updateBy(monster.objectTimer.getDeltaMicros());

@@ -172,4 +172,7 @@ namespace Core
 	void drawHollowCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
 	void drawSolidCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
 	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color tint, TextJustification justification, bool isItalic);
+
+
+	
 }

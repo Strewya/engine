@@ -23,27 +23,28 @@ namespace Core
 
 		/* these are inside the class for tolua++ binding compatibility */
 		Vec2 operator+(float f) const;
-		Vec2 operator+(const Vec2& v) const;
-		Vec2& operator+=(const Vec2& v);
+		Vec2 operator+(Vec2 v) const;
+		Vec2& operator+=(Vec2 v);
 		Vec2 operator-() const;
-		Vec2 operator-(const Vec2& v) const;
+		Vec2 operator-(Vec2 v) const;
 		Vec2 operator*(float f) const;
-		Vec2& operator*=(const Vec2& v);
+		Vec2& operator*=(Vec2 v);
 		Vec2& operator*=(float f);
 		Vec2 operator/(float f) const;
 		Vec2& operator/=(float f);
+		Vec2& operator/=(Vec2 v);
 		
-		static float length(const Vec2& v);
-		static float length2(const Vec2& v);
-		static Vec2 normalize(const Vec2& v);
-		static float dotProduct(const Vec2& l, const Vec2& r);
-		static Vec2 projection(const Vec2& vec, const Vec2& target);
+		static float length(Vec2 v);
+		static float length2(Vec2 v);
+		static Vec2 normalize(Vec2 v);
+		static float dotProduct(Vec2 l, Vec2 r);
+		static Vec2 projection(Vec2 vec, Vec2 target);
 	};
 
-	Vec2 operator*(float f, const Vec2& v);
-	Vec2 operator*(const Vec2& l, const Vec2& r);
-	Vec2 operator/(float f, const Vec2& v);
-	std::ostream& operator<<(std::ostream& os, const Vec2& v);
+	Vec2 operator*(float f, Vec2 v);
+	Vec2 operator*(Vec2 l, Vec2 r);
+	Vec2 operator/(float f, Vec2 v);
+	std::ostream& operator<<(std::ostream& os, Vec2 v);
 }
 
 //
