@@ -165,10 +165,17 @@ namespace Core
 							selectWeapon(m_players[0], Sniper, m_weaponDatabase);
 							return true;
 
+						case Keyboard::m_I:
+							if(m_players[0].maxHealth == 100)
+								m_players[0].maxHealth = m_players[0].health = 1000000000;
+							else
+								m_players[0].maxHealth = 100;
+							return true;
+
 						case Keyboard::m_R:
 							m_monsters.clear();
 							g_spawnEnabled = !g_spawnEnabled;
-							break;
+							return true;
 					}
 				}
 				return false;
@@ -368,21 +375,48 @@ namespace Core
 			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/moss.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/shoota.png");
+			m_isRunning &= (bool)m_textureCache.load("Textures/splatter.tif");
 			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			m_defaultFont = m_fontCache.getResourceID("font");
 			m_backgroundTexture = m_textureCache.getResourceID("Textures/moss.png");
 			m_charsTexture = m_textureCache.getResourceID("Textures/shoota.png");
+			m_splatterTexture = m_textureCache.getResourceID("Textures/splatter.tif");
 		}
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
-		m_triangle =
+		Vec2 splatterImgSize{1969, 885};
+		m_splatterDatabase =
 		{
-			Vec2{1.5f,0},
-			Vec2{0,-1},
-			Vec2{0,1}
+			{{92, 98}, 193, 115},
+			{{453, 87}, 184, 128},
+			{{799, 89}, 196, 145},
+			{{1153, 83}, 285, 181},
+			{{1573, 81}, 227, 151},
+			
+			{{85, 369}, 211, 162},
+			{{494, 336}, 246, 200},
+			{{888, 354}, 262, 160},
+			{{1287, 350}, 236, 186},
+			{{1714, 378}, 151, 112},
+			
+			{{61, 650}, 224, 160},
+			{{497, 623}, 186, 192},
+			{{949, 640}, 143, 105},
+			{{1304, 648}, 212, 148},
+			{{1656, 652}, 225, 132}
 		};
+		for(auto& r : m_splatterDatabase)
+		{
+			r.halfWidth /= 2;
+			r.halfHeight /= 2;
+			r.center.x += r.halfWidth;
+			r.center.y += r.halfHeight;
+			r.center /= splatterImgSize;
+			r.halfWidth /= splatterImgSize.x;
+			r.halfHeight /= splatterImgSize.y;
+		}
 		
 		initGame(*this);
 
@@ -503,6 +537,7 @@ namespace Core
 		VKillLocations locations;
 		killMonsters(m_monsters, locations, m_players);
 		generatePickups(locations, m_pickups, m_bonusDatabase);
+		generateSplatter(locations, *this);
 		checkPickups(*this);
 		updateBonuses(*this);
 		updatePickups(*this);
@@ -540,9 +575,9 @@ namespace Core
 		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 
-		m_graphicsSystem.setTransparencyMode(false);
+
 		{
-			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{12, 9}*3);
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, m_playingField.halfSize());
 			vertices[0].setTextureCoords(0, 0);
 			vertices[1].setTextureCoords(1, 0);
 			vertices[2].setTextureCoords(0, 1);
@@ -552,10 +587,42 @@ namespace Core
 			m_graphicsSystem.v3_setVertices(vertices);
 			m_graphicsSystem.v3_setIndices(indices);
 			m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}}, 0, 1);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			m_graphicsSystem.setTransparencyMode(false);
 			m_graphicsSystem.v3_setTexture(m_backgroundTexture);
 			m_graphicsSystem.v3_draw(indices.size(), 1);
+			
+			//draw the texture render target over the screen
+			//m_graphicsSystem.setTransparencyMode(true);
+			//m_graphicsSystem.v3_setTextureFromRenderTarget();
+			//m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
-		m_graphicsSystem.setTransparencyMode(true);
+		{
+			//draw splatters to texture render target
+			//m_graphicsSystem.v3_setTextureAsRenderTarget();
+			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
+			m_graphicsSystem.setTransparencyMode(true);
+			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_graphicsSystem.v3_setTexture(m_splatterTexture);
+			m_graphicsSystem.v3_setIndices(indices);
+			for(auto splatter : m_splatters)
+			{
+				auto& sdb = m_splatterDatabase[splatter.second];
+				float ratio = sdb.halfWidth / sdb.halfHeight;
+				auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio,1});
+				vertices[0].setTextureCoords(sdb.left(), sdb.top());
+				vertices[1].setTextureCoords(sdb.right(), sdb.top());
+				vertices[2].setTextureCoords(sdb.left(), sdb.bottom());
+				vertices[3].setTextureCoords(sdb.right(), sdb.bottom());
+				m_graphicsSystem.v3_setVertices(vertices);
+				m_graphicsSystem.v3_setInstanceData({{splatter.first, {2, 2}, 0}}, {{1, 1, 1}}, 0, 1);
+				m_graphicsSystem.v3_draw(indices.size(), 1);
+			}
+			//m_splatters.clear();
+			//m_graphicsSystem.v3_clearTextureAsRenderTarget();
+		}
+
 		{
 			std::vector<Transform> tfs;
 			std::vector<Color> fills;
@@ -578,14 +645,14 @@ namespace Core
 			}
 		}
 
-		float ratio = 225.0f / 165.0f;
 		{
 			//monsters
-			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
 			Rect r{{122, 866}, 120, 88};
 			r.center /= Vec2{986, 971};
 			r.halfWidth /= 986;
 			r.halfHeight /= 971;
+			float ratio = r.halfWidth / r.halfHeight;
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
 			vertices[0].setTextureCoords(r.left(), r.top());
 			vertices[1].setTextureCoords(r.right(), r.top());
 			vertices[2].setTextureCoords(r.left(), r.bottom());
@@ -616,9 +683,14 @@ namespace Core
 			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			m_graphicsSystem.v3_draw(inds.size(), m_monsters.size());
 		}
-		ratio = 176.0f / 88.0f;
 		{
-			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, Vec2{ratio, 1});
+			Rect r{{514, 71}, 94, 51};
+			r.center /= Vec2{986, 971};
+			r.halfWidth /= 986;
+			r.halfHeight /= 971;
+			float ratio = r.halfWidth / r.halfHeight;
+
+			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
 			vertices[0].setTextureCoords(426.0f / 986.0f, 28.0f / 971.0f);
 			vertices[1].setTextureCoords(602.0f / 986.0f, 28.0f / 971.0f);
 			vertices[2].setTextureCoords(426.0f / 986.0f, 116.0f / 971.0f);
@@ -641,14 +713,14 @@ namespace Core
 			}
 			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size());
 			m_graphicsSystem.v3_draw(indices.size(), m_players.size());
-
+#ifndef DEPLOY
 			auto inds = m_graphicsSystem.v3_makeHollowCircleIndices(18);
 			m_graphicsSystem.v3_setVertices(m_graphicsSystem.v3_makeCircleVertices({}, 1.0f, 18));
 			m_graphicsSystem.v3_setIndices(inds);
 			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size());
 			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			m_graphicsSystem.v3_draw(inds.size(), m_players.size());
-
+#endif
 			for(auto& obj : m_players)
 			{
 				if(obj.currentWeapon.ammo == 0)

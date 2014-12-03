@@ -50,7 +50,8 @@ namespace Core
 		Rect m_playingField;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
-		std::vector<Vec2> m_triangle;
+		std::vector<Rect> m_splatterDatabase;
+		std::vector<std::pair<Vec2, uint32_t>> m_splatters;
 
 		VPlayers m_players;
 		VMonsters m_monsters;
@@ -73,6 +74,7 @@ namespace Core
 		uint32_t m_defaultFont;
 		uint32_t m_backgroundTexture;
 		uint32_t m_charsTexture;
+		uint32_t m_splatterTexture;
 		Window* m_window;
 		bool m_isRunning;
 		bool perkMode;

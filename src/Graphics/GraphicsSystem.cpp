@@ -112,6 +112,10 @@ namespace Core
 			m_circleData.emplace_back(std::cosf(rad), std::sinf(rad));
 		}
 
+		m_RTtexture.rtView = nullptr;
+		m_RTtexture.srView = nullptr;
+		m_RTtexture.texture = nullptr;
+
 		status &= SUCCEEDED(hr);
 
 		DEBUG_INIT(GraphicsSystem);
@@ -705,6 +709,72 @@ namespace Core
 			inds.emplace_back(x + 0);
 		}
 		return inds;
+	}
+
+	void GraphicsSystem::createTextureRenderTarget(uint32_t w, uint32_t h)
+	{
+		if(m_RTtexture.texture != nullptr)
+		{
+			return;
+		}
+
+		D3D11_TEXTURE2D_DESC textureDesc;
+		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+		ZeroMemory(&textureDesc, sizeof(textureDesc));
+		ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
+		ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
+
+		// Create the texture
+		textureDesc.Width = w;
+		textureDesc.Height = h;
+		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = 1;
+		textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.Usage = D3D11_USAGE_DEFAULT;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.CPUAccessFlags = 0;
+		textureDesc.MiscFlags = 0;
+		m_dev->CreateTexture2D(&textureDesc, nullptr, &m_RTtexture.texture);
+
+		// Create the render target view.
+		renderTargetViewDesc.Format = textureDesc.Format;
+		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+		m_dev->CreateRenderTargetView(m_RTtexture.texture, &renderTargetViewDesc, &m_RTtexture.rtView);
+
+		// Create the shader resource view.
+		shaderResourceViewDesc.Format = textureDesc.Format;
+		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+		shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+		m_dev->CreateShaderResourceView(m_RTtexture.texture, &shaderResourceViewDesc, &m_RTtexture.srView);
+	}
+
+	void GraphicsSystem::clearTextureRenderTarget()
+	{
+		safeRelease(m_RTtexture.rtView);
+		safeRelease(m_RTtexture.srView);
+		safeRelease(m_RTtexture.texture);
+	}
+
+	void GraphicsSystem::v3_setTextureAsRenderTarget()
+	{
+		m_devcon->OMSetRenderTargets(1, &m_RTtexture.rtView, m_depthStencilView);
+	}
+
+	void GraphicsSystem::v3_clearTextureAsRenderTarget()
+	{
+		m_devcon->OMSetRenderTargets(1, &m_renderTarget, m_depthStencilView);
+	}
+
+	void GraphicsSystem::v3_setTextureFromRenderTarget()
+	{
+		m_devcon->PSSetSamplers(0, 1, &m_samplerState);
+		m_devcon->PSSetShaderResources(0, 1, &m_RTtexture.srView);
 	}
 
 	//*****************************************************************

@@ -252,4 +252,6 @@ namespace Core
 
 	void activateTimeCapsule(RainbowlandGame& game);
 	void updateTimeCapsule(RainbowlandGame& game);
+
+	void generateSplatter(VKillLocations loc, RainbowlandGame& game);
 }

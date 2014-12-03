@@ -101,6 +101,13 @@ namespace Core
 		void v3_setFontTexture(uint32_t fontId);
 		void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
 
+		void v3_setTextureAsRenderTarget();
+		void v3_clearTextureAsRenderTarget();
+		void v3_setTextureFromRenderTarget();
+
+		void createTextureRenderTarget(uint32_t width, uint32_t height);
+		void clearTextureRenderTarget();
+
 	private:
 		template<typename T> static void releasePtr(T* ptr);
 		template<typename T> static void safeRelease(T*& ptr);
@@ -139,6 +146,15 @@ namespace Core
 		typedef std::unique_ptr<ID3D11ShaderResourceView, void(*)(ID3D11ShaderResourceView*)> DxTexturePtr;
 		std::vector<DxTexturePtr> m_textures;
 		std::vector<Vec2> m_circleData;
+
+		//texture render targets
+		struct RenderTargetTexture
+		{
+			ID3D11Texture2D* texture;
+			ID3D11RenderTargetView* rtView;
+			ID3D11ShaderResourceView* srView;
+		};
+		RenderTargetTexture m_RTtexture;
 	};
 
 	template<typename T> void GraphicsSystem::safeRelease(T*& ptr)

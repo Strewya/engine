@@ -40,6 +40,8 @@ namespace Core
 		game.m_playingField.halfWidth = std::abs(topleft.x);
 		game.m_playingField.halfHeight = std::abs(topleft.y);
 
+		game.m_graphicsSystem.createTextureRenderTarget(static_cast<uint32_t>(game.m_playingField.halfWidth) * 40, static_cast<uint32_t>(game.m_playingField.halfHeight) * 40);
+
 		game.m_camera.setPosition({0, 0, -50});
 		game.m_graphicsSystem.setTransparencyMode(true);
 
@@ -147,6 +149,7 @@ namespace Core
 		game.m_weaponDatabase.clear();
 		game.m_perkDatabase.clear();
 		game.m_bonusDatabase.clear();
+		game.m_graphicsSystem.clearTextureRenderTarget();
 	}
 
 	void initPlayer(Player& player, uint32_t id, RainbowlandGame& game)
@@ -930,6 +933,16 @@ namespace Core
 					monster->objectTimer.setTimeScale(Time::NORMAL_TIME);
 				}
 			}
+		}
+	}
+
+	void generateSplatter(VKillLocations loc, RainbowlandGame& game)
+	{
+		Random gen(Time::getRealTimeMicros());
+		for(auto p : loc)
+		{
+			uint32_t splatterIndex = gen.randInt(0, game.m_splatterDatabase.size() - 1);
+			game.m_splatters.emplace_back(p, splatterIndex);
 		}
 	}
 }
