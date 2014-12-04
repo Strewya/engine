@@ -608,7 +608,7 @@ namespace Core
 		return v3_makeHollowPolygonIndices(p);
 	}
 
-	std::vector<Vertex> GraphicsSystem::v3_makeQuadVertices(const Vec2& pos, const Vec2& hs) const
+	std::vector<Vertex> GraphicsSystem::v3_makeQuadVertices(Vec2 pos, Vec2 hs) const
 	{
 		/*
 			0-1
@@ -629,7 +629,7 @@ namespace Core
 		return
 		{
 			0, 1, 3,
-			0, 3, 2
+			3, 2, 0
 		};
 	}
 
@@ -737,6 +737,7 @@ namespace Core
 		textureDesc.CPUAccessFlags = 0;
 		textureDesc.MiscFlags = 0;
 		m_dev->CreateTexture2D(&textureDesc, nullptr, &m_RTtexture.texture);
+		
 
 		// Create the render target view.
 		renderTargetViewDesc.Format = textureDesc.Format;
@@ -752,6 +753,10 @@ namespace Core
 		shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
 		m_dev->CreateShaderResourceView(m_RTtexture.texture, &shaderResourceViewDesc, &m_RTtexture.srView);
+
+		//clear the texture
+		FLOAT c[4]{0, 0, 0, 0};
+		m_devcon->ClearRenderTargetView(m_RTtexture.rtView, c);
 	}
 
 	void GraphicsSystem::clearTextureRenderTarget()
@@ -763,7 +768,7 @@ namespace Core
 
 	void GraphicsSystem::v3_setTextureAsRenderTarget()
 	{
-		m_devcon->OMSetRenderTargets(1, &m_RTtexture.rtView, m_depthStencilView);
+		m_devcon->OMSetRenderTargets(1, &m_RTtexture.rtView, nullptr);
 	}
 
 	void GraphicsSystem::v3_clearTextureAsRenderTarget()
@@ -1232,5 +1237,43 @@ namespace Core
 		gfx.v3_setFontTexture(fontID);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		gfx.v3_draw(indices.size(), 1);
+	}
+
+	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Transform transform, Vec2 halfSize, Color color)
+	{
+		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
+		auto indices = gfx.v3_makeSolidQuadIndices();
+
+		vertices[0].setTextureCoords(image.left(), image.top());
+		vertices[1].setTextureCoords(image.right(), image.top());
+		vertices[2].setTextureCoords(image.left(), image.bottom());
+		vertices[3].setTextureCoords(image.right(), image.bottom());
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_draw(indices.size(), 1);
+	}
+
+	void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		assert(transforms.size() == colors.size());
+
+		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
+		auto indices = gfx.v3_makeSolidQuadIndices();
+
+		//top and bottom are reversed because texture coordinates y axis is reversed
+		vertices[0].setTextureCoords(image.left(), image.bottom());
+		vertices[1].setTextureCoords(image.right(), image.bottom());
+		vertices[2].setTextureCoords(image.left(), image.top());
+		vertices[3].setTextureCoords(image.right(), image.top());
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices(indices);
+		gfx.v3_setInstanceData(transforms, colors, 0, transforms.size());
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		gfx.v3_setTexture(textureID);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 }

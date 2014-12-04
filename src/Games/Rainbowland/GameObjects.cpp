@@ -316,17 +316,17 @@ namespace Core
 		}
 	}
 
-	void fixupCamera(VPlayers& players, Camera& camera)
+	void fixupCamera(RainbowlandGame& game)
 	{
-		if(players.size() > 0)
+		if(game.m_players.size() > 0)
 		{
 			Vec2 averagePos;
-			for(auto& player : players)
+			for(auto& player : game.m_players)
 			{
 				averagePos += player.transform.position;
 			}
-			averagePos /= (float)players.size();
-			auto pos = camera.getPosition();
+			averagePos /= (float)game.m_players.size();
+			auto pos = game.m_camera.getPosition();
 			Vec2 pos2{pos.x, pos.y};
 			clamp(-5.0f, 5.0f, averagePos.x);
 			clamp(-2.0f, 2.0f, averagePos.y);
@@ -334,8 +334,8 @@ namespace Core
 			if(Vec2::length(diff) > 0)
 			{
 				pos.set(averagePos.x, averagePos.y, pos.z);
-				camera.move({diff.x, diff.y, 0});
-				players[0].aim += diff;
+				game.m_camera.move({diff.x, diff.y, 0});
+				game.m_players[0].aim += diff;
 			}
 		}
 	}

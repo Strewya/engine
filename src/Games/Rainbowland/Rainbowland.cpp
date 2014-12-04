@@ -375,18 +375,17 @@ namespace Core
 			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/moss.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/shoota.png");
-			m_isRunning &= (bool)m_textureCache.load("Textures/splatter.tif");
+			m_isRunning &= (bool)m_textureCache.load("Textures/splatter.png");
 			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			m_defaultFont = m_fontCache.getResourceID("font");
 			m_backgroundTexture = m_textureCache.getResourceID("Textures/moss.png");
 			m_charsTexture = m_textureCache.getResourceID("Textures/shoota.png");
-			m_splatterTexture = m_textureCache.getResourceID("Textures/splatter.tif");
+			m_splatterTexture = m_textureCache.getResourceID("Textures/splatter.png");
 		}
 
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
-		Vec2 splatterImgSize{1969, 885};
 		m_splatterDatabase =
 		{
 			{{92, 98}, 193, 115},
@@ -413,9 +412,6 @@ namespace Core
 			r.halfHeight /= 2;
 			r.center.x += r.halfWidth;
 			r.center.y += r.halfHeight;
-			r.center /= splatterImgSize;
-			r.halfWidth /= splatterImgSize.x;
-			r.halfHeight /= splatterImgSize.y;
 		}
 		
 		initGame(*this);
@@ -526,7 +522,7 @@ namespace Core
 		orientMonsters(m_monsters);
 		checkMonsterHurtingPlayer(*this);
 		checkLevelup(*this);
-		fixupCamera(m_players, m_camera);
+		fixupCamera(*this);
 		
 		orientPlayers(m_players);
 		fireWeapons(*this);
@@ -577,6 +573,39 @@ namespace Core
 
 
 		{
+			//draw splatters to texture render target
+			m_graphicsSystem.v3_setTextureAsRenderTarget();
+			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
+			m_graphicsSystem.setTransparencyMode(true);
+			m_graphicsSystem.v3_setTexture(m_splatterTexture);
+			Vec2 splatterImgSize{1969, 885};
+			for(auto splatter : m_splatters)
+			{
+				auto sdb = m_splatterDatabase[splatter.second];
+				float ratio = sdb.halfWidth / sdb.halfHeight;
+				sdb.halfWidth /= splatterImgSize.x;
+				sdb.halfHeight /= splatterImgSize.y;
+				sdb.center /= splatterImgSize;
+				auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
+				vertices[0].setTextureCoords(sdb.left(), sdb.bottom());
+				vertices[1].setTextureCoords(sdb.right(), sdb.bottom());
+				vertices[2].setTextureCoords(sdb.left(), sdb.top());
+				vertices[3].setTextureCoords(sdb.right(), sdb.top());
+				Transform t;
+				t.position = splatter.first;
+				t.scale.set(2, 2);
+
+				m_graphicsSystem.v3_setVertices(vertices);
+				m_graphicsSystem.v3_setIndices(indices);
+				m_graphicsSystem.v3_setInstanceData({t}, {{}}, 0, 1);
+				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				m_graphicsSystem.v3_draw(indices.size(), 1);
+			}
+			
+			m_splatters.clear();
+			m_graphicsSystem.v3_clearTextureAsRenderTarget();
+		}
+		{
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, m_playingField.halfSize());
 			vertices[0].setTextureCoords(0, 0);
 			vertices[1].setTextureCoords(1, 0);
@@ -594,33 +623,9 @@ namespace Core
 			m_graphicsSystem.v3_draw(indices.size(), 1);
 			
 			//draw the texture render target over the screen
-			//m_graphicsSystem.setTransparencyMode(true);
-			//m_graphicsSystem.v3_setTextureFromRenderTarget();
-			//m_graphicsSystem.v3_draw(indices.size(), 1);
-		}
-		{
-			//draw splatters to texture render target
-			//m_graphicsSystem.v3_setTextureAsRenderTarget();
-			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
 			m_graphicsSystem.setTransparencyMode(true);
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			m_graphicsSystem.v3_setTexture(m_splatterTexture);
-			m_graphicsSystem.v3_setIndices(indices);
-			for(auto splatter : m_splatters)
-			{
-				auto& sdb = m_splatterDatabase[splatter.second];
-				float ratio = sdb.halfWidth / sdb.halfHeight;
-				auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio,1});
-				vertices[0].setTextureCoords(sdb.left(), sdb.top());
-				vertices[1].setTextureCoords(sdb.right(), sdb.top());
-				vertices[2].setTextureCoords(sdb.left(), sdb.bottom());
-				vertices[3].setTextureCoords(sdb.right(), sdb.bottom());
-				m_graphicsSystem.v3_setVertices(vertices);
-				m_graphicsSystem.v3_setInstanceData({{splatter.first, {2, 2}, 0}}, {{1, 1, 1}}, 0, 1);
-				m_graphicsSystem.v3_draw(indices.size(), 1);
-			}
-			//m_splatters.clear();
-			//m_graphicsSystem.v3_clearTextureAsRenderTarget();
+			m_graphicsSystem.v3_setTextureFromRenderTarget();
+			m_graphicsSystem.v3_draw(indices.size(), 1);
 		}
 
 		{
@@ -652,18 +657,6 @@ namespace Core
 			r.halfWidth /= 986;
 			r.halfHeight /= 971;
 			float ratio = r.halfWidth / r.halfHeight;
-			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
-			vertices[0].setTextureCoords(r.left(), r.top());
-			vertices[1].setTextureCoords(r.right(), r.top());
-			vertices[2].setTextureCoords(r.left(), r.bottom());
-			vertices[3].setTextureCoords(r.right(), r.bottom());
-			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
-
-			m_graphicsSystem.v3_setVertices(vertices);
-			m_graphicsSystem.v3_setIndices(indices);
-			m_graphicsSystem.v3_setTexture(m_charsTexture);
-			m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 			std::vector<Transform> tfs;
 			std::vector<Color> fills;
 			tfs.reserve(m_monsters.size());
@@ -673,8 +666,8 @@ namespace Core
 				tfs.emplace_back(obj.transform);
 				fills.emplace_back(Color{1, 1, 1, 1});
 			}
-			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_monsters.size());
-			m_graphicsSystem.v3_draw(indices.size(), m_monsters.size());
+
+			drawMultipleTexturedQuads(m_graphicsSystem, m_charsTexture, r, {ratio, 1}, tfs, fills);
 
 			auto inds = m_graphicsSystem.v3_makeHollowCircleIndices(18);
 			m_graphicsSystem.v3_setVertices(m_graphicsSystem.v3_makeCircleVertices({}, 0.8f, 18));
@@ -691,10 +684,14 @@ namespace Core
 			float ratio = r.halfWidth / r.halfHeight;
 
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
-			vertices[0].setTextureCoords(426.0f / 986.0f, 28.0f / 971.0f);
+			vertices[0].setTextureCoords(r.left(), r.bottom());
+			vertices[1].setTextureCoords(r.right(), r.bottom());
+			vertices[2].setTextureCoords(r.left(), r.top());
+			vertices[3].setTextureCoords(r.right(), r.top());
+			/*vertices[0].setTextureCoords(426.0f / 986.0f, 28.0f / 971.0f);
 			vertices[1].setTextureCoords(602.0f / 986.0f, 28.0f / 971.0f);
 			vertices[2].setTextureCoords(426.0f / 986.0f, 116.0f / 971.0f);
-			vertices[3].setTextureCoords(602.0f / 986.0f, 116.0f / 971.0f);
+			vertices[3].setTextureCoords(602.0f / 986.0f, 116.0f / 971.0f);*/
 			auto indices = m_graphicsSystem.v3_makeSolidQuadIndices();
 			
 			m_graphicsSystem.v3_setVertices(vertices);

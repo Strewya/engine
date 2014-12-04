@@ -83,7 +83,7 @@ namespace Core
 
 		std::vector<Vertex> v3_makeCustomVertices(const Vec2* pos, uint32_t pts) const;
 		std::vector<Vertex> v3_makeCircleVertices(const Vec2& pos, float radius, uint32_t pts) const;
-		std::vector<Vertex> v3_makeQuadVertices(const Vec2& pos, const Vec2& halfSize) const;
+		std::vector<Vertex> v3_makeQuadVertices(Vec2 pos, Vec2 halfSize) const;
 		std::vector<Vertex> v3_makeTextVertices(uint32_t font, const std::string& text, bool italic);
 		std::vector<uint32_t> v3_makeSolidPolygonIndices(uint32_t pts) const;
 		std::vector<uint32_t> v3_makeHollowPolygonIndices(uint32_t pts) const;
@@ -181,14 +181,14 @@ namespace Core
 		m_dxInterfaces.emplace_back((IUnknown**)ptr);
 	}
 
-	void drawHollowPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color fillColor);
-	void drawSolidPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color fillColor);
+	void drawHollowPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color);
+	void drawSolidPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color);
 	void drawHollowQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color);
-	void drawSolidQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color fillColor);
+	void drawSolidQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color);
 	void drawHollowCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
 	void drawSolidCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
 	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color tint, TextJustification justification, bool isItalic);
+	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Transform transform, Vec2 halfSize, Color color);
 
-
-	
+	void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, const std::vector<Transform>& transform, const std::vector<Color>& color);
 }

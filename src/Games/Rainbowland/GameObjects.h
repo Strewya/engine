@@ -214,7 +214,7 @@ namespace Core
 	void checkLevelup(RainbowlandGame& game);
 	void grantExperience(uint32_t exp, VPlayers& players);
 	void updateGuiLabels(RainbowlandGame& game);
-	void fixupCamera(VPlayers& players, Camera& camera);
+	void fixupCamera(RainbowlandGame& game);
 
 	void enableBonus(Player& player, Bonus& bonus, RainbowlandGame& game);
 	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
