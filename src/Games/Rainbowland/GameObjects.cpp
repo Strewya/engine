@@ -40,7 +40,7 @@ namespace Core
 		game.m_playingField.halfWidth = std::abs(topleft.x);
 		game.m_playingField.halfHeight = std::abs(topleft.y);
 
-		game.m_graphicsSystem.createTextureRenderTarget(static_cast<uint32_t>(game.m_playingField.halfWidth) * 40, static_cast<uint32_t>(game.m_playingField.halfHeight) * 40);
+		game.m_graphicsSystem.createTextureRenderTarget(1200, 900);
 
 		game.m_camera.setPosition({0, 0, -50});
 		game.m_graphicsSystem.setTransparencyMode(true);
@@ -942,6 +942,10 @@ namespace Core
 		for(auto p : loc)
 		{
 			uint32_t splatterIndex = gen.randInt(0, game.m_splatterDatabase.size() - 1);
+			auto fieldHeight = 2 * std::tanf(Deg2Rad(45)) * 50;
+			auto fieldWidth = 2 * fieldHeight * (game.m_window->getSizeX() / game.m_window->getSizeY());
+
+
 			game.m_splatters.emplace_back(p, splatterIndex);
 		}
 	}

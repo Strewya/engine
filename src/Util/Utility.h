@@ -31,6 +31,9 @@ namespace Core
 #define DEBUG_INFO(...) (void)0
 #endif
 
+#define Deg2Rad(deg) ((deg)*3.14159265358979f/180.0f)
+#define Rad2Deg(rad) ((rad)*180.0f/3.14159265358979f)
+
 
 	template<typename T> T& wrap(const T& low, const T& high, T& value)
 	{

@@ -569,7 +569,7 @@ namespace Core
 		m_graphicsSystem.begin();
 	
 		m_graphicsSystem.setPerspectiveProjection();
-		m_graphicsSystem.applyCamera(m_camera);
+		//m_graphicsSystem.applyCamera(m_camera);
 
 
 		{
@@ -605,6 +605,7 @@ namespace Core
 			m_splatters.clear();
 			m_graphicsSystem.v3_clearTextureAsRenderTarget();
 		}
+		m_graphicsSystem.applyCamera(m_camera);
 		{
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, m_playingField.halfSize());
 			vertices[0].setTextureCoords(0, 0);
