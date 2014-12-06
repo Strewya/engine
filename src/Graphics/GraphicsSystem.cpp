@@ -287,7 +287,7 @@ namespace Core
 	//*****************************************************************
 	//					SCREEN TO WORLD COORDS
 	//*****************************************************************
-	Vec2 GraphicsSystem::screenToWorld(const Vec2& screen, const Camera& cam) const
+	Vec2 GraphicsSystem::screenToWorld(Vec2 screen, Camera& cam) const
 	{
 		auto camView = calculateCamView(cam);
 		
@@ -296,6 +296,14 @@ namespace Core
 		auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
 		auto loc = XMPlaneIntersectLine(plane, objectSpace, camPos);
 		return Vec2{loc.m128_f32[0], loc.m128_f32[1]};
+	}
+
+	//*****************************************************************
+	//					WORLD TO SCREEN COORDS
+	//*****************************************************************
+	Vec2 GraphicsSystem::worldToScreen(Vec2 world, Camera& camera) const
+	{
+		return{};
 	}
 
 	//*****************************************************************

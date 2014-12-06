@@ -93,6 +93,6 @@ namespace Core
 
 	bool isCircleTouchingCircle(const Circle& l, const Circle& r)
 	{
-		return (Vec2::length(l.center - r.center) <= l.radius + r.radius);
+		return (Vec2::length(l.center - r.center) <= (l.radius + r.radius));
 	}
 }

@@ -69,7 +69,9 @@ namespace Core
 		void applyCamera(const Camera& camera);
 		void clearCamera();
 
-		Vec2 screenToWorld(const Vec2& screen, const Camera& camera) const;
+		Vec2 screenToWorld(Vec2 screen, Camera& camera) const;
+		Vec2 worldToScreen(Vec2 world, Camera& camera) const;
+
 		Vec2 textHalfSize(uint32_t fontID, const std::string& text) const;
 		Transform justifyText(Transform textTf, float textSizeX, TextJustification justification);
 

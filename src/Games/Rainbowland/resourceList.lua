@@ -3,7 +3,7 @@ return
 	"Defs/font.font",
 	"Textures/font_t.png",
 	"Textures/shoota.png",
-	"Textures/moss.png"
+	"Textures/background.png"
 },
 { -- DLL dependencies
 	"tolua++",

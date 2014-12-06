@@ -112,6 +112,15 @@ namespace Core
 
 	typedef std::vector<Pickup> VPickups;
 
+	struct BloodSplatter
+	{
+		Transform transform;
+		Color color;
+		uint32_t splatterImage;
+	};
+
+	typedef std::vector<BloodSplatter> VSplatters;
+
 	struct Bonus
 	{
 		BonusType type;
@@ -208,7 +217,7 @@ namespace Core
 	void initGame(RainbowlandGame& game);
 	void cleanGame(RainbowlandGame& game);
 	void initPlayer(Player& player, uint32_t id, RainbowlandGame& game);
-	void movePlayers(VPlayers& players, const Rect& playingField);
+	void movePlayers(RainbowlandGame& game);
 	void orientPlayers(VPlayers& players);
 	void checkPlayerDeath(RainbowlandGame& game);
 	void checkLevelup(RainbowlandGame& game);
@@ -219,7 +228,7 @@ namespace Core
 	void enableBonus(Player& player, Bonus& bonus, RainbowlandGame& game);
 	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
 	void updateBonuses(RainbowlandGame& game);
-	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb);
+	void generatePickups(VKillLocations& killLocations, RainbowlandGame& game);
 	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus);
 	void checkPickups(RainbowlandGame& game);
 	void updatePickups(RainbowlandGame& game);
@@ -227,18 +236,18 @@ namespace Core
 	void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
 	void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb);
 	void fireWeapons(RainbowlandGame& game);
-	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
+	void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce);
 	void moveBullets(VBullets& bullets);
 	void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<Monster*>& outMonsters);
 	void updateBullets(VBullets& bullets, VMonsters& monsters);
 
-	void updateMonsterSpawners(VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount);
-	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target);
-	void moveMonsters(VMonsters& monsters, const VPlayers& players);
+	void updateMonsterSpawners(RainbowlandGame& game);
+	void generateMonster(VMonsters& monsters, Random& gen, Vec2 position, uint32_t target);
+	void moveMonsters(RainbowlandGame& game);
 	void orientMonsters(VMonsters& monsters);
 	void hurtMonster(Monster& monster, uint32_t amount);
 	void checkMonsterHurtingPlayer(RainbowlandGame& game);
-	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players);
+	void killMonsters(RainbowlandGame& game, VKillLocations& killLocations);
 
 	bool enterPerkMode(RainbowlandGame& game);
 	void exitPerkMode(RainbowlandGame& game);

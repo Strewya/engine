@@ -17,7 +17,7 @@
 
 namespace Core
 {
-#ifdef _DEBUG
+#ifndef DEPLOY
 	bool g_spawnEnabled = true;
 	bool step = false;
 	bool stepBack = false;
@@ -96,7 +96,7 @@ namespace Core
 						auto wp = m_graphicsSystem.screenToWorld(sp, m_camera);
 						m_players[0].aim = wp;
 					}
-#ifdef _DEBUG
+#ifndef DEPLOY
 					if(w.m_mouseMove.m_isRelative)
 					{
 						mx += w.m_mouseMove.m_x;
@@ -142,7 +142,7 @@ namespace Core
 				}
 				return false;
 			});
-#ifdef _DEBUG
+#ifndef DEPLOY
 			m_messageHandlers.emplace_back([&](const WindowEvent& w)
 			{
 				if(!perkMode && w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown && m_players.size() >= 1)
@@ -208,6 +208,10 @@ namespace Core
 							break;
 						case Keyboard::m_U:
 							m_window->lockCursor(false);
+							break;
+
+						case Keyboard::m_X:
+							generateMonster(m_monsters, m_randomGenerator, loc, 0);
 							break;
 
 						case Keyboard::m_Home:
@@ -373,12 +377,12 @@ namespace Core
 			m_isRunning &= m_graphicsSystem.initPixelShader("Shaders/shader.hlsl");
 
 			m_isRunning &= (bool)m_textureCache.load("Textures/font_t.png");
-			m_isRunning &= (bool)m_textureCache.load("Textures/moss.png");
+			m_isRunning &= (bool)m_textureCache.load("Textures/background.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/shoota.png");
 			m_isRunning &= (bool)m_textureCache.load("Textures/splatter.png");
 			m_isRunning &= (bool)m_fontCache.load("Defs/font.font", m_luaSystem.getStack());
 			m_defaultFont = m_fontCache.getResourceID("font");
-			m_backgroundTexture = m_textureCache.getResourceID("Textures/moss.png");
+			m_backgroundTexture = m_textureCache.getResourceID("Textures/background.png");
 			m_charsTexture = m_textureCache.getResourceID("Textures/shoota.png");
 			m_splatterTexture = m_textureCache.getResourceID("Textures/splatter.png");
 		}
@@ -386,7 +390,7 @@ namespace Core
 		m_logicTimer.setTimeScale(Time::NORMAL_TIME);
 		m_renderTimer.setTimeScale(Time::NORMAL_TIME);
 
-		m_splatterDatabase =
+		m_splatterImageDatabase =
 		{
 			{{92, 98}, 193, 115},
 			{{453, 87}, 184, 128},
@@ -406,7 +410,7 @@ namespace Core
 			{{1304, 648}, 212, 148},
 			{{1656, 652}, 225, 132}
 		};
-		for(auto& r : m_splatterDatabase)
+		for( auto& r : m_splatterImageDatabase )
 		{
 			r.halfWidth /= 2;
 			r.halfHeight /= 2;
@@ -460,7 +464,7 @@ namespace Core
 				}
 			}
 		}
-#ifdef _DEBUG
+#ifndef DEPLOY
 		if(step)
 		{
 			auto currentScale = m_gameplayTimer.getTimeScale();
@@ -475,7 +479,7 @@ namespace Core
 		}
 #endif
 		m_gameplayTimer.updateBy(m_logicTimer.getDeltaMicros());
-#ifdef _DEBUG
+#ifndef DEPLOY
 		if(step)
 		{
 			step = false;
@@ -513,12 +517,12 @@ namespace Core
 			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
 		}
 
-		movePlayers(m_players, m_playingField);
-#ifdef _DEBUG
+		movePlayers(*this);
+#ifndef DEPLOY
 		if(g_spawnEnabled)
 #endif
-		updateMonsterSpawners(m_monsterSpawners, m_monsters, m_players.size());
-		moveMonsters(m_monsters, m_players);
+		updateMonsterSpawners(*this);
+		moveMonsters(*this);
 		orientMonsters(m_monsters);
 		checkMonsterHurtingPlayer(*this);
 		checkLevelup(*this);
@@ -531,8 +535,8 @@ namespace Core
 		moveBullets(m_bullets);
 		updateBullets(m_bullets, m_monsters);
 		VKillLocations locations;
-		killMonsters(m_monsters, locations, m_players);
-		generatePickups(locations, m_pickups, m_bonusDatabase);
+		killMonsters(*this, locations);
+		generatePickups(locations, *this);
 		generateSplatter(locations, *this);
 		checkPickups(*this);
 		updateBonuses(*this);
@@ -569,7 +573,7 @@ namespace Core
 		m_graphicsSystem.begin();
 	
 		m_graphicsSystem.setPerspectiveProjection();
-		//m_graphicsSystem.applyCamera(m_camera);
+		m_graphicsSystem.applyCamera(m_camera);
 
 
 		{
@@ -581,7 +585,7 @@ namespace Core
 			Vec2 splatterImgSize{1969, 885};
 			for(auto splatter : m_splatters)
 			{
-				auto sdb = m_splatterDatabase[splatter.second];
+				auto sdb = m_splatterImageDatabase[splatter.splatterImage];
 				float ratio = sdb.halfWidth / sdb.halfHeight;
 				sdb.halfWidth /= splatterImgSize.x;
 				sdb.halfHeight /= splatterImgSize.y;
@@ -591,13 +595,10 @@ namespace Core
 				vertices[1].setTextureCoords(sdb.right(), sdb.bottom());
 				vertices[2].setTextureCoords(sdb.left(), sdb.top());
 				vertices[3].setTextureCoords(sdb.right(), sdb.top());
-				Transform t;
-				t.position = splatter.first;
-				t.scale.set(2, 2);
-
+				
 				m_graphicsSystem.v3_setVertices(vertices);
 				m_graphicsSystem.v3_setIndices(indices);
-				m_graphicsSystem.v3_setInstanceData({t}, {{}}, 0, 1);
+				m_graphicsSystem.v3_setInstanceData({splatter.transform}, {splatter.color}, 0, 1);
 				m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 				m_graphicsSystem.v3_draw(indices.size(), 1);
 			}
@@ -605,6 +606,7 @@ namespace Core
 			m_splatters.clear();
 			m_graphicsSystem.v3_clearTextureAsRenderTarget();
 		}
+		m_graphicsSystem.setPerspectiveProjection();
 		m_graphicsSystem.applyCamera(m_camera);
 		{
 			auto vertices = m_graphicsSystem.v3_makeQuadVertices({}, m_playingField.halfSize());
@@ -641,7 +643,7 @@ namespace Core
 			}
 			if( tfs.size() > 0 )
 			{
-				auto verts = m_graphicsSystem.v3_makeCircleVertices({}, 1, 32);
+				auto verts = m_graphicsSystem.v3_makeCircleVertices({}, 0.75f, 32);
 				auto inds = m_graphicsSystem.v3_makeSolidCircleIndices(32);
 				m_graphicsSystem.v3_setVertices(verts);
 				m_graphicsSystem.v3_setIndices(inds);
@@ -711,7 +713,7 @@ namespace Core
 			}
 			m_graphicsSystem.v3_setInstanceData(tfs, fills, 0, m_players.size());
 			m_graphicsSystem.v3_draw(indices.size(), m_players.size());
-#ifndef DEPLOY
+#ifdef _DEBUG
 			auto inds = m_graphicsSystem.v3_makeHollowCircleIndices(18);
 			m_graphicsSystem.v3_setVertices(m_graphicsSystem.v3_makeCircleVertices({}, 1.0f, 18));
 			m_graphicsSystem.v3_setIndices(inds);
@@ -791,6 +793,10 @@ namespace Core
 			auto text = std::to_string(m_gameplayTimer.getTimeScale());
 			drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 
+			tf.position.y -= 20;
+
+			text = std::to_string(m_camera.getPosition().z);
+			drawText(m_graphicsSystem, m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
 			tf.position.y -= 20;
 		}
 #endif

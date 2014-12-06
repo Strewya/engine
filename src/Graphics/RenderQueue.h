@@ -4,6 +4,8 @@
 *	usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Graphics/Vertex.h>

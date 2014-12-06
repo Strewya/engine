@@ -19,8 +19,10 @@
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
 #include <Scripting/LuaSystem.h>
+#include <Util/Random.h>
 #include <Util/Rect.h>
 #include <Util/Time.h>
+#include <Util/Transform.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -48,10 +50,10 @@ namespace Core
 		
 		Camera m_camera;
 		Rect m_playingField;
+		Random m_randomGenerator;
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
-		std::vector<Rect> m_splatterDatabase;
-		std::vector<std::pair<Vec2, uint32_t>> m_splatters;
+		std::vector<Rect> m_splatterImageDatabase;
 
 		VPlayers m_players;
 		VMonsters m_monsters;
@@ -61,6 +63,7 @@ namespace Core
 		VWeapons m_weaponDatabase;
 		VPerks m_perkDatabase;
 		VBonuses m_bonusDatabase;
+		VSplatters m_splatters;
 		
 		Circle m_defenseMatrixArea;
 		Circle m_timeCapsuleArea;

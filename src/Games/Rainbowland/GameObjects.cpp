@@ -24,6 +24,8 @@ namespace Core
 {
 	void initGame(RainbowlandGame& game)
 	{
+		game.m_randomGenerator.reseed(Time::getRealTimeMicros());
+
 		game.m_window->showCursor(false);
 		game.m_window->lockCursor(true);
 		//background
@@ -50,11 +52,10 @@ namespace Core
 		uint32_t spawnerCount = 8;
 		Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
 		Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
-		Random gen{Time::getRealTimeMicros()};
 		for(uint32_t i = 0; i < spawnerCount; ++i)
 		{
 			game.m_monsterSpawners.emplace_back();
-			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 4);
 			game.m_monsterSpawners.back().spawnRadius = 1;
 			game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
 			game.m_monsterSpawners.back().timer.reset();
@@ -65,7 +66,7 @@ namespace Core
 		for(uint32_t i = 0; i < spawnerCount; ++i)
 		{
 			game.m_monsterSpawners.emplace_back();
-			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 4);
 			game.m_monsterSpawners.back().spawnRadius = 1;
 			game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
 			game.m_monsterSpawners.back().timer.reset();
@@ -76,7 +77,7 @@ namespace Core
 		for(uint32_t i = 0; i < spawnerCount; ++i)
 		{
 			game.m_monsterSpawners.emplace_back();
-			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 4);
 			game.m_monsterSpawners.back().spawnRadius = 1;
 			game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
 			game.m_monsterSpawners.back().timer.reset();
@@ -87,7 +88,7 @@ namespace Core
 		for(uint32_t i = 0; i < spawnerCount; ++i)
 		{
 			game.m_monsterSpawners.emplace_back();
-			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(gen.randFloat() * 5 + 4);
+			game.m_monsterSpawners.back().spawnCooldown = Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 4);
 			game.m_monsterSpawners.back().spawnRadius = 1;
 			game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
 			game.m_monsterSpawners.back().timer.reset();
@@ -213,9 +214,9 @@ namespace Core
 		game.m_guiSystem.label(panel + "WEAPON", panel, game.m_defaultFont, weapon, weaponPos, {0.75f, 0.75f}, {0, 0, 0}, TJ_Left, false);
 	}
 
-	void movePlayers(VPlayers& players, const Rect& playingField)
+	void movePlayers(RainbowlandGame& game)
 	{
-		for(Player& player : players)
+		for(Player& player : game.m_players)
 		{
 			Vec2 direction;
 			if(player.directions[Up]) direction.y += 1;
@@ -231,10 +232,14 @@ namespace Core
 			player.transform.position += (player.objectTimer.getDeltaTime()*player.velocity);
 			Circle playerCollider = player.collisionData;
 			playerCollider.center = player.transform.position;
-			if(!isCircleInsideRect(playerCollider, playingField))
+			if(!isCircleInsideRect(playerCollider, game.m_playingField))
 			{
-				clamp(playingField.left() + player.collisionData.radius, playingField.right() - player.collisionData.radius, player.transform.position.x);
-				clamp(playingField.bottom() + player.collisionData.radius, playingField.top() - player.collisionData.radius, player.transform.position.y);
+				clamp(game.m_playingField.left() + player.collisionData.radius,
+					  game.m_playingField.right() - player.collisionData.radius,
+					  player.transform.position.x);
+				clamp(game.m_playingField.bottom() + player.collisionData.radius,
+					  game.m_playingField.top() - player.collisionData.radius,
+					  player.transform.position.y);
 			}
 		}
 	}
@@ -370,14 +375,13 @@ namespace Core
 		}
 	}
 
-	void generatePickups(VKillLocations& killLocations, VPickups& pickups, const VBonuses& bonusDb)
+	void generatePickups(VKillLocations& killLocations, RainbowlandGame& game)
 	{
-		Random gen{Time::getRealTimeMicros()};
 		for(auto& loc : killLocations)
 		{
-			if(gen.randInt(1, 10000) < 2000)
+			if( game.m_randomGenerator.randInt(1, 10000) < 2000 )
 			{
-				placePickup(pickups, gen, loc, (BonusType)gen.randInt(0, bonusDb.size()-1));
+				placePickup(game.m_pickups, game.m_randomGenerator, loc, (BonusType)game.m_randomGenerator.randInt(0, game.m_bonusDatabase.size() - 1));
 			}
 		}
 	}
@@ -421,8 +425,10 @@ namespace Core
 			{
 				Circle pCollider = player.collisionData;
 				pCollider.center = player.transform.position;
+				pCollider.radius *= player.transform.scale.x;
 				Circle bCollider = game.m_pickups[b].collisionData;
 				bCollider.center = game.m_pickups[b].transform.position;
+				bCollider.radius *= game.m_pickups[b].transform.scale.x;
 				if(isCircleTouchingCircle(pCollider, bCollider))
 				{
 					enableBonus(player, game.m_pickups[b].bonus, game);
@@ -486,7 +492,7 @@ namespace Core
 					player.weaponTimer.reset();
 					--w.ammo;
 					auto p = Vec2::normalize(player.aim - player.transform.position)*player.collisionData.radius;
-					generateBullets(game.m_bullets, w.bulletsPerShot, w.spread, player.transform.position + p, player.aim, w.damage, w.bulletPierce);
+					generateBullets(game.m_bullets, game.m_randomGenerator, w.bulletsPerShot, w.spread, player.transform.position + p, player.aim + p, w.damage, w.bulletPierce);
 				}
 			}
 			else
@@ -500,12 +506,11 @@ namespace Core
 		}
 	}
 
-	void generateBullets(VBullets& bullets, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce)
+	void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, const Vec2& origin, const Vec2& target, uint32_t damage, bool pierce)
 	{
 
 		Vec2 direction = Vec2::normalize(target - origin);
 		Vec2 targetDistance = direction * 30;
-		Random gen{Time::getRealTimeMicros()};
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
@@ -591,28 +596,30 @@ namespace Core
 		}
 	}
 
-	void updateMonsterSpawners(VMonsterSpawners& spawners, VMonsters& monsters, uint32_t playerCount)
+	void updateMonsterSpawners(RainbowlandGame& game)
 	{
-		if(playerCount == 0) return;
+		if(game.m_players.size() == 0) return;
 
-		Random gen{Time::getRealTimeMicros()};
-		for(auto& spawner : spawners)
+		for(auto& spawner : game.m_monsterSpawners)
 		{
 			spawner.timer.updateBy(spawner.objectTimer.getDeltaMicros());
 			if(spawner.timer.getCurrentMicros() > spawner.spawnCooldown)
 			{
 				spawner.timer.reset();
-				generateMonster(monsters, spawner.transform.position + Vec2{(gen.randFloat() * 2 - 1)*spawner.spawnRadius, (gen.randFloat() * 2 - 1)*spawner.spawnRadius}, gen.randInt(0, playerCount - 1));
+				generateMonster(game.m_monsters, game.m_randomGenerator,
+								spawner.transform.position +
+								Vec2{(game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius,
+								(game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius},
+								game.m_randomGenerator.randInt(0, game.m_players.size() - 1));
 			}
 		}
 	}
 	
-	void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target)
+	void generateMonster(VMonsters& monsters, Random& gen, Vec2 position, uint32_t target)
 	{
 		if(monsters.size() > 40) return;
 
 		monsters.emplace_back();
-		Random gen{Time::getRealTimeMicros()};
 		auto& monster = monsters.back();
 		monster.objectTimer.reset();
 		monster.collisionData.set(0, 0, 0.8f);
@@ -632,19 +639,29 @@ namespace Core
 		}
 	}
 
-	void moveMonsters(VMonsters& monsters, const VPlayers& players)
+	void moveMonsters(RainbowlandGame& game)
 	{
-		for(auto& monster : monsters)
+		for(auto& monster : game.m_monsters)
 		{
-			if(players.size() != 0)
+			if(game.m_players.size() != 0)
 			{
-				if(monster.targetPlayer >= players.size())
+				if(monster.targetPlayer >= game.m_players.size())
 				{
-					monster.targetPlayer = Random{Time::getRealTimeMicros()}.randInt(0, players.size() - 1);
+					monster.targetPlayer = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
 				}
-				monster.direction = Vec2::normalize(players[monster.targetPlayer].transform.position - monster.transform.position);
+				monster.direction = Vec2::normalize(game.m_players[monster.targetPlayer].transform.position - monster.transform.position);
 			}
-			monster.transform.position += (monster.direction*monster.maxVelocity*monster.objectTimer.getDeltaTime());
+			auto newPos = monster.transform.position + (monster.direction*monster.maxVelocity*monster.objectTimer.getDeltaTime());
+			if( game.m_players.size() > monster.targetPlayer )
+			{
+				Circle mCollider{newPos, monster.collisionData.radius*monster.transform.scale.x*0.9f};
+				Circle pCollider{game.m_players[monster.targetPlayer].transform.position, game.m_players[monster.targetPlayer].collisionData.radius};
+				pCollider.radius *= game.m_players[monster.targetPlayer].transform.scale.x*0.9f;
+				if( !isCircleTouchingCircle(mCollider, pCollider) )
+				{
+					monster.transform.position = newPos;
+				}
+			}
 		}
 	}
 
@@ -690,17 +707,17 @@ namespace Core
 		}
 	}
 
-	void killMonsters(VMonsters& monsters, VKillLocations& killLocations, VPlayers& players)
+	void killMonsters(RainbowlandGame& game, VKillLocations& killLocations)
 	{
-		for(uint32_t m = 0; m < monsters.size(); ) 
+		for(uint32_t m = 0; m < game.m_monsters.size(); ) 
 		{
-			if(monsters[m].health <= 0)
+			if(game.m_monsters[m].health <= 0)
 			{
-				auto exp = static_cast<uint32_t>(static_cast<float>(monsters[m].maxHealth)*monsters[m].expModifier);
-				grantExperience(exp, players);
-				killLocations.emplace_back(monsters[m].transform.position);
-				monsters[m] = monsters.back();
-				monsters.pop_back();
+				auto exp = static_cast<uint32_t>(static_cast<float>(game.m_monsters[m].maxHealth)*game.m_monsters[m].expModifier);
+				grantExperience(exp, game.m_players);
+				killLocations.emplace_back(game.m_monsters[m].transform.position);
+				game.m_monsters[m] = game.m_monsters.back();
+				game.m_monsters.pop_back();
 			}
 			else
 			{
@@ -919,7 +936,7 @@ namespace Core
 				auto radius2 = area.radius*area.radius;
 				auto diff = radius2 - distance2;
 				double scale = 1.0 - (double)diff / (double)radius2;
-				clamp(0.3, 1.0, scale);
+				clamp(0.2, 1.0, scale);
 				monster->objectTimer.setTimeScale(scale);
 			}
 			//check if over
@@ -941,12 +958,25 @@ namespace Core
 		Random gen(Time::getRealTimeMicros());
 		for(auto p : loc)
 		{
-			uint32_t splatterIndex = gen.randInt(0, game.m_splatterDatabase.size() - 1);
-			auto fieldHeight = 2 * std::tanf(Deg2Rad(45)) * 50;
-			auto fieldWidth = 2 * fieldHeight * (game.m_window->getSizeX() / game.m_window->getSizeY());
-
-
-			game.m_splatters.emplace_back(p, splatterIndex);
+			p.y = -p.y;
+			//(-halfSize, halfSize) -> (0, 2*halfSize)
+			p += game.m_playingField.halfSize();
+			//(0, 2*halfSize) -> (0, 1)
+			p /= (2 * game.m_playingField.halfSize());
+			//(0, 1) -> (0, windowSize)
+			p *= {(float)game.m_window->getSizeX(), (float)game.m_window->getSizeY()};
+			//(0, windowSize) -> worldPos
+			p = game.m_graphicsSystem.screenToWorld(p, game.m_camera);
+			float scale{gen.randFloat() + 1};
+			float rotation = gen.randFloat() * 360;
+			Transform t{p, {scale, scale}, rotation};
+			float r = gen.randFloat();
+			float g = gen.randFloat();
+			float b = gen.randFloat();
+			Color c{};
+			uint32_t splatterIndex = gen.randInt(0, game.m_splatterImageDatabase.size() - 1);
+			BloodSplatter bs{t, c, splatterIndex};
+			game.m_splatters.emplace_back(bs);
 		}
 	}
 }
