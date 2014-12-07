@@ -26,5 +26,5 @@ namespace Core
 	bool isCircleTouchingRect(const Circle& circle, const Rect& rect);
 	bool isRectTouchingRect(const Rect& l, const Rect& r);
 	bool isCircleTouchingCircle(const Circle& l, const Circle& r);
-
+	bool isLineTouchingCircle(Vec2 A, Vec2 B, Circle circle);
 }

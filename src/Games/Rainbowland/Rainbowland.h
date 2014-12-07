@@ -54,6 +54,8 @@ namespace Core
 
 		std::vector<std::function<bool(const WindowEvent&)>> m_messageHandlers;
 		std::vector<Rect> m_splatterImageDatabase;
+		std::vector<Rect> m_bonusImageDatabase;
+		std::vector<Rect> m_weaponImageDatabase;
 
 		VPlayers m_players;
 		VMonsters m_monsters;
@@ -78,6 +80,7 @@ namespace Core
 		uint32_t m_backgroundTexture;
 		uint32_t m_charsTexture;
 		uint32_t m_splatterTexture;
+		uint32_t m_bonusTexture;
 		Window* m_window;
 		bool m_isRunning;
 		bool perkMode;

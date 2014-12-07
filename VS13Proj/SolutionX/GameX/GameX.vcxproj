@@ -247,6 +247,7 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
@@ -314,6 +315,7 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />

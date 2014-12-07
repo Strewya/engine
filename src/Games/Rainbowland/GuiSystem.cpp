@@ -67,7 +67,7 @@ namespace Core
 	{
 		Transform t;
 		t.position = pos;
-		drawSolidQuad(graphics, t, halfSize, color);
+		drawSolidQuad(graphics, halfSize, t, color);
 	}
 	
 	bool GuiSystem::Button::handleEvent(const WindowEvent& we, Vec2 windowSize)
@@ -94,7 +94,7 @@ namespace Core
 	{
 		Transform t;
 		t.position = pos;
-		drawHollowQuad(graphics, t, halfSize, color);
+		drawHollowQuad(graphics, halfSize, t, color);
 	}
 
 	void GuiSystem::Label::drawSelf(GraphicsSystem& graphics)

@@ -100,42 +100,6 @@ namespace Core
 					player.bonuses[index] = player.bonuses.back();
 					player.bonuses.pop_back();
 				}
-			},
-
-			{
-				BonusType::Weapon_Pistol, "Pistol", 0,
-				[](Player& player, RainbowlandGame& game)
-				{
-					selectWeapon(player, Pistol, game.m_weaponDatabase);
-				},
-					[](Player& player, RainbowlandGame& game) {}
-			},
-
-			{
-				BonusType::Weapon_Shotgun, "Shotgun", 0,
-				[](Player& player, RainbowlandGame& game)
-				{
-					selectWeapon(player, Shotgun, game.m_weaponDatabase);
-				},
-					[](Player& player, RainbowlandGame& game) {}
-			},
-
-			{
-				BonusType::Weapon_Uzi, "Uzi", 0,
-				[](Player& player, RainbowlandGame& game)
-				{
-					selectWeapon(player, Uzi, game.m_weaponDatabase);
-				},
-					[](Player& player, RainbowlandGame& game) {}
-			},
-
-			{
-				BonusType::Weapon_Sniper, "Gauss", 0,
-					[](Player& player, RainbowlandGame& game)
-				{
-					selectWeapon(player, Sniper, game.m_weaponDatabase);
-				},
-					[](Player& player, RainbowlandGame& game) {}
 			}
 		};
 

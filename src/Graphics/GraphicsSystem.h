@@ -75,10 +75,6 @@ namespace Core
 		Vec2 textHalfSize(uint32_t fontID, const std::string& text) const;
 		Transform justifyText(Transform textTf, float textSizeX, TextJustification justification);
 
-		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
-		void drawLine(const Transform& transform, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color);
-		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
-		
 		bool loadTexture(const ResourceFile& filename, Texture& outTexture);
 		bool reloadTexture(const ResourceFile& filename, Texture& outTexture);
 		void unloadTexture(Texture& texture);
@@ -98,7 +94,7 @@ namespace Core
 		void v3_setVertices(const std::vector<Vertex>& vertices);
 		void v3_setIndices(const std::vector<uint32_t>& indices);
 		void v3_setTopology(D3D_PRIMITIVE_TOPOLOGY topology);
-		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, uint32_t startOffset, uint32_t count);
+		void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills);
 		void v3_setTexture(uint32_t textureId);
 		void v3_setFontTexture(uint32_t fontId);
 		void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
@@ -182,15 +178,33 @@ namespace Core
 		*ptr = nullptr;
 		m_dxInterfaces.emplace_back((IUnknown**)ptr);
 	}
+	
+	void drawLine(GraphicsSystem& gfx, Vec2 p1, Vec2 p2, Transform transform, Color color);
+	void drawLine(GraphicsSystem& gfx, Vec2 p1, Color c1, Vec2 p2, Color c2, Transform transform, Color color);
+	void drawMultipleLines(GraphicsSystem& gfx, Vec2 p1, Vec2 p2, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
 
-	void drawHollowPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color);
-	void drawSolidPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color);
-	void drawHollowQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color);
-	void drawSolidQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color);
-	void drawHollowCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
-	void drawSolidCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color);
-	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color tint, TextJustification justification, bool isItalic);
-	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Transform transform, Vec2 halfSize, Color color);
+	void drawMultiline(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, Transform transform, Color color);
 
+	void drawHollowPolygon(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, Transform transform, Color color);
+	void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+	
+	void drawSolidPolygon(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, Transform transform, Color color);
+	void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+
+	void drawHollowQuad(GraphicsSystem& gfx, Vec2 halfSize, Transform transform, Color color);
+	void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+
+	void drawSolidQuad(GraphicsSystem& gfx, Vec2 halfSize, Transform transform, Color color);
+	void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+
+	void drawHollowCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color);
+	void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+
+	void drawSolidCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color);
+	void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+
+	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, Transform transform, Color color);
 	void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, const std::vector<Transform>& transform, const std::vector<Color>& color);
+	
+	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color tint, TextJustification justification, bool isItalic);
 }

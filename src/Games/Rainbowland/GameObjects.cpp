@@ -102,7 +102,7 @@ namespace Core
 			{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0, false},
 			{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f, false},
 			{Uzi, "Urban cleaner", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.5f, false},
-			{Sniper, "One shot piercer", Time::secondsToMicros(1.4f), Time::secondsToMicros(2), 50, 8, 8, 1, 0, true},
+			{Sniper, "One shot piercer", Time::secondsToMicros(1.4f), Time::secondsToMicros(2), 1, 8, 8, 1, 0, true},
 		};
 		std::sort(game.m_weaponDatabase.begin(), game.m_weaponDatabase.end(),
 				  [](const Weapon& l, const Weapon& r)
@@ -379,42 +379,35 @@ namespace Core
 	{
 		for(auto& loc : killLocations)
 		{
-			if( game.m_randomGenerator.randInt(1, 10000) < 2000 )
+			if( game.m_randomGenerator.randInt(1, 10000) < 2000 )//20%
 			{
-				placePickup(game.m_pickups, game.m_randomGenerator, loc, (BonusType)game.m_randomGenerator.randInt(0, game.m_bonusDatabase.size() - 1));
+
+				WeaponType weapon = WeaponTypeCount;
+				BonusType bonus = BonusTypeCount;
+				
+				if( game.m_randomGenerator.randInt(1, 10000) <= 50000 ) //50%
+				{
+					bonus = (BonusType)game.m_randomGenerator.randInt(0, game.m_bonusDatabase.size() - 1);
+				}
+				else
+				{
+					weapon = (WeaponType)game.m_randomGenerator.randInt(0, game.m_weaponDatabase.size() - 1);
+				}
+				placePickup(game.m_pickups, loc, bonus, weapon);
 			}
 		}
 	}
 
-	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus)
+	void placePickup(VPickups& pickups, Vec2 location, BonusType bonus, WeaponType weapon)
 	{
 		pickups.emplace_back();
 		pickups.back().objectTimer.reset();
 		pickups.back().transform.position = location;
-		pickups.back().collisionData.set(0, 0, 0.75f);
+		pickups.back().transform.scale.set(0.75f, 0.75f);
+		pickups.back().collisionData.set(0, 0, 1);
 		pickups.back().bonus = bonus;
+		pickups.back().weapon = weapon;
 		pickups.back().duration = Time::secondsToMicros(15);
-		switch(bonus)
-		{
-			case IncreasedRateOfFire:
-				pickups.back().color.set(0, 0, 1);
-				break;
-			case IncreasedMovementSpeed:
-				pickups.back().color.set(0, 1, 1);
-				break;
-			case Heal:
-				pickups.back().color.set(0, 1, 0);
-				break;
-			case SlowTime:
-				pickups.back().color.set(1, 0.5f, 1);
-				break;
-			case Weapon_Pistol:
-			case Weapon_Shotgun:
-			case Weapon_Uzi:
-			case Weapon_Sniper:
-				pickups.back().color.set(1, 1, 0);
-				break;
-		}
 	}
 
 	void checkPickups(RainbowlandGame& game)
@@ -431,7 +424,14 @@ namespace Core
 				bCollider.radius *= game.m_pickups[b].transform.scale.x;
 				if(isCircleTouchingCircle(pCollider, bCollider))
 				{
-					enableBonus(player, game.m_pickups[b].bonus, game);
+					if( game.m_pickups[b].bonus != BonusTypeCount )
+					{
+						enableBonus(player, game.m_pickups[b].bonus, game);
+					}
+					if( game.m_pickups[b].weapon != WeaponTypeCount )
+					{
+						selectWeapon(player, game.m_pickups[b].weapon, game.m_weaponDatabase);
+					}
 					game.m_pickups[b] = game.m_pickups.back();
 					game.m_pickups.pop_back();
 				}
@@ -456,7 +456,8 @@ namespace Core
 			{
 				auto duration = game.m_pickups[b].duration;
 				auto diff = duration - game.m_pickups[b].objectTimer.getCurrentMicros();
-				game.m_pickups[b].color.a = 0.2f + (float)diff / (float)duration;
+				game.m_pickups[b].color.a = (float)diff / Time::secondsToMicros(2);
+				clamp(0.0f, 1.0f, game.m_pickups[b].color.a);
 				++b;
 			}
 		}
@@ -514,32 +515,43 @@ namespace Core
 		for(uint32_t i = 0; i < count; ++i)
 		{
 			Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-			bullets.emplace_back(Bullet{Time(), origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, pierce});
+			bullets.emplace_back(Bullet{Time(), origin, origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, pierce});
 			bullets.back().objectTimer.reset();
 		}
 	}
 
 	void moveBullets(VBullets& bullets)
 	{
-		for(uint32_t i = 0; i < bullets.size();)
+		for(uint32_t i = 0; i < bullets.size(); ++i)
 		{
 			auto displacement = bullets[i].objectTimer.getDeltaTime()*bullets[i].velocity;
 			auto travel = Vec2::length(displacement);
-			bullets[i].position += displacement;
 			bullets[i].travelled += travel;
+			if( !bullets[i].dead )
+			{
+				bullets[i].oldPosition = bullets[i].position;
+				bullets[i].position += displacement;
+			}
 			if(bullets[i].travelled > 10)
 			{
-				bullets[i].origin += displacement;
+				bullets[i].trail += (displacement*(1.0f + (bullets[i].dead ? 1.0f : 0.0f)));
 			}
 
 			if(bullets[i].travelled > 50)
 			{
-				bullets[i] = bullets.back();
-				bullets.pop_back();
+				bullets[i].dead = true;
 			}
-			else
+			if( bullets[i].dead )
 			{
-				++i;
+				auto old = Vec2::normalize(bullets[i].oldPosition - bullets[i].position);
+				auto trail = Vec2::normalize(bullets[i].trail - bullets[i].position);
+				auto dot = Vec2::dotProduct(old, trail);
+				if( dot < 0 )
+				{
+					bullets[i] = bullets.back();
+					bullets.pop_back();
+					--i;
+				}
 			}
 		}
 	}
@@ -552,7 +564,8 @@ namespace Core
 			{
 				Circle bCollider = monsters[m].collisionData;
 				bCollider.center = monsters[m].transform.position;
-				if(isPointInsideCircle(bullet.position, bCollider))
+				bCollider.radius *= monsters[m].transform.scale.x;
+				if(isLineTouchingCircle(bullet.oldPosition, bullet.position, bCollider))
 				{
 					outMonsters.push_back(m);
 				}
@@ -562,36 +575,34 @@ namespace Core
 
 	void updateBullets(VBullets& bullets, VMonsters& monsters)
 	{
-		for(uint32_t b = 0; b < bullets.size();)
+		for(uint32_t b = 0; b < bullets.size();++b)
 		{
 			auto& bullet = bullets[b];
-			std::vector<uint32_t> hitMonsters;
-			findBulletHits(bullet, monsters, hitMonsters);
-			if(!hitMonsters.empty())
+			if( !bullet.dead )
 			{
-				std::sort(hitMonsters.begin(), hitMonsters.end(), [&](uint32_t l, uint32_t r)
+				std::vector<uint32_t> hitMonsters;
+				findBulletHits(bullet, monsters, hitMonsters);
+				if( !hitMonsters.empty() )
 				{
-					auto ll = Vec2::length(monsters[l].transform.position - bullet.origin);
-					auto rl = Vec2::length(monsters[r].transform.position - bullet.origin);
-					return ll < rl;
-				});
-				for(auto mid : hitMonsters)
-				{
-					hurtMonster(monsters[mid], bullet.damage);
-					if(!bullet.pierce)
+					std::sort(hitMonsters.begin(), hitMonsters.end(), [&](uint32_t l, uint32_t r)
 					{
-						break;
+						auto ll = Vec2::length(monsters[l].transform.position - bullet.trail);
+						auto rl = Vec2::length(monsters[r].transform.position - bullet.trail);
+						return ll < rl;
+					});
+					for( auto mid : hitMonsters )
+					{
+						hurtMonster(monsters[mid], bullet.damage);
+						if( !bullet.pierce )
+						{
+							break;
+						}
 					}
 				}
-			}
-			if(!hitMonsters.empty() && !bullet.pierce)
-			{
-				bullets[b] = bullets.back();
-				bullets.pop_back();
-			}
-			else
-			{
-				++b;
+				if( !hitMonsters.empty() && !bullet.pierce )
+				{
+					bullets[b].dead = true;
+				}
 			}
 		}
 	}
@@ -631,11 +642,11 @@ namespace Core
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
 		monster.attackTimer.updateBy(Time::secondsToMicros(5));
 		monster.expModifier = 1 * scale;
-		monster.color.set(0, 0, 0);
+		monster.color.set(1, 1, 1);
 		if(gen.randInt(0,99999) < 25000)
 		{
 			monster.expModifier *= 4;
-			monster.color.set(0.2f, 0.2f, 0.7f);
+			monster.color.set(0.2f, 0.8f, 0.2f);
 		}
 	}
 

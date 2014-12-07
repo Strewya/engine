@@ -374,59 +374,6 @@ namespace Core
 		return dim;
 	}
 
-	//*****************************************************************
-	//					DRAW LINE
-	//*****************************************************************
-	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Vec2& p2, const Color& c)
-	{
-		drawLine(tf, p1, c, p2, c);
-	}
-
-	//*****************************************************************
-	//					DRAW LINE
-	//*****************************************************************
-	void GraphicsSystem::drawLine(const Transform& tf, const Vec2& p1, const Color& p1Color, const Vec2& p2, const Color& p2Color)
-	{
-		std::vector<Vertex> vertices(2);
-		vertices[0].setPosition(p1.x, p1.y, 0);
-		vertices[0].setDiffuse(p1Color.r, p1Color.g, p1Color.b, p1Color.a);
-		vertices[0].setTextureCoords(-1, -1);
-		vertices[1].setPosition(p2.x, p2.y, 0);
-		vertices[1].setDiffuse(p2Color.r, p2Color.g, p2Color.b, p2Color.a);
-		vertices[1].setTextureCoords(-1, -1);
-
-		v3_setVertices(vertices);
-
-		v3_setInstanceData({tf}, {{}}, 0, 1);
-
-		v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		
-		m_devcon->DrawInstanced(2, 1, 0, 0);
-	}
-
-	//*****************************************************************
-	//					DRAW MULTILINE
-	//*****************************************************************
-	void GraphicsSystem::drawMultiline(const Transform& tf, const Vec2* pos, uint32_t count, const Color& c)
-	{
-		std::vector<Vertex> vertices(count);
-		for(uint32_t i = 0; i < count; ++i)
-		{
-			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
-			vertices[i].setDiffuse(1, 1, 1, 1);
-			vertices[i].setTextureCoords(-1, -1);
-		}
-
-		v3_setVertices(vertices);
-
-		v3_setInstanceData({tf}, {c}, 0, 1);
-		v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-
-		m_devcon->DrawInstanced(count, 1, 0, 0);
-	}
-
-	
-
 	void GraphicsSystem::v3_setVertices(const std::vector<Vertex>& vertices)
 	{
 		if(vertices.size() == 0)
@@ -463,18 +410,17 @@ namespace Core
 		m_devcon->IASetPrimitiveTopology(topology);
 	}
 
-	void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, uint32_t startOffset, uint32_t count)
+	void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills)
 	{
+		uint32_t count = tfs.size();
 		if(count == 0)
 			return;
 		
-		assert(startOffset < tfs.size());
-		assert(startOffset + count <= tfs.size());
 		assert(tfs.size() == fills.size());
 		
 		std::vector<dataPerInstance> data;
 		data.reserve(count);
-		for(uint32_t i = startOffset; i < startOffset+count; ++i)
+		for(uint32_t i = 0; i < count; ++i)
 		{
 			data.emplace_back();
 			auto& dpi = data.back();
@@ -1162,76 +1108,201 @@ namespace Core
 		return XMVectorSet(v.x, v.y, 0, 0);
 	}
 
-	void drawHollowPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color)
+	void drawLine(GraphicsSystem& gfx, Vec2 p1, Vec2 p2, Transform transform, Color color)
 	{
+		drawMultipleLines(gfx, p1, p2, {transform}, {color});
+	}
+
+	void drawLine(GraphicsSystem& gfx, Vec2 p1, Color c1, Vec2 p2, Color c2, Transform transform, Color color)
+	{
+		std::vector<Vertex> vertices
+		{
+			{p1.x, p1.y, 0, c1.r, c1.g, c1.b, c1.a, -1, -1},
+			{p2.x, p2.y, 0, c2.r, c2.g, c2.b, c2.a, -1, -1}
+		};
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices({0, 1});
+		gfx.v3_setInstanceData({transform}, {color});
+
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		gfx.v3_draw(2, 1);
+	}
+
+	void drawMultipleLines(GraphicsSystem& gfx, Vec2 p1, Vec2 p2, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		std::vector<Vertex> vertices
+		{
+			{p1.x, p1.y, 0, 1, 1, 1, 1, -1, -1},
+			{p2.x, p2.y, 0, 1, 1, 1, 1, -1, -1}
+		};
+
+		gfx.v3_setVertices(vertices);
+		gfx.v3_setIndices({0, 1});
+		gfx.v3_setInstanceData(transforms, colors);
+
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+		gfx.v3_draw(2, transforms.size());
+	}
+
+	void drawMultiline(GraphicsSystem& gfx, const Vec2* pos, uint32_t count, Transform tf, Color c)
+	{
+		std::vector<Vertex> vertices(count);
+		for( uint32_t i = 0; i < count; ++i )
+		{
+			vertices[i].setPosition(pos[i].x, pos[i].y, 0);
+			vertices[i].setDiffuse(1, 1, 1, 1);
+			vertices[i].setTextureCoords(-1, -1);
+		}
+
+		gfx.v3_setVertices(vertices);
+
+		gfx.v3_setInstanceData({tf}, {c});
+		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+		gfx.v3_draw(count, 1);
+	}
+	
+	void drawHollowPolygon(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, Transform transform, Color color)
+	{
+		drawMultipleHollowPolygons(gfx, positions, count, {transform}, {color});
+	}
+
+	void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeCustomVertices(positions, count);
 		auto indices = gfx.v3_makeHollowPolygonIndices(count);
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 	
-	void drawSolidPolygon(GraphicsSystem& gfx, Transform transform, const Vec2* positions, uint32_t count, Color color)
+	void drawSolidPolygon(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, Transform transform, Color color)
 	{
+		drawMultipleSolidPolygons(gfx, positions, count, {transform}, {color});
+	}
+
+	void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeCustomVertices(positions, count);
 		auto indices = gfx.v3_makeSolidPolygonIndices(count);
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 
-	void drawHollowQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color)
+
+
+	void drawHollowQuad(GraphicsSystem& gfx, Vec2 halfSize, Transform transform, Color color)
 	{
+		drawMultipleHollowQuads(gfx, halfSize, {transform}, {color});
+	}
+
+	void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
 		auto indices = gfx.v3_makeHollowQuadIndices();
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 
-	void drawSolidQuad(GraphicsSystem& gfx, Transform transform, Vec2 halfSize, Color color)
+	void drawSolidQuad(GraphicsSystem& gfx, Vec2 halfSize, Transform transform, Color color)
 	{
+		drawMultipleSolidQuads(gfx, halfSize, {transform}, {color});
+	}
+
+	void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
 		auto indices = gfx.v3_makeSolidQuadIndices();
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 
-	void drawHollowCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color)
+	void drawHollowCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color)
 	{
+		drawMultipleHollowCircles(gfx, radius, points, {transform}, {color});
+	}
+
+	void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeCircleVertices({}, radius, points);
 		auto indices = gfx.v3_makeHollowCircleIndices(points);
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 	
-	void drawSolidCircle(GraphicsSystem& gfx, Transform transform, float radius, uint32_t points, Color color)
+	void drawSolidCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color)
 	{
+		drawMultipleSolidCircles(gfx, radius, points, {transform}, {color});
+	}
+
+	void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+		assert(transforms.size() == colors.size());
+
 		auto vertices = gfx.v3_makeCircleVertices({}, radius, points);
 		auto indices = gfx.v3_makeSolidCircleIndices(points);
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		gfx.v3_draw(indices.size(), 1);
+		gfx.v3_draw(indices.size(), transforms.size());
 	}
 	
 	void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color color, TextJustification justification, bool isItalic)
@@ -1241,31 +1312,24 @@ namespace Core
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({gfx.justifyText(transform, gfx.textHalfSize(fontID, text).x*2, justification)}, {color}, 0, 1);
+		gfx.v3_setInstanceData({gfx.justifyText(transform, gfx.textHalfSize(fontID, text).x*2, justification)}, {color});
 		gfx.v3_setFontTexture(fontID);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		gfx.v3_draw(indices.size(), 1);
 	}
 
-	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Transform transform, Vec2 halfSize, Color color)
+	void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, Transform transform, Color color)
 	{
-		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
-		auto indices = gfx.v3_makeSolidQuadIndices();
-
-		vertices[0].setTextureCoords(image.left(), image.top());
-		vertices[1].setTextureCoords(image.right(), image.top());
-		vertices[2].setTextureCoords(image.left(), image.bottom());
-		vertices[3].setTextureCoords(image.right(), image.bottom());
-
-		gfx.v3_setVertices(vertices);
-		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData({transform}, {color}, 0, 1);
-		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		gfx.v3_draw(indices.size(), 1);
+		drawMultipleTexturedQuads(gfx, textureID, image, halfSize, {transform}, {color});
 	}
 
 	void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2 halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
 	{
+		if( transforms.size() == 0 )
+		{
+			return;
+		}
+
 		assert(transforms.size() == colors.size());
 
 		auto vertices = gfx.v3_makeQuadVertices({}, halfSize);
@@ -1279,7 +1343,7 @@ namespace Core
 
 		gfx.v3_setVertices(vertices);
 		gfx.v3_setIndices(indices);
-		gfx.v3_setInstanceData(transforms, colors, 0, transforms.size());
+		gfx.v3_setInstanceData(transforms, colors);
 		gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		gfx.v3_setTexture(textureID);
 		gfx.v3_draw(indices.size(), transforms.size());

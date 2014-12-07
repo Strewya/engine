@@ -95,4 +95,23 @@ namespace Core
 	{
 		return (Vec2::length(l.center - r.center) <= (l.radius + r.radius));
 	}
+
+	bool isLineTouchingCircle(Vec2 A, Vec2 B, Circle circle)
+	{
+		A -= circle.center;
+		B -= circle.center;
+		circle.center.set(0, 0);
+		auto D = B - A;
+		auto a = Vec2::length2(D);
+		auto b = 2 * Vec2::dotProduct(A, D);
+		auto c = Vec2::length2(A) - circle.radius*circle.radius;
+		auto d = b*b - 4 * a*c;
+		if( d >= 0 )
+		{
+			auto t1 = (-b + d) / (2 * a);
+			auto t2 = (-b - d) / (2 * a);
+			return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+		}
+		return false;
+	}
 }

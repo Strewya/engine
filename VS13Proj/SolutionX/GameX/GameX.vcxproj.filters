@@ -213,6 +213,9 @@
     <ClCompile Include="..\..\..\src\Graphics\RenderQueue.cpp">
       <Filter>Framework\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -389,6 +392,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\RenderQueue.h">
       <Filter>Framework\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h">
+      <Filter>Design\Rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -42,8 +42,5 @@ namespace Core
 
 		void applyCamera(const Camera& cam);
 		void clearCamera();
-
-		void drawLine(const Transform& transform, const Vec2& p1, const Vec2& p2, const Color& lineColor);
-		void drawMultiline(const Transform& transform, const Vec2* positions, uint32_t count, const Color& lineColor);
 	};
 }

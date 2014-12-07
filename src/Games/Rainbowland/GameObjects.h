@@ -30,7 +30,7 @@ namespace Core
 		Shotgun,
 		Uzi,
 		Sniper,
-		WeaponCount
+		WeaponTypeCount
 	};
 
 	enum BonusType
@@ -39,10 +39,6 @@ namespace Core
 		IncreasedMovementSpeed,
 		Heal,
 		SlowTime,
-		Weapon_Pistol,
-		Weapon_Shotgun,
-		Weapon_Uzi,
-		Weapon_Sniper,
 		BonusTypeCount
 	};
 
@@ -108,6 +104,7 @@ namespace Core
 		Circle collisionData;
 		uint64_t duration;
 		BonusType bonus;
+		WeaponType weapon;
 	};
 
 	typedef std::vector<Pickup> VPickups;
@@ -145,12 +142,14 @@ namespace Core
 	struct Bullet
 	{
 		Time objectTimer;
-		Vec2 origin;
+		Vec2 trail;
 		Vec2 position;
+		Vec2 oldPosition;
 		Vec2 velocity;
 		float travelled;
 		uint32_t damage;
 		bool pierce;
+		bool dead;
 	};
 
 	typedef std::vector<Bullet> VBullets;
@@ -229,7 +228,7 @@ namespace Core
 	void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
 	void updateBonuses(RainbowlandGame& game);
 	void generatePickups(VKillLocations& killLocations, RainbowlandGame& game);
-	void placePickup(VPickups& pickups, Random& gen, Vec2 location, BonusType bonus);
+	void placePickup(VPickups& pickups, Vec2 location, BonusType bonus, WeaponType weapon);
 	void checkPickups(RainbowlandGame& game);
 	void updatePickups(RainbowlandGame& game);
 
