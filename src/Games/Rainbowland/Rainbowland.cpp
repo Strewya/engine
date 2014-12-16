@@ -224,33 +224,40 @@ namespace Core
 			obj.objectTimer.updateBy(m_gameplayTimer.getDeltaMicros());
 		}
 
-		movePlayers(*this);
 #ifndef DEPLOY
 		if(g_spawnEnabled)
 #endif
-		updateMonsterSpawners(*this);
+		//updateMonsterSpawners(*this);
+		runMonsterAI(*this);
+		
+		movePlayers(*this);
 		moveMonsters(*this);
-		orientMonsters(m_monsters);
-		checkMonsterHurtingPlayer(*this);
-		checkLevelup(*this);
+		moveBullets(m_bullets);
 		fixupCamera(*this);
 		
 		orientPlayers(m_players);
+		orientMonsters(m_monsters);
+
 		fireWeapons(*this);
 		
-		updatePerks(*this);
-		moveBullets(m_bullets);
-		updateBullets(m_bullets, m_monsters);
-		VKillLocations locations;
-		killMonsters(*this, locations);
-		generatePickups(locations, *this);
-		generateSplatter(locations, *this);
+		//checkMonsterHurtingPlayer(*this);
 		checkPickups(*this);
+
+		checkPlayerDeath(*this);
+		checkLevelup(*this);
+		
+		updateBullets(m_bullets, m_monsters);
 		updateBonuses(*this);
 		updatePickups(*this);
 		updateDefenseMatrix(*this);
 		updateTimeCapsule(*this);
-		checkPlayerDeath(*this);
+		
+		updatePerks(*this);
+		VKillLocations locations;
+		killMonsters(*this, locations);
+		generatePickups(locations, *this);
+		generateSplatter(locations, *this);
+		
 		updateGuiLabels(*this);
 
 		if(m_players.size() == 0)

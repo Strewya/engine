@@ -26,8 +26,8 @@ namespace Core
 	{
 		game.m_randomGenerator.reseed(Time::getRealTimeMicros());
 
-		game.m_window->showCursor(false);
-		game.m_window->lockCursor(true);
+		//game.m_window->showCursor(false);
+		//game.m_window->lockCursor(true);
 		//background
 		game.m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
@@ -102,7 +102,7 @@ namespace Core
 			{Pistol, "Pew-Pew", Time::secondsToMicros(0.5f), Time::secondsToMicros(1.4f), 10, 12, 12, 1, 0, false},
 			{Shotgun, "Spreader", Time::secondsToMicros(1.0f), Time::secondsToMicros(3.0f), 20, 5, 5, 6, 2.0f, false},
 			{Uzi, "Urban cleaner", Time::secondsToMicros(0.1f), Time::secondsToMicros(1.3f), 5, 32, 32, 1, 0.5f, false},
-			{Sniper, "One shot piercer", Time::secondsToMicros(1.4f), Time::secondsToMicros(2), 1, 8, 8, 1, 0, true},
+			{Sniper, "One shot piercer", Time::secondsToMicros(1.4f), Time::secondsToMicros(2), 50, 8, 8, 1, 0, true},
 		};
 		std::sort(game.m_weaponDatabase.begin(), game.m_weaponDatabase.end(),
 				  [](const Weapon& l, const Weapon& r)
@@ -164,9 +164,9 @@ namespace Core
 		player.color.g = id == 1 ? 1.0f : 0.0f;
 		player.color.b = id == 2 ? 1.0f : 0.0f;
 		player.collisionData.set(0, 0, 1.0f);
-		player.velocity.set(0.0f, 0.0f);
-		player.maxVelocity.set(5.0f, 5.0f);
-		player.acceleration.set(1.0f, 1.0f);
+		player.direction.set(0.0f, 0.0f);
+		player.maxSpeed = Vec2::length({0.0f, 5.0f});
+		player.acceleration = 1.0f;
 		player.directions[Up] = player.directions[Down] = player.directions[Left] = player.directions[Right] = false;
 		player.aim.set(0, 0);
 		//player.weaponTimer set in selectWeapon
@@ -223,13 +223,9 @@ namespace Core
 			if(player.directions[Down]) direction.y -= 1;
 			if(player.directions[Left]) direction.x -= 1;
 			if(player.directions[Right]) direction.x += 1;
-			player.velocity += (player.acceleration*Vec2::normalize(direction));
-			direction.x = std::fabs(direction.x);
-			direction.y = std::fabs(direction.y);
-			player.velocity *= direction;
-			clamp(-player.maxVelocity.x, player.maxVelocity.x, player.velocity.x);
-			clamp(-player.maxVelocity.y, player.maxVelocity.y, player.velocity.y);
-			player.transform.position += (player.objectTimer.getDeltaTime()*player.velocity);
+			player.direction = Vec2::normalize(direction);
+			auto velocity = direction*player.maxSpeed;
+			player.transform.position += (player.objectTimer.getDeltaTime()*velocity);
 			Circle playerCollider = player.collisionData;
 			playerCollider.center = player.transform.position;
 			if(!isCircleInsideRect(playerCollider, game.m_playingField))
@@ -379,13 +375,13 @@ namespace Core
 	{
 		for(auto& loc : killLocations)
 		{
-			if( game.m_randomGenerator.randInt(1, 10000) < 2000 )//20%
+			if( game.m_randomGenerator.randInt(1, 100*100) < 20*100 )//20%
 			{
 
 				WeaponType weapon = WeaponTypeCount;
 				BonusType bonus = BonusTypeCount;
 				
-				if( game.m_randomGenerator.randInt(1, 10000) <= 50000 ) //50%
+				if( game.m_randomGenerator.randInt(1, 100*100) <= 50*100 ) //50%
 				{
 					bonus = (BonusType)game.m_randomGenerator.randInt(0, game.m_bonusDatabase.size() - 1);
 				}
@@ -634,45 +630,58 @@ namespace Core
 		auto& monster = monsters.back();
 		monster.objectTimer.reset();
 		monster.collisionData.set(0, 0, 0.8f);
-		monster.maxVelocity = 1 + gen.randFloat() * 3.5f;
+		monster.maxSpeed = 1 + gen.randFloat() * 3.5f;
+		monster.turnSpeed = 1 + monster.maxSpeed / 2;
+		monster.direction.set(1, 0);
 		monster.transform.position = position;
 		auto scale = 1 + 0.3f - gen.randFloat()*0.6f;
 		monster.transform.scale.set(scale, scale);
-		monster.targetPlayer = target;
+		monster.brain.timer.reset();
+		monster.brain.updateDelay = Time::secondsToMicros(gen.randFloat());
+		monster.brain.timer.updateBy(monster.brain.updateDelay);
+		monster.brain.targetPlayer = -1;
+		monster.brain.targetLocation = position;
+		monster.brain.steerLogic = SB_Arrive;
 		monster.maxHealth = monster.health = gen.randInt(20, 70);
 		monster.attackTimer.updateBy(Time::secondsToMicros(5));
 		monster.expModifier = 1 * scale;
 		monster.color.set(1, 1, 1);
-		if(gen.randInt(0,99999) < 25000)
+		if(gen.randInt(0,100*100) < 25*100)
 		{
 			monster.expModifier *= 4;
 			monster.color.set(0.2f, 0.8f, 0.2f);
 		}
 	}
 
+	void runMonsterAI(RainbowlandGame& game)
+	{
+		for( auto& monster : game.m_monsters )
+		{
+			//monster.brain.timer.updateBy(monster.objectTimer.getDeltaMicros());
+			//if( monster.brain.timer.getCurrentMicros() >= monster.brain.updateDelay )
+			{
+				//monster.brain.timer.reset();
+				//monster brain does work here
+				//decide which player to target
+				auto playerId = monster.brain.targetPlayer;
+				auto playerIndex = filterFind(game.m_players, [=](const Player& p) { return p.id == playerId; });
+				if( playerIndex == game.m_players.size() || monster.brain.targetPlayer >= game.m_players.size() )
+				{
+					playerIndex = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
+					monster.brain.targetPlayer = game.m_players[playerIndex].id;
+					monster.brain.steerLogic = SB_Pursuit;
+				}
+				monster.brain.targetLocation = game.m_players[playerIndex].transform.position;
+			}
+		}
+	}
+	
 	void moveMonsters(RainbowlandGame& game)
 	{
 		for(auto& monster : game.m_monsters)
 		{
-			if(game.m_players.size() != 0)
-			{
-				if(monster.targetPlayer >= game.m_players.size())
-				{
-					monster.targetPlayer = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
-				}
-				monster.direction = Vec2::normalize(game.m_players[monster.targetPlayer].transform.position - monster.transform.position);
-			}
-			auto newPos = monster.transform.position + (monster.direction*monster.maxVelocity*monster.objectTimer.getDeltaTime());
-			if( game.m_players.size() > monster.targetPlayer )
-			{
-				Circle mCollider{newPos, monster.collisionData.radius*monster.transform.scale.x*0.9f};
-				Circle pCollider{game.m_players[monster.targetPlayer].transform.position, game.m_players[monster.targetPlayer].collisionData.radius};
-				pCollider.radius *= game.m_players[monster.targetPlayer].transform.scale.x*0.9f;
-				if( !isCircleTouchingCircle(mCollider, pCollider) )
-				{
-					monster.transform.position = newPos;
-				}
-			}
+			auto n = Vec2::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
+			monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaTime();
 		}
 	}
 
@@ -680,7 +689,22 @@ namespace Core
 	{
 		for(auto& monster : monsters)
 		{
-			monster.transform.rotation = std::atan2(monster.direction.y, monster.direction.x);
+			float direction = std::atan2f(monster.direction.y, monster.direction.x);
+			auto targetDirection = Vec2::normalize(monster.brain.targetLocation - monster.transform.position);
+			float target = std::atan2f(targetDirection.y, targetDirection.x);
+			direction = Rad2Deg(direction);
+			target = Rad2Deg(target);
+
+			auto wra = target - direction;
+			if( wra > 180.0f ) wra -= 360.0f;
+			if( wra < -180.0f ) wra += 360.0f;
+
+			auto newDir = direction + wra*monster.turnSpeed*monster.objectTimer.getDeltaTime();
+			newDir = Deg2Rad(newDir);
+			monster.direction.x = std::cosf(newDir);
+			monster.direction.y = std::sinf(newDir);
+
+			monster.transform.rotation = newDir;
 		}
 	}
 
@@ -964,6 +988,14 @@ namespace Core
 		}
 	}
 
+	void activateBlink(RainbowlandGame& game)
+	{
+		if( game.m_players.size() > 0 )
+		{
+			game.m_players[0].transform.position = game.m_players[0].aim;
+		}
+	}
+
 	void generateSplatter(VKillLocations loc, RainbowlandGame& game)
 	{
 		Random gen(Time::getRealTimeMicros());
@@ -989,5 +1021,48 @@ namespace Core
 			BloodSplatter bs{t, c, splatterIndex};
 			game.m_splatters.emplace_back(bs);
 		}
+	}
+
+	Vec2 steer_seek(Vec2 position, float maxSpeed, Vec2 targetLocation)
+	{
+		Vec2 desiredVelocity = Vec2::normalize(targetLocation - position)*maxSpeed;
+		return desiredVelocity;
+	}
+
+	Vec2 steer_flee(Vec2 position, float maxSpeed, Vec2 targetLocation)
+	{
+		Vec2 desiredVelocity = Vec2::normalize(position - targetLocation)*maxSpeed;
+		return desiredVelocity;
+	}
+
+	Vec2 steer_arrive(Vec2 position, float maxSpeed, Vec2 targetLocation)
+	{
+		auto toTarget = targetLocation - position;
+		auto distance = Vec2::length(toTarget);
+
+		if( distance > 0 )
+		{
+			float decelerationTweaker = 0.6f;
+			auto speed = distance / decelerationTweaker;
+			speed = std::min(speed, maxSpeed);
+
+			auto desiredVelocity = toTarget*speed / distance;
+			return desiredVelocity;
+		}
+		return{0, 0};
+	}
+
+	Vec2 steer_pursuit(Vec2 position, Vec2 heading, float maxSpeed, Vec2 targetPosition, Vec2 targetHeading, float targetMaxSpeed)
+	{
+		auto toEvader = targetPosition - position;
+		auto relativeHeading = Vec2::dotProduct(heading, targetHeading);
+		if( Vec2::dotProduct(toEvader, heading) > 0 &&
+		    relativeHeading < -0.95f )
+		{
+			return steer_arrive(position, maxSpeed, targetPosition);
+		}
+
+		auto lookAheadTime = Vec2::length(toEvader) / (maxSpeed + targetMaxSpeed);
+		return steer_arrive(position, maxSpeed, (targetPosition + lookAheadTime*(targetHeading*targetMaxSpeed)));
 	}
 }

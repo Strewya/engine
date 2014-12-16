@@ -264,6 +264,13 @@ namespace Core
 						if( firstDown )
 							activateTimeCapsule(game);
 						break;
+					case Keyboard::m_F:
+					{
+						if( firstDown )
+						{
+							activateBlink(game);
+						}
+					} break;
 				}
 			}
 			return false;

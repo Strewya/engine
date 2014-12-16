@@ -68,15 +68,33 @@ namespace Core
 
 	typedef std::vector<Weapon> VWeapons;
 
+	enum SteeringBehaviour
+	{
+		SB_Seek,
+		SB_Flee,
+		SB_Arrive,
+		SB_Pursuit
+	};
+
+	struct Brain
+	{
+		Time timer;
+		uint64_t updateDelay;
+		uint32_t targetPlayer;
+		Vec2 targetLocation;
+		SteeringBehaviour steerLogic;
+	};
+
 	struct Monster
 	{
+		Brain brain;
 		Time objectTimer;
 		Transform transform;
 		Color color;
 		Circle collisionData;
 		Vec2 direction;
-		float maxVelocity;
-		uint32_t targetPlayer;
+		float maxSpeed;
+		float turnSpeed;
 		int32_t maxHealth;
 		int32_t health;
 		Time attackTimer;
@@ -173,9 +191,9 @@ namespace Core
 		Transform transform;
 		Color color;
 		Circle collisionData;
-		Vec2 velocity;
-		Vec2 maxVelocity;
-		Vec2 acceleration;
+		Vec2 direction;
+		float maxSpeed;
+		float acceleration;
 		bool directions[4];
 		Vec2 aim;
 		VActiveBonuses bonuses;
@@ -242,6 +260,7 @@ namespace Core
 
 	void updateMonsterSpawners(RainbowlandGame& game);
 	void generateMonster(VMonsters& monsters, Random& gen, Vec2 position, uint32_t target);
+	void runMonsterAI(RainbowlandGame& game);
 	void moveMonsters(RainbowlandGame& game);
 	void orientMonsters(VMonsters& monsters);
 	void hurtMonster(Monster& monster, uint32_t amount);
@@ -260,6 +279,13 @@ namespace Core
 
 	void activateTimeCapsule(RainbowlandGame& game);
 	void updateTimeCapsule(RainbowlandGame& game);
+	
+	void activateBlink(RainbowlandGame& game);
 
 	void generateSplatter(VKillLocations loc, RainbowlandGame& game);
+
+	Vec2 steer_seek(Vec2 position, float maxSpeed, Vec2 targetLocation);
+	Vec2 steer_flee(Vec2 position, float maxSpeed, Vec2 targetLocation);
+	Vec2 steer_arrive(Vec2 position, float maxSpeed, Vec2 targetLocation);
+	Vec2 steer_pursuit(Vec2 position, Vec2 heading, float maxSpeed, Vec2 targetPosition, Vec2 targetHeading, float targetMaxSpeed);
 }

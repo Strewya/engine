@@ -110,7 +110,10 @@ namespace Core
 		{
 			auto t1 = (-b + d) / (2 * a);
 			auto t2 = (-b - d) / (2 * a);
-			return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+			auto y = (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+			if( y )
+				return y;
+			return y;
 		}
 		return false;
 	}

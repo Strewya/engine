@@ -65,13 +65,13 @@ namespace Core
 						player.bonuses[index].duration = 0;
 						player.bonuses[index].timer.reset();
 						player.bonuses[index].type = IncreasedMovementSpeed;
-						player.maxVelocity *= 2;
+						player.maxSpeed *= 2;
 					}
 					player.bonuses[index].duration += game.m_bonusDatabase[IncreasedMovementSpeed].durationMicros;
 				},
 					[](Player& player, RainbowlandGame& game)
 				{
-					player.maxVelocity *= 0.5f;
+					player.maxSpeed *= 0.5f;
 					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedMovementSpeed == e.type; });
 					player.bonuses[index] = player.bonuses.back();
 					player.bonuses.pop_back();
