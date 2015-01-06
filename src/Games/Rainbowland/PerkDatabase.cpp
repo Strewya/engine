@@ -391,8 +391,8 @@ namespace Core
             if( !firedOnReload )
             {
                firedOnReload = true;
-               generateBullets(game.m_bullets, game.m_randomGenerator, 2, 1, player.transform.position,
-                               Vec2::normalize(-player.aim), 50, true, &player);
+               generateRocket(game.m_rockets, player.transform.position,
+                               Vec2::normalize(-player.aim), 30, &player);
             }
          }
          else

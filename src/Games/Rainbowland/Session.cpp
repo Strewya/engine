@@ -222,30 +222,6 @@ namespace Core
          game.m_graphicsSystem.v3_draw(indices.size(), 1);
       }
 
-      
-      {
-         // pickups
-         for( auto& pickup : game.m_pickups )
-         {
-            auto imageRect = game.m_rainbowlandImageDatabase[pickup.iconIndex];
-            auto circleRect = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_bonuses + 6];
-
-            imageRect.center /= atlasSize;
-            imageRect.halfWidth /= atlasSize.x;
-            imageRect.halfHeight /= atlasSize.y;
-            circleRect.center /= atlasSize;
-            circleRect.halfWidth /= atlasSize.x;
-            circleRect.halfHeight /= atlasSize.y;
-
-            Vec2 scale{1, 1};
-            if( pickup.bonus != BonusTypeCount )
-               drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, circleRect, {1.5f, 1.5f}, pickup.transform, pickup.color);
-            else
-               scale.set(1.5f, 1.5f);
-            drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, imageRect, scale, pickup.transform, pickup.color);
-         }
-      }
-      
       if( game.m_monsters.size() > 0 )
       {
          //monsters
@@ -276,6 +252,28 @@ namespace Core
             r.halfHeight /= atlasSize.y;
 
             drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color);
+#if 0
+            switch( obj.brain.state )
+            {
+               case BS_Attack:
+               {
+                  Transform textTf{obj.transform.position, {0.02f, 0.02f}, 0};
+                  drawText(game.m_graphicsSystem, game.m_defaultFont, "Attack", textTf, obj.color, TJ_Center, false);
+               } break;
+               case BS_Wander:
+               {
+                  Transform textTf{obj.transform.position, {0.02f, 0.02f}, 0};
+                  drawText(game.m_graphicsSystem, game.m_defaultFont, "Wander", textTf, obj.color, TJ_Center, false);
+               } break;
+               case BS_Flank:
+               {
+                  Transform textTf{obj.transform.position, {0.02f, 0.02f}, 0};
+                  drawText(game.m_graphicsSystem, game.m_defaultFont, "Flank", textTf, obj.color, TJ_Center, false);
+               } break;
+            }*/
+            //drawLine(game.m_graphicsSystem, obj.transform.position, obj.brain.targetLocation, {}, obj.color);
+#endif
+
 
 #ifdef _DEBUG_OFF
             auto t = obj.transform;
@@ -285,6 +283,29 @@ namespace Core
             t.position += obj.collisionData_hitbox.center;
             drawHollowCircle(game.m_graphicsSystem, obj.collisionData_hitbox.radius, 18, t, {});
 #endif
+         }
+      }
+
+      {
+         // pickups
+         for( auto& pickup : game.m_pickups )
+         {
+            auto imageRect = game.m_rainbowlandImageDatabase[pickup.iconIndex];
+            auto circleRect = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_bonuses + 6];
+
+            imageRect.center /= atlasSize;
+            imageRect.halfWidth /= atlasSize.x;
+            imageRect.halfHeight /= atlasSize.y;
+            circleRect.center /= atlasSize;
+            circleRect.halfWidth /= atlasSize.x;
+            circleRect.halfHeight /= atlasSize.y;
+
+            Vec2 scale{1, 1};
+            if( pickup.bonus != BonusTypeCount )
+               drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, circleRect, {1.5f, 1.5f}, pickup.transform, pickup.color);
+            else
+               scale.set(1.5f, 1.5f);
+            drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, imageRect, scale, pickup.transform, pickup.color);
          }
       }
 

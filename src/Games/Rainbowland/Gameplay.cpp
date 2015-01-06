@@ -780,24 +780,29 @@ namespace Core
       monsta.health = static_cast<uint32_t>(static_cast<float>(monsta.health)*game.m_difficulty);
       monsta.maxHealth = monsta.health;
       monsta.damage = static_cast<uint32_t>(static_cast<float>(monsta.damage)*game.m_difficulty);
+      //monsta.maxSpeed *= game.m_difficulty;
+      //clamp(0.0f, 5.0f, monsta.maxSpeed);
    }
 
    void setFlowerSpecificData(Monster& monster)
    {
       monster.collisionData_attack.set(0, 0, 0.6f);
       monster.collisionData_hitbox.set(0, 0, 0.7f);
+      monster.brain.state = BS_Attack;
    }
 
    void setLadybugSpecificData(Monster& monster)
    {
       monster.collisionData_attack.set(0, 0, 0.7f);
       monster.collisionData_hitbox.set(0, 0, 0.8f);
+      monster.brain.state = BS_Flank;
    }
 
    void setButterflySpecificData(Monster& monster)
    {
       monster.collisionData_attack.set(0, 0, 0.5f);
       monster.collisionData_hitbox.set(0, 0, 0.7f);
+      monster.brain.state = BS_Wander;
    }
 
    void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target, RainbowlandGame& game)
@@ -818,15 +823,23 @@ namespace Core
       monster.brain.timer.updateBy(monster.brain.updateDelay);
       monster.brain.targetPlayer = -1;
       monster.brain.targetLocation = position;
-      monster.brain.steerLogic = SB_Arrive;
-      uint32_t hp = static_cast<uint32_t>(20 * (game.m_randomGenerator.randFloat()*0.4f + 0.8f));
+      auto rnd = game.m_randomGenerator.randInt(0, 100 * 100);
+      if( rnd < 20*100 )
+         monster.brain.state = BS_Wander;
+      else if( 20*100 <= rnd && rnd < 60*100 )
+         monster.brain.state = BS_Flank;
+      else
+         monster.brain.state = BS_Attack;
+      monster.brain.attackRadius = 7;
+      monster.brain.chanceToWander = 0.01f;
+      uint32_t hp = static_cast<uint32_t>(30 * (game.m_randomGenerator.randFloat()*0.4f + 0.8f));
       monster.maxHealth = monster.health = static_cast<uint32_t>(hp);
       monster.attackTimer.updateBy(Time::secondsToMicros(5));
       monster.attackDelay = Time::secondsToMicros(0.4f);
       monster.damage = 1;
       monster.expGain = hp;
       monster.color.set(1, 1, 1);
-      if( game.m_randomGenerator.randInt(0, 100 * 100) < 25 * 100 )
+      if( game.m_randomGenerator.randInt(0, 100 * 100) < 15 * 100 )
       {
          monster.expGain *= 2;
          monster.color.set(0.7f, 1, 0.7f);
@@ -851,6 +864,20 @@ namespace Core
       }
    }
 
+   uint32_t findPlayerInArea(Circle area, VPlayers& players)
+   {
+      auto index = 0;
+      for( auto& player : players )
+      {
+         if( isPointInsideCircle(player.transform.position, area) )
+         {
+            return index;
+         }
+         ++index;
+      }
+      return players.size();
+   }
+
    void runMonsterAI(RainbowlandGame& game)
    {
       for( auto& monster : game.m_monsters )
@@ -861,21 +888,63 @@ namespace Core
             monster.brain.timer.reset();
             //monster brain does work here
             //decide which player to target
-            if( game.m_players.size() > 0 )
+            if( game.m_players.size() == 0 )
             {
-               auto playerId = monster.brain.targetPlayer;
-               auto playerIndex = filterFind(game.m_players, [=](const Player& p) { return p.id == playerId; });
-               if( playerIndex == game.m_players.size() || monster.brain.targetPlayer >= game.m_players.size() )
-               {
-                  playerIndex = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
-                  monster.brain.targetPlayer = game.m_players[playerIndex].id;
-                  monster.brain.steerLogic = SB_Pursuit;
-               }
-               monster.brain.targetLocation = game.m_players[playerIndex].transform.position;
+               monster.brain.state = BS_Wander;
             }
-            else
+            
+            auto playerId = monster.brain.targetPlayer;
+            auto playerIndex = filterFind(game.m_players, [=](const Player& p) { return p.id == playerId; });
+            if( playerIndex == game.m_players.size() && playerIndex != 0)
             {
-               monster.brain.steerLogic = SB_Wander;
+               playerIndex = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
+               monster.brain.targetPlayer = game.m_players[playerIndex].id;
+            }
+            
+            switch( monster.brain.state )
+            {
+               case BS_Wander:
+               {
+                  auto direction = steer_wander(monster, game);
+                  if( Vec2::length2(monster.transform.position) >= Vec2::length2(game.m_playingField.halfSize()) )
+                  {
+                     direction = Vec2::normalize(-monster.transform.position);
+                  }
+                  monster.brain.targetLocation = monster.transform.position + direction * 4;
+                  auto pi = findPlayerInArea(Circle{monster.transform.position, monster.brain.attackRadius}, game.m_players);
+                  if( pi != game.m_players.size() )
+                  {
+                     monster.brain.targetPlayer = game.m_players[pi].id;
+                     monster.brain.state = BS_Attack;
+                  }
+               } break;
+
+               case BS_Attack:
+               {
+                  monster.brain.targetLocation = game.m_players[playerIndex].transform.position;
+                  auto pi = findPlayerInArea(Circle{monster.transform.position, monster.brain.attackRadius}, game.m_players);
+                  if( pi == game.m_players.size() && game.m_randomGenerator.randFloat() < monster.brain.chanceToWander )
+                  {
+                     monster.brain.state = BS_Wander;
+                  }
+               } break;
+
+               case BS_Flank:
+               {
+                  auto& player = game.m_players[playerIndex];
+                  auto target = Vec2{game.m_randomGenerator.randFloat() * 2 - 1,
+                     game.m_randomGenerator.randFloat() * 2 - 1};
+                  target = Vec2::normalize(target) * 4;
+                  target += player.transform.position;
+
+                  monster.brain.targetLocation = target;
+                  auto pi = findPlayerInArea(Circle{monster.transform.position, monster.brain.attackRadius}, game.m_players);
+                  if( pi != game.m_players.size() )
+                  {
+                     monster.brain.targetPlayer = game.m_players[pi].id;
+                     monster.brain.state = BS_Attack;
+                  }
+               } break;
             }
          }
       }
@@ -903,24 +972,9 @@ namespace Core
    {
       for( auto& monster : game.m_monsters )
       {
-         switch( monster.brain.steerLogic )
-         {
-            case SB_Arrive:
-            {
-               auto n = Vec2::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
-               monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaTime();
-            } break;
-
-            case SB_Pursuit:
-            {
-               auto playerId = monster.brain.targetPlayer;
-               auto playerIndex = filterFind(game.m_players, [=](const Player& p) { return p.id == playerId; });
-               auto& player = game.m_players[playerIndex];
-               auto n = Vec2::length(steer_pursuit(monster.transform.position, monster.direction, monster.maxSpeed,
-                  player.transform.position, player.direction, player.maxSpeed));
-               monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaTime();
-            } break;
-         }
+         auto n = Vec2::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
+         monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaTime();
+         
          separateMonsters(monster, game.m_monsters);
       }
    }
@@ -1285,9 +1339,24 @@ namespace Core
             turret.weaponTimer.reset();
 
             auto aim = Vec2::normalize(turret.aim);
-            auto p = aim*turret.area.radius;
-            generateBullets(game.m_bullets, game.m_randomGenerator, w.bulletsPerShot, w.spread, turret.area.center + p,
-                            aim, w.damage, w.bulletPierce, &game.m_turret);
+            switch( w.type )
+            {
+               case RPG:
+               {
+                  generateRocket(game.m_rockets, turret.area.center, aim, w.damage, &game.m_turret);
+               } break;
+
+               case Pistol:
+               case Shotgun:
+               case Uzi:
+               case Sniper:
+               {
+                  generateBullets(game.m_bullets, game.m_randomGenerator, w.bulletsPerShot, w.spread,
+                                  turret.area.center, aim, w.damage, w.bulletPierce, &game.m_turret);
+               } break;
+            }
+
+            
          }
 
          //check if over
@@ -1361,7 +1430,7 @@ namespace Core
       auto toTarget = targetLocation - position;
       auto distance = Vec2::length(toTarget);
 
-      if( distance > 0.1f )
+      if( distance > 0.0f )
       {
          float decelerationTweaker = 0.4f;
          auto speed = distance / decelerationTweaker;
@@ -1387,8 +1456,18 @@ namespace Core
       return steer_arrive(position, maxSpeed, (targetPosition + lookAheadTime*(targetHeading*targetMaxSpeed)));
    }
 
-   Vec2 steer_wander()
+   Vec2 steer_wander(Monster& monster, RainbowlandGame& game)
    {
-      return Vec2{};
+      Vec2 random = Vec2{game.m_randomGenerator.randFloat()*2-1,
+         game.m_randomGenerator.randFloat()*2-1};
+      return random;
+      /*
+      random = Vec2::normalize(random);
+      
+      random += Vec2::normalize(monster.direction) * 1;
+
+      auto newDir = Vec2::normalize(random - monster.transform.position);
+
+      return newDir;*/
    }
 }

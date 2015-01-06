@@ -29,50 +29,50 @@
 
 namespace Core
 {
-	class Window;
-	class WindowEvent;
-	
-	class RainbowlandGame
-	{
-	public:
+   class Window;
+   class WindowEvent;
+
+   class RainbowlandGame
+   {
+   public:
       typedef std::function<bool(const WindowEvent&)> EventHandlerFunction;
       typedef std::vector<EventHandlerFunction> EventHandlerList;
 
 
-		GraphicsSystem m_graphicsSystem;
+      GraphicsSystem m_graphicsSystem;
       AudioSystem m_audioSystem;
-		InputSystem m_inputSystem;
-		LuaSystem m_luaSystem;
+      InputSystem m_inputSystem;
+      LuaSystem m_luaSystem;
 
       RenderQueue m_renderQueue;
-      
-		FontCache m_fontCache;
-		ImageCache m_imageCache;
-		TextureCache m_textureCache;
-		
-		Time m_logicTimer;
-		Time m_renderTimer;
-		Time m_deathTimer;
-		Time m_gameplayTimer;
+
+      FontCache m_fontCache;
+      ImageCache m_imageCache;
+      TextureCache m_textureCache;
+
+      Time m_logicTimer;
+      Time m_renderTimer;
+      Time m_deathTimer;
+      Time m_gameplayTimer;
       Time m_difficultyTimer;
-		double m_restoreTimeScaleAfterPerkMode;
-		
-		Camera m_camera;
+      double m_restoreTimeScaleAfterPerkMode;
+
+      Camera m_camera;
       Vec2 m_cameraBounds;
-		Rect m_playingField;
-		Random m_randomGenerator;
+      Rect m_playingField;
+      Random m_randomGenerator;
 
       SessionPreparationData m_preparationData;
 
       EventHandlerList m_messageHandlers;
-      
+
       EventHandlerList m_sessionPreparationHandlers;
       EventHandlerList m_sessionHandlers;
       EventHandlerList m_sessionPerkMenuHandlers;
       EventHandlerList m_sessionEndHandlers;
 
       std::vector<Rect> m_rainbowlandImageDatabase;
-      
+
       uint32_t m_imageStartIndex_flower;
       uint32_t m_imageStartIndex_ladybug;
       uint32_t m_imageStartIndex_splatter;
@@ -84,32 +84,24 @@ namespace Core
       uint32_t m_imageStartIndex_rocket;
       uint32_t m_imageStartIndex_turret;
 
-      /*
-		std::vector<Rect> m_splatterImageDatabase;
-		std::vector<Rect> m_bonusImageDatabase;
-		std::vector<Rect> m_weaponImageDatabase;
-      std::vector<Rect> m_flowerImageDatabase;
-      std::vector<Rect> m_ladybugImageDatabase;
-      std::vector<Rect> m_butterflyImageDatabase;
-      */
-		VWeapons m_weaponDatabase;
-		VPerks m_perkDatabase;
-		VBonuses m_bonusDatabase;
-		VMonsterSpawners m_monsterSpawners;
+      VWeapons m_weaponDatabase;
+      VPerks m_perkDatabase;
+      VBonuses m_bonusDatabase;
+      VMonsterSpawners m_monsterSpawners;
 
-		VPlayers m_players;
+      VPlayers m_players;
       VPlayers m_deadPlayers;
-		VMonsters m_monsters;
-		VPickups m_pickups;
-		VBullets m_bullets;
-		VBlasts m_blasts;
+      VMonsters m_monsters;
+      VPickups m_pickups;
+      VBullets m_bullets;
+      VBlasts m_blasts;
       VRockets m_rockets;
-		VSplatters m_splatters;
-		VActiveBonuses m_activeBonuses;
-		
-		DefenseMatrix m_defenseMatrix;
-		TimeCapsule m_timeCapsule;
-		Blink m_blink;
+      VSplatters m_splatters;
+      VActiveBonuses m_activeBonuses;
+
+      DefenseMatrix m_defenseMatrix;
+      TimeCapsule m_timeCapsule;
+      Blink m_blink;
       Turret m_turret;
       bool m_defenseMatrixPlaying;
       bool m_timeCapsulePlaying;
@@ -128,34 +120,34 @@ namespace Core
       uint32_t m_level;
       int32_t m_flavour;
 
-		uint32_t m_defaultFont;
+      uint32_t m_defaultFont;
       uint32_t m_atlasTexture;
-		uint32_t m_backgroundTexture;
+      uint32_t m_backgroundTexture;
 
       void* m_music;
       void* m_shootSfx;
       void* m_reloadSfx;
-		
-		Window* m_window;
-		bool m_isRunning;
 
-		enum GameState
-		{
-			GS_SessionPreparation,
-			GS_Session,
-			GS_SessionPerkMenu,
-			GS_SessionEnd,
-			GS_Count
-		};
-		GameState m_currentGameState;
+      Window* m_window;
+      bool m_isRunning;
+
+      enum GameState
+      {
+         GS_SessionPreparation,
+         GS_Session,
+         GS_SessionPerkMenu,
+         GS_SessionEnd,
+         GS_Count
+      };
+      GameState m_currentGameState;
       GameState m_nextGameState;
-		
 
-		bool init(Window& window);
-		bool tick();
-		void shutdown();
 
-		void tickLogic(uint64_t updateTime);
-		void tickRender(uint64_t updateTime);
-	};
+      bool init(Window& window);
+      bool tick();
+      void shutdown();
+
+      void tickLogic(uint64_t updateTime);
+      void tickRender(uint64_t updateTime);
+   };
 }
