@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
@@ -16,6 +17,8 @@
 namespace Core
 {
 	class GraphicsSystem;
+ 
+   typedef std::function<void(GraphicsSystem& gfx)> RenderCommand;
 
 	class RenderQueue
 	{
@@ -23,33 +26,12 @@ namespace Core
 		bool init(GraphicsSystem& graphics);
 		bool shutdown();
 
-		void drawLine();
-		void drawMultiline();
-		void drawRect();
-		void drawCircle();
-		void drawPolygon();
-		void drawSolidRect();
-		void drawSolidCircle();
-		void drawSolidPolygon();
-		void drawTexturedQuad();
-		void drawText();
+      void enqueueRenderCommand(RenderCommand command);
 
-		void drawCustomData();
-
-		void setTransparency();
-		void setCulling();
-
-
+      void runAndFlushRenderCommands();
 
 	private:
-		struct InstanceData
-		{
-			Transform tf;
-			Color col;
-		};
 		GraphicsSystem* m_graphicsSystem;
-		std::vector<Vertex> m_vertices;
-		std::vector<uint32_t> m_indices;
-		std::vector<InstanceData> m_instances;
+		std::vector<RenderCommand> m_commands;
 	};
 }

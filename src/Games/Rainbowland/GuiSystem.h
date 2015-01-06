@@ -36,6 +36,7 @@ namespace Core
 		void label(std::string name, std::string parent, uint32_t font, std::string text, Vec2 pos, Vec2 scale, Color color, TextJustification justification, bool italic);
 
 		void editLabel(std::string name, std::string text);
+      std::string getLabelText(std::string name);
 
 		void removeElement(std::string name);
 

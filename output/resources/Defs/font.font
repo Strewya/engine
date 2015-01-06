@@ -62,7 +62,7 @@ return {
 			{ char='U',  left=421, right=442, top=64},
 			{ char='V',  left=453, right=474, top=64},
 			{ char='W',  left=485, right=506, top=64},
-			{ char='X',  left=517, right=558, top=64},
+			{ char='X',  left=517, right=538, top=64},
 			{ char='Y',  left=549, right=570, top=64},
 			{ char='Z',  left=581, right=602, top=64},
 			{ char='[',  left=613, right=634, top=64},

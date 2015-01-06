@@ -104,4 +104,14 @@ namespace Core
 		m_allocated = m_data.getActiveIDs();
 		return{LoadResultFlag::Success};
 	}
+
+   Vec2 TextureCache::getTextureDimensions(uint32_t id)
+   {
+      auto* res = getResource(id);
+      if( res != nullptr )
+      {
+         return m_graphics->getTextureDimensions(*res);
+      }
+      return Vec2{0, 0};
+   }
 }

@@ -16,25 +16,27 @@
 
 namespace Core
 {
-	class GraphicsSystem;
-	class ResourceFile;
+   class GraphicsSystem;
+   class ResourceFile;
 
-	class TextureCache
-	{
-	public:
-		bool init(GraphicsSystem& graphics);
-		bool shutdown();
+   class TextureCache
+   {
+   public:
+      bool init(GraphicsSystem& graphics);
+      bool shutdown();
 
-		uint32_t getResourceID(const char* path);
-		const Texture* getResource(uint32_t id);
-		
-		LoadResult load(const ResourceFile& path);
-		LoadResult reload(const ResourceFile& path);
-		LoadResult unload(const ResourceFile& path);
-		
-	private:
-		GraphicsSystem* m_graphics;
-		ObjectPool<Texture> m_data;
-		std::vector<uint32_t> m_allocated;
-	};
+      uint32_t getResourceID(const char* path);
+      const Texture* getResource(uint32_t id);
+
+      LoadResult load(const ResourceFile& path);
+      LoadResult reload(const ResourceFile& path);
+      LoadResult unload(const ResourceFile& path);
+
+      Vec2 getTextureDimensions(uint32_t id);
+
+   private:
+      GraphicsSystem* m_graphics;
+      ObjectPool<Texture> m_data;
+      std::vector<uint32_t> m_allocated;
+   };
 }

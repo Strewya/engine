@@ -12,101 +12,156 @@
 
 namespace Core
 {
-	void initBonusDatabase(VBonuses& bonusDb)
-	{
-		bonusDb =
-		{
-			{
-				BonusType::Heal, "Heal", 0,
-				[](Player& player, RainbowlandGame& game)
-				{
-					player.health += 20;
-					clamp(0, 100, player.health);
-				},
-					[](Player& player, RainbowlandGame& game) {}
-			},
+   void initBonusDatabase(VBonuses& bonusDb)
+   {
+      bonusDb =
+      {
+         {BonusType::AtomicBomb},
+         {BonusType::Heal},
+         {BonusType::IncreasedMovementSpeed},
+         {BonusType::IncreasedRateOfFire},
+         {BonusType::MassHeal},
+         {BonusType::SlowTime}
+      };
 
-			{
-				BonusType::IncreasedRateOfFire, "Shooter", Time::secondsToMicros(5),
-				[](Player& player, RainbowlandGame& game)
-				{
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedRateOfFire == e.type; });
-					if(index == player.bonuses.size())
-					{
-						player.bonuses.emplace_back();
-						player.bonuses[index].duration = 0;
-						player.bonuses[index].timer.reset();
-						player.bonuses[index].type = IncreasedRateOfFire;
-						player.rateOfFireMultiplier *= 0.5f;
-						player.reloadMultiplier *= 0.5f;
-						calculateWeaponBonuses(player, game.m_weaponDatabase);
-					}
-					player.bonuses[index].duration += game.m_bonusDatabase[IncreasedRateOfFire].durationMicros;
-				},
-					[](Player& player, RainbowlandGame& game)
-				{
-					player.rateOfFireMultiplier *= 2;
-					player.reloadMultiplier *= 2;
-					calculateWeaponBonuses(player, game.m_weaponDatabase);
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedRateOfFire == e.type; });
-					player.bonuses[index] = player.bonuses.back();
-					player.bonuses.pop_back();
-				}
-			},
+      assert(bonusDb.size() == (uint32_t)BonusTypeCount);
 
-			{
-				BonusType::IncreasedMovementSpeed, "Runner", Time::secondsToMicros(5), 
-				[](Player& player, RainbowlandGame& game)
-				{
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedMovementSpeed == e.type; });
-					if(index == player.bonuses.size())
-					{
-						player.bonuses.emplace_back();
-						player.bonuses[index].duration = 0;
-						player.bonuses[index].timer.reset();
-						player.bonuses[index].type = IncreasedMovementSpeed;
-						player.maxSpeed *= 2;
-					}
-					player.bonuses[index].duration += game.m_bonusDatabase[IncreasedMovementSpeed].durationMicros;
-				},
-					[](Player& player, RainbowlandGame& game)
-				{
-					player.maxSpeed *= 0.5f;
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return IncreasedMovementSpeed == e.type; });
-					player.bonuses[index] = player.bonuses.back();
-					player.bonuses.pop_back();
-				}
-			},
+      std::sort(bonusDb.begin(), bonusDb.end(),
+                [](const Bonus& l, const Bonus& r)
+      {
+         return l.type < r.type;
+      });
+      BonusType type;
 
-			{
-				BonusType::SlowTime, "Time slower", Time::secondsToMicros(8),
-				[](Player& player, RainbowlandGame& game)
-				{
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return SlowTime == e.type; });
-					if(index == player.bonuses.size())
-					{
-						player.bonuses.emplace_back();
-						player.bonuses[index].duration = 0;
-						player.bonuses[index].timer.reset();
-						player.bonuses[index].type = SlowTime;
-						game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale()*0.4);
-					}
-					player.bonuses[index].duration += game.m_bonusDatabase[SlowTime].durationMicros;
-				},
-					[](Player& player, RainbowlandGame& game)
-				{
-					game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale()/0.4);
-					auto index = filterFind(player.bonuses, [=](const ActiveBonus& e){return SlowTime == e.type; });
-					player.bonuses[index] = player.bonuses.back();
-					player.bonuses.pop_back();
-				}
-			}
-		};
+      
+      type = Heal;
+      bonusDb[type].name = "Heal";
+      bonusDb[type].durationMicros = 0; //not important
+      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         picker.health += 20;
+         clamp<int32_t>(0, picker.maxHealth, picker.health);
+      };
+      bonusDb[type].timeoutLogic = [](RainbowlandGame& game) {}; //none
 
-		std::sort(bonusDb.begin(), bonusDb.end(),
-				  [](const Bonus& l, const Bonus& r)
-		{
-			return l.type < r.type;
-		});
-	}
+
+
+      type = MassHeal;
+      bonusDb[type].name = "MassHeal";
+      bonusDb[type].durationMicros = 0; //not important
+      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         for( auto& player : game.m_players )
+         {
+            player.health += 20;
+            clamp<int32_t>(0, player.maxHealth, player.health);
+         }
+      };
+      bonusDb[type].timeoutLogic = [](RainbowlandGame& game) {}; //none
+
+
+
+      type = AtomicBomb;
+      bonusDb[type].name = "Atomic Bomb";
+      bonusDb[type].durationMicros = 0; //not important
+      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         generateBlast(game.m_blasts, position, 0, 12, 0.8f, 10, nullptr);
+      };
+      bonusDb[type].timeoutLogic = [](RainbowlandGame& game) {}; //none
+
+      
+      
+      type = IncreasedRateOfFire;
+      bonusDb[type].name = "Shooter";
+      bonusDb[type].durationMicros = Time::secondsToMicros(15);
+      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         if( index == game.m_activeBonuses.size() )
+         {
+            game.m_activeBonuses.emplace_back();
+            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
+            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].type = type;
+            for( auto& player : game.m_players )
+            {
+               player.rateOfFireMultiplier *= 0.5f;
+               player.reloadMultiplier *= 0.5f;
+               calculateWeaponBonuses(player, game.m_weaponDatabase);
+            }
+         }
+         game.m_activeBonuses[index].timer.reset();
+      };
+      bonusDb[type].timeoutLogic = [=](RainbowlandGame& game)
+      {
+         for( auto& player : game.m_players )
+         {
+            player.rateOfFireMultiplier *= 2;
+            player.reloadMultiplier *= 2;
+            calculateWeaponBonuses(player, game.m_weaponDatabase);
+         }
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         game.m_activeBonuses[index] = game.m_activeBonuses.back();
+         game.m_activeBonuses.pop_back();
+      };
+
+      
+      
+      type = IncreasedMovementSpeed;
+      bonusDb[type].name = "Runner";
+      bonusDb[type].durationMicros = Time::secondsToMicros(15);
+      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         if( index == game.m_activeBonuses.size() )
+         {
+            game.m_activeBonuses.emplace_back();
+            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
+            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].type = type;
+            for( auto& player : game.m_players )
+            {
+               player.maxSpeed *= 1.4f;
+            }
+         }
+         game.m_activeBonuses[index].timer.reset();
+      };
+      bonusDb[type].timeoutLogic = [=](RainbowlandGame& game)
+      {
+         for( auto& player : game.m_players )
+         {
+            player.maxSpeed /= 1.4f;
+         }
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         game.m_activeBonuses[index] = game.m_activeBonuses.back();
+         game.m_activeBonuses.pop_back();
+      };
+
+     
+      
+      type = SlowTime;
+      bonusDb[type].name = "Time lords";
+      bonusDb[type].durationMicros = Time::secondsToMicros(8);
+      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      {
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         if( index == game.m_activeBonuses.size() )
+         {
+            game.m_activeBonuses.emplace_back();
+            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
+            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].type = type;
+            game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale()*0.4);
+         }
+         game.m_activeBonuses[index].timer.reset();
+      };
+      bonusDb[type].timeoutLogic = [=](RainbowlandGame& game)
+      {
+         game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale() * 2.5); // 1 div 0.4 == 2.5
+         auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
+         game.m_activeBonuses[index] = game.m_activeBonuses.back();
+         game.m_activeBonuses.pop_back();
+      };
+   }
 }

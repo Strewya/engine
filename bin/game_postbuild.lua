@@ -1,19 +1,24 @@
 dofile(os.getenv("SGPROJECT").."/bin/cmn.lua");
 
-local function enumerateDLLsForCopy(dllList, lib, build)
+local function enumerateDLLsForCopy(dllList, libDir, buildDir, buildName)
 	local foundDLLs = {};
-	for _, dll in ipairs(dllList) do
-		if(not dll:find(".dll$")) then
-			dll = dll .. ".dll";
+	for _, dll in pairs(dllList) do
+		if( type(dll) == "string" ) then
+			if(not dll:find(".dll$")) then
+				dll = dll .. ".dll";
+			end;
+			if(checkFileExists(libDir.."/"..dll)) then
+				foundDLLs[dll] = libDir.."/"..dll;
+			elseif(checkFileExists(buildDir.."/"..dll)) then
+				foundDLLs[dll] = buildDir.."/"..dll;
+			else
+				ensure(false, ("The dll %s could not be found!"):format(dll));
+			end;
 		end;
-		if(checkFileExists(lib.."/"..dll)) then
-			foundDLLs[dll] = lib.."/"..dll;
-		elseif(checkFileExists(build.."/"..dll)) then
-			foundDLLs[dll] = build.."/"..dll;
-		else
-			ensure(false, ("The dll %s could not be found!"):format(dll));
-		end;
-		
+	end;
+	if( type(dllList[buildName]) == "table" ) then
+		local buildDependantDlls = enumerateDLLsForCopy(dllList[buildName], libDir, buildDir, buildName);
+		mergeTables(foundDLLs, buildDependantDlls);
 	end;
 	return foundDLLs;
 end;
@@ -26,15 +31,16 @@ local buildLibDir = libDir .. "/" .. buildName;
 local buildOutputDir = gProjDir .. "/output/" .. buildName;
 local resDir = gProjDir .. "/output/resources";
 
-
 ensure(checkFileExists(resFile), ("Resource file %s does not exist!"):format(resFile));
 ensure(checkFolderExists(libDir), "Lib directory not found!");
 ensure(checkFolderExists(buildOutputDir), ("Output directory for %s not found!"):format(buildName));
 
+
+
 local resList, dllList = dofile(resFile);
 -- DLL list can be nil if there are no DLL dependencies!
 if(dllList ~= nil) then
-	dllList = enumerateDLLsForCopy(dllList, libDir, buildLibDir);
+	dllList = enumerateDLLsForCopy(dllList, libDir, buildLibDir, buildName);
 	for dll, dllPath in pairs(dllList) do
 		local file = copyIfNewer(dllPath, buildOutputDir.."/"..dll);
 		if(file) then

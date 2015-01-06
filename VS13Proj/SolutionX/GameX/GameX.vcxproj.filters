@@ -192,9 +192,6 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp">
-      <Filter>Design\Rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Circle.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -214,6 +211,30 @@
       <Filter>Framework\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp">
+      <Filter>Framework\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameMain.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Session.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Gameplay.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPreparation.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionEnd.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
@@ -372,9 +393,6 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h">
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h">
-      <Filter>Design\Rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Circle.h">
       <Filter>Util</Filter>
     </ClInclude>
@@ -394,6 +412,30 @@
       <Filter>Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\AudioSystem.h">
+      <Filter>Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodInclude.h">
+      <Filter>Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameDefinitions.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPreparation.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Session.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionEnd.h">
+      <Filter>Design\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.h">
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
   </ItemGroup>

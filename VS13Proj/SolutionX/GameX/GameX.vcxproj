@@ -56,7 +56,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildBeforeTargets>
@@ -65,14 +65,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
@@ -86,11 +86,12 @@
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
@@ -139,13 +140,14 @@
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
@@ -179,7 +181,7 @@
       <PreprocessorDefinitions>DEPLOY;CORE_USE_PCH;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -187,7 +189,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;XInput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
@@ -217,6 +219,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp" />
     <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp" />
     <ClCompile Include="..\..\..\src\Caches\FontCache.cpp" />
@@ -245,11 +248,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp" />
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameObjects.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameMain.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Gameplay.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Session.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionEnd.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPreparation.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
@@ -287,6 +296,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
+    <ClInclude Include="..\..\..\src\Audio\AudioSystem.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodInclude.h" />
     <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
     <ClInclude Include="..\..\..\src\Caches\FileHandlerCache.h" />
     <ClInclude Include="..\..\..\src\Caches\FontCache.h" />
@@ -313,11 +324,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h" />
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameObjects.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameDefinitions.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Session.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionEnd.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPreparation.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.h" />
     <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />

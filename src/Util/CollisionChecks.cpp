@@ -13,7 +13,7 @@
 
 namespace Core
 {
-	bool isPointInsideRect(const Vec2& point, const Rect& rect)
+	bool isPointInsideRect(Vec2 point, Rect rect)
 	{
 		if(point.x < rect.center.x - rect.halfWidth) return false;
 		if(point.x > rect.center.x + rect.halfWidth) return false;
@@ -22,12 +22,12 @@ namespace Core
 		return true;
 	}
 
-	bool isPointInsideCircle(const Vec2& point, const Circle& circle)
+	bool isPointInsideCircle(Vec2 point, Circle circle)
 	{
-		return (Vec2::length(point - circle.center) <= circle.radius);
+		return (Vec2::length2(point - circle.center) <= circle.radius*circle.radius);
 	}
 
-	bool isRectInsideRect(const Rect& inner, const Rect& outer)
+	bool isRectInsideRect(Rect inner, Rect outer)
 	{
 		if(!isPointInsideRect({inner.left(), inner.top()}, outer)) return false;
 		if(!isPointInsideRect({inner.left(), inner.bottom()}, outer)) return false;
@@ -36,12 +36,13 @@ namespace Core
 		return true;
 	}
 
-	bool isCircleInsideCircle(const Circle& inner, const Circle& outer)
+	bool isCircleInsideCircle(Circle inner, Circle outer)
 	{
-		return (Vec2::length(inner.center - outer.center) <= outer.radius - inner.radius);
+		auto radiusDiff = outer.radius - inner.radius;
+		return (Vec2::length2(inner.center - outer.center) <= radiusDiff*radiusDiff);
 	}
 
-	bool isRectInsideCircle(const Rect& rect, const Circle& circle)
+	bool isRectInsideCircle(Rect rect, Circle circle)
 	{
 		if(!isPointInsideCircle({rect.left(), rect.top()}, circle)) return false;
 		if(!isPointInsideCircle({rect.left(), rect.bottom()}, circle)) return false;
@@ -50,7 +51,7 @@ namespace Core
 		return true;
 	}
 
-	bool isCircleInsideRect(const Circle& circle, const Rect& rect)
+	bool isCircleInsideRect(Circle circle, Rect rect)
 	{
 		if(!isPointInsideRect(circle.center, rect)) return false;
 		Vec2 pts[4]{circle.center, circle.center, circle.center, circle.center};
@@ -68,12 +69,12 @@ namespace Core
 		return true;
 	}
 
-	bool isRectTouchingCircle(const Rect& rect, const Circle& circle)
+	bool isRectTouchingCircle(Rect rect, Circle circle)
 	{
 		return isCircleTouchingRect(circle, rect);
 	}
 
-	bool isCircleTouchingRect(const Circle& circle, const Rect& rect)
+	bool isCircleTouchingRect(Circle circle, Rect rect)
 	{
 		if(circle.center.x + circle.radius < rect.left()) return false;
 		if(circle.center.x - circle.radius > rect.right()) return false;
@@ -82,7 +83,7 @@ namespace Core
 		return true;
 	}
 
-	bool isRectTouchingRect(const Rect& l, const Rect& r)
+	bool isRectTouchingRect(Rect l, Rect r)
 	{
 		if(l.left() > r.right()) return false;
 		if(l.right() < r.left()) return false;
@@ -91,7 +92,7 @@ namespace Core
 		return true;
 	}
 
-	bool isCircleTouchingCircle(const Circle& l, const Circle& r)
+	bool isCircleTouchingCircle(Circle l, Circle r)
 	{
 		return (Vec2::length(l.center - r.center) <= (l.radius + r.radius));
 	}

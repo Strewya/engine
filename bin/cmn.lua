@@ -7,6 +7,27 @@ local copyCmd = [[copy /Y "%s" "%s"]];
 local makeFolderCmd = [[xcopy "%s" "%s\" /T /Y]];
 local deleteCmd = [[del "%s"]];
 
+function printTable(t)
+	local count = 0;
+	print("table\n{");
+	for key, value in pairs(t) do
+		count = count + 1;
+		local valueStr = "";
+		if(type(value) ~= "table") then valueStr = tostring(value); end;
+		print("   " .. tostring(key) .. " -> " .. type(value) .. "("..valueStr..")");
+	end;
+	print("}\nTotal count: " .. count);
+end;
+
+function mergeTables(destination, source, overwrite)
+	overwrite = overwrite or true;
+	for key, value in pairs(source) do
+		if( destination[key] == nil or overwrite ) then
+			destination[key] = value;
+		end;
+	end;
+end;
+
 function winPath(path)
 	return path:gsub("/", "\\");
 end;

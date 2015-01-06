@@ -22,6 +22,7 @@ namespace Core
 		WE_MOUSEBUTTON,
 		WE_MOUSEWHEEL,
 
+      WE_GAMEPADCONNECTION,
 		WE_GAMEPADBUTTON,
 		WE_GAMEPADAXIS,
 
@@ -66,6 +67,12 @@ namespace Core
 		int32_t m_scroll;
 	};
 
+   struct GamepadConnection
+   {
+      uint8_t m_gamepad;
+      bool m_isConnected;
+   };
+
 	struct GamepadButtonEvent
 	{
 		uint8_t m_gamepad;
@@ -75,8 +82,10 @@ namespace Core
 
 	struct GamepadAxisEvent
 	{
-		int16_t m_x;
-		int16_t m_y;
+      float m_x;
+      float m_y;
+      float m_magnitude;
+      float m_normalizedMagnitude;
 		uint8_t m_gamepad;
 		uint8_t m_axis;
 	};
@@ -112,6 +121,7 @@ namespace Core
 			FileChangeEvent m_fileChange;
 			GamepadButtonEvent m_gamepadButton;
 			GamepadAxisEvent m_gamepadAxis;
+         GamepadConnection m_gamepadConnection;
 		};
 	};
 }

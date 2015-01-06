@@ -6,7 +6,7 @@
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/GameObjects.h>
+#include <Games/Rainbowland/GameDefinitions.h>
 /******* end header inclusion *******/
 
 namespace Core

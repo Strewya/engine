@@ -824,7 +824,6 @@ namespace Core
 			auto& ied = Vertex::getDescription();
 			safeRelease(m_inputLayout);
 			hr = m_dev->CreateInputLayout(ied.data(), ied.size(), shaderBuffer, shaderSize, &m_inputLayout);
-			DEBUG_INFO((int32_t)hr);
 			if(SUCCEEDED(hr))
 			{
 				m_devcon->VSSetShader(m_vertexShader, nullptr, 0);

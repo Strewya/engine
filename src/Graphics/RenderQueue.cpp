@@ -26,5 +26,17 @@ namespace Core
 		DEBUG_SHUTDOWN(RenderQueue);
 	}
 
+   void RenderQueue::enqueueRenderCommand(RenderCommand command)
+   {
+      m_commands.emplace_back(command);
+   }
 
+   void RenderQueue::runAndFlushRenderCommands()
+   {
+      for( auto& command : m_commands )
+      {
+         command(*m_graphicsSystem);
+      }
+      m_commands.clear();
+   }
 }

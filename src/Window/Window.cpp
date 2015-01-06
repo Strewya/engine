@@ -54,7 +54,7 @@ namespace Core
 		m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
 		m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
 		m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
-		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(256), m_gamepadEmptyUpdateDelay(2000),
+		m_headIndex(1), m_tailIndex(0), m_eventQueueSize(1024), m_gamepadEmptyUpdateDelay(2000),
 		m_hwnd(nullptr),
 		m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false), m_isRunning(true),
 		m_class(title), m_title(title), m_resourcesDirectory(),
@@ -80,17 +80,7 @@ namespace Core
 		memset(m_gamepadState, 0, sizeof(XINPUT_STATE) * MAX_GAMEPADS);
 
 		m_timer.update();
-		for(auto i = 0; i < MAX_GAMEPADS; ++i)
-		{
-			m_gamepadConnected[i] = false;
-			DWORD connected = XInputGetState(i, &m_gamepadState[i]);
-			m_gamepadLastUpdateTime[i] = m_timer.getCurrentMicros();
-			if(connected == ERROR_SUCCESS)
-			{
-				m_gamepadConnected[i] = true;
-			}
-		}
-
+		
 		m_events.resize(m_eventQueueSize);
 	}
 
@@ -282,8 +272,17 @@ namespace Core
 				XINPUT_STATE state{0};
 				XINPUT_STATE& oldState = m_gamepadState[i];
 				auto connected = XInputGetState(i, &state);
+            
 				if(connected == ERROR_SUCCESS)
 				{
+               if( m_gamepadConnected[i] == false )
+               {
+                  auto& we = newEvent();
+                  we.m_type = WE_GAMEPADCONNECTION;
+                  we.m_gamepadConnection.m_gamepad = i;
+                  we.m_gamepadConnection.m_isConnected = true;
+                  writeEvent();
+               }
 					m_gamepadConnected[i] = true;
 					if(state.dwPacketNumber != oldState.dwPacketNumber)
 					{
@@ -427,70 +426,105 @@ namespace Core
 							we.m_gamepadButton.m_isDown = (state.Gamepad.wButtons & XINPUT_GAMEPAD_Y) != 0;
 							writeEvent();
 						}
-						if(state.Gamepad.bLeftTrigger <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
-							state.Gamepad.bLeftTrigger = 0;
-						if(state.Gamepad.bLeftTrigger > 255)
-						{
-							state.Gamepad.bLeftTrigger = 255;
-							state.Gamepad.bLeftTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-						}
 
-						if(state.Gamepad.bRightTrigger <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
-							state.Gamepad.bRightTrigger = 0;
-						if(state.Gamepad.bRightTrigger > 255)
-						{
-							state.Gamepad.bRightTrigger = 255;
-							state.Gamepad.bRightTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-						}
+                  /*** TRIGGERS ***/
+                  float leftTrigger{(float)state.Gamepad.bLeftTrigger};
+                  float rightTrigger{(float)state.Gamepad.bRightTrigger};
+                  float leftTriggerNormalized = 0;
+                  float rightTriggerNormalized = 0;
 						
-						if(std::abs(state.Gamepad.sThumbLX) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-							state.Gamepad.sThumbLX = 0;
-						if(std::abs(state.Gamepad.sThumbLX) > 32767)
+                  /* left trigger */
+                  if(leftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
 						{
-							auto sign = (state.Gamepad.sThumbLX < 0 ? -1 : 1);
-							state.Gamepad.sThumbLX = 0x7fff * sign;
+                     if( leftTrigger > 0xff )
+                     {
+                        leftTrigger = 0xff;
+                     }
+							
+                     leftTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+                     leftTriggerNormalized = leftTrigger / (0xff - XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
 						}
-						if(std::abs(state.Gamepad.sThumbLY) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-							state.Gamepad.sThumbLY = 0;
-						if(std::abs(state.Gamepad.sThumbLY) > 32767)
-						{
-							auto sign = (state.Gamepad.sThumbLY < 0 ? -1 : 1);
-							state.Gamepad.sThumbLY = 0x7fff * sign;
-						}
+                  else
+                  {
+                     leftTrigger = 0;
+                  }
+                  /* right trigger */
+                  if( rightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD )
+                  {
+                     if( rightTrigger > 0xff )
+                     {
+                        rightTrigger = 0xff;
+                     }
 
-						if(std::abs(state.Gamepad.sThumbRX) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-							state.Gamepad.sThumbRX = 0;
-						if(std::abs(state.Gamepad.sThumbRX) > 32767)
-						{
-							auto sign = (state.Gamepad.sThumbRX < 0 ? -1 : 1);
-							state.Gamepad.sThumbRX = 0x7fff * sign;
-						}
-						if(std::abs(state.Gamepad.sThumbRY) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-							state.Gamepad.sThumbRY = 0;
-						if(std::abs(state.Gamepad.sThumbRY) > 32767)
-						{
-							auto sign = (state.Gamepad.sThumbRY < 0 ? -1 : 1);
-							state.Gamepad.sThumbRY = 0x7fff * sign;
-						}
+                     rightTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+                     rightTriggerNormalized = rightTrigger / (0xff - XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+                  }
+                  else
+                  {
+                     rightTrigger = 0;
+                  }
 
-						if(state.Gamepad.bLeftTrigger != oldState.Gamepad.bLeftTrigger)
-						{
-							auto& we = newEvent();
-							we.m_type = WE_GAMEPADAXIS;
-							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftTrigger;
-							we.m_gamepadAxis.m_x = state.Gamepad.bLeftTrigger;
-							writeEvent();
-						}
-						if(state.Gamepad.bRightTrigger != oldState.Gamepad.bRightTrigger)
-						{
-							auto& we = newEvent();
-							we.m_type = WE_GAMEPADAXIS;
-							we.m_gamepadAxis.m_gamepad = i;
-							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightTrigger;
-							we.m_gamepadAxis.m_x = state.Gamepad.bRightTrigger;
-							writeEvent();
-						}
+                  if( state.Gamepad.bLeftTrigger != oldState.Gamepad.bLeftTrigger )
+                  {
+                     auto& we = newEvent();
+                     we.m_type = WE_GAMEPADAXIS;
+                     we.m_gamepadAxis.m_gamepad = i;
+                     we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftTrigger;
+                     we.m_gamepadAxis.m_magnitude = leftTrigger;
+                     we.m_gamepadAxis.m_normalizedMagnitude = leftTriggerNormalized;
+                     writeEvent();
+                  }
+                  if( state.Gamepad.bRightTrigger != oldState.Gamepad.bRightTrigger )
+                  {
+                     auto& we = newEvent();
+                     we.m_type = WE_GAMEPADAXIS;
+                     we.m_gamepadAxis.m_gamepad = i;
+                     we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightTrigger;
+                     we.m_gamepadAxis.m_magnitude = rightTrigger;
+                     we.m_gamepadAxis.m_normalizedMagnitude = rightTriggerNormalized;
+                     writeEvent();
+                  }
+
+                  /*** THUMB STICKS ***/
+                  Vec2 leftStick{(float)state.Gamepad.sThumbLX, (float)state.Gamepad.sThumbLY};
+                  Vec2 rightStick{(float)state.Gamepad.sThumbRX, (float)state.Gamepad.sThumbRY};
+                  float leftMagnitude = Vec2::length(leftStick);
+                  float rightMagnitude = Vec2::length(rightStick);
+                  float leftMagnitudeNorm = 0;
+                  float rightMagnitudeNorm = 0;
+                  leftStick = Vec2::normalize(leftStick);
+                  rightStick = Vec2::normalize(rightStick);
+
+                  /* left thumb stick */
+                  if( leftMagnitude > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
+                  {
+                     if( leftMagnitude > 0x7fff )
+						   {
+                        leftMagnitude = 0x7fff;
+						   }
+                     leftMagnitude -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+                     leftMagnitudeNorm = leftMagnitude / (0x7fff - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+                  }
+                  else
+                  {
+                     leftMagnitude = 0;
+                  }
+
+                  /* right thumb stick */
+                  if( rightMagnitude > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
+                  {
+                     if( rightMagnitude > 0x7fff )
+                     {
+                        rightMagnitude = 0x7fff;
+                     }
+                     rightMagnitude -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+                     rightMagnitudeNorm = rightMagnitude / (0x7fff - XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+                  }
+                  else
+                  {
+                     rightMagnitude = 0;
+                  }
+
 						if((state.Gamepad.sThumbLX != oldState.Gamepad.sThumbLX) ||
 						   (state.Gamepad.sThumbLY != oldState.Gamepad.sThumbLY))
 						{
@@ -498,8 +532,10 @@ namespace Core
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
 							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftStick;
-							we.m_gamepadAxis.m_x = state.Gamepad.sThumbLX;
-							we.m_gamepadAxis.m_y = state.Gamepad.sThumbLY;
+							we.m_gamepadAxis.m_x = leftStick.x;
+                     we.m_gamepadAxis.m_y = leftStick.y;
+                     we.m_gamepadAxis.m_magnitude = leftMagnitude;
+                     we.m_gamepadAxis.m_normalizedMagnitude = leftMagnitudeNorm;
 							writeEvent();
 						}
 						if((state.Gamepad.sThumbRX != oldState.Gamepad.sThumbRX) ||
@@ -509,18 +545,28 @@ namespace Core
 							we.m_type = WE_GAMEPADAXIS;
 							we.m_gamepadAxis.m_gamepad = i;
 							we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightStick;
-							we.m_gamepadAxis.m_x = state.Gamepad.sThumbRX;
-							we.m_gamepadAxis.m_y = state.Gamepad.sThumbRY;
+                     we.m_gamepadAxis.m_x = rightStick.x;
+                     we.m_gamepadAxis.m_y = rightStick.y;
+                     we.m_gamepadAxis.m_magnitude = rightMagnitude;
+                     we.m_gamepadAxis.m_normalizedMagnitude = rightMagnitudeNorm;
 							writeEvent();
 						}
 						
 						oldState = state;
 					}
 				}
-				else
-				{
-					m_gamepadConnected[i] = false;
-				}
+            else if( connected == ERROR_DEVICE_NOT_CONNECTED )
+            {
+               if( m_gamepadConnected[i] == true )
+               {
+                  auto& we = newEvent();
+                  we.m_type = WE_GAMEPADCONNECTION;
+                  we.m_gamepadConnection.m_gamepad = i;
+                  we.m_gamepadConnection.m_isConnected = false;
+                  writeEvent();
+               }
+               m_gamepadConnected[i] = false;
+            }
 			}
 		}
 	}
