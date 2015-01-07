@@ -126,7 +126,7 @@ namespace Core
       uint64_t fireDelay;
       uint64_t reloadDelay;
       uint32_t damage;
-      uint32_t ammo;
+      int32_t ammo;
       uint32_t maxAmmo;
       uint32_t bulletsPerShot;
       float spread;
@@ -302,6 +302,8 @@ namespace Core
       uint64_t updateDelay;
       float cooldownSeconds;
       float durationSeconds;
+      uint32_t healPeriod;
+      uint32_t maxHealPeriod;
       Circle area;
       bool active;
    };
@@ -410,6 +412,7 @@ namespace Core
       std::vector<PerkType> acquiredPerks;
       std::vector<PerkType> selectablePerks;
       std::function<void(Player&, RainbowlandGame&)> ability;
+      std::function<uint32_t(RainbowlandGame&)> abilityTimeLeft;
       PerkType chosenPerk;
       bool isShooting;
       bool isAimRelative;
@@ -482,6 +485,11 @@ namespace Core
    void updateTimeCapsule(RainbowlandGame& game);
    void updateBlink(RainbowlandGame& game);
    void updateTurret(RainbowlandGame& game);
+
+   uint32_t defenseMatrixTimeLeft(RainbowlandGame& game);
+   uint32_t blinkTimeLeft(RainbowlandGame& game);
+   uint32_t timeCapsuleTimeLeft(RainbowlandGame& game);
+   uint32_t turretTimeLeft(RainbowlandGame& game);
 
    void generateSplatter(VKillLocations loc, RainbowlandGame& game);
 

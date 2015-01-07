@@ -43,6 +43,7 @@ namespace Core
       {
          Transform tCell;
          Vec2 hCell;
+         Color cAll = player.color;
 
          hCell.set(hPanel.x, hPanel.y / 4);
          tCell.position.set(0, hPanel.y - hCell.y - hCell.y * 2 * player.id);
@@ -76,25 +77,27 @@ namespace Core
 
          for( auto& perk : player.selectablePerks )
          {
-            Transform tButton;
-            tButton.position.set(-hButtonPart.x + buttonCellHalfWidth + buttonCellHalfWidth*perkIndex*2, 0);
-            tButton.position += tButtonPart.position;
-            cButton.set(1, 1, 1);
-            if( player.selectedPerkIndex == perkIndex )
+            if (player.chosenPerk == PerkTypeCount || player.chosenPerk == perk)
             {
-               cButton.set(0.98f, 0.92f, 0.01f);
-               if( player.chosenPerk != PerkType::PerkTypeCount )
+               Transform tButton;
+               tButton.position.set(-hButtonPart.x + buttonCellHalfWidth + buttonCellHalfWidth*perkIndex * 2, 0);
+               tButton.position += tButtonPart.position;
+               cButton.set(1, 1, 1);
+               if (player.selectedPerkIndex == perkIndex)
                {
-                  cButton.set(0.06f, 0.62f, 0.02f);
+                  cButton = player.color;
+                  if (cButton.r < 0.9f) cButton.r = 0;
+                  if (cButton.g < 0.9f) cButton.g = 0;
+                  if (cButton.b < 0.9f) cButton.b = 0;
                }
-            }
-            game.m_renderQueue.enqueueRenderCommand(
-               std::bind(drawHollowQuad, _1, hButton, tButton, cButton));
+               game.m_renderQueue.enqueueRenderCommand(
+                  std::bind(drawHollowQuad, _1, hButton, tButton, cButton));
 
-            tButton.scale *= 0.5f;
-            game.m_renderQueue.enqueueRenderCommand(
-               std::bind(drawText, _1, game.m_defaultFont, game.m_perkDatabase[perk].name, tButton, cButton,
-               TJ_Center, false));
+               tButton.scale *= 0.5f;
+               game.m_renderQueue.enqueueRenderCommand(
+                  std::bind(drawText, _1, game.m_defaultFont, game.m_perkDatabase[perk].name, tButton, Color{},
+                  TJ_Center, false));
+            }
             ++perkIndex;
          }
          
@@ -103,7 +106,7 @@ namespace Core
          hDescriptionPart.set(hCell.x, hCell.y*0.3f);
          tDescriptionPart.position.set(0, -hCell.y + hDescriptionPart.y);
          tDescriptionPart.position += tCell.position;
-         tDescriptionPart.scale *= 0.5f;
+         tDescriptionPart.scale *= 0.6f;
          
          game.m_renderQueue.enqueueRenderCommand(
             std::bind(drawText, _1, game.m_defaultFont, game.m_perkDatabase[perk].description, tDescriptionPart, Color{},
@@ -114,6 +117,7 @@ namespace Core
       if( allPlayersChosePerk(game.m_players) )
       {
          applyPerksForPlayers(game);
+         game.m_exitingPerkMode = true;
          game.m_nextGameState = RainbowlandGame::GS_Session;
       }
       

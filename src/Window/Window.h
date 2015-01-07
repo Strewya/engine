@@ -107,7 +107,7 @@ namespace Core
 		uint32_t m_headIndex;
 		uint32_t m_tailIndex;
 		const uint32_t m_eventQueueSize;
-		const uint32_t m_gamepadEmptyUpdateDelay;
+		const uint64_t m_gamepadEmptyUpdateDelay;
 
 		HWND m_hwnd;
 

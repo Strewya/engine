@@ -73,6 +73,45 @@ namespace Core
       }
 #endif
 
+      if (game.m_enteringPerkMode)
+      {
+         game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
+         if (game.m_perkModeTransitionTimer.getCurrentMicros() < game.m_perkModeTransitionDelay)
+         {
+            auto percent = static_cast<double>(game.m_perkModeTransitionTimer.getCurrentMicros()) / static_cast<double>(game.m_perkModeTransitionDelay);
+            percent *= game.m_currentTimeScale;
+            game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale - percent);
+         }
+         else
+         {
+            game.m_enteringPerkMode = false;
+            game.m_perkModeTransitionTimer.reset();
+            game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+            game.m_nextGameState = RainbowlandGame::GS_SessionPerkMenu;
+            for (auto& player : game.m_players)
+            {
+               player.directionActive[Up] = player.directionActive[Right] = player.directionActive[Left] = player.directionActive[Down] = false;
+            }
+         }
+      }
+      if (game.m_exitingPerkMode)
+      {
+         game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
+         if (game.m_perkModeTransitionTimer.getCurrentMicros() < game.m_perkModeTransitionDelay)
+         {
+            auto percent = static_cast<double>(game.m_perkModeTransitionTimer.getCurrentMicros()) / static_cast<double>(game.m_perkModeTransitionDelay);
+            percent *= game.m_currentTimeScale;
+            game.m_gameplayTimer.setTimeScale(percent);
+         }
+         else
+         {
+            game.m_exitingPerkMode = false;
+            game.m_perkModeTransitionTimer.reset();
+            game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
+            return;
+         }
+      }
+
       for( auto& obj : game.m_players )
       {
          obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
@@ -151,6 +190,10 @@ namespace Core
          if( game.m_flavour == -1 )
          {
             game.m_flavour = game.m_randomGenerator.randInt(0, 6);
+         }
+         if (game.m_totalKillCount > game.m_highScore)
+         {
+            game.m_highScore = game.m_totalKillCount;
          }
          game.m_deathTimer.updateBy(game.m_logicTimer.getDeltaMicros());
          if( game.m_deathTimer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(5) )
@@ -304,7 +347,7 @@ namespace Core
             if( pickup.bonus != BonusTypeCount )
                drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, circleRect, {1.5f, 1.5f}, pickup.transform, pickup.color);
             else
-               scale.set(1.5f, 1.5f);
+               scale.set(2.0f, 2.0f);
             drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, imageRect, scale, pickup.transform, pickup.color);
          }
       }
@@ -322,20 +365,15 @@ namespace Core
 
             drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color);
 
-            if( obj.currentWeapon.ammo == 0 )
-            {
-               Transform textTf{obj.transform.position, {0.02f, 0.02f}, 0};
-               drawText(game.m_graphicsSystem, game.m_defaultFont, "RELOADING", textTf, obj.color, TJ_Center, false);
-#if 0
-               textTf.position.y -= 1;
-               auto timeRemaining = Time::microsToSeconds(obj.currentWeapon.reloadDelay - obj.weaponTimer.getCurrentMicros());
-               std::string remaining = std::to_string(timeRemaining);
-               drawText(game.m_graphicsSystem, game.m_defaultFont, remaining, textTf, {0, 0, 0}, TJ_Center, false);
-#endif
-            }
             Transform tHP{obj.transform.position+Vec2{0,1}, {0.03f, 0.03f}, 0};
-            std::string hpExp = std::to_string(obj.health) + "/" + std::to_string(game.m_experience);
+            std::string hpExp = std::to_string(obj.health);
             drawText(game.m_graphicsSystem, game.m_defaultFont, hpExp, tHP, obj.color, TJ_Center, false);
+
+            auto time = obj.abilityTimeLeft(game);
+            auto text = std::to_string(time);
+            tHP.position = obj.transform.position + Vec2{0, -1};
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, tHP, obj.color, TJ_Center, false);
+
 
             Transform tDir{obj.transform.position + obj.direction * 2, {0.3f, 0.3f}, 0};
             drawSolidCircle(game.m_graphicsSystem, 1, 8, tDir, obj.color);
@@ -405,6 +443,12 @@ namespace Core
       {
          Transform t{game.m_defenseMatrix.area.center, {1, 1}, 0};
          drawSolidCircle(game.m_graphicsSystem, game.m_defenseMatrix.area.radius, 36, t, {0.25f, 0.42f, 0.76f, 0.2f});
+         auto displayTime = defenseMatrixTimeLeft(game);
+         {
+            auto text = std::to_string(displayTime);
+            t.scale.set(0.03f, 0.03f);
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Left, false);
+         }
       }
       if( game.m_timeCapsule.active )
       {
@@ -422,6 +466,13 @@ namespace Core
          game.m_graphicsSystem.v3_setInstanceData({t}, {{}});
          game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
          game.m_graphicsSystem.v3_draw(indices.size(), 1);
+
+         auto displayTime = timeCapsuleTimeLeft(game);
+         {
+            auto text = std::to_string(displayTime);
+            t.scale.set(0.03f, 0.03f);
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Left, false);
+         }
       }
       if( game.m_turret.active )
       {
@@ -432,10 +483,19 @@ namespace Core
          rect.halfHeight /= atlasSize.y;
          rect.halfWidth /= atlasSize.x;
          drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, {});
+         auto displayTime = turretTimeLeft(game);
+         {
+            auto text = std::to_string(displayTime);
+            t.scale.set(0.03f, 0.03f);
+            t.position.y -= 1;
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Left, false);
+         }
       }
       if( game.m_blink.active )
       {
          Transform t{game.m_blink.area.center, {1, 1}, 0};
+         drawHollowCircle(game.m_graphicsSystem, game.m_blink.area.radius, 18, t, {0.7f, 0.7f, 0});
+         t.position = game.m_blink.target;
          drawHollowCircle(game.m_graphicsSystem, game.m_blink.area.radius, 18, t, {0.7f, 0.7f, 0});
       }
 
@@ -454,14 +514,37 @@ namespace Core
                "DUDE YOU KINDA SUCK",
                "HAD FUN DYING LOL",
                "MY MOM COULD BEAT THAT SCORE",
-               "YOUR LAST GAME WAS WAY BETTER"
+               "YOUR LAST GAME WAS WAY BETTER",
+               "MARAC JE SUPAK!"
+         };
+         const char* flavours2[] =
+         {
+            "What a loser",
+            "So bad.",
+            "Such low.",
+            "He sucked most.",
+            "Haha lame."
+         };
+         const char* classes[4]
+         {
+            "Blinker", "Defenser", "Turreter", "Slower"
          };
 
-         drawSolidQuad(game.m_graphicsSystem, {600, 100}, {}, {0.1f, 0.1f, 0.1f});
+         drawSolidQuad(game.m_graphicsSystem, {600, 400}, {}, {0.1f, 0.1f, 0.1f});
          auto text = "You managed to kill " + std::to_string(game.m_totalKillCount) + " thingies before being humiliated!";
-         drawText(game.m_graphicsSystem, game.m_defaultFont, flavours[game.m_flavour], {{0, 40}, {1, 1}, 0}, {}, TJ_Center, false);
-         drawText(game.m_graphicsSystem, game.m_defaultFont, text, {{0, 0}, {1, 1}, 0}, {}, TJ_Center, false);
-         drawText(game.m_graphicsSystem, game.m_defaultFont, "Try better next time!", {{0, -40}, {1, 1}, 0}, {}, TJ_Center, false);
+         Transform t{{0, 140}, {1, 1}, 0};
+         drawText(game.m_graphicsSystem, game.m_defaultFont, flavours[game.m_flavour], t, {}, TJ_Center, false);
+         t.position.y -= 40;
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {}, TJ_Center, false);
+         t.position.y -= 40;
+         drawText(game.m_graphicsSystem, game.m_defaultFont, "Try harder next time! Highest so far: " + std::to_string(game.m_highScore), t, {}, TJ_Center, false);
+         t.position.y -= 40;
+         for (auto& player : game.m_deadPlayers)
+         {
+            auto text = classes[player.id] + std::string(" killed ") + std::to_string(player.killCount) + " monsters.";
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {}, TJ_Center, false);
+            t.position.y -= 40;
+         }
       }
 
       Transform tf;
@@ -470,14 +553,18 @@ namespace Core
 
       {
          auto text = "Monster count: " + std::to_string(game.m_monsters.size());
-         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
+         tf.position.y -= 20;
+         text = "Experience: " + std::to_string(game.m_experience) + " / " + std::to_string(game.m_experienceForNextLevel);
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
       }
-#ifdef _DEBUG_OFF
-      {
+      /*{
+         tf.position.y -= 20;
          auto text = std::to_string(game.m_gameplayTimer.getTimeScale());
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
-         tf.position.y -= 20;
-
+      }*/
+#ifdef _DEBUG_OFF
+      {
          text = std::to_string(game.m_camera.getPosition().z);
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
          tf.position.y -= 20;
@@ -489,33 +576,8 @@ namespace Core
 #endif
 
       tf.position.y = 300;
-      int64_t timeLeft;
-      uint32_t displayTime;
 
-      if( game.m_defenseMatrixPlaying )
-      {
-         timeLeft = game.m_defenseMatrix.updateDelay - game.m_defenseMatrix.timer.getCurrentMicros();
-         displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
-         if( timeLeft < 0 ) displayTime = 0;
-         {
-            auto text = "Defense matrix: " + std::to_string(displayTime);
-            drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
-         }
-         tf.position.y -= 20;
-      }
-
-      if( game.m_timeCapsulePlaying )
-      {
-         timeLeft = game.m_timeCapsule.updateDelay - game.m_timeCapsule.timer.getCurrentMicros();
-         displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
-         if( timeLeft < 0 ) displayTime = 0;
-         {
-            auto text = "Time capsule: " + std::to_string(displayTime);
-            drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
-         }
-         tf.position.y -= 20;
-      }
-
+      /*
       if( game.m_blinkPlaying )
       {
          timeLeft = game.m_blink.updateDelay - game.m_blink.timer.getCurrentMicros();
@@ -527,25 +589,13 @@ namespace Core
          }
          tf.position.y -= 20;
       }
-
-      if( game.m_turretPlaying )
-      {
-         timeLeft = game.m_turret.updateDelay - game.m_turret.timer.getCurrentMicros();
-         displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
-         if( timeLeft < 0 ) displayTime = 0;
-         {
-            auto text = "Turret: " + std::to_string(displayTime);
-            drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
-         }
-         tf.position.y -= 20;
-      }
-
+      */
       for( auto& b : game.m_activeBonuses )
       {
          std::string text = game.m_bonusDatabase[b.type].name;
          auto remaining = b.duration - b.timer.getCurrentMicros();
          text += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
-         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {0, 0, 0}, TJ_Left, false);
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
 
          tf.position.y -= 20;
       }
@@ -574,6 +624,17 @@ namespace Core
          if( col.g < 0.9f ) col.g = 0;
          if( col.b < 0.9f ) col.b = 0;
          drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, col);
+
+         t.scale.set(0.03f, 0.03f);
+         t.position.y -= 1.0f;
+         
+         auto text = std::to_string(player.currentWeapon.ammo);
+         if (player.currentWeapon.ammo == 0)
+         {
+            t.scale.set(0.02f, 0.02f);
+            text = "RELOADING";
+         }
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, col, TJ_Center, false);
       }
    }
 }

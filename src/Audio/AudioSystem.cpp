@@ -98,13 +98,12 @@ namespace Core
    {
       if( snd != nullptr && isLoaded(m_loadedSounds, snd) )
       {
-         if( m_channel != nullptr )
+         if (m_channel != nullptr)
          {
             m_channel->stop();
-            m_musicPlaying = snd;
-            m_system->playSound((FMOD::Sound*)snd, nullptr, false, &m_channel);
-            m_channel->setVolume(0.5f);
          }
+         m_musicPlaying = snd;
+         m_system->playSound((FMOD::Sound*)snd, nullptr, false, &m_channel);
       }
    }
 

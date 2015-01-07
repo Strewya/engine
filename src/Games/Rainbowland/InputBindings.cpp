@@ -436,7 +436,7 @@ namespace Core
 
             case WE_MOUSEBUTTON:
             {
-               if( we.m_mouseButton.m_button == Mouse::m_LeftButton && we.m_mouseButton.m_isDown )
+               if( we.m_mouseButton.m_button == Mouse::m_RightButton && we.m_mouseButton.m_isDown )
                {
                   player.chosenPerk = player.selectablePerks[player.selectedPerkIndex];
                   return true;
@@ -553,8 +553,12 @@ namespace Core
          {
             case WE_GAMEPADBUTTON:
             {
+               auto gid = we.m_gamepadButton.m_gamepad;
+               if (gid != gamepadID) return false;
+
                if( we.m_gamepadButton.m_button == Gamepad::m_DPadRight && we.m_gamepadButton.m_isDown )
                {
+
                   player.selectedPerkIndex = (++player.selectedPerkIndex) % player.perksPerLevel;
                   return true;
                }

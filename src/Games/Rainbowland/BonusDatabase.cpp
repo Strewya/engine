@@ -152,13 +152,15 @@ namespace Core
             game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
             game.m_activeBonuses[index].timer.reset();
             game.m_activeBonuses[index].type = type;
-            game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale()*0.4);
+            game.m_currentTimeScale *= 0.4;
+            game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
          }
          game.m_activeBonuses[index].timer.reset();
       };
       bonusDb[type].timeoutLogic = [=](RainbowlandGame& game)
       {
-         game.m_gameplayTimer.setTimeScale(game.m_gameplayTimer.getTimeScale() * 2.5); // 1 div 0.4 == 2.5
+         game.m_currentTimeScale *= 2.5;// 1 div 0.4 == 2.5
+         game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          game.m_activeBonuses[index] = game.m_activeBonuses.back();
          game.m_activeBonuses.pop_back();

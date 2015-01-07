@@ -99,7 +99,7 @@ namespace Core
          if( controllerTaken )
          {
             std::string text = "BACK";
-            if( i == 0 ) text = "Q";
+            if( i == 0 ) text = "RMB";
             game.m_renderQueue.enqueueRenderCommand(
                std::bind(drawText, _1, game.m_defaultFont, text, tLabel, Color{}, TJ_Center, false));
          }
@@ -243,7 +243,8 @@ namespace Core
 
       game.m_deathTimer.reset();
       game.m_gameplayTimer.reset();
-      game.m_restoreTimeScaleAfterPerkMode = game.m_gameplayTimer.getTimeScale();
+      game.m_currentTimeScale = Time::NORMAL_TIME;
+      game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
       game.m_difficulty = 1;
       game.m_killCounter = 0;
       game.m_totalKillCount = 0;
@@ -263,6 +264,7 @@ namespace Core
       game.m_timeCapsule.timer.reset();
       game.m_timeCapsule.durationSeconds = 8;
       game.m_timeCapsule.cooldownSeconds = 20;
+      game.m_timeCapsule.maxHealPeriod = 40;
 
       game.m_blink.active = false;
       game.m_blink.area.set(0, 0, 6);
@@ -281,8 +283,8 @@ namespace Core
       game.m_turret.killCount = 0;
 
       game.m_experience = 0;
-      game.m_experienceIncrement = 5000;
-      game.m_experienceForNextLevel = 3000;
+      game.m_experienceIncrement = 5000*game.m_playerCount;
+      game.m_experienceForNextLevel = 5000;
       game.m_level = 1;
 
       for( auto& spawner : game.m_monsterSpawners )
@@ -329,12 +331,13 @@ namespace Core
                con = 0;
                switch( we.m_keyboard.m_keyCode )
                {
-                  case Keyboard::m_Q:
+                  case Keyboard::m_Escape:
                   {
-                     auto i = game.m_preparationData.controllers[con];
-                     game.m_preparationData.classes[i] = -1;
-                     game.m_preparationData.controllers[con] = -1;
-                     return true;
+                     if (we.m_keyboard.m_isDown && !we.m_keyboard.m_previouslyDown)
+                     {
+                        game.m_isRunning = false;
+                        return true;
+                     }
                   } break;
 
                   case Keyboard::m_W:
@@ -361,9 +364,18 @@ namespace Core
 
             case WE_MOUSEBUTTON:
             {
+               con = 0;
                if( we.m_mouseButton.m_button == Mouse::m_LeftButton && we.m_mouseButton.m_isDown )
                {
                   game.m_preparationData.start = true;
+                  return true;
+               }
+
+               if(we.m_mouseButton.m_button == Mouse::m_RightButton && we.m_mouseButton.m_isDown)
+               {
+                  auto i = game.m_preparationData.controllers[con];
+                  game.m_preparationData.classes[i] = -1;
+                  game.m_preparationData.controllers[con] = -1;
                   return true;
                }
             } break;
@@ -387,22 +399,22 @@ namespace Core
                      return true;
                   } break;
 
-                  case Gamepad::m_TopButton:
+                  case Gamepad::m_DPadUp:
                   {
                      cls = 0;
                   } break;
 
-                  case Gamepad::m_BottomButton:
+                  case Gamepad::m_DPadDown:
                   {
                      cls = 3;
                   } break;
 
-                  case Gamepad::m_LeftButton:
+                  case Gamepad::m_DPadLeft:
                   {
                      cls = 2;
                   } break;
 
-                  case Gamepad::m_RightButton:
+                  case Gamepad::m_DPadRight:
                   {
                      cls = 1;
                   } break;

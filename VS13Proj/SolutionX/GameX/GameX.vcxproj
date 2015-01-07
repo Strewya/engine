@@ -281,6 +281,7 @@
     <ClCompile Include="..\..\..\src\Util\Circle.cpp" />
     <ClCompile Include="..\..\..\src\Util\CollisionChecks.cpp" />
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Logger.cpp" />
     <ClCompile Include="..\..\..\src\Util\Random.cpp" />
     <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
     <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp" />
@@ -354,6 +355,7 @@
     <ClInclude Include="..\..\..\src\Util\Circle.h" />
     <ClInclude Include="..\..\..\src\Util\CollisionChecks.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
+    <ClInclude Include="..\..\..\src\Util\Logger.h" />
     <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
     <ClInclude Include="..\..\..\src\Util\Rect.h" />
     <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />

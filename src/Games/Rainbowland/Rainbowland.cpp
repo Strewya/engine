@@ -5,6 +5,7 @@
 #include <Games/Rainbowland/Rainbowland.h>
 /******* C++ headers *******/
 #include <algorithm>
+#include <fstream>
 /******* extra headers *******/
 #include <Games/GameLoopParams.h>
 #include <Games/Rainbowland/SessionPreparation.h>
@@ -24,6 +25,13 @@ namespace Core
       DEBUG_STATUS(true);
       m_window->lockCursor(false);
       m_window->showCursor(true);
+
+      std::ofstream file("score");
+      if (file.is_open())
+      {
+         file << m_highScore;
+      }
+      file.close();
 
       status &= m_textureCache.shutdown();
       status &= m_fontCache.shutdown();

@@ -55,7 +55,7 @@ namespace Core
       Time m_deathTimer;
       Time m_gameplayTimer;
       Time m_difficultyTimer;
-      double m_restoreTimeScaleAfterPerkMode;
+      double m_currentTimeScale;;
 
       Camera m_camera;
       Vec2 m_cameraBounds;
@@ -113,12 +113,18 @@ namespace Core
       uint32_t m_playerCount;
       uint32_t m_killCounter;
       uint32_t m_totalKillCount;
+      uint32_t m_highScore;
 
       uint32_t m_experience;
       uint32_t m_experienceIncrement;
       uint32_t m_experienceForNextLevel;
       uint32_t m_level;
       int32_t m_flavour;
+
+      Time m_perkModeTransitionTimer;
+      uint64_t m_perkModeTransitionDelay;
+      bool m_enteringPerkMode;
+      bool m_exitingPerkMode;
 
       uint32_t m_defaultFont;
       uint32_t m_atlasTexture;

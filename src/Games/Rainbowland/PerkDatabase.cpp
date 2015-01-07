@@ -209,7 +209,7 @@ namespace Core
       perkDb[type].acquireLogic = [=](Player& player, RainbowlandGame& game)
       {
          float manip = 0.1f / game.m_playerCount;
-			game.m_restoreTimeScaleAfterPerkMode -= manip;
+			game.m_currentTimeScale -= manip;
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
 
@@ -383,21 +383,21 @@ namespace Core
          return true;
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
-      bool firedOnReload = false;
+      std::vector<bool> firedOnReload{false, false, false, false};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
-         if( player.currentWeapon.ammo == 0 )
+         if( player.currentWeapon.ammo <= 0 )
          {
-            if( !firedOnReload )
+            if( !firedOnReload[player.id] )
             {
-               firedOnReload = true;
+               firedOnReload[player.id] = true;
                generateRocket(game.m_rockets, player.transform.position,
-                               Vec2::normalize(-player.aim), 30, &player);
+                               Vec2::normalize(player.transform.position-player.aim), 30, &player);
             }
          }
          else
          {
-            firedOnReload = false;
+            firedOnReload[player.id] = false;
          }
       };
 
@@ -502,7 +502,7 @@ namespace Core
 
       type = MonsterCleaner;
       perkDb[type].name = "Jackson's Deal";
-      perkDb[type].description = "Trade 1/3 of your maximum health to kill every monster, without gaining experience.";
+      perkDb[type].description = "Trade 1/3 of your maximum health to kill every monster, without gaining experience. You might die!";
       perkDb[type].repeatable = true;
       perkDb[type].dependencyCheck = [](Player& player)
       {
