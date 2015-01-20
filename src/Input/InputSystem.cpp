@@ -34,11 +34,11 @@ namespace Core
 		DEBUG_SHUTDOWN(InputSystem);
 	}
 
-	void InputSystem::update(const Time& timer)
+	void InputSystem::update(const Clock& clock)
 	{
 		m_inputEvents.clear();
 		WindowEvent we;
-		auto currentPeekTime = timer.getCurrentMicros();
+		auto currentPeekTime = clock.getCurrentMicros();
 		while(m_window->readEvent(currentPeekTime, we))
 		{
 			m_inputEvents.emplace_back(we);

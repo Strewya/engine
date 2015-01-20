@@ -123,8 +123,8 @@ namespace Core
    {
       WeaponType type;
       std::string name;
-      uint64_t fireDelay;
-      uint64_t reloadDelay;
+      uint32_t fireDelay;
+      uint32_t reloadDelay;
       uint32_t damage;
       int32_t ammo;
       uint32_t maxAmmo;
@@ -145,8 +145,7 @@ namespace Core
 
    struct Brain
    {
-      Time timer;
-      uint64_t updateDelay;
+      PeriodicTimer timer;
       BrainState state;
 
       uint32_t targetPlayer;
@@ -159,7 +158,7 @@ namespace Core
    struct Monster
    {
       Brain brain;
-      Time objectTimer;
+      Timer objectTimer;
       Transform transform;
       Color color;
       Circle collisionData_attack;
@@ -170,8 +169,7 @@ namespace Core
       float turnSpeed;
       int32_t maxHealth;
       int32_t health;
-      Time attackTimer;
-      uint64_t attackDelay;
+      PeriodicTimer attackTimer;
       uint32_t damage;
       uint32_t expGain;
       MonsterType type;
@@ -181,10 +179,8 @@ namespace Core
 
    struct MonsterSpawner
    {
-      Time objectTimer;
+      PeriodicTimer spawnTimer;
       Transform transform;
-      Time timer;
-      uint64_t spawnCooldown;
       float spawnRadius;
    };
 
@@ -192,11 +188,10 @@ namespace Core
 
    struct Pickup
    {
-      Time objectTimer;
+      CooldownTimer objectTimer;
       Transform transform;
       Color color;
       Circle collisionData;
-      uint64_t duration;
       BonusType bonus;
       WeaponType weapon;
       uint32_t iconIndex;
@@ -211,7 +206,6 @@ namespace Core
    {
       BonusType type;
       std::string name;
-      uint64_t durationMicros;
       BonusAcquireLogic acquireLogic;
       BonusTimeoutLogic timeoutLogic;
    };
@@ -220,8 +214,7 @@ namespace Core
 
    struct ActiveBonus
    {
-      Time timer;
-      uint64_t duration;
+      CooldownTimer timer;
       BonusType type;
    };
 
@@ -246,7 +239,7 @@ namespace Core
 
    struct Bullet
    {
-      Time objectTimer;
+      Timer objectTimer;
       Vec2 trail;
       Vec2 position;
       Vec2 oldPosition;
@@ -262,8 +255,7 @@ namespace Core
 
    struct Blast
    {
-      Time objectTimer;
-      uint64_t duration;
+      CooldownTimer objectTimer;
       Circle area;
       float maxRadius;
       int32_t damage;
@@ -275,8 +267,7 @@ namespace Core
 
    struct Rocket
    {
-      Time objectTimer;
-      uint64_t duration;
+      CooldownTimer objectTimer;
       Circle body;
       Vec2 direction;
       float speed;
@@ -288,8 +279,7 @@ namespace Core
 
    struct DefenseMatrix
    {
-      Time timer;
-      uint64_t updateDelay;
+      CooldownTimer timer;
       float cooldownSeconds;
       float durationSeconds;
       Circle area;
@@ -298,8 +288,7 @@ namespace Core
 
    struct TimeCapsule
    {
-      Time timer;
-      uint64_t updateDelay;
+      CooldownTimer timer;
       float cooldownSeconds;
       float durationSeconds;
       uint32_t healPeriod;
@@ -310,8 +299,7 @@ namespace Core
 
    struct Blink
    {
-      Time timer;
-      uint64_t updateDelay;
+      CooldownTimer timer;
       float cooldownSeconds;
       float durationSeconds;
       Circle area;
@@ -321,13 +309,12 @@ namespace Core
 
    struct Turret
    {
-      Time timer;
-      uint64_t updateDelay;
+      CooldownTimer timer;
       float cooldownSeconds;
       float durationSeconds;
       Circle area;
       Weapon weapon;
-      Time weaponTimer;
+      PeriodicTimer weaponTimer;
       Vec2 aim;
       uint32_t killCount;
       bool active;
@@ -377,8 +364,8 @@ namespace Core
 
    struct Player
    {
-      Time objectTimer;
-      Time weaponTimer;
+      Timer objectTimer;
+      PeriodicTimer weaponTimer;
       Transform transform;
       Color color;
       Circle collisionData;

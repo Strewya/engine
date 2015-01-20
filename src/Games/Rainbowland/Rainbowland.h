@@ -50,11 +50,11 @@ namespace Core
       ImageCache m_imageCache;
       TextureCache m_textureCache;
 
-      Time m_logicTimer;
-      Time m_renderTimer;
-      Time m_deathTimer;
-      Time m_gameplayTimer;
-      Time m_difficultyTimer;
+      Clock m_logicTimer;
+      Clock m_renderTimer;
+      CooldownTimer m_deathTimer;
+      Clock m_gameplayTimer;
+      PeriodicTimer m_difficultyTimer;
       double m_currentTimeScale;;
 
       Camera m_camera;
@@ -109,7 +109,6 @@ namespace Core
       bool m_turretPlaying;
 
       float m_difficulty;
-      uint32_t m_difficultyIncrementMilis;
       uint32_t m_playerCount;
       uint32_t m_killCounter;
       uint32_t m_totalKillCount;
@@ -121,8 +120,7 @@ namespace Core
       uint32_t m_level;
       int32_t m_flavour;
 
-      Time m_perkModeTransitionTimer;
-      uint64_t m_perkModeTransitionDelay;
+      CooldownTimer m_perkModeTransitionTimer;
       bool m_enteringPerkMode;
       bool m_exitingPerkMode;
 

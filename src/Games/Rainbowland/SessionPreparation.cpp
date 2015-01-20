@@ -242,7 +242,6 @@ namespace Core
       game.m_graphicsSystem.createTextureRenderTarget(1200, 900);
 
       game.m_deathTimer.reset();
-      game.m_gameplayTimer.reset();
       game.m_currentTimeScale = Time::NORMAL_TIME;
       game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
       game.m_difficulty = 1;
@@ -253,14 +252,14 @@ namespace Core
 
       game.m_defenseMatrix.active = false;
       game.m_defenseMatrix.area.set(0, 0, 4);
-      game.m_defenseMatrix.updateDelay = 0;
+      game.m_defenseMatrix.timer.setDurationMicros(0);
       game.m_defenseMatrix.timer.reset();
       game.m_defenseMatrix.durationSeconds = 8;
       game.m_defenseMatrix.cooldownSeconds = 20;
 
       game.m_timeCapsule.active = false;
       game.m_timeCapsule.area.set(0, 0, 10);
-      game.m_timeCapsule.updateDelay = 0;
+      game.m_timeCapsule.timer.setDurationMicros(0);
       game.m_timeCapsule.timer.reset();
       game.m_timeCapsule.durationSeconds = 8;
       game.m_timeCapsule.cooldownSeconds = 20;
@@ -269,14 +268,14 @@ namespace Core
       game.m_blink.active = false;
       game.m_blink.area.set(0, 0, 6);
       game.m_blink.target.set(0, 0);
-      game.m_blink.updateDelay = 0;
+      game.m_blink.timer.setDurationMicros(0);
       game.m_blink.timer.reset();
       game.m_blink.durationSeconds = 0.1f;
       game.m_blink.cooldownSeconds = 20;
 
       game.m_turret.active = false;
       game.m_turret.area.set(0, 0, 1);
-      game.m_turret.updateDelay = 0;
+      game.m_turret.timer.setDurationMicros(0);
       game.m_turret.timer.reset();
       game.m_turret.durationSeconds = 8;
       game.m_turret.cooldownSeconds = 20;
@@ -289,9 +288,9 @@ namespace Core
 
       for( auto& spawner : game.m_monsterSpawners )
       {
-         spawner.objectTimer.reset();
-         spawner.timer.reset();
-         spawner.spawnCooldown = Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 1)/game.m_playerCount;
+         spawner.spawnTimer.reset();
+         spawner.spawnTimer.setPeriodMicros(
+            Time::secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 1)/game.m_playerCount);
       }
 
       game.m_players.reserve(game.m_playerCount);

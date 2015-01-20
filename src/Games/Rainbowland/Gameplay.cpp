@@ -135,14 +135,14 @@ namespace Core
          if( wra > 180.0f ) wra -= 360.0f;
          if( wra < -180.0f ) wra += 360.0f;
 
-         currentDeg += wra * 4 * player.objectTimer.getDeltaTime();
+         currentDeg += wra * 4 * player.objectTimer.getDeltaSeconds();
          currentRad = Deg2Rad(currentDeg);
 
          player.direction.x = std::cosf(currentRad);
          player.direction.y = std::sinf(currentRad);
 
          auto velocity = player.direction*player.currentSpeed;
-         player.transform.position += (player.objectTimer.getDeltaTime()*velocity);
+         player.transform.position += (player.objectTimer.getDeltaSeconds()*velocity);
          Circle playerCollider = player.collisionData;
          playerCollider.center = player.transform.position;
          if( !isCircleInsideRect(playerCollider, game.m_playingField) )
@@ -247,9 +247,9 @@ namespace Core
    void updateDifficulty(RainbowlandGame& game)
    {
       game.m_difficultyTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      if( (int64_t)game.m_difficultyTimer.getCurrentMicros() >= Time::milisToMicros(game.m_difficultyIncrementMilis) )
+      if( game.m_difficultyTimer.hasElapsed() )
       {
-         game.m_difficultyTimer.updateBy(-Time::milisToMicros(game.m_difficultyIncrementMilis));
+         game.m_difficultyTimer.period();
          game.m_difficulty += (0.1f/game.m_playerCount);
       }
       if( game.m_killCounter >= 100 )
@@ -275,7 +275,7 @@ namespace Core
       {
          auto& bonus = game.m_activeBonuses[b];
          bonus.timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-         if( bonus.timer.getCurrentMicros() > bonus.duration )
+         if( bonus.timer.hasElapsed() )
          {
             disableBonus(bonus.type, game);
          }
@@ -351,13 +351,12 @@ namespace Core
    void placePickup(RainbowlandGame& game, Vec2 location, BonusType bonus, WeaponType weapon)
    {
       game.m_pickups.emplace_back();
-      game.m_pickups.back().objectTimer.reset();
+      game.m_pickups.back().objectTimer.setDurationMicros(15*1000000U);
       game.m_pickups.back().transform.position = location;
       game.m_pickups.back().transform.scale.set(1.1f, 1.1f);
       game.m_pickups.back().collisionData.set(0, 0, 1);
       game.m_pickups.back().bonus = bonus;
       game.m_pickups.back().weapon = weapon;
-      game.m_pickups.back().duration = Time::secondsToMicros(15);
 
       if( bonus != BonusTypeCount )
       {
@@ -426,16 +425,15 @@ namespace Core
    {
       for( uint32_t b = 0; b < game.m_pickups.size(); )
       {
-         if( game.m_pickups[b].objectTimer.getCurrentMicros() > game.m_pickups[b].duration )
+         if( game.m_pickups[b].objectTimer.hasElapsed() )
          {
             game.m_pickups[b] = game.m_pickups.back();
             game.m_pickups.pop_back();
          }
          else
          {
-            auto duration = game.m_pickups[b].duration;
-            auto diff = duration - game.m_pickups[b].objectTimer.getCurrentMicros();
-            game.m_pickups[b].color.a = (float)diff / Time::secondsToMicros(2);
+            auto diff = game.m_pickups[b].objectTimer.getPercentDone();
+            game.m_pickups[b].color.a = diff / 0.15f;
             clamp(0.0f, 1.0f, game.m_pickups[b].color.a);
             ++b;
          }
@@ -463,14 +461,22 @@ namespace Core
    {
       for( auto& player : game.m_players )
       {
+         if( !player.isShooting )
+         {
+            continue;
+         }
+
          auto& w = player.currentWeapon;
          if( w.ammo > 0 )
          {
             player.weaponTimer.updateBy(player.objectTimer.getDeltaMicros());
-            if( player.isShooting && player.weaponTimer.getCurrentMicros() > w.fireDelay )
+            if( player.weaponTimer.hasElapsed() )
             {
-               player.weaponTimer.reset();
                --w.ammo;
+               if( w.ammo > 0 )
+               {
+                  player.weaponTimer.period();
+               }
                auto aim = player.aim;
                if( !player.isAimRelative )
                {
@@ -502,15 +508,19 @@ namespace Core
          }
          else
          {
-            if( player.weaponTimer.getCurrentMicros() == 0 )
+            if( player.weaponTimer.hasElapsed() )
             {
                game.m_audioSystem.playSfx(game.m_reloadSfx);
+               player.weaponTimer.period();
+               player.weaponTimer.setPeriodMicros(w.reloadDelay);
             }
             player.weaponTimer.updateBy(player.objectTimer.getDeltaMicros());
-            if( player.weaponTimer.getCurrentMicros() > w.reloadDelay )
+            if( player.weaponTimer.hasElapsed() )
             {
                w.ammo = w.maxAmmo;
-               player.weaponTimer.updateBy(Time::secondsToMicros(50));
+               player.weaponTimer.setPeriodMicros(w.fireDelay);
+               player.weaponTimer.updateBy(w.fireDelay);
+               player.weaponTimer.hardReset();
             }
          }
       }
@@ -522,7 +532,7 @@ namespace Core
       for( uint32_t i = 0; i < count; ++i )
       {
          Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-         bullets.emplace_back(Bullet{Time(), origin, origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, owner, pierce});
+         bullets.emplace_back(Bullet{{}, origin, origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, owner, pierce});
          bullets.back().objectTimer.reset();
       }
    }
@@ -559,7 +569,7 @@ namespace Core
    {
       for( uint32_t i = 0; i < bullets.size(); ++i )
       {
-         auto displacement = bullets[i].objectTimer.getDeltaTime()*bullets[i].velocity;
+         auto displacement = bullets[i].objectTimer.getDeltaSeconds()*bullets[i].velocity;
          auto travel = Vec2::length(displacement);
          bullets[i].travelled += travel;
          if( !bullets[i].dead )
@@ -606,7 +616,7 @@ namespace Core
    {
       for( auto& rocket : rockets )
       {
-         rocket.body.center += rocket.direction*rocket.speed*rocket.objectTimer.getDeltaTime();
+         rocket.body.center += rocket.direction*rocket.speed*rocket.objectTimer.getDeltaSeconds();
       }
    }
 
@@ -1011,7 +1021,7 @@ namespace Core
       for( auto& monster : game.m_monsters )
       {
          auto n = Vec2::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
-         monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaTime();
+         monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaSeconds();
          
          separateMonsters(monster, game.m_monsters);
       }
@@ -1031,7 +1041,7 @@ namespace Core
          if( wra > 180.0f ) wra -= 360.0f;
          if( wra < -180.0f ) wra += 360.0f;
 
-         auto newDir = direction + wra*monster.turnSpeed*monster.objectTimer.getDeltaTime();
+         auto newDir = direction + wra*monster.turnSpeed*monster.objectTimer.getDeltaSeconds();
          newDir = Deg2Rad(newDir);
          monster.direction.x = std::cosf(newDir);
          monster.direction.y = std::sinf(newDir);

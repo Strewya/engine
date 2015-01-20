@@ -166,7 +166,6 @@ namespace Core
          {
             game.m_monsterSpawners.emplace_back();
             game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
             game.m_monsterSpawners.back().transform.position = pos;
 
             pos.x += distanceBetweenSpawners.x;
@@ -175,7 +174,6 @@ namespace Core
          {
             game.m_monsterSpawners.emplace_back();
             game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
             game.m_monsterSpawners.back().transform.position = pos;
 
             pos.y -= distanceBetweenSpawners.y;
@@ -184,7 +182,6 @@ namespace Core
          {
             game.m_monsterSpawners.emplace_back();
             game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
             game.m_monsterSpawners.back().transform.position = pos;
 
             pos.x -= distanceBetweenSpawners.x;
@@ -193,7 +190,6 @@ namespace Core
          {
             game.m_monsterSpawners.emplace_back();
             game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().timer.setTimeScale(Time::NORMAL_TIME);
             game.m_monsterSpawners.back().transform.position = pos;
 
             pos.y += distanceBetweenSpawners.y;
@@ -203,12 +199,13 @@ namespace Core
          initPerkDatabase(game.m_perkDatabase);
          initBonusDatabase(game.m_bonusDatabase);
 
+         game.m_deathTimer.setDurationMicros(5 * 1000000U);
          game.m_defenseMatrixPlaying = false;
          game.m_timeCapsulePlaying = false;
          game.m_blinkPlaying = false;
          game.m_turretPlaying = false;
-         game.m_difficultyIncrementMilis = Time::secondsToMilis(5);
-         game.m_perkModeTransitionDelay = Time::secondsToMicros(2);
+         game.m_difficultyTimer.setPeriodMicros(5 * 1000000U);
+         game.m_perkModeTransitionTimer.setDurationMicros(2*1000000U);
          game.m_perkModeTransitionTimer.reset();
          game.m_enteringPerkMode = false;
          game.m_exitingPerkMode = false;

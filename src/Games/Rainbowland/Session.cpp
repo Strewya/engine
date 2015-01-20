@@ -76,9 +76,9 @@ namespace Core
       if (game.m_enteringPerkMode)
       {
          game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
-         if (game.m_perkModeTransitionTimer.getCurrentMicros() < game.m_perkModeTransitionDelay)
+         if ( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
-            auto percent = static_cast<double>(game.m_perkModeTransitionTimer.getCurrentMicros()) / static_cast<double>(game.m_perkModeTransitionDelay);
+            auto percent = game.m_perkModeTransitionTimer.getPercentDone();
             percent *= game.m_currentTimeScale;
             game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale - percent);
          }
@@ -97,9 +97,9 @@ namespace Core
       if (game.m_exitingPerkMode)
       {
          game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
-         if (game.m_perkModeTransitionTimer.getCurrentMicros() < game.m_perkModeTransitionDelay)
+         if ( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
-            auto percent = static_cast<double>(game.m_perkModeTransitionTimer.getCurrentMicros()) / static_cast<double>(game.m_perkModeTransitionDelay);
+            auto percent = game.m_perkModeTransitionTimer.getPercentDone();
             percent *= game.m_currentTimeScale;
             game.m_gameplayTimer.setTimeScale(percent);
          }
@@ -122,7 +122,7 @@ namespace Core
       }
       for( auto& obj : game.m_monsterSpawners )
       {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         obj.spawnTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
       }
       for( auto& obj : game.m_bullets )
       {
@@ -196,7 +196,7 @@ namespace Core
             game.m_highScore = game.m_totalKillCount;
          }
          game.m_deathTimer.updateBy(game.m_logicTimer.getDeltaMicros());
-         if( game.m_deathTimer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(5) )
+         if( game.m_deathTimer.hasElapsed() )
          {
             cleanSession(game);
             game.m_nextGameState = RainbowlandGame::GS_SessionPreparation;
@@ -593,7 +593,7 @@ namespace Core
       for( auto& b : game.m_activeBonuses )
       {
          std::string text = game.m_bonusDatabase[b.type].name;
-         auto remaining = b.duration - b.timer.getCurrentMicros();
+         auto remaining = b.timer.getRemainingMicros();
          text += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
 

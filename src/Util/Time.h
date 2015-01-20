@@ -115,10 +115,13 @@ namespace Core
       float m_timeScale;
    };
 
-   class Cooldown
+   class CooldownTimer
    {
    public:
-      Cooldown(uint32_t durationMicros)
+      CooldownTimer() : CooldownTimer(0)
+      {}
+
+      CooldownTimer(uint32_t durationMicros)
          : m_durationMicros(durationMicros)
       {}
 
@@ -134,9 +137,13 @@ namespace Core
       {
          return m_durationMicros - m_timer.getCurrentMicros();
       }
+      float getPercentDone() const
+      {
+         return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_durationMicros);
+      }
       void reset()
       {
-         m_timer.reset(m_durationMicros);
+         m_timer.reset();
       }
 
       uint32_t getDurationMicros() const
@@ -151,5 +158,54 @@ namespace Core
    protected:
       Timer m_timer;
       uint32_t m_durationMicros;
+   };
+
+   class PeriodicTimer
+   {
+   public:
+      PeriodicTimer() : PeriodicTimer(0)
+      {}
+
+      PeriodicTimer(uint32_t periodMicros)
+         : m_periodMicros(periodMicros)
+      {}
+
+      void updateBy(uint32_t deltaMicros)
+      {
+         m_timer.updateBy(deltaMicros);
+      }
+      bool hasElapsed() const
+      {
+         return m_timer.getCurrentMicros() >= m_periodMicros;
+      }
+      uint32_t getRemainingMicros() const
+      {
+         return m_periodMicros - m_timer.getCurrentMicros();
+      }
+      float getPercentDone() const
+      {
+         return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_periodMicros);
+      }
+      void period()
+      {
+         m_timer.reset(m_periodMicros);
+      }
+      void hardReset()
+      {
+         m_timer.reset();
+      }
+
+      uint32_t getPeriodMicros() const
+      {
+         return m_periodMicros;
+      }
+      void setPeriodMicros(uint32_t periodMicros)
+      {
+         m_periodMicros = periodMicros;
+      }
+
+   protected:
+      Timer m_timer;
+      uint32_t m_periodMicros;
    };
 }
