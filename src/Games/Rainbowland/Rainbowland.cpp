@@ -69,8 +69,8 @@ namespace Core
 
       window.setFullscreen(true);
 
-      m_logicTimer.setTimeScale(Time::NORMAL_TIME);
-      m_renderTimer.setTimeScale(Time::NORMAL_TIME);
+      m_logicTimer.setTimeScale(1);
+      m_renderTimer.setTimeScale(1);
       
       m_currentGameState = GS_Count; //invalid value until we are sure we can run
 

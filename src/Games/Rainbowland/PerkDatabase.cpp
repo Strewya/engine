@@ -51,8 +51,8 @@ namespace Core
          return l.type < r.type;
       });
 
-		Time timer;
-		timer.reset();
+      CooldownTimer cdt;
+      PeriodicTimer pt;
 
       
       PerkType
@@ -70,10 +70,12 @@ namespace Core
       };
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
+         auto& timer = pt;
+         timer.setPeriodMicros(nSeconds::toMicros(player.regenDelayForOneHealth));
          timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-         if( timer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(static_cast<float>(player.regenDelayForOneHealth)) )
+         if( timer.hasElapsed() )
          {
-            timer.reset();
+            timer.period();
             player.health += 1;
             clamp<int32_t>(0, player.maxHealth, player.health);
          }
@@ -129,10 +131,12 @@ namespace Core
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
 		{
+         auto& timer = pt;
+         timer.setPeriodMicros(nSeconds::toMicros(0.5f));
 			timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-			if(timer.getCurrentMicros() > (uint64_t)Time::secondsToMicros(0.5f))
+			if(timer.hasElapsed())
 			{
-				timer.reset();
+				timer.period();
 				Circle radioactiveArea{player.transform.position, 5};
 				for(auto& monsta : game.m_monsters)
 				{
@@ -351,11 +355,13 @@ namespace Core
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
+         auto& timer = pt;
+         timer.setPeriodMicros(nSeconds::toMicros(10U));
          timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-         if( timer.getCurrentMicros() >= (uint64_t)Time::secondsToMicros(10) )
+         if( timer.hasElapsed() )
          {
-            timer.reset();
-            Vec2 directions[16] =
+            timer.period();
+            Vec2 directions[] =
             {
                Vec2{-1, 1}, Vec2{-0.5f, 1}, Vec2{0, 1}, Vec2{0.5f, 1}, Vec2{1, 1},
                Vec2{-1, 0.5f},                                             Vec2{1, 0.5f},

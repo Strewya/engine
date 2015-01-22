@@ -42,7 +42,7 @@ namespace Core
 		bool init(AnimationCache& animations);
 		bool shutdown();
 
-		void update(uint64_t dt);
+		void update(uint32_t dt);
 
 		uint32_t createPlayer(uint32_t& outImageID);
 		void releasePlayer(uint32_t playerID);
@@ -53,7 +53,7 @@ namespace Core
 		bool isRunning(uint32_t playerID);
 		
 	private:
-		Time m_timer;
+		Timer m_timer;
 		std::vector<AnimationPlayer> m_runningAnimations;
 		AnimationCache* m_animations;
 		uint32_t m_idCounter;

@@ -40,7 +40,7 @@ namespace Core
 		DEBUG_SHUTDOWN(AnimationSystem);
 	}
 
-	void AnimationSystem::update(uint64_t deltaTime)
+	void AnimationSystem::update(uint32_t deltaTime)
 	{
 		m_timer.updateBy(deltaTime);
 

@@ -60,7 +60,6 @@ namespace Core
             player.ability = activateBlink;
             player.abilityTimeLeft = blinkTimeLeft;
             player.skillCooldown = &game.m_blink.cooldownSeconds;
-            game.m_blinkPlaying = true;
          } break;
          case 1:
          {
@@ -68,7 +67,6 @@ namespace Core
             player.ability = activateDefenseMatrix;
             player.abilityTimeLeft = defenseMatrixTimeLeft;
             player.skillCooldown = &game.m_defenseMatrix.cooldownSeconds;
-            game.m_defenseMatrixPlaying = true;
          } break;
          case 2:
          {
@@ -76,7 +74,6 @@ namespace Core
             player.ability = activateTurret;
             player.abilityTimeLeft = turretTimeLeft;
             player.skillCooldown = &game.m_turret.cooldownSeconds;
-            game.m_turretPlaying = true;
          } break;
          case 3:
          {
@@ -84,7 +81,6 @@ namespace Core
             player.ability = activateTimeCapsule;
             player.abilityTimeLeft = timeCapsuleTimeLeft;
             player.skillCooldown = &game.m_timeCapsule.cooldownSeconds;
-            game.m_timeCapsulePlaying = true;
          } break;
       }
    }
@@ -445,7 +441,8 @@ namespace Core
       player.currentWeapon = weaponDb[weapon];
       calculateWeaponBonuses(player, weaponDb);
       player.currentWeapon.ammo = player.currentWeapon.maxAmmo;
-      player.weaponTimer.updateBy(Time::secondsToMicros(50));
+      player.weaponTimer.setDurationMicros(player.currentWeapon.fireDelay);
+      player.weaponTimer.updateBy(player.weaponTimer.getDurationMicros());
    }
 
    void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb)
@@ -461,21 +458,17 @@ namespace Core
    {
       for( auto& player : game.m_players )
       {
-         if( !player.isShooting )
-         {
-            continue;
-         }
-
          auto& w = player.currentWeapon;
          if( w.ammo > 0 )
          {
             player.weaponTimer.updateBy(player.objectTimer.getDeltaMicros());
             if( player.weaponTimer.hasElapsed() )
             {
+               player.weaponTimer.reset();
                --w.ammo;
-               if( w.ammo > 0 )
+               if( w.ammo == 0 )
                {
-                  player.weaponTimer.period();
+                  player.weaponTimer.setDurationMicros(w.reloadDelay);
                }
                auto aim = player.aim;
                if( !player.isAimRelative )
@@ -508,19 +501,16 @@ namespace Core
          }
          else
          {
-            if( player.weaponTimer.hasElapsed() )
+            if( player.weaponTimer.getPercentDone() == 0 )
             {
                game.m_audioSystem.playSfx(game.m_reloadSfx);
-               player.weaponTimer.period();
-               player.weaponTimer.setPeriodMicros(w.reloadDelay);
             }
             player.weaponTimer.updateBy(player.objectTimer.getDeltaMicros());
             if( player.weaponTimer.hasElapsed() )
             {
                w.ammo = w.maxAmmo;
-               player.weaponTimer.setPeriodMicros(w.fireDelay);
-               player.weaponTimer.updateBy(w.fireDelay);
-               player.weaponTimer.hardReset();
+               player.weaponTimer.setDurationMicros(w.fireDelay);
+               player.weaponTimer.reset();
             }
          }
       }
@@ -532,8 +522,15 @@ namespace Core
       for( uint32_t i = 0; i < count; ++i )
       {
          Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
-         bullets.emplace_back(Bullet{{}, origin, origin, origin, Vec2::normalize(targetDistance + t) * 60, 0, damage, owner, pierce});
-         bullets.back().objectTimer.reset();
+         Bullet b;
+         b.oldPosition = b.position = b.trail = origin;
+         b.velocity = Vec2::normalize(targetDistance + t) * 60;
+         b.travelled = 0;
+         b.damage = damage;
+         b.owner = owner;
+         b.pierce = pierce;
+         b.dead = false;
+         bullets.emplace_back(b);
       }
    }
 
@@ -545,8 +542,7 @@ namespace Core
       blast.maxRadius = endRadius;
       blast.rotation = 0;
       blast.damage = damage;
-      blast.duration = Time::secondsToMicros(duration);
-      blast.objectTimer.reset();
+      blast.objectTimer.setDurationMicros(nSeconds::toMicros(duration));
       blast.owner = owner;
       blasts.emplace_back(blast);
    }
@@ -554,8 +550,7 @@ namespace Core
    void generateRocket(VRockets& rockets, Vec2 location, Vec2 direction, uint32_t damage, void* owner)
    {
       Rocket rocky;
-      rocky.objectTimer.reset();
-      rocky.duration = Time::secondsToMicros(24);
+      rocky.objectTimer.setDurationMicros(24*1000000U);
       rocky.body.center = location;
       rocky.body.radius = 0.2f;
       rocky.direction = direction;
@@ -605,8 +600,7 @@ namespace Core
    {
       for( auto& blast : blasts )
       {
-         auto percent = static_cast<float>(blast.objectTimer.getCurrentMicros());
-         percent /= static_cast<float>(blast.duration);
+         auto percent = blast.objectTimer.getPercentDone();
          blast.area.radius = blast.maxRadius*percent;
          blast.rotation += Deg2Rad(5);
       }
@@ -616,7 +610,7 @@ namespace Core
    {
       for( auto& rocket : rockets )
       {
-         rocket.body.center += rocket.direction*rocket.speed*rocket.objectTimer.getDeltaSeconds();
+         rocket.body.center += rocket.direction*rocket.speed*rocket.objectTimer.getTimer().getDeltaSeconds();
       }
    }
 
@@ -749,7 +743,7 @@ namespace Core
       for( uint32_t rocketIndex = 0; rocketIndex < game.m_rockets.size(); )
       {
          auto& rock = game.m_rockets[rocketIndex];
-         bool done = rock.objectTimer.getCurrentMicros() > rock.duration;
+         bool done = rock.objectTimer.hasElapsed();
          if( !done )
          {
             //get monsters inside radius
@@ -804,10 +798,9 @@ namespace Core
 
       for( auto& spawner : game.m_monsterSpawners )
       {
-         spawner.timer.updateBy(spawner.objectTimer.getDeltaMicros());
-         if( spawner.timer.getCurrentMicros() > spawner.spawnCooldown )
+         if( spawner.spawnTimer.hasElapsed() )
          {
-            spawner.timer.reset();
+            spawner.spawnTimer.period();
             if( game.m_monsters.size() < 400 )
             {
                Vec2 displacement{(game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius,
@@ -866,9 +859,8 @@ namespace Core
       auto scale = 1.3f - game.m_randomGenerator.randFloat()*0.6f;
       monster.transform.scale.set(scale, scale);
       monster.collisionData_separation.set(0, 0, 0.5f);
-      monster.brain.timer.reset();
-      monster.brain.updateDelay = Time::secondsToMicros(game.m_randomGenerator.randFloat());
-      monster.brain.timer.updateBy(monster.brain.updateDelay);
+      monster.brain.timer.setPeriodMicros(nSeconds::toMicros(game.m_randomGenerator.randFloat()));
+      monster.brain.timer.updateBy(monster.brain.timer.getPeriodMicros());
       monster.brain.targetPlayer = -1;
       monster.brain.targetLocation = position;
       auto rnd = game.m_randomGenerator.randInt(0, 100 * 100);
@@ -882,8 +874,8 @@ namespace Core
       monster.brain.chanceToWander = 0.01f;
       uint32_t hp = static_cast<uint32_t>(30 * (game.m_randomGenerator.randFloat()*0.4f + 0.8f));
       monster.maxHealth = monster.health = static_cast<uint32_t>(hp);
-      monster.attackTimer.updateBy(Time::secondsToMicros(5));
-      monster.attackDelay = Time::secondsToMicros(0.5f);
+      monster.attackTimer.setDurationMicros(nSeconds::toMicros(0.5f));
+      monster.attackTimer.updateBy(monster.attackTimer.getDurationMicros());
       monster.damage = 1;
       monster.expGain = hp;
       monster.color.set(1, 1, 1);
@@ -931,9 +923,9 @@ namespace Core
       for( auto& monster : game.m_monsters )
       {
          monster.brain.timer.updateBy(monster.objectTimer.getDeltaMicros());
-         if( monster.brain.timer.getCurrentMicros() >= monster.brain.updateDelay )
+         if( monster.brain.timer.hasElapsed() )
          {
-            monster.brain.timer.reset();
+            monster.brain.timer.period();
             //monster brain does work here
             //decide which player to target
             if( game.m_players.size() == 0 )
@@ -1070,7 +1062,7 @@ namespace Core
             monster.attackTimer.updateBy(monster.objectTimer.getDeltaMicros());
             if( isCircleTouchingCircle(mCollider, pCollider) )
             {
-               if( monster.attackTimer.getCurrentMicros() >= monster.attackDelay )
+               if( monster.attackTimer.hasElapsed() )
                {
                   if( game.m_randomGenerator.randInt(0, 100 * 100) >= (int32_t)player.dodgeChance * 100 )
                   {
@@ -1120,7 +1112,7 @@ namespace Core
 
    void generatePerks(VPlayers& players, const VPerks& perkDb)
    {
-      Random gen{Time::getRealTimeMicros()};
+      Random gen{Clock::getRealTimeMicros()};
 
       for( auto& player : players )
       {
@@ -1195,11 +1187,11 @@ namespace Core
 
    void activateDefenseMatrix(Player& player, RainbowlandGame& game)
    {
-      if( !game.m_defenseMatrix.active && game.m_defenseMatrix.timer.getCurrentMicros() >= game.m_defenseMatrix.updateDelay )
+      if( !game.m_defenseMatrix.active && game.m_defenseMatrix.timer.hasElapsed() )
       {
          game.m_defenseMatrix.active = true;
          game.m_defenseMatrix.area.center = player.transform.position;
-         game.m_defenseMatrix.updateDelay = Time::secondsToMicros(game.m_defenseMatrix.durationSeconds);
+         game.m_defenseMatrix.timer.setDurationMicros(nSeconds::toMicros(game.m_defenseMatrix.durationSeconds));
          game.m_defenseMatrix.timer.reset();
       }
    }
@@ -1221,10 +1213,10 @@ namespace Core
             }
          }
          //check if over
-         if( game.m_defenseMatrix.timer.getCurrentMicros() >= game.m_defenseMatrix.updateDelay )
+         if( game.m_defenseMatrix.timer.hasElapsed() )
          {
             game.m_defenseMatrix.timer.reset();
-            game.m_defenseMatrix.updateDelay = Time::secondsToMicros(game.m_defenseMatrix.cooldownSeconds);
+            game.m_defenseMatrix.timer.setDurationMicros(nSeconds::toMicros(game.m_defenseMatrix.cooldownSeconds));
             game.m_defenseMatrix.active = false;
          }
       }
@@ -1232,12 +1224,11 @@ namespace Core
 
    void activateTimeCapsule(Player& player, RainbowlandGame& game)
    {
-      if( !game.m_timeCapsule.active && game.m_timeCapsule.timer.getCurrentMicros() >= game.m_timeCapsule.updateDelay )
+      if( !game.m_timeCapsule.active && game.m_timeCapsule.timer.hasElapsed() )
       {
          game.m_timeCapsule.active = true;
          game.m_timeCapsule.area.center = player.transform.position;
-         game.m_timeCapsule.updateDelay = Time::secondsToMicros(game.m_timeCapsule.durationSeconds);
-         game.m_timeCapsule.timer.reset();
+         game.m_timeCapsule.timer.setDurationMicros(nSeconds::toMicros(game.m_timeCapsule.durationSeconds));
          game.m_timeCapsule.healPeriod = game.m_timeCapsule.maxHealPeriod;
       }
    }
@@ -1267,8 +1258,8 @@ namespace Core
             auto distance2 = Vec2::length2(monster->transform.position - area.center);
             auto radius2 = area.radius*area.radius;
             auto diff = radius2 - distance2;
-            double scale = 1.0 - (double)diff / (double)radius2;
-            clamp(0.2, 1.0, scale);
+            float scale = 1.0f - diff / radius2;
+            clamp(0.2f, 1.0f, scale);
             monster->objectTimer.setTimeScale(scale);
          }
          --game.m_timeCapsule.healPeriod;
@@ -1287,14 +1278,13 @@ namespace Core
             }
          }
          //check if over
-         if( game.m_timeCapsule.timer.getCurrentMicros() >= game.m_timeCapsule.updateDelay )
+         if( game.m_timeCapsule.timer.hasElapsed() )
          {
-            game.m_timeCapsule.timer.reset();
-            game.m_timeCapsule.updateDelay = Time::secondsToMicros(game.m_timeCapsule.cooldownSeconds);
+            game.m_timeCapsule.timer.setDurationMicros(nSeconds::toMicros(game.m_timeCapsule.cooldownSeconds));
             game.m_timeCapsule.active = false;
             for( auto* monster : monstersAffected )
             {
-               monster->objectTimer.setTimeScale(Time::NORMAL_TIME);
+               monster->objectTimer.setTimeScale(1);
             }
          }
       }
@@ -1302,13 +1292,12 @@ namespace Core
 
    void activateBlink(Player& player, RainbowlandGame& game)
    {
-      if( !game.m_blink.active && game.m_blink.timer.getCurrentMicros() >= game.m_blink.updateDelay )
+      if( !game.m_blink.active && game.m_blink.timer.hasElapsed() )
       {
          game.m_blink.target = Vec2::normalize(player.aim)*15;
          game.m_blink.active = true;
          game.m_blink.area.center = player.transform.position;
-         game.m_blink.updateDelay = Time::secondsToMicros(game.m_blink.durationSeconds);
-         game.m_blink.timer.reset();
+         game.m_blink.timer.setDurationMicros(nSeconds::toMicros(game.m_blink.durationSeconds));
       }
    }
 
@@ -1341,10 +1330,9 @@ namespace Core
          }
 
          //check if over
-         if( game.m_blink.timer.getCurrentMicros() >= game.m_blink.updateDelay )
+         if( game.m_blink.timer.hasElapsed() )
          {
-            game.m_blink.timer.reset();
-            game.m_blink.updateDelay = Time::secondsToMicros(game.m_blink.cooldownSeconds);
+            game.m_blink.timer.setDurationMicros(nSeconds::toMicros(game.m_blink.cooldownSeconds));
             game.m_blink.active = false;
          }
       }
@@ -1352,14 +1340,13 @@ namespace Core
 
    void activateTurret(Player& player, RainbowlandGame& game)
    {
-      if( !game.m_turret.active && game.m_turret.timer.getCurrentMicros() >= game.m_turret.updateDelay )
+      if( !game.m_turret.active && game.m_turret.timer.hasElapsed() )
       {
          game.m_turret.active = true;
          game.m_turret.area.center = player.transform.position;
-         game.m_turret.updateDelay = Time::secondsToMicros(game.m_turret.durationSeconds);
-         game.m_turret.timer.reset();
+         game.m_turret.timer.setDurationMicros(nSeconds::toMicros(game.m_turret.durationSeconds));
          game.m_turret.weapon = player.currentWeapon;
-         game.m_turret.weaponTimer.reset();
+         game.m_turret.weaponTimer.hardReset();
          game.m_turret.killCount = 0;
       }
    }
@@ -1403,11 +1390,11 @@ namespace Core
          }
 
          //fire weapon
-         turret.weaponTimer.updateBy(turret.timer.getDeltaMicros());
+         turret.weaponTimer.updateBy(turret.timer.getTimer().getDeltaMicros());
          auto& w = turret.weapon;
-         if( turret.weaponTimer.getCurrentMicros() >= w.fireDelay )
+         if( turret.weaponTimer.hasElapsed() )
          {
-            turret.weaponTimer.reset();
+            turret.weaponTimer.period();
 
             auto aim = Vec2::normalize(turret.aim);
             switch( w.type )
@@ -1426,15 +1413,13 @@ namespace Core
                                   turret.area.center, aim, w.damage, w.bulletPierce, &game.m_turret);
                } break;
             }
-
-            
          }
 
          //check if over
-         if( game.m_turret.timer.getCurrentMicros() >= game.m_turret.updateDelay )
+         if( game.m_turret.timer.hasElapsed() )
          {
             game.m_turret.timer.reset();
-            game.m_turret.updateDelay = Time::secondsToMicros(game.m_turret.cooldownSeconds);
+            game.m_turret.timer.setDurationMicros(nSeconds::toMicros(game.m_turret.cooldownSeconds));
             game.m_turret.active = false;
          }
       }
@@ -1442,39 +1427,39 @@ namespace Core
 
    uint32_t defenseMatrixTimeLeft(RainbowlandGame& game)
    {
-      int64_t  timeLeft = game.m_defenseMatrix.updateDelay - game.m_defenseMatrix.timer.getCurrentMicros();
-      auto displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+      auto timeLeft = game.m_defenseMatrix.timer.getRemainingMicros();
+      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
 
    uint32_t blinkTimeLeft(RainbowlandGame& game)
    {
-      int64_t  timeLeft = game.m_blink.updateDelay - game.m_blink.timer.getCurrentMicros();
-      auto displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+      auto  timeLeft = game.m_blink.timer.getRemainingMicros();
+      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
 
    uint32_t timeCapsuleTimeLeft(RainbowlandGame& game)
    {
-      int64_t timeLeft = game.m_timeCapsule.updateDelay - game.m_timeCapsule.timer.getCurrentMicros();
-      auto displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+      auto timeLeft = game.m_timeCapsule.timer.getRemainingMicros();
+      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
 
    uint32_t turretTimeLeft(RainbowlandGame& game)
    {
-      int64_t  timeLeft = game.m_turret.updateDelay - game.m_turret.timer.getCurrentMicros();
-      auto displayTime = static_cast<uint32_t>(Time::microsToSeconds(timeLeft) + 1);
+      auto  timeLeft = game.m_turret.timer.getRemainingMicros();
+      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
 
    void generateSplatter(VKillLocations locations, RainbowlandGame& game)
    {
-      Random gen(Time::getRealTimeMicros());
+      Random gen(Clock::getRealTimeMicros());
       for( auto loc : locations )
       {
          loc.transform.position.y = -loc.transform.position.y;

@@ -55,7 +55,7 @@ namespace Core
       CooldownTimer m_deathTimer;
       Clock m_gameplayTimer;
       PeriodicTimer m_difficultyTimer;
-      double m_currentTimeScale;;
+      double m_currentTimeScale;
 
       Camera m_camera;
       Vec2 m_cameraBounds;
@@ -103,10 +103,6 @@ namespace Core
       TimeCapsule m_timeCapsule;
       Blink m_blink;
       Turret m_turret;
-      bool m_defenseMatrixPlaying;
-      bool m_timeCapsulePlaying;
-      bool m_blinkPlaying;
-      bool m_turretPlaying;
 
       float m_difficulty;
       uint32_t m_playerCount;

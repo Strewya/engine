@@ -11,57 +11,6 @@
 
 namespace Core
 {
-   class Time
-   {
-   public:
-      static const double STOP_TIME;
-      static const double NORMAL_TIME;
-
-      static int64_t secondsToMicros(float sec);
-      static int64_t milisToMicros(int32_t mili);
-      static float milisToSeconds(int32_t mili);
-      static float microsToSeconds(int64_t micros);
-      static int32_t secondsToMilis(float sec);
-      static int32_t microsToMilis(int64_t micros);
-
-      static int32_t countMilisInMicros(int64_t micros);
-      static int32_t countSecondsInMicros(int64_t micros);
-      static int32_t countMinutesInMicros(int64_t micros);
-      static int32_t countHoursInMicros(int64_t micros);
-
-      static int32_t microsDelta(int64_t start, int64_t end);
-
-      Time();
-
-      void update();
-      void updateBy(int64_t delta);
-      uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
-
-      uint64_t getLastRealTimeMicros() const;
-      static uint64_t getRealTimeMicros();
-
-      uint64_t getCurrentMicros() const;
-      int32_t getDeltaMicros() const;
-      float getDeltaTime() const;
-
-      //use only for countup related timers
-      void reset();
-
-      void setTimeScale(double timeScale);
-      double getTimeScale() const;
-
-   protected:
-      uint64_t m_oldRealTime;
-
-      uint64_t m_lastMicros;
-      uint64_t m_curMicros;
-      int64_t m_deltaMicros;
-
-      float m_deltaTime;
-      double m_timeScale;
-   };
-
-
    class Clock
    {
    public:
@@ -108,7 +57,6 @@ namespace Core
       void reset(uint32_t micros = 0);
 
    protected:
-      uint32_t m_lastMicros;
       uint32_t m_currentMicros;
       uint32_t m_deltaMicros;
       float m_deltaSeconds;
@@ -153,6 +101,10 @@ namespace Core
       void setDurationMicros(uint32_t durationMicros)
       {
          m_durationMicros = durationMicros;
+      }
+      const Timer& getTimer() const
+      {
+         return m_timer;
       }
 
    protected:
@@ -203,9 +155,51 @@ namespace Core
       {
          m_periodMicros = periodMicros;
       }
+      const Timer& getTimer() const
+      {
+         return m_timer;
+      }
 
    protected:
       Timer m_timer;
       uint32_t m_periodMicros;
    };
+
+   namespace nSeconds
+   {
+      inline uint32_t toMicros(uint32_t s)
+      {
+         return s * 1000U * 1000U;
+      }
+      inline uint32_t toMicros(float s)
+      {
+         return static_cast<uint32_t>(s*1000.0f) * 1000U;
+      }
+      inline uint32_t toMilis(uint32_t s)
+      {
+         return s * 1000U;
+      }
+      inline uint32_t toMilis(float s)
+      {
+         return static_cast<uint32_t>(s*1000.0f);
+      }
+   }
+   namespace nMilis
+   {
+      inline uint32_t toMicros(uint32_t ms)
+      {
+         return ms * 1000U;
+      }
+      inline float toSeconds(uint32_t ms)
+      {
+         return static_cast<float>(ms)*0.001f;
+      }
+   }
+   namespace nMicros
+   {
+      inline float toSeconds(uint32_t us)
+      {
+         return static_cast<float>(us)*0.001f*0.001f;
+      }
+   }
 }

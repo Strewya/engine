@@ -15,7 +15,7 @@ namespace Core
    bool g_spawnEnabled = true;
    bool g_step = false;
    bool g_stepBack = false;
-   double g_debugPauseTime = Time::STOP_TIME;
+   double g_debugPauseTime = 0;
    uint32_t g_mx = 0;
    uint32_t g_my = 0;
 #endif
@@ -79,14 +79,14 @@ namespace Core
          if ( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
             auto percent = game.m_perkModeTransitionTimer.getPercentDone();
-            percent *= game.m_currentTimeScale;
+            percent *= (float)game.m_currentTimeScale;
             game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale - percent);
          }
          else
          {
             game.m_enteringPerkMode = false;
             game.m_perkModeTransitionTimer.reset();
-            game.m_gameplayTimer.setTimeScale(Time::STOP_TIME);
+            game.m_gameplayTimer.setTimeScale(0);
             game.m_nextGameState = RainbowlandGame::GS_SessionPerkMenu;
             for (auto& player : game.m_players)
             {
@@ -100,7 +100,7 @@ namespace Core
          if ( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
             auto percent = game.m_perkModeTransitionTimer.getPercentDone();
-            percent *= game.m_currentTimeScale;
+            percent *= (float)game.m_currentTimeScale;
             game.m_gameplayTimer.setTimeScale(percent);
          }
          else
@@ -594,7 +594,7 @@ namespace Core
       {
          std::string text = game.m_bonusDatabase[b.type].name;
          auto remaining = b.timer.getRemainingMicros();
-         text += " " + std::to_string(static_cast<uint32_t>(Time::microsToSeconds(remaining) + 1));
+         text += " " + std::to_string(static_cast<uint32_t>(nMicros::toSeconds(remaining) + 1));
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
 
          tf.position.y -= 20;

@@ -54,10 +54,13 @@ namespace Core
       : m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
       m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
       m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
-      m_exitCode(0), m_style(0), m_extendedStyle(0), m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
-      m_headIndex(1), m_tailIndex(0), m_eventQueueSize(1024), m_gamepadEmptyUpdateDelay(Time::secondsToMicros(0.2f)),
+      m_exitCode(0), m_style(0), m_extendedStyle(0),
+      m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
+      m_headIndex(1), m_tailIndex(0), m_eventQueueSize(1024),
+      m_gamepadEmptyUpdateDelay(nSeconds::toMicros(0.2f)),
       m_hwnd(nullptr),
-      m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false), m_isRunning(true),
+      m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false),
+      m_isRunning(true),
       m_class(title), m_title(title), m_resourcesDirectory(),
       m_nextFreeSlot(0)
    {
@@ -610,7 +613,7 @@ namespace Core
       std::for_each(begin(m_fileChanges), end(m_fileChanges), [&](FileChangeInfo& info)
       {
          if (info.m_state == FileChangeInfo::EVENT_PENDING &&
-            m_timer.getCurrentMicros() > info.m_timestamp + Time::milisToMicros(m_fileChangeDelay))
+            m_timer.getCurrentMicros() > info.m_timestamp + nMilis::toMicros(m_fileChangeDelay))
          {
             info.m_state = FileChangeInfo::READ_PENDING;
             auto& we = newEvent();

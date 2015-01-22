@@ -146,7 +146,7 @@ namespace Core
 		std::vector<FileChangeInfo> m_fileChanges;
 		uint32_t m_nextFreeSlot;
 
-		Time m_timer;
+		Clock m_timer;
 		CReadDirectoryChanges m_monitor;
 	};
 

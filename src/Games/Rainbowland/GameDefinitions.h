@@ -169,7 +169,7 @@ namespace Core
       float turnSpeed;
       int32_t maxHealth;
       int32_t health;
-      PeriodicTimer attackTimer;
+      CooldownTimer attackTimer;
       uint32_t damage;
       uint32_t expGain;
       MonsterType type;
@@ -206,6 +206,7 @@ namespace Core
    {
       BonusType type;
       std::string name;
+      uint32_t durationMicros;
       BonusAcquireLogic acquireLogic;
       BonusTimeoutLogic timeoutLogic;
    };
@@ -365,7 +366,7 @@ namespace Core
    struct Player
    {
       Timer objectTimer;
-      PeriodicTimer weaponTimer;
+      CooldownTimer weaponTimer;
       Transform transform;
       Color color;
       Circle collisionData;

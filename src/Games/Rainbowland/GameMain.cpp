@@ -135,82 +135,62 @@ namespace Core
          game.m_imageStartIndex_turret = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(2087, 1178, 2377 - 2087, 1470 - 1178, 1, 1, 1, game.m_rainbowlandImageDatabase);
 
-         game.m_playerCount = 0;
-         game.m_nextGameState = game.m_currentGameState = RainbowlandGame::GS_SessionPreparation;
+         //all non-changeable values first
+         game.m_randomGenerator.reseed(Clock::getRealTimeMicros());
 
-         game.m_randomGenerator.reseed(Time::getRealTimeMicros());
-
-         game.m_graphicsSystem.setBackgroundColor(0.5f, 0.5f, 0.5f);
-         //playing field boundary
+         //playing field calculation
          game.m_graphicsSystem.setPerspectiveProjection();
-
-
          game.m_cameraBounds.set(3, 3);
          game.m_camera.setPosition({-game.m_cameraBounds.x, game.m_cameraBounds.y, -50.0f});
          game.m_graphicsSystem.applyCamera(game.m_camera);
          Vec2 topleft = game.m_graphicsSystem.screenToWorld({0, 0}, game.m_camera);
          game.m_playingField.halfWidth = std::abs(topleft.x);
          game.m_playingField.halfHeight = std::abs(topleft.y);
-
          game.m_camera.setPosition({0, 0, -50});
-         game.m_graphicsSystem.setTransparencyMode(true);
-
-//         game.m_audioSystem.playMusic(game.m_music);
 
          //spawners
          Rect spawnerLocations{{0, 0}, game.m_playingField.halfWidth + 3, game.m_playingField.halfHeight + 3};
          uint32_t spawnerCount = 8;
          Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
          Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
-         for(uint32_t i = 0; i < spawnerCount; ++i)
+         for(uint32_t i = 0; i < spawnerCount*4; ++i)
          {
             game.m_monsterSpawners.emplace_back();
             game.m_monsterSpawners.back().spawnRadius = 1;
             game.m_monsterSpawners.back().transform.position = pos;
-
-            pos.x += distanceBetweenSpawners.x;
-         }
-         for(uint32_t i = 0; i < spawnerCount; ++i)
-         {
-            game.m_monsterSpawners.emplace_back();
-            game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().transform.position = pos;
-
-            pos.y -= distanceBetweenSpawners.y;
-         }
-         for(uint32_t i = 0; i < spawnerCount; ++i)
-         {
-            game.m_monsterSpawners.emplace_back();
-            game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().transform.position = pos;
-
-            pos.x -= distanceBetweenSpawners.x;
-         }
-         for(uint32_t i = 0; i < spawnerCount; ++i)
-         {
-            game.m_monsterSpawners.emplace_back();
-            game.m_monsterSpawners.back().spawnRadius = 1;
-            game.m_monsterSpawners.back().transform.position = pos;
-
-            pos.y += distanceBetweenSpawners.y;
+            switch( i / spawnerCount )
+            {
+               case 0:
+               {
+                  pos.x += distanceBetweenSpawners.x;
+               } break;
+               case 1:
+               {
+                  pos.y -= distanceBetweenSpawners.y;
+               } break;
+               case 2:
+               {
+                  pos.x -= distanceBetweenSpawners.x;
+               } break;
+               case 3:
+               {
+                  pos.y += distanceBetweenSpawners.y;
+               } break;
+            }
          }
 
+         //databases
          initWeaponDatabase(game.m_weaponDatabase);
          initPerkDatabase(game.m_perkDatabase);
          initBonusDatabase(game.m_bonusDatabase);
 
-         game.m_deathTimer.setDurationMicros(5 * 1000000U);
-         game.m_defenseMatrixPlaying = false;
-         game.m_timeCapsulePlaying = false;
-         game.m_blinkPlaying = false;
-         game.m_turretPlaying = false;
-         game.m_difficultyTimer.setPeriodMicros(5 * 1000000U);
-         game.m_perkModeTransitionTimer.setDurationMicros(2*1000000U);
-         game.m_perkModeTransitionTimer.reset();
-         game.m_enteringPerkMode = false;
-         game.m_exitingPerkMode = false;
-         game.m_highScore = 0;
+         //timers
+         game.m_deathTimer.setDurationMicros(nSeconds::toMicros(5U));
+         game.m_difficultyTimer.setPeriodMicros(nSeconds::toMicros(5U));
+         game.m_perkModeTransitionTimer.setDurationMicros(nSeconds::toMicros(2U));
 
+         //high score
+         game.m_highScore = 0;
          std::ifstream file("score", std::ios::in);
          if (file.is_open())
          {
@@ -218,20 +198,99 @@ namespace Core
          }
          file.close();
 
-         initPreparationHandlers(game);
+         //abilities
+         game.m_defenseMatrix.area.radius = 4;
+         game.m_defenseMatrix.durationSeconds = 8;
+
+         game.m_timeCapsule.area.radius = 10;
+         game.m_timeCapsule.durationSeconds = 8;
+         game.m_timeCapsule.maxHealPeriod = 40;
+
+         game.m_blink.area.radius = 6;
+         game.m_blink.durationSeconds = 0.1f;
+
+         game.m_turret.area.radius = 1;
+         game.m_turret.durationSeconds = 8;
+
+         //finally, prepare for game start
+         initPreparationHandlers(game); //i will say this only once
 
          game.m_preparationData.start = false;
-         for(uint32_t i = 0; i < 4; ++i)
-         {
-            game.m_preparationData.classes[i] = -1;
-         }
-         for(uint32_t i = 0; i < 5; ++i)
-         {
-            game.m_preparationData.controllers[i] = -1;
-         }
+         memset(game.m_preparationData.classes, -1, sizeof(int32_t) * 4);
+         memset(game.m_preparationData.controllers, -1, sizeof(int32_t) * 5);
+
+         game.m_nextGameState = game.m_currentGameState = RainbowlandGame::GS_SessionPreparation;
+         
+         //game.m_audioSystem.playMusic(game.m_music);
       }
    }
 
+   void initSession(RainbowlandGame& game)
+   {
+      game.m_graphicsSystem.createTextureRenderTarget(1200, 900);
+
+      game.m_deathTimer.reset();
+      game.m_currentTimeScale = 1;
+      game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);
+      game.m_difficulty = 1;
+      game.m_killCounter = 0;
+      game.m_totalKillCount = 0;
+      game.m_difficultyTimer.hardReset();
+      game.m_flavour = -1;
+
+      game.m_defenseMatrix.active = false;
+      game.m_defenseMatrix.timer.setDurationMicros(0);
+      game.m_defenseMatrix.timer.reset();
+      game.m_defenseMatrix.cooldownSeconds = 20;
+      game.m_timeCapsule.active = false;
+      game.m_timeCapsule.timer.setDurationMicros(0);
+      game.m_timeCapsule.timer.reset();
+      game.m_timeCapsule.cooldownSeconds = 20;
+      
+      game.m_blink.active = false;
+      game.m_blink.timer.setDurationMicros(0);
+      game.m_blink.timer.reset();
+      game.m_blink.cooldownSeconds = 20;
+      
+      game.m_turret.active = false;
+      game.m_turret.timer.setDurationMicros(0);
+      game.m_turret.timer.reset();
+      game.m_turret.killCount = 0;
+      game.m_turret.cooldownSeconds = 20;
+
+      game.m_experience = 0;
+      game.m_experienceIncrement = 5000 * game.m_playerCount;
+      game.m_experienceForNextLevel = 5000;
+      game.m_level = 1;
+
+      for( auto& spawner : game.m_monsterSpawners )
+      {
+         spawner.spawnTimer.hardReset();
+         spawner.spawnTimer.setPeriodMicros(
+            nSeconds::toMicros(game.m_randomGenerator.randFloat() * 5 + 1) / game.m_playerCount);
+      }
+
+      game.m_players.reserve(game.m_playerCount);
+      for( auto soldier = 0; soldier < 4; ++soldier )
+      {
+         auto controller = game.m_preparationData.classes[soldier];
+         if( controller != -1 )
+         {
+            game.m_players.emplace_back();
+            initPlayer(game.m_players.back(), soldier, game);
+            if( controller == 0 )
+            {
+               //keyboard
+               registerKeyboardMouse(game, soldier);
+            }
+            else
+            {
+               //gamepad
+               registerGamepad(game, soldier, controller - 1);
+            }
+         }
+      }
+   }
 
 
    void cleanSession(RainbowlandGame& game)
@@ -250,19 +309,9 @@ namespace Core
       game.m_activeBonuses.clear();
       game.m_graphicsSystem.clearTextureRenderTarget();
       game.m_preparationData.start = false;
-      for(uint32_t i = 0; i < 4; ++i)
-      {
-         game.m_preparationData.classes[i] = -1;
-      }
-      for(uint32_t i = 0; i < 5; ++i)
-      {
-         game.m_preparationData.controllers[i] = -1;
-      }
+      memset(game.m_preparationData.classes, -1, sizeof(int32_t) * 4);
+      memset(game.m_preparationData.controllers, -1, sizeof(int32_t) * 5);
       game.m_sessionHandlers.clear();
       game.m_sessionPerkMenuHandlers.clear();
-      game.m_defenseMatrixPlaying = false;
-      game.m_timeCapsulePlaying = false;
-      game.m_blinkPlaying = false;
-      game.m_turretPlaying = false;
    }
 }

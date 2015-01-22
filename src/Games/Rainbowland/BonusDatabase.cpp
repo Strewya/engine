@@ -36,7 +36,6 @@ namespace Core
       
       type = Heal;
       bonusDb[type].name = "Heal";
-      bonusDb[type].durationMicros = 0; //not important
       bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          picker.health += 20;
@@ -48,7 +47,6 @@ namespace Core
 
       type = MassHeal;
       bonusDb[type].name = "MassHeal";
-      bonusDb[type].durationMicros = 0; //not important
       bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          for( auto& player : game.m_players )
@@ -63,7 +61,6 @@ namespace Core
 
       type = AtomicBomb;
       bonusDb[type].name = "Atomic Bomb";
-      bonusDb[type].durationMicros = 0; //not important
       bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          generateBlast(game.m_blasts, position, 0, 12, 0.8f, 10, nullptr);
@@ -74,15 +71,14 @@ namespace Core
       
       type = IncreasedRateOfFire;
       bonusDb[type].name = "Shooter";
-      bonusDb[type].durationMicros = Time::secondsToMicros(15);
+      bonusDb[type].durationMicros = nSeconds::toMicros(15U);
       bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )
          {
             game.m_activeBonuses.emplace_back();
-            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
-            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].timer.setDurationMicros(game.m_bonusDatabase[type].durationMicros);
             game.m_activeBonuses[index].type = type;
             for( auto& player : game.m_players )
             {
@@ -110,15 +106,14 @@ namespace Core
       
       type = IncreasedMovementSpeed;
       bonusDb[type].name = "Runner";
-      bonusDb[type].durationMicros = Time::secondsToMicros(15);
+      bonusDb[type].durationMicros = nSeconds::toMicros(15U);
       bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )
          {
             game.m_activeBonuses.emplace_back();
-            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
-            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].timer.setDurationMicros(game.m_bonusDatabase[type].durationMicros);
             game.m_activeBonuses[index].type = type;
             for( auto& player : game.m_players )
             {
@@ -142,15 +137,14 @@ namespace Core
       
       type = SlowTime;
       bonusDb[type].name = "Time lords";
-      bonusDb[type].durationMicros = Time::secondsToMicros(8);
+      bonusDb[type].durationMicros = nSeconds::toMicros(8U);
       bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )
          {
             game.m_activeBonuses.emplace_back();
-            game.m_activeBonuses[index].duration = game.m_bonusDatabase[type].durationMicros;
-            game.m_activeBonuses[index].timer.reset();
+            game.m_activeBonuses[index].timer.setDurationMicros(game.m_bonusDatabase[type].durationMicros);
             game.m_activeBonuses[index].type = type;
             game.m_currentTimeScale *= 0.4;
             game.m_gameplayTimer.setTimeScale(game.m_currentTimeScale);

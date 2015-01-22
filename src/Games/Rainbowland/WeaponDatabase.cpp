@@ -32,8 +32,8 @@ namespace Core
       WeaponType 
       type = Pistol;
       weapons[type].name            = "Pew-Pew";
-      weapons[type].fireDelay       = Time::secondsToMicros(0.5f);
-      weapons[type].reloadDelay     = Time::secondsToMicros(0.7f);
+      weapons[type].fireDelay       = nSeconds::toMicros(0.5f);
+      weapons[type].reloadDelay     = nSeconds::toMicros(0.7f);
       weapons[type].damage          = 40;
       weapons[type].maxAmmo         = 20;
       weapons[type].bulletsPerShot  = 1;
@@ -42,8 +42,8 @@ namespace Core
       
       type = Shotgun;
       weapons[type].name            = "Spreader";
-      weapons[type].fireDelay       = Time::secondsToMicros(0.5f);
-      weapons[type].reloadDelay     = Time::secondsToMicros(1.2f);
+      weapons[type].fireDelay       = nSeconds::toMicros(0.5f);
+      weapons[type].reloadDelay     = nSeconds::toMicros(1.2f);
       weapons[type].damage          = 50;
       weapons[type].maxAmmo         = 12;
       weapons[type].bulletsPerShot  = 6;
@@ -52,8 +52,8 @@ namespace Core
 
       type = Uzi;
       weapons[type].name            = "Urban cleaner";
-      weapons[type].fireDelay       = Time::secondsToMicros(0.1f);
-      weapons[type].reloadDelay     = Time::secondsToMicros(1.3f);
+      weapons[type].fireDelay       = nSeconds::toMicros(0.1f);
+      weapons[type].reloadDelay     = nSeconds::toMicros(1.3f);
       weapons[type].damage          = 20;
       weapons[type].maxAmmo         = 32;
       weapons[type].bulletsPerShot  = 1;
@@ -62,8 +62,8 @@ namespace Core
 
       type = Sniper;
       weapons[type].name            = "Piercer";
-      weapons[type].fireDelay       = Time::secondsToMicros(0.5f);
-      weapons[type].reloadDelay     = Time::secondsToMicros(1.0f);
+      weapons[type].fireDelay       = nSeconds::toMicros(0.5f);
+      weapons[type].reloadDelay     = nSeconds::toMicros(1.0f);
       weapons[type].damage          = 100;
       weapons[type].maxAmmo         = 8;
       weapons[type].bulletsPerShot  = 1;
@@ -72,8 +72,8 @@ namespace Core
 
       type = RPG;
       weapons[type].name            = "Bazoooooka";
-      weapons[type].fireDelay       = Time::secondsToMicros(0.3f);
-      weapons[type].reloadDelay     = Time::secondsToMicros(1.5);
+      weapons[type].fireDelay       = nSeconds::toMicros(0.3f);
+      weapons[type].reloadDelay     = nSeconds::toMicros(1.5f);
       weapons[type].damage          = 70;
       weapons[type].maxAmmo         = 10;
       weapons[type].bulletsPerShot  = 1;
