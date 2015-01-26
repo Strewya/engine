@@ -9,46 +9,45 @@
 
 namespace Core
 {
-	Rect::Rect()
-		: halfWidth(0), halfHeight(0)
-	{}
+   Rect::Rect()
+      : halfWidth(0), halfHeight(0)
+   {}
 
-	Rect::Rect(Vec2 c, float hw, float hh)
-		: center(c), halfWidth(hw), halfHeight(hh)
-	{
-	}
+   Rect::Rect(Vec2f c, float hw, float hh)
+      : center(c), halfWidth(hw), halfHeight(hh)
+   {}
 
-	float Rect::left() const
-	{
-		return center.x - halfWidth;
-	}
+   float Rect::left() const
+   {
+      return center.x - halfWidth;
+   }
 
-	float Rect::right() const
-	{
-		return center.x + halfWidth;
-	}
+   float Rect::right() const
+   {
+      return center.x + halfWidth;
+   }
 
-	float Rect::top() const
-	{
-		return center.y + halfHeight;
-	}
+   float Rect::top() const
+   {
+      return center.y + halfHeight;
+   }
 
-	float Rect::bottom() const
-	{
-		return center.y - halfHeight;
-	}
+   float Rect::bottom() const
+   {
+      return center.y - halfHeight;
+   }
 
-	Vec2 Rect::halfSize() const
-	{
-		return Vec2(halfWidth, halfHeight);
-	}
+   Vec2f Rect::halfSize() const
+   {
+      return{halfWidth, halfHeight};
+   }
 
-	void Rect::set(float cx, float cy, float hw, float hh)
-	{
-		center.set(cx, cy);
-		halfWidth = hw;
-		halfHeight = hh;
-	}
+   void Rect::set(float cx, float cy, float hw, float hh)
+   {
+      center.set(cx, cy);
+      halfWidth = hw;
+      halfHeight = hh;
+   }
 }
 
 

@@ -240,6 +240,9 @@
     <ClCompile Include="..\..\..\src\Util\Logger.cpp">
       <Filter>Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\ObjectRendering.cpp">
+      <Filter>Design\Rainbowland</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -443,6 +446,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Logger.h">
       <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec2Impl.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\ObjectRendering.h">
+      <Filter>Design\Rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

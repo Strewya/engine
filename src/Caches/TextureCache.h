@@ -32,7 +32,7 @@ namespace Core
       LoadResult reload(const ResourceFile& path);
       LoadResult unload(const ResourceFile& path);
 
-      Vec2 getTextureDimensions(uint32_t id);
+      Vec2f getTextureDimensions(uint32_t id);
 
    private:
       GraphicsSystem* m_graphics;

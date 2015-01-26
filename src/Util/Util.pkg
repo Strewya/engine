@@ -102,26 +102,28 @@ namespace Core
 	{
 		Transform();
 
-		Vec2 position;
-		Vec2 scale;
+		Vec2f position;
+		Vec2f scale;
 		float rotation;
 	};
 
 	class Vec2
 	{
-		float x;
-		float y;
+		TEMPLATE_BIND(T, int32_t, float)
+		
+		T x;
+		T y;
 
 		Vec2();
-		Vec2(float x, float y);
+		Vec2(T x, T y);
 		
-		void set(float x, float y);
+		void set(T x, T y);
 
 		Vec2 operator+(const Vec2& b) const;
 		Vec2 operator-() const;
 		Vec2 operator-(const Vec2& v) const;
-		Vec2 operator*(float f) const;
-		Vec2 operator/(float f) const;
+		Vec2 operator*(T f) const;
+		Vec2 operator/(T f) const;
 	};
 
 	class Vec3

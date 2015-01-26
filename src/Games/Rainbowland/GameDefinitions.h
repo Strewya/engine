@@ -149,7 +149,7 @@ namespace Core
       BrainState state;
 
       uint32_t targetPlayer;
-      Vec2 targetLocation;
+      Vec2f targetLocation;
 
       float attackRadius;
       float chanceToWander;
@@ -164,7 +164,7 @@ namespace Core
       Circle collisionData_attack;
       Circle collisionData_hitbox;
       Circle collisionData_separation;
-      Vec2 direction;
+      Vec2f direction;
       float maxSpeed;
       float turnSpeed;
       int32_t maxHealth;
@@ -176,6 +176,25 @@ namespace Core
    };
 
    typedef std::vector<Monster> VMonsters;
+
+   struct Cell
+   {
+      std::vector<Monster*> contents;
+   };
+
+   struct Grid
+   {
+      std::vector<Cell> cells;
+      Vec2f cellHalfsize;
+      uint32_t columns;
+      uint32_t rows;
+   };
+
+   Vec2i calculateCellCoords(Grid& grid, Vec2f position);
+   int32_t indexFromCellCoords(Grid& grid, Vec2i cell);
+   void updateMonsterInGrid(Grid& grid, Monster& monster, Vec2i oldCell, Vec2i newCell);
+   void removeMonsterfromGrid(Grid& grid, Monster& monster, Vec2i cell);
+   std::vector<Monster*> collectMonstersInArea(Grid& grid, Vec2i centerCell, Vec2i box);
 
    struct MonsterSpawner
    {
@@ -199,7 +218,7 @@ namespace Core
 
    typedef std::vector<Pickup> VPickups;
 
-   typedef std::function<void(Vec2, Player&, RainbowlandGame&)> BonusAcquireLogic;
+   typedef std::function<void(Vec2f, Player&, RainbowlandGame&)> BonusAcquireLogic;
    typedef std::function<void(RainbowlandGame&)> BonusTimeoutLogic;
 
    struct Bonus
@@ -241,10 +260,10 @@ namespace Core
    struct Bullet
    {
       Timer objectTimer;
-      Vec2 trail;
-      Vec2 position;
-      Vec2 oldPosition;
-      Vec2 velocity;
+      Vec2f trail;
+      Vec2f position;
+      Vec2f oldPosition;
+      Vec2f velocity;
       float travelled;
       uint32_t damage;
       void* owner;
@@ -270,7 +289,7 @@ namespace Core
    {
       CooldownTimer objectTimer;
       Circle body;
-      Vec2 direction;
+      Vec2f direction;
       float speed;
       uint32_t damage;
       void* owner;
@@ -278,6 +297,13 @@ namespace Core
 
    typedef std::vector<Rocket> VRockets;
 
+   enum AbilityType
+   {
+      AT_DefenseMatrix,
+      AT_TimeCapsule,
+      AT_Blink,
+      AT_Turret
+   };
    struct DefenseMatrix
    {
       CooldownTimer timer;
@@ -304,7 +330,7 @@ namespace Core
       float cooldownSeconds;
       float durationSeconds;
       Circle area;
-      Vec2 target;
+      Vec2f target;
       bool active;
    };
 
@@ -316,7 +342,7 @@ namespace Core
       Circle area;
       Weapon weapon;
       PeriodicTimer weaponTimer;
-      Vec2 aim;
+      Vec2f aim;
       uint32_t killCount;
       bool active;
    };
@@ -370,14 +396,14 @@ namespace Core
       Transform transform;
       Color color;
       Circle collisionData;
-      Vec2 direction;
-      Vec2 targetDirection;
+      Vec2f direction;
+      Vec2f targetDirection;
       bool directionActive[4];
       float currentSpeed;
       float maxSpeed;
       float acceleration;
-      Vec2 aim;
-      Vec2 aimDirection;
+      Vec2f aim;
+      Vec2f aimDirection;
       float aimDistance;
       float maxAimDistance;
       float minAimDistance;
@@ -399,8 +425,7 @@ namespace Core
       std::vector<PerkType> availablePerks;
       std::vector<PerkType> acquiredPerks;
       std::vector<PerkType> selectablePerks;
-      std::function<void(Player&, RainbowlandGame&)> ability;
-      std::function<uint32_t(RainbowlandGame&)> abilityTimeLeft;
+      AbilityType ability;
       PerkType chosenPerk;
       bool isShooting;
       bool isAimRelative;
@@ -426,20 +451,20 @@ namespace Core
    void fixupCamera(RainbowlandGame& game);
    void updateDifficulty(RainbowlandGame& game);
 
-   void enableBonus(BonusType bonus, Vec2 pickupPosition, Player& player, RainbowlandGame& game);
+   void enableBonus(BonusType bonus, Vec2f pickupPosition, Player& player, RainbowlandGame& game);
    void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
    void updateBonuses(RainbowlandGame& game);
    void generatePickups(VKillLocations& killLocations, RainbowlandGame& game);
-   void placePickup(RainbowlandGame& game, Vec2 location, BonusType bonus, WeaponType weapon);
+   void placePickup(RainbowlandGame& game, Vec2f location, BonusType bonus, WeaponType weapon);
    void checkPickups(RainbowlandGame& game);
    void updatePickups(RainbowlandGame& game);
 
    void selectWeapon(Player& player, WeaponType weapon, const VWeapons& weaponDb);
    void calculateWeaponBonuses(Player& player, const VWeapons& weaponDb);
    void fireWeapons(RainbowlandGame& game);
-   void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, Vec2 origin, Vec2 direction, uint32_t damage, bool pierce, void* owner);
-   void generateBlast(VBlasts& blasts, Vec2 location, float startRadius, float endRadius, float duration, int32_t damage, void* owner);
-   void generateRocket(VRockets& rockets, Vec2 location, Vec2 direction, uint32_t damage, void* owner);
+   void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, Vec2f origin, Vec2f direction, uint32_t damage, bool pierce, void* owner);
+   void generateBlast(VBlasts& blasts, Vec2f location, float startRadius, float endRadius, float duration, int32_t damage, void* owner);
+   void generateRocket(VRockets& rockets, Vec2f location, Vec2f direction, uint32_t damage, void* owner);
    void moveBullets(VBullets& bullets);
    void moveBlasts(VBlasts& blasts);
    void moveRockets(VRockets& rockets);
@@ -449,7 +474,7 @@ namespace Core
    void increaseKillCount(RainbowlandGame& game, void* owner);
 
    void updateMonsterSpawners(RainbowlandGame& game);
-   void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target, RainbowlandGame& game);
+   void generateMonster(VMonsters& monsters, Vec2f position, uint32_t target, RainbowlandGame& game);
    void runMonsterAI(RainbowlandGame& game);
    void moveMonsters(RainbowlandGame& game);
    void orientMonsters(VMonsters& monsters);
@@ -464,6 +489,8 @@ namespace Core
    void applyPerksForPlayers(RainbowlandGame& game);
    void updatePerks(RainbowlandGame& game);
 
+   void activateAbility(Player& player, RainbowlandGame& game);
+   
    void activateDefenseMatrix(Player& player, RainbowlandGame& game);
    void activateTimeCapsule(Player& player, RainbowlandGame& game);
    void activateBlink(Player& player, RainbowlandGame& game);
@@ -474,6 +501,7 @@ namespace Core
    void updateBlink(RainbowlandGame& game);
    void updateTurret(RainbowlandGame& game);
 
+   uint32_t abilityTimeLeft(RainbowlandGame& game, AbilityType ability);
    uint32_t defenseMatrixTimeLeft(RainbowlandGame& game);
    uint32_t blinkTimeLeft(RainbowlandGame& game);
    uint32_t timeCapsuleTimeLeft(RainbowlandGame& game);
@@ -481,9 +509,9 @@ namespace Core
 
    void generateSplatter(VKillLocations loc, RainbowlandGame& game);
 
-   Vec2 steer_seek(Vec2 position, float maxSpeed, Vec2 targetLocation);
-   Vec2 steer_flee(Vec2 position, float maxSpeed, Vec2 targetLocation);
-   Vec2 steer_arrive(Vec2 position, float maxSpeed, Vec2 targetLocation);
-   Vec2 steer_pursuit(Vec2 position, Vec2 heading, float maxSpeed, Vec2 targetPosition, Vec2 targetHeading, float targetMaxSpeed);
-   Vec2 steer_wander(Monster& m, RainbowlandGame& game);
+   Vec2f steer_seek(Vec2f position, float maxSpeed, Vec2f targetLocation);
+   Vec2f steer_flee(Vec2f position, float maxSpeed, Vec2f targetLocation);
+   Vec2f steer_arrive(Vec2f position, float maxSpeed, Vec2f targetLocation);
+   Vec2f steer_pursuit(Vec2f position, Vec2f heading, float maxSpeed, Vec2f targetPosition, Vec2f targetHeading, float targetMaxSpeed);
+   Vec2f steer_wander(Monster& m, RainbowlandGame& game);
 }

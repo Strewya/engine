@@ -21,7 +21,7 @@ namespace Core
 		}
 
 		outAnimation.m_name = lua.to<std::string>(-2);
-		outAnimation.m_duration = nSeconds::toMicros(get(lua, "duration", defaults.duration));
+		outAnimation.m_duration = secondsToMicros(get(lua, "duration", defaults.duration));
 		outAnimation.m_loops = get(lua, "loop", defaults.loops);
 
 		for( lua.ipairs("images"); lua.next(); lua.pop(1) )

@@ -28,7 +28,7 @@ namespace Core
       player.maxSpeed = 5;
       player.acceleration = 1.0f;
       player.aim = player.direction;
-      player.aimDirection = Vec2::normalize(player.aim);
+      player.aimDirection = Vec2f::normalize(player.aim);
       player.aimDistance = 0;
       player.maxAimDistance = 6;
       player.minAimDistance = 1.5;
@@ -57,29 +57,25 @@ namespace Core
          case 0:
          {
             player.color.set(1, dimm, dimm);
-            player.ability = activateBlink;
-            player.abilityTimeLeft = blinkTimeLeft;
+            player.ability = AT_Blink;
             player.skillCooldown = &game.m_blink.cooldownSeconds;
          } break;
          case 1:
          {
             player.color.set(1, 1, dimm);
-            player.ability = activateDefenseMatrix;
-            player.abilityTimeLeft = defenseMatrixTimeLeft;
+            player.ability = AT_DefenseMatrix;
             player.skillCooldown = &game.m_defenseMatrix.cooldownSeconds;
          } break;
          case 2:
          {
             player.color.set(dimm, 1, dimm);
-            player.ability = activateTurret;
-            player.abilityTimeLeft = turretTimeLeft;
+            player.ability = AT_Turret;
             player.skillCooldown = &game.m_turret.cooldownSeconds;
          } break;
          case 3:
          {
             player.color.set(dimm, dimm, 1);
-            player.ability = activateTimeCapsule;
-            player.abilityTimeLeft = timeCapsuleTimeLeft;
+            player.ability = AT_TimeCapsule;
             player.skillCooldown = &game.m_timeCapsule.cooldownSeconds;
          } break;
       }
@@ -95,7 +91,7 @@ namespace Core
             {
                player.currentSpeed = player.maxSpeed;
 
-               Vec2 targetVector;
+               Vec2f targetVector;
                if( player.directionActive[Up] )
                {
                   targetVector.y += 1;
@@ -113,7 +109,7 @@ namespace Core
                   targetVector.x += 1;
                }
 
-               player.targetDirection = Vec2::normalize(targetVector);
+               player.targetDirection = Vec2f::normalize(targetVector);
             }
             else
             {
@@ -162,7 +158,7 @@ namespace Core
          {
             aimDir -= player.transform.position;
          }
-         aimDir = Vec2::normalize(aimDir);
+         aimDir = Vec2f::normalize(aimDir);
          player.transform.rotation = std::atan2(aimDir.y, aimDir.x);
       }
    }
@@ -204,7 +200,7 @@ namespace Core
          game.m_experienceForNextLevel += game.m_experienceIncrement;
          ++game.m_level;
          enterPerkMode(game);
-         for (auto& player : game.m_players)
+         for( auto& player : game.m_players )
          {
             generateBlast(game.m_blasts, player.transform.position, 0, 2, 1, 30, &player);
          }
@@ -220,18 +216,18 @@ namespace Core
    {
       if( game.m_players.size() > 0 )
       {
-         Vec2 averagePos;
+         Vec2f averagePos;
          for( auto& player : game.m_players )
          {
             averagePos += player.transform.position;
          }
          averagePos /= (float)game.m_players.size();
          auto pos = game.m_camera.getPosition();
-         Vec2 pos2{pos.x, pos.y};
+         Vec2f pos2{pos.x, pos.y};
          clamp(-game.m_cameraBounds.x, game.m_cameraBounds.x, averagePos.x);
          clamp(-game.m_cameraBounds.y, game.m_cameraBounds.y, averagePos.y);
          auto diff = averagePos - pos2;
-         if( Vec2::length(diff) > 0 )
+         if( Vec2f::length(diff) > 0 )
          {
             pos.set(averagePos.x, averagePos.y, pos.z);
             game.m_camera.move({diff.x, diff.y, 0});
@@ -246,16 +242,16 @@ namespace Core
       if( game.m_difficultyTimer.hasElapsed() )
       {
          game.m_difficultyTimer.period();
-         game.m_difficulty += (0.1f/game.m_playerCount);
+         game.m_difficulty += (0.1f / game.m_playerCount);
       }
       if( game.m_killCounter >= 100 )
       {
-         game.m_difficulty += (0.5f/game.m_playerCount);
+         game.m_difficulty += (0.5f / game.m_playerCount);
          game.m_killCounter -= 100;
       }
    }
 
-   void enableBonus(BonusType bonus, Vec2 pickupPosition, Player& player, RainbowlandGame& game)
+   void enableBonus(BonusType bonus, Vec2f pickupPosition, Player& player, RainbowlandGame& game)
    {
       game.m_bonusDatabase[bonus].acquireLogic(pickupPosition, player, game);
    }
@@ -292,26 +288,26 @@ namespace Core
       for( auto& loc : killLocations )
       {
          //check if too far away from center
-         if (Vec2::length2(loc.transform.position) >= (Vec2::length2(game.m_playingField.halfSize())/1.3f))
+         if( Vec2f::length2(loc.transform.position) >= (Vec2f::length2(game.m_playingField.halfSize()) / 2) )
          {
             continue;
          }
 
          //check if there is any other bonus at this location
          bool shouldItSpawn = true;
-         for (auto& pick : game.m_pickups)
+         for( auto& pick : game.m_pickups )
          {
             Circle old = pick.collisionData;
             old.center = pick.transform.position;
             Circle nju = pick.collisionData;
             nju.center = loc.transform.position;
-            if (isCircleTouchingCircle(old, nju))
+            if( isCircleTouchingCircle(old, nju) )
             {
                shouldItSpawn = false;
                break;
             }
          }
-         if (!shouldItSpawn)
+         if( shouldItSpawn == false )
          {
             continue;
          }
@@ -328,8 +324,8 @@ namespace Core
          if( game.m_randomGenerator.randInt(1, 100 * 100) < weaponChance * 100 )
          {
             auto count = std::count_if(game.m_pickups.begin(), game.m_pickups.end(),
-               [](Pickup& p) { return p.weapon != WeaponTypeCount; });
-            if (count == game.m_playerCount)
+                                       [](Pickup& p) { return p.weapon != WeaponTypeCount; });
+            if( count == game.m_playerCount )
             {
                return;
             }
@@ -344,7 +340,7 @@ namespace Core
       }
    }
 
-   void placePickup(RainbowlandGame& game, Vec2 location, BonusType bonus, WeaponType weapon)
+   void placePickup(RainbowlandGame& game, Vec2f location, BonusType bonus, WeaponType weapon)
    {
       game.m_pickups.emplace_back();
       game.m_pickups.back().objectTimer.setDurationMicros(15*1000000U);
@@ -462,7 +458,7 @@ namespace Core
          if( w.ammo > 0 )
          {
             player.weaponTimer.updateBy(player.objectTimer.getDeltaMicros());
-            if( player.weaponTimer.hasElapsed() )
+            if( player.isShooting && player.weaponTimer.hasElapsed() )
             {
                player.weaponTimer.reset();
                --w.ammo;
@@ -475,7 +471,7 @@ namespace Core
                {
                   aim -= player.transform.position;
                }
-               aim = Vec2::normalize(aim);
+               aim = Vec2f::normalize(aim);
                auto p = aim*player.collisionData.radius;
 
                switch( w.type )
@@ -516,15 +512,15 @@ namespace Core
       }
    }
 
-   void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, Vec2 origin, Vec2 direction, uint32_t damage, bool pierce, void* owner)
+   void generateBullets(VBullets& bullets, Random& gen, uint32_t count, float spread, Vec2f origin, Vec2f direction, uint32_t damage, bool pierce, void* owner)
    {
-      Vec2 targetDistance = direction * 30;
+      Vec2f targetDistance = direction * 30;
       for( uint32_t i = 0; i < count; ++i )
       {
-         Vec2 t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
+         Vec2f t{gen.randFloat()*spread * 2 - spread, gen.randFloat()*spread * 2 - spread};
          Bullet b;
          b.oldPosition = b.position = b.trail = origin;
-         b.velocity = Vec2::normalize(targetDistance + t) * 60;
+         b.velocity = Vec2f::normalize(targetDistance + t) * 60;
          b.travelled = 0;
          b.damage = damage;
          b.owner = owner;
@@ -534,7 +530,7 @@ namespace Core
       }
    }
 
-   void generateBlast(VBlasts& blasts, Vec2 location, float startRadius, float endRadius, float duration, int32_t damage, void* owner)
+   void generateBlast(VBlasts& blasts, Vec2f location, float startRadius, float endRadius, float duration, int32_t damage, void* owner)
    {
       Blast blast;
       blast.area.center = location;
@@ -542,12 +538,12 @@ namespace Core
       blast.maxRadius = endRadius;
       blast.rotation = 0;
       blast.damage = damage;
-      blast.objectTimer.setDurationMicros(nSeconds::toMicros(duration));
+      blast.objectTimer.setDurationMicros(secondsToMicros(duration));
       blast.owner = owner;
       blasts.emplace_back(blast);
    }
 
-   void generateRocket(VRockets& rockets, Vec2 location, Vec2 direction, uint32_t damage, void* owner)
+   void generateRocket(VRockets& rockets, Vec2f location, Vec2f direction, uint32_t damage, void* owner)
    {
       Rocket rocky;
       rocky.objectTimer.setDurationMicros(24*1000000U);
@@ -565,7 +561,7 @@ namespace Core
       for( uint32_t i = 0; i < bullets.size(); ++i )
       {
          auto displacement = bullets[i].objectTimer.getDeltaSeconds()*bullets[i].velocity;
-         auto travel = Vec2::length(displacement);
+         auto travel = Vec2f::length(displacement);
          bullets[i].travelled += travel;
          if( !bullets[i].dead )
          {
@@ -583,9 +579,9 @@ namespace Core
          }
          if( bullets[i].dead )
          {
-            auto old = Vec2::normalize(bullets[i].oldPosition - bullets[i].position);
-            auto trail = Vec2::normalize(bullets[i].trail - bullets[i].position);
-            auto dot = Vec2::dotProduct(old, trail);
+            auto old = Vec2f::normalize(bullets[i].oldPosition - bullets[i].position);
+            auto trail = Vec2f::normalize(bullets[i].trail - bullets[i].position);
+            auto dot = Vec2f::dotProduct(old, trail);
             if( dot < 0 )
             {
                bullets[i] = bullets.back();
@@ -614,15 +610,24 @@ namespace Core
       }
    }
 
-   void findBulletHits(const Bullet& bullet, const VMonsters& monsters, std::vector<uint32_t>& outMonsters)
+   void findBulletHits(const Bullet& bullet, RainbowlandGame& game, std::vector<uint32_t>& outMonsters)
    {
+      auto oldPosCell = calculateCellCoords(game.m_monsterGrid, bullet.oldPosition);
+      auto posCell = calculateCellCoords(game.m_monsterGrid, bullet.position);
+      auto monsters = collectMonstersInArea(game.m_monsterGrid, oldPosCell, {1, 1});
+      auto r2 = collectMonstersInArea(game.m_monsterGrid, posCell, {1, 1});
+      monsters.insert(monsters.end(), r2.begin(), r2.end());
+      std::sort(monsters.begin(), monsters.end());
+      auto newEnd = std::unique(monsters.begin(), monsters.end());
+      monsters.erase(newEnd, monsters.end());
+
       for( uint32_t m = 0; m < monsters.size(); ++m )
       {
-         if( monsters[m].health > 0 )
+         if( monsters[m]->health > 0 )
          {
-            Circle bCollider = monsters[m].collisionData_hitbox;
-            bCollider.center = monsters[m].transform.position;
-            bCollider.radius *= monsters[m].transform.scale.x;
+            Circle bCollider = monsters[m]->collisionData_hitbox;
+            bCollider.center = monsters[m]->transform.position;
+            bCollider.radius *= monsters[m]->transform.scale.x;
             if( isLineTouchingCircle(bullet.oldPosition, bullet.position, bCollider) )
             {
                outMonsters.push_back(m);
@@ -631,15 +636,20 @@ namespace Core
       }
    }
 
-   void findBlastHits(const Blast& blast, const VMonsters& monsters, std::vector<uint32_t>& outMonsters)
+   void findBlastHits(const Blast& blast, RainbowlandGame& game, std::vector<uint32_t>& outMonsters)
    {
+      auto posCell = calculateCellCoords(game.m_monsterGrid, blast.area.center);
+      auto minSize = std::min(game.m_monsterGrid.cellHalfsize.x, game.m_monsterGrid.cellHalfsize.y);
+      auto extraCells = (int32_t)(blast.area.radius / minSize);
+      auto monsters = collectMonstersInArea(game.m_monsterGrid, posCell, {1+extraCells, 1+extraCells});
+      
       for( uint32_t m = 0; m < monsters.size(); ++m )
       {
-         if( monsters[m].health > 0 )
+         if( monsters[m]->health > 0 )
          {
-            Circle bCollider = monsters[m].collisionData_hitbox;
-            bCollider.center = monsters[m].transform.position;
-            bCollider.radius *= monsters[m].transform.scale.x;
+            Circle bCollider = monsters[m]->collisionData_hitbox;
+            bCollider.center = monsters[m]->transform.position;
+            bCollider.radius *= monsters[m]->transform.scale.x;
             if( isCircleTouchingCircle(bCollider, blast.area) )
             {
                outMonsters.push_back(m);
@@ -648,15 +658,20 @@ namespace Core
       }
    }
 
-   void findRocketHits(const Rocket& rock, const VMonsters& monsters, std::vector<uint32_t>& outMonsters)
+   void findRocketHits(const Rocket& rock, RainbowlandGame& game, std::vector<uint32_t>& outMonsters)
    {
+      auto posCell = calculateCellCoords(game.m_monsterGrid, rock.body.center);
+      auto minSize = std::min(game.m_monsterGrid.cellHalfsize.x, game.m_monsterGrid.cellHalfsize.y);
+      auto extraCells = (int32_t)(rock.body.radius / minSize);
+      auto monsters = collectMonstersInArea(game.m_monsterGrid, posCell, {1 + extraCells, 1 + extraCells});
+
       for( uint32_t m = 0; m < monsters.size(); ++m )
       {
-         if( monsters[m].health > 0 )
+         if( monsters[m]->health > 0 )
          {
-            Circle bCollider = monsters[m].collisionData_hitbox;
-            bCollider.center = monsters[m].transform.position;
-            bCollider.radius *= monsters[m].transform.scale.x;
+            Circle bCollider = monsters[m]->collisionData_hitbox;
+            bCollider.center = monsters[m]->transform.position;
+            bCollider.radius *= monsters[m]->transform.scale.x;
             if( isCircleTouchingCircle(bCollider, rock.body) )
             {
                outMonsters.push_back(m);
@@ -673,13 +688,13 @@ namespace Core
          if( !bullet.dead )
          {
             std::vector<uint32_t> hitMonsters;
-            findBulletHits(bullet, game.m_monsters, hitMonsters);
+            findBulletHits(bullet, game, hitMonsters);
             if( !hitMonsters.empty() )
             {
                std::sort(hitMonsters.begin(), hitMonsters.end(), [&](uint32_t l, uint32_t r)
                {
-                  auto ll = Vec2::length(game.m_monsters[l].transform.position - bullet.trail);
-                  auto rl = Vec2::length(game.m_monsters[r].transform.position - bullet.trail);
+                  auto ll = Vec2f::length(game.m_monsters[l].transform.position - bullet.trail);
+                  auto rl = Vec2f::length(game.m_monsters[r].transform.position - bullet.trail);
                   return ll < rl;
                });
                for( auto mid : hitMonsters )
@@ -714,7 +729,7 @@ namespace Core
          {
             //get monsters inside radius
             std::vector<uint32_t> hitMonsters;
-            findBlastHits(blast, game.m_monsters, hitMonsters);
+            findBlastHits(blast, game, hitMonsters);
             if( !hitMonsters.empty() )
             {
                for( auto mid : hitMonsters )
@@ -748,7 +763,7 @@ namespace Core
          {
             //get monsters inside radius
             std::vector<uint32_t> hitMonsters;
-            findRocketHits(rock, game.m_monsters, hitMonsters);
+            findRocketHits(rock, game, hitMonsters);
             if( !hitMonsters.empty() )
             {
                generateBlast(game.m_blasts, rock.body.center, 0, 2, 0.5f, rock.damage, rock.owner);
@@ -759,7 +774,7 @@ namespace Core
                ++rocketIndex;
             }
          }
-         
+
          if( done )
          {
             //remove
@@ -801,9 +816,9 @@ namespace Core
          if( spawner.spawnTimer.hasElapsed() )
          {
             spawner.spawnTimer.period();
-            if( game.m_monsters.size() < 400 )
+            if( game.m_monsters.size() < game.m_maxMonsterCount )
             {
-               Vec2 displacement{(game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius,
+               Vec2f displacement{(game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius,
                   (game.m_randomGenerator.randFloat() * 2 - 1)*spawner.spawnRadius};
                generateMonster(game.m_monsters,
                                spawner.transform.position + displacement,
@@ -846,7 +861,7 @@ namespace Core
       //monster.brain.state = BS_Wander;
    }
 
-   void generateMonster(VMonsters& monsters, Vec2 position, uint32_t target, RainbowlandGame& game)
+   void generateMonster(VMonsters& monsters, Vec2f position, uint32_t target, RainbowlandGame& game)
    {
       monsters.emplace_back();
       auto& monster = monsters.back();
@@ -859,14 +874,14 @@ namespace Core
       auto scale = 1.3f - game.m_randomGenerator.randFloat()*0.6f;
       monster.transform.scale.set(scale, scale);
       monster.collisionData_separation.set(0, 0, 0.5f);
-      monster.brain.timer.setPeriodMicros(nSeconds::toMicros(game.m_randomGenerator.randFloat()));
+      monster.brain.timer.setPeriodMicros(secondsToMicros(game.m_randomGenerator.randFloat()));
       monster.brain.timer.updateBy(monster.brain.timer.getPeriodMicros());
       monster.brain.targetPlayer = -1;
       monster.brain.targetLocation = position;
       auto rnd = game.m_randomGenerator.randInt(0, 100 * 100);
-      if( rnd < 20*100 )
+      if( rnd < 20 * 100 )
          monster.brain.state = BS_Wander;
-      else if( 20*100 <= rnd && rnd < 60*100 )
+      else if( 20 * 100 <= rnd && rnd < 60 * 100 )
          monster.brain.state = BS_Flank;
       else
          monster.brain.state = BS_Attack;
@@ -874,7 +889,7 @@ namespace Core
       monster.brain.chanceToWander = 0.01f;
       uint32_t hp = static_cast<uint32_t>(30 * (game.m_randomGenerator.randFloat()*0.4f + 0.8f));
       monster.maxHealth = monster.health = static_cast<uint32_t>(hp);
-      monster.attackTimer.setDurationMicros(nSeconds::toMicros(0.5f));
+      monster.attackTimer.setDurationMicros(secondsToMicros(0.5f));
       monster.attackTimer.updateBy(monster.attackTimer.getDurationMicros());
       monster.damage = 1;
       monster.expGain = hp;
@@ -902,6 +917,10 @@ namespace Core
             setButterflySpecificData(monster);
          } break;
       }
+
+      auto oldCell = calculateCellCoords(game.m_monsterGrid, monster.transform.position);
+      auto newCell = calculateCellCoords(game.m_monsterGrid, monster.transform.position);
+      updateMonsterInGrid(game.m_monsterGrid, monster, oldCell, newCell);
    }
 
    uint32_t findPlayerInArea(Circle area, VPlayers& players)
@@ -932,23 +951,23 @@ namespace Core
             {
                monster.brain.state = BS_Wander;
             }
-            
+
             auto playerId = monster.brain.targetPlayer;
             auto playerIndex = filterFind(game.m_players, [=](const Player& p) { return p.id == playerId; });
-            if( playerIndex == game.m_players.size() && playerIndex != 0)
+            if( playerIndex == game.m_players.size() && playerIndex != 0 )
             {
                playerIndex = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
                monster.brain.targetPlayer = game.m_players[playerIndex].id;
             }
-            
+
             switch( monster.brain.state )
             {
                case BS_Wander:
                {
                   auto direction = steer_wander(monster, game);
-                  if( Vec2::length2(monster.transform.position) >= Vec2::length2(game.m_playingField.halfSize()) )
+                  if( Vec2f::length2(monster.transform.position) >= Vec2f::length2(game.m_playingField.halfSize()) )
                   {
-                     direction = Vec2::normalize(-monster.transform.position);
+                     direction = Vec2f::normalize(-monster.transform.position);
                   }
                   monster.brain.targetLocation = monster.transform.position + direction * 4;
                   auto pi = findPlayerInArea(Circle{monster.transform.position, monster.brain.attackRadius}, game.m_players);
@@ -972,9 +991,9 @@ namespace Core
                case BS_Flank:
                {
                   auto& player = game.m_players[playerIndex];
-                  auto target = Vec2{game.m_randomGenerator.randFloat() * 2 - 1,
+                  auto target = Vec2f{game.m_randomGenerator.randFloat() * 2 - 1,
                      game.m_randomGenerator.randFloat() * 2 - 1};
-                  target = Vec2::normalize(target) * 4;
+                  target = Vec2f::normalize(target) * 4;
                   target += player.transform.position;
 
                   monster.brain.targetLocation = target;
@@ -990,17 +1009,19 @@ namespace Core
       }
    }
 
-   void separateMonsters(Monster& monsta, VMonsters& monsters)
+   void separateMonsters(Monster& monsta, Grid& grid)
    {
-      for( auto& monster : monsters )
+      auto cell = calculateCellCoords(grid, monsta.transform.position);
+      auto monsters = collectMonstersInArea(grid, cell, {1, 1});
+      for( auto* monster : monsters )
       {
-         if( &monsta == &monster ) continue;
+         if( &monsta == monster ) continue;
 
-         auto distanceVec = monsta.transform.position - monster.transform.position;
-         auto distanceLen = Vec2::length(distanceVec);
+         auto distanceVec = monsta.transform.position - monster->transform.position;
+         auto distanceLen = Vec2f::length(distanceVec);
 
          auto overlap = monsta.collisionData_separation.radius*monsta.transform.scale.x +
-            monster.collisionData_separation.radius*monster.transform.scale.x - distanceLen;
+            monster->collisionData_separation.radius*monster->transform.scale.x - distanceLen;
          if( overlap > 0 )
          {
             monsta.transform.position += (overlap*distanceVec / distanceLen);
@@ -1012,10 +1033,13 @@ namespace Core
    {
       for( auto& monster : game.m_monsters )
       {
-         auto n = Vec2::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
+         auto oldCell = calculateCellCoords(game.m_monsterGrid, monster.transform.position);
+         auto n = Vec2f::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
          monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaSeconds();
+         auto newCell = calculateCellCoords(game.m_monsterGrid, monster.transform.position);
          
-         separateMonsters(monster, game.m_monsters);
+         updateMonsterInGrid(game.m_monsterGrid, monster, oldCell, newCell);
+         separateMonsters(monster, game.m_monsterGrid);
       }
    }
 
@@ -1024,7 +1048,7 @@ namespace Core
       for( auto& monster : monsters )
       {
          float direction = std::atan2f(monster.direction.y, monster.direction.x);
-         auto targetDirection = Vec2::normalize(monster.brain.targetLocation - monster.transform.position);
+         auto targetDirection = Vec2f::normalize(monster.brain.targetLocation - monster.transform.position);
          float target = std::atan2f(targetDirection.y, targetDirection.x);
          direction = Rad2Deg(direction);
          target = Rad2Deg(target);
@@ -1054,21 +1078,25 @@ namespace Core
          auto pCollider = player.collisionData;
          pCollider.center = player.transform.position;
          pCollider.radius *= player.transform.scale.x;
-         for( auto& monster : game.m_monsters )
+
+         auto cell = calculateCellCoords(game.m_monsterGrid, pCollider.center);
+         auto monsters = collectMonstersInArea(game.m_monsterGrid, cell, {1, 1});
+
+         for( auto* monster : monsters )
          {
-            auto mCollider = monster.collisionData_attack;
-            mCollider.center = monster.transform.position;
-            mCollider.radius *= monster.transform.scale.x;
-            monster.attackTimer.updateBy(monster.objectTimer.getDeltaMicros());
+            auto mCollider = monster->collisionData_attack;
+            mCollider.center = monster->transform.position;
+            mCollider.radius *= monster->transform.scale.x;
+            monster->attackTimer.updateBy(monster->objectTimer.getDeltaMicros());
             if( isCircleTouchingCircle(mCollider, pCollider) )
             {
-               if( monster.attackTimer.hasElapsed() )
+               if( monster->attackTimer.hasElapsed() )
                {
                   if( game.m_randomGenerator.randInt(0, 100 * 100) >= (int32_t)player.dodgeChance * 100 )
                   {
-                     player.health -= monster.damage;
+                     player.health -= monster->damage;
                   }
-                  monster.attackTimer.reset();
+                  monster->attackTimer.reset();
                }
             }
          }
@@ -1086,8 +1114,12 @@ namespace Core
                grantExperience(game.m_monsters[m].expGain, game);
             }
             killLocations.emplace_back(KillLocation{game.m_monsters[m].transform, game.m_monsters[m].type});
+            auto backCell = calculateCellCoords(game.m_monsterGrid, game.m_monsters.back().transform.position);
+            removeMonsterfromGrid(game.m_monsterGrid, game.m_monsters.back(), backCell);
+            auto cell = calculateCellCoords(game.m_monsterGrid, game.m_monsters[m].transform.position);
             game.m_monsters[m] = game.m_monsters.back();
             game.m_monsters.pop_back();
+            updateMonsterInGrid(game.m_monsterGrid, game.m_monsters[m], cell, backCell);
          }
          else
          {
@@ -1105,7 +1137,7 @@ namespace Core
             player.directionActive[Down] =
             player.directionActive[Left] =
             player.directionActive[Right] = false;
-         player.currentSpeed = 0;*/
+            player.currentSpeed = 0;*/
          player.targetDirection = player.direction;
       }
    }
@@ -1185,13 +1217,61 @@ namespace Core
       }
    }
 
+   void activateAbility(Player& player, RainbowlandGame& game)
+   {
+      switch( player.ability )
+      {
+         case AT_Blink:
+         {
+            activateBlink(player, game);
+         } break;
+         case AT_DefenseMatrix:
+         {
+            activateDefenseMatrix(player, game);
+         } break;
+         case AT_TimeCapsule:
+         {
+            activateTimeCapsule(player, game);
+         } break;
+         case AT_Turret:
+         {
+            activateTurret(player, game);
+         } break;
+      }
+   }
+
+   uint32_t abilityTimeLeft(RainbowlandGame& game, AbilityType ability)
+   {
+      switch( ability )
+      {
+         case AT_Blink:
+         {
+            return blinkTimeLeft(game);
+         } break;
+         case AT_DefenseMatrix:
+         {
+            return defenseMatrixTimeLeft(game);
+         } break;
+         case AT_TimeCapsule:
+         {
+            return timeCapsuleTimeLeft(game);
+         } break;
+         case AT_Turret:
+         {
+            return turretTimeLeft(game);
+         } break;
+      }
+
+      return 0;
+   }
+
    void activateDefenseMatrix(Player& player, RainbowlandGame& game)
    {
       if( !game.m_defenseMatrix.active && game.m_defenseMatrix.timer.hasElapsed() )
       {
          game.m_defenseMatrix.active = true;
          game.m_defenseMatrix.area.center = player.transform.position;
-         game.m_defenseMatrix.timer.setDurationMicros(nSeconds::toMicros(game.m_defenseMatrix.durationSeconds));
+         game.m_defenseMatrix.timer.setDurationMicros(secondsToMicros(game.m_defenseMatrix.durationSeconds));
          game.m_defenseMatrix.timer.reset();
       }
    }
@@ -1202,21 +1282,26 @@ namespace Core
       if( game.m_defenseMatrix.active )
       {
          auto area = game.m_defenseMatrix.area;
+
+         auto cell = calculateCellCoords(game.m_monsterGrid, area.center);
+         auto monsters = collectMonstersInArea(game.m_monsterGrid, cell, {2, 2});
+
          //push monsters out
-         for( auto& monster : game.m_monsters )
+         for( auto* monster : monsters )
          {
-            Circle monstaCollider{monster.transform.position, monster.collisionData_hitbox.radius*monster.transform.scale.x};
+            Circle monstaCollider{monster->transform.position,
+               monster->collisionData_hitbox.radius*monster->transform.scale.x};
             if( isCircleTouchingCircle(area, monstaCollider) )
             {
-               auto dir = Vec2::normalize(monstaCollider.center - area.center);
-               monster.transform.position = area.center + dir*(area.radius + monstaCollider.radius);
+               auto dir = Vec2f::normalize(monstaCollider.center - area.center);
+               monster->transform.position = area.center + dir*(area.radius + monstaCollider.radius);
             }
          }
          //check if over
          if( game.m_defenseMatrix.timer.hasElapsed() )
          {
             game.m_defenseMatrix.timer.reset();
-            game.m_defenseMatrix.timer.setDurationMicros(nSeconds::toMicros(game.m_defenseMatrix.cooldownSeconds));
+            game.m_defenseMatrix.timer.setDurationMicros(secondsToMicros(game.m_defenseMatrix.cooldownSeconds));
             game.m_defenseMatrix.active = false;
          }
       }
@@ -1228,7 +1313,7 @@ namespace Core
       {
          game.m_timeCapsule.active = true;
          game.m_timeCapsule.area.center = player.transform.position;
-         game.m_timeCapsule.timer.setDurationMicros(nSeconds::toMicros(game.m_timeCapsule.durationSeconds));
+         game.m_timeCapsule.timer.setDurationMicros(secondsToMicros(game.m_timeCapsule.durationSeconds));
          game.m_timeCapsule.healPeriod = game.m_timeCapsule.maxHealPeriod;
       }
    }
@@ -1240,22 +1325,26 @@ namespace Core
       {
          auto area = game.m_timeCapsule.area;
          std::vector<Monster*> monstersAffected;
-         for( auto& monster : game.m_monsters )
+         auto cell = calculateCellCoords(game.m_monsterGrid, area.center);
+         auto monsters = collectMonstersInArea(game.m_monsterGrid, cell, {2, 2});
+
+         for( auto* monster : monsters )
          {
-            Circle monstaCollider{monster.transform.position, monster.collisionData_hitbox.radius*monster.transform.scale.x};
+            Circle monstaCollider{monster->transform.position,
+               monster->collisionData_hitbox.radius*monster->transform.scale.x};
             if( isCircleTouchingCircle(area, monstaCollider) )
             {
-               auto distance2 = Vec2::length2(monstaCollider.center - area.center);
+               auto distance2 = Vec2f::length2(monstaCollider.center - area.center);
                auto radius2 = area.radius*area.radius;
                if( distance2 - radius2 < 0 )
                {
-                  monstersAffected.emplace_back(&monster);
+                  monstersAffected.emplace_back(monster);
                }
             }
          }
          for( auto* monster : monstersAffected )
          {
-            auto distance2 = Vec2::length2(monster->transform.position - area.center);
+            auto distance2 = Vec2f::length2(monster->transform.position - area.center);
             auto radius2 = area.radius*area.radius;
             auto diff = radius2 - distance2;
             float scale = 1.0f - diff / radius2;
@@ -1263,14 +1352,14 @@ namespace Core
             monster->objectTimer.setTimeScale(scale);
          }
          --game.m_timeCapsule.healPeriod;
-         if (game.m_timeCapsule.healPeriod == 0)
+         if( game.m_timeCapsule.healPeriod == 0 )
          {
             game.m_timeCapsule.healPeriod = game.m_timeCapsule.maxHealPeriod;
-            
-            for (auto& player : game.m_players)
+
+            for( auto& player : game.m_players )
             {
                Circle monstaCollider{player.transform.position, player.collisionData.radius*player.transform.scale.x};
-               if (isCircleTouchingCircle(area, monstaCollider))
+               if( isCircleTouchingCircle(area, monstaCollider) )
                {
                   player.health += 1;
                   clamp(0, (int32_t)player.maxHealth, player.health);
@@ -1280,7 +1369,7 @@ namespace Core
          //check if over
          if( game.m_timeCapsule.timer.hasElapsed() )
          {
-            game.m_timeCapsule.timer.setDurationMicros(nSeconds::toMicros(game.m_timeCapsule.cooldownSeconds));
+            game.m_timeCapsule.timer.setDurationMicros(secondsToMicros(game.m_timeCapsule.cooldownSeconds));
             game.m_timeCapsule.active = false;
             for( auto* monster : monstersAffected )
             {
@@ -1294,10 +1383,10 @@ namespace Core
    {
       if( !game.m_blink.active && game.m_blink.timer.hasElapsed() )
       {
-         game.m_blink.target = Vec2::normalize(player.aim)*15;
+         game.m_blink.target = Vec2f::normalize(player.aim) * 15;
          game.m_blink.active = true;
          game.m_blink.area.center = player.transform.position;
-         game.m_blink.timer.setDurationMicros(nSeconds::toMicros(game.m_blink.durationSeconds));
+         game.m_blink.timer.setDurationMicros(secondsToMicros(game.m_blink.durationSeconds));
       }
    }
 
@@ -1309,7 +1398,7 @@ namespace Core
          auto area = game.m_blink.area;
 
          auto distanceVector = game.m_blink.target - area.center;
-         
+
          for( auto& p : game.m_players )
          {
             if( isPointInsideCircle(p.transform.position, game.m_blink.area) )
@@ -1319,12 +1408,12 @@ namespace Core
          }
 
          area.center = game.m_blink.target;
-         for (auto& monster : game.m_monsters)
+         for( auto& monster : game.m_monsters )
          {
             Circle monstaCollider{monster.transform.position, monster.collisionData_hitbox.radius*monster.transform.scale.x};
-            if (isCircleTouchingCircle(area, monstaCollider))
+            if( isCircleTouchingCircle(area, monstaCollider) )
             {
-               auto dir = Vec2::normalize(monstaCollider.center - area.center);
+               auto dir = Vec2f::normalize(monstaCollider.center - area.center);
                monster.transform.position = area.center + dir*(area.radius + monstaCollider.radius);
             }
          }
@@ -1332,7 +1421,7 @@ namespace Core
          //check if over
          if( game.m_blink.timer.hasElapsed() )
          {
-            game.m_blink.timer.setDurationMicros(nSeconds::toMicros(game.m_blink.cooldownSeconds));
+            game.m_blink.timer.setDurationMicros(secondsToMicros(game.m_blink.cooldownSeconds));
             game.m_blink.active = false;
          }
       }
@@ -1344,7 +1433,7 @@ namespace Core
       {
          game.m_turret.active = true;
          game.m_turret.area.center = player.transform.position;
-         game.m_turret.timer.setDurationMicros(nSeconds::toMicros(game.m_turret.durationSeconds));
+         game.m_turret.timer.setDurationMicros(secondsToMicros(game.m_turret.durationSeconds));
          game.m_turret.weapon = player.currentWeapon;
          game.m_turret.weaponTimer.hardReset();
          game.m_turret.killCount = 0;
@@ -1358,23 +1447,26 @@ namespace Core
       if( turret.active )
       {
          auto area = game.m_turret.area;
+         auto cell = calculateCellCoords(game.m_monsterGrid, area.center);
+         auto monsters = collectMonstersInArea(game.m_monsterGrid, cell, {1, 1});
          //push everyone out
-         for( auto& monster : game.m_monsters )
+         for( auto& monster : monsters )
          {
-            Circle monstaCollider{monster.transform.position, monster.collisionData_hitbox.radius*monster.transform.scale.x};
+            Circle monstaCollider{monster->transform.position,
+               monster->collisionData_hitbox.radius*monster->transform.scale.x};
             if( isCircleTouchingCircle(area, monstaCollider) )
             {
-               auto dir = Vec2::normalize(monstaCollider.center - area.center);
-               monster.transform.position = area.center + dir*(area.radius + monstaCollider.radius);
+               auto dir = Vec2f::normalize(monstaCollider.center - area.center);
+               monster->transform.position = area.center + dir*(area.radius + monstaCollider.radius);
             }
          }
-         for( auto& monster : game.m_players )
+         for( auto& player : game.m_players )
          {
-            Circle monstaCollider{monster.transform.position, monster.collisionData.radius*monster.transform.scale.x};
+            Circle monstaCollider{player.transform.position, player.collisionData.radius*player.transform.scale.x};
             if( isCircleTouchingCircle(area, monstaCollider) )
             {
-               auto dir = Vec2::normalize(monstaCollider.center - area.center);
-               monster.transform.position = area.center + dir*(area.radius + monstaCollider.radius);
+               auto dir = Vec2f::normalize(monstaCollider.center - area.center);
+               player.transform.position = area.center + dir*(area.radius + monstaCollider.radius);
             }
          }
 
@@ -1382,7 +1474,7 @@ namespace Core
          if( game.m_monsters.size() > 0 )
          {
             auto randIndex = game.m_randomGenerator.randInt(0, game.m_monsters.size() - 1);
-            turret.aim = Vec2::normalize(game.m_monsters[randIndex].transform.position - turret.area.center);
+            turret.aim = Vec2f::normalize(game.m_monsters[randIndex].transform.position - turret.area.center);
          }
          else
          {
@@ -1396,7 +1488,7 @@ namespace Core
          {
             turret.weaponTimer.period();
 
-            auto aim = Vec2::normalize(turret.aim);
+            auto aim = Vec2f::normalize(turret.aim);
             switch( w.type )
             {
                case RPG:
@@ -1419,7 +1511,7 @@ namespace Core
          if( game.m_turret.timer.hasElapsed() )
          {
             game.m_turret.timer.reset();
-            game.m_turret.timer.setDurationMicros(nSeconds::toMicros(game.m_turret.cooldownSeconds));
+            game.m_turret.timer.setDurationMicros(secondsToMicros(game.m_turret.cooldownSeconds));
             game.m_turret.active = false;
          }
       }
@@ -1428,7 +1520,7 @@ namespace Core
    uint32_t defenseMatrixTimeLeft(RainbowlandGame& game)
    {
       auto timeLeft = game.m_defenseMatrix.timer.getRemainingMicros();
-      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
+      auto displayTime = static_cast<uint32_t>(microsToSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
@@ -1436,7 +1528,7 @@ namespace Core
    uint32_t blinkTimeLeft(RainbowlandGame& game)
    {
       auto  timeLeft = game.m_blink.timer.getRemainingMicros();
-      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
+      auto displayTime = static_cast<uint32_t>(microsToSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
@@ -1444,7 +1536,7 @@ namespace Core
    uint32_t timeCapsuleTimeLeft(RainbowlandGame& game)
    {
       auto timeLeft = game.m_timeCapsule.timer.getRemainingMicros();
-      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
+      auto displayTime = static_cast<uint32_t>(microsToSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
@@ -1452,7 +1544,7 @@ namespace Core
    uint32_t turretTimeLeft(RainbowlandGame& game)
    {
       auto  timeLeft = game.m_turret.timer.getRemainingMicros();
-      auto displayTime = static_cast<uint32_t>(nMicros::toSeconds(timeLeft) + 1);
+      auto displayTime = static_cast<uint32_t>(microsToSeconds(timeLeft) + 1);
       if (timeLeft < 0) displayTime = 0;
       return displayTime;
    }
@@ -1466,7 +1558,7 @@ namespace Core
          //(-halfSize, halfSize) -> (0, 2*halfSize)
          loc.transform.position += game.m_playingField.halfSize();
          //(0, 2*halfSize) -> (0, 1)
-         loc.transform.position /= (2 * game.m_playingField.halfSize());
+         loc.transform.position /= (2.0f * game.m_playingField.halfSize());
          //(0, 1) -> (0, windowSize)
          loc.transform.position *= {(float)game.m_window->getSizeX(), (float)game.m_window->getSizeY()};
          //(0, windowSize) -> worldPos
@@ -1501,22 +1593,22 @@ namespace Core
       }
    }
 
-   Vec2 steer_seek(Vec2 position, float maxSpeed, Vec2 targetLocation)
+   Vec2f steer_seek(Vec2f position, float maxSpeed, Vec2f targetLocation)
    {
-      Vec2 desiredVelocity = Vec2::normalize(targetLocation - position)*maxSpeed;
+      Vec2f desiredVelocity = Vec2f::normalize(targetLocation - position)*maxSpeed;
       return desiredVelocity;
    }
 
-   Vec2 steer_flee(Vec2 position, float maxSpeed, Vec2 targetLocation)
+   Vec2f steer_flee(Vec2f position, float maxSpeed, Vec2f targetLocation)
    {
-      Vec2 desiredVelocity = Vec2::normalize(position - targetLocation)*maxSpeed;
+      Vec2f desiredVelocity = Vec2f::normalize(position - targetLocation)*maxSpeed;
       return desiredVelocity;
    }
 
-   Vec2 steer_arrive(Vec2 position, float maxSpeed, Vec2 targetLocation)
+   Vec2f steer_arrive(Vec2f position, float maxSpeed, Vec2f targetLocation)
    {
       auto toTarget = targetLocation - position;
-      auto distance = Vec2::length(toTarget);
+      auto distance = Vec2f::length(toTarget);
 
       if( distance > 0.0f )
       {
@@ -1530,31 +1622,31 @@ namespace Core
       return{0, 0};
    }
 
-   Vec2 steer_pursuit(Vec2 position, Vec2 heading, float maxSpeed, Vec2 targetPosition, Vec2 targetHeading, float targetMaxSpeed)
+   Vec2f steer_pursuit(Vec2f position, Vec2f heading, float maxSpeed, Vec2f targetPosition, Vec2f targetHeading, float targetMaxSpeed)
    {
       auto toEvader = targetPosition - position;
-      auto relativeHeading = Vec2::dotProduct(heading, targetHeading);
-      if( Vec2::dotProduct(toEvader, heading) > 0 &&
+      auto relativeHeading = Vec2f::dotProduct(heading, targetHeading);
+      if( Vec2f::dotProduct(toEvader, heading) > 0 &&
          relativeHeading < -0.95f )
       {
          return steer_arrive(position, maxSpeed, targetPosition);
       }
 
-      auto lookAheadTime = Vec2::length(toEvader) / (maxSpeed + targetMaxSpeed);
+      auto lookAheadTime = Vec2f::length(toEvader) / (maxSpeed + targetMaxSpeed);
       return steer_arrive(position, maxSpeed, (targetPosition + lookAheadTime*(targetHeading*targetMaxSpeed)));
    }
 
-   Vec2 steer_wander(Monster& monster, RainbowlandGame& game)
+   Vec2f steer_wander(Monster& monster, RainbowlandGame& game)
    {
-      Vec2 random = Vec2{game.m_randomGenerator.randFloat()*2-1,
-         game.m_randomGenerator.randFloat()*2-1};
+      Vec2f random = Vec2f{game.m_randomGenerator.randFloat() * 2 - 1,
+         game.m_randomGenerator.randFloat() * 2 - 1};
       return random;
       /*
-      random = Vec2::normalize(random);
-      
-      random += Vec2::normalize(monster.direction) * 1;
+      random = Vec2f::normalize(random);
 
-      auto newDir = Vec2::normalize(random - monster.transform.position);
+      random += Vec2f::normalize(monster.direction) * 1;
+
+      auto newDir = Vec2f::normalize(random - monster.transform.position);
 
       return newDir;*/
    }

@@ -28,7 +28,7 @@ namespace Core
       using std::placeholders::_1;
 
       Transform tPanel;
-      Vec2 hPanel;
+      Vec2f hPanel;
       Color cPanel;
 
       tPanel.position.set(0, 0);
@@ -42,7 +42,7 @@ namespace Core
       for( auto& player : game.m_players )
       {
          Transform tCell;
-         Vec2 hCell;
+         Vec2f hCell;
          Color cAll = player.color;
 
          hCell.set(hPanel.x, hPanel.y / 4);
@@ -55,8 +55,8 @@ namespace Core
 
          Transform tButtonPart;
          Transform tDescriptionPart;
-         Vec2 hButtonPart;
-         Vec2 hDescriptionPart;
+         Vec2f hButtonPart;
+         Vec2f hDescriptionPart;
 
          hButtonPart.set(hCell.x, hCell.y*0.7f);
          tButtonPart.position.set(0, hCell.y - hButtonPart.y);
@@ -69,7 +69,7 @@ namespace Core
 
          //button part
          uint32_t perkIndex = 0;
-         Vec2 hButton;
+         Vec2f hButton;
          Color cButton;
          float buttonCellHalfWidth = hButtonPart.x / player.selectablePerks.size();
          

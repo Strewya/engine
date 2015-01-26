@@ -9,21 +9,21 @@
 
 namespace Core
 {
-	Color::Color(float r, float g, float b, float a)
-		: r(r), g(g), b(b), a(a)
-	{}
+   Color::Color(float r, float g, float b, float a)
+      : r(r), g(g), b(b), a(a)
+   {}
 
-	Color::Color()
-		: Color(1, 1, 1)
-	{}
+   Color::Color()
+      : Color(1, 1, 1)
+   {}
 
-	void Color::set(float r, float g, float b, float a)
-	{
-		this->r = r;
-		this->g = g;
-		this->b = b;
-		this->a = a;
-	}
+   void Color::set(float r, float g, float b, float a)
+   {
+      this->r = r;
+      this->g = g;
+      this->b = b;
+      this->a = a;
+   }
 }
 
 //namespace Util

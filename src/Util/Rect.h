@@ -11,24 +11,24 @@
 
 namespace Core
 {
-	class Rect
-	{
-	public:
-		Vec2 center;
-		float halfWidth;
-		float halfHeight;
+   class Rect
+   {
+   public:
+      Vec2f center;
+      float halfWidth;
+      float halfHeight;
 
-		Rect();
-		Rect(Vec2, float, float);
+      Rect();
+      Rect(Vec2f, float, float);
 
-		float left() const;
-		float right() const;
-		float top() const;
-		float bottom() const;
-		Vec2 halfSize() const;
+      float left() const;
+      float right() const;
+      float top() const;
+      float bottom() const;
+      Vec2f halfSize() const;
 
-		void set(float cx, float cy, float hw, float hh);
-	};
+      void set(float cx, float cy, float hw, float hh);
+   };
 }
 
 //#include <iostream>

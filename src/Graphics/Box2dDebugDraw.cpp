@@ -40,7 +40,7 @@ namespace Core
 		if(m_graphics == nullptr)
 			return;
 
-		std::vector<Vec2> polygonData = reverseDirection(vertices, vertexCount);
+		std::vector<Vec2f> polygonData = reverseDirection(vertices, vertexCount);
 		Color c(color.r, color.g, color.b);
 
 		Transform t;
@@ -55,7 +55,7 @@ namespace Core
 		if(m_graphics == nullptr)
 			return;
 
-		std::vector<Vec2> polygonData = reverseDirection(vertices, vertexCount);
+		std::vector<Vec2f> polygonData = reverseDirection(vertices, vertexCount);
 		Color c(color.r, color.g, color.b);
 
 		Transform t;
@@ -102,7 +102,7 @@ namespace Core
 			return;
 
 		Color c(color.r, color.g, color.b);
-		Vec2 pos[] { Vec2(p1.x, p1.y), Vec2(p2.x, p2.y) };
+      Vec2f pos[] { Vec2f{p1.x, p1.y}, Vec2f{p2.x, p2.y} };
 		Transform t;
 		t.scale.set(m_lengthScale, m_lengthScale);
 		t.rotation = 0;
@@ -124,9 +124,9 @@ namespace Core
 		DrawSegment(p1, p2, c);
 	}
 
-	std::vector<Vec2> Box2dDebugDraw::reverseDirection(const b2Vec2* vertices, int32 vertexCount) const
+	std::vector<Vec2f> Box2dDebugDraw::reverseDirection(const b2Vec2* vertices, int32 vertexCount) const
 	{
-		std::vector<Vec2> out;
+		std::vector<Vec2f> out;
 		out.reserve(vertexCount);
 		for(int32_t i = vertexCount; i--;)
 		{

@@ -66,46 +66,18 @@ namespace Core
    class CooldownTimer
    {
    public:
-      CooldownTimer() : CooldownTimer(0)
-      {}
+      CooldownTimer();
+      CooldownTimer(uint32_t durationMicros);
 
-      CooldownTimer(uint32_t durationMicros)
-         : m_durationMicros(durationMicros)
-      {}
+      void updateBy(uint32_t deltaMicros);
+      bool hasElapsed() const;
+      uint32_t getRemainingMicros() const;
+      float getPercentDone() const;
+      void reset();
 
-      void updateBy(uint32_t deltaMicros)
-      {
-         m_timer.updateBy(deltaMicros);
-      }
-      bool hasElapsed() const
-      {
-         return m_timer.getCurrentMicros() >= m_durationMicros;
-      }
-      uint32_t getRemainingMicros() const
-      {
-         return m_durationMicros - m_timer.getCurrentMicros();
-      }
-      float getPercentDone() const
-      {
-         return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_durationMicros);
-      }
-      void reset()
-      {
-         m_timer.reset();
-      }
-
-      uint32_t getDurationMicros() const
-      {
-         return m_durationMicros;
-      }
-      void setDurationMicros(uint32_t durationMicros)
-      {
-         m_durationMicros = durationMicros;
-      }
-      const Timer& getTimer() const
-      {
-         return m_timer;
-      }
+      uint32_t getDurationMicros() const;
+      void setDurationMicros(uint32_t durationMicros);
+      const Timer& getTimer() const;
 
    protected:
       Timer m_timer;
@@ -115,91 +87,30 @@ namespace Core
    class PeriodicTimer
    {
    public:
-      PeriodicTimer() : PeriodicTimer(0)
-      {}
+      PeriodicTimer();
+      PeriodicTimer(uint32_t periodMicros);
 
-      PeriodicTimer(uint32_t periodMicros)
-         : m_periodMicros(periodMicros)
-      {}
+      void updateBy(uint32_t deltaMicros);
+      bool hasElapsed() const;
+      uint32_t getRemainingMicros() const;
+      float getPercentDone() const;
+      void period();
+      void hardReset();
 
-      void updateBy(uint32_t deltaMicros)
-      {
-         m_timer.updateBy(deltaMicros);
-      }
-      bool hasElapsed() const
-      {
-         return m_timer.getCurrentMicros() >= m_periodMicros;
-      }
-      uint32_t getRemainingMicros() const
-      {
-         return m_periodMicros - m_timer.getCurrentMicros();
-      }
-      float getPercentDone() const
-      {
-         return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_periodMicros);
-      }
-      void period()
-      {
-         m_timer.reset(m_periodMicros);
-      }
-      void hardReset()
-      {
-         m_timer.reset();
-      }
-
-      uint32_t getPeriodMicros() const
-      {
-         return m_periodMicros;
-      }
-      void setPeriodMicros(uint32_t periodMicros)
-      {
-         m_periodMicros = periodMicros;
-      }
-      const Timer& getTimer() const
-      {
-         return m_timer;
-      }
+      uint32_t getPeriodMicros() const;
+      void setPeriodMicros(uint32_t periodMicros);
+      const Timer& getTimer() const;
 
    protected:
       Timer m_timer;
       uint32_t m_periodMicros;
    };
 
-   namespace nSeconds
-   {
-      inline uint32_t toMicros(uint32_t s)
-      {
-         return s * 1000U * 1000U;
-      }
-      inline uint32_t toMicros(float s)
-      {
-         return static_cast<uint32_t>(s*1000.0f) * 1000U;
-      }
-      inline uint32_t toMilis(uint32_t s)
-      {
-         return s * 1000U;
-      }
-      inline uint32_t toMilis(float s)
-      {
-         return static_cast<uint32_t>(s*1000.0f);
-      }
-   }
-   namespace nMilis
-   {
-      inline uint32_t toMicros(uint32_t ms)
-      {
-         return ms * 1000U;
-      }
-      inline float toSeconds(uint32_t ms)
-      {
-         return static_cast<float>(ms)*0.001f;
-      }
-   }
-   namespace nMicros
-   {
-      inline float toSeconds(uint32_t us)
-      {
-         return static_cast<float>(us)*0.001f*0.001f;
-      }
-   }
+   uint32_t secondsToMicros(uint32_t s);
+   uint32_t secondsToMicros(float s);
+   uint32_t secondsToMilis(uint32_t s);
+   uint32_t secondsToMilis(float s);
+   uint32_t milisToMicros(uint32_t ms);
+   float milisToSeconds(uint32_t ms);
+   float microsToSeconds(uint32_t us);
 }

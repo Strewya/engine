@@ -14,12 +14,12 @@
 
 namespace Core
 {
-	class Texture
-	{
-	public:
-		std::string m_name;
-		size_t m_fileHash;
-		Vec2 m_dimensions;
-		uint32_t m_rawTextureID;
-	};
+   class Texture
+   {
+   public:
+      std::string m_name;
+      size_t m_fileHash;
+      Vec2f m_dimensions;
+      uint32_t m_rawTextureID;
+   };
 }

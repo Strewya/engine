@@ -11,15 +11,18 @@
 
 namespace Core
 {
-	class Transform
-	{
-	public:
-		Transform();
-		Transform(Vec2 p, Vec2 s, float r);
+   class Transform
+   {
+   public:
+      Vec2f position;
+      Vec2f scale;
+      float rotation;
 
-		Vec2 position;
-		Vec2 scale;
-		float rotation;
+      Transform();
+      Transform(Vec2f p, Vec2f s, float r);
+      Transform(Vec2f p, float s, float r);
 
-	};
+      void set(Vec2f p, Vec2f s, float r);
+      void set(Vec2f p, float s, float r);
+   };
 }

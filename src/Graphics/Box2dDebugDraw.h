@@ -13,7 +13,9 @@
 namespace Core
 {
 	class GraphicsSystem;
-	class Vec2;
+   template<typename T>
+   class Vec2;
+   typedef Vec2<float> Vec2f;
 
 	class Box2dDebugDraw : public b2Draw
 	{
@@ -46,6 +48,6 @@ namespace Core
 		float m_lengthScale;
 		GraphicsSystem* m_graphics;
 
-		std::vector<Vec2> reverseDirection(const b2Vec2* vertices, int32 vertexCount) const;
+		std::vector<Vec2f> reverseDirection(const b2Vec2* vertices, int32 vertexCount) const;
 	};
 }

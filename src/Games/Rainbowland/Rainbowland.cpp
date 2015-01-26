@@ -107,17 +107,16 @@ namespace Core
       {
          tickRender(fullUpdateTime);
       }
-
-      if( m_nextGameState != m_currentGameState )
-      {
-         m_currentGameState = m_nextGameState;
-      }
-
       return m_isRunning;
    }
 
    void RainbowlandGame::tickLogic(uint64_t updateTime)
    {
+      if( m_nextGameState != m_currentGameState )
+      {
+         m_currentGameState = m_nextGameState;
+      }
+
       m_logicTimer.updateBy(updateTime);
 
       m_inputSystem.update(m_logicTimer);

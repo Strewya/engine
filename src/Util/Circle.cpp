@@ -13,7 +13,7 @@ namespace Core
 		: Circle({0, 0}, 0)
 	{}
 
-	Circle::Circle(Vec2 c, float r)
+	Circle::Circle(Vec2f c, float r)
 		: center(c), radius(r)
 	{}
 

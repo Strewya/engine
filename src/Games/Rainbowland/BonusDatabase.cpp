@@ -33,10 +33,9 @@ namespace Core
       });
       BonusType type;
 
-      
       type = Heal;
       bonusDb[type].name = "Heal";
-      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].acquireLogic = [](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          picker.health += 20;
          clamp<int32_t>(0, picker.maxHealth, picker.health);
@@ -47,7 +46,7 @@ namespace Core
 
       type = MassHeal;
       bonusDb[type].name = "MassHeal";
-      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].acquireLogic = [](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          for( auto& player : game.m_players )
          {
@@ -61,18 +60,18 @@ namespace Core
 
       type = AtomicBomb;
       bonusDb[type].name = "Atomic Bomb";
-      bonusDb[type].acquireLogic = [](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].acquireLogic = [](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          generateBlast(game.m_blasts, position, 0, 12, 0.8f, 10, nullptr);
       };
       bonusDb[type].timeoutLogic = [](RainbowlandGame& game) {}; //none
 
-      
-      
+
+
       type = IncreasedRateOfFire;
       bonusDb[type].name = "Shooter";
-      bonusDb[type].durationMicros = nSeconds::toMicros(15U);
-      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].durationMicros = secondsToMicros(15U);
+      bonusDb[type].acquireLogic = [=](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )
@@ -102,12 +101,12 @@ namespace Core
          game.m_activeBonuses.pop_back();
       };
 
-      
-      
+
+
       type = IncreasedMovementSpeed;
       bonusDb[type].name = "Runner";
-      bonusDb[type].durationMicros = nSeconds::toMicros(15U);
-      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].durationMicros = secondsToMicros(15U);
+      bonusDb[type].acquireLogic = [=](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )
@@ -133,12 +132,12 @@ namespace Core
          game.m_activeBonuses.pop_back();
       };
 
-     
-      
+
+
       type = SlowTime;
       bonusDb[type].name = "Time lords";
-      bonusDb[type].durationMicros = nSeconds::toMicros(8U);
-      bonusDb[type].acquireLogic = [=](Vec2 position, Player& picker, RainbowlandGame& game)
+      bonusDb[type].durationMicros = secondsToMicros(8U);
+      bonusDb[type].acquireLogic = [=](Vec2f position, Player& picker, RainbowlandGame& game)
       {
          auto index = filterFind(game.m_activeBonuses, [=](const ActiveBonus& e) { return type == e.type; });
          if( index == game.m_activeBonuses.size() )

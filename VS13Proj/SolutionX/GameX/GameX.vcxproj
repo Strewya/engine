@@ -252,6 +252,7 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Gameplay.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\ObjectRendering.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Session.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameDefinitions.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\ObjectRendering.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Session.h" />
@@ -364,6 +366,7 @@
     <ClInclude Include="..\..\..\src\Util\Time.h" />
     <ClInclude Include="..\..\..\src\Util\Transform.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2.h" />
+    <ClInclude Include="..\..\..\src\Util\Vec2Impl.h" />
     <ClInclude Include="..\..\..\src\Util\Vec3.h" />
     <ClInclude Include="..\..\..\src\Window\myWindows.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h" />

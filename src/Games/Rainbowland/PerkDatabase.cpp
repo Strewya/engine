@@ -14,9 +14,9 @@
 
 namespace Core
 {
-	void initPerkDatabase(VPerks& perkDb)
-	{
-		perkDb =
+   void initPerkDatabase(VPerks& perkDb)
+   {
+      perkDb =
       {
          {PerkType::Regeneration},
          {PerkType::GreaterRegeneration},
@@ -53,9 +53,8 @@ namespace Core
 
       CooldownTimer cdt;
       PeriodicTimer pt;
+      PerkType type;
 
-      
-      PerkType
       type = Regeneration;
       perkDb[type].name = "Regeneration";
       perkDb[type].description = "Slowly gives back some health";
@@ -65,13 +64,13 @@ namespace Core
          return true;
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game)
-		{
-			player.regenDelayForOneHealth = 4;
+      {
+         player.regenDelayForOneHealth = 4;
       };
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
          auto& timer = pt;
-         timer.setPeriodMicros(nSeconds::toMicros(player.regenDelayForOneHealth));
+         timer.setPeriodMicros(secondsToMicros(player.regenDelayForOneHealth));
          timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
          if( timer.hasElapsed() )
          {
@@ -113,8 +112,8 @@ namespace Core
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game)
       {
-			player.bonusDamage += 10;
-			calculateWeaponBonuses(player, game.m_weaponDatabase);
+         player.bonusDamage += 10;
+         calculateWeaponBonuses(player, game.m_weaponDatabase);
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
 
@@ -130,24 +129,24 @@ namespace Core
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
-		{
+      {
          auto& timer = pt;
-         timer.setPeriodMicros(nSeconds::toMicros(0.5f));
-			timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-			if(timer.hasElapsed())
-			{
-				timer.period();
-				Circle radioactiveArea{player.transform.position, 5};
-				for(auto& monsta : game.m_monsters)
-				{
-					auto bCollider = monsta.collisionData_hitbox;
-					bCollider.center = monsta.transform.position;
-					if(isCircleTouchingCircle(bCollider, radioactiveArea))
-					{
-						monsta.health -= 1;
-					}
-				}
-			}
+         timer.setPeriodMicros(secondsToMicros(0.5f));
+         timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         if( timer.hasElapsed() )
+         {
+            timer.period();
+            Circle radioactiveArea{player.transform.position, 5};
+            for( auto& monsta : game.m_monsters )
+            {
+               auto bCollider = monsta.collisionData_hitbox;
+               bCollider.center = monsta.transform.position;
+               if( isCircleTouchingCircle(bCollider, radioactiveArea) )
+               {
+                  monsta.health -= 1;
+               }
+            }
+         }
       };
 
 
@@ -162,8 +161,8 @@ namespace Core
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game)
       {
-			player.ammoMultiplier = 1.3f;
-			calculateWeaponBonuses(player, game.m_weaponDatabase);
+         player.ammoMultiplier = 1.3f;
+         calculateWeaponBonuses(player, game.m_weaponDatabase);
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
 
@@ -195,7 +194,7 @@ namespace Core
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game)
       {
-			player.reloadMultiplier *= 0.7f;
+         player.reloadMultiplier *= 0.7f;
          calculateWeaponBonuses(player, game.m_weaponDatabase);
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
@@ -213,7 +212,7 @@ namespace Core
       perkDb[type].acquireLogic = [=](Player& player, RainbowlandGame& game)
       {
          float manip = 0.1f / game.m_playerCount;
-			game.m_currentTimeScale -= manip;
+         game.m_currentTimeScale -= manip;
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
 
@@ -318,7 +317,7 @@ namespace Core
       perkDb[type].acquireLogic = [=](Player& player, RainbowlandGame& game)
       {
          player.currentWeapon.maxAmmo += 1;
-         
+
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
 
@@ -356,24 +355,24 @@ namespace Core
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
          auto& timer = pt;
-         timer.setPeriodMicros(nSeconds::toMicros(10U));
+         timer.setPeriodMicros(secondsToMicros(10U));
          timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
          if( timer.hasElapsed() )
          {
             timer.period();
-            Vec2 directions[] =
+            Vec2f directions[] =
             {
-               Vec2{-1, 1}, Vec2{-0.5f, 1}, Vec2{0, 1}, Vec2{0.5f, 1}, Vec2{1, 1},
-               Vec2{-1, 0.5f},                                             Vec2{1, 0.5f},
-               Vec2{-1, 0},                                                Vec2{1, 0},
-               Vec2{-1, -0.5f},                                            Vec2{1, -0.5f},
-               Vec2{-1, -1}, Vec2{-0.5f, -1}, Vec2{0, -1}, Vec2{0.5f, -1}, Vec2{1, -1}
+               Vec2f{-1, 1}, Vec2f{-0.5f, 1}, Vec2f{0, 1}, Vec2f{0.5f, 1}, Vec2f{1, 1},
+               Vec2f{-1, 0.5f}, Vec2f{1, 0.5f},
+               Vec2f{-1, 0}, Vec2f{1, 0},
+               Vec2f{-1, -0.5f}, Vec2f{1, -0.5f},
+               Vec2f{-1, -1}, Vec2f{-0.5f, -1}, Vec2f{0, -1}, Vec2f{0.5f, -1}, Vec2f{1, -1}
             };
 
             for( auto aim : directions )
             {
                generateBullets(game.m_bullets, game.m_randomGenerator, 1, 0, player.transform.position,
-                               Vec2::normalize(aim), 50, false, &player);
+                               Vec2f::normalize(aim), 50, false, &player);
             }
          }
       };
@@ -389,7 +388,7 @@ namespace Core
          return true;
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
-      std::vector<bool> firedOnReload{false, false, false, false};
+      std::array<bool, 4> firedOnReload = {false, false, false, false};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
          if( player.currentWeapon.ammo <= 0 )
@@ -398,7 +397,7 @@ namespace Core
             {
                firedOnReload[player.id] = true;
                generateRocket(game.m_rockets, player.transform.position,
-                               Vec2::normalize(player.transform.position-player.aim), 30, &player);
+                              Vec2f::normalize(player.transform.position - player.aim), 30, &player);
             }
          }
          else
@@ -418,20 +417,20 @@ namespace Core
          return true;
       };
       perkDb[type].acquireLogic = [](Player& player, RainbowlandGame& game) {};
-      bool reloadIncreased = false;
+      std::array<bool, 4> reloadIncreased = {false, false, false, false};
       perkDb[type].updateLogic = [=](Player& player, RainbowlandGame& game) mutable
       {
-         if( player.currentSpeed < 0.01f && !reloadIncreased)
+         if( player.currentSpeed < 0.01f && !reloadIncreased[player.id] )
          {
             player.reloadMultiplier *= 0.5f;
             calculateWeaponBonuses(player, game.m_weaponDatabase);
-            reloadIncreased = true;
+            reloadIncreased[player.id] = true;
          }
-         if( player.currentSpeed >= 0.01f && reloadIncreased )
+         if( player.currentSpeed >= 0.01f && reloadIncreased[player.id] )
          {
             player.reloadMultiplier *= 2;
             calculateWeaponBonuses(player, game.m_weaponDatabase);
-            reloadIncreased = false;
+            reloadIncreased[player.id] = false;
          }
       };
 
@@ -528,5 +527,5 @@ namespace Core
          generateSplatter(kills, game);
       };
       perkDb[type].updateLogic = [](Player& player, RainbowlandGame& game) {};
-	}
+   }
 }

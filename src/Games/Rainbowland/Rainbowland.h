@@ -58,7 +58,7 @@ namespace Core
       double m_currentTimeScale;
 
       Camera m_camera;
-      Vec2 m_cameraBounds;
+      Vec2f m_cameraBounds;
       Rect m_playingField;
       Random m_randomGenerator;
 
@@ -98,6 +98,7 @@ namespace Core
       VRockets m_rockets;
       VSplatters m_splatters;
       VActiveBonuses m_activeBonuses;
+      Grid m_monsterGrid;
 
       DefenseMatrix m_defenseMatrix;
       TimeCapsule m_timeCapsule;
@@ -109,6 +110,7 @@ namespace Core
       uint32_t m_killCounter;
       uint32_t m_totalKillCount;
       uint32_t m_highScore;
+      uint32_t m_maxMonsterCount;
 
       uint32_t m_experience;
       uint32_t m_experienceIncrement;

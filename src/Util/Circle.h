@@ -11,15 +11,16 @@
 
 namespace Core
 {
-	class Circle
-	{
-	public:
-		Vec2 center;
-		float radius;
+   class Circle
+   {
+   public:
+      Vec2f center;
+      float radius;
 
-		Circle();
-		Circle(Vec2 center, float radius);
+      Circle();
+      Circle(Vec2f c, float r);
 
-		void set(float cx, float cy, float r);
-	};
+      void set(Vec2f c, float r);
+      void set(float cx, float cy, float r);
+   };
 }

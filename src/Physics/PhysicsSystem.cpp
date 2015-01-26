@@ -19,7 +19,7 @@ namespace Core
 		m_joints.reserve(20);
 	}
 
-	bool PhysicsSystem::init(const Vec2& gravity, b2Draw* debugDraw)
+	bool PhysicsSystem::init(const Vec2f& gravity, b2Draw* debugDraw)
 	{
 		DEBUG_STATUS(true);
 

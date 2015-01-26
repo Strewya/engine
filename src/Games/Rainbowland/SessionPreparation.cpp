@@ -40,7 +40,7 @@ namespace Core
 
 
       Transform tMainPanel;
-      Vec2 hMainPanel;
+      Vec2f hMainPanel;
       Color cMainPanel;
 
       tMainPanel.position.set(0, 0);
@@ -50,7 +50,7 @@ namespace Core
          std::bind(drawSolidQuad, _1, hMainPanel, tMainPanel, cMainPanel));
 
       Transform tNotPlayingPanel;
-      Vec2 hNotPlayingPanel;
+      Vec2f hNotPlayingPanel;
       Color cNotPlayingPanel;
 
       hNotPlayingPanel.set(hMainPanel.x * 0.2f, hMainPanel.y - 20);
@@ -63,7 +63,7 @@ namespace Core
          std::bind(drawSolidQuad, _1, hNotPlayingPanel, tNotPlayingPanel, cNotPlayingPanel));
 
       Transform tBox;
-      Vec2 hBox;
+      Vec2f hBox;
       Color cBox;
 
       const char* controllers[5]
@@ -106,7 +106,7 @@ namespace Core
       }
 
       Transform tPlayingPanel;
-      Vec2 hPlayingPanel;
+      Vec2f hPlayingPanel;
       Color cPlayingPanel;
 
       hPlayingPanel.set(hMainPanel.x * 0.7f, hMainPanel.y * 0.8f);
@@ -127,7 +127,7 @@ namespace Core
          "W / Y", "D / B", "A / X", "S / A"
       };
 
-      Vec2 cellSize = hPlayingPanel / 2;
+      Vec2f cellSize = hPlayingPanel / 2;
       for( uint32_t i = 0; i < 2; ++i )
       {
          for( uint32_t j = 0; j < 2; ++j )
@@ -171,7 +171,7 @@ namespace Core
       }
 
       Transform tStart;
-      Vec2 hStart;
+      Vec2f hStart;
       Color cStart;
 
       hStart.set(100, 20);

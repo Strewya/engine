@@ -261,7 +261,7 @@ namespace Core
 
 		stack.pull("test5", 0);
 		assert(stack.is<luaFunction>());
-		Vec2 v(5, 5);
+		Vec2f v(5, 5);
 		called = stack.call(luaCustom{&v, CLASS(Vec2)});
 		assert(called);
 		assert(stack.getTop() == 0);

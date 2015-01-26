@@ -10,43 +10,43 @@
 
 namespace Core
 {
-	class Color
-	{
-	public:
-		float r, g, b, a;
+   class Color
+   {
+   public:
+      float r, g, b, a;
 
-		Color();
-		Color(float r, float g, float b, float a = 1);
+      Color();
+      Color(float r, float g, float b, float a = 1);
 
-		void set(float r, float g, float b, float a = 1);
-	};
+      void set(float r, float g, float b, float a = 1);
+   };
 }
 
-	/*class Color
-	{
-	public:
-		Color();
-		Color(const Color &c);
-		Color(float r, float g, float b, float a = 1.0f);
-		Color(const float* RGBA);
-		~Color();
+/*class Color
+{
+public:
+Color();
+Color(const Color &c);
+Color(float r, float g, float b, float a = 1.0f);
+Color(const float* RGBA);
+~Color();
 
-		Color& operator=(const Color& c);
-		bool operator==(const Color& rhs) const;
-		Color& set(const Color& c);
+Color& operator=(const Color& c);
+bool operator==(const Color& rhs) const;
+Color& set(const Color& c);
 
-		void setRed(float value);
-		void setGreen(float value);
-		void setBlue(float value);
-		void setAlpha(float value);
-		void setRGBA(float r, float g, float b, float a = 1.0f);
+void setRed(float value);
+void setGreen(float value);
+void setBlue(float value);
+void setAlpha(float value);
+void setRGBA(float r, float g, float b, float a = 1.0f);
 
-		float getRed() const;
-		float getGreen() const;
-		float getBlue() const;
-		float getAlpha() const;
-        float const * const getRGBA() const;
+float getRed() const;
+float getGreen() const;
+float getBlue() const;
+float getAlpha() const;
+float const * const getRGBA() const;
 
-	private:
-		float r, g, b, a;
-	};*/
+private:
+float r, g, b, a;
+};*/

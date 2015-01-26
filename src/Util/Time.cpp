@@ -159,7 +159,7 @@ namespace Core
    {
       m_deltaMicros = static_cast<uint32_t>(static_cast<float>(deltaMicros)*m_timeScale);
       m_currentMicros += m_deltaMicros;
-      m_deltaSeconds = nMicros::toSeconds(m_deltaMicros);
+      m_deltaSeconds = microsToSeconds(m_deltaMicros);
    }
 
    void Timer::setTimeScale(float timeScale)
@@ -197,5 +197,126 @@ namespace Core
       {
          m_currentMicros -= micros;
       }
+   }
+
+
+   CooldownTimer::CooldownTimer()
+      : CooldownTimer(0)
+   {}
+
+   CooldownTimer::CooldownTimer(uint32_t durationMicros)
+      : m_durationMicros(durationMicros)
+   {}
+
+   void CooldownTimer::updateBy(uint32_t deltaMicros)
+   {
+      m_timer.updateBy(deltaMicros);
+   }
+   bool CooldownTimer::hasElapsed() const
+   {
+      return m_timer.getCurrentMicros() >= m_durationMicros;
+   }
+   uint32_t CooldownTimer::getRemainingMicros() const
+   {
+      return m_durationMicros - m_timer.getCurrentMicros();
+   }
+   float CooldownTimer::getPercentDone() const
+   {
+      return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_durationMicros);
+   }
+   void CooldownTimer::reset()
+   {
+      m_timer.reset();
+   }
+
+   uint32_t CooldownTimer::getDurationMicros() const
+   {
+      return m_durationMicros;
+   }
+   void CooldownTimer::setDurationMicros(uint32_t durationMicros)
+   {
+      m_durationMicros = durationMicros;
+   }
+   const Timer& CooldownTimer::getTimer() const
+   {
+      return m_timer;
+   }
+
+
+   PeriodicTimer::PeriodicTimer()
+      : PeriodicTimer(0)
+   {}
+
+   PeriodicTimer::PeriodicTimer(uint32_t periodMicros)
+      : m_periodMicros(periodMicros)
+   {}
+
+   void PeriodicTimer::updateBy(uint32_t deltaMicros)
+   {
+      m_timer.updateBy(deltaMicros);
+   }
+   bool PeriodicTimer::hasElapsed() const
+   {
+      return m_timer.getCurrentMicros() >= m_periodMicros;
+   }
+   uint32_t PeriodicTimer::getRemainingMicros() const
+   {
+      return m_periodMicros - m_timer.getCurrentMicros();
+   }
+   float PeriodicTimer::getPercentDone() const
+   {
+      return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_periodMicros);
+   }
+   void PeriodicTimer::period()
+   {
+      m_timer.reset(m_periodMicros);
+   }
+   void PeriodicTimer::hardReset()
+   {
+      m_timer.reset();
+   }
+
+   uint32_t PeriodicTimer::getPeriodMicros() const
+   {
+      return m_periodMicros;
+   }
+   void PeriodicTimer::setPeriodMicros(uint32_t periodMicros)
+   {
+      m_periodMicros = periodMicros;
+   }
+   const Timer& PeriodicTimer::getTimer() const
+   {
+      return m_timer;
+   }
+
+
+
+   uint32_t secondsToMicros(uint32_t s)
+   {
+      return s * 1000U * 1000U;
+   }
+   uint32_t secondsToMicros(float s)
+   {
+      return static_cast<uint32_t>(s*1000.0f*1000.0f);
+   }
+   uint32_t secondsToMilis(uint32_t s)
+   {
+      return s * 1000U;
+   }
+   uint32_t secondsToMilis(float s)
+   {
+      return static_cast<uint32_t>(s*1000.0f);
+   }
+   uint32_t milisToMicros(uint32_t ms)
+   {
+      return ms * 1000U;
+   }
+   float milisToSeconds(uint32_t ms)
+   {
+      return static_cast<float>(ms)*0.001f;
+   }
+   float microsToSeconds(uint32_t us)
+   {
+      return static_cast<float>(us)*0.001f*0.001f;
    }
 }

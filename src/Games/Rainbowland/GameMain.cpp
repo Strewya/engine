@@ -40,7 +40,7 @@ namespace Core
       {
          for(uint32_t x = 0; x < columns; ++x)
          {
-            out.emplace_back(Rect{Vec2{startX + x*w + hw, startY + y*h + hh}, hw, hh});
+            out.emplace_back(Rect{Vec2f{startX + x*w + hw, startY + y*h + hh}, hw, hh});
             if(totalCount > 0)
             {
                --totalCount;
@@ -97,7 +97,7 @@ namespace Core
 
       if(game.m_isRunning)
       {
-         game.m_window->resize(CW_USEDEFAULT, CW_USEDEFAULT);
+         //game.m_window->resize(CW_USEDEFAULT, CW_USEDEFAULT);
          game.m_window->lockCursor(true);
          game.m_window->showCursor(false);
 
@@ -143,7 +143,7 @@ namespace Core
          game.m_cameraBounds.set(3, 3);
          game.m_camera.setPosition({-game.m_cameraBounds.x, game.m_cameraBounds.y, -50.0f});
          game.m_graphicsSystem.applyCamera(game.m_camera);
-         Vec2 topleft = game.m_graphicsSystem.screenToWorld({0, 0}, game.m_camera);
+         Vec2f topleft = game.m_graphicsSystem.screenToWorld({0, 0}, game.m_camera);
          game.m_playingField.halfWidth = std::abs(topleft.x);
          game.m_playingField.halfHeight = std::abs(topleft.y);
          game.m_camera.setPosition({0, 0, -50});
@@ -151,8 +151,8 @@ namespace Core
          //spawners
          Rect spawnerLocations{{0, 0}, game.m_playingField.halfWidth + 3, game.m_playingField.halfHeight + 3};
          uint32_t spawnerCount = 8;
-         Vec2 distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
-         Vec2 pos{spawnerLocations.left(), spawnerLocations.top()};
+         Vec2f distanceBetweenSpawners{spawnerLocations.halfWidth * 2 / spawnerCount, spawnerLocations.halfHeight * 2 / spawnerCount};
+         Vec2f pos{spawnerLocations.left(), spawnerLocations.top()};
          for(uint32_t i = 0; i < spawnerCount*4; ++i)
          {
             game.m_monsterSpawners.emplace_back();
@@ -185,9 +185,16 @@ namespace Core
          initBonusDatabase(game.m_bonusDatabase);
 
          //timers
-         game.m_deathTimer.setDurationMicros(nSeconds::toMicros(5U));
-         game.m_difficultyTimer.setPeriodMicros(nSeconds::toMicros(5U));
-         game.m_perkModeTransitionTimer.setDurationMicros(nSeconds::toMicros(2U));
+         game.m_deathTimer.setDurationMicros(secondsToMicros(5U));
+         game.m_difficultyTimer.setPeriodMicros(secondsToMicros(5U));
+         game.m_perkModeTransitionTimer.setDurationMicros(secondsToMicros(2U));
+
+         game.m_perkModeTransitionTimer.reset();
+         game.m_enteringPerkMode = false;
+         game.m_exitingPerkMode = false;
+         game.m_highScore = 0;
+         game.m_maxMonsterCount = 400;
+         game.m_monsters.reserve(game.m_maxMonsterCount);
 
          //high score
          game.m_highScore = 0;
@@ -267,7 +274,7 @@ namespace Core
       {
          spawner.spawnTimer.hardReset();
          spawner.spawnTimer.setPeriodMicros(
-            nSeconds::toMicros(game.m_randomGenerator.randFloat() * 5 + 1) / game.m_playerCount);
+            secondsToMicros(game.m_randomGenerator.randFloat() * 5 + 1) / game.m_playerCount);
       }
 
       game.m_players.reserve(game.m_playerCount);
@@ -290,6 +297,11 @@ namespace Core
             }
          }
       }
+
+      game.m_monsterGrid.cellHalfsize.set(2, 2);
+      game.m_monsterGrid.columns = (uint32_t)(game.m_playingField.halfWidth * 2 / game.m_monsterGrid.cellHalfsize.x);
+      game.m_monsterGrid.rows = (uint32_t)(game.m_playingField.halfHeight * 2 / game.m_monsterGrid.cellHalfsize.y);
+      game.m_monsterGrid.cells.resize(game.m_monsterGrid.columns*game.m_monsterGrid.rows);
    }
 
 
@@ -313,5 +325,77 @@ namespace Core
       memset(game.m_preparationData.controllers, -1, sizeof(int32_t) * 5);
       game.m_sessionHandlers.clear();
       game.m_sessionPerkMenuHandlers.clear();
+   }
+
+   Vec2i calculateCellCoords(Grid& grid, Vec2f position)
+   {
+      position.x += grid.cellHalfsize.x;
+      position.y += grid.cellHalfsize.y;
+
+      position.x /= (grid.cellHalfsize.x * 2);
+      position.y /= (grid.cellHalfsize.y * 2);
+
+      position.x = std::floorf(position.x);
+      position.y = std::floorf(position.y);
+
+      return (Vec2i)position;
+   }
+
+   int32_t indexFromCellCoords(Grid& grid, Vec2i cell)
+   {
+      auto mx = grid.columns / 2;
+      auto my = grid.rows / 2;
+      cell.x += mx;
+      cell.y += my;
+      return cell.y*grid.columns + cell.x;
+   }
+
+   void updateMonsterInGrid(Grid& grid, Monster& monster, Vec2i oldCell, Vec2i newCell)
+   {
+      auto oldCellIndex = indexFromCellCoords(grid, oldCell);
+      auto newCellIndex = indexFromCellCoords(grid, newCell);
+      if( oldCellIndex != newCellIndex )
+      {
+         removeMonsterfromGrid(grid, monster, oldCell);
+         if( 0 <= newCellIndex && newCellIndex < (int32_t)grid.cells.size() )
+         {
+            grid.cells[newCellIndex].contents.emplace_back(&monster);
+         }
+      }
+   }
+
+   void removeMonsterfromGrid(Grid& grid, Monster& monster, Vec2i cell)
+   {
+      auto cellIndex = indexFromCellCoords(grid, cell);
+      if( 0 <= cellIndex && cellIndex < (int32_t)grid.cells.size() )
+      {
+         for( auto*& mon : grid.cells[cellIndex].contents )
+         {
+            if( mon == &monster )
+            {
+               mon = grid.cells[cellIndex].contents.back();
+               grid.cells[cellIndex].contents.pop_back();
+               break;
+            }
+         }
+      }
+   }
+
+   std::vector<Monster*> collectMonstersInArea(Grid& grid, Vec2i centerCell, Vec2i box)
+   {
+      std::vector<Monster*> result;
+      for( int32_t y = centerCell.y - box.y; y <= centerCell.y + box.y; ++y )
+      {
+         for( int32_t x = centerCell.x - box.x; x <= centerCell.x + box.x; ++x )
+         {
+            Vec2i cell{x, y};
+            auto index = indexFromCellCoords(grid, cell);
+            if( 0 <= index && index < (int32_t)grid.cells.size() )
+            {
+               result.insert(result.end(), grid.cells[index].contents.begin(), grid.cells[index].contents.end());
+            }
+         }
+      }
+      return result;
    }
 }
