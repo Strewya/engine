@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Vec2.h>
+//#include <Util/Vec2.h>
 /******* C++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/

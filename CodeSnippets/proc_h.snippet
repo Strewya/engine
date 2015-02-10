@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+      <Title>empty_header</Title>
+      <Shortcut>hproc</Shortcut>
+      <Author>Marko Pipal</Author>
+      <Description>Code snippet for empty class header file</Description>
+      <HelpUrl>
+      </HelpUrl>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal Editable="true">
+          <ID>contents</ID>
+          <ToolTip>Contents of the file</ToolTip>
+          <Default>MyContents</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
+          <ID>namespace</ID>
+          <ToolTip>Enclosing namespace</ToolTip>
+          <Default>Core</Default>
+          <Function>
+          </Function>
+        </Literal>
+      </Declarations>
+      <Code Language="cpp"><![CDATA[#pragma once
+/********************************************
+*  contents:   $contents$
+*  usage:
+********************************************/
+/******* C++ headers *******/
+/******* common headers *******/
+/******* extra headers *******/
+/******* end header inclusion *******/
+
+namespace $namespace$
+{
+   $end$
+}
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

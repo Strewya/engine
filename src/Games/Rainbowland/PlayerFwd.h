@@ -1,15 +1,17 @@
 #pragma once
 /********************************************
-*	class:	WeaponDatabase
-*	usage:
+*  contents:   Player related forward declarations
+*  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/WeaponFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   void initWeaponDatabase(VWeapons& weapons);
+   struct Player;
+
+   typedef std::vector<Player> VPlayers;
 }

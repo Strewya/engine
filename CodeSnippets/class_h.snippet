@@ -6,18 +6,25 @@
         <SnippetType>Expansion</SnippetType>
       </SnippetTypes>
       <Title>empty_header</Title>
+      <Shortcut>hclass</Shortcut>
       <Author>Marko Pipal</Author>
       <Description>Code snippet for empty class header file</Description>
       <HelpUrl>
       </HelpUrl>
-      <Shortcut>empty_header</Shortcut>
     </Header>
     <Snippet>
       <Declarations>
         <Literal Editable="true">
+          <ID>contents</ID>
+          <ToolTip>Contents of the file</ToolTip>
+          <Default>MyContents</Default>
+          <Function>
+          </Function>
+        </Literal>
+        <Literal Editable="true">
           <ID>namespace</ID>
           <ToolTip>Enclosing namespace</ToolTip>
-          <Default>MyNamespace</Default>
+          <Default>Core</Default>
           <Function>
           </Function>
         </Literal>
@@ -29,10 +36,11 @@
           </Function>
         </Literal>
       </Declarations>
-      <Code Language="cpp"><![CDATA[#pragma once
+      <Code Language="cpp">
+  <![CDATA[#pragma once
 /********************************************
-*	class:	$name$
-*	usage:	
+*  contents:   $contents$
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
@@ -41,14 +49,14 @@
 
 namespace $namespace$
 {
-	class $name$
-	{
-	public:
-		$end$
+  class $name$
+  {
+  public:
+    $end$
 
-	private:
-		
-	};
+  private:
+    
+  };
 }
 ]]></Code>
     </Snippet>

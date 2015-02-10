@@ -6,10 +6,10 @@
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/GameDefinitions.h>
+#include <Games/Rainbowland/BonusFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	void initBonusDatabase(VBonuses& bonuses);
+   void initBonusDatabase(VBonuses& list);
 }

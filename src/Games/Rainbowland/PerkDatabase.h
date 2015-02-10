@@ -6,10 +6,10 @@
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/GameDefinitions.h>
+#include <Games/Rainbowland/PerkFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-	void initPerkDatabase(VPerks& perkDb);
+	void initPerkDatabase(VPerks& list);
 }

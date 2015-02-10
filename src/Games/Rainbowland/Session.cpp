@@ -141,6 +141,10 @@ namespace Core
       {
          obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
       }
+      for( auto& obj : game.m_activeBonuses )
+      {
+         obj.timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+      }
 
       updateDifficulty(game);
 #ifndef DEPLOY

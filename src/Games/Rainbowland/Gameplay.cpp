@@ -58,25 +58,25 @@ namespace Core
          {
             player.color.set(1, dimm, dimm);
             player.ability = AT_Blink;
-            player.skillCooldown = &game.m_blink.cooldownSeconds;
+            player.skillCooldown = game.m_blink.cooldownSeconds;
          } break;
          case 1:
          {
             player.color.set(1, 1, dimm);
             player.ability = AT_DefenseMatrix;
-            player.skillCooldown = &game.m_defenseMatrix.cooldownSeconds;
+            player.skillCooldown = game.m_defenseMatrix.cooldownSeconds;
          } break;
          case 2:
          {
             player.color.set(dimm, 1, dimm);
             player.ability = AT_Turret;
-            player.skillCooldown = &game.m_turret.cooldownSeconds;
+            player.skillCooldown = game.m_turret.cooldownSeconds;
          } break;
          case 3:
          {
             player.color.set(dimm, dimm, 1);
             player.ability = AT_TimeCapsule;
-            player.skillCooldown = &game.m_timeCapsule.cooldownSeconds;
+            player.skillCooldown = game.m_timeCapsule.cooldownSeconds;
          } break;
       }
    }
@@ -253,12 +253,18 @@ namespace Core
 
    void enableBonus(BonusType bonus, Vec2f pickupPosition, Player& player, RainbowlandGame& game)
    {
-      game.m_bonusDatabase[bonus].acquireLogic(pickupPosition, player, game);
+      if( game.m_bonusDatabase[bonus].acquireLogic )
+      {
+         game.m_bonusDatabase[bonus].acquireLogic(pickupPosition, player, game);
+      }
    }
 
    void disableBonus(BonusType bonus, RainbowlandGame& game)
    {
-      game.m_bonusDatabase[bonus].timeoutLogic(game);
+      if( game.m_bonusDatabase[bonus].timeoutLogic )
+      {
+         game.m_bonusDatabase[bonus].timeoutLogic(game);
+      }
    }
 
    void updateBonuses(RainbowlandGame& game)
@@ -266,7 +272,6 @@ namespace Core
       for( uint32_t b = 0; b < game.m_activeBonuses.size(); )
       {
          auto& bonus = game.m_activeBonuses[b];
-         bonus.timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
          if( bonus.timer.hasElapsed() )
          {
             disableBonus(bonus.type, game);
@@ -1158,7 +1163,8 @@ namespace Core
             if( perks.size() != 0 )
             {
                uint32_t perkIndex = gen.randInt(0, perks.size() - 1);
-               if( perkDb[perks[perkIndex]].dependencyCheck(player) )
+               if( perkDb[perks[perkIndex]].dependencyCheck == nullptr ||
+                   perkDb[perks[perkIndex]].dependencyCheck(player) )
                {
                   player.selectablePerks.emplace_back(perks[perkIndex]);
                }
@@ -1191,12 +1197,16 @@ namespace Core
       for( auto& player : game.m_players )
       {
          auto& perk = game.m_perkDatabase[player.chosenPerk];
-         perk.acquireLogic(player, game);
+         if( perk.acquireLogic )
+         {
+            perk.acquireLogic(player, game);
+         }
 
          player.selectablePerks.clear();
          if( !perk.repeatable )
          {
-            player.acquiredPerks.emplace_back(player.chosenPerk);
+            player.acquiredPerks.emplace_back();
+            player.acquiredPerks.back().type = player.chosenPerk;
             auto index = valueFind(player.availablePerks, player.chosenPerk);
             if( index != player.availablePerks.size() )
             {
@@ -1210,9 +1220,12 @@ namespace Core
    {
       for( auto& player : game.m_players )
       {
-         for( auto perk : player.acquiredPerks )
+         for( auto& perk : player.acquiredPerks )
          {
-            game.m_perkDatabase[perk].updateLogic(player, game);
+            if( game.m_perkDatabase[perk.type].updateLogic )
+            {
+               game.m_perkDatabase[perk.type].updateLogic(perk, player, game);
+            }
          }
       }
    }

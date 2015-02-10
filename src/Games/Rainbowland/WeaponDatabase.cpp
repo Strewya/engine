@@ -5,7 +5,8 @@
 #include <Games/Rainbowland/WeaponDatabase.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/Rainbowland.h>
+#include <Games/Rainbowland/Weapon.h>
+#include <Util/Time.h>
 /******* end headers *******/
 
 namespace Core

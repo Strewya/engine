@@ -1,15 +1,15 @@
 #pragma once
 /********************************************
-*	class:	WeaponDatabase
-*	usage:
+*  contents:   Movement code
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/WeaponFwd.h>
+#include <Games/Rainbowland/PlayerFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   void initWeaponDatabase(VWeapons& weapons);
+   void movePlayers(VPlayers& players);
 }

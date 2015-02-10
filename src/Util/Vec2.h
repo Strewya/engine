@@ -7,6 +7,7 @@
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Vec2Fwd.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -64,9 +65,6 @@ namespace Core
    Vec2<T> operator/(T f, Vec2<T> v);
    template<typename T>
    std::ostream& operator<<(std::ostream& os, Vec2<T> v);
-
-   typedef Vec2<int32_t> Vec2i;
-   typedef Vec2<float> Vec2f;
 }
 
 #include <Util/Vec2Impl.h>

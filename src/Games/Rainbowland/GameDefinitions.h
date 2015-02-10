@@ -9,6 +9,11 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Games/Rainbowland/Bonus.h>
+#include <Games/Rainbowland/Grid.h>
+#include <Games/Rainbowland/Monster.h>
+#include <Games/Rainbowland/Perk.h>
+#include <Games/Rainbowland/Weapon.h>
 #include <Util/Circle.h>
 #include <Util/Color.h>
 #include <Util/Time.h>
@@ -29,20 +34,6 @@ namespace Core
       int32_t classes[4];
       int32_t controllers[5];
       bool start;
-   };
-
-
-
-
-   enum BonusType
-   {
-      AtomicBomb,
-      SlowTime,
-      Heal,
-      MassHeal,
-      IncreasedMovementSpeed,
-      IncreasedRateOfFire,
-      BonusTypeCount
    };
 
    enum BonusIcon
@@ -67,16 +58,6 @@ namespace Core
       OneThousandExpIcon = 27,
    };
 
-   enum WeaponType
-   {
-      Pistol,
-      Shotgun,
-      Uzi,
-      Sniper,
-      RPG,
-      WeaponTypeCount
-   };
-
    enum WeaponIcon
    {
       MinigunIcon = 8,
@@ -92,118 +73,11 @@ namespace Core
       SniperIcon = 32
    };
 
-   enum MonsterType
-   {
-      Flower,
-      Ladybug,
-      Butterfly,
-      MonsterTypeCount
-   };
-
    enum DirectionalMovement
    {
       Up, Down,
       Left, Right
    };
-
-   enum SteeringBehaviour
-   {
-      SB_Seek,
-      SB_Flee,
-      SB_Arrive,
-      SB_Pursuit,
-      SB_Wander
-   };
-
-   struct Player;
-
-   typedef std::function<void(Player&, RainbowlandGame&)> UpdateLogic;
-
-   struct Weapon
-   {
-      WeaponType type;
-      std::string name;
-      uint32_t fireDelay;
-      uint32_t reloadDelay;
-      uint32_t damage;
-      int32_t ammo;
-      uint32_t maxAmmo;
-      uint32_t bulletsPerShot;
-      float spread;
-      bool bulletPierce;
-   };
-
-   typedef std::vector<Weapon> VWeapons;
-
-   enum BrainState
-   {
-      BS_Wander,
-      BS_Flank,
-      BS_Attack
-   };
-
-
-   struct Brain
-   {
-      PeriodicTimer timer;
-      BrainState state;
-
-      uint32_t targetPlayer;
-      Vec2f targetLocation;
-
-      float attackRadius;
-      float chanceToWander;
-   };
-
-   struct Monster
-   {
-      Brain brain;
-      Timer objectTimer;
-      Transform transform;
-      Color color;
-      Circle collisionData_attack;
-      Circle collisionData_hitbox;
-      Circle collisionData_separation;
-      Vec2f direction;
-      float maxSpeed;
-      float turnSpeed;
-      int32_t maxHealth;
-      int32_t health;
-      CooldownTimer attackTimer;
-      uint32_t damage;
-      uint32_t expGain;
-      MonsterType type;
-   };
-
-   typedef std::vector<Monster> VMonsters;
-
-   struct Cell
-   {
-      std::vector<Monster*> contents;
-   };
-
-   struct Grid
-   {
-      std::vector<Cell> cells;
-      Vec2f cellHalfsize;
-      uint32_t columns;
-      uint32_t rows;
-   };
-
-   Vec2i calculateCellCoords(Grid& grid, Vec2f position);
-   int32_t indexFromCellCoords(Grid& grid, Vec2i cell);
-   void updateMonsterInGrid(Grid& grid, Monster& monster, Vec2i oldCell, Vec2i newCell);
-   void removeMonsterfromGrid(Grid& grid, Monster& monster, Vec2i cell);
-   std::vector<Monster*> collectMonstersInArea(Grid& grid, Vec2i centerCell, Vec2i box);
-
-   struct MonsterSpawner
-   {
-      PeriodicTimer spawnTimer;
-      Transform transform;
-      float spawnRadius;
-   };
-
-   typedef std::vector<MonsterSpawner> VMonsterSpawners;
 
    struct Pickup
    {
@@ -217,28 +91,6 @@ namespace Core
    };
 
    typedef std::vector<Pickup> VPickups;
-
-   typedef std::function<void(Vec2f, Player&, RainbowlandGame&)> BonusAcquireLogic;
-   typedef std::function<void(RainbowlandGame&)> BonusTimeoutLogic;
-
-   struct Bonus
-   {
-      BonusType type;
-      std::string name;
-      uint32_t durationMicros;
-      BonusAcquireLogic acquireLogic;
-      BonusTimeoutLogic timeoutLogic;
-   };
-
-   typedef std::vector<Bonus> VBonuses;
-
-   struct ActiveBonus
-   {
-      CooldownTimer timer;
-      BonusType type;
-   };
-
-   typedef std::vector<ActiveBonus> VActiveBonuses;
 
    struct BloodSplatter
    {
@@ -347,48 +199,6 @@ namespace Core
       bool active;
    };
 
-   enum PerkType
-   {
-      Regeneration,
-      GreaterRegeneration,
-      PoisonBullets,
-      Radioactive,
-      AmmoManiac,
-      InstantWinner,
-      Fastloader,
-      ReflexBoosted,
-      Dodger,
-      Ninja,
-      Assassin,
-      HealthBoost,
-      EquipedWeaponDamageBoost,
-      EquipedWeaponAmmoBoost,
-      FasterCooldown,
-      HotTempered,
-      AngryReloader,
-      StationaryReloader,
-      FastShot,
-      ExtraBullet,
-      PerkExpert,
-      PerkMaster,
-      MonsterCleaner,
-      PerkTypeCount
-   };
-
-   typedef std::function<bool(Player&)> PlayerCheck;
-   struct Perk
-   {
-      PerkType type;
-      std::string name;
-      std::string description;
-      PlayerCheck dependencyCheck;
-      UpdateLogic acquireLogic;
-      UpdateLogic updateLogic;
-      bool repeatable;
-   };
-
-   typedef std::vector<Perk> VPerks;
-
    struct Player
    {
       Timer objectTimer;
@@ -421,9 +231,9 @@ namespace Core
       uint32_t selectedPerkIndex;
       uint32_t id;
       uint32_t killCount;
-      float* skillCooldown;
+      float skillCooldown;
+      VActivePerks acquiredPerks;
       std::vector<PerkType> availablePerks;
-      std::vector<PerkType> acquiredPerks;
       std::vector<PerkType> selectablePerks;
       AbilityType ability;
       PerkType chosenPerk;
@@ -442,7 +252,7 @@ namespace Core
    void initSession(RainbowlandGame& game);
    void cleanSession(RainbowlandGame& game);
    void initPlayer(Player& player, uint32_t id, RainbowlandGame& game);
-   void movePlayers(RainbowlandGame& game);
+   
    void orientPlayers(VPlayers& players);
    void updatePlayerAim(VPlayers& players);
    void checkPlayerDeath(RainbowlandGame& game);
@@ -452,7 +262,7 @@ namespace Core
    void updateDifficulty(RainbowlandGame& game);
 
    void enableBonus(BonusType bonus, Vec2f pickupPosition, Player& player, RainbowlandGame& game);
-   void disableBonus(Player& player, BonusType bonus, RainbowlandGame& game);
+   void disableBonus(BonusType bonus, RainbowlandGame& game);
    void updateBonuses(RainbowlandGame& game);
    void generatePickups(VKillLocations& killLocations, RainbowlandGame& game);
    void placePickup(RainbowlandGame& game, Vec2f location, BonusType bonus, WeaponType weapon);

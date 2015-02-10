@@ -1,15 +1,19 @@
 #pragma once
 /********************************************
-*	class:	WeaponDatabase
-*	usage:
+*  contents:   Forward declaration for vector
+*  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/WeaponFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   void initWeaponDatabase(VWeapons& weapons);
+   template<typename T>
+   class Vec2;
+
+   typedef Vec2<float> Vec2f;
+   typedef Vec2<int32_t> Vec2i;
 }

@@ -218,6 +218,10 @@ namespace Core
    }
    uint32_t CooldownTimer::getRemainingMicros() const
    {
+      if( m_durationMicros < m_timer.getCurrentMicros() )
+      {
+         return 0;
+      }
       return m_durationMicros - m_timer.getCurrentMicros();
    }
    float CooldownTimer::getPercentDone() const
