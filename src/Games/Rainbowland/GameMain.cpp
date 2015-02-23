@@ -127,7 +127,7 @@ namespace Core
 
          game.m_imageStartIndex_ladybug = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(0, 422, 481, 431, 3, 3, 7, game.m_rainbowlandImageDatabase);
-         game.ladybugAnimationLoop = {0, 1, 2, 3, 4};
+         game.ladybugAnimationLoop = {0, 1, 2, 3, 4, 3, 2, 1};
          for( auto& i : game.ladybugAnimationLoop )
          {
             i += game.m_imageStartIndex_ladybug;

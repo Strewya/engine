@@ -171,12 +171,7 @@ namespace Core
                std::bind(drawText, _1, game.m_defaultFont, classes[index], tLabel, classNameColor, TJ_Center, false));
 
             tLabel.scale *= 0.4f;
-            tLabel.position.set(0, -hBox.y + 15);
-            tLabel.position += tBox.position;
-
-            game.m_renderQueue.enqueueRenderCommand(
-               std::bind(drawText, _1, game.m_defaultFont, "LT / RMB for ability", tLabel, Color{}, TJ_Center, false));
-
+            
             tLabel.position.set(0, hBox.y - 15);
             tLabel.position += tBox.position;
 
@@ -196,7 +191,7 @@ namespace Core
       Vec2f hStart;
       Color cStart;
 
-      hStart.set(100, 60);
+      hStart.set(200, 20);
       tStart.position.set(hMainPanel.x - hStart.x - 10, -hMainPanel.y + hStart.y+10);
       tStart.position += tMainPanel.position;
       cStart.set(0, 0, 1);
@@ -206,28 +201,40 @@ namespace Core
 
       Transform tLabel;
       tLabel.position += tStart.position;
-
-      tLabel.position.y += 30;
+      
       game.m_renderQueue.enqueueRenderCommand(
-         std::bind(drawText, _1, game.m_defaultFont, "press", tLabel, Color{}, TJ_Center, false));
+         std::bind(drawText, _1, game.m_defaultFont, "press SHOOT to start", tLabel, Color{}, TJ_Center, false));
 
-      tLabel.position.y -= 30;
-      game.m_renderQueue.enqueueRenderCommand(
-         std::bind(drawText, _1, game.m_defaultFont, "SHOOT", tLabel, Color{}, TJ_Center, false));
-
-      tLabel.position.y -= 30;
-      game.m_renderQueue.enqueueRenderCommand(
-         std::bind(drawText, _1, game.m_defaultFont, "to start", tLabel, Color{}, TJ_Center, false));
 
       Transform tControls;
       Vec2f hControls;
+      float dy = 0.4f;
+      tControls.scale.set(100, 100);
 
-      tControls.position.set(0, 0);
-      tControls.scale.set(10, 10);
-
-      Rect r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_mouseControls];
       Vec2f atlasSize = game.m_textureCache.getTextureDimensions(game.m_atlasTexture);
+      
+      tControls.position.set(tMainPanel.position.x + hMainPanel.x*0.2f, tMainPanel.position.y - hMainPanel.y*dy);
+      Rect r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_mouseControls];
       float ratio = r.halfWidth / r.halfHeight;
+      r.center /= atlasSize;
+      r.halfWidth /= atlasSize.x;
+      r.halfHeight /= atlasSize.y;
+      game.m_renderQueue.enqueueRenderCommand(
+         std::bind(drawTexturedQuad, _1, game.m_atlasTexture, r, Vec2f{ratio, 1}, tControls, Color{}, 0));
+
+      tControls.position.set(tMainPanel.position.x-hMainPanel.x*0.2f, tMainPanel.position.y - hMainPanel.y*dy);
+      r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_wsadControls];
+      ratio = r.halfWidth / r.halfHeight;
+      r.center /= atlasSize;
+      r.halfWidth /= atlasSize.x;
+      r.halfHeight /= atlasSize.y;
+      game.m_renderQueue.enqueueRenderCommand(
+         std::bind(drawTexturedQuad, _1, game.m_atlasTexture, r, Vec2f{ratio, 1}, tControls, Color{}, 0));
+
+      tControls.scale.set(120, 120);
+      tControls.position.set(tMainPanel.position.x + hMainPanel.x*0.7f, tMainPanel.position.y - hMainPanel.y*dy);
+      r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_gamepadControls];
+      ratio = r.halfWidth / r.halfHeight;
       r.center /= atlasSize;
       r.halfWidth /= atlasSize.x;
       r.halfHeight /= atlasSize.y;

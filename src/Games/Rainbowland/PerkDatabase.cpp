@@ -488,13 +488,13 @@ namespace Core
       static bool reloadIncreased[4] = {false, false, false, false};
       if( player.currentSpeed < 0.01f && !reloadIncreased[player.id] )
       {
-         player.reloadMultiplier *= 0.01f;
+         player.reloadMultiplier *= 0.3f;
          calculateWeaponBonuses(player, game.m_weaponDatabase);
          reloadIncreased[player.id] = true;
       }
       if( player.currentSpeed >= 0.01f && reloadIncreased[player.id] )
       {
-         player.reloadMultiplier *= 100;
+         player.reloadMultiplier /= 0.3f;
          calculateWeaponBonuses(player, game.m_weaponDatabase);
          reloadIncreased[player.id] = false;
       }
