@@ -4,12 +4,26 @@
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/PlayerFwd.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   void movePlayers(VPlayers& players);
+   struct Movable
+   {
+      Vec2f position;
+      Vec2f direction;
+      float speed;
+      float maxSpeed;
+      float acceleration;
+      float maxAcceleration;
+      
+   };
+
+   typedef std::vector<Movable> VMovables;
+
+   void processMovement(VMovables& list);
 }

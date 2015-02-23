@@ -34,7 +34,7 @@ namespace Core
 
          game.m_graphicsSystem.v3_setVertices(vertices);
          game.m_graphicsSystem.v3_setIndices(indices);
-         game.m_graphicsSystem.v3_setInstanceData({splatter.transform}, {splatter.color});
+         game.m_graphicsSystem.v3_setInstanceData({splatter.transform}, {splatter.color}, {0});
          game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
          game.m_graphicsSystem.v3_draw(indices.size(), 1);
       }
@@ -54,7 +54,7 @@ namespace Core
 
       game.m_graphicsSystem.v3_setVertices(vertices);
       game.m_graphicsSystem.v3_setIndices(indices);
-      game.m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}});
+      game.m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}}, {0});
       game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
       game.m_graphicsSystem.setTransparencyMode(false);
@@ -72,91 +72,69 @@ namespace Core
    {
       for( auto& obj : game.m_players )
       {
-         Rect r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_players + obj.id];
+         game.m_graphicsSystem.togglePixelShader();
+         Rect r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_healthBar];
          float ratio = r.halfWidth / r.halfHeight;
          r.center /= atlasSize;
          r.halfWidth /= atlasSize.x;
          r.halfHeight /= atlasSize.y;
 
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color);
+         Transform t = obj.transform;
+         t.rotation = 0;
+         
+         //health circle
+         t.scale *= 1.2f;
+         Color c = obj.color;
+         //c.clip(0.8f);
+         float health = (float)obj.health;
+         health /= obj.maxHealth;
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, t, c, health);
+         game.m_graphicsSystem.togglePixelShader();
 
-         Transform tHP{obj.transform.position + Vec2f{0, 1}, {0.03f, 0.03f}, 0};
-         std::string hpExp = std::to_string(obj.health);
-         drawText(game.m_graphicsSystem, game.m_defaultFont, hpExp, tHP, obj.color, TJ_Center, false);
+         r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_players + obj.id];
+         ratio = r.halfWidth / r.halfHeight;
+         r.center /= atlasSize;
+         r.halfWidth /= atlasSize.x;
+         r.halfHeight /= atlasSize.y;
+         //player
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color, {0});
 
-         auto time = abilityTimeLeft(game, obj.ability);
-         auto text = std::to_string(time);
-         tHP.position = obj.transform.position + Vec2f{0, -1};
-         drawText(game.m_graphicsSystem, game.m_defaultFont, text, tHP, obj.color, TJ_Center, false);
-
-
-         Transform tDir{obj.transform.position + obj.direction * 2, {0.3f, 0.3f}, 0};
+         Transform tDir{obj.transform.position + obj.direction * 2, {0.2f, 0.2f}, 0};
          drawSolidCircle(game.m_graphicsSystem, 1, 8, tDir, obj.color);
       }
-#if 0
-      if( game.m_players.size() > 0 )
-      {
-         std::vector<Transform> tfs;
-         std::vector<Color> fills;
-         tfs.reserve(game.m_players.size());
-         fills.reserve(game.m_players.size());
-         for( auto& obj : game.m_players )
-         {
-            tfs.emplace_back(obj.transform);
-            auto col = obj.color;
-            fills.emplace_back(col);
-         }
-
-         auto inds = game.m_graphicsSystem.v3_makeHollowCircleIndices(18);
-         auto verts = game.m_graphicsSystem.v3_makeCircleVertices(game.m_players.front().collisionData.center,
-                                                                  game.m_players.front().collisionData.radius, 18);
-         game.m_graphicsSystem.v3_setVertices(verts);
-         game.m_graphicsSystem.v3_setIndices(inds);
-         game.m_graphicsSystem.v3_setInstanceData(tfs, fills);
-         game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-         game.m_graphicsSystem.v3_draw(inds.size(), game.m_players.size());
-      }
-#endif
    }
 
    void draw_monsters(RainbowlandGame& game, Vec2f atlasSize)
    {
-      for( auto& obj : game.m_monsters )
+      for( auto* obj_ptr : game.m_monsters )
       {
-         Rect r;
+         auto& obj = *obj_ptr;
+         uint32_t imageIndex = UINT32_MAX;
          switch( obj.type )
          {
             case Flower:
             {
-               r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_flower];
+               imageIndex = game.flowerAnimationLoop[obj.currentAnimationFrame];
             } break;
 
             case Butterfly:
             {
-               r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_butterfly];
+               imageIndex = game.butterflyAnimationLoop[obj.currentAnimationFrame];
             } break;
 
             case Ladybug:
             {
-               r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_ladybug];
+               imageIndex = game.ladybugAnimationLoop[obj.currentAnimationFrame];
             } break;
          }
-
+         assert(imageIndex != UINT32_MAX);
+         Rect r = game.m_rainbowlandImageDatabase[imageIndex];
          float ratio = r.halfWidth / r.halfHeight;
          r.center /= atlasSize;
          r.halfWidth /= atlasSize.x;
          r.halfHeight /= atlasSize.y;
 
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color);
-
-#if 0
-         auto t = obj.transform;
-         t.position += obj.collisionData_attack.center;
-         drawHollowCircle(game.m_graphicsSystem, obj.collisionData_attack.radius, 18, t, {});
-         t = obj.transform;
-         t.position += obj.collisionData_hitbox.center;
-         drawHollowCircle(game.m_graphicsSystem, obj.collisionData_hitbox.radius, 18, t, {});
-#endif
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color, {0});
       }
    }
 
@@ -176,10 +154,10 @@ namespace Core
 
          Vec2f scale{1, 1};
          if( pickup.bonus != BonusTypeCount )
-            drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, circleRect, {1.5f, 1.5f}, pickup.transform, pickup.color);
+            drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, circleRect, {1.5f, 1.5f}, pickup.transform, pickup.color, {0});
          else
             scale.set(2.0f, 2.0f);
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, imageRect, scale, pickup.transform, pickup.color);
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, imageRect, scale, pickup.transform, pickup.color, {0});
       }
    }
 
@@ -207,7 +185,7 @@ namespace Core
 
          game.m_graphicsSystem.v3_setVertices(vertices);
          game.m_graphicsSystem.v3_setIndices(indices);
-         game.m_graphicsSystem.v3_setInstanceData({t}, {{}});
+         game.m_graphicsSystem.v3_setInstanceData({t}, {{}}, {0});
          game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
          game.m_graphicsSystem.v3_draw(indices.size(), 1);
 
@@ -224,19 +202,22 @@ namespace Core
          rect.center /= atlasSize;
          rect.halfHeight /= atlasSize.y;
          rect.halfWidth /= atlasSize.x;
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, {});
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, {}, {0});
          auto displayTime = turretTimeLeft(game);
          auto text = std::to_string(displayTime);
          t.scale.set(0.03f, 0.03f);
          t.position.y -= 1;
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Left, false);
       }
-      if( game.m_blink.active )
+      if( game.m_healingCloud.active )
       {
-         Transform t{game.m_blink.area.center, {1, 1}, 0};
-         drawHollowCircle(game.m_graphicsSystem, game.m_blink.area.radius, 18, t, {0.7f, 0.7f, 0});
-         t.position = game.m_blink.target;
-         drawHollowCircle(game.m_graphicsSystem, game.m_blink.area.radius, 18, t, {0.7f, 0.7f, 0});
+         Transform t{game.m_healingCloud.area.center, {1, 1}, 0};
+         drawHollowCircle(game.m_graphicsSystem, game.m_healingCloud.area.radius, 18, t, {0.7f, 0.7f, 0});
+         auto displayTime = healingCloudTimeLeft(game);
+         auto text = std::to_string(displayTime);
+         t.scale.set(0.03f, 0.03f);
+         t.position.y -= 1;
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Left, false);
       }
    }
 
@@ -256,7 +237,7 @@ namespace Core
 
          Transform t{obj.body.center, {1, 1}, std::atan2(obj.direction.y, obj.direction.x)};
          t.rotation = Deg2Rad(Rad2Deg(t.rotation) - 90);
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, {});
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, {}, {0});
       }
       for( auto& obj : game.m_blasts )
       {
@@ -276,7 +257,7 @@ namespace Core
             c.a *= (percent / (0.2f));
          }
 
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, img, hs, t, c);
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, img, hs, t, c, {0});
          //drawHollowCircle(m_graphicsSystem, obj.area.radius, 36, t, c);
       }
    }
@@ -284,5 +265,34 @@ namespace Core
    void draw_gui(RainbowlandGame& game, Vec2f atlasSize)
    {
 
+   }
+
+   void draw_grid_debug_info(Grid& grid, GraphicsSystem& gfx)
+   {
+      auto x = grid.cellHalfsize.x*(grid.columns / 2) - grid.cellHalfsize.x;
+      auto y = grid.cellHalfsize.y*(grid.rows / 2);
+      for( float i = -x; i <= x; i += (grid.cellHalfsize.x * 2) )
+      {
+         drawLine(gfx, {i, y}, {i, -y}, {}, {});
+      }
+      for( float i = -y; i <= y; i += (grid.cellHalfsize.y * 2) )
+      {
+         drawLine(gfx, {x, i}, {-x, i}, {}, {});
+      }
+
+      x += grid.cellHalfsize.x;
+      y += grid.cellHalfsize.y;
+      for( float j = -y; j < y; j += (grid.cellHalfsize.y*2) )
+      {
+         for( float i = -x; i < x; i += (grid.cellHalfsize.x*2) )
+         {
+            auto cellCoords = calculateCellCoords(grid, Vec2f{i, j});
+            auto cellIndex = indexFromCellCoords(grid, cellCoords);
+            for( auto* monster : grid.cells[cellIndex].contents )
+            {
+               drawLine(gfx, monster->transform.position, {i, j}, {}, {});
+            }
+         }
+      }
    }
 }

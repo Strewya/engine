@@ -29,7 +29,7 @@ namespace Core
 		static std::string Name(uint32_t code);
 
 		static const int32_t m_Unknown = -1;
-		enum Keys
+		enum Keys : uint8_t
 		{
 			m_DPadUp,
 			m_DPadDown,
@@ -68,7 +68,7 @@ namespace Core
 		static std::string Name(uint32_t code);
 
 		static const int32_t m_Unknown = -1;
-		enum Keys
+		enum Keys : uint8_t
 		{
 			m_LeftButton		= 0x00,
 			m_RightButton,
@@ -92,7 +92,7 @@ namespace Core
 		static std::string Name(uint32_t code);
 		
 		static const int32_t m_Unknown = -1;
-		enum Keys
+		enum Keys : uint8_t
 		{
 			m_Cancel		= 0x03,
 	
@@ -366,7 +366,7 @@ namespace Core
 			* 0xFF : reserved
 			*/
 
-			m_KeyCount		= 0x100
+			m_KeyCount		= 0xFF
 		};
 	};
 }

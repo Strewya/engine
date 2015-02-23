@@ -28,8 +28,8 @@ namespace Core
 		uint32_t getResourceID(const char* name);
 		const Font* getResource(uint32_t id);
 
-		LoadResult load(const ResourceFile& file, LuaStack& lua);
-		LoadResult reload(const ResourceFile& file, LuaStack& lua);
+		LoadResult load(const ResourceFile& file, LuaStack lua);
+		LoadResult reload(const ResourceFile& file, LuaStack lua);
 		LoadResult unload(const ResourceFile& file);
 
 	private:

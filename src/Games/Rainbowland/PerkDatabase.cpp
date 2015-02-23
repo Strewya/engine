@@ -248,7 +248,7 @@ namespace Core
 
       type = ExtraBullet;
       perkDb[type].name = "Bulleteer";
-      perkDb[type].description = "You're a magician with guns, firing an extra bullet on every shot";
+      perkDb[type].description = "You make your own clips that hold 6 extra bullets.";
       perkDb[type].repeatable = false;
       perkDb[type].dependencyCheck = nullptr;
       perkDb[type].acquireLogic = ACQUIRE(ExtraBullet);
@@ -326,13 +326,13 @@ namespace Core
       {
          timer.period();
          Circle radioactiveArea{player.transform.position, 5};
-         for( auto& monsta : game.m_monsters )
+         for( auto* monsta : game.m_monsters )
          {
-            auto bCollider = monsta.collisionData_hitbox;
-            bCollider.center = monsta.transform.position;
+            auto bCollider = monsta->collisionData_hitbox;
+            bCollider.center = monsta->transform.position;
             if( isCircleTouchingCircle(bCollider, radioactiveArea) )
             {
-               monsta.health -= 1;
+               monsta->health -= 1;
             }
          }
       }
@@ -421,9 +421,9 @@ namespace Core
       auto cooldownMicros = secondsToMicros(player.skillCooldown);
       switch( player.ability )
       {
-         case AT_Blink:
+         case AT_HealingCloud:
          {
-            game.m_blink.timer.setDurationMicros(cooldownMicros);
+            game.m_healingCloud.timer.setDurationMicros(cooldownMicros);
          } break;
          case AT_DefenseMatrix:
          {
@@ -488,13 +488,13 @@ namespace Core
       static bool reloadIncreased[4] = {false, false, false, false};
       if( player.currentSpeed < 0.01f && !reloadIncreased[player.id] )
       {
-         player.reloadMultiplier *= 0.5f;
+         player.reloadMultiplier *= 0.01f;
          calculateWeaponBonuses(player, game.m_weaponDatabase);
          reloadIncreased[player.id] = true;
       }
       if( player.currentSpeed >= 0.01f && reloadIncreased[player.id] )
       {
-         player.reloadMultiplier *= 2;
+         player.reloadMultiplier *= 100;
          calculateWeaponBonuses(player, game.m_weaponDatabase);
          reloadIncreased[player.id] = false;
       }
@@ -508,7 +508,7 @@ namespace Core
 
    ACQUIRE_FN(ExtraBullet)
    {
-      player.extraBullets = 1;
+      player.extraBullets = 6;
    }
 
    ACQUIRE_FN(PerkExpert)
@@ -532,7 +532,7 @@ namespace Core
       player.health -= third;
       for( auto& monsta : game.m_monsters )
       {
-         monsta.health = 0;
+         monsta->health = 0;
       }
       VKillLocations kills;
       killMonsters(game, kills, false);

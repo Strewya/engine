@@ -24,6 +24,14 @@ namespace Core
       this->b = b;
       this->a = a;
    }
+
+   void Color::clip(float threshold)
+   {
+      if( r < threshold ) r = 0;
+      if( g < threshold ) g = 0;
+      if( b < threshold ) b = 0;
+      if( a < threshold ) a = 0;
+   }
 }
 
 //namespace Util

@@ -6,14 +6,14 @@
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Vec2Fwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
    class RainbowlandGame;
-   
-   template<typename T> class Vec2;
-   typedef Vec2<float> Vec2f;
+   struct Grid;
+   class GraphicsSystem;
 
    void draw_splatters_to_texture(RainbowlandGame& game, Vec2f atlasSize);
    void draw_background(RainbowlandGame& game, Vec2f atlasSize);
@@ -23,4 +23,5 @@ namespace Core
    void draw_skills(RainbowlandGame& game, Vec2f atlasSize);
    void draw_damagers(RainbowlandGame& game, Vec2f atlasSize);
    void draw_gui(RainbowlandGame& game, Vec2f atlasSize);
+   void draw_grid_debug_info(Grid& grid, GraphicsSystem& gfx);
 }

@@ -15,7 +15,7 @@ namespace Core
 	{
 		return t;
 	}
-
+   
 	static float quadratic(float t)
 	{
 		return t*t;
@@ -149,7 +149,7 @@ namespace Core
 		auto it = std::find_if(begin(m_runningAnimations), end(m_runningAnimations),
 							   [=](const AnimationPlayer& p){ return p.m_id == playerID; });
 		
-		uint32_t index = -1;
+      uint32_t index = UINT32_MAX;
 		if(it != end(m_runningAnimations))
 		{
 			index = std::distance(begin(m_runningAnimations), it);

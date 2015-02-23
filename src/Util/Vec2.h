@@ -48,6 +48,9 @@ namespace Core
       Vec2& operator/=(T f);
       Vec2& operator/=(Vec2 v);
 
+      bool operator==(Vec2 other);
+      bool operator!=(Vec2 other);
+
       static T length(Vec2 v);
       static T length2(Vec2 v);
       static Vec2 normalize(Vec2 v);
@@ -63,6 +66,10 @@ namespace Core
    Vec2<T> operator*(T f, Vec2<T> v);
    template<typename T>
    Vec2<T> operator/(T f, Vec2<T> v);
+   template<typename T>
+   bool operator==(Vec2<T> left, Vec2<T> right);
+   template<typename T>
+   bool operator!=(Vec2<T> left, Vec2<T> right);
    template<typename T>
    std::ostream& operator<<(std::ostream& os, Vec2<T> v);
 }

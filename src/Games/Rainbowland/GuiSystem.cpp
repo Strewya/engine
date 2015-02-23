@@ -26,7 +26,6 @@ namespace Core
       m_elements.emplace_back(std::move(ptr));
 
       DEBUG_INIT(GuiSystem);
-      return status;
    }
 
    bool GuiSystem::shutdown()
@@ -34,7 +33,6 @@ namespace Core
       bool status = true;
 
       DEBUG_SHUTDOWN(GuiSystem);
-      return status;
    }
 
    bool GuiSystem::handleEvent(WindowEvent& we)

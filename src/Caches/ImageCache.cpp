@@ -56,7 +56,7 @@ namespace Core
 			return{LoadResultFlag::Fail, str};
 		}
 
-		ImageDefaults defaults;
+      ImageDefaults defaults{};
 		std::string texture = "";
 		lua.pull("defaults");
 		if( lua.is<luaTable>() )

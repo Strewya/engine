@@ -80,13 +80,16 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CORE_USE_PCH;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,7 +133,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -141,6 +144,8 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -173,7 +178,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -183,6 +188,8 @@
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -253,6 +260,7 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Grid.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Monster.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\ObjectRendering.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp" />
@@ -325,6 +333,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Abilities.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Bonus.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusFwd.h" />
@@ -346,7 +355,6 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionEnd.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPreparation.h" />
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Types.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Weapon.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponFwd.h" />

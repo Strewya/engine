@@ -59,7 +59,7 @@ namespace Core
       std::vector<std::function<void(b2Contact*)>> m_beginContactListeners;
       std::vector<std::function<void(b2Contact*)>> m_endContactListeners;
 
-      template<typename C, typename V, typename F> InstanceID store(C& container, V& data, F& cmp);
+      template<typename C, typename V, typename F> InstanceID store(C& container, V& data, const F& cmp);
    };
 
    inline Vec2f convert(const b2Vec2& v)
@@ -72,7 +72,7 @@ namespace Core
       return b2Vec2(v.x, v.y);
    }
 
-   template<typename C, typename V, typename F> InstanceID PhysicsSystem::store(C& container, V& data, F& cmp)
+   template<typename C, typename V, typename F> InstanceID PhysicsSystem::store(C& container, V& data, const F& cmp)
    {
       auto it = std::find_if(std::begin(container), std::end(container), cmp);
       InstanceID id = 0;

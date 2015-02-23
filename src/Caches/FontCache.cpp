@@ -73,7 +73,7 @@ namespace Core
 		return res;
 	}
 
-	LoadResult FontCache::load(const ResourceFile& file, LuaStack& lua)
+	LoadResult FontCache::load(const ResourceFile& file, LuaStack lua)
 	{
 		return process(file, lua, [&]() -> LoadResult
 		{
@@ -92,7 +92,7 @@ namespace Core
 		});
 	}
 
-	LoadResult FontCache::reload(const ResourceFile& file, LuaStack& lua)
+	LoadResult FontCache::reload(const ResourceFile& file, LuaStack lua)
 	{
 		return process(file, lua, [&]() -> LoadResult
 		{

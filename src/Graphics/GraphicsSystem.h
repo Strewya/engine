@@ -57,6 +57,8 @@ namespace Core
       bool initSamplerState();
       bool initDepthBuffer();
 
+      void togglePixelShader();
+
       Vec2f getTextureDimensions(const Texture& texture) const;
       void setBackgroundColor(float red, float green, float blue);
 
@@ -94,7 +96,7 @@ namespace Core
       void v3_setVertices(const std::vector<Vertex>& vertices);
       void v3_setIndices(const std::vector<uint32_t>& indices);
       void v3_setTopology(D3D_PRIMITIVE_TOPOLOGY topology);
-      void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills);
+      void v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills, const std::vector<float>& healths);
       void v3_setTexture(uint32_t textureId);
       void v3_setFontTexture(uint32_t fontId);
       void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
@@ -124,6 +126,7 @@ namespace Core
       ID3D11RenderTargetView* m_renderTarget;
       ID3D11VertexShader* m_vertexShader;
       ID3D11PixelShader* m_pixelShader;
+      ID3D11PixelShader* m_healthbarShader;
       ID3D11InputLayout* m_inputLayout;
       ID3D11SamplerState* m_samplerState;
       ID3D11DepthStencilView* m_depthStencilView;
@@ -181,30 +184,54 @@ namespace Core
 
    void drawLine(GraphicsSystem& gfx, Vec2f p1, Vec2f p2, Transform transform, Color color);
    void drawLine(GraphicsSystem& gfx, Vec2f p1, Color c1, Vec2f p2, Color c2, Transform transform, Color color);
-   void drawMultipleLines(GraphicsSystem& gfx, Vec2f p1, Vec2f p2, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleLines(GraphicsSystem& gfx, Vec2f p1, Vec2f p2,
+                          const std::vector<Transform>& transforms,
+                          const std::vector<Color>& colors,
+                          const std::vector<float>& healths);
 
    void drawMultiline(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, Transform transform, Color color);
 
    void drawHollowPolygon(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, Transform transform, Color color);
-   void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count,
+                                   const std::vector<Transform>& transforms,
+                                   const std::vector<Color>& colors,
+                                   const std::vector<float>& healths);
 
    void drawSolidPolygon(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, Transform transform, Color color);
-   void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count,
+                                  const std::vector<Transform>& transforms,
+                                  const std::vector<Color>& colors,
+                                  const std::vector<float>& healths);
 
    void drawHollowQuad(GraphicsSystem& gfx, Vec2f halfSize, Transform transform, Color color);
-   void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2f halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2f halfSize,
+                                const std::vector<Transform>& transforms,
+                                const std::vector<Color>& colors,
+                                const std::vector<float>& healths);
 
    void drawSolidQuad(GraphicsSystem& gfx, Vec2f halfSize, Transform transform, Color color);
-   void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2f halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2f halfSize,
+                               const std::vector<Transform>& transforms,
+                               const std::vector<Color>& colors,
+                               const std::vector<float>& healths);
 
    void drawHollowCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color);
-   void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points,
+                                  const std::vector<Transform>& transforms,
+                                  const std::vector<Color>& colors,
+                                  const std::vector<float>& healths);
 
    void drawSolidCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color);
-   void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors);
+   void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points,
+                                 const std::vector<Transform>& transforms,
+                                 const std::vector<Color>& colors,
+                                 const std::vector<float>& healths);
 
-   void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, Transform transform, Color color);
-   void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, const std::vector<Transform>& transform, const std::vector<Color>& color);
+   void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, Transform transform, Color color, float health);
+   void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize,
+                                  const std::vector<Transform>& transform,
+                                  const std::vector<Color>& color,
+                                  const std::vector<float>& healths);
 
    void drawText(GraphicsSystem& gfx, uint32_t fontID, const std::string& text, Transform transform, Color tint, TextJustification justification, bool isItalic);
 }

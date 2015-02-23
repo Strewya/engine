@@ -9,6 +9,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Games/Rainbowland/Abilities.h>
 #include <Games/Rainbowland/Bonus.h>
 #include <Games/Rainbowland/Grid.h>
 #include <Games/Rainbowland/Monster.h>
@@ -149,56 +150,6 @@ namespace Core
 
    typedef std::vector<Rocket> VRockets;
 
-   enum AbilityType
-   {
-      AT_DefenseMatrix,
-      AT_TimeCapsule,
-      AT_Blink,
-      AT_Turret
-   };
-   struct DefenseMatrix
-   {
-      CooldownTimer timer;
-      float cooldownSeconds;
-      float durationSeconds;
-      Circle area;
-      bool active;
-   };
-
-   struct TimeCapsule
-   {
-      CooldownTimer timer;
-      float cooldownSeconds;
-      float durationSeconds;
-      uint32_t healPeriod;
-      uint32_t maxHealPeriod;
-      Circle area;
-      bool active;
-   };
-
-   struct Blink
-   {
-      CooldownTimer timer;
-      float cooldownSeconds;
-      float durationSeconds;
-      Circle area;
-      Vec2f target;
-      bool active;
-   };
-
-   struct Turret
-   {
-      CooldownTimer timer;
-      float cooldownSeconds;
-      float durationSeconds;
-      Circle area;
-      Weapon weapon;
-      PeriodicTimer weaponTimer;
-      Vec2f aim;
-      uint32_t killCount;
-      bool active;
-   };
-
    struct Player
    {
       Timer objectTimer;
@@ -252,7 +203,7 @@ namespace Core
    void initSession(RainbowlandGame& game);
    void cleanSession(RainbowlandGame& game);
    void initPlayer(Player& player, uint32_t id, RainbowlandGame& game);
-   
+   void movePlayers(RainbowlandGame& game);
    void orientPlayers(VPlayers& players);
    void updatePlayerAim(VPlayers& players);
    void checkPlayerDeath(RainbowlandGame& game);
@@ -284,13 +235,14 @@ namespace Core
    void increaseKillCount(RainbowlandGame& game, void* owner);
 
    void updateMonsterSpawners(RainbowlandGame& game);
-   void generateMonster(VMonsters& monsters, Vec2f position, uint32_t target, RainbowlandGame& game);
+   void generateMonster(VPMonsters& monsters, Vec2f position, RainbowlandGame& game);
    void runMonsterAI(RainbowlandGame& game);
    void moveMonsters(RainbowlandGame& game);
-   void orientMonsters(VMonsters& monsters);
+   void orientMonsters(VPMonsters& monsters);
    void hurtMonster(Monster& monster, uint32_t amount);
    void checkMonsterHurtingPlayer(RainbowlandGame& game);
    void killMonsters(RainbowlandGame& game, VKillLocations& killLocations, bool grantExp);
+   void animateMonsters(RainbowlandGame& game);
 
    void enterPerkMode(RainbowlandGame& game);
    void exitPerkMode(RainbowlandGame& game);
@@ -300,20 +252,22 @@ namespace Core
    void updatePerks(RainbowlandGame& game);
 
    void activateAbility(Player& player, RainbowlandGame& game);
+   uint32_t abilityTimeLeft(RainbowlandGame& game, AbilityType ability);
+   float abilityPercentCharged(RainbowlandGame& game, AbilityType ability);
+   bool isAbilityActive(RainbowlandGame& game, AbilityType ability);
    
    void activateDefenseMatrix(Player& player, RainbowlandGame& game);
    void activateTimeCapsule(Player& player, RainbowlandGame& game);
-   void activateBlink(Player& player, RainbowlandGame& game);
+   void activateHealingCloud(Player& player, RainbowlandGame& game);
    void activateTurret(Player& player, RainbowlandGame& game);
 
    void updateDefenseMatrix(RainbowlandGame& game);
    void updateTimeCapsule(RainbowlandGame& game);
-   void updateBlink(RainbowlandGame& game);
+   void updateHealingCloud(RainbowlandGame& game);
    void updateTurret(RainbowlandGame& game);
 
-   uint32_t abilityTimeLeft(RainbowlandGame& game, AbilityType ability);
    uint32_t defenseMatrixTimeLeft(RainbowlandGame& game);
-   uint32_t blinkTimeLeft(RainbowlandGame& game);
+   uint32_t healingCloudTimeLeft(RainbowlandGame& game);
    uint32_t timeCapsuleTimeLeft(RainbowlandGame& game);
    uint32_t turretTimeLeft(RainbowlandGame& game);
 

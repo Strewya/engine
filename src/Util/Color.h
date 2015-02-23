@@ -19,6 +19,7 @@ namespace Core
       Color(float r, float g, float b, float a = 1);
 
       void set(float r, float g, float b, float a = 1);
+      void clip(float threshold);
    };
 }
 

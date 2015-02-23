@@ -59,8 +59,12 @@ namespace Core
       {
          game.m_messageHandlers.emplace_back([&](const WindowEvent& w)
          {
-            if ((w.m_type == WindowEventType::WE_KEYBOARDKEY && w.m_keyboard.m_keyCode == Keyboard::m_Escape && w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown) )
-               //(w.m_type == WindowEventType::WE_GAMEPADBUTTON && w.m_gamepadButton.m_button == Gamepad::m_LeftShoulder && w.m_gamepadButton.m_isDown))
+            if ((w.m_type == WindowEventType::WE_KEYBOARDKEY &&
+                 w.m_keyboard.m_keyCode == Keyboard::m_Escape && 
+                 w.m_keyboard.m_isDown && !w.m_keyboard.m_previouslyDown) ||
+               (w.m_type == WindowEventType::WE_GAMEPADBUTTON &&
+                w.m_gamepadButton.m_button == Gamepad::m_Back &&
+                w.m_gamepadButton.m_isDown))
             {
                if (game.m_currentGameState == RainbowlandGame::GS_SessionPreparation)
                {
@@ -86,13 +90,21 @@ namespace Core
 
          game.m_isRunning &= (bool)game.m_textureCache.load("Textures/font_t.png");
          game.m_isRunning &= (bool)game.m_textureCache.load("Textures/background.png");
-         game.m_isRunning &= (bool)game.m_textureCache.load("Textures/rainbowland_atlas.png");
+         game.m_isRunning &= (bool)game.m_textureCache.load("Textures/rainbowland_atlas.tif");
          game.m_isRunning &= (bool)game.m_fontCache.load("Defs/font.font", game.m_luaSystem.getStack());
 
-         game.m_shootSfx = game.m_audioSystem.loadSound("Sounds/shot.mp3");
-         game.m_music = game.m_audioSystem.loadSound("Sounds/music.mp3");
+
+         game.m_shootSounds[Pistol] = game.m_audioSystem.loadSound("Sounds/pistol.wav");
+         game.m_shootSounds[Shotgun] = game.m_audioSystem.loadSound("Sounds/shotgun.wav");
+         game.m_shootSounds[Uzi] = game.m_audioSystem.loadSound("Sounds/uzi.wav");
+         game.m_shootSounds[Sniper] = game.m_audioSystem.loadSound("Sounds/sniper.wav");
+         game.m_shootSounds[RPG] = game.m_audioSystem.loadSound("Sounds/missile.wav");
          game.m_reloadSfx = game.m_audioSystem.loadSound("Sounds/reload.wav");
-         game.m_isRunning &= (game.m_music != nullptr && game.m_shootSfx != nullptr && game.m_reloadSfx != nullptr);
+         game.m_isRunning &= (std::all_of(std::begin(game.m_shootSounds), std::end(game.m_shootSounds),
+            [](void* ptr)
+         {
+            return ptr != nullptr;
+         }) && game.m_reloadSfx != nullptr);
       }
 
       if(game.m_isRunning)
@@ -103,19 +115,34 @@ namespace Core
 
          game.m_defaultFont = game.m_fontCache.getResourceID("font");
          game.m_backgroundTexture = game.m_textureCache.getResourceID("Textures/background.png");
-         game.m_atlasTexture = game.m_textureCache.getResourceID("Textures/rainbowland_atlas.png");
+         game.m_atlasTexture = game.m_textureCache.getResourceID("Textures/rainbowland_atlas.tif");
 
          game.m_imageStartIndex_flower = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(0, 0, 1312, 422, 4, 2, 7, game.m_rainbowlandImageDatabase);
+         game.flowerAnimationLoop = {0, 1, 2, 3, 4, 5};
+         for( auto& i : game.flowerAnimationLoop )
+         {
+            i += game.m_imageStartIndex_flower;
+         }
 
          game.m_imageStartIndex_ladybug = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(0, 422, 481, 431, 3, 3, 7, game.m_rainbowlandImageDatabase);
+         game.ladybugAnimationLoop = {0, 1, 2, 3, 4};
+         for( auto& i : game.ladybugAnimationLoop )
+         {
+            i += game.m_imageStartIndex_ladybug;
+         }
 
          game.m_imageStartIndex_splatter = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(0, 853, 1125, 900, 5, 6, 5 * 6, game.m_rainbowlandImageDatabase);
 
          game.m_imageStartIndex_butterfly = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(481, 422, 1220, 251, 7, 1, 7, game.m_rainbowlandImageDatabase);
+         game.butterflyAnimationLoop = {0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1};
+         for( auto& i : game.butterflyAnimationLoop )
+         {
+            i += game.m_imageStartIndex_butterfly;
+         }
 
          game.m_imageStartIndex_blast = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(1179, 673, 884, 885, 1, 1, 1, game.m_rainbowlandImageDatabase);
@@ -134,6 +161,18 @@ namespace Core
 
          game.m_imageStartIndex_turret = game.m_rainbowlandImageDatabase.size();
          initGridDatabase(2087, 1178, 2377 - 2087, 1470 - 1178, 1, 1, 1, game.m_rainbowlandImageDatabase);
+
+         game.m_imageStartIndex_healthBar = game.m_rainbowlandImageDatabase.size();
+         initGridDatabase(2505, 1170, 510, 510, 1, 1, 1, game.m_rainbowlandImageDatabase);
+
+         game.m_imageStartIndex_gamepadControls = game.m_rainbowlandImageDatabase.size();
+         initGridDatabase(3130, 43, 481, 453, 1, 1, 1, game.m_rainbowlandImageDatabase);
+
+         game.m_imageStartIndex_wsadControls = game.m_rainbowlandImageDatabase.size();
+         initGridDatabase(3323, 523, 288, 261, 1, 1, 1, game.m_rainbowlandImageDatabase);
+
+         game.m_imageStartIndex_mouseControls = game.m_rainbowlandImageDatabase.size();
+         initGridDatabase(3298, 858, 338, 340, 1, 1, 1, game.m_rainbowlandImageDatabase);
 
          //all non-changeable values first
          game.m_randomGenerator.reseed(Clock::getRealTimeMicros());
@@ -185,7 +224,7 @@ namespace Core
          initBonusDatabase(game.m_bonusDatabase);
 
          //timers
-         game.m_deathTimer.setDurationMicros(secondsToMicros(5U));
+         game.m_deathTimer.setDurationMicros(secondsToMicros(6U));
          game.m_difficultyTimer.setPeriodMicros(secondsToMicros(5U));
          game.m_perkModeTransitionTimer.setDurationMicros(secondsToMicros(2U));
 
@@ -194,7 +233,7 @@ namespace Core
          game.m_exitingPerkMode = false;
          game.m_highScore = 0;
          game.m_maxMonsterCount = 400;
-         game.m_monsters.reserve(game.m_maxMonsterCount);
+         game.m_monsterPool.setMaxSize(game.m_maxMonsterCount);
 
          //high score
          game.m_highScore = 0;
@@ -211,13 +250,20 @@ namespace Core
 
          game.m_timeCapsule.area.radius = 10;
          game.m_timeCapsule.durationSeconds = 8;
-         game.m_timeCapsule.maxHealPeriod = 40;
 
-         game.m_blink.area.radius = 6;
-         game.m_blink.durationSeconds = 0.1f;
+         game.m_healingCloud.area.radius = 6;
+         game.m_healingCloud.durationSeconds = 8;
+         game.m_healingCloud.healStrength = 10;
+         game.m_healingCloud.healTimer.setPeriodMicros(secondsToMicros(0.3f));
 
          game.m_turret.area.radius = 1;
          game.m_turret.durationSeconds = 8;
+
+         //grid
+         game.m_monsterGrid.cellHalfsize.set(2, 2);
+         game.m_monsterGrid.columns = (uint32_t)(game.m_playingField.halfWidth * 3 / game.m_monsterGrid.cellHalfsize.x);
+         game.m_monsterGrid.rows = (uint32_t)(game.m_playingField.halfHeight * 3 / game.m_monsterGrid.cellHalfsize.y);
+         game.m_monsterGrid.cells.resize(game.m_monsterGrid.columns*game.m_monsterGrid.rows);
 
          //finally, prepare for game start
          initPreparationHandlers(game); //i will say this only once
@@ -234,7 +280,7 @@ namespace Core
 
    void initSession(RainbowlandGame& game)
    {
-      game.m_graphicsSystem.createTextureRenderTarget(1200, 900);
+      game.m_graphicsSystem.createTextureRenderTarget(0, 0);
 
       game.m_deathTimer.reset();
       game.m_currentTimeScale = 1;
@@ -249,15 +295,16 @@ namespace Core
       game.m_defenseMatrix.timer.setDurationMicros(0);
       game.m_defenseMatrix.timer.reset();
       game.m_defenseMatrix.cooldownSeconds = 20;
+
       game.m_timeCapsule.active = false;
       game.m_timeCapsule.timer.setDurationMicros(0);
       game.m_timeCapsule.timer.reset();
       game.m_timeCapsule.cooldownSeconds = 20;
       
-      game.m_blink.active = false;
-      game.m_blink.timer.setDurationMicros(0);
-      game.m_blink.timer.reset();
-      game.m_blink.cooldownSeconds = 20;
+      game.m_healingCloud.active = false;
+      game.m_healingCloud.timer.setDurationMicros(0);
+      game.m_healingCloud.timer.reset();
+      game.m_healingCloud.cooldownSeconds = 20;
       
       game.m_turret.active = false;
       game.m_turret.timer.setDurationMicros(0);
@@ -298,10 +345,7 @@ namespace Core
          }
       }
 
-      game.m_monsterGrid.cellHalfsize.set(2, 2);
-      game.m_monsterGrid.columns = (uint32_t)(game.m_playingField.halfWidth * 2 / game.m_monsterGrid.cellHalfsize.x);
-      game.m_monsterGrid.rows = (uint32_t)(game.m_playingField.halfHeight * 2 / game.m_monsterGrid.cellHalfsize.y);
-      game.m_monsterGrid.cells.resize(game.m_monsterGrid.columns*game.m_monsterGrid.rows);
+      
    }
 
 
@@ -310,14 +354,18 @@ namespace Core
       game.m_players.clear();
       game.m_deadPlayers.clear();
       game.m_monsters.clear();
+      game.m_monsterPool.releaseAll();
+      removeAllMonstersFromGrid(game.m_monsterGrid);
       game.m_pickups.clear();
       game.m_bullets.clear();
       game.m_blasts.clear();
       game.m_splatters.clear();
+/*      
       for (auto& bonus : game.m_activeBonuses)
       {
          disableBonus(bonus.type, game);
       }
+*/
       game.m_activeBonuses.clear();
       game.m_graphicsSystem.clearTextureRenderTarget();
       game.m_preparationData.start = false;

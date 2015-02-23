@@ -87,7 +87,6 @@ end
 		bool status = true;
 		lua_close(m_L);
 		DEBUG_SHUTDOWN(LuaSystem);
-		return status;
 	}
 
 	void LuaSystem::update()

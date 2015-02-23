@@ -48,18 +48,21 @@ namespace Core
    {
       Brain brain;
       Timer objectTimer;
+      PeriodicTimer animationTimer;
       Transform transform;
       Color color;
       Circle collisionData_attack;
       Circle collisionData_hitbox;
       Circle collisionData_separation;
       Vec2f direction;
+      Vec2i gridCell;
       float maxSpeed;
       float turnSpeed;
       int32_t maxHealth;
       int32_t health;
       CooldownTimer attackTimer;
       uint32_t damage;
+      uint32_t currentAnimationFrame;
       uint32_t expGain;
       MonsterType type;
    };
@@ -69,5 +72,18 @@ namespace Core
       PeriodicTimer spawnTimer;
       Transform transform;
       float spawnRadius;
+   };
+
+
+   class MonsterObjectPool
+   {
+   public:
+      VMonsters monsters;
+      std::vector<uint32_t> freeSlots;
+      void setMaxSize(uint32_t maxSize);
+
+      Monster* newMonster();
+      void releaseMonster(Monster* m);
+      void releaseAll();
    };
 }

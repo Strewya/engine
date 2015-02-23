@@ -117,9 +117,9 @@ namespace Core
       {
          obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
       }
-      for( auto& obj : game.m_monsters )
+      for( auto* obj : game.m_monsters )
       {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         obj->objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
       }
       for( auto& obj : game.m_monsterSpawners )
       {
@@ -162,6 +162,7 @@ namespace Core
       moveRockets(game.m_rockets);
       fixupCamera(game);
 
+      animateMonsters(game);
       orientPlayers(game.m_players);
       orientMonsters(game.m_monsters);
       updatePlayerAim(game.m_players);
@@ -181,7 +182,7 @@ namespace Core
       updatePickups(game);
       updateDefenseMatrix(game);
       updateTimeCapsule(game);
-      updateBlink(game);
+      updateHealingCloud(game);
       updateTurret(game);
 
       updatePerks(game);
@@ -190,7 +191,7 @@ namespace Core
       generatePickups(locations, game);
       generateSplatter(locations, game);
 
-      if( game.m_players.size() == 0 )
+      if( game.m_players.empty() && game.m_blasts.empty() )
       {
          if( game.m_flavour == -1 )
          {
@@ -229,17 +230,8 @@ namespace Core
 
       draw_skills(game, atlasSize);
 
-#if 0
-      auto x = game.m_monsterGrid.cellHalfsize.x*(game.m_monsterGrid.columns / 2);
-      auto y = game.m_monsterGrid.cellHalfsize.y*(game.m_monsterGrid.rows / 2);
-      for( float i = -x; i <= x; i += (game.m_monsterGrid.cellHalfsize.x * 2) )
-      {
-         drawLine(game.m_graphicsSystem, {i, y}, {i, -y}, {}, {});
-      }
-      for( float i = -y; i <= y; i += (game.m_monsterGrid.cellHalfsize.y * 2) )
-      {
-         drawLine(game.m_graphicsSystem, {x, i}, {-x, i}, {}, {});
-      }
+#if 0//GRID_DRAWING
+      draw_grid_debug_info(game.m_monsterGrid, game.m_graphicsSystem);
 #endif
 
       //****************************
@@ -247,36 +239,37 @@ namespace Core
       //****************************
       game.m_graphicsSystem.clearCamera();
       game.m_graphicsSystem.setOrthographicProjection();
-      if( game.m_players.size() == 0 )
+      if( game.m_players.empty() && game.m_blasts.empty() )
       {
          const char* flavours[] =
          {
             "HAHA YOU ARE DEAD",
                "LOLZ YOU CROAKED",
-               "YO YO YO SOMEBODY DIED",
-               "DUDE YOU KINDA SUCK",
-               "HAD FUN DYING LOL",
-               "MY MOM COULD BEAT THAT SCORE",
-               "YOUR LAST GAME WAS WAY BETTER",
-               "MARAC JE SUPAK!"
+               "I THINK SOMEBODY DIED",
+               "THAT WAS A GOOD DEATH",
+               "MY MOTHER ONCE SCORED HIGHER",
+               "YOUR LAST GAME WAS WAY BETTER"
          };
-         const char* flavours2[] =
+/*         const char* flavours2[] =
          {
             "What a loser",
             "So bad.",
             "Such low.",
             "He sucked most.",
             "Haha lame."
-         };
+         };*/
          const char* classes[4]
          {
-            "Blinker", "Defenser", "Turreter", "Slower"
+            "Healther", "Defenser", "Turreter", "Slower"
          };
 
-         drawSolidQuad(game.m_graphicsSystem, {600, 400}, {}, {0.1f, 0.1f, 0.1f});
+         drawSolidQuad(game.m_graphicsSystem, {600, 400}, {}, {0.1f, 0.1f, 0.1f, 0.7f});
          auto text = "You managed to kill " + std::to_string(game.m_totalKillCount) + " thingies before being humiliated!";
          Transform t{{0, 140}, {1, 1}, 0};
-         drawText(game.m_graphicsSystem, game.m_defaultFont, flavours[game.m_flavour], t, {}, TJ_Center, false);
+         if( game.m_flavour != -1 )
+         {
+            drawText(game.m_graphicsSystem, game.m_defaultFont, flavours[game.m_flavour], t, {}, TJ_Center, false);
+         }
          t.position.y -= 40;
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {}, TJ_Center, false);
          t.position.y -= 40;
@@ -300,6 +293,16 @@ namespace Core
          tf.position.y -= 20;
          text = "Experience: " + std::to_string(game.m_experience) + " / " + std::to_string(game.m_experienceForNextLevel);
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
+#if 0
+         tf.position.y -= 20;
+
+         if( !game.m_players.empty() )
+         {
+            auto cell = calculateCellCoords(game.m_monsterGrid, game.m_players.front().aim);
+            text = "Mouse cell coords: " + std::to_string(cell.x) + "," + std::to_string(cell.y);
+            drawText(game.m_graphicsSystem, game.m_defaultFont, text, tf, {}, TJ_Left, false);
+         }
+#endif
       }
       /*{
          tf.position.y -= 20;
@@ -350,10 +353,30 @@ namespace Core
          rect.halfHeight /= atlasSize.y;
 
          auto col = player.color;
-         if( col.r < 0.9f ) col.r = 0;
-         if( col.g < 0.9f ) col.g = 0;
-         if( col.b < 0.9f ) col.b = 0;
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, col);
+         col.clip(0.9f);
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, rect, {ratio, 1}, t, col, {0});
+
+         game.m_graphicsSystem.togglePixelShader();
+         Rect image = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_healthBar];
+         ratio = image.halfWidth / image.halfHeight;
+         image.center /= atlasSize;
+         image.halfWidth /= atlasSize.x;
+         image.halfHeight /= atlasSize.y;
+         t.scale *= 1.5f;
+         t.rotation = 0;
+         Color c{0, 0, 0};
+         float value = abilityPercentCharged(game, player.ability);
+         bool isActive = isAbilityActive(game, player.ability);
+         if( isActive || value >= 1.0f )
+         {
+            c = col;
+            if( isActive )
+            {
+               value = 1 - value;
+            }
+         }
+         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, image, {ratio, 1}, t, c, value);
+         game.m_graphicsSystem.togglePixelShader();
 
          t.scale.set(0.03f, 0.03f);
          t.position.y -= 1.0f;
@@ -364,7 +387,7 @@ namespace Core
             t.scale.set(0.02f, 0.02f);
             text = "RELOADING";
          }
-         drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, col, TJ_Center, false);
+         drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Center, false);
       }
    }
 }

@@ -86,7 +86,7 @@ namespace Core
       m_timer.update();
 
       auto currentTime = m_timer.getCurrentMicros();
-      for( auto i = 0; i < MAX_GAMEPADS; ++i )
+      for( uint8_t i = 0; i < MAX_GAMEPADS; ++i )
       {
          m_gamepadConnected[i] = false;
          DWORD connected = XInputGetState(i, &m_gamepadState[i]);
@@ -244,8 +244,8 @@ namespace Core
 
    void Window::resize(uint32_t x, uint32_t y)
    {
-      m_xSize = x == CW_USEDEFAULT ? GetSystemMetrics(SM_CXSCREEN) : x;
-      m_ySize = y == CW_USEDEFAULT ? GetSystemMetrics(SM_CYSCREEN) : y;
+      m_xSize = (x == CW_USEDEFAULT || x == 0) ? GetSystemMetrics(SM_CXSCREEN) : x;
+      m_ySize = (y == CW_USEDEFAULT || y == 0) ? GetSystemMetrics(SM_CYSCREEN) : y;
       calculateClientRect(x, y);
       SetWindowPos(m_hwnd, 0, m_xPos, m_yPos, x, y, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW);
    }
@@ -286,7 +286,7 @@ namespace Core
       m_timer.update();
       uint64_t currentTime = m_timer.getCurrentMicros();
       uint64_t delay = m_gamepadEmptyUpdateDelay;
-      for( uint32_t i = 0; i < MAX_GAMEPADS; ++i )
+      for( uint8_t i = 0; i < MAX_GAMEPADS; ++i )
       {
          if( m_gamepadConnected[i] || (currentTime >= m_gamepadLastUpdateTime[i] + delay) )
          {
@@ -451,41 +451,39 @@ namespace Core
                   }
 
                   /*** TRIGGERS ***/
-                  float leftTrigger{(float)state.Gamepad.bLeftTrigger};
-                  float rightTrigger{(float)state.Gamepad.bRightTrigger};
-                  float leftTriggerNormalized = 0;
-                  float rightTriggerNormalized = 0;
-
-                  /* left trigger */
-                  if( leftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD )
+                  struct AnalogData
                   {
-                     if( leftTrigger > 0xff )
+                     float value;
+                     float normalized;
+                  };
+                  auto lambda = [](float inputValue, uint32_t deadzone, uint32_t maxValue)
+                  {
+                     AnalogData result{inputValue, 0};
+                     if( result.value > deadzone )
                      {
-                        leftTrigger = 0xff;
+                        if( result.value > maxValue )
+                        {
+                           result.value = (float)maxValue;
+                        }
+                        result.value -= deadzone;
+                        result.normalized = result.value / (maxValue - deadzone);
                      }
-
-                     leftTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-                     leftTriggerNormalized = leftTrigger / (0xff - XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
-                  }
-                  else
-                  {
-                     leftTrigger = 0;
-                  }
-                  /* right trigger */
-                  if( rightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD )
-                  {
-                     if( rightTrigger > 0xff )
+                     else
                      {
-                        rightTrigger = 0xff;
+                        result.value = 0;
                      }
+                     return result;
+                  };
 
-                     rightTrigger -= XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-                     rightTriggerNormalized = rightTrigger / (0xff - XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
-                  }
-                  else
-                  {
-                     rightTrigger = 0;
-                  }
+                  float on = 0.8f;
+                  float off = 0.2f;
+
+                  auto leftTrigger = lambda((float)state.Gamepad.bLeftTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff);
+                  auto rightTrigger = lambda((float)state.Gamepad.bRightTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff);
+
+                  auto oldLeftTrigger = lambda((float)oldState.Gamepad.bLeftTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff);
+                  auto oldRightTrigger = lambda((float)oldState.Gamepad.bRightTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff);
+                  
 
                   if( state.Gamepad.bLeftTrigger != oldState.Gamepad.bLeftTrigger )
                   {
@@ -493,9 +491,20 @@ namespace Core
                      we.m_type = WE_GAMEPADAXIS;
                      we.m_gamepadAxis.m_gamepad = i;
                      we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftTrigger;
-                     we.m_gamepadAxis.m_magnitude = leftTrigger;
-                     we.m_gamepadAxis.m_normalizedMagnitude = leftTriggerNormalized;
+                     we.m_gamepadAxis.m_magnitude = leftTrigger.value;
+                     we.m_gamepadAxis.m_normalizedMagnitude = leftTrigger.normalized;
                      writeEvent();
+                     
+                     if( (oldLeftTrigger.normalized < on && leftTrigger.normalized >= on) ||
+                        (oldLeftTrigger.normalized > off && leftTrigger.normalized <= off) )
+                     {
+                        auto& we = newEvent();
+                        we.m_type = WE_GAMEPADBUTTON;
+                        we.m_gamepadButton.m_gamepad = i;
+                        we.m_gamepadButton.m_button = Gamepad::Keys::m_LeftTrigger;
+                        we.m_gamepadButton.m_isDown = leftTrigger.normalized >= 0.7f;
+                        writeEvent();
+                     }
                   }
                   if( state.Gamepad.bRightTrigger != oldState.Gamepad.bRightTrigger )
                   {
@@ -503,50 +512,35 @@ namespace Core
                      we.m_type = WE_GAMEPADAXIS;
                      we.m_gamepadAxis.m_gamepad = i;
                      we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightTrigger;
-                     we.m_gamepadAxis.m_magnitude = rightTrigger;
-                     we.m_gamepadAxis.m_normalizedMagnitude = rightTriggerNormalized;
+                     we.m_gamepadAxis.m_magnitude = rightTrigger.value;
+                     we.m_gamepadAxis.m_normalizedMagnitude = rightTrigger.normalized;
                      writeEvent();
+
+                     if( (oldRightTrigger.normalized < on && rightTrigger.normalized >= on) ||
+                        (oldRightTrigger.normalized > 0.3f && rightTrigger.normalized <= 0.3f) )
+                     {
+                        auto& we = newEvent();
+                        we.m_type = WE_GAMEPADBUTTON;
+                        we.m_gamepadButton.m_gamepad = i;
+                        we.m_gamepadButton.m_button = Gamepad::Keys::m_RightTrigger;
+                        we.m_gamepadButton.m_isDown = rightTrigger.normalized >= 0.7f;
+                        writeEvent();
+                     }
                   }
 
                   /*** THUMB STICKS ***/
-                  Vec2f leftStick{(float)state.Gamepad.sThumbLX, (float)state.Gamepad.sThumbLY};
-                  Vec2f rightStick{(float)state.Gamepad.sThumbRX, (float)state.Gamepad.sThumbRY};
-                  float leftMagnitude = Vec2f::length(leftStick);
-                  float rightMagnitude = Vec2f::length(rightStick);
-                  float leftMagnitudeNorm = 0;
-                  float rightMagnitudeNorm = 0;
-                  leftStick = Vec2f::normalize(leftStick);
-                  rightStick = Vec2f::normalize(rightStick);
+                  Vec2f leftStickVec{(float)state.Gamepad.sThumbLX, (float)state.Gamepad.sThumbLY};
+                  Vec2f rightStickVec{(float)state.Gamepad.sThumbRX, (float)state.Gamepad.sThumbRY};
+                  auto leftStick = lambda(Vec2f::length(leftStickVec), XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, 0x7fff);
+                  auto rightStick = lambda(Vec2f::length(rightStickVec), XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, 0x7fff);
+                  
+                  leftStickVec = Vec2f::normalize(leftStickVec);
+                  rightStickVec = Vec2f::normalize(rightStickVec);
 
-                  /* left thumb stick */
-                  if( leftMagnitude > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
-                  {
-                     if( leftMagnitude > 0x7fff )
-                     {
-                        leftMagnitude = 0x7fff;
-                     }
-                     leftMagnitude -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
-                     leftMagnitudeNorm = leftMagnitude / (0x7fff - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
-                  }
-                  else
-                  {
-                     leftMagnitude = 0;
-                  }
-
-                  /* right thumb stick */
-                  if( rightMagnitude > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
-                  {
-                     if( rightMagnitude > 0x7fff )
-                     {
-                        rightMagnitude = 0x7fff;
-                     }
-                     rightMagnitude -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
-                     rightMagnitudeNorm = rightMagnitude / (0x7fff - XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
-                  }
-                  else
-                  {
-                     rightMagnitude = 0;
-                  }
+                  Vec2f oldLeftStickVec{(float)oldState.Gamepad.sThumbLX, (float)oldState.Gamepad.sThumbLY};
+                  Vec2f oldRightStickVec{(float)oldState.Gamepad.sThumbRX, (float)oldState.Gamepad.sThumbRY};
+                  auto oldLeftStick = lambda(Vec2f::length(oldLeftStickVec), XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, 0x7fff);
+                  auto oldRightStick = lambda(Vec2f::length(oldRightStickVec), XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, 0x7fff);
 
                   if( (state.Gamepad.sThumbLX != oldState.Gamepad.sThumbLX) ||
                      (state.Gamepad.sThumbLY != oldState.Gamepad.sThumbLY) )
@@ -555,11 +549,29 @@ namespace Core
                      we.m_type = WE_GAMEPADAXIS;
                      we.m_gamepadAxis.m_gamepad = i;
                      we.m_gamepadAxis.m_axis = Gamepad::Keys::m_LeftStick;
-                     we.m_gamepadAxis.m_x = leftStick.x;
-                     we.m_gamepadAxis.m_y = leftStick.y;
-                     we.m_gamepadAxis.m_magnitude = leftMagnitude;
-                     we.m_gamepadAxis.m_normalizedMagnitude = leftMagnitudeNorm;
+                     we.m_gamepadAxis.m_x = leftStickVec.x;
+                     we.m_gamepadAxis.m_y = leftStickVec.y;
+                     we.m_gamepadAxis.m_magnitude = leftStick.value;
+                     we.m_gamepadAxis.m_normalizedMagnitude = leftStick.normalized;
                      writeEvent();
+                     
+                     if( (oldLeftStick.normalized < on && leftStick.normalized >= on) ||
+                        (oldLeftStick.normalized > off && leftStick.normalized <= off) )
+                     {
+                        auto& we = newEvent();
+                        we.m_type = WE_GAMEPADBUTTON;
+                        we.m_gamepadButton.m_gamepad = i;
+                        we.m_gamepadButton.m_isDown = leftStick.normalized >= on;
+                        if(leftStickVec.x >= on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadRight;
+                        else if(leftStickVec.x <= -on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadLeft;
+                        else if( leftStickVec.y <= -on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadDown;
+                        else if( leftStickVec.y >= on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadUp;
+                        writeEvent();
+                     }
                   }
                   if( (state.Gamepad.sThumbRX != oldState.Gamepad.sThumbRX) ||
                      (state.Gamepad.sThumbRY != oldState.Gamepad.sThumbRY) )
@@ -568,11 +580,29 @@ namespace Core
                      we.m_type = WE_GAMEPADAXIS;
                      we.m_gamepadAxis.m_gamepad = i;
                      we.m_gamepadAxis.m_axis = Gamepad::Keys::m_RightStick;
-                     we.m_gamepadAxis.m_x = rightStick.x;
-                     we.m_gamepadAxis.m_y = rightStick.y;
-                     we.m_gamepadAxis.m_magnitude = rightMagnitude;
-                     we.m_gamepadAxis.m_normalizedMagnitude = rightMagnitudeNorm;
+                     we.m_gamepadAxis.m_x = rightStickVec.x;
+                     we.m_gamepadAxis.m_y = rightStickVec.y;
+                     we.m_gamepadAxis.m_magnitude = rightStick.value;
+                     we.m_gamepadAxis.m_normalizedMagnitude = rightStick.normalized;
                      writeEvent();
+
+                     if( (oldRightStick.normalized < on && rightStick.normalized >= on) ||
+                        (oldRightStick.normalized > off && rightStick.normalized <= off) )
+                     {
+                        auto& we = newEvent();
+                        we.m_type = WE_GAMEPADBUTTON;
+                        we.m_gamepadButton.m_gamepad = i;
+                        we.m_gamepadButton.m_isDown = rightStick.normalized >= on;
+                        if( rightStickVec.x >= on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadRight;
+                        else if( rightStickVec.x <= -on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadLeft;
+                        else if( rightStickVec.y <= -on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadDown;
+                        else if( rightStickVec.y >= on )
+                           we.m_gamepadButton.m_button = Gamepad::Keys::m_DPadUp;
+                        writeEvent();
+                     }
                   }
                }
             }
@@ -698,7 +728,7 @@ namespace Core
       return false;
    }
 
-   void Window::openConsole(uint32_t xPos, uint32_t yPos)
+   void Window::openConsole(int32_t xPos, int32_t yPos)
    {
       if( !AllocConsole() )
          return;
@@ -810,7 +840,7 @@ namespace Core
          case WM_SYSKEYUP:
          {
             we.m_type = WindowEventType::WE_KEYBOARDKEY;
-            we.m_keyboard.m_keyCode = wParam;
+            we.m_keyboard.m_keyCode = (uint8_t)wParam;
             we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
             we.m_keyboard.m_isDown = (lParam & (1 << 31)) == 0;
             we.m_keyboard.m_previouslyDown = (lParam & (1 << 30)) != 0;
@@ -820,7 +850,7 @@ namespace Core
          case WM_CHAR:
          {
             we.m_type = WindowEventType::WE_KEYBOARDTEXT;
-            we.m_keyboard.m_keyCode = wParam;
+            we.m_keyboard.m_keyCode = (uint8_t)wParam;
             we.m_keyboard.m_repeat = (uint8_t)LOWORD(lParam);
             we.m_keyboard.m_isDown = true;
             we.m_keyboard.m_previouslyDown = false;
@@ -905,7 +935,7 @@ namespace Core
             GetClientRect(m_hwnd, &rc);
             ScreenToClient(m_hwnd, &cur);
             result = notProcessed;
-            if( !m_showCursor && cur.y > rc.top && cur.y < rc.bottom && cur.x > rc.left && cur.x < rc.right )
+            if( !m_showCursor && cur.y >= rc.top && cur.y <= rc.bottom && cur.x >= rc.left && cur.x <= rc.right )
             {
                SetCursor(nullptr);
                result = TRUE;
@@ -923,6 +953,8 @@ namespace Core
             else
             {
                we.m_type = WindowEventType::WE_GAINFOCUS;
+               lockCursor(m_lockCursor);
+               showCursor(m_showCursor);
             }
             result = notProcessed;
          }

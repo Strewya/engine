@@ -36,7 +36,9 @@ namespace Core
    {
       XMFLOAT4X4 world;
       XMFLOAT4 fillColor;
+      FLOAT healthPercentage;
    };
+
 
    static void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd, HWND hwnd, uint32_t width, uint32_t height);
    static ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
@@ -60,6 +62,7 @@ namespace Core
       declare(&m_renderTarget);
       declare(&m_vertexShader);
       declare(&m_pixelShader);
+      declare(&m_healthbarShader);
       declare(&m_inputLayout);
       declare(&m_samplerState);
       declare(&m_depthStencilView);
@@ -410,7 +413,9 @@ namespace Core
       m_devcon->IASetPrimitiveTopology(topology);
    }
 
-   void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs, const std::vector<Color>& fills)
+   void GraphicsSystem::v3_setInstanceData(const std::vector<Transform>& tfs,
+                                           const std::vector<Color>& fills,
+                                           const std::vector<float>& healthPercentages)
    {
       uint32_t count = tfs.size();
       if( count == 0 )
@@ -419,11 +424,12 @@ namespace Core
       assert(tfs.size() == fills.size());
 
       std::vector<dataPerInstance> data;
-      data.reserve(count);
+      data.resize(count);
       for( uint32_t i = 0; i < count; ++i )
       {
-         data.emplace_back();
-         auto& dpi = data.back();
+         auto& dpi = data[i];
+
+         dpi.healthPercentage = healthPercentages[i];
 
          dpi.fillColor.x = fills[i].r;
          dpi.fillColor.y = fills[i].g;
@@ -680,8 +686,8 @@ namespace Core
       ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
 
       // Create the texture
-      textureDesc.Width = w;
-      textureDesc.Height = h;
+      textureDesc.Width = (w == 0) ? m_window->getSizeX() : w;
+      textureDesc.Height = (h == 0) ? m_window->getSizeY() : h;
       textureDesc.MipLevels = 1;
       textureDesc.ArraySize = 1;
       textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -821,7 +827,7 @@ namespace Core
       HRESULT hr = m_dev->CreateVertexShader(shaderBuffer, shaderSize, nullptr, &m_vertexShader);
       if( SUCCEEDED(hr) )
       {
-         auto& ied = Vertex::getDescription();
+         auto ied = Vertex::getDescription();
          safeRelease(m_inputLayout);
          hr = m_dev->CreateInputLayout(ied.data(), ied.size(), shaderBuffer, shaderSize, &m_inputLayout);
          if( SUCCEEDED(hr) )
@@ -843,26 +849,55 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::initPixelShader(const ResourceFile& shaderFile)
    {
+      // general shader
       LPVOID shaderBuffer = nullptr;
       SIZE_T shaderSize = 0;
+      HRESULT hr = S_OK;
       {
 #include <Graphics/pshader.h>
          shaderBuffer = (LPVOID)g_PShader;
          shaderSize = sizeof(g_PShader);
-      }
 
-      safeRelease(m_pixelShader);
-      HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_pixelShader);
-      if( SUCCEEDED(hr) )
+         safeRelease(m_pixelShader);
+         hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_pixelShader);
+         if( SUCCEEDED(hr) )
+         {
+            m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
+         }
+      }
+      //healthbar shader
+      shaderBuffer = nullptr;
+      shaderSize = 0;
       {
-         m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
-      }
+#include <Graphics/health_shader.h>
+         shaderBuffer = (LPVOID)g_Healthbar;
+         shaderSize = sizeof(g_Healthbar);
 
+         safeRelease(m_healthbarShader);
+         HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &m_healthbarShader);
+      }
       if( FAILED(hr) )
       {
          DEBUG_INFO("\tinitPixelShader failed:", hr);
       }
       return SUCCEEDED(hr);
+   }
+
+   //*****************************************************************
+   //					TOGGLE PIXEL SHADER
+   //*****************************************************************
+   void GraphicsSystem::togglePixelShader()
+   {
+      ID3D11PixelShader* currentShader = nullptr;
+      m_devcon->PSGetShader(&currentShader, nullptr, nullptr);
+      if( currentShader == m_pixelShader )
+      {
+         m_devcon->PSSetShader(m_healthbarShader, nullptr, 0);
+      }
+      else
+      {
+         m_devcon->PSSetShader(m_pixelShader, nullptr, 0);
+      }
    }
 
    //*****************************************************************
@@ -939,6 +974,21 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::loadTexture(const ResourceFile& file, Texture& outTexture)
    {
+      D3DX11_IMAGE_LOAD_INFO info{};
+      info.BindFlags = D3DX11_DEFAULT;
+      info.CpuAccessFlags = D3DX11_DEFAULT;
+      info.Depth = D3DX11_DEFAULT;
+      info.Filter = D3DX11_DEFAULT;
+      info.FirstMipLevel = D3DX11_DEFAULT;
+      info.Height = D3DX11_DEFAULT;
+      info.MipFilter = D3DX11_DEFAULT;
+      info.MipLevels = D3DX11_DEFAULT;
+      info.MiscFlags = D3DX11_DEFAULT;
+      info.pSrcInfo = nullptr;
+      info.Usage = (D3D11_USAGE)D3DX11_DEFAULT;
+      info.Width = D3DX11_DEFAULT;
+      info.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
       ID3D11ShaderResourceView* texturePtr = nullptr;
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
       bool loaded = false;
@@ -960,6 +1010,7 @@ namespace Core
          outTexture.m_fileHash = file.getHash();
          outTexture.m_dimensions = getTextureDimensions(outTexture);
          loaded = true;
+         
       }
       return loaded;
    }
@@ -1109,7 +1160,7 @@ namespace Core
 
    void drawLine(GraphicsSystem& gfx, Vec2f p1, Vec2f p2, Transform transform, Color color)
    {
-      drawMultipleLines(gfx, p1, p2, {transform}, {color});
+      drawMultipleLines(gfx, p1, p2, {transform}, {color}, {0});
    }
 
    void drawLine(GraphicsSystem& gfx, Vec2f p1, Color c1, Vec2f p2, Color c2, Transform transform, Color color)
@@ -1122,14 +1173,17 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices({0, 1});
-      gfx.v3_setInstanceData({transform}, {color});
+      gfx.v3_setInstanceData({transform}, {color}, {0});
 
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
       gfx.v3_draw(2, 1);
    }
 
-   void drawMultipleLines(GraphicsSystem& gfx, Vec2f p1, Vec2f p2, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleLines(GraphicsSystem& gfx, Vec2f p1, Vec2f p2,
+                          const std::vector<Transform>& transforms,
+                          const std::vector<Color>& colors,
+                          const std::vector<float>& healths)
    {
       std::vector<Vertex> vertices
       {
@@ -1139,7 +1193,7 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices({0, 1});
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
 
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -1158,7 +1212,7 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
 
-      gfx.v3_setInstanceData({tf}, {c});
+      gfx.v3_setInstanceData({tf}, {c}, {0});
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
       gfx.v3_draw(count, 1);
@@ -1166,10 +1220,13 @@ namespace Core
 
    void drawHollowPolygon(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, Transform transform, Color color)
    {
-      drawMultipleHollowPolygons(gfx, positions, count, {transform}, {color});
+      drawMultipleHollowPolygons(gfx, positions, count, {transform}, {color}, {0});
    }
 
-   void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleHollowPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count,
+                                   const std::vector<Transform>& transforms,
+                                   const std::vector<Color>& colors,
+                                   const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1182,17 +1239,20 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
 
    void drawSolidPolygon(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, Transform transform, Color color)
    {
-      drawMultipleSolidPolygons(gfx, positions, count, {transform}, {color});
+      drawMultipleSolidPolygons(gfx, positions, count, {transform}, {color}, {0});
    }
 
-   void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleSolidPolygons(GraphicsSystem& gfx, const Vec2f* positions, uint32_t count,
+                                  const std::vector<Transform>& transforms,
+                                  const std::vector<Color>& colors,
+                                  const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1205,7 +1265,7 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
@@ -1214,10 +1274,13 @@ namespace Core
 
    void drawHollowQuad(GraphicsSystem& gfx, Vec2f halfSize, Transform transform, Color color)
    {
-      drawMultipleHollowQuads(gfx, halfSize, {transform}, {color});
+      drawMultipleHollowQuads(gfx, halfSize, {transform}, {color}, {0});
    }
 
-   void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2f halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleHollowQuads(GraphicsSystem& gfx, Vec2f halfSize,
+                                const std::vector<Transform>& transforms,
+                                const std::vector<Color>& colors,
+                                const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1230,17 +1293,20 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
 
    void drawSolidQuad(GraphicsSystem& gfx, Vec2f halfSize, Transform transform, Color color)
    {
-      drawMultipleSolidQuads(gfx, halfSize, {transform}, {color});
+      drawMultipleSolidQuads(gfx, halfSize, {transform}, {color}, {0});
    }
 
-   void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2f halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleSolidQuads(GraphicsSystem& gfx, Vec2f halfSize,
+                               const std::vector<Transform>& transforms,
+                               const std::vector<Color>& colors,
+                               const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1253,17 +1319,20 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
 
    void drawHollowCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color)
    {
-      drawMultipleHollowCircles(gfx, radius, points, {transform}, {color});
+      drawMultipleHollowCircles(gfx, radius, points, {transform}, {color}, {0});
    }
 
-   void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleHollowCircles(GraphicsSystem& gfx, float radius, uint32_t points,
+                                  const std::vector<Transform>& transforms,
+                                  const std::vector<Color>& colors,
+                                  const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1276,17 +1345,20 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
 
    void drawSolidCircle(GraphicsSystem& gfx, float radius, uint32_t points, Transform transform, Color color)
    {
-      drawMultipleSolidCircles(gfx, radius, points, {transform}, {color});
+      drawMultipleSolidCircles(gfx, radius, points, {transform}, {color}, {0});
    }
 
-   void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleSolidCircles(GraphicsSystem& gfx, float radius, uint32_t points,
+                                 const std::vector<Transform>& transforms,
+                                 const std::vector<Color>& colors,
+                                 const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1299,7 +1371,7 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       gfx.v3_draw(indices.size(), transforms.size());
    }
@@ -1311,18 +1383,21 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData({gfx.justifyText(transform, gfx.textHalfSize(fontID, text).x * 2, justification)}, {color});
+      gfx.v3_setInstanceData({gfx.justifyText(transform, gfx.textHalfSize(fontID, text).x * 2, justification)}, {color}, {0});
       gfx.v3_setFontTexture(fontID);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       gfx.v3_draw(indices.size(), 1);
    }
 
-   void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, Transform transform, Color color)
+   void drawTexturedQuad(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, Transform transform, Color color, float health)
    {
-      drawMultipleTexturedQuads(gfx, textureID, image, halfSize, {transform}, {color});
+      drawMultipleTexturedQuads(gfx, textureID, image, halfSize, {transform}, {color}, {health});
    }
 
-   void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize, const std::vector<Transform>& transforms, const std::vector<Color>& colors)
+   void drawMultipleTexturedQuads(GraphicsSystem& gfx, uint32_t textureID, Rect image, Vec2f halfSize,
+                                  const std::vector<Transform>& transforms,
+                                  const std::vector<Color>& colors,
+                                  const std::vector<float>& healths)
    {
       if( transforms.size() == 0 )
       {
@@ -1342,7 +1417,7 @@ namespace Core
 
       gfx.v3_setVertices(vertices);
       gfx.v3_setIndices(indices);
-      gfx.v3_setInstanceData(transforms, colors);
+      gfx.v3_setInstanceData(transforms, colors, healths);
       gfx.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       gfx.v3_setTexture(textureID);
       gfx.v3_draw(indices.size(), transforms.size());

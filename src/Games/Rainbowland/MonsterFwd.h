@@ -19,5 +19,6 @@ namespace Core
    struct MonsterSpawner;
 
    typedef std::vector<Monster> VMonsters;
+   typedef std::vector<Monster*> VPMonsters;
    typedef std::vector<MonsterSpawner> VMonsterSpawners;
 }

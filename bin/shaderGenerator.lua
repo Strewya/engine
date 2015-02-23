@@ -3,7 +3,8 @@ function rebuildShadersIfNeccessary()
 	local shaderList =
 	{
 		{ "/Shaders/shader.hlsl", "ps_4_0", "PShader", "pshader.h" },
-		{ "/Shaders/shader.hlsl", "vs_4_0", "VShader", "vshader.h" }
+		{ "/Shaders/shader.hlsl", "vs_4_0", "VShader", "vshader.h" },
+		{ "/Shaders/shader.hlsl", "ps_4_0", "Healthbar", "health_shader.h" }
 	};
 
 	local pwd = lfs.currentdir();

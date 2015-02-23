@@ -83,15 +83,24 @@ namespace Core
       uint32_t m_imageStartIndex_players;
       uint32_t m_imageStartIndex_rocket;
       uint32_t m_imageStartIndex_turret;
+      uint32_t m_imageStartIndex_gradient;
+      uint32_t m_imageStartIndex_healthBar;
+      uint32_t m_imageStartIndex_mouseControls;
+      uint32_t m_imageStartIndex_wsadControls;
+      uint32_t m_imageStartIndex_gamepadControls;
+
+      std::vector<uint32_t> ladybugAnimationLoop;
+      std::vector<uint32_t> flowerAnimationLoop;
+      std::vector<uint32_t> butterflyAnimationLoop;
 
       VWeapons m_weaponDatabase;
       VPerks m_perkDatabase;
       VBonuses m_bonusDatabase;
       VMonsterSpawners m_monsterSpawners;
-
+      MonsterObjectPool m_monsterPool;
       VPlayers m_players;
       VPlayers m_deadPlayers;
-      VMonsters m_monsters;
+      VPMonsters m_monsters;
       VPickups m_pickups;
       VBullets m_bullets;
       VBlasts m_blasts;
@@ -102,7 +111,7 @@ namespace Core
 
       DefenseMatrix m_defenseMatrix;
       TimeCapsule m_timeCapsule;
-      Blink m_blink;
+      HealingCloud m_healingCloud;
       Turret m_turret;
 
       float m_difficulty;
@@ -126,8 +135,7 @@ namespace Core
       uint32_t m_atlasTexture;
       uint32_t m_backgroundTexture;
 
-      void* m_music;
-      void* m_shootSfx;
+      void* m_shootSounds[WeaponTypeCount];
       void* m_reloadSfx;
 
       Window* m_window;

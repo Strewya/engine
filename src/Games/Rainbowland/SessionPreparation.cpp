@@ -92,14 +92,26 @@ namespace Core
             game.m_renderQueue.enqueueRenderCommand(
                std::bind(drawText, _1, game.m_defaultFont, controllers[i], tLabel, Color{}, TJ_Center, false));
          }
-         tLabel.position.set(0, hBox.y - 15);
-         tLabel.position += tBox.position;
-         tLabel.scale *= 0.5f;
 
          if( controllerTaken )
          {
-            std::string text = "BACK";
-            if( i == 0 ) text = "RMB";
+            tLabel.scale *= 0.8f;
+
+            tLabel.position.set(0, 30);
+            tLabel.position += tBox.position;
+            std::string text = "press";
+            game.m_renderQueue.enqueueRenderCommand(
+               std::bind(drawText, _1, game.m_defaultFont, text, tLabel, Color{}, TJ_Center, false));
+            
+            tLabel.position.set(0, 0);
+            tLabel.position += tBox.position;
+            text = "ABILITY";
+            game.m_renderQueue.enqueueRenderCommand(
+               std::bind(drawText, _1, game.m_defaultFont, text, tLabel, Color{0,0,0}, TJ_Center, false));
+
+            tLabel.position.set(0, -30);
+            tLabel.position += tBox.position;
+            text = "to cancel";
             game.m_renderQueue.enqueueRenderCommand(
                std::bind(drawText, _1, game.m_defaultFont, text, tLabel, Color{}, TJ_Center, false));
          }
@@ -109,9 +121,9 @@ namespace Core
       Vec2f hPlayingPanel;
       Color cPlayingPanel;
 
-      hPlayingPanel.set(hMainPanel.x * 0.7f, hMainPanel.y * 0.8f);
+      hPlayingPanel.set(hMainPanel.x * 0.7f, hMainPanel.y * 0.5f);
       tPlayingPanel.position.set(hMainPanel.x - 20 - hMainPanel.x * 0.7f,
-                                 hMainPanel.y - 20 - hMainPanel.y*0.8f);
+                                 hMainPanel.y - 20 - hMainPanel.y*0.5f);
       tPlayingPanel.position += tMainPanel.position;
       cPlayingPanel.set(0.15f, 0.56f, 0.15f);
 
@@ -120,11 +132,11 @@ namespace Core
 
       const char* classes[4]
       {
-         "Blinker", "Defenser", "Turreter", "Slower"
+         "Healther", "Defenser", "Turreter", "Slower"
       };
       const char* keys[4]
       {
-         "W / Y", "D / B", "A / X", "S / A"
+         "move UP", "move RIGHT", "move LEFT", "move DOWN"
       };
 
       Vec2f cellSize = hPlayingPanel / 2;
@@ -137,7 +149,7 @@ namespace Core
             tBox.position.set(-hPlayingPanel.x + cellSize.x + cellSize.x * 2 * i,
                               hPlayingPanel.y - cellSize.y - cellSize.y * 2 * j);
             tBox.position += tPlayingPanel.position;
-            hBox = cellSize*0.7f;
+            hBox = cellSize*0.8f;
 
             game.m_renderQueue.enqueueRenderCommand(
                std::bind(drawSolidQuad, _1, hBox, tBox, cBox));
@@ -145,8 +157,18 @@ namespace Core
             Transform tLabel;
             tLabel.position += tBox.position;
 
+            Color classNameColor;
+            float dimm = 0.6f;
+            float full = 1.0f;
+            switch( index )
+            {
+               case 0: { classNameColor.set(full, dimm, dimm); } break;
+               case 1: { classNameColor.set(full, full, dimm); } break;
+               case 2: { classNameColor.set(dimm, full, dimm); } break;
+               case 3: { classNameColor.set(dimm, dimm, full); } break;
+            }
             game.m_renderQueue.enqueueRenderCommand(
-               std::bind(drawText, _1, game.m_defaultFont, classes[index], tLabel, Color{}, TJ_Center, false));
+               std::bind(drawText, _1, game.m_defaultFont, classes[index], tLabel, classNameColor, TJ_Center, false));
 
             tLabel.scale *= 0.4f;
             tLabel.position.set(0, -hBox.y + 15);
@@ -174,7 +196,7 @@ namespace Core
       Vec2f hStart;
       Color cStart;
 
-      hStart.set(100, 20);
+      hStart.set(100, 60);
       tStart.position.set(hMainPanel.x - hStart.x - 10, -hMainPanel.y + hStart.y+10);
       tStart.position += tMainPanel.position;
       cStart.set(0, 0, 1);
@@ -185,8 +207,33 @@ namespace Core
       Transform tLabel;
       tLabel.position += tStart.position;
 
+      tLabel.position.y += 30;
       game.m_renderQueue.enqueueRenderCommand(
-         std::bind(drawText, _1, game.m_defaultFont, "Start/LMB", tLabel, Color{}, TJ_Center, false));
+         std::bind(drawText, _1, game.m_defaultFont, "press", tLabel, Color{}, TJ_Center, false));
+
+      tLabel.position.y -= 30;
+      game.m_renderQueue.enqueueRenderCommand(
+         std::bind(drawText, _1, game.m_defaultFont, "SHOOT", tLabel, Color{}, TJ_Center, false));
+
+      tLabel.position.y -= 30;
+      game.m_renderQueue.enqueueRenderCommand(
+         std::bind(drawText, _1, game.m_defaultFont, "to start", tLabel, Color{}, TJ_Center, false));
+
+      Transform tControls;
+      Vec2f hControls;
+
+      tControls.position.set(0, 0);
+      tControls.scale.set(10, 10);
+
+      Rect r = game.m_rainbowlandImageDatabase[game.m_imageStartIndex_mouseControls];
+      Vec2f atlasSize = game.m_textureCache.getTextureDimensions(game.m_atlasTexture);
+      float ratio = r.halfWidth / r.halfHeight;
+      r.center /= atlasSize;
+      r.halfWidth /= atlasSize.x;
+      r.halfHeight /= atlasSize.y;
+      game.m_renderQueue.enqueueRenderCommand(
+         std::bind(drawTexturedQuad, _1, game.m_atlasTexture, r, Vec2f{ratio, 1}, tControls, Color{}, 0));
+
 
       if( game.m_preparationData.start )
       {
@@ -222,7 +269,7 @@ namespace Core
 
       game.m_graphicsSystem.v3_setVertices(vertices);
       game.m_graphicsSystem.v3_setIndices(indices);
-      game.m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}});
+      game.m_graphicsSystem.v3_setInstanceData({{}}, {{0.6f, 0.6f, 0.6f}}, {0});
       game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
       game.m_graphicsSystem.setTransparencyMode(false);
@@ -241,8 +288,8 @@ namespace Core
       auto sessionPreparationHandler = [=, &game](const WindowEvent& we) -> bool
       {
          auto& prep = game.m_preparationData;
-         uint32_t con = -1;
-         uint32_t cls = -1;
+         uint32_t con = UINT32_MAX;
+         uint32_t cls = UINT32_MAX;
 
          switch( we.m_type )
          {
@@ -303,41 +350,44 @@ namespace Core
             case WE_GAMEPADBUTTON:
             {
                con = we.m_gamepadButton.m_gamepad + 1;
-               switch( we.m_gamepadButton.m_button )
+               if( we.m_gamepadButton.m_isDown )
                {
-                  case Gamepad::m_Back:
+                  switch( we.m_gamepadButton.m_button )
                   {
-                     auto i = game.m_preparationData.controllers[con];
-                     game.m_preparationData.classes[i] = -1;
-                     game.m_preparationData.controllers[con] = -1;
-                     return true;
-                  } break;
+                     case Gamepad::m_LeftTrigger:
+                     {
+                        auto i = game.m_preparationData.controllers[con];
+                        game.m_preparationData.classes[i] = -1;
+                        game.m_preparationData.controllers[con] = -1;
+                        return true;
+                     } break;
 
-                  case Gamepad::m_Start:
-                  {
-                     game.m_preparationData.start = true;
-                     return true;
-                  } break;
+                     case Gamepad::m_RightTrigger:
+                     {
+                        game.m_preparationData.start = true;
+                        return true;
+                     } break;
 
-                  case Gamepad::m_DPadUp:
-                  {
-                     cls = 0;
-                  } break;
+                     case Gamepad::m_DPadUp:
+                     {
+                        cls = 0;
+                     } break;
 
-                  case Gamepad::m_DPadDown:
-                  {
-                     cls = 3;
-                  } break;
+                     case Gamepad::m_DPadDown:
+                     {
+                        cls = 3;
+                     } break;
 
-                  case Gamepad::m_DPadLeft:
-                  {
-                     cls = 2;
-                  } break;
+                     case Gamepad::m_DPadLeft:
+                     {
+                        cls = 2;
+                     } break;
 
-                  case Gamepad::m_DPadRight:
-                  {
-                     cls = 1;
-                  } break;
+                     case Gamepad::m_DPadRight:
+                     {
+                        cls = 1;
+                     } break;
+                  }
                }
             } break;
          }

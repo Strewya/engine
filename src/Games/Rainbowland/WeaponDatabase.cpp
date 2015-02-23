@@ -4,6 +4,8 @@
 /******* personal header *******/
 #include <Games/Rainbowland/WeaponDatabase.h>
 /******* C++ headers *******/
+#include <algorithm>
+#include <cassert>
 /******* extra headers *******/
 #include <Games/Rainbowland/Weapon.h>
 #include <Util/Time.h>
@@ -45,7 +47,7 @@ namespace Core
       weapons[type].name            = "Spreader";
       weapons[type].fireDelay       = secondsToMicros(0.5f);
       weapons[type].reloadDelay     = secondsToMicros(1.2f);
-      weapons[type].damage          = 50;
+      weapons[type].damage          = 80;
       weapons[type].maxAmmo         = 12;
       weapons[type].bulletsPerShot  = 6;
       weapons[type].spread          = 2;
@@ -55,7 +57,7 @@ namespace Core
       weapons[type].name            = "Urban cleaner";
       weapons[type].fireDelay       = secondsToMicros(0.1f);
       weapons[type].reloadDelay     = secondsToMicros(1.3f);
-      weapons[type].damage          = 20;
+      weapons[type].damage          = 70;
       weapons[type].maxAmmo         = 32;
       weapons[type].bulletsPerShot  = 1;
       weapons[type].spread          = 0.5f;

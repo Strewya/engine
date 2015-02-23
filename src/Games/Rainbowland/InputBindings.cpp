@@ -102,6 +102,8 @@ namespace Core
                   if( single )
                   {
                      game.m_monsters.clear();
+                     game.m_monsterPool.releaseAll();
+                     removeAllMonstersFromGrid(game.m_monsterGrid);
                      g_spawnEnabled = !g_spawnEnabled;
                   }
                } break;
@@ -146,7 +148,7 @@ namespace Core
 
                case Keyboard::m_X:
                {
-                  generateMonster(game.m_monsters, loc, 0, game);
+                  generateMonster(game.m_monsters, loc, game);
                } break;
 
                case Keyboard::m_Home:
@@ -506,9 +508,12 @@ namespace Core
                   }
                   return true;
                }
-               if( we.m_gamepadAxis.m_axis == Gamepad::m_RightTrigger )
+            } break;
+            case WE_GAMEPADBUTTON:
+            {
+               if( we.m_gamepadButton.m_button == Gamepad::m_RightTrigger )
                {
-                  if( we.m_gamepadAxis.m_magnitude > 0.1f )
+                  if( we.m_gamepadButton.m_isDown )
                   {
                      player.isShooting = true;
                   }
@@ -518,9 +523,9 @@ namespace Core
                   }
                   return true;
                }
-               if( we.m_gamepadAxis.m_axis == Gamepad::m_LeftTrigger )
+               if( we.m_gamepadButton.m_button == Gamepad::m_LeftTrigger )
                {
-                  if( we.m_gamepadAxis.m_magnitude > 0.4f )
+                  if( we.m_gamepadButton.m_isDown )
                   {
                      activateAbility(player, game);
                   }
@@ -571,7 +576,7 @@ namespace Core
                   }
                   return true;
                }
-               if( we.m_gamepadButton.m_button == Gamepad::m_BottomButton && we.m_gamepadButton.m_isDown )
+               if( we.m_gamepadButton.m_button == Gamepad::m_LeftTrigger && we.m_gamepadButton.m_isDown )
                {
                   player.chosenPerk = player.selectablePerks[player.selectedPerkIndex];
                   return true;

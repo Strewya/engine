@@ -155,6 +155,18 @@ namespace Core
    }
 
    template<typename T>
+   bool Vec2<T>::operator==(Vec2<T> v)
+   {
+      return x == v.x && y == v.y;
+   }
+
+   template<typename T>
+   bool Vec2<T>::operator!=(Vec2<T> v)
+   {
+      return !(*this == v);
+   }
+
+   template<typename T>
    T Vec2<T>::length(Vec2<T> v)
    {
       return static_cast<T>(std::sqrtf(static_cast<float>(length2(v))));
@@ -202,6 +214,18 @@ namespace Core
    Vec2<T> operator/(T f, Vec2<T> v)
    {
       return v / f;
+   }
+
+   template<typename T>
+   bool operator==(Vec2<T> l, Vec2<T> r)
+   {
+      return l == r;
+   }
+
+   template<typename T>
+   bool operator!=(Vec2<T> l, Vec2<T> r)
+   {
+      return l != r;
    }
 
    template<typename T>

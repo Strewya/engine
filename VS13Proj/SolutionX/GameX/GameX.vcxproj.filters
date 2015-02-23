@@ -52,10 +52,6 @@
     <Filter Include="Design\Rainbowland">
       <UniqueIdentifier>{98560073-d057-4945-bcde-ea1e6a437678}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Framework\Graphics\Shaders">
-      <UniqueIdentifier>{b60c4e91-ee31-43cf-ba18-e4b5d579d23f}</UniqueIdentifier>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
     <Filter Include="Design\Rainbowland\Structures">
       <UniqueIdentifier>{597d408e-5ef3-42c3-b10b-ba1c9835e89b}</UniqueIdentifier>
     </Filter>
@@ -67,6 +63,9 @@
     </Filter>
     <Filter Include="Design\Rainbowland\States">
       <UniqueIdentifier>{e7eaf3e5-6327-41dd-88de-f7c40540c67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Framework\Graphics\Shaders">
+      <UniqueIdentifier>{1e728a9f-b51b-40fe-b2a7-0d222c8a3e73}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -210,9 +209,6 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp">
       <Filter>Design\Rainbowland</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
-      <Filter>Design\Rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\RenderQueue.cpp">
       <Filter>Framework\Graphics</Filter>
     </ClCompile>
@@ -253,6 +249,12 @@
       <Filter>Design\Rainbowland\States</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.cpp">
+      <Filter>Design\Rainbowland\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Monster.cpp">
+      <Filter>Design\Rainbowland\Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
       <Filter>Design\Rainbowland\Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -417,9 +419,6 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h">
       <Filter>Design\Rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
-      <Filter>Design\Rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\RenderQueue.h">
       <Filter>Framework\Graphics</Filter>
     </ClInclude>
@@ -446,9 +445,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Vec2.h">
       <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Types.h">
-      <Filter>Design\Rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Vec2Fwd.h">
       <Filter>Util</Filter>
@@ -507,6 +503,12 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Movement.h">
       <Filter>Design\Rainbowland\Code</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Abilities.h">
+      <Filter>Design\Rainbowland\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
+      <Filter>Design\Rainbowland\Code</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Input\Input.pkg">
@@ -548,7 +550,9 @@
     <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
       <Filter>Design\Pong</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl" />
+    <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl">
+      <Filter>Framework\Graphics\Shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua">

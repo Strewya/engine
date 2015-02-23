@@ -83,7 +83,7 @@ namespace Core
 
       bool readEvent(uint64_t time, WindowEvent& outEvent);
 
-      void openConsole(uint32_t xPos, uint32_t yPos);
+      void openConsole(int32_t xPos, int32_t yPos);
       void closeConsole();
 
    protected:
@@ -136,11 +136,11 @@ namespace Core
             : m_timestamp(0), m_action(0), m_index(index), m_filename(), m_state(UNUSED)
          {}
 
-         uint64_t		m_timestamp;
-         DWORD			m_action;
-         const uint32_t	m_index;
-         State			m_state;
-         std::string		m_filename;
+         uint64_t m_timestamp;
+         DWORD m_action;
+         uint32_t m_index;
+         State m_state;
+         std::string m_filename;
       };
 
       std::vector<FileChangeInfo> m_fileChanges;

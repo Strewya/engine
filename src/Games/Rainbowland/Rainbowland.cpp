@@ -51,7 +51,7 @@ namespace Core
    {
       m_window = &window;
 
-      window.resize(1200, 900);
+      window.resize(0, 0);
 #ifndef DEPLOY
       window.openConsole(-1200, 0);
 #endif
