@@ -511,6 +511,9 @@ namespace Core
             } break;
             case WE_GAMEPADBUTTON:
             {
+               auto gid = we.m_gamepadButton.m_gamepad;
+               if (gid != gamepadID) return false;
+
                if( we.m_gamepadButton.m_button == Gamepad::m_RightTrigger )
                {
                   if( we.m_gamepadButton.m_isDown )

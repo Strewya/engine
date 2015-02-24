@@ -195,7 +195,7 @@ namespace Core
       {
          if( game.m_flavour == -1 )
          {
-            game.m_flavour = game.m_randomGenerator.randInt(0, 6);
+            game.m_flavour = game.m_randomGenerator.randInt(0, 5);
          }
          if (game.m_totalKillCount > game.m_highScore)
          {

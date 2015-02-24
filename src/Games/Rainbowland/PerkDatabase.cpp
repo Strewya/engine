@@ -509,6 +509,7 @@ namespace Core
    ACQUIRE_FN(ExtraBullet)
    {
       player.extraBullets = 6;
+      calculateWeaponBonuses(player, game.m_weaponDatabase);
    }
 
    ACQUIRE_FN(PerkExpert)

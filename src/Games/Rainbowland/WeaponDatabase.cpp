@@ -47,7 +47,7 @@ namespace Core
       weapons[type].name            = "Spreader";
       weapons[type].fireDelay       = secondsToMicros(0.5f);
       weapons[type].reloadDelay     = secondsToMicros(1.2f);
-      weapons[type].damage          = 80;
+      weapons[type].damage          = 65;
       weapons[type].maxAmmo         = 12;
       weapons[type].bulletsPerShot  = 6;
       weapons[type].spread          = 2;
@@ -57,7 +57,7 @@ namespace Core
       weapons[type].name            = "Urban cleaner";
       weapons[type].fireDelay       = secondsToMicros(0.1f);
       weapons[type].reloadDelay     = secondsToMicros(1.3f);
-      weapons[type].damage          = 70;
+      weapons[type].damage          = 60;
       weapons[type].maxAmmo         = 32;
       weapons[type].bulletsPerShot  = 1;
       weapons[type].spread          = 0.5f;
@@ -75,9 +75,9 @@ namespace Core
 
       type = RPG;
       weapons[type].name            = "Bazoooooka";
-      weapons[type].fireDelay       = secondsToMicros(0.3f);
+      weapons[type].fireDelay       = secondsToMicros(0.6f);
       weapons[type].reloadDelay     = secondsToMicros(1.5f);
-      weapons[type].damage          = 70;
+      weapons[type].damage          = 60;
       weapons[type].maxAmmo         = 10;
       weapons[type].bulletsPerShot  = 1;
       weapons[type].spread          = 0;

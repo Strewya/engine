@@ -92,6 +92,7 @@ namespace Core
       void writeEvent();
 
       XINPUT_STATE m_gamepadState[MAX_GAMEPADS];
+      bool GamepadAxisAsButon[4][2];
       uint64_t m_gamepadLastUpdateTime[MAX_GAMEPADS];
       bool m_gamepadConnected[MAX_GAMEPADS];
       DWORD m_trackedChanges;

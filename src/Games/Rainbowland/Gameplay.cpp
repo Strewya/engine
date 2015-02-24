@@ -364,6 +364,9 @@ namespace Core
 
    void placePickup(RainbowlandGame& game, Vec2f location, BonusType bonus, WeaponType weapon)
    {
+      bool exists = std::find_if(game.m_pickups.begin(), game.m_pickups.end(),
+         [=](Pickup& p) { return p.bonus == SlowTime; }) != game.m_pickups.end();
+
       game.m_pickups.emplace_back();
       game.m_pickups.back().objectTimer.setDurationMicros(secondsToMicros(15U));
       game.m_pickups.back().transform.position = location;
@@ -383,6 +386,12 @@ namespace Core
             IncreasedMovementSpeedIcon,
             IncreasedRateOfFireIcon
          };
+
+         if (bonus == SlowTime && exists)
+         {
+            game.m_pickups.pop_back();
+            return;
+         }
 
          game.m_pickups.back().iconIndex = icons[bonus] + game.m_imageStartIndex_bonuses;
       }
@@ -518,7 +527,7 @@ namespace Core
                   case Uzi:
                   case Sniper:
                   {
-                     generateBullets(game.m_bullets, game.m_randomGenerator, w.bulletsPerShot + player.extraBullets,
+                     generateBullets(game.m_bullets, game.m_randomGenerator, w.bulletsPerShot,
                                      w.spread, player.transform.position + p, aim, w.damage, w.bulletPierce, &player);
                   } break;
                }
@@ -868,7 +877,7 @@ namespace Core
       monsta.damage = static_cast<uint32_t>(static_cast<float>(monsta.damage)*game.m_difficulty);
       clamp(1U, 15U, monsta.damage);
       monsta.maxSpeed *= game.m_difficulty;
-      clamp(0.0f, 4.0f, monsta.maxSpeed);
+      clamp(0.0f, 5.0f, monsta.maxSpeed);
    }
 
    void setFlowerSpecificData(Monster& monster)
@@ -924,7 +933,7 @@ namespace Core
       else
          monster.brain.state = BS_Attack;
       monster.brain.attackRadius = 7;
-      monster.brain.chanceToWander = 0.01f;
+      monster.brain.chanceToWander = 0.05f;
       uint32_t hp = static_cast<uint32_t>(30 * (game.m_randomGenerator.randFloat()*0.4f + 0.8f));
       monster.maxHealth = monster.health = static_cast<uint32_t>(hp);
       monster.attackTimer.setDurationMicros(secondsToMicros(0.5f));
@@ -1012,11 +1021,17 @@ namespace Core
                   }
                   monster.brain.targetLocation = monster.transform.position + direction * 4;
                   auto pi = findPlayerInArea(Circle{monster.transform.position, monster.brain.attackRadius}, game.m_players);
-                  if( pi != game.m_players.size() )
+                  if( pi != game.m_players.size())
                   {
                      monster.brain.targetPlayer = game.m_players[pi].id;
                      monster.brain.state = BS_Attack;
                   }
+                  /* if (game.m_randomGenerator.randFloat() < 0.1f && !game.m_players.empty())
+                  {
+                     pi = game.m_randomGenerator.randInt(0, game.m_players.size() - 1);
+                     monster.brain.targetPlayer = game.m_players[pi].id;
+                     monster.brain.state = BS_Attack;
+                  } */
                } break;
 
                case BS_Attack:

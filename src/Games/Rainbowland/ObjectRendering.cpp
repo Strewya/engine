@@ -212,7 +212,7 @@ namespace Core
       if( game.m_healingCloud.active )
       {
          Transform t{game.m_healingCloud.area.center, {1, 1}, 0};
-         drawHollowCircle(game.m_graphicsSystem, game.m_healingCloud.area.radius, 18, t, {0.7f, 0.7f, 0});
+         drawSolidCircle(game.m_graphicsSystem, game.m_healingCloud.area.radius, 18, t, {0.0f, 0.7f, 0, 0.2f});
          auto displayTime = healingCloudTimeLeft(game);
          auto text = std::to_string(displayTime);
          t.scale.set(0.03f, 0.03f);
