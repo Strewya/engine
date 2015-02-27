@@ -13,6 +13,8 @@
 /******* extra headers *******/
 #include <DataStructs/Font.h>
 #include <Graphics/Vertex.h>
+#include <Util/Color.h>
+#include <Util/Transform.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -33,7 +35,7 @@ namespace Core
    };
       
    typedef std::vector<Vertex> VertexBuffer;
-   typedef std::vector<uitn32_t> IndexBuffer;
+   typedef std::vector<uint32_t> IndexBuffer;
    typedef std::vector<InstanceData> InstanceBuffer;
    
    class Camera;
@@ -112,7 +114,7 @@ namespace Core
       void v3_setFontTexture(uint32_t fontId);
       void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
       
-      void v4_setData(VertexBuffer vertices, IndexBuffer indices, InstanceData instance);
+      void v4_setData(VertexBuffer vertices, IndexBuffer indices, Transform transform, Color color, float fValue);
       void v4_drawBuffers();
 
       void v3_setTextureAsRenderTarget();

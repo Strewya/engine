@@ -671,16 +671,85 @@ namespace Core
       return inds;
    }
 
-   void GraphicsSystem::v4_setData(VertexBuffer vertices, IndexBuffer indices, InstanceData instance)
+   void GraphicsSystem::v4_setData(VertexBuffer vertices, IndexBuffer indices, Transform transform, Color color, float fValue)
    {
-      m_verticesToDraw.emplace_back(m_verticesToDraw.end(), vertices.begin(), vertices.end());
+      uint32_t vertexOffset = m_verticesToDraw.size();
+      m_verticesToDraw.insert(m_verticesToDraw.end(), vertices.begin(), vertices.end());
+      
+      for(auto& i : indices)
+      {
+         i += vertexOffset;
+      }
       m_indicesToDraw.insert(m_indicesToDraw.end(), indices.begin(), indices.end());
-      m_instanceData.push_back(instance);
+      m_instanceData.push_back({transform, color, fValue});
    }
    
    void GraphicsSystem::v4_drawBuffers()
    {
+      if( m_verticesToDraw.empty() || m_indicesToDraw.empty() || m_instanceData.empty() )
+         return;
+
+      std::vector<dataPerInstance> data;
+      data.resize(m_instanceData.size());
+      for( uint32_t i = 0; i < m_instanceData.size(); ++i )
+      {
+         auto& dpi = data[i];
+
+         dpi.healthPercentage = m_instanceData[i].floatValue;
+
+         dpi.fillColor.x = m_instanceData[i].color.r;
+         dpi.fillColor.y = m_instanceData[i].color.g;
+         dpi.fillColor.z = m_instanceData[i].color.b;
+         dpi.fillColor.w = m_instanceData[i].color.a;
+
+         auto world = XMMatrixIdentity();
+         world *= XMMatrixScaling(m_instanceData[i].transform.scale.x, m_instanceData[i].transform.scale.y, 1.0f);
+         //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+         //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+         world *= XMMatrixRotationZ(m_instanceData[i].transform.rotation);
+         world *= XMMatrixTranslation(m_instanceData[i].transform.position.x, m_instanceData[i].transform.position.y, 0);
+         world = XMMatrixTranspose(world*m_camView*m_camProjection);
+
+         XMStoreFloat4x4(&dpi.world, world);
+      }
+   
+      D3D11_MAPPED_SUBRESOURCE ms;
       
+      auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), m_verticesToDraw.size());
+      auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), m_indicesToDraw.size());
+      auto* instb = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), m_instanceData.size());
+      
+      HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+      assert(SUCCEEDED(hr));
+      memcpy(ms.pData, m_verticesToDraw.data(), m_verticesToDraw.size() * sizeof(Vertex));
+      m_devcon->Unmap(vb, 0);
+      
+      hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+      assert(SUCCEEDED(hr));
+      memcpy(ms.pData, m_indicesToDraw.data(), m_indicesToDraw.size() * sizeof(uint32_t));
+      m_devcon->Unmap(ib, 0);
+
+      hr = m_devcon->Map(instb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+      assert(SUCCEEDED(hr));
+      memcpy(ms.pData, data.data(), data.size() * sizeof(dataPerInstance));
+      m_devcon->Unmap(ib, 0);
+
+      uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
+      uint32_t offsets[2] = {0, 0};
+      ID3D11Buffer* bufferPtrs[2] = {vb, ib};
+      
+      m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
+      m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
+
+      m_devcon->DrawIndexedInstanced(m_indicesToDraw.size(), m_instanceData.size(), 0, 0, 0);
+
+      m_verticesToDraw.clear();
+      m_indicesToDraw.clear();
+      m_instanceData.clear();
+      
+      safeRelease(ib);
+      safeRelease(vb);
+      safeRelease(instb);
    }
       
    void GraphicsSystem::createTextureRenderTarget(uint32_t w, uint32_t h)

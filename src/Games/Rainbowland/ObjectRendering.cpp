@@ -19,6 +19,8 @@ namespace Core
       auto indices = game.m_graphicsSystem.v3_makeSolidQuadIndices();
       game.m_graphicsSystem.setTransparencyMode(true);
       game.m_graphicsSystem.v3_setTexture(game.m_atlasTexture);
+      game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      
       for( auto splatter : game.m_splatters )
       {
          auto sdb = game.m_rainbowlandImageDatabase[splatter.splatterImage];
@@ -31,13 +33,15 @@ namespace Core
          vertices[1].setTextureCoords(sdb.right(), sdb.bottom());
          vertices[2].setTextureCoords(sdb.left(), sdb.top());
          vertices[3].setTextureCoords(sdb.right(), sdb.top());
-
+/*
          game.m_graphicsSystem.v3_setVertices(vertices);
          game.m_graphicsSystem.v3_setIndices(indices);
-         game.m_graphicsSystem.v3_setInstanceData({splatter.transform}, {splatter.color}, {0});
-         game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+         game.m_graphicsSystem.v3_setInstanceData({splatter.transform}, {splatter.color}, {0});        
          game.m_graphicsSystem.v3_draw(indices.size(), 1);
+*/
+         game.m_graphicsSystem.v4_setData(vertices, indices, splatter.transform, splatter.color, 0);
       }
+      game.m_graphicsSystem.v4_drawBuffers();
 
       game.m_splatters.clear();
       game.m_graphicsSystem.v3_clearTextureAsRenderTarget();
@@ -134,7 +138,20 @@ namespace Core
          r.halfWidth /= atlasSize.x;
          r.halfHeight /= atlasSize.y;
 
-         drawTexturedQuad(game.m_graphicsSystem, game.m_atlasTexture, r, {ratio, 1}, obj.transform, obj.color, {0});
+         auto vertices = game.m_graphicsSystem.v3_makeQuadVertices({}, {ratio, 1});
+         auto indices = game.m_graphicsSystem.v3_makeSolidQuadIndices();
+
+         //top and bottom are reversed because texture coordinates y axis is reversed
+         vertices[0].setTextureCoords(r.left(), r.bottom());
+         vertices[1].setTextureCoords(r.right(), r.bottom());
+         vertices[2].setTextureCoords(r.left(), r.top());
+         vertices[3].setTextureCoords(r.right(), r.top());
+
+         game.m_graphicsSystem.v3_setTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+         game.m_graphicsSystem.v3_setTexture(game.m_atlasTexture);
+         
+         game.m_graphicsSystem.v4_setData(vertices, indices, obj.transform, obj.color, 0);
+         game.m_graphicsSystem.v4_drawBuffers();
       }
    }
 
