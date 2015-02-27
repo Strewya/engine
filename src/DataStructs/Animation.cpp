@@ -15,6 +15,7 @@ namespace Core
 {
 	LoadResult loadAnimation(Animation& outAnimation, LuaStack& lua, size_t fileHash, const AnimationDefaults& defaults, ImageCache& images)
 	{
+      (void)fileHash;
 		if( !lua.is<std::string>(-2) || !lua.is<luaTable>(-1) )
 		{
 			return {LoadResultFlag::Fail, "Invalid animation format"};

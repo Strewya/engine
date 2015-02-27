@@ -671,6 +671,18 @@ namespace Core
       return inds;
    }
 
+   void GraphicsSystem::v4_setData(VertexBuffer vertices, IndexBuffer indices, InstanceData instance)
+   {
+      m_verticesToDraw.emplace_back(m_verticesToDraw.end(), vertices.begin(), vertices.end());
+      m_indicesToDraw.insert(m_indicesToDraw.end(), indices.begin(), indices.end());
+      m_instanceData.push_back(instance);
+   }
+   
+   void GraphicsSystem::v4_drawBuffers()
+   {
+      
+   }
+      
    void GraphicsSystem::createTextureRenderTarget(uint32_t w, uint32_t h)
    {
       if( m_RTtexture.texture != nullptr )

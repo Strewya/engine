@@ -25,6 +25,17 @@ namespace Core
       TJ_Right
    };
 
+   struct InstanceData
+   {
+      Transform transform;
+      Color color;
+      float floatValue;
+   };
+      
+   typedef std::vector<Vertex> VertexBuffer;
+   typedef std::vector<uitn32_t> IndexBuffer;
+   typedef std::vector<InstanceData> InstanceBuffer;
+   
    class Camera;
    class Circle;
    class Color;
@@ -100,6 +111,9 @@ namespace Core
       void v3_setTexture(uint32_t textureId);
       void v3_setFontTexture(uint32_t fontId);
       void v3_draw(uint32_t indiceCount, uint32_t instanceCount);
+      
+      void v4_setData(VertexBuffer vertices, IndexBuffer indices, InstanceData instance);
+      void v4_drawBuffers();
 
       void v3_setTextureAsRenderTarget();
       void v3_clearTextureAsRenderTarget();
@@ -148,6 +162,9 @@ namespace Core
       std::vector<DxTexturePtr> m_textures;
       std::vector<Vec2f> m_circleData;
 
+      std::vector<Vertex> m_verticesToDraw;
+      std::vector<uint32_t> m_indicesToDraw;
+      std::vector<InstanceData> m_instanceData;
       //texture render targets
       struct RenderTargetTexture
       {
