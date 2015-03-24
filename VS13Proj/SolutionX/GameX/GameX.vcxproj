@@ -45,20 +45,23 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SolutionX.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SolutionX.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SolutionX.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
-    <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(SolutionDir)\..\..\include\fmod;$(SolutionDir)\..\..\include\lua;$(SolutionDir)\..\..\include\tolua++;$(SolutionDir)\..\..\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\..\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
+    <SourcePath>$(SolutionDir)\..\..\src;$(VC_SourcePath);</SourcePath>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
   </PropertyGroup>
@@ -102,7 +105,7 @@
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
+      <Command>call lua $(SolutionDir)\..\..\bin\game_prebuild.lua</Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -128,7 +131,7 @@
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>call lua $(SolutionDir)\..\..\bin\game_postbuild.lua $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

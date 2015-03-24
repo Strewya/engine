@@ -24,14 +24,14 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\SolutionX.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SGPROJECT)\include\tolua++;$(SGPROJECT)\include\lua;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SGPROJECT)\lib\</OutDir>
     <TargetName>tolua++</TargetName>
+    <IncludePath>$(SXROOT)\include\tolua++;$(SXROOT)\include\lua;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
