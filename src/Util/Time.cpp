@@ -7,6 +7,7 @@
 #include <chrono>
 #include <Window/myWindows.h>
 /******* extra headers *******/
+#include <Util/Utility.h>
 /******* end headers *******/
 	
 namespace Core
@@ -15,7 +16,7 @@ namespace Core
 #define QPCC 0
 #define CHRC 1
 
-#define TIME_SOURCE CHRC
+#define TIME_SOURCE QPCC
 
    /********************************************************
    *		TIME SOURCES
@@ -294,6 +295,19 @@ namespace Core
       return m_timer;
    }
 
+
+   DebugTimingOutputString::DebugTimingOutputString(std::string format)
+      : m_startTime(Clock::getRealTimeMicros()), m_format(format)
+   {
+   }
+
+   DebugTimingOutputString::~DebugTimingOutputString()
+   {
+      auto t2 = Clock::getRealTimeMicros();
+      auto delta = static_cast<uint32_t>(t2 - m_startTime);
+      replaceAll(m_format, "%t", std::to_string(delta) + "us");
+      OutputDebugStringA(m_format.c_str());
+   }
 
 
    uint32_t secondsToMicros(uint32_t s)

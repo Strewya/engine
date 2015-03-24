@@ -5,6 +5,7 @@
 ********************************************/
 /******* C++ headers *******/
 #include <cstdint>
+#include <string>
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/
@@ -104,6 +105,16 @@ namespace Core
    protected:
       Timer m_timer;
       uint32_t m_periodMicros;
+   };
+
+   class DebugTimingOutputString
+   {
+   public:
+      DebugTimingOutputString(std::string format = "%t");
+      ~DebugTimingOutputString();
+   private:
+      uint64_t m_startTime;
+      std::string m_format;
    };
 
    uint32_t secondsToMicros(uint32_t s);

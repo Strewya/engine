@@ -232,7 +232,7 @@ namespace Core
          game.m_enteringPerkMode = false;
          game.m_exitingPerkMode = false;
          game.m_highScore = 0;
-         game.m_maxMonsterCount = 400;
+         game.m_maxMonsterCount = 10000;
          game.m_monsterPool.setMaxSize(game.m_maxMonsterCount);
 
          //high score
@@ -260,7 +260,7 @@ namespace Core
          game.m_turret.durationSeconds = 8;
 
          //grid
-         game.m_monsterGrid.cellHalfsize.set(2, 2);
+         game.m_monsterGrid.cellHalfsize.set(1, 1);
          game.m_monsterGrid.columns = (uint32_t)(game.m_playingField.halfWidth * 3 / game.m_monsterGrid.cellHalfsize.x);
          game.m_monsterGrid.rows = (uint32_t)(game.m_playingField.halfHeight * 3 / game.m_monsterGrid.cellHalfsize.y);
          game.m_monsterGrid.cells.resize(game.m_monsterGrid.columns*game.m_monsterGrid.rows);

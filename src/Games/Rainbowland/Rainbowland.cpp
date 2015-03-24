@@ -94,7 +94,9 @@ namespace Core
       count = l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime);
       for( l; l--; )
       {
+         DebugTimingOutputString timing("Logic: %t\n");
          tickLogic(microsPerFrame);
+         
          if( !m_isRunning )
          {
             break;
@@ -105,7 +107,10 @@ namespace Core
       uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
       if( count > 0 )
       {
+         DebugTimingOutputString timing("Render: %t\n");
          tickRender(fullUpdateTime);
+         std::string drawCalls = "DrawCallCount: " + std::to_string(m_graphicsSystem.readDrawCallCount()) + "\n";
+         OutputDebugStringA(drawCalls.c_str());
       }
       return m_isRunning;
    }

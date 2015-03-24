@@ -24,6 +24,7 @@ namespace Core
 		XMFLOAT3 pos;
 		XMFLOAT4 diffuse;
 		XMFLOAT2 texCoord;
+      XMFLOAT2 floatValue;
 
 		static std::vector<D3D11_INPUT_ELEMENT_DESC> getDescription();
 	};

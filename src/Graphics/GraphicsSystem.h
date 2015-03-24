@@ -124,6 +124,8 @@ namespace Core
       void createTextureRenderTarget(uint32_t width, uint32_t height);
       void clearTextureRenderTarget();
 
+      uint32_t readDrawCallCount();
+
    private:
       template<typename T> static void releasePtr(T* ptr);
       template<typename T> static void safeRelease(T*& ptr);
@@ -156,6 +158,8 @@ namespace Core
 
       FontCache* m_fontCache;
       TextureCache* m_textureCache;
+
+      uint32_t m_drawCallCount;
 
       //this is for automatic cleanup of all named DX objects
       std::vector<IUnknown**> m_dxInterfaces;

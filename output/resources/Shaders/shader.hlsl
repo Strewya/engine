@@ -1,26 +1,18 @@
 
 struct Vertex
 {
-	float4 position : POSITION; 
-	float2 texCoord : TEXCOORD;
-	float4 diffuse : DIFFUSE;
-	matrix world : WORLD;
-	float4 fill : FILL;
-	float health : HEALTH;
+   float4 position : POSITION; 
+   float2 texCoord : TEXCOORD;
+   float4 diffuse : DIFFUSE;
+   float2 health : HEALTH;
 };
 
 struct Pixel
 {
-    float4 position : SV_POSITION;
-    float4 diffuse : DIFFUSE;
-	float2 texCoord : TEXCOORD;
-	float health : HEALTH;
-};
-
-cbuffer dataPerScene
-{
-	matrix view;
-	matrix projection;
+   float4 position : SV_POSITION;
+   float4 diffuse : DIFFUSE;
+   float2 texCoord : TEXCOORD;
+   float health : HEALTH;
 };
 
 Texture2D<float4> ObjTexture;
@@ -28,13 +20,13 @@ SamplerState ObjSamplerState;
 
 Pixel VShader(Vertex vx)
 {
-    Pixel px;
-	px.position = mul(vx.position, vx.world);
-	px.texCoord = vx.texCoord;
-	px.diffuse = vx.diffuse * vx.fill;
-	px.health = vx.health;
+   Pixel px;
+   px.position = vx.position;
+   px.texCoord = vx.texCoord;
+   px.diffuse = vx.diffuse;
+   px.health = vx.health.x;
 	
-	return px;
+   return px;
 }
 
 

@@ -15,7 +15,7 @@ namespace Core
    struct Grid;
    class GraphicsSystem;
 
-   void draw_splatters_to_texture(RainbowlandGame& game, Vec2f atlasSize);
+   void draw_splatters(RainbowlandGame& game, Vec2f atlasSize);
    void draw_background(RainbowlandGame& game, Vec2f atlasSize);
    void draw_players(RainbowlandGame& game, Vec2f atlasSize);
    void draw_monsters(RainbowlandGame& game, Vec2f atlasSize);

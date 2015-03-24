@@ -74,10 +74,10 @@ namespace Core
       }
 #endif
 
-      if (game.m_enteringPerkMode)
+      if( game.m_enteringPerkMode )
       {
          game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
-         if ( !game.m_perkModeTransitionTimer.hasElapsed() )
+         if( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
             auto percent = game.m_perkModeTransitionTimer.getPercentDone();
             percent *= (float)game.m_currentTimeScale;
@@ -89,16 +89,16 @@ namespace Core
             game.m_perkModeTransitionTimer.reset();
             game.m_gameplayTimer.setTimeScale(0);
             game.m_nextGameState = RainbowlandGame::GS_SessionPerkMenu;
-            for (auto& player : game.m_players)
+            for( auto& player : game.m_players )
             {
                player.directionActive[Up] = player.directionActive[Right] = player.directionActive[Left] = player.directionActive[Down] = false;
             }
          }
       }
-      if (game.m_exitingPerkMode)
+      if( game.m_exitingPerkMode )
       {
          game.m_perkModeTransitionTimer.updateBy(game.m_logicTimer.getDeltaMicros());
-         if ( !game.m_perkModeTransitionTimer.hasElapsed() )
+         if( !game.m_perkModeTransitionTimer.hasElapsed() )
          {
             auto percent = game.m_perkModeTransitionTimer.getPercentDone();
             percent *= (float)game.m_currentTimeScale;
@@ -112,38 +112,41 @@ namespace Core
             return;
          }
       }
+      {
+         DebugTimingOutputString t("updating timers: %t\n");
 
-      for( auto& obj : game.m_players )
-      {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto* obj : game.m_monsters )
-      {
-         obj->objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_monsterSpawners )
-      {
-         obj.spawnTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_bullets )
-      {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_blasts )
-      {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_rockets )
-      {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_pickups )
-      {
-         obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
-      }
-      for( auto& obj : game.m_activeBonuses )
-      {
-         obj.timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         for( auto& obj : game.m_players )
+         {
+            obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto* obj : game.m_monsters )
+         {
+            obj->objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_monsterSpawners )
+         {
+            obj.spawnTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_bullets )
+         {
+            obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_blasts )
+         {
+            obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_rockets )
+         {
+            obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_pickups )
+         {
+            obj.objectTimer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
+         for( auto& obj : game.m_activeBonuses )
+         {
+            obj.timer.updateBy(game.m_gameplayTimer.getDeltaMicros());
+         }
       }
 
       updateDifficulty(game);
@@ -151,45 +154,115 @@ namespace Core
       if( g_spawnEnabled )
 #endif
       {
+         DebugTimingOutputString t("spawners: %t\n");
          updateMonsterSpawners(game);
       }
-      runMonsterAI(game);
 
-      movePlayers(game);
-      moveMonsters(game);
-      moveBullets(game.m_bullets);
-      moveBlasts(game.m_blasts);
-      moveRockets(game.m_rockets);
+      {
+         DebugTimingOutputString t("AI: %t\n");
+         runMonsterAI(game);
+      }
+      {
+         DebugTimingOutputString t("movement: %t\n");
+         {
+            DebugTimingOutputString t("move players: %t\n");
+            movePlayers(game);
+         }
+         {
+            DebugTimingOutputString t("move monsters: %t\n");
+            moveMonsters(game);
+         }
+         {
+            DebugTimingOutputString t("move bullets: %t\n");
+            moveBullets(game.m_bullets);
+         }
+         {
+            DebugTimingOutputString t("move blasts: %t\n");
+            moveBlasts(game.m_blasts);
+         }
+         {
+            DebugTimingOutputString t("move rockets: %t\n");
+            moveRockets(game.m_rockets);
+         }
+      }
       fixupCamera(game);
+      {
+         DebugTimingOutputString t("animation, orientation, aim: %t\n");
+         animateMonsters(game);
+         orientPlayers(game.m_players);
+         orientMonsters(game.m_monsters);
+         updatePlayerAim(game.m_players);
+      }
 
-      animateMonsters(game);
-      orientPlayers(game.m_players);
-      orientMonsters(game.m_monsters);
-      updatePlayerAim(game.m_players);
+      {
+         DebugTimingOutputString t("fire: %t\n");
+         fireWeapons(game);
+      }
+      {
+         DebugTimingOutputString t("player collisions: %t\n");
+         //checkMonsterHurtingPlayer(game);
+         checkPickups(game);
+      }
+      {
+         DebugTimingOutputString t("death, lvlup: %t\n");
+         checkPlayerDeath(game);
+         checkLevelup(game);
+      }
+      {
+         DebugTimingOutputString t("bullets: %t\n");
+         updateBullets(game);
+      }
+      {
+         DebugTimingOutputString t("rockets: %t\n");
+         updateRockets(game);
+      }
+      {
+         DebugTimingOutputString t("blasts: %t\n");
+         updateBlasts(game);
+      }
+      {
+         DebugTimingOutputString t("bonuses: %t\n");
+         updateBonuses(game);
+      }
+      {
+         DebugTimingOutputString t("pickups: %t\n");
+         updatePickups(game);
+      }
+      {
+         DebugTimingOutputString t("defensematrix: %t\n");
+         updateDefenseMatrix(game);
+      }
+      {
+         DebugTimingOutputString t("timecapsule: %t\n");
+         updateTimeCapsule(game);
+      }
+      {
+         DebugTimingOutputString t("healingcloud: %t\n");
+         updateHealingCloud(game);
+      }
+      {
+         DebugTimingOutputString t("turret: %t\n");
+         updateTurret(game);
+      }
+      {
+         DebugTimingOutputString t("perks: %t\n");
+         updatePerks(game);
+      }
 
-      fireWeapons(game);
-
-      checkMonsterHurtingPlayer(game);
-      checkPickups(game);
-
-      checkPlayerDeath(game);
-      checkLevelup(game);
-
-      updateBullets(game);
-      updateRockets(game);
-      updateBlasts(game);
-      updateBonuses(game);
-      updatePickups(game);
-      updateDefenseMatrix(game);
-      updateTimeCapsule(game);
-      updateHealingCloud(game);
-      updateTurret(game);
-
-      updatePerks(game);
       VKillLocations locations;
-      killMonsters(game, locations, true);
-      generatePickups(locations, game);
-      generateSplatter(locations, game);
+      {
+         DebugTimingOutputString t("kill monsters: %t\n");
+         killMonsters(game, locations, true);
+      }
+      {
+         DebugTimingOutputString t("generate pickups: %t\n");
+         generatePickups(locations, game);
+      }
+      {
+         DebugTimingOutputString t("generate splatter: %t\n");
+         generateSplatter(locations, game);
+      }
+      OutputDebugStringA(std::to_string(game.m_monsters.size()).c_str());
 
       if( game.m_players.empty() && game.m_blasts.empty() )
       {
@@ -215,25 +288,39 @@ namespace Core
       game.m_graphicsSystem.applyCamera(game.m_camera);
       game.m_graphicsSystem.setPerspectiveProjection();
       Vec2f atlasSize = game.m_textureCache.getTextureDimensions(game.m_atlasTexture);
-
-      draw_splatters_to_texture(game, atlasSize);
-
-      draw_background(game, atlasSize);
-
-      draw_monsters(game, atlasSize);
-
-      draw_pickups(game, atlasSize);
-
-      draw_players(game, atlasSize);
-
-      draw_damagers(game, atlasSize);
-
-      draw_skills(game, atlasSize);
-
+      
+      {
+         DebugTimingOutputString t("background: %t\n");
+         draw_background(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("splatters: %t\n");
+         draw_splatters(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("monsters: %t\n");
+         draw_monsters(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("pickups: %t\n");
+         draw_pickups(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("players: %t\n");
+         draw_players(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("damagers: %t\n");
+         draw_damagers(game, atlasSize);
+      }
+      {
+         DebugTimingOutputString t("skills: %t\n");
+         draw_skills(game, atlasSize);
+      }
 #if 0//GRID_DRAWING
       draw_grid_debug_info(game.m_monsterGrid, game.m_graphicsSystem);
 #endif
-
+#if 0
       //****************************
       //			gui from now on
       //****************************
@@ -389,5 +476,6 @@ namespace Core
          }
          drawText(game.m_graphicsSystem, game.m_defaultFont, text, t, {0, 0, 0}, TJ_Center, false);
       }
+#endif
    }
 }

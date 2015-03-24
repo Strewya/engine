@@ -26,20 +26,6 @@
 
 namespace Core
 {
-   struct dataPerScene
-   {
-      XMMATRIX view;
-      XMMATRIX projection;
-   };
-
-   struct dataPerInstance
-   {
-      XMFLOAT4X4 world;
-      XMFLOAT4 fillColor;
-      FLOAT healthPercentage;
-   };
-
-
    static void fillSwapChainDesc(DXGI_SWAP_CHAIN_DESC& scd, HWND hwnd, uint32_t width, uint32_t height);
    static ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
    static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
@@ -75,6 +61,7 @@ namespace Core
       m_textureCache = &textureCache;
       m_window = &window;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
+      m_drawCallCount = 0;
 
       status = initDevice() &&
          initSwapChain() &&
@@ -84,9 +71,7 @@ namespace Core
          initSamplerState();
 
       m_camView = XMMatrixIdentity();
-      m_constantBuffer = makeConstantBuffer(m_dev, sizeof(dataPerScene));
-      status &= (m_constantBuffer != nullptr);
-
+      
       D3D11_BLEND_DESC blendDesc;
       ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
 
@@ -232,9 +217,9 @@ namespace Core
    void GraphicsSystem::setOrthographicProjection()
    {
       m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
-      dataPerScene dps;
-      dps.projection = XMMatrixTranspose(m_camProjection);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
+      //dataPerScene dps;
+      //dps.projection = XMMatrixTranspose(m_camProjection);
+      //m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
    }
 
    //*****************************************************************
@@ -243,9 +228,9 @@ namespace Core
    void GraphicsSystem::setPerspectiveProjection()
    {
       m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
-      dataPerScene dps;
+      /*dataPerScene dps;
       dps.projection = XMMatrixTranspose(m_camProjection);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
+      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
    }
 
    //*****************************************************************
@@ -271,9 +256,9 @@ namespace Core
    void GraphicsSystem::applyCamera(const Camera& cam)
    {
       m_camView = calculateCamView(cam);
-      dataPerScene dps;
+      /*dataPerScene dps;
       dps.view = XMMatrixTranspose(m_camView);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
+      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
    }
 
    //*****************************************************************
@@ -282,9 +267,9 @@ namespace Core
    void GraphicsSystem::clearCamera()
    {
       m_camView = XMMatrixIdentity();
-      dataPerScene dps;
+      /*dataPerScene dps;
       dps.view = XMMatrixTranspose(m_camView);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
+      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
    }
 
    //*****************************************************************
@@ -417,50 +402,50 @@ namespace Core
                                            const std::vector<Color>& fills,
                                            const std::vector<float>& healthPercentages)
    {
-      uint32_t count = tfs.size();
-      if( count == 0 )
-         return;
+      //uint32_t count = tfs.size();
+      //if( count == 0 )
+      //   return;
 
-      assert(tfs.size() == fills.size());
+      //assert(tfs.size() == fills.size());
 
-      std::vector<dataPerInstance> data;
-      data.resize(count);
-      for( uint32_t i = 0; i < count; ++i )
-      {
-         auto& dpi = data[i];
+      //std::vector<dataPerInstance> data;
+      //data.resize(count);
+      //for( uint32_t i = 0; i < count; ++i )
+      //{
+      //   auto& dpi = data[i];
 
-         dpi.healthPercentage = healthPercentages[i];
+      //   dpi.healthPercentage = healthPercentages[i];
 
-         dpi.fillColor.x = fills[i].r;
-         dpi.fillColor.y = fills[i].g;
-         dpi.fillColor.z = fills[i].b;
-         dpi.fillColor.w = fills[i].a;
+      //   dpi.fillColor.x = fills[i].r;
+      //   dpi.fillColor.y = fills[i].g;
+      //   dpi.fillColor.z = fills[i].b;
+      //   dpi.fillColor.w = fills[i].a;
 
-         auto world = XMMatrixIdentity();
-         world *= XMMatrixScaling(tfs[i].scale.x, tfs[i].scale.y, 1.0f);
-         //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-         //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-         world *= XMMatrixRotationZ(tfs[i].rotation);
-         world *= XMMatrixTranslation(tfs[i].position.x, tfs[i].position.y, 0);
-         world = XMMatrixTranspose(world*m_camView*m_camProjection);
+      //   auto world = XMMatrixIdentity();
+      //   world *= XMMatrixScaling(tfs[i].scale.x, tfs[i].scale.y, 1.0f);
+      //   //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+      //   //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+      //   world *= XMMatrixRotationZ(tfs[i].rotation);
+      //   world *= XMMatrixTranslation(tfs[i].position.x, tfs[i].position.y, 0);
+      //   world = XMMatrixTranspose(world*m_camView*m_camProjection);
 
-         XMStoreFloat4x4(&dpi.world, world);
-      }
+      //   XMStoreFloat4x4(&dpi.world, world);
+      //}
 
-      D3D11_MAPPED_SUBRESOURCE ms;
-      auto* ib = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), count);
-      HRESULT hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      assert(SUCCEEDED(hr));
-      memcpy(ms.pData, data.data(), data.size() * sizeof(dataPerInstance));
-      m_devcon->Unmap(ib, 0);
+      //D3D11_MAPPED_SUBRESOURCE ms;
+      //auto* ib = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), count);
+      //HRESULT hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
+      //assert(SUCCEEDED(hr));
+      //memcpy(ms.pData, data.data(), data.size() * sizeof(dataPerInstance));
+      //m_devcon->Unmap(ib, 0);
 
-      uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-      uint32_t offsets[2] = {0, 0};
-      ID3D11Buffer* bufferPtrs[2] = {m_vertexBuffer, ib};
-      m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
+      //uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
+      //uint32_t offsets[2] = {0, 0};
+      //ID3D11Buffer* bufferPtrs[2] = {m_vertexBuffer, ib};
+      //m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
 
-      safeRelease(ib);
-      safeRelease(m_vertexBuffer);
+      //safeRelease(ib);
+      //safeRelease(m_vertexBuffer);
    }
 
    void GraphicsSystem::v3_setTexture(uint32_t textureId)
@@ -484,6 +469,7 @@ namespace Core
    {
       if( instanceCount >= 1 )
       {
+         ++m_drawCallCount;
          m_devcon->DrawIndexedInstanced(indiceCount, instanceCount, 0, 0, 0);
       }
    }
@@ -674,6 +660,27 @@ namespace Core
    void GraphicsSystem::v4_setData(VertexBuffer vertices, IndexBuffer indices, Transform transform, Color color, float fValue)
    {
       uint32_t vertexOffset = m_verticesToDraw.size();
+      for( auto& vx : vertices )
+      {
+         vx.floatValue.x = fValue;
+
+         XMCOLOR fillColor(color.r, color.g, color.b, color.a);
+         XMVECTOR fill = XMLoadColor(&fillColor);
+         XMVECTOR diffuse = XMLoadFloat4(&vx.diffuse);
+         diffuse *= fill;
+         XMStoreFloat4(&vx.diffuse, diffuse);
+
+         auto world = XMMatrixIdentity();
+         world *= XMMatrixScaling(transform.scale.x, transform.scale.y, 1.0f);
+         //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+         //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+         world *= XMMatrixRotationZ(transform.rotation);
+         world *= XMMatrixTranslation(transform.position.x, transform.position.y, 0);
+         world = world*m_camView*m_camProjection;
+         XMVECTOR position = XMLoadFloat3(&vx.pos);
+         position = XMVector3TransformCoord(position, world);
+         XMStoreFloat3(&vx.pos, position);
+      }
       m_verticesToDraw.insert(m_verticesToDraw.end(), vertices.begin(), vertices.end());
       
       for(auto& i : indices)
@@ -681,43 +688,17 @@ namespace Core
          i += vertexOffset;
       }
       m_indicesToDraw.insert(m_indicesToDraw.end(), indices.begin(), indices.end());
-      m_instanceData.push_back({transform, color, fValue});
    }
    
    void GraphicsSystem::v4_drawBuffers()
    {
-      if( m_verticesToDraw.empty() || m_indicesToDraw.empty() || m_instanceData.empty() )
+      if( m_verticesToDraw.empty() || m_indicesToDraw.empty() )
          return;
 
-      std::vector<dataPerInstance> data;
-      data.resize(m_instanceData.size());
-      for( uint32_t i = 0; i < m_instanceData.size(); ++i )
-      {
-         auto& dpi = data[i];
-
-         dpi.healthPercentage = m_instanceData[i].floatValue;
-
-         dpi.fillColor.x = m_instanceData[i].color.r;
-         dpi.fillColor.y = m_instanceData[i].color.g;
-         dpi.fillColor.z = m_instanceData[i].color.b;
-         dpi.fillColor.w = m_instanceData[i].color.a;
-
-         auto world = XMMatrixIdentity();
-         world *= XMMatrixScaling(m_instanceData[i].transform.scale.x, m_instanceData[i].transform.scale.y, 1.0f);
-         //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-         //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-         world *= XMMatrixRotationZ(m_instanceData[i].transform.rotation);
-         world *= XMMatrixTranslation(m_instanceData[i].transform.position.x, m_instanceData[i].transform.position.y, 0);
-         world = XMMatrixTranspose(world*m_camView*m_camProjection);
-
-         XMStoreFloat4x4(&dpi.world, world);
-      }
-   
       D3D11_MAPPED_SUBRESOURCE ms;
       
       auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), m_verticesToDraw.size());
       auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), m_indicesToDraw.size());
-      auto* instb = makeInstanceBuffer(m_dev, sizeof(dataPerInstance), m_instanceData.size());
       
       HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       assert(SUCCEEDED(hr));
@@ -729,27 +710,28 @@ namespace Core
       memcpy(ms.pData, m_indicesToDraw.data(), m_indicesToDraw.size() * sizeof(uint32_t));
       m_devcon->Unmap(ib, 0);
 
-      hr = m_devcon->Map(instb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      assert(SUCCEEDED(hr));
-      memcpy(ms.pData, data.data(), data.size() * sizeof(dataPerInstance));
-      m_devcon->Unmap(ib, 0);
-
-      uint32_t strides[2] = {sizeof(Vertex), sizeof(dataPerInstance)};
-      uint32_t offsets[2] = {0, 0};
-      ID3D11Buffer* bufferPtrs[2] = {vb, ib};
       
-      m_devcon->IASetVertexBuffers(0, 2, bufferPtrs, strides, offsets);
+      uint32_t stride = sizeof(Vertex);
+      uint32_t offset = 0;
+      
+      m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
       m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
 
-      m_devcon->DrawIndexedInstanced(m_indicesToDraw.size(), m_instanceData.size(), 0, 0, 0);
+      ++m_drawCallCount;
+      m_devcon->DrawIndexed(m_indicesToDraw.size(), 0, 0);
 
       m_verticesToDraw.clear();
       m_indicesToDraw.clear();
-      m_instanceData.clear();
       
       safeRelease(ib);
       safeRelease(vb);
-      safeRelease(instb);
+   }
+
+   uint32_t GraphicsSystem::readDrawCallCount()
+   {
+      auto tmp = m_drawCallCount;
+      m_drawCallCount = 0;
+      return tmp;
    }
       
    void GraphicsSystem::createTextureRenderTarget(uint32_t w, uint32_t h)

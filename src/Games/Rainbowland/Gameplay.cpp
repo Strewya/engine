@@ -1095,6 +1095,7 @@ namespace Core
          monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaSeconds();
       
          updateMonsterInGrid(game.m_monsterGrid, monster);
+
          separateMonsters(monster, game.m_monsterGrid);
       }
    }
