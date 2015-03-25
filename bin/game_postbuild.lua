@@ -1,4 +1,3 @@
-dofile(os.getenv("SGPROJECT").."/bin/cmn.lua");
 
 local function enumerateDLLsForCopy(dllList, libDir, buildDir, buildName)
 	local foundDLLs = {};
@@ -23,50 +22,48 @@ local function enumerateDLLsForCopy(dllList, libDir, buildDir, buildName)
 	return foundDLLs;
 end;
 
-local buildName = arg[1];
-local game = extractGameName();
-local resFile = gProjDir .. "/src/Games/" .. game .. "/resourceList.lua";
-local libDir = gProjDir .. "/lib";
-local buildLibDir = libDir .. "/" .. buildName;
-local buildOutputDir = gProjDir .. "/output/" .. buildName;
-local resDir = gProjDir .. "/output/resources";
+function game_postbuild(sxRoot, buildName)
+	local game = extractGameName(sxRoot);
+	local resFile = sxRoot .. "/src/Games/" .. game .. "/resourceList.lua";
+	local libDir = sxRoot .. "/lib";
+	local buildLibDir = libDir .. "/" .. buildName;
+	local buildOutputDir = sxRoot .. "/output/" .. buildName;
+	local resDir = sxRoot .. "/output/resources";
 
-ensure(checkFileExists(resFile), ("Resource file %s does not exist!"):format(resFile));
-ensure(checkFolderExists(libDir), "Lib directory not found!");
-ensure(checkFolderExists(buildOutputDir), ("Output directory for %s not found!"):format(buildName));
+	ensure(checkFileExists(resFile), ("Resource file %s does not exist!"):format(resFile));
+	ensure(checkFolderExists(libDir), "Lib directory not found!");
+	ensure(checkFolderExists(buildOutputDir), ("Output directory for %s not found!"):format(buildName));
 
 
-
-local resList, dllList = dofile(resFile);
--- DLL list can be nil if there are no DLL dependencies!
-if(dllList ~= nil) then
-	dllList = enumerateDLLsForCopy(dllList, libDir, buildLibDir, buildName);
-	for dll, dllPath in pairs(dllList) do
-		local file = copyIfNewer(dllPath, buildOutputDir.."/"..dll);
-		if(file) then
-			print("Copy OK: "..file);
+	local resList, dllList = dofile(resFile);
+	-- DLL list can be nil if there are no DLL dependencies!
+	if(dllList ~= nil) then
+		dllList = enumerateDLLsForCopy(dllList, libDir, buildLibDir, buildName);
+		for dll, dllPath in pairs(dllList) do
+			local file = copyIfNewer(dllPath, buildOutputDir.."/"..dll);
+			if(file) then
+				print("Copy OK: "..file);
+			end;
 		end;
+	else
+		print("No DLL dependencies found, skipping...")
 	end;
-else
-	print("No DLL dependencies found, skipping...")
-end;
 
--- make sure all resource dependencies are present, and log if any are missing
--- as before, the game might not have any resource dependencies
-assertResourcesPresent(resList, resDir);
+	-- make sure all resource dependencies are present, and log if any are missing
+	-- as before, the game might not have any resource dependencies
+	assertResourcesPresent(resList, resDir);
 
 
-
-if(buildName == "Deploy" or buildName == "Release") then
-	allResourcesPresent = resOK;
-	gameName = game;
-	resourceList = resList;
-	dofile(gProjDir.."/bin/game_deploy.lua");
-	print(buildName);
-	if(buildName == "Deploy") then
-		doDeployment(dropboxTarget(), buildName);
-	end;
-	if(buildName == "Release") then
-		doDeployment(deployTarget(), buildName);
+	if(buildName == "Deploy" or buildName == "Release") then
+		allResourcesPresent = resOK;
+		gameName = game;
+		resourceList = resList;
+		print(buildName);
+		if(buildName == "Deploy") then
+			doDeployment(sxRoot, dropboxTarget(), buildName);
+		end;
+		if(buildName == "Release") then
+			doDeployment(sxRoot, deployTarget(sxRoot), buildName);
+		end;
 	end;
 end;

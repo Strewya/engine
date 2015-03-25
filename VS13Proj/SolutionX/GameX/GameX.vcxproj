@@ -58,27 +58,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)\..\..\include\fmod;$(SolutionDir)\..\..\include\lua;$(SolutionDir)\..\..\include\tolua++;$(SolutionDir)\..\..\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\..\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
-    <SourcePath>$(SolutionDir)\..\..\src;$(VC_SourcePath);</SourcePath>
+    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
+    <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
-    <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
+    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
+    <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SGPROJECT)\output\$(Configuration)\</OutDir>
-    <IncludePath>$(SGPROJECT)\include\fmod;$(SGPROJECT)\include\lua;$(SGPROJECT)\include\tolua++;$(SGPROJECT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)\Lib\x86</LibraryPath>
-    <SourcePath>$(SGPROJECT)\src;$(VC_SourcePath);</SourcePath>
+    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+    <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -97,7 +94,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SX_LIB)\$(Configuration)\Box2D.lib;$(SX_LIB)\fmod_vc.lib;$(SX_LIB)\lua51.lib;$(SX_LIB)\lua5.1.lib;$(SX_LIB)\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
@@ -105,7 +102,7 @@
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SolutionDir)\..\..\bin\game_prebuild.lua</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -131,7 +128,7 @@
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>call lua $(SolutionDir)\..\..\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,28 +152,30 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SX_LIB)\$(Configuration)\Box2D.lib;$(SX_LIB)\fmod_vc.lib;$(SX_LIB)\lua51.lib;$(SX_LIB)\lua5.1.lib;$(SX_LIB)\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
       </Command>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>
+      </Command>
       <Outputs>
       </Outputs>
       <Inputs>
       </Inputs>
+      <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
@@ -199,14 +198,14 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SGPROJECT)\lib\$(Configuration)\Box2D.lib;$(SGPROJECT)\lib\$(Configuration)\fmod_vc.lib;$(SGPROJECT)\lib\lua51.lib;$(SGPROJECT)\lib\lua5.1.lib;$(SGPROJECT)\lib\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SX_LIB)\$(Configuration)\Box2D.lib;$(SX_LIB)\fmod_vc.lib;$(SX_LIB)\lua51.lib;$(SX_LIB)\lua5.1.lib;$(SX_LIB)\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\game_prebuild.lua</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -217,7 +216,7 @@
       </Command>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>call lua $(SGPROJECT)\bin\game_postbuild.lua $(Configuration)</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>

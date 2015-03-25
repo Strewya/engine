@@ -20,17 +20,17 @@ local function removeWhitelines(filename)
 	file:close();
 end;
 
-function rebuildLuaDocsIfNeccessary(gen)
+function rebuildLuaDocsIfNeccessary(sxRoot)
 	local pkgFiles = {};
-	forEachDir(gProjDir .. "/src", findPkgFiles, pkgFiles);
+	forEachDir(sxRoot .. "/src", findPkgFiles, pkgFiles);
 
-	local binding = winPath(gProjDir .. "/src/Scripting/luaBinding.cpp");
-	local bindingHeader = winPath(gProjDir .. "/src/Scripting/luaBinding.h");
-	local selector = winPath(gProjDir .. "/src/Games/GameSelector.h");
-	local docs = winPath(gProjDir .. "/docs.html");
-	local gamePkg = winPath(gProjDir .. "/src/Games/Game.pkg");
-	local gameCpp = winPath(gProjDir .. "/src/Games/Game.cpp");
-	local mainExportPkg = winPath(gProjDir .. "/src/mainExport.pkg");
+	local binding = winPath(sxRoot .. "/src/Scripting/luaBinding.cpp");
+	local bindingHeader = winPath(sxRoot .. "/src/Scripting/luaBinding.h");
+	local selector = winPath(sxRoot .. "/src/Games/GameSelector.h");
+	local docs = winPath(sxRoot .. "/docs.html");
+	local gamePkg = winPath(sxRoot .. "/src/Games/Game.pkg");
+	local gameCpp = winPath(sxRoot .. "/src/Games/Game.cpp");
+	local mainExportPkg = winPath(sxRoot .. "/src/mainExport.pkg");
 
 	ensure(checkFileExists(selector), ("ERROR: Selector file %s does not exist!"):format(selector));
 	ensure(checkFileExists(gameCpp), ("ERROR: Compile file %s does not exist!"):format(gameCpp));
@@ -54,27 +54,25 @@ function rebuildLuaDocsIfNeccessary(gen)
 		-- the following command depends on being in a specific directory when executed
 		-- it's because of the format in which the main pkg file is written
 		local makeBindings = ("%s/bin/tolua++.exe -n core -H %s -o %s %s");
-		lfs.chdir(gProjDir .. "/src");
-		exec(makeBindings:format(gProjDir, bindingHeader, binding, mainExportPkg));
+		lfs.chdir(sxRoot .. "/src");
+		exec(makeBindings:format(sxRoot, bindingHeader, binding, mainExportPkg));
 	else
 		print("Lua bindings up to date...");
 	end;
 
 	if(isNewer(binding, docs)) then
 		print("Generating Lua API docs...");
-		gen:generateAPIDocs(pkgFiles, docs);
+		generateAPIDocs(pkgFiles, docs);
 	else
 		print("Lua API docs up to date...")
 	end;
 end;
 
-local generator = {};
-
-function generator:generateAPIDocs(pkgFiles, location)
+function generateAPIDocs(pkgFiles, location)
 	local data = {};
 	for i, file in ipairs(pkgFiles) do
 		local tejbl = {vars={}, funcs={}, enums={}};
-		self:parseFileForAPI(file, tejbl);
+		parseFileForAPI(file, tejbl);
 		tejbl.name = file:match("/([^/]*)$"):lower();
 		table.insert(data, tejbl);
 	end;
@@ -82,11 +80,11 @@ function generator:generateAPIDocs(pkgFiles, location)
 	function output:write(...) self.f:write(...); end;
 	function output:wl(...) self.f:write(...); self.f:write("\n"); end;
 	
-	self:makeHtml(output, data);
+	makeHtml(output, data);
 	output.f:close();
 end;
 
-function generator:parseFileForAPI(file, data)
+function parseFileForAPI(file, data)
 	local pkg = io.open(file, "r");
 	local blocks = {};
 	local level = 1;
@@ -106,8 +104,8 @@ function generator:parseFileForAPI(file, data)
 			level = level - 1;
 			if(enum) then enum = false; end;
 		else
-			local func = self:parseFunction(line, level-1, blocks);
-			local var = self:parseVariable(line, level-1, blocks, enum);
+			local func = parseFunction(line, level-1, blocks);
+			local var = parseVariable(line, level-1, blocks, enum);
 			local val = func or var;
 			if(val) then
 				table.insert(data[val.id], val);
@@ -117,7 +115,7 @@ function generator:parseFileForAPI(file, data)
 	pkg:close();
 end;
 
-function generator:parseFunction(line, level, blocks)
+function parseFunction(line, level, blocks)
 	local rn, args, const = line:match("%s*([^(]*)%(([^)]*)%)(.*);");
 	if(rn == nil) then
 		return nil;
@@ -129,7 +127,7 @@ function generator:parseFunction(line, level, blocks)
 	ret = ret:gsub("inline ", "");
 	
 	local full = ret;
-	local loc = self:getLocation(level, blocks);
+	local loc = getLocation(level, blocks);
 	full = full .. loc .. ":";
 	if(not space) then
 		full = full:sub(1, #full-1);
@@ -142,7 +140,7 @@ function generator:parseFunction(line, level, blocks)
 	return {Type=ret, Name=func, Location=loc, Delimiter=":", Full=full, id="funcs", Args=args};
 end;
 
-function generator:parseVariable(line, level, blocks, isEnum)
+function parseVariable(line, level, blocks, isEnum)
 	
 	line = line:match("%s*(.*)%s*$")
 	local mustEndWith = isEnum and ",$" or ";$";
@@ -161,13 +159,13 @@ function generator:parseVariable(line, level, blocks, isEnum)
 	vn = line:sub(1, #line-1);
 	
 	local full = vt .. (isEnum and "" or " ");
-	local loc = self:getLocation(level, blocks);
+	local loc = getLocation(level, blocks);
 	full = full .. loc .. "." .. vn .. ";";
 	
 	return {Type=vt, Name=vn, Location=loc, Delimiter=".", Full = full, id=(isEnum and "enums" or "vars")};
 end;
 
-function generator:getLocation(level, blocks)
+function getLocation(level, blocks)
 	local str = "";
 	for i=1, level do
 		str = str .. blocks[i];
@@ -176,7 +174,7 @@ function generator:getLocation(level, blocks)
 	return str:sub(1, #str-1);
 end;
 
-function generator:makeHtml(output, data)
+function makeHtml(output, data)
 	output:wl("<html>");
 	output:wl("<head>");
 	output:wl("<style>");
@@ -204,12 +202,12 @@ function generator:makeHtml(output, data)
 	
 	output:wl("<div id='selection'>");
 	for i,v in ipairs(data) do
-		self:drawSelection(output, v);
+		drawSelection(output, v);
 	end;
 	output:wl("</div>");
 	output:wl("<div id='content'>");
 	for i,v in ipairs(data) do
-		self:drawContent(output, v);
+		drawContent(output, v);
 	end;
 	output:wl("</div>");
 	
@@ -217,7 +215,7 @@ function generator:makeHtml(output, data)
 	output:wl("</html>");
 end;
 
-function generator:drawSelection(output, data)
+function drawSelection(output, data)
 	if(#data.enums == 0 and #data.vars == 0 and #data.funcs == 0) then
 		return;
 	end;
@@ -227,16 +225,16 @@ function generator:drawSelection(output, data)
 	output:wl("</button>");
 end;
 
-function generator:drawContent(output, data)
+function drawContent(output, data)
 	local uniqueID = data.name;
 	output:wl("<div id='" .. uniqueID .. "' style='display:none'>");
-	self:drawButtonContent(output, "ENUMS", data.enums);
-	self:drawButtonContent(output, "VARIABLES", data.vars);
-	self:drawButtonContent(output, "FUNCTIONS", data.funcs);
+	drawButtonContent(output, "ENUMS", data.enums);
+	drawButtonContent(output, "VARIABLES", data.vars);
+	drawButtonContent(output, "FUNCTIONS", data.funcs);
 	output:wl("</div>");
 end;
 
-function generator:drawButtonContent(output, header, data)
+function drawButtonContent(output, header, data)
 	if(#data == 0) then
 		return;
 	end;
@@ -265,5 +263,3 @@ function generator:drawButtonContent(output, header, data)
 	end;
 	output:wl("</table>");
 end;
-
-return generator;

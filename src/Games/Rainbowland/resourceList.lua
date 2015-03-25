@@ -15,7 +15,5 @@ return
 	"tolua++",
 	"lua51",
 	"lua5.1",
-	Debug = {"fmodL"},
-	Release = {"fmod"},
-	Deploy = {"fmod"}
+	"fmod"
 };

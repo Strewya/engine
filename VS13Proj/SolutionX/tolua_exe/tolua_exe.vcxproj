@@ -29,9 +29,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SGPROJECT)\include\tolua++;$(SGPROJECT)\include\lua;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SGPROJECT)\lib;$(LibraryPath)</LibraryPath>
-    <OutDir>$(SGPROJECT)\bin\</OutDir>
+    <IncludePath>$(SX_INC)\tolua++;$(SX_INC)\lua;$(IncludePath)</IncludePath>
+    <OutDir>$(SX_BIN)\</OutDir>
     <TargetName>tolua++</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

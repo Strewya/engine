@@ -2,10 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SXROOT>$(SolutionDir)\..\..</SXROOT>
+    <SXROOT>$(SolutionDir)..\..</SXROOT>
+    <SX_INC>$(SXROOT)\include</SX_INC>
+    <SX_SRC>$(SXROOT)\src</SX_SRC>
+    <SX_LIB>$(SXROOT)\lib</SX_LIB>
+    <SX_BIN>$(SXROOT)\bin</SX_BIN>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(SXROOT)\src;$(SXROOT)\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(SXROOT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SXROOT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
     <SourcePath>$(SXROOT)\src;$(VC_SourcePath);</SourcePath>
   </PropertyGroup>
@@ -13,6 +17,22 @@
   <ItemGroup>
     <BuildMacro Include="SXROOT">
       <Value>$(SXROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SX_INC">
+      <Value>$(SX_INC)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SX_SRC">
+      <Value>$(SX_SRC)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SX_LIB">
+      <Value>$(SX_LIB)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="SX_BIN">
+      <Value>$(SX_BIN)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

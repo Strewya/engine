@@ -1,8 +1,4 @@
-gProjDir = os.getenv("SGPROJECT");
-exec = print;
-exec = os.execute;
 
-local lfs = require("lfs");
 local copyCmd = [[copy /Y "%s" "%s"]];
 local makeFolderCmd = [[xcopy "%s" "%s\" /T /Y]];
 local deleteCmd = [[del "%s"]];
@@ -26,14 +22,6 @@ function mergeTables(destination, source, overwrite)
 			destination[key] = value;
 		end;
 	end;
-end;
-
-function winPath(path)
-	return path:gsub("/", "\\");
-end;
-
-function nixPath(path)
-	return path:gsub("\\", "/");
 end;
 
 function ensure(check, errorTxt)
@@ -75,7 +63,7 @@ function delete(dst)
 	exec(deleteCmd:format(winPath(dst)));
 end;
 
-function copyIfNewer(src, dst)	
+function copyIfNewer(src, dst)
 	if(isNewer(src, dst)) then
 		return copy(src, dst);
 	end;
@@ -124,8 +112,8 @@ function findInTable(t, f)
 	return false;
 end;
 
-function extractGameName()
-	local selector = gProjDir .. "/src/Games/GameSelector.h";
+function extractGameName(sxRoot)
+	local selector = sxRoot .. "/src/Games/GameSelector.h";
 	local gameDef = "#define CORE_GAME_BUILD";
 
 	local game, defEnd = findLineContaining(selector, gameDef);
@@ -141,7 +129,7 @@ function assertResourcesPresent(resList, resRootDir)
 	if(resList ~= nil) then
 		for _, res in pairs(resList) do
 			if(not checkFileExists(resRootDir.."/"..res)) then
-				print("Missing resource dependency " .. res);
+				print("Missing resource dependency " .. resRootDir.."/"..res);
 				resOK = false;
 			end;
 		end;

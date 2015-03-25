@@ -1,5 +1,5 @@
 
-function rebuildShadersIfNeccessary()
+function rebuildShadersIfNeccessary(sxRoot)
 	local shaderList =
 	{
 		{ "/Shaders/shader.hlsl", "ps_4_0", "PShader", "pshader.h" },
@@ -14,10 +14,10 @@ function rebuildShadersIfNeccessary()
 	local shaderDestinationDir = "/src/Graphics/";
 	local shaderCompilerCmds = {};
 	for i=1, #shaderList do
-		local shaderFile = winPath(gProjDir .. shaderSourceDir .. shaderList[i][1]);
+		local shaderFile = winPath(sxRoot .. shaderSourceDir .. shaderList[i][1]);
 		local shaderProfile = shaderList[i][2];
 		local shaderFunction = shaderList[i][3];
-		local shaderHeader = winPath(gProjDir .. shaderDestinationDir .. shaderList[i][4]);
+		local shaderHeader = winPath(sxRoot .. shaderDestinationDir .. shaderList[i][4]);
 		if(isNewer(shaderFile, shaderHeader)) then
 			local cmd = string.format(shaderCompilerOptions, shaderProfile, shaderFunction, shaderHeader, shaderFile);
 			table.insert(shaderCompilerCmds, "fxc " .. cmd);

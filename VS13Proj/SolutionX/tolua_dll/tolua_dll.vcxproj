@@ -29,9 +29,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SGPROJECT)\lib\</OutDir>
+    <IncludePath>$(SX_INC)\tolua++;$(SX_INC)\lua;$(IncludePath)</IncludePath>
+    <OutDir>$(SX_LIB)\</OutDir>
     <TargetName>tolua++</TargetName>
-    <IncludePath>$(SXROOT)\include\tolua++;$(SXROOT)\include\lua;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -50,7 +50,7 @@
       <AdditionalDependencies>lua51.lib;lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>call lua $(SGPROJECT)\bin\tolua_postbuild.lua</Command>
+      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) tolua_postbuild</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,8 +1,4 @@
 
-if(not gProjDir) then
-	dofile(os.getenv("SGPROJECT").."/bin/cmn.lua");
-end;
-
 local function b64dec(data)
 	local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     data = string.gsub(data, '[^'..b..'=]', '');
@@ -36,7 +32,9 @@ local function cleanUnusedFiles(path, file, usedFilesList, deletedFiles)
 end;
 
 function dropboxTarget()
-	local dropboxDir = os.getenv("USERPROFILE").."/AppData/Roaming/Dropbox/host.db";
+	local userProfile = os.getenv("USERPROFILE");
+	if(userProfile == nil) then return; end;
+	local dropboxDir = userProfile .. "/AppData/Roaming/Dropbox/host.db";
 	if(checkFileExists(dropboxDir)) then
 		dropboxDir = findLineContaining(dropboxDir, 2);
 		dropboxDir = b64dec(dropboxDir) .. "/Games/";
@@ -46,18 +44,18 @@ function dropboxTarget()
 	return dropboxDir;
 end;
 
-function deployTarget()
-	return gProjDir .. "/deploy/";
+function deployTarget(sxRoot)
+	return sxRoot .. "/deploy/";
 end;
 
-function doDeployment(target, build)
+function doDeployment(sxRoot, target, build)
 	if(target == nil) then
 		print("Invalid deploy target");
 		return;
 	end;
 	local game = gameName or extractGameName();
-	local resFile = gProjDir .. "/src/Games/" .. game .. "/resourceList.lua";
-	local resDir = gProjDir .. "/output/resources";
+	local resFile = sxRoot .. "/src/Games/" .. game .. "/resourceList.lua";
+	local resDir = sxRoot .. "/output/resources";
 
 	local resList = resourceList and resourceList or dofile(resFile);
 	local resOK = allResourcesPresent or assertResourcesPresent(resList, resDir);
@@ -67,8 +65,8 @@ function doDeployment(target, build)
 	local dstRootDir = target .. game;
 	local dstBinDir = dstRootDir .. "/bin";
 	local dstResDir = dstRootDir .. "/resources";
-	local srcBinDir = gProjDir .. "/output/" .. build;
-	local srcResDir = gProjDir .. "/output/resources";
+	local srcBinDir = sxRoot .. "/output/" .. build;
+	local srcResDir = sxRoot .. "/output/resources";
 	
 	print("Deploying " .. game .. " game to " .. nixPath(dstRootDir));
 	local files = {};
