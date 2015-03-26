@@ -154,10 +154,9 @@ namespace Core
 
 
       bool init(Window& window);
-      bool tick();
       void shutdown();
 
-      void tickLogic(uint64_t updateTime);
+      bool tickLogic(uint64_t updateTime);
       void tickRender(uint64_t updateTime);
    };
 }

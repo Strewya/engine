@@ -17,28 +17,28 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-    (void) hInst;
-    (void) hPrevInst;
-    (void) lpCmdLine;
-    (void) nShowCmd;
-	
-	Core::Window window("CoreEngine");
-	
-	int result = Core::initializeWindow(window);
-	
-	if (result == Core::WindowResult::OK)
-	{
-		std::thread logicThread(Core::initGame, std::ref(window));
-		
-		//start input loop
-		while (window.isRunning())
-		{
-			window.update();
-			window.processFileChanges();
-			window.processGamepads();
-		}
-		logicThread.join();
-		result = window.getExitCode();
-	}
-	return result;
+   (void)hInst;
+   (void)hPrevInst;
+   (void)lpCmdLine;
+   (void)nShowCmd;
+
+   Core::Window window("CoreEngine");
+
+   int result = Core::initializeWindow(window);
+
+   if( result == Core::WindowResult::OK )
+   {
+      std::thread logicThread(Core::runGame, std::ref(window));
+
+      //start input loop
+      while( window.isRunning() )
+      {
+         window.update();
+         window.processFileChanges();
+         window.processGamepads();
+      }
+      logicThread.join();
+      result = window.getExitCode();
+   }
+   return result;
 }

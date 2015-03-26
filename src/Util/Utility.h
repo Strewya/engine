@@ -22,8 +22,14 @@ namespace Core
 
 #ifndef DEPLOY
 
-	inline void debugPrint() { std::cout << std::endl; }
-	template<typename T, typename... Args> void debugPrint(T t, Args... args) { std::cout << t; debugPrint(args...); }
+   inline void debugPrint()
+   {
+      std::cout << std::endl;
+   }
+   template<typename T, typename... Args> void debugPrint(T t, Args... args)
+   {
+      std::cout << t; debugPrint(args...);
+   }
 
 #define DEBUG_INFO(...) debugPrint(__VA_ARGS__)
 
@@ -36,52 +42,52 @@ namespace Core
 #define Rad2Deg(rad) ((rad)*180.0f/MATH_PI)
 
 
-	template<typename T> T& wrap(const T& low, const T& high, T& value)
-	{
-		auto d = high - low;
-		if( value < low )
-		{
-			value += d;
-		}
-		else if( value > high )
-		{
-			value -= d;
-		}
-		return value;
-	}
+   template<typename T>
+   void wrap(T low, T high, T& value)
+   {
+      auto d = high - low;
+      if( value < low )
+      {
+         value += d;
+      }
+      else if( value > high )
+      {
+         value -= d;
+      }
+   }
 
-	template<typename T> T& clamp(const T& low, const T& high, T& value)
-	{
-		if( value < low )
-		{
-			value = low;
-		}
-		else if( value > high )
-		{
-			value = high;
-		}
-		return value;
-	}
+   template<typename T>
+   void clamp(T low, T high, T& value)
+   {
+      if( value < low )
+      {
+         value = low;
+      }
+      else if( value > high )
+      {
+         value = high;
+      }
+   }
 
-	inline std::string& replace(std::string& str, const std::string& from, const std::string& to)
-	{
-		size_t start_pos = str.find(from);
-		if( start_pos != std::string::npos )
-		{
-			str.replace(start_pos, from.length(), to);
-		}
-		return str;
-	}
+   inline std::string& replace(std::string& str, const std::string& from, const std::string& to)
+   {
+      size_t start_pos = str.find(from);
+      if( start_pos != std::string::npos )
+      {
+         str.replace(start_pos, from.length(), to);
+      }
+      return str;
+   }
 
-	template<typename C, typename F> size_t filterFind(const C& container, const F& filter)
-	{
-		return std::distance(std::begin(container), std::find_if(std::begin(container), std::end(container), filter));
-	}
+   template<typename C, typename F> size_t filterFind(const C& container, const F& filter)
+   {
+      return std::distance(std::begin(container), std::find_if(std::begin(container), std::end(container), filter));
+   }
 
-	template<typename C, typename T> size_t valueFind(const C& container, const T& value)
-	{
-		return std::distance(std::begin(container), std::find(std::begin(container), std::end(container), value));
-	}
+   template<typename C, typename T> size_t valueFind(const C& container, const T& value)
+   {
+      return std::distance(std::begin(container), std::find(std::begin(container), std::end(container), value));
+   }
 
    inline void replaceAll(std::string& str, const std::string& from, const std::string& to)
    {

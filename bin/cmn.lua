@@ -113,8 +113,8 @@ function findInTable(t, f)
 end;
 
 function extractGameName(sxRoot)
-	local selector = sxRoot .. "/src/Games/GameSelector.h";
-	local gameDef = "#define CORE_GAME_BUILD";
+	local selector = sxRoot .. "/src/Games/GameList.h";
+	local gameDef = "#define";
 
 	local game, defEnd = findLineContaining(selector, gameDef);
 	ensure(game ~= nil, "Game not defined!");

@@ -26,10 +26,10 @@ function rebuildLuaDocsIfNeccessary(sxRoot)
 
 	local binding = winPath(sxRoot .. "/src/Scripting/luaBinding.cpp");
 	local bindingHeader = winPath(sxRoot .. "/src/Scripting/luaBinding.h");
-	local selector = winPath(sxRoot .. "/src/Games/GameSelector.h");
+	local selector = winPath(sxRoot .. "/src/Games/GameList.h");
 	local docs = winPath(sxRoot .. "/docs.html");
-	local gamePkg = winPath(sxRoot .. "/src/Games/Game.pkg");
-	local gameCpp = winPath(sxRoot .. "/src/Games/Game.cpp");
+	local gamePkg = winPath(sxRoot .. "/src/Games/GamePkg.pkg");
+	local gameCpp = winPath(sxRoot .. "/src/Games/GamePkg.cpp");
 	local mainExportPkg = winPath(sxRoot .. "/src/mainExport.pkg");
 
 	ensure(checkFileExists(selector), ("ERROR: Selector file %s does not exist!"):format(selector));

@@ -240,8 +240,9 @@
     <ClCompile Include="..\..\..\src\DataStructs\Font.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Image.cpp" />
     <ClCompile Include="..\..\..\src\DataStructs\Package.cpp" />
+    <ClCompile Include="..\..\..\src\Games\ChaosGarden\Game.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <ClCompile Include="..\..\..\src\Games\Game.cpp">
+    <ClCompile Include="..\..\..\src\Games\GamePkg.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -322,9 +323,9 @@
     <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Package.h" />
     <ClInclude Include="..\..\..\src\DataStructs\Texture.h" />
+    <ClInclude Include="..\..\..\src\Games\ChaosGarden\Game.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
-    <ClInclude Include="..\..\..\src\Games\GameLoopParams.h" />
-    <ClInclude Include="..\..\..\src\Games\GameSelector.h" />
+    <ClInclude Include="..\..\..\src\Games\GameList.h" />
     <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
@@ -347,16 +348,19 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Monster.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\MonsterFwd.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Movement.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\MovementSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\ObjectRendering.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Perk.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkFwd.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerData.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerFwd.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Session.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionEnd.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPreparation.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\TimingSystem.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Weapon.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponFwd.h" />
@@ -415,7 +419,7 @@
     <CustomBuild Include="..\..\..\src\Games\Hedgehog\Hedgehog.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Game.pkg">
+    <CustomBuild Include="..\..\..\src\Games\GamePkg.pkg">
       <FileType>Document</FileType>
     </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">

@@ -1,20 +1,18 @@
 #pragma once
 /********************************************
-*  contents:   Movement code
+*  contents:   Player data
 *  usage:
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/MovementSystem.h>
-#include <Games/Rainbowland/TimingSystem.h>
+#include <Games/Rainbowland/PlayerFwd.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   struct GameplaySystems
+   struct PlayerData
    {
-      MovementSystem movement;
-      TimingSystem timing;
+      VPlayers players;
    };
 }

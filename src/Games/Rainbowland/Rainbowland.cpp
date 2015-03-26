@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <fstream>
 /******* extra headers *******/
-#include <Games/GameLoopParams.h>
 #include <Games/Rainbowland/SessionPreparation.h>
 #include <Games/Rainbowland/Session.h>
 #include <Games/Rainbowland/SessionPerkMenu.h>
@@ -83,39 +82,7 @@ namespace Core
       return m_isRunning;
    }
 
-   bool RainbowlandGame::tick()
-   {
-      float fraction = 0;
-      uint64_t unusedMicros = 0;
-      uint64_t droppedTime = 0;
-      static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
-
-      uint32_t count, l;
-      count = l = getLogicUpdateCount(m_logicTimer, microsPerFrame, fraction, unusedMicros, droppedTime);
-      for( l; l--; )
-      {
-         DebugTimingOutputString timing("Logic: %t\n");
-         tickLogic(microsPerFrame);
-         
-         if( !m_isRunning )
-         {
-            break;
-         }
-      }
-      m_logicTimer.updateBy(droppedTime);
-
-      uint64_t fullUpdateTime = m_logicTimer.getLastRealTimeMicros() + unusedMicros - m_renderTimer.getLastRealTimeMicros();
-      if( count > 0 )
-      {
-         DebugTimingOutputString timing("Render: %t\n");
-         tickRender(fullUpdateTime);
-         std::string drawCalls = "DrawCallCount: " + std::to_string(m_graphicsSystem.readDrawCallCount()) + "\n";
-         OutputDebugStringA(drawCalls.c_str());
-      }
-      return m_isRunning;
-   }
-
-   void RainbowlandGame::tickLogic(uint64_t updateTime)
+   bool RainbowlandGame::tickLogic(uint64_t updateTime)
    {
       if( m_nextGameState != m_currentGameState )
       {
@@ -156,6 +123,7 @@ namespace Core
             assert(false && "HOLY SHIT SOMETHING WENT WRONG");
          } break;
       }
+      return m_isRunning;
    }
 
 

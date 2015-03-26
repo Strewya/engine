@@ -1,20 +1,29 @@
 #pragma once
 /********************************************
-*  contents:   Movement code
+*  class:   Game
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Games/Rainbowland/MovementSystem.h>
-#include <Games/Rainbowland/TimingSystem.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   struct GameplaySystems
+   class Window;
+
+   class Game
    {
-      MovementSystem movement;
-      TimingSystem timing;
+   public:
+      Window* m_window;
+
+
+
+      bool init(Window& window);
+      void shutdown();
+
+      bool tickLogic(uint64_t updateTime);
+      void tickRender(uint64_t updateTime);
    };
 }

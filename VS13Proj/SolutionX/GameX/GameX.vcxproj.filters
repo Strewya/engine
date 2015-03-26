@@ -67,6 +67,12 @@
     <Filter Include="Framework\Graphics\Shaders">
       <UniqueIdentifier>{1e728a9f-b51b-40fe-b2a7-0d222c8a3e73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Design\Rainbowland\Systems">
+      <UniqueIdentifier>{17871321-d444-4a0d-b481-6b1d365c9e84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Design\ChaosGarden">
+      <UniqueIdentifier>{389491e1-317d-4e6a-a34d-0364ee52e602}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -139,9 +145,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp">
       <Filter>Framework\Caches</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Game.cpp">
-      <Filter>Design</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp">
       <Filter>Framework\Graphics</Filter>
@@ -257,6 +260,12 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
       <Filter>Design\Rainbowland\Code</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\ChaosGarden\Game.cpp">
+      <Filter>Design\ChaosGarden</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\GamePkg.cpp">
+      <Filter>Design</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Input\KeyCodes.h">
@@ -317,17 +326,11 @@
     <ClInclude Include="..\..\..\src\Scripting\luaBinding.h">
       <Filter>Framework\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\GameSelector.h">
-      <Filter>Design</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Pong\Pong.h">
       <Filter>Design\Pong</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h">
       <Filter>Design\Hedgehog</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\GameLoopParams.h">
-      <Filter>Design</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\InputSystem.h">
       <Filter>Framework\Input</Filter>
@@ -509,6 +512,21 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
       <Filter>Design\Rainbowland\Code</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerData.h">
+      <Filter>Design\Rainbowland\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\MovementSystem.h">
+      <Filter>Design\Rainbowland\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\TimingSystem.h">
+      <Filter>Design\Rainbowland\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\GameList.h">
+      <Filter>Design</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\ChaosGarden\Game.h">
+      <Filter>Design\ChaosGarden</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\..\src\Input\Input.pkg">
@@ -541,9 +559,6 @@
     <CustomBuild Include="..\..\..\src\mainExport.pkg">
       <Filter>Framework\toluaPackages</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Game.pkg">
-      <Filter>Design</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\..\src\Games\Hedgehog\Hedgehog.pkg">
       <Filter>Design\Hedgehog</Filter>
     </CustomBuild>
@@ -552,6 +567,9 @@
     </CustomBuild>
     <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl">
       <Filter>Framework\Graphics\Shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\src\Games\GamePkg.pkg">
+      <Filter>Design</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

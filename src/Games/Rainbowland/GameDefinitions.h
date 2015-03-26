@@ -152,19 +152,27 @@ namespace Core
 
    struct Player
    {
+      //misc
       Timer objectTimer;
-      CooldownTimer weaponTimer;
+      uint32_t killCount;
+      uint32_t id;
+      //rendering
       Transform transform;
       Color color;
+      //collision
       Circle collisionData;
+      //movement
       Vec2f direction;
       Vec2f targetDirection;
       bool directionActive[4];
       float currentSpeed;
       float maxSpeed;
       float acceleration;
+      //weapon related
+      CooldownTimer weaponTimer;
       Vec2f aim;
       Vec2f aimDirection;
+      bool isAimRelative;
       float aimDistance;
       float maxAimDistance;
       float minAimDistance;
@@ -173,23 +181,24 @@ namespace Core
       float reloadMultiplier;
       float ammoMultiplier;
       uint32_t extraBullets;
-      uint32_t dodgeChance;
       uint32_t bonusDamage;
+      bool isShooting;
+      //collision response
+      uint32_t dodgeChance;
       uint32_t maxHealth;
       int32_t health;
+      //perk related
       uint32_t regenDelayForOneHealth;
+      //levelup
       uint32_t perksPerLevel;
       uint32_t selectedPerkIndex;
-      uint32_t id;
-      uint32_t killCount;
-      float skillCooldown;
       VActivePerks acquiredPerks;
       std::vector<PerkType> availablePerks;
       std::vector<PerkType> selectablePerks;
-      AbilityType ability;
       PerkType chosenPerk;
-      bool isShooting;
-      bool isAimRelative;
+      //skill
+      float skillCooldown;
+      AbilityType ability;
    };
 
    typedef std::vector<Player> VPlayers;
