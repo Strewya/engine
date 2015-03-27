@@ -13,12 +13,13 @@ namespace Core
 {
    void Game::shutdown()
    {
-      DEBUG_INFO("---------------------------------");
-      DEBUG_STATUS(true);
+      CORE_INFO("----- shutdown start -----");
+      bool status = true;
+      status = m_graphicsSystem.shutdown() && status;
       
       if( !status )
       {
-         DEBUG_INFO("\nShutdown has failed! Bugs...");
+         CORE_INFO("\nShutdown has failed! Bugs...");
       }
    }
 
@@ -30,10 +31,14 @@ namespace Core
 #ifndef DEPLOY
       window.openConsole(-1200, 0);
 #endif
-
       //window.setFullscreen(true);
 
-      DEBUG_INFO("---------------------------------");
+      CORE_STATUS(true);
+      CORE_STATUS_AND(m_graphicsSystem.init(window));
+      CORE_STATUS_AND(m_textureStore.init(m_graphicsSystem));
+      CORE_STATUS_AND(m_fontStore.init(m_textureStore));
+
+      CORE_INFO("----- init done -----");
       return true;
    }
 

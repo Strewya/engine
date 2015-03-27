@@ -73,6 +73,9 @@
     <Filter Include="Design\ChaosGarden">
       <UniqueIdentifier>{389491e1-317d-4e6a-a34d-0364ee52e602}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Framework\Common">
+      <UniqueIdentifier>{23decf31-0176-4572-9a37-38752ba898c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp">
@@ -526,6 +529,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\ChaosGarden\Game.h">
       <Filter>Design\ChaosGarden</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Common\Handle.h">
+      <Filter>Framework\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Common\Cache.h">
+      <Filter>Framework\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h">
+      <Filter>Framework\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

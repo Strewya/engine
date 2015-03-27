@@ -37,7 +37,7 @@ namespace Core
    //*****************************************************************
    //					INIT
    //*****************************************************************
-   bool GraphicsSystem::init(FontCache& fontCache, TextureCache& textureCache, Window& window)
+   bool GraphicsSystem::init(Window& window)
    {
       DEBUG_STATUS(true);
 
@@ -57,8 +57,6 @@ namespace Core
       declare(&m_constantBuffer);
       declare(&m_vertexBuffer);
 
-      m_fontCache = &fontCache;
-      m_textureCache = &textureCache;
       m_window = &window;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       m_drawCallCount = 0;
@@ -1037,21 +1035,6 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::loadTexture(const ResourceFile& file, Texture& outTexture)
    {
-      D3DX11_IMAGE_LOAD_INFO info{};
-      info.BindFlags = D3DX11_DEFAULT;
-      info.CpuAccessFlags = D3DX11_DEFAULT;
-      info.Depth = D3DX11_DEFAULT;
-      info.Filter = D3DX11_DEFAULT;
-      info.FirstMipLevel = D3DX11_DEFAULT;
-      info.Height = D3DX11_DEFAULT;
-      info.MipFilter = D3DX11_DEFAULT;
-      info.MipLevels = D3DX11_DEFAULT;
-      info.MiscFlags = D3DX11_DEFAULT;
-      info.pSrcInfo = nullptr;
-      info.Usage = (D3D11_USAGE)D3DX11_DEFAULT;
-      info.Width = D3DX11_DEFAULT;
-      info.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
       ID3D11ShaderResourceView* texturePtr = nullptr;
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, file.getPath().c_str(), nullptr, nullptr, &texturePtr, nullptr);
       bool loaded = false;

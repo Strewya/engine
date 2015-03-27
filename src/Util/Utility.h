@@ -13,11 +13,10 @@
 namespace Core
 {
 
-#define CLASS(x) "Core::"#x
-
-#define DEBUG_STATUS(x) bool status = x
-#define DEBUG_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL"); return status
-#define DEBUG_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
+#define CORE_STATUS(x) bool status = x
+#define CORE_STATUS_AND(x) status = x && status
+#define CORE_INIT(c) DEBUG_INFO( #c" init ", status ? "OK" : "FAIL"); return status
+#define CORE_SHUTDOWN(c) DEBUG_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
 
 
 #ifndef DEPLOY
@@ -31,10 +30,10 @@ namespace Core
       std::cout << t; debugPrint(args...);
    }
 
-#define DEBUG_INFO(...) debugPrint(__VA_ARGS__)
+#define CORE_INFO(...) debugPrint(__VA_ARGS__)
 
 #else
-#define DEBUG_INFO(...) (void)0
+#define CORE_INFO(...) (void)0
 #endif
 
 #define MATH_PI 3.14159265358979f

@@ -11,6 +11,8 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/DXTextureManager.h>
+
 #include <DataStructs/Font.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
@@ -41,19 +43,17 @@ namespace Core
    class Camera;
    class Circle;
    class Color;
-   class FontCache;
    class Image;
    class Rect;
    class ResourceFile;
    class Texture;
-   class TextureCache;
    class Transform;
    class Window;
 
    class GraphicsSystem
    {
    public:
-      bool init(FontCache& fontCache, TextureCache& textureCache, Window& window);
+      bool init(Window& window);
       bool shutdown();
 
       void update();
@@ -156,16 +156,14 @@ namespace Core
       XMMATRIX m_camView;
       XMMATRIX m_camProjection;
 
-      FontCache* m_fontCache;
-      TextureCache* m_textureCache;
-
       uint32_t m_drawCallCount;
 
       //this is for automatic cleanup of all named DX objects
       std::vector<IUnknown**> m_dxInterfaces;
 
-      typedef std::unique_ptr<ID3D11ShaderResourceView, void(*)(ID3D11ShaderResourceView*)> DxTexturePtr;
-      std::vector<DxTexturePtr> m_textures;
+      //typedef std::unique_ptr<ID3D11ShaderResourceView, void(*)(ID3D11ShaderResourceView*)> DxTexturePtr;
+      //std::vector<DxTexturePtr> m_textures;
+      DXTextureManager m_textures;
       std::vector<Vec2f> m_circleData;
 
       std::vector<Vertex> m_verticesToDraw;
