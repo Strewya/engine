@@ -8,31 +8,36 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
-#include <Common/Cache.h>
-#include <Common/Handle.h>
+#include <Graphics/DXTexture.h>
+#include <Graphics/DXTextureFileLoader.h>
+#include <Util/Cache.h>
+#include <Util/Handle.h>
+#include <Util/NameCache.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
    struct tag_DXTexture;
    typedef Handle<tag_DXTexture> HTexture;
+
    
-   struct DXTexture
-   {
-      ID3D11Texture2D* rawTexture;
-      uint32_t width;
-      uint32_t height;
-   };
 
    class DXTextureManager
    {
    public:
-      
+      bool init(DXTexture defaultData);
+      bool shutdown();
+
+      HTexture loadFromFile(std::string filename);
+      DXTexture* getData(HTexture handle);
 
    private:
-      typedef Cache<DXTexture, HTexture> DXTextureCache;
-      
-      DXTextureCache m_textures;
-      DXTexture m_defaultTexture;
+      typedef Cache<DXTexture, HTexture> Data;
+      typedef NameCache<HTexture> Names;
+
+      Data m_data;
+      Names m_names;
+      DXTexture m_default;
+      DXTextureFileLoader m_fileloader;
    };
 }

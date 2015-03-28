@@ -1,7 +1,7 @@
 #pragma once
 /********************************************
-*	class:	
-*	usage:
+*  class:
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
@@ -10,7 +10,7 @@
 
 namespace Core
 {
-	class Window;
+   class Window;
 
-	void runGame(Window& window);
+   void runGame(Window& window);
 }

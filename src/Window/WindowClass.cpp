@@ -15,15 +15,18 @@ namespace Core
 {
    WindowClass::WindowClass(const char* className)
       : WindowClass(::GetModuleHandle(nullptr), className)
-   {}
+   {
+   }
 
    WindowClass::WindowClass(const std::string& className)
       : WindowClass(className.c_str())
-   {}
+   {
+   }
 
    WindowClass::WindowClass(HINSTANCE hInst, const std::string& className)
       : WindowClass(hInst, className.c_str())
-   {}
+   {
+   }
 
    WindowClass::WindowClass(HINSTANCE hInst, const char* className)
    {

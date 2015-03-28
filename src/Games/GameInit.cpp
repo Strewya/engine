@@ -5,7 +5,7 @@
 #include <Games/GameInit.h>
 /******* C++ headers *******/
 /******* extra headers *******/
-#include <Util/Time.h>
+#include <Util/Clock.h>
 #include <Window/Window.h>
 
 #include <Games/GameList.h>
@@ -28,6 +28,7 @@ namespace Core
 {
    void runGame(Window& window)
    {
+#ifndef NO_GAME
       static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
       static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
       Clock logicTimer;
@@ -68,5 +69,6 @@ namespace Core
       }
       game.shutdown();
       window.close();
+#endif
    }
 }

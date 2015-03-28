@@ -5,7 +5,7 @@
 
 //	STL
 #include <algorithm>
-#include <cassert>
+#include <assert.h>
 #include <chrono>
 #include <stdint.h>
 #include <functional>
@@ -15,13 +15,9 @@
 #include <random>
 #include <set>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-//hmmmmm
-#include <Window/myWindows.h>
 
 #endif

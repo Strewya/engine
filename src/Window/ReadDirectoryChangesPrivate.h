@@ -1,112 +1,112 @@
 #pragma once
 /********************************************
-*	class:	CReadChangesRequest, CReadChangesServer
-*	usage:
+*  class:   CReadChangesRequest, CReadChangesServer
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <string>
 #include <vector>
-#include <Window/myWindows.h>
 /******* common headers *******/
+#include <Window/myWindows.h>
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core
 {
-	class CReadDirectoryChanges;
+   class CReadDirectoryChanges;
 
-	namespace RDCPrivate
-	{
-		class CReadChangesServer;
+   namespace RDCPrivate
+   {
+      class CReadChangesServer;
 
-		///////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////
 
-		// All functions in CReadChangesRequest run in the context of the worker thread.
-		// One instance of this object is created for each call to AddDirectory().
-		class CReadChangesRequest
-		{
-		public:
-			CReadChangesRequest(CReadChangesServer* pServer, const std::string& dirName, BOOL trackSubdirs, DWORD trackFlags, DWORD bufferSize);
+      // All functions in CReadChangesRequest run in the context of the worker thread.
+      // One instance of this object is created for each call to AddDirectory().
+      class CReadChangesRequest
+      {
+      public:
+         CReadChangesRequest(CReadChangesServer* pServer, const std::string& dirName, BOOL trackSubdirs, DWORD trackFlags, DWORD bufferSize);
 
-			~CReadChangesRequest();
+         ~CReadChangesRequest();
 
-			bool OpenDirectory();
+         bool OpenDirectory();
 
-			void BeginRead();
+         void BeginRead();
 
-			// The dwSize is the actual number of bytes sent to the APC.
-			void BackupBuffer(DWORD bytesToCopy);
+         // The dwSize is the actual number of bytes sent to the APC.
+         void BackupBuffer(DWORD bytesToCopy);
 
-			void ProcessNotification();
+         void ProcessNotification();
 
-			void RequestTermination();
+         void RequestTermination();
 
-			CReadChangesServer* m_pServer;
+         CReadChangesServer* m_pServer;
 
-		protected:
+      protected:
 
-			static VOID CALLBACK NotificationCompletion(
-					DWORD dwErrorCode,							// completion code
-					DWORD dwNumberOfBytesTransfered,			// number of bytes transferred
-					LPOVERLAPPED lpOverlapped);					// I/O information buffer
+         static VOID CALLBACK NotificationCompletion(
+            DWORD dwErrorCode,               // completion code
+            DWORD dwNumberOfBytesTransfered, // number of bytes transferred
+            LPOVERLAPPED lpOverlapped);      // I/O information buffer
 
-			// Parameters from the caller for ReadDirectoryChangesW().
-			DWORD		m_trackFlags;
-			DWORD		m_bufferSize;
-			BOOL		m_trackSubdirs;
-			std::string	m_dirName;
+         // Parameters from the caller for ReadDirectoryChangesW().
+         DWORD       m_trackFlags;
+         DWORD       m_bufferSize;
+         BOOL        m_trackSubdirs;
+         std::string m_dirName;
 
-			// Result of calling CreateFile().
-			HANDLE		m_dirHandle;
+         // Result of calling CreateFile().
+         HANDLE      m_dirHandle;
 
-			// Required parameter for ReadDirectoryChangesW().
-			OVERLAPPED	m_overlapped;
+         // Required parameter for ReadDirectoryChangesW().
+         OVERLAPPED  m_overlapped;
 
-			// Data buffer for the request.
-			// Since the memory is allocated by malloc, it will always
-			// be aligned as required by ReadDirectoryChangesW().
-			std::vector<BYTE> m_mainBuffer;
+         // Data buffer for the request.
+         // Since the memory is allocated by malloc, it will always
+         // be aligned as required by ReadDirectoryChangesW().
+         std::vector<BYTE> m_mainBuffer;
 
-			// Double buffer strategy so that we can issue a new read
-			// request before we process the current buffer.
-			std::vector<BYTE> m_backupBuffer;
-		};
+         // Double buffer strategy so that we can issue a new read
+         // request before we process the current buffer.
+         std::vector<BYTE> m_backupBuffer;
+      };
 
-		///////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////
 
-		// All functions in CReadChangesServer run in the context of the worker thread.
-		// One instance of this object is allocated for each instance of CReadDirectoryChanges.
-		// This class is responsible for thread startup, orderly thread shutdown, and shimming
-		// the various C++ member functions with C-style Win32 functions.
-		class CReadChangesServer
-		{
-		public:
-			CReadChangesServer(CReadDirectoryChanges* parent);
+      // All functions in CReadChangesServer run in the context of the worker thread.
+      // One instance of this object is allocated for each instance of CReadDirectoryChanges.
+      // This class is responsible for thread startup, orderly thread shutdown, and shimming
+      // the various C++ member functions with C-style Win32 functions.
+      class CReadChangesServer
+      {
+      public:
+         CReadChangesServer(CReadDirectoryChanges* parent);
 
-			static unsigned int WINAPI ThreadStartProc(LPVOID arg);
+         static unsigned int WINAPI ThreadStartProc(LPVOID arg);
 
-			// Called by QueueUserAPC to start orderly shutdown.
-			static void CALLBACK TerminateProc(__in  ULONG_PTR arg);
+         // Called by QueueUserAPC to start orderly shutdown.
+         static void CALLBACK TerminateProc(__in  ULONG_PTR arg);
 
-			// Called by QueueUserAPC to add another directory.
-			static void CALLBACK AddDirectoryProc(__in  ULONG_PTR arg);
+         // Called by QueueUserAPC to add another directory.
+         static void CALLBACK AddDirectoryProc(__in  ULONG_PTR arg);
 
-			CReadDirectoryChanges* m_pParent;
+         CReadDirectoryChanges* m_pParent;
 
-			volatile DWORD m_nOutstandingRequests;
+         volatile DWORD m_nOutstandingRequests;
 
-		protected:
+      protected:
 
-			void Run();
+         void Run();
 
-			void AddDirectory(CReadChangesRequest* pBlock);
+         void AddDirectory(CReadChangesRequest* pBlock);
 
-			void RequestTermination();
+         void RequestTermination();
 
-			std::vector<CReadChangesRequest*> m_pBlocks;
+         std::vector<CReadChangesRequest*> m_pBlocks;
 
-			bool m_bTerminate;
-		};
+         bool m_bTerminate;
+      };
 
-	}
+   }
 }

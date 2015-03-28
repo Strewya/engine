@@ -1,7 +1,7 @@
 #pragma once
 /********************************************
-*	class:	Camera
-*	usage:
+*  class:   Camera
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 /******* common headers *******/
@@ -11,31 +11,31 @@
 
 namespace Core
 {
-	class Camera
-	{
-	public:
-		Camera();
+   class Camera
+   {
+   public:
+      Camera();
 
-		void move(const Vec3& translation);
-		void rotate(const Vec3& rotation);
+      void move(Vec3f translation);
+      void rotate(Vec3f rotation);
 
-		const Vec3& getPosition() const;
-		const Vec3& getLookAtAxis() const;
-		const Vec3& getUpAxis() const;
-		const Vec3& getRotation() const;
-		float getSpeed() const;
+      Vec3f getPosition() const;
+      Vec3f getLookAtAxis() const;
+      Vec3f getUpAxis() const;
+      Vec3f getRotation() const;
+      float getSpeed() const;
 
-		void setPosition(const Vec3& pos);
-		void setUpAxis(const Vec3& upAxis);
-		void setLookAtAxis(const Vec3& lookAtAxis);
-		void setRotation(const Vec3& rot);
-		void setSpeed(float speed);
+      void setPosition(Vec3f pos);
+      void setUpAxis(Vec3f upAxis);
+      void setLookAtAxis(Vec3f lookAtAxis);
+      void setRotation(Vec3f rot);
+      void setSpeed(float speed);
 
-	private:
-		Vec3 m_position;
-		Vec3 m_lookAtAxis;
-		Vec3 m_upAxis;
-		Vec3 m_rotation;
-		float m_speed;
-	};
+   private:
+      Vec3f m_position;
+      Vec3f m_lookAtAxis;
+      Vec3f m_upAxis;
+      Vec3f m_rotation;
+      float m_speed;
+   };
 }

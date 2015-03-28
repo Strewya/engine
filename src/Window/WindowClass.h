@@ -1,12 +1,12 @@
 #pragma once
 /********************************************
-*	class:	WindowClass
-*	usage:
+*  class:   WindowClass
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <string>
-#include <Window/myWindows.h>
 /******* common headers *******/
+#include <Window/myWindows.h>
 /******* extra headers *******/
 /******* end header inclusion *******/
 

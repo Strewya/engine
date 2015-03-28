@@ -1,7 +1,7 @@
 #pragma once
 /********************************************
-*	class:	Vec2
-*	usage:
+*  class:   Vec2 template
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <ostream>
@@ -24,54 +24,43 @@ namespace Core
 
       void set(T x, T y);
 
-      template<typename U>
-      operator Vec2<U>() const;
+      template<typename U> operator Vec2<U>() const;
 
-      Vec2 operator+(T s) const;
-      Vec2 operator+(Vec2 v) const;
       Vec2& operator+=(T s);
       Vec2& operator+=(Vec2 v);
 
-      Vec2 operator-() const;
-      Vec2 operator-(T s) const;
-      Vec2 operator-(Vec2 v) const;
       Vec2& operator-=(T s);
       Vec2& operator-=(Vec2 v);
-      
-      Vec2 operator*(T s) const;
-      Vec2 operator*(Vec2 v) const;
+
       Vec2& operator*=(T s);
       Vec2& operator*=(Vec2 v);
-      
-      Vec2 operator/(T s) const;
-      Vec2 operator/(Vec2 v) const;
-      Vec2& operator/=(T f);
-      Vec2& operator/=(Vec2 v);
 
-      bool operator==(Vec2 other);
-      bool operator!=(Vec2 other);
+      Vec2& operator/=(T s);
+      Vec2& operator/=(Vec2 v);
 
       static T length(Vec2 v);
       static T length2(Vec2 v);
       static Vec2 normalize(Vec2 v);
       static T dotProduct(Vec2 l, Vec2 r);
-      static Vec2 projection(Vec2 vec, Vec2 target);
+      static Vec2 projection(Vec2 v, Vec2 target);
    };
 
-   template<typename T>
-   Vec2<T> operator+(T f, Vec2<T> v);
-   template<typename T>
-   Vec2<T> operator-(T f, Vec2<T> v);
-   template<typename T>
-   Vec2<T> operator*(T f, Vec2<T> v);
-   template<typename T>
-   Vec2<T> operator/(T f, Vec2<T> v);
-   template<typename T>
-   bool operator==(Vec2<T> left, Vec2<T> right);
-   template<typename T>
-   bool operator!=(Vec2<T> left, Vec2<T> right);
-   template<typename T>
-   std::ostream& operator<<(std::ostream& os, Vec2<T> v);
+   template<typename T> Vec2<T> operator-(Vec2<T> v);
+
+   template<typename T> Vec2<T> operator+(Vec2<T> v, T s);
+   template<typename T> Vec2<T> operator-(Vec2<T> v, T s);
+   template<typename T> Vec2<T> operator*(Vec2<T> v, T s);
+   template<typename T> Vec2<T> operator/(Vec2<T> v, T s);
+
+   template<typename T> Vec2<T> operator+(Vec2<T> l, Vec2<T> r);
+   template<typename T> Vec2<T> operator-(Vec2<T> l, Vec2<T> r);
+   template<typename T> Vec2<T> operator*(Vec2<T> l, Vec2<T> r);
+   template<typename T> Vec2<T> operator/(Vec2<T> l, Vec2<T> r);
+
+   template<typename T> bool operator==(Vec2<T> l, Vec2<T> r);
+   template<typename T> bool operator!=(Vec2<T> l, Vec2<T> r);
+
+   template<typename T> std::ostream& operator<<(std::ostream& os, Vec2<T> v);
 }
 
 #include <Util/Vec2Impl.h>

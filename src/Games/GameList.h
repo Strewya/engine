@@ -33,7 +33,13 @@
 
 #define CORE_GAME Game
 #define CORE_PKG
-#define CORE_HEADER <Games/ChaosGarden/Game.h>
+#define CORE_HEADER <Games/Rainbowland/Main.h>
+
+#else
+
+#define NO_GAME
+#define CORE_PKG
+#define CORE_HEADER <Games/GameList.h>
 
 #endif
 

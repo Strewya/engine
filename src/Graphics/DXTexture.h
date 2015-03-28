@@ -1,0 +1,21 @@
+#pragma once
+/********************************************
+*  contents:   DXTexture
+*  usage:
+********************************************/
+/******* C++ headers *******/
+#include <cstdint>
+/******* common headers *******/
+#include <Graphics/DXInclude.h>
+/******* extra headers *******/
+/******* end header inclusion *******/
+
+namespace Core
+{
+   struct DXTexture
+   {
+      ID3D11Texture2D* rawTexture;
+      uint32_t width;
+      uint32_t height;
+   };
+}

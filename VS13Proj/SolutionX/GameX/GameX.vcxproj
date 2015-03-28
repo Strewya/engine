@@ -90,6 +90,7 @@
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>SyncCThrow</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,7 +103,8 @@
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
     <PreBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
+      <Command>
+      </Command>
       <Message>
       </Message>
     </PreBuildEvent>
@@ -128,7 +130,8 @@
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,6 +149,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>SyncCThrow</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -192,6 +196,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>SyncCThrow</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -227,264 +232,68 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\Animation\AnimationSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\AnimationCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\FileHandlerCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\FontCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\ImageCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\PackageCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\ScriptCache.cpp" />
-    <ClCompile Include="..\..\..\src\Caches\TextureCache.cpp" />
-    <ClCompile Include="..\..\..\src\DataStructs\Animation.cpp" />
-    <ClCompile Include="..\..\..\src\DataStructs\Font.cpp" />
-    <ClCompile Include="..\..\..\src\DataStructs\Image.cpp" />
-    <ClCompile Include="..\..\..\src\DataStructs\Package.cpp" />
-    <ClCompile Include="..\..\..\src\Games\ChaosGarden\Game.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
-    <ClCompile Include="..\..\..\src\Games\GamePkg.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Hedgehog\Hedgehog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Pong\Pong.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\BonusDatabase.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameMain.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\Gameplay.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\Grid.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\GuiSystem.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\InputBindings.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\Monster.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\ObjectRendering.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\PerkDatabase.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\Rainbowland.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\Session.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionEnd.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\SessionPreparation.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Box2dDebugDraw.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\RenderQueue.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
-    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Input\KeyCodes.cpp" />
-    <ClCompile Include="..\..\..\src\Loaders\PackageLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\luaBinding.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\LuaStack.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\LuaStackImpl.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\LuaSystem.cpp" />
-    <ClCompile Include="..\..\..\src\Scripting\LuaSystemPlayground.cpp" />
+    <ClCompile Include="..\..\..\src\Input\Gamepad.cpp" />
+    <ClCompile Include="..\..\..\src\Input\Keyboard.cpp" />
+    <ClCompile Include="..\..\..\src\Input\Mouse.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Util\Circle.cpp" />
-    <ClCompile Include="..\..\..\src\Util\CollisionChecks.cpp" />
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Logger.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Random.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
-    <ClCompile Include="..\..\..\src\Util\ResourceFile.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Time.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
-    <ClCompile Include="..\..\..\src\Util\Vec3.cpp" />
+    <ClCompile Include="..\..\..\src\Util\PeriodicTimer.cpp" />
+    <ClCompile Include="..\..\..\src\Util\CooldownTimer.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Timer.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Clock.cpp" />
+    <ClCompile Include="..\..\..\src\Window\GamepadHandler.cpp" />
+    <ClCompile Include="..\..\..\src\Window\KeyboardHandler.cpp" />
+    <ClCompile Include="..\..\..\src\Window\MouseHandler.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChanges.cpp" />
     <ClCompile Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.cpp" />
     <ClCompile Include="..\..\..\src\Window\Window.cpp" />
     <ClCompile Include="..\..\..\src\Window\WindowClass.cpp" />
+    <ClCompile Include="..\..\..\src\Window\Window_general.cpp" />
+    <ClCompile Include="..\..\..\src\Window\Window_platform.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\Animation\AnimationSystem.h" />
-    <ClInclude Include="..\..\..\src\Audio\AudioSystem.h" />
-    <ClInclude Include="..\..\..\src\Audio\FmodInclude.h" />
-    <ClInclude Include="..\..\..\src\Caches\AnimationCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\FileHandlerCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\FontCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\ImageCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\PackageCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\ScriptCache.h" />
-    <ClInclude Include="..\..\..\src\Caches\TextureCache.h" />
-    <ClInclude Include="..\..\..\src\Common\Cache.h" />
-    <ClInclude Include="..\..\..\src\Common\Handle.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Animation.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Font.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Image.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Package.h" />
-    <ClInclude Include="..\..\..\src\DataStructs\Texture.h" />
-    <ClInclude Include="..\..\..\src\Games\ChaosGarden\Game.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameList.h" />
-    <ClInclude Include="..\..\..\src\Games\Hedgehog\Hedgehog.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Pong\Pong.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Abilities.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Bonus.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusDatabase.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\BonusFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameDefinitions.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Grid.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\GridFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\GuiSystem.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\InputBindings.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Monster.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\MonsterFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Movement.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\MovementSystem.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\ObjectRendering.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Perk.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkDatabase.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\PerkFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerData.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Rainbowland.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Session.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionEnd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPerkMenu.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\SessionPreparation.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\TimingSystem.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\Weapon.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponDatabase.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Games\Rainbowland\WeaponFwd.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Box2dDebugDraw.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Main.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h" />
+    <ClInclude Include="..\..\..\src\Graphics\DXTexture.h" />
+    <ClInclude Include="..\..\..\src\Graphics\DXTextureFileLoader.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
-    <ClInclude Include="..\..\..\src\Graphics\RenderQueue.h" />
-    <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
-    <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
-    <ClInclude Include="..\..\..\src\Input\KeyCodes.h" />
-    <ClInclude Include="..\..\..\src\Loaders\Defines.h" />
-    <ClInclude Include="..\..\..\src\Loaders\PackageLoader.h" />
-    <ClInclude Include="..\..\..\src\Physics\PhysicsSystem.h" />
-    <ClInclude Include="..\..\..\src\Scripting\luaBinding.h" />
-    <ClInclude Include="..\..\..\src\Scripting\LuaInclude.h" />
-    <ClInclude Include="..\..\..\src\Scripting\LuaStack.h" />
-    <ClInclude Include="..\..\..\src\Scripting\LuaStackImpl.h" />
-    <ClInclude Include="..\..\..\src\Scripting\LuaSystem.h" />
+    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h" />
+    <ClInclude Include="..\..\..\src\Input\Gamepad.h" />
+    <ClInclude Include="..\..\..\src\Input\Keyboard.h" />
+    <ClInclude Include="..\..\..\src\Input\Mouse.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
-    <ClInclude Include="..\..\..\src\Util\Circle.h" />
-    <ClInclude Include="..\..\..\src\Util\CollisionChecks.h" />
+    <ClInclude Include="..\..\..\src\Util\Cache.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
-    <ClInclude Include="..\..\..\src\Util\Logger.h" />
-    <ClInclude Include="..\..\..\src\Util\ObjectPool.h" />
-    <ClInclude Include="..\..\..\src\Util\Rect.h" />
-    <ClInclude Include="..\..\..\src\Util\ResourceFile.h" />
+    <ClInclude Include="..\..\..\src\Util\Handle.h" />
+    <ClInclude Include="..\..\..\src\Util\NameCache.h" />
+    <ClInclude Include="..\..\..\src\Util\PeriodicTimer.h" />
+    <ClInclude Include="..\..\..\src\Util\CooldownTimer.h" />
+    <ClInclude Include="..\..\..\src\Util\Timer.h" />
+    <ClInclude Include="..\..\..\src\Util\Clock.h" />
+    <ClInclude Include="..\..\..\src\Util\TimeUnitConversions.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
-    <ClInclude Include="..\..\..\src\Util\Random.h" />
-    <ClInclude Include="..\..\..\src\Util\Time.h" />
-    <ClInclude Include="..\..\..\src\Util\Transform.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2Fwd.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2Impl.h" />
     <ClInclude Include="..\..\..\src\Util\Vec3.h" />
+    <ClInclude Include="..\..\..\src\Util\Vec3Fwd.h" />
+    <ClInclude Include="..\..\..\src\Util\Vec3Impl.h" />
+    <ClInclude Include="..\..\..\src\Window\GamepadHandler.h" />
+    <ClInclude Include="..\..\..\src\Window\KeyboardHandler.h" />
+    <ClInclude Include="..\..\..\src\Window\MouseHandler.h" />
     <ClInclude Include="..\..\..\src\Window\myWindows.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChanges.h" />
     <ClInclude Include="..\..\..\src\Window\ReadDirectoryChangesPrivate.h" />
@@ -493,57 +302,7 @@
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\src\Animation\Animation.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Audio\Audio.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Caches\Caches.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\DataStructs\DataStructs.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Hedgehog\Hedgehog.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\GamePkg.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Games\Pong\Pong.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Graphics\Graphics.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Input\Input.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\mainExport.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Physics\Physics.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Util\Util.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-    <CustomBuild Include="..\..\..\src\Window\Window.pkg">
-      <FileType>Document</FileType>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\src\Games\Hedgehog\resourceList.lua" />
-    <None Include="..\..\..\src\Games\Pong\resourceList.lua" />
-    <None Include="..\..\..\src\Games\Rainbowland\Rainbowland.pkg" />
-    <None Include="..\..\..\src\Games\Rainbowland\resourceList.lua" />
-    <None Include="..\..\..\src\Loaders\Loaders.pkg" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\..\output\resources\Shaders\shader.hlsl">
-      <FileType>Document</FileType>
-    </CustomBuild>
+    <None Include="..\..\..\src\Window\Window.pkg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,67 +9,68 @@
 
 namespace Core
 {
-	Camera::Camera()
-		: m_position(0, 0, 0), m_lookAtAxis(0, 0, 1), m_upAxis(0, 1, 0), m_speed(0)
-	{}
+   Camera::Camera()
+      : m_position(0, 0, 0), m_lookAtAxis(0, 0, 1), m_upAxis(0, 1, 0), m_speed(0)
+   {
+   }
 
-	void Camera::move(const Vec3& translation)
-	{
-		m_position += translation;
-	}
+   void Camera::move(Vec3f translation)
+   {
+      m_position += translation;
+   }
 
-	void Camera::rotate(const Vec3& rotation)
-	{
-		m_rotation += rotation;
-	}
+   void Camera::rotate(Vec3f rotation)
+   {
+      m_rotation += rotation;
+   }
 
-	const Vec3& Camera::getPosition() const
-	{
-		return m_position;
-	}
+   Vec3f Camera::getPosition() const
+   {
+      return m_position;
+   }
 
-	const Vec3& Camera::getLookAtAxis() const
-	{
-		return m_lookAtAxis;
-	}
+   Vec3f Camera::getLookAtAxis() const
+   {
+      return m_lookAtAxis;
+   }
 
-	const Vec3& Camera::getUpAxis() const
-	{
-		return m_upAxis;
-	}
+   Vec3f Camera::getUpAxis() const
+   {
+      return m_upAxis;
+   }
 
-	const Vec3& Camera::getRotation() const
-	{
-		return m_rotation;
-	}
+   Vec3f Camera::getRotation() const
+   {
+      return m_rotation;
+   }
 
-	float Camera::getSpeed() const
-	{
-		return m_speed;
-	}
+   float Camera::getSpeed() const
+   {
+      return m_speed;
+   }
 
-	void Camera::setPosition(const Vec3& pos)
-	{
-		m_position = pos;
-	}
+   void Camera::setPosition(Vec3f pos)
+   {
+      m_position = pos;
+   }
 
-	void Camera::setUpAxis(const Vec3& upAxis)
-	{
-		m_upAxis = upAxis;
-	}
+   void Camera::setUpAxis(Vec3f upAxis)
+   {
+      m_upAxis = upAxis;
+   }
 
-	void Camera::setLookAtAxis(const Vec3& lookAtAxis)
-	{
-		m_lookAtAxis = lookAtAxis;
-	}
+   void Camera::setLookAtAxis(Vec3f lookAtAxis)
+   {
+      m_lookAtAxis = lookAtAxis;
+   }
 
-	void Camera::setRotation(const Vec3& rot)
-	{
-		m_rotation = rot;
-	}
+   void Camera::setRotation(Vec3f rot)
+   {
+      m_rotation = rot;
+   }
 
-	void Camera::setSpeed(float speed)
-	{
-		m_speed = speed;
-	}
+   void Camera::setSpeed(float speed)
+   {
+      m_speed = speed;
+   }
 }

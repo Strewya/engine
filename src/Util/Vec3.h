@@ -1,38 +1,70 @@
 #pragma once
 /********************************************
-*	class:	Vec3
-*	usage:
+*  class:   Vec3 template
+*  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Util/Vec3Fwd.h>
 /******* end header inclusion *******/
 
-namespace Core 
+namespace Core
 {
-	class Vec3
-	{
-	public:
-		float x, y, z;
+   template<typename T>
+   class Vec3
+   {
+   public:
+      T x;
+      T y;
+      T z;
 
-		Vec3();
-		Vec3(float x, float y, float z);
+      Vec3();
+      Vec3(T x, T y, T z);
 
-		void set(float x, float y, float z);
+      void set(T x, T y, T z);
 
-		Vec3 operator+(const Vec3& v) const;
-		Vec3& operator+=(const Vec3& v);
-		Vec3 operator-() const;
-		Vec3 operator-(const Vec3& v) const;
-		Vec3 operator*(float f) const;
-		Vec3 operator/(float f) const;
-	};
+      template<typename U> operator Vec3<U>() const;
 
-	Vec3 operator*(float f, const Vec3& v);
-	Vec3 operator/(float f, const Vec3& v);
-	std::ostream& operator<<(std::ostream& os, const Vec3& v);
+      Vec3& operator+=(T s);
+      Vec3& operator+=(Vec3 v);
+
+      Vec3& operator-=(T s);
+      Vec3& operator-=(Vec3 v);
+
+      Vec3& operator*=(T s);
+      Vec3& operator*=(Vec3 v);
+
+      Vec3& operator/=(T s);
+      Vec3& operator/=(Vec3 v);
+
+      static T length(Vec3 v);
+      static T length2(Vec3 v);
+      static Vec3 normalize(Vec3 v);
+      static T dotProduct(Vec3 l, Vec3 r);
+   };
+
+   template<typename T> Vec3<T> operator-(Vec3<T> v);
+
+   template<typename T> Vec3<T> operator+(Vec3<T> v, T s);
+   template<typename T> Vec3<T> operator-(Vec3<T> v, T s);
+   template<typename T> Vec3<T> operator*(Vec3<T> v, T s);
+   template<typename T> Vec3<T> operator/(Vec3<T> v, T s);
+
+   template<typename T> Vec3<T> operator+(Vec3<T> l, Vec3<T> r);
+   template<typename T> Vec3<T> operator-(Vec3<T> l, Vec3<T> r);
+   template<typename T> Vec3<T> operator*(Vec3<T> l, Vec3<T> r);
+   template<typename T> Vec3<T> operator/(Vec3<T> l, Vec3<T> r);
+
+   template<typename T> bool operator==(Vec3<T> l, Vec3<T> r);
+   template<typename T> bool operator!=(Vec3<T> l, Vec3<T> r);
+
+   template<typename T> std::ostream& operator<<(std::ostream& os, Vec3<T> v);
 }
+
+#include <Util/Vec3Impl.h>
+
 
 // #include <iostream>
 //namespace Util
