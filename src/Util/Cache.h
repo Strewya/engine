@@ -17,7 +17,7 @@ namespace Core
    class Cache
    {
    public:
-      DATA* acquire(HANDLE& handle)
+      DATA& acquire(HANDLE& handle)
       {
          uint16_t index;
          if( m_freeSlots.empty() )
@@ -34,8 +34,9 @@ namespace Core
             m_freeSlots.pop_back();
             m_magicNumbers[index] = handle.getMagic();
          }
-         return &m_data[index];
+         return m_data[index];
       }
+
       void release(HANDLE handle)
       {
          uint16_t index = handle.getIndex();
@@ -50,15 +51,15 @@ namespace Core
       {
          if( handle.isNull() )
          {
-            return nullptr;
+            uint16_t index = handle.getIndex();
+            if( index < m_data.size() && m_magicNumbers[index] == handle.getMagic() )
+            {
+               return &m_data[index];
+            }
          }
-         uint16_t index = handle.getIndex();
-         if( index >= m_data.size() || m_magicNumbers[index] != handle.getMagic() )
-         {
-            return nullptr;
-         }
-         return &m_data[index];
+         return nullptr;
       }
+      
       const DATA* dereference(HANDLE handle) const
       {
          typedef Cache<DATA, HANDLE> ThisType;
@@ -69,6 +70,7 @@ namespace Core
       {
          return m_magicNumbers.size() - m_freeSlots.size();
       }
+      
       bool hasUsedHandles() const
       {
          return !!getUsedHandleCount();

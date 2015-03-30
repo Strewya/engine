@@ -20,16 +20,15 @@ namespace Core
    struct tag_DXTexture;
    typedef Handle<tag_DXTexture> HTexture;
 
-   
-
    class DXTextureManager
    {
    public:
       bool init(DXTexture defaultData);
       bool shutdown();
 
-      HTexture loadFromFile(std::string filename);
-      DXTexture* getData(HTexture handle);
+      HTexture loadFromFile(const std::string& filename);
+      DXTexture& getData(HTexture handle);
+      void release(HTexture handle);
 
    private:
       typedef Cache<DXTexture, HTexture> Data;

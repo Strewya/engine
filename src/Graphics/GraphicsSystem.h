@@ -37,10 +37,7 @@ namespace Core
 
 
    private:
-      template<typename T> static void releasePtr(T* ptr);
-      template<typename T> static void safeRelease(T*& ptr);
       template<typename T> void declare(T** ptr);
-
       bool initDevice();
       bool initSwapChain();
       bool initRenderTarget();
@@ -67,24 +64,8 @@ namespace Core
 
       std::vector<IUnknown**> m_declaredObjects;
 
+
    };
-
-   template<typename T> void GraphicsSystem::safeRelease(T*& ptr)
-   {
-      if( ptr != nullptr )
-      {
-         releasePtr(ptr);
-         ptr = nullptr;
-      }
-   }
-
-   template<typename T> void GraphicsSystem::releasePtr(T* ptr)
-   {
-      if( ptr != nullptr )
-      {
-         ptr->Release();
-      }
-   }
 
    template<typename T> void GraphicsSystem::declare(T** ptr)
    {

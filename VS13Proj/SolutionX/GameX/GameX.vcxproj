@@ -236,6 +236,7 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\DXTextureManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\Gamepad.cpp" />
     <ClCompile Include="..\..\..\src\Input\Keyboard.cpp" />

@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\stdafx_builder.cpp" />
-    <ClCompile Include="..\..\..\src\winmain.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp">
       <Filter>Code\Games</Filter>
     </ClCompile>
@@ -69,9 +67,17 @@
     <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp">
       <Filter>Code\Framework\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\winmain.cpp">
+      <Filter>Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\DXTextureManager.cpp">
+      <Filter>Code\Framework\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
       <Filter>Code\Games</Filter>
     </ClInclude>
@@ -182,6 +188,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\DXTexture.h">
       <Filter>Code\Framework\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\stdafx.h">
+      <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

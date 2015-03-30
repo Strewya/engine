@@ -14,7 +14,7 @@ namespace Core
 {
    struct DXTexture
    {
-      ID3D11Texture2D* rawTexture;
+      ID3D11ShaderResourceView* shaderResourceView;
       uint32_t width;
       uint32_t height;
    };
