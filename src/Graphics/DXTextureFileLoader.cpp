@@ -27,7 +27,7 @@ namespace Core
 
    DXTexture DXTextureFileLoader::load(const std::string& filename) const
    {
-      DXTexture& result{nullptr, 0, 0};
+      DXTexture result{nullptr, 0, 0};
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename.c_str(), nullptr, nullptr, &result.shaderResourceView, nullptr);
       if( SUCCEEDED(hr) )
       {

@@ -23,7 +23,7 @@ namespace Core
    class DXTextureManager
    {
    public:
-      bool init(DXTexture defaultData);
+      bool init(ID3D11Device* device, DXTexture defaultData);
       bool shutdown();
 
       HTexture loadFromFile(const std::string& filename);

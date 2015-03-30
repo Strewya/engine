@@ -16,7 +16,7 @@ namespace Core
    class NameCache
    {
    public:
-      HANDLE getHandle(const std::string& name)
+      HANDLE getHandle(const std::string& name) const
       {
          auto it = m_handles.find(name);
          if( it != m_handles.end() )
@@ -38,7 +38,7 @@ namespace Core
 
       void unbind(HANDLE handle)
       {
-         std::remove_if(m_handles.begin(), m_handles.end(), [=](HandleMap::value_type& value)
+         std::remove_if(m_handles.begin(), m_handles.end(), [=](const HandleMap::value_type& value)
          {
             return value.second == handle;
          });

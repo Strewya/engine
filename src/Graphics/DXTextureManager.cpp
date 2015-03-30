@@ -10,11 +10,13 @@
 
 namespace Core
 {
-   bool DXTextureManager::init(DXTexture defaultData)
+   bool DXTextureManager::init(ID3D11Device* device, DXTexture defaultData)
    {
       m_default = defaultData;
 
       CORE_STATUS(true);
+      CORE_STATUS_AND(m_fileloader.init(device));
+
       CORE_INIT(DXTextureManager);
    }
 

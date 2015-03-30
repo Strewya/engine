@@ -22,7 +22,7 @@ namespace Core
          uint16_t index;
          if( m_freeSlots.empty() )
          {
-            index = m_magicNumbers.size();
+            index = (uint16_t)m_magicNumbers.size();
             handle.init(index);
             m_data.emplace_back();
             m_magicNumbers.push_back(handle.getMagic());
@@ -39,7 +39,7 @@ namespace Core
 
       void release(HANDLE handle)
       {
-         uint16_t index = handle.getIndex();
+         auto index = handle.getIndex();
          assert(index < m_data.size());
          assert(m_magicNumbers[index] == handle.getMagic());
 
@@ -51,7 +51,7 @@ namespace Core
       {
          if( handle.isNull() )
          {
-            uint16_t index = handle.getIndex();
+            auto index = handle.getIndex();
             if( index < m_data.size() && m_magicNumbers[index] == handle.getMagic() )
             {
                return &m_data[index];

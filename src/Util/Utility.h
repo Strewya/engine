@@ -20,7 +20,7 @@ namespace Core
 #define CORE_STATUS_OK (status == true)
 #define CORE_INIT(c) CORE_INFO( #c" init ", status ? "OK" : "FAIL"); return status
 #define CORE_SHUTDOWN(c) CORE_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
-
+#define CORE_RESOURCE(x) "../resources/"#x
 
 #ifndef CORE_DEPLOY
 

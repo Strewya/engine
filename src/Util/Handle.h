@@ -20,7 +20,7 @@ namespace Core
       {
       }
 
-      void init(uint32_t index)
+      void init(uint16_t index)
       {
          assert(isNull());
          assert(index <= MAX_INDEX);
@@ -34,11 +34,11 @@ namespace Core
          m_magic = s_autoMagic;
       }
 
-      uint32_t getIndex() const
+      uint16_t getIndex() const
       {
          return m_index;
       }
-      uint32_t getMagic() const
+      uint16_t getMagic() const
       {
          return m_magic;
       }
@@ -59,7 +59,7 @@ namespace Core
       enum
       {
          MAX_BITS_INDEX = 16,
-         MAX_BTIS_MAGIC = 16,
+         MAX_BITS_MAGIC = 16,
          MAX_INDEX = (1 << MAX_BITS_INDEX) - 1,
          MAX_MAGIC = (1 << MAX_BITS_MAGIC) - 1
       };
@@ -75,12 +75,12 @@ namespace Core
    };
 
    template<typename TAG>
-   inline bool operator==(Handle<TAG> l, Handle<TAAG> r)
+   inline bool operator==(Handle<TAG> l, Handle<TAG> r)
    {
       return l.getHandle() == r.getHandle();
    }
    template<typename TAG>
-   inline bool operator!=(Handle<TAG> l, Handle<TAAG> r)
+   inline bool operator!=(Handle<TAG> l, Handle<TAG> r)
    {
       return !(l == r);
    }

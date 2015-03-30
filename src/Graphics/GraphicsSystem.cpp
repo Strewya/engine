@@ -44,6 +44,12 @@ namespace Core
       CORE_STATUS_AND(initRenderTarget());
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
+      
+      DXTextureFileLoader fileLoader;
+      CORE_STATUS_AND(fileLoader.init(m_dev));
+      DXTexture defaultTexture = fileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
+
+      CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
 
       CORE_INIT(GraphicsSystem);
    }

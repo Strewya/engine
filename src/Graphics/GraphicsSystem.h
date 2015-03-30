@@ -9,6 +9,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/DXTextureManager.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -64,7 +65,7 @@ namespace Core
 
       std::vector<IUnknown**> m_declaredObjects;
 
-
+      DXTextureManager m_textures;
    };
 
    template<typename T> void GraphicsSystem::declare(T** ptr)
