@@ -1,10 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   DXTexture
+*  contents:   DXVertexShader, DXPixelShader
 *  usage:
 ********************************************/
 /******* C++ headers *******/
-#include <cstdint>
 #include <string>
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
@@ -13,12 +12,18 @@
 
 namespace Core
 {
-   class DXTexture
+   class DXVertexShader
    {
    public:
       std::string name;
-      ID3D11ShaderResourceView* shaderResourceView;
-      uint32_t width;
-      uint32_t height;
+      ID3D11VertexShader* shader;
+      ID3D11InputLayout* inputLayout;
+   };
+
+   class DXPixelShader
+   {
+   public:
+      std::string name;
+      ID3D11PixelShader* shader;
    };
 }

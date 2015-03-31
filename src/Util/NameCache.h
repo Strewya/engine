@@ -38,10 +38,14 @@ namespace Core
 
       void unbind(HANDLE handle)
       {
-         std::remove_if(m_handles.begin(), m_handles.end(), [=](const HandleMap::value_type& value)
+         for( auto it = m_handles.begin(); it != m_handles.end(); ++it )
          {
-            return value.second == handle;
-         });
+            if( it->second == handle )
+            {
+               m_handles.erase(it);
+               break;
+            }
+         }
       }
 
    private:

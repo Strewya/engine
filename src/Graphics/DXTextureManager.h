@@ -31,11 +31,11 @@ namespace Core
       void release(HTexture handle);
 
    private:
-      typedef Cache<DXTexture, HTexture> Data;
-      typedef NameCache<HTexture> Names;
+      typedef Cache<DXTexture, HTexture> TextureCache;
+      typedef NameCache<HTexture> TextureNames;
 
-      Data m_data;
-      Names m_names;
+      TextureCache m_data;
+      TextureNames m_names;
       DXTexture m_default;
       DXTextureFileLoader m_fileloader;
    };

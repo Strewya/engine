@@ -27,7 +27,7 @@ namespace Core
 
    DXTexture DXTextureFileLoader::load(const std::string& filename) const
    {
-      DXTexture result{nullptr, 0, 0};
+      DXTexture result{filename, nullptr, 0, 0};
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename.c_str(), nullptr, nullptr, &result.shaderResourceView, nullptr);
       if( SUCCEEDED(hr) )
       {
@@ -43,8 +43,16 @@ namespace Core
             result.width = desc.Width;
             result.height = desc.Height;
          }
+         else
+         {
+            CORE_INFO("Failed to read dimensions for texture '", filename, "'");
+         }
          safeRelease(texture2d);
          safeRelease(res);
+      }
+      else
+      {
+         CORE_INFO("Failed to load texture '", filename, "'");
       }
       return result;
    }
@@ -52,7 +60,6 @@ namespace Core
    void DXTextureFileLoader::unload(DXTexture& texture) const
    {
       safeRelease(texture.shaderResourceView);
-      texture.shaderResourceView = nullptr;
       texture.width = 0;
       texture.height = 0;
    }

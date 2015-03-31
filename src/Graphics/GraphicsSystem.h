@@ -9,6 +9,8 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/DXRenderer.h>
+#include <Graphics/DXShaderManager.h>
 #include <Graphics/DXTextureManager.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
@@ -33,12 +35,14 @@ namespace Core
       void applyCamera(const Camera& camera);
       void clearCamera();
 
-
-
+      DXRenderer m_renderer;
+      DXTextureManager m_textures;
+      DXShaderManager m_shaders;
+      //DXBufferManager m_buffers; //predefined mesh buffers?
 
 
    private:
-      template<typename T> void declare(T** ptr);
+      template<typename T> void declare(T*& ptr);
       bool initDevice();
       bool initSwapChain();
       bool initRenderTarget();
@@ -64,14 +68,11 @@ namespace Core
       ID3D11DepthStencilView* m_depthStencilView;
 
       std::vector<IUnknown**> m_declaredObjects;
-
-      DXTextureManager m_textures;
    };
 
-   template<typename T> void GraphicsSystem::declare(T** ptr)
+   template<typename T> void GraphicsSystem::declare(T*& ptr)
    {
-      assert(ptr != nullptr);
-      *ptr = nullptr;
-      m_declaredObjects.emplace_back((IUnknown**)ptr);
+      ptr = nullptr;
+      m_declaredObjects.emplace_back((IUnknown**)&ptr);
    }
 }

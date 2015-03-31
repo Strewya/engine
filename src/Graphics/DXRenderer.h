@@ -1,24 +1,22 @@
 #pragma once
 /********************************************
-*  contents:   DXTexture
+*  contents:   DXRenderer
 *  usage:
 ********************************************/
 /******* C++ headers *******/
-#include <cstdint>
-#include <string>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXTexture
+   class DXRenderer
    {
    public:
-      std::string name;
-      ID3D11ShaderResourceView* shaderResourceView;
-      uint32_t width;
-      uint32_t height;
+      bool init();
+      bool shutdown();
+
+   private:
+      
    };
 }

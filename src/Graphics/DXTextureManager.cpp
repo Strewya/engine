@@ -22,13 +22,14 @@ namespace Core
 
    bool DXTextureManager::shutdown()
    {
+      //unload all existing textures
       CORE_STATUS(true);
       CORE_SHUTDOWN(DXTextureManager);
    }
 
    HTexture DXTextureManager::loadFromFile(const std::string& filename)
    {
-      auto handle = m_names.getHandle(filename);
+      HTexture handle = m_names.getHandle(filename);
       if( handle.isNull() )
       {
          auto loadedData = m_fileloader.load(filename);
@@ -37,11 +38,6 @@ namespace Core
             auto& data = m_data.acquire(handle);
             data = loadedData;
             m_names.bind(filename, handle);
-         }
-         else
-         {
-            m_data.release(handle);
-            handle = HTexture{};
          }
       }
       return handle;
@@ -59,10 +55,12 @@ namespace Core
 
    void DXTextureManager::release(HTexture handle)
    {
-      if( m_data.dereference(handle) != nullptr )
+      auto* data = m_data.dereference(handle);
+      if( data != nullptr )
       {
-         m_data.release(handle);
+         m_fileloader.unload(*data);
          m_names.unbind(handle);
+         m_data.release(handle);
       }
    }
 }

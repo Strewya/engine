@@ -64,16 +64,28 @@
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp">
       <Filter>Code\Framework\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp">
-      <Filter>Code\Framework\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
       <Filter>Code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\winmain.cpp">
       <Filter>Code</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\DXRenderer.cpp">
+      <Filter>Code\Framework\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp">
+      <Filter>Code\Framework\Graphics\Texture</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\DXTextureManager.cpp">
+      <Filter>Code\Framework\Graphics\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\DXShaderManager.cpp">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\DXShaderFileLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp">
       <Filter>Code\Framework\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -180,17 +192,32 @@
     <ClInclude Include="..\..\..\src\Util\NameCache.h">
       <Filter>Code\Framework\Util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h">
-      <Filter>Code\Framework\Graphics</Filter>
+    <ClInclude Include="..\..\..\src\stdafx.h">
+      <Filter>Code</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\DXTextureFileLoader.h">
+    <ClInclude Include="..\..\..\src\Graphics\DXRenderer.h">
       <Filter>Code\Framework\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\DXTexture.h">
-      <Filter>Code\Framework\Graphics</Filter>
+      <Filter>Code\Framework\Graphics\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\stdafx.h">
-      <Filter>Code</Filter>
+    <ClInclude Include="..\..\..\src\Graphics\DXTextureFileLoader.h">
+      <Filter>Code\Framework\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h">
+      <Filter>Code\Framework\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXShaderManager.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXShader.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\DXShaderFileLoader.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Vertex.h">
+      <Filter>Code\Framework\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -223,6 +250,12 @@
     </Filter>
     <Filter Include="Code\Games\Rainbowland">
       <UniqueIdentifier>{61078100-e572-45d1-a0e0-5654390f3945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Graphics\Texture">
+      <UniqueIdentifier>{98952245-2e0d-4b12-a832-19ff29546a66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Graphics\Shader">
+      <UniqueIdentifier>{86373863-cfd8-421a-bd79-fd87b123cf75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

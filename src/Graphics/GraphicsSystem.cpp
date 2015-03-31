@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Graphics/Camera.h>
+#include <Graphics/Vertex.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 /******* end headers *******/
@@ -28,14 +29,14 @@ namespace Core
       m_backbufferSize = backbufferSize;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
 
-      declare(&m_dxgiFactory);
-      declare(&m_dev);
-      declare(&m_devcon);
-      declare(&m_swapchain);
-      declare(&m_renderTarget);
-      declare(&m_samplerState);
-      declare(&m_depthStencilBuffer);
-      declare(&m_depthStencilView);
+      declare(m_dxgiFactory);
+      declare(m_dev);
+      declare(m_devcon);
+      declare(m_swapchain);
+      declare(m_renderTarget);
+      declare(m_samplerState);
+      declare(m_depthStencilBuffer);
+      declare(m_depthStencilView);
 
       CORE_STATUS(true);
 
@@ -44,12 +45,21 @@ namespace Core
       CORE_STATUS_AND(initRenderTarget());
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
-      
-      DXTextureFileLoader fileLoader;
-      CORE_STATUS_AND(fileLoader.init(m_dev));
-      DXTexture defaultTexture = fileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
 
-      CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
+      DXTextureFileLoader textureFileLoader;
+      DXShaderFileLoader shaderFileLoader;
+      CORE_STATUS_AND(textureFileLoader.init(m_dev));
+      CORE_STATUS_AND(shaderFileLoader.init(m_dev));
+      if( CORE_STATUS_OK )
+      {
+         auto defaultTexture = textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
+         auto defaultVertexShader = shaderFileLoader.loadVertexShader(CORE_RESOURCE("Shaders/defaultVShader.cso"), Vertex::getDescription());
+         auto defaultPixelShader = shaderFileLoader.loadPixelShader(CORE_RESOURCE("Shaders/defaultPShader.cso"));
+
+         CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
+         CORE_STATUS_AND(m_shaders.init(m_dev, defaultPixelShader, defaultVertexShader));
+      }
+
 
       CORE_INIT(GraphicsSystem);
    }
