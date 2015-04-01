@@ -15,12 +15,14 @@ namespace Core
    {
       m_dev = device;
 
-      CORE_STATUS(true);
+      CORE_STATUS(m_dev != nullptr);
       CORE_INIT(DXTextureFileLoader);
    }
 
    bool DXTextureFileLoader::shutdown()
    {
+      m_dev = nullptr;
+
       CORE_STATUS(true);
       CORE_SHUTDOWN(DXTextureFileLoader);
    }

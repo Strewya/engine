@@ -16,12 +16,14 @@ namespace Core
    {
       m_dev = device;
       
-      CORE_STATUS(true);
+      CORE_STATUS(m_dev != nullptr);
       CORE_INIT(DXShaderFileLoader);
    }
 
    bool DXShaderFileLoader::shutdown()
    {
+      m_dev = nullptr;
+
       CORE_STATUS(true);
       CORE_SHUTDOWN(DXShaderFileLoader);
    }
@@ -94,8 +96,7 @@ namespace Core
 
    void DXShaderFileLoader::unload(DXPixelShader& shader)
    {
-      shader.shader->Release();
-      shader.shader = nullptr;
+      safeRelease(shader.shader);
    }
 
    void DXShaderFileLoader::unload(DXVertexShader& shader)

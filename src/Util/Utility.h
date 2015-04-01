@@ -12,16 +12,6 @@
 
 namespace Core
 {
-
-#define CORE_STATUS(x) bool status = (x)
-#define CORE_STATUS_AND(x) status = (x) && status
-#define CORE_STATUS_OR(x) status = (x) || status
-#define CORE_STATUS_NOK (status == false)
-#define CORE_STATUS_OK (status == true)
-#define CORE_INIT(c) CORE_INFO( #c" init ", status ? "OK" : "FAIL"); return status
-#define CORE_SHUTDOWN(c) CORE_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
-#define CORE_RESOURCE(x) "../resources/"#x
-
 #ifndef CORE_DEPLOY
 
    inline void debugPrint()
@@ -38,6 +28,15 @@ namespace Core
 #else
 #define CORE_INFO(...) (void)0
 #endif
+
+#define CORE_STATUS(x) bool status = (x)
+#define CORE_STATUS_NOK (status == false)
+#define CORE_STATUS_OK (status == true)
+#define CORE_STATUS_AND(x) status = (x) && status
+#define CORE_STATUS_OR(x) status = (x) || status
+#define CORE_INIT(c) CORE_INFO( #c" init ", status ? "OK" : "FAIL"); return status
+#define CORE_SHUTDOWN(c) CORE_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
+#define CORE_RESOURCE(x) "../resources/"x
 
 #define CORE_PI 3.14159265358979f
 #define Deg2Rad(deg) ((deg)*CORE_PI/180.0f)

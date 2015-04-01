@@ -15,15 +15,24 @@ namespace Core
       m_defaultPixelShader = defaultPixelShader;
       m_defaultVertexShader = defaultVertexShader;
 
-      CORE_STATUS(true);
-      CORE_STATUS_AND(m_fileloader.init(device));
+      CORE_STATUS(m_fileloader.init(device));
+      CORE_STATUS_AND(m_defaultPixelShader.shader != nullptr);
+      CORE_STATUS_AND(m_defaultVertexShader.shader != nullptr);
+
       CORE_INIT(DXShaderManager);
    }
 
    bool DXShaderManager::shutdown()
    {
       //unload all existing shaders
-      CORE_STATUS(true);
+      m_fileloader.unload(m_defaultPixelShader);
+      m_fileloader.unload(m_defaultVertexShader);
+      
+      CORE_STATUS(m_defaultPixelShader.shader == nullptr);
+      CORE_STATUS_AND(m_defaultVertexShader.shader == nullptr);
+      CORE_STATUS_AND(m_pixelShaderData.hasUsedHandles() == false);
+      CORE_STATUS_AND(m_vertexShaderData.hasUsedHandles() == false);
+      CORE_STATUS_AND(m_fileloader.shutdown());
       CORE_SHUTDOWN(DXShaderManager);
    }
 

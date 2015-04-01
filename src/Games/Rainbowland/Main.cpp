@@ -16,8 +16,7 @@ namespace Core
    void Game::shutdown()
    {
       CORE_INFO("----- shutdown start -----");
-      CORE_STATUS(true);
-      CORE_STATUS_AND(m_graphicsSystem.shutdown());
+      CORE_STATUS(m_graphicsSystem.shutdown());
 
       if( CORE_STATUS_NOK )
       {
@@ -35,8 +34,7 @@ namespace Core
 #endif
       //window.setFullscreen(true);
 
-      CORE_STATUS(true);
-      CORE_STATUS_AND(m_graphicsSystem.init(window, {1200, 900}));
+      CORE_STATUS(m_graphicsSystem.init(window, {1200, 900}));
 
       CORE_INFO("----- init done -----");
       return CORE_STATUS_OK;

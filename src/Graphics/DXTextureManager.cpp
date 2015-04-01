@@ -12,10 +12,10 @@ namespace Core
 {
    bool DXTextureManager::init(ID3D11Device* device, DXTexture defaultData)
    {
-      m_default = defaultData;
+      m_defaultTexture = defaultData;
 
-      CORE_STATUS(true);
-      CORE_STATUS_AND(m_fileloader.init(device));
+      CORE_STATUS(m_fileloader.init(device));
+      CORE_STATUS_AND(m_defaultTexture.shaderResourceView != nullptr);
 
       CORE_INIT(DXTextureManager);
    }
@@ -23,7 +23,11 @@ namespace Core
    bool DXTextureManager::shutdown()
    {
       //unload all existing textures
-      CORE_STATUS(true);
+      m_fileloader.unload(m_defaultTexture);
+      
+      CORE_STATUS(m_defaultTexture.shaderResourceView == nullptr);
+      CORE_STATUS_AND(m_data.hasUsedHandles() == false);
+      CORE_STATUS_AND(m_fileloader.shutdown());
       CORE_SHUTDOWN(DXTextureManager);
    }
 
@@ -48,7 +52,7 @@ namespace Core
       auto* data = m_data.dereference(handle);
       if( data == nullptr )
       {
-         return m_default;
+         return m_defaultTexture;
       }
       return *data;
    }

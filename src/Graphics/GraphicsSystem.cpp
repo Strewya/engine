@@ -28,38 +28,42 @@ namespace Core
       m_window = &window;
       m_backbufferSize = backbufferSize;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
-
-      declare(m_dxgiFactory);
-      declare(m_dev);
-      declare(m_devcon);
-      declare(m_swapchain);
-      declare(m_renderTarget);
-      declare(m_samplerState);
-      declare(m_depthStencilBuffer);
+      
+      //should be declared in reverse order due to how the cleanup is performed
       declare(m_depthStencilView);
+      declare(m_depthStencilBuffer);
+      declare(m_samplerState);
+      declare(m_renderTarget);
+      declare(m_swapchain);
+      declare(m_devcon);
+      declare(m_dev);
+      declare(m_dxgiFactory);
 
-      CORE_STATUS(true);
-
-      CORE_STATUS_AND(initDevice());
+      CORE_STATUS(initDevice());
       CORE_STATUS_AND(initSwapChain());
       CORE_STATUS_AND(initRenderTarget());
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
+      CORE_STATUS_AND(m_renderer.init());
+
       DXTextureFileLoader textureFileLoader;
-      DXShaderFileLoader shaderFileLoader;
-      CORE_STATUS_AND(textureFileLoader.init(m_dev));
-      CORE_STATUS_AND(shaderFileLoader.init(m_dev));
-      if( CORE_STATUS_OK )
+      if( textureFileLoader.init(m_dev) )
       {
          auto defaultTexture = textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
+         CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
+         textureFileLoader.shutdown();
+      }
+
+      DXShaderFileLoader shaderFileLoader;
+      if( shaderFileLoader.init(m_dev) )
+      {
          auto defaultVertexShader = shaderFileLoader.loadVertexShader(CORE_RESOURCE("Shaders/defaultVShader.cso"), Vertex::getDescription());
          auto defaultPixelShader = shaderFileLoader.loadPixelShader(CORE_RESOURCE("Shaders/defaultPShader.cso"));
 
-         CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
          CORE_STATUS_AND(m_shaders.init(m_dev, defaultPixelShader, defaultVertexShader));
+         shaderFileLoader.shutdown();
       }
-
 
       CORE_INIT(GraphicsSystem);
    }
@@ -69,7 +73,9 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::shutdown()
    {
-      CORE_STATUS(true);
+      CORE_STATUS(m_shaders.shutdown());
+      CORE_STATUS_AND(m_textures.shutdown());
+      
       for( auto** unknown : m_declaredObjects )
       {
          safeRelease(*unknown);

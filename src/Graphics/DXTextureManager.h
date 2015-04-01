@@ -36,7 +36,7 @@ namespace Core
 
       TextureCache m_data;
       TextureNames m_names;
-      DXTexture m_default;
+      DXTexture m_defaultTexture;
       DXTextureFileLoader m_fileloader;
    };
 }
