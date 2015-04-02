@@ -13,14 +13,64 @@
 
 namespace Core
 {
+   template<typename CACHE>
+   class core_iterator
+   {
+   public:
+      typedef typename CACHE::DataType DataType;
+
+      DataType& operator*()
+      {
+         return m_cache->m_data[m_index];
+      }
+      DataType* operator->()
+      {
+         return &(m_cache->m_data[m_index]);
+      }
+      core_iterator& operator++()
+      {
+         uint32_t size = m_cache->m_magicNumbers.size();
+         if( m_index < size )
+         {
+            while( (++m_index) < size && m_cache->m_magicNumbers[m_index] == 0 );
+         }
+         return *this;
+      }
+      core_iterator operator++(int)
+      {
+         auto self = *this;
+         operator++();
+         return self;
+      }
+      bool operator==(const core_iterator& other)
+      {
+         return m_cache == other.m_cache && m_index == other.m_index;
+      }
+      bool operator!=(const core_iterator& other)
+      {
+         return !(*this == other);
+      }
+
+   private:
+      friend CACHE;
+      CACHE* m_cache;
+      uint32_t m_index;
+   };
+
    template<typename DATA, typename HANDLE>
    class Cache
    {
+   public:
+      typedef DATA DataType;
+      typedef HANDLE HandleType;
+      typedef Cache<DATA, HANDLE> ThisType;
+
+
       typedef std::vector<DATA> DataVec;
       typedef std::vector<uint16_t> MagicVec;
       typedef std::vector<uint16_t> FreeVec;
+      typedef core_iterator<ThisType> iterator;
 
-   public:
       DATA& acquire(HANDLE& handle)
       {
          uint16_t index;
@@ -66,7 +116,6 @@ namespace Core
       
       const DATA* dereference(HANDLE handle) const
       {
-         typedef Cache<DATA, HANDLE> ThisType;
          return const_cast<ThisType*>(this)->dereference(handle);
       }
 
@@ -80,60 +129,31 @@ namespace Core
          return !!getUsedHandleCount();
       }
 
-      friend class iterator;
-      class iterator
-      {
-      public:
-         DATA& operator*()
-         {
-            return m_cache->m_data[m_index];
-         }
-         iterator& operator++()
-         {
-            uint32_t size = m_magicNumbers.size();
-            if( m_index < size )
-            {
-               while( (++m_index) < size && m_magicNumbers[m_index] == 0 );
-            }
-            return *this;
-         }
-         iterator operator++(int)
-         {
-            auto self = *this;
-            operator++();
-            return self;
-         }
-         bool operator==(const iterator& other)
-         {
-            return m_cache == other.m_cache && m_index == other.m_index;
-         }
-         bool operator!=(const iterator& other)
-         {
-            return !(*this == other);
-         }
-      private:
-         Cache* m_cache;
-         uint32_t m_index;
-      };
-
       iterator begin()
       {
-         uint32_t index = 0;
-         while( m_magicNumbers[index] == 0 )
+         iterator it;
+         it.m_cache = this;
+         it.m_index = 0;
+         while( m_magicNumbers[it.m_index] == 0 )
          {
-            ++index;
+            ++it.m_index;
          }
-         return iterator{this, index};
+         return it;
       }
       iterator end()
       {
-         return iterator{this, m_magicNumbers.size()};
+         iterator it;
+         it.m_cache = this;
+         it.m_index = m_magicNumbers.size();
+         return it;
       }
 
    private:
-      
+      friend class core_iterator<ThisType>;
       DataVec m_data;
       MagicVec m_magicNumbers;
       FreeVec m_freeSlots;
    };
+
+   
 }

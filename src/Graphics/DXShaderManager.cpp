@@ -27,7 +27,17 @@ namespace Core
       //unload all existing shaders
       m_fileloader.unload(m_defaultPixelShader);
       m_fileloader.unload(m_defaultVertexShader);
-      
+
+      //to not have memory leaks on shutdown, but still check if all resources were cleaned up in the game code
+      for( auto& data : m_pixelShaderData )
+      {
+         m_fileloader.unload(data);
+      }
+      for( auto& data : m_vertexShaderData )
+      {
+         m_fileloader.unload(data);
+      }
+
       CORE_STATUS(m_defaultPixelShader.shader == nullptr);
       CORE_STATUS_AND(m_defaultVertexShader.shader == nullptr);
       CORE_STATUS_AND(m_pixelShaderData.hasUsedHandles() == false);

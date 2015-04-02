@@ -5,6 +5,7 @@
 #include <Games/Rainbowland/Main.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Util/Cache.h>
 #include <Util/Color.h>
 #include <Util/Utility.h>
 #include <Util/Vec2.h>
@@ -35,7 +36,7 @@ namespace Core
       //window.setFullscreen(true);
 
       CORE_STATUS(m_graphicsSystem.init(window, {1200, 900}));
-
+      
       CORE_INFO("----- init done -----");
       return CORE_STATUS_OK;
    }

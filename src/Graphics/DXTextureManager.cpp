@@ -24,6 +24,11 @@ namespace Core
    {
       //unload all existing textures
       m_fileloader.unload(m_defaultTexture);
+      //to not have memory leaks on shutdown, but still check if all resources were cleaned up by the game code
+      for( auto& data : m_data )
+      {
+         m_fileloader.unload(data);
+      }
       
       CORE_STATUS(m_defaultTexture.shaderResourceView == nullptr);
       CORE_STATUS_AND(m_data.hasUsedHandles() == false);
