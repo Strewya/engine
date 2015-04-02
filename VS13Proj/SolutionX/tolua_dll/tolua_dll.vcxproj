@@ -41,6 +41,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;TOLUA_API=extern __declspec(dllexport);NDEBUG;_WINDOWS;_USRDLL;TOLUA_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -52,6 +53,9 @@
     <PostBuildEvent>
       <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) tolua_postbuild</Command>
     </PostBuildEvent>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\toLua++\dll\tolua_event.c" />

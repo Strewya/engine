@@ -10,8 +10,8 @@
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
 #include <Graphics/DXRenderer.h>
-#include <Graphics/DXShaderManager.h>
-#include <Graphics/DXTextureManager.h>
+#include <Graphics/Shader/DXShaderManager.h>
+#include <Graphics/Texture/DXTextureManager.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -20,6 +20,8 @@ namespace Core
    class Camera;
    class Vertex;
    class Window;
+
+   
 
    class GraphicsSystem
    {
@@ -35,11 +37,12 @@ namespace Core
       void applyCamera(const Camera& camera);
       void clearCamera();
 
+      
+
       DXRenderer m_renderer;
       DXTextureManager m_textures;
       DXShaderManager m_shaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
-
 
    private:
       template<typename T> void declare(T*& ptr);
@@ -49,6 +52,8 @@ namespace Core
       bool initViewport();
       bool initSamplerState();
       bool initDepthBuffer();
+
+      ID3D11InputLayout* createInputLayout(std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc);
 
       Vec2i m_backbufferSize;
       Window* m_window;

@@ -28,7 +28,8 @@ namespace Core
       m_window = &window;
       m_backbufferSize = backbufferSize;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
-      
+      clearCamera();
+
       //should be declared in reverse order due to how the cleanup is performed
       declare(m_depthStencilView);
       declare(m_depthStencilBuffer);
@@ -45,7 +46,7 @@ namespace Core
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
-      CORE_STATUS_AND(m_renderer.init());
+      CORE_STATUS_AND(m_renderer.init(m_devcon, m_samplerState));
 
       DXTextureFileLoader textureFileLoader;
       if( textureFileLoader.init(m_dev) )
@@ -54,7 +55,7 @@ namespace Core
          CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
          textureFileLoader.shutdown();
       }
-
+      //switch to header compiled default shaders which should be really really basic.
       DXShaderFileLoader shaderFileLoader;
       if( shaderFileLoader.init(m_dev) )
       {
@@ -75,7 +76,7 @@ namespace Core
    {
       CORE_STATUS(m_shaders.shutdown());
       CORE_STATUS_AND(m_textures.shutdown());
-      
+
       for( auto** unknown : m_declaredObjects )
       {
          safeRelease(*unknown);

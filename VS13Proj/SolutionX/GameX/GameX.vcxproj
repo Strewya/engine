@@ -91,6 +91,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +134,9 @@
       <Command>
       </Command>
     </PostBuildEvent>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -150,6 +154,7 @@
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -197,6 +202,7 @@
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -236,11 +242,12 @@
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\DXRenderer.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\DXShaderFileLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\DXShaderManager.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\DXTextureFileLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\DXTextureManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderManager.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\Gamepad.cpp" />
     <ClCompile Include="..\..\..\src\Input\Keyboard.cpp" />
@@ -273,13 +280,14 @@
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXRenderer.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXShader.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXShaderFileLoader.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXShaderManager.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXTexture.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXTextureFileLoader.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
-    <ClInclude Include="..\..\..\src\Graphics\DXTextureManager.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderLoader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderManager.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Texture\DXTexture.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureManager.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\Gamepad.h" />
     <ClInclude Include="..\..\..\src\Input\Keyboard.h" />
