@@ -91,6 +91,15 @@
     <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderLoader.cpp">
       <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Utility.cpp">
+      <Filter>Code\Framework\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Mesh\Mesh.cpp">
+      <Filter>Code\Framework\Graphics\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Transform.cpp">
+      <Filter>Code\Framework\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
@@ -225,6 +234,18 @@
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderLoader.h">
       <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultPixelShader.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultVertexShader.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Mesh\Mesh.h">
+      <Filter>Code\Framework\Graphics\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Transform.h">
+      <Filter>Code\Framework\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Code">
@@ -262,6 +283,9 @@
     </Filter>
     <Filter Include="Code\Framework\Graphics\Shader">
       <UniqueIdentifier>{86373863-cfd8-421a-bd79-fd87b123cf75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Graphics\Mesh">
+      <UniqueIdentifier>{1e7b813a-acbd-419d-8b6d-316d3d6777a1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

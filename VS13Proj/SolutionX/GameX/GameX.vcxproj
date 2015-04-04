@@ -243,6 +243,7 @@
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\DXRenderer.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\GraphicsSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Graphics\Mesh\Mesh.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderManager.cpp" />
@@ -262,6 +263,8 @@
     <ClCompile Include="..\..\..\src\Util\CooldownTimer.cpp" />
     <ClCompile Include="..\..\..\src\Util\Timer.cpp" />
     <ClCompile Include="..\..\..\src\Util\Clock.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Utility.cpp" />
     <ClCompile Include="..\..\..\src\Window\GamepadHandler.cpp" />
     <ClCompile Include="..\..\..\src\Window\KeyboardHandler.cpp" />
     <ClCompile Include="..\..\..\src\Window\MouseHandler.cpp" />
@@ -281,6 +284,9 @@
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXRenderer.h" />
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Mesh\Mesh.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultPixelShader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultVertexShader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderLoader.h" />
@@ -302,6 +308,7 @@
     <ClInclude Include="..\..\..\src\Util\Timer.h" />
     <ClInclude Include="..\..\..\src\Util\Clock.h" />
     <ClInclude Include="..\..\..\src\Util\TimeUnitConversions.h" />
+    <ClInclude Include="..\..\..\src\Util\Transform.h" />
     <ClInclude Include="..\..\..\src\Util\Utility.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2.h" />
     <ClInclude Include="..\..\..\src\Util\Vec2Fwd.h" />

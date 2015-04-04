@@ -5,6 +5,7 @@
 #include <Graphics/GraphicsSystem.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Graphics/Shader/DXShaderLoader.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
 #include <Util/Utility.h>
@@ -25,6 +26,8 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::init(Window& window, Vec2i backbufferSize)
    {
+      CORE_INIT_START(GraphicsSystem);
+
       m_window = &window;
       m_backbufferSize = backbufferSize;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
@@ -40,33 +43,38 @@ namespace Core
       declare(m_dev);
       declare(m_dxgiFactory);
 
-      CORE_STATUS(initDevice());
+      CORE_STATUS_AND(initDevice());
       CORE_STATUS_AND(initSwapChain());
       CORE_STATUS_AND(initRenderTarget());
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
-      CORE_STATUS_AND(m_renderer.init(m_devcon, m_samplerState));
+      CORE_STATUS_AND(renderer.init(m_dev, m_devcon, m_samplerState));
 
       DXTextureFileLoader textureFileLoader;
       if( textureFileLoader.init(m_dev) )
       {
          auto defaultTexture = textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
-         CORE_STATUS_AND(m_textures.init(m_dev, defaultTexture));
+         CORE_STATUS_AND(textures.init(m_dev, defaultTexture));
          textureFileLoader.shutdown();
       }
-      //switch to header compiled default shaders which should be really really basic.
-      DXShaderFileLoader shaderFileLoader;
-      if( shaderFileLoader.init(m_dev) )
-      {
-         auto defaultVertexShader = shaderFileLoader.loadVertexShader(CORE_RESOURCE("Shaders/defaultVShader.cso"), Vertex::getDescription());
-         auto defaultPixelShader = shaderFileLoader.loadPixelShader(CORE_RESOURCE("Shaders/defaultPShader.cso"));
 
-         CORE_STATUS_AND(m_shaders.init(m_dev, defaultPixelShader, defaultVertexShader));
-         shaderFileLoader.shutdown();
+      DXShaderLoader shaderLoader;
+      if( shaderLoader.init(m_dev) )
+      {
+         DXShader defaultShader{nullptr, nullptr, nullptr};
+         {
+#include <Graphics/Shader/defaultVertexShader.h>
+#include <Graphics/Shader/defaultPixelShader.h>
+
+            defaultShader = shaderLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader), (const char*)g_PShader, sizeof(g_PShader));
+         }
+         shaderLoader.shutdown();
+
+         CORE_STATUS_AND(shaders.init(m_dev, defaultShader));
       }
 
-      CORE_INIT(GraphicsSystem);
+      CORE_INIT_END(GraphicsSystem);
    }
 
    //*****************************************************************
@@ -74,15 +82,24 @@ namespace Core
    //*****************************************************************
    bool GraphicsSystem::shutdown()
    {
-      CORE_STATUS(m_shaders.shutdown());
-      CORE_STATUS_AND(m_textures.shutdown());
+      CORE_SHUTDOWN_START(GraphicsSystem);
 
+      CORE_STATUS_AND(shaders.shutdown());
+      CORE_STATUS_AND(textures.shutdown());
+      CORE_STATUS_AND(renderer.shutdown());
+      ID3D11Debug* debug = nullptr;
+      HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
       for( auto** unknown : m_declaredObjects )
       {
          safeRelease(*unknown);
       }
+      if( SUCCEEDED(hr) && debug != nullptr )
+      {
+         debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+         safeRelease(debug);
+      }
 
-      CORE_SHUTDOWN(GraphicsSystem);
+      CORE_SHUTDOWN_END(GraphicsSystem);
    }
 
    //*****************************************************************
@@ -106,10 +123,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setOrthographicProjection()
    {
-      m_camProjection = XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f);
-      //dataPerScene dps;
-      //dps.projection = XMMatrixTranspose(m_camProjection);
-      //m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);
+      renderer.setProjection(XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -117,10 +131,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setPerspectiveProjection()
    {
-      m_camProjection = XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f);
-      /*dataPerScene dps;
-      dps.projection = XMMatrixTranspose(m_camProjection);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
+      renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -128,10 +139,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::applyCamera(const Camera& cam)
    {
-      m_camView = calculateCamView(cam);
-      /*dataPerScene dps;
-      dps.view = XMMatrixTranspose(m_camView);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
+      renderer.setView(calculateCamView(cam));
    }
 
    //*****************************************************************
@@ -139,10 +147,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::clearCamera()
    {
-      m_camView = XMMatrixIdentity();
-      /*dataPerScene dps;
-      dps.view = XMMatrixTranspose(m_camView);
-      m_devcon->UpdateSubresource(m_constantBuffer, 0, nullptr, &dps, 0, 0);*/
+      renderer.setView(XMMatrixIdentity());
    }
 
    //*****************************************************************

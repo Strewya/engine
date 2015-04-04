@@ -2,8 +2,8 @@
 struct Vertex
 {
    float4 position : POSITION; 
-   float2 texCoord : TEXCOORD;
    float4 diffuse : DIFFUSE;
+   float2 texCoord : TEXCOORD;
    float2 health : HEALTH;
 };
 

@@ -16,40 +16,26 @@
 
 namespace Core
 {
-   struct tag_DXPixelShader;
-   typedef Handle<tag_DXPixelShader> HPixelShader;
-
-   struct tag_DXVertexShader;
-   typedef Handle<tag_DXVertexShader> HVertexShader;
+   struct tag_DXShader;
+   typedef Handle<tag_DXShader> HShader;
 
    class DXShaderManager
    {
    public:
-      bool init(ID3D11Device* device, DXPixelShader defaultPixelShader, DXVertexShader defaultVertexShader);
+      bool init(ID3D11Device* device, DXShader defaultShader);
       bool shutdown();
 
-      HPixelShader loadPixelShaderFromFile(const std::string& filename);
-      HVertexShader loadVertexShaderFromFile(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied);
-
-      DXPixelShader& getData(HPixelShader handle);
-      DXVertexShader& getData(HVertexShader handle);
-      void release(HPixelShader handle);
-      void release(HVertexShader handle);
+      HShader loadFromFile(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied);
+      DXShader& getData(HShader handle);
+      void release(HShader handle);
 
    private:
-      typedef Cache<DXPixelShader, HPixelShader> PixelShaderCache;
-      typedef NameCache<HPixelShader> PixelShaderNames;
-      typedef Cache<DXVertexShader, HVertexShader> VertexShaderCache;
-      typedef NameCache<HVertexShader> VertexShaderNames;
+      typedef Cache<DXShader, HShader> ShaderCache;
+      typedef NameCache<HShader> ShaderNames;
 
-      PixelShaderCache m_pixelShaderData;
-      PixelShaderNames m_pixelShaderNames;
-
-      VertexShaderCache m_vertexShaderData;
-      VertexShaderNames m_vertexShaderNames;
-
-      DXPixelShader m_defaultPixelShader;
-      DXVertexShader m_defaultVertexShader;
+      ShaderCache m_data;
+      ShaderNames m_names;
+      DXShader m_defaultShader;
 
       DXShaderFileLoader m_fileloader;
    };

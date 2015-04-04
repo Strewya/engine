@@ -103,7 +103,7 @@ namespace Core
 
       DATA* dereference(HANDLE handle)
       {
-         if( handle.isNull() )
+         if( !handle.isNull() )
          {
             auto index = handle.getIndex();
             if( index < m_data.size() && m_magicNumbers[index] == handle.getMagic() )
@@ -134,7 +134,7 @@ namespace Core
          iterator it;
          it.m_cache = this;
          it.m_index = 0;
-         while( m_magicNumbers[it.m_index] == 0 )
+         while( it.m_index < m_magicNumbers.size() && m_magicNumbers[it.m_index] == 0 )
          {
             ++it.m_index;
          }

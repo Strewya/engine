@@ -17,14 +17,16 @@ namespace Core
    class Game
    {
    public:
-      Window* m_window;
+      Window* window;
 
-      GraphicsSystem m_graphicsSystem;
+      GraphicsSystem graphicsSystem;
 
-      
+      HTexture textureAtlasHandle;
+      HShader mainShaderHandle;
+      HShader healthShaderHandle;
 
       bool init(Window& window);
-      void shutdown();
+      bool shutdown();
 
       bool tickLogic(uint64_t updateTime);
       void tickRender(uint64_t updateTime);

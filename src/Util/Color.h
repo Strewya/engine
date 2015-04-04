@@ -18,8 +18,7 @@ namespace Core
       float b;
       float a;
 
-      Color();
-      Color(float r, float g, float b, float a = 1);
+      Color(float r = 1, float g = 1, float b = 1, float a = 1);
 
       void set(float r, float g, float b, float a = 1);
       void clip(float threshold);

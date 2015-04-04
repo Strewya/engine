@@ -21,7 +21,7 @@ namespace Core
       bool shutdown();
 
       DXTexture load(const std::string& filename) const;
-      
+
       void unload(DXTexture& texture) const;
 
    private:

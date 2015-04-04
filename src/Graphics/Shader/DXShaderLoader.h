@@ -14,8 +14,9 @@
 
 namespace Core
 {
-   class DXVertexShader;
-   class DXPixelShader;
+   class DXShader;
+
+   typedef std::vector<D3D11_INPUT_ELEMENT_DESC> InputLayout;
 
    class DXShaderLoader
    {
@@ -23,13 +24,17 @@ namespace Core
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXVertexShader loadVertexShader(const char* buffer, uint32_t bufferSize, std::vector<D3D11_INPUT_ELEMENT_DESC> ied) const;
-      DXPixelShader loadPixelShader(const char* buffer, uint32_t bufferSize) const;
+      DXShader load(InputLayout layout,
+                    const char* vsBuffer, uint32_t vsSize,
+                    const char* psBuffer, uint32_t psSize) const;
 
-      void unload(DXPixelShader& shader);
-      void unload(DXVertexShader& shader);
+      void unload(DXShader& shader);
 
    private:
       ID3D11Device* m_dev;
+
+      ID3D11InputLayout* loadInputLayout(InputLayout layout, const char* vsBuffer, uint32_t vsSize) const;
+      ID3D11VertexShader* loadVertexShader(const char* vsBuffer, uint32_t vsSize) const;
+      ID3D11PixelShader* loadPixelShader(const char* psBuffer, uint32_t psSize) const;
    };
 }

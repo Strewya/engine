@@ -5,40 +5,49 @@
 #include <Games/Rainbowland/Main.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Graphics/Camera.h>
+#include <Graphics/Mesh/Mesh.h>
+#include <Graphics/Vertex.h>
 #include <Util/Cache.h>
 #include <Util/Color.h>
+#include <Util/Transform.h>
 #include <Util/Utility.h>
-#include <Util/Vec2.h>
 #include <Window/Window.h>
 /******* end headers *******/
 
 namespace Core
 {
-   void Game::shutdown()
+   bool Game::shutdown()
    {
-      CORE_INFO("----- shutdown start -----");
-      CORE_STATUS(m_graphicsSystem.shutdown());
+      CORE_SHUTDOWN_START(Rainbowland);
 
-      if( CORE_STATUS_NOK )
-      {
-         CORE_INFO("\nShutdown has failed! Bugs...");
-      }
+      CORE_STATUS_AND(graphicsSystem.shutdown());
+
+      CORE_SHUTDOWN_END(Rainbowland);
    }
 
    bool Game::init(Window& window)
    {
-      m_window = &window;
+      CORE_INIT_START(Rainbowland);
+
+      this->window = &window;
 
       window.resize(MONITOR_RESOLUTION, MONITOR_RESOLUTION);
-#ifndef DEPLOY
-      window.openConsole(-1200, 0);
-#endif
+      window.showCursor(true);
+
       //window.setFullscreen(true);
 
-      CORE_STATUS(m_graphicsSystem.init(window, {1200, 900}));
-      
-      CORE_INFO("----- init done -----");
-      return CORE_STATUS_OK;
+      CORE_STATUS_AND(graphicsSystem.init(window, {1200, 900}));
+
+      textureAtlasHandle = graphicsSystem.textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
+      mainShaderHandle = graphicsSystem.shaders.loadFromFile(CORE_RESOURCE("Shaders/shader"), Vertex::getDescription());
+      healthShaderHandle = graphicsSystem.shaders.loadFromFile(CORE_RESOURCE("Shaders/health"), Vertex::getDescription());
+
+      CORE_STATUS_AND(textureAtlasHandle.isNull() == false);
+      CORE_STATUS_AND(mainShaderHandle.isNull() == false);
+      CORE_STATUS_AND(healthShaderHandle.isNull() == false);
+
+      CORE_INIT_END(Rainbowland);
    }
 
    bool Game::tickLogic(uint64_t updateTime)
@@ -52,12 +61,7 @@ namespace Core
    {
       struct Dude
       {
-         struct Transform
-         {
-            Vec2f position;
-            float scale;
-            float rotationRad;
-         } transform;
+         Transform transform;
          struct VisualPart
          {
             Color color;
@@ -68,8 +72,33 @@ namespace Core
          } visualPart;
       } guy;
 
+      Mesh mesh = makeSolidQuad({}, {1, 1});
+      Camera camera;
+      camera.setPosition({0, 0, -10});
+      
+      graphicsSystem.begin();
 
-      m_graphicsSystem.begin();
+      graphicsSystem.setPerspectiveProjection();
+      graphicsSystem.applyCamera(camera);
+      
+      //graphicsSystem.renderer.setCulling(true);
+      //graphicsSystem.renderer.setTransparency(false);
+      graphicsSystem.renderer.setTexture(graphicsSystem.textures.getData(textureAtlasHandle));
+      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainShaderHandle));
+      graphicsSystem.renderer.setVertexTopology(TriangleList);
+      graphicsSystem.renderer.render(Transform{{-1,-1}}, Color{1, 0, 0}, mesh.vertices, mesh.indices);
+      
+      
+      //graphicsSystem.renderer.setCulling(true);
+      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainShaderHandle));
+      graphicsSystem.renderer.setVertexTopology(TriangleList);
+      //graphicsSystem.renderer.setTransparency(false);
+      auto indices = graphicsSystem.renderer.makeSolidQuadIndices();
+      auto vertices = graphicsSystem.renderer.makeQuadVertices({}, {1, 1});
+      graphicsSystem.renderer.setData(mesh.vertices, mesh.indices, {}, {0.6f, 0.6f, 0.6f}, 0);
+      graphicsSystem.renderer.drawBuffers();
+      
+
       /*
       auto& mesh = m_meshStore.getMesh(guy.visualPart.meshId);
       m_gfxProxy.renderMesh(guy.transform, guy.color, mesh);
@@ -78,6 +107,6 @@ namespace Core
          m_graphicsSystem.setBlendMode(mesh.blendModeId);
          m_graphicsSystem.renderMesh(guy.transform, guy.color, mesh.vertices, mesh.indices);
       */
-      m_graphicsSystem.present();
+      graphicsSystem.present();
    }
 }

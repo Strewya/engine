@@ -1,22 +1,26 @@
 #pragma once
 /********************************************
-*  contents:   DXVertexShader, DXPixelShader
+*  contents:   Mesh
 *  usage:
 ********************************************/
 /******* C++ headers *******/
-#include <string>
+#include <cstdint>
+#include <vector>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/Vertex.h>
+#include <Util/Vec2.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXShader
+   class Mesh
    {
    public:
-      ID3D11InputLayout* inputLayout;
-      ID3D11VertexShader* vertex;
-      ID3D11PixelShader* pixel;
+      std::vector<Vertex> vertices;
+      std::vector<uint32_t> indices;
    };
+   
+   Mesh makeSolidQuad(Vec2f pos, Vec2f hs);
+
 }

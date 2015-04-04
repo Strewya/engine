@@ -6,6 +6,7 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Util/Clock.h>
+#include <Util/Utility.h>
 #include <Window/Window.h>
 
 #include <Games/GameList.h>
@@ -29,6 +30,9 @@ namespace Core
    void runGame(Window& window)
    {
 #ifndef NO_GAME
+#ifndef DEPLOY
+      window.openConsole(10, 10);
+#endif
       static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
       static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
       Clock logicTimer;
@@ -67,7 +71,11 @@ namespace Core
          }
          renderTimer.updateBy(fullUpdateTime);
       }
-      game.shutdown();
+      bool shutdownStatus = game.shutdown();
+      if( !shutdownStatus )
+      {
+         CORE_INFO("GAME SHUTDOWN HAS FAILED!!!");
+      }
       window.close();
 #endif
    }

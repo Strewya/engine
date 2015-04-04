@@ -28,14 +28,30 @@ namespace Core
 #else
 #define CORE_INFO(...) (void)0
 #endif
+   extern uint32_t g_indent;
 
-#define CORE_STATUS(x) bool status = (x)
-#define CORE_STATUS_NOK (status == false)
+#define UP_INDENT ++g_indent
+#define DOWN_INDENT --g_indent
+
+#define CORE_PHASE_INIT "init"
+#define CORE_PHASE_SHUTDOWN "shutdown"
+#define CORE_PHASE_LOG(obj, phase, text) CORE_INFO( std::string(g_indent, ' '), #obj" "phase" ", text)
+#define CORE_START_PHASE(obj, phase) UP_INDENT; CORE_PHASE_LOG(obj, phase, "start"); bool status = true
+#define CORE_END_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, status ? "OK" : "FAILED"); DOWN_INDENT; return status
+
+
+#define CORE_INIT_START(c) CORE_START_PHASE(c, CORE_PHASE_INIT)
+#define CORE_INIT_END(c) CORE_END_PHASE(c, CORE_PHASE_INIT)
+
+#define CORE_SHUTDOWN_START(c) CORE_START_PHASE(c, CORE_PHASE_SHUTDOWN)
+#define CORE_SHUTDOWN_END(c) CORE_END_PHASE(c, CORE_PHASE_SHUTDOWN)
+
 #define CORE_STATUS_OK (status == true)
+#define CORE_STATUS_NOK (status == false)
+#define CORE_STATUS_SET(x) status = (x)
 #define CORE_STATUS_AND(x) status = (x) && status
 #define CORE_STATUS_OR(x) status = (x) || status
-#define CORE_INIT(c) CORE_INFO( #c" init ", status ? "OK" : "FAIL"); return status
-#define CORE_SHUTDOWN(c) CORE_INFO( #c" shutdown ", status ? "OK" : "FAIL"); return status
+
 #define CORE_RESOURCE(x) "../resources/"x
 
 #define CORE_PI 3.14159265358979f

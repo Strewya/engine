@@ -13,23 +13,27 @@ namespace Core
 {
    bool DXTextureFileLoader::init(ID3D11Device* device)
    {
+      CORE_INIT_START(DXTextureFileLoader);
+
       m_dev = device;
 
-      CORE_STATUS(m_dev != nullptr);
-      CORE_INIT(DXTextureFileLoader);
+      CORE_STATUS_AND(m_dev != nullptr);
+
+      CORE_INIT_END(DXTextureFileLoader);
    }
 
    bool DXTextureFileLoader::shutdown()
    {
+      CORE_SHUTDOWN_START(DXTextureFileLoader);
+
       m_dev = nullptr;
 
-      CORE_STATUS(true);
-      CORE_SHUTDOWN(DXTextureFileLoader);
+      CORE_SHUTDOWN_END(DXTextureFileLoader);
    }
 
    DXTexture DXTextureFileLoader::load(const std::string& filename) const
    {
-      DXTexture result{filename, nullptr, 0, 0};
+      DXTexture result{nullptr, 0, 0};
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename.c_str(), nullptr, nullptr, &result.shaderResourceView, nullptr);
       if( SUCCEEDED(hr) )
       {

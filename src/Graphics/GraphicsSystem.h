@@ -21,7 +21,7 @@ namespace Core
    class Vertex;
    class Window;
 
-   
+
 
    class GraphicsSystem
    {
@@ -37,11 +37,9 @@ namespace Core
       void applyCamera(const Camera& camera);
       void clearCamera();
 
-      
-
-      DXRenderer m_renderer;
-      DXTextureManager m_textures;
-      DXShaderManager m_shaders;
+      DXRenderer renderer;
+      DXTextureManager textures;
+      DXShaderManager shaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
 
    private:
@@ -55,13 +53,12 @@ namespace Core
 
       ID3D11InputLayout* createInputLayout(std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc);
 
-      Vec2i m_backbufferSize;
-      Window* m_window;
-
-      //DX specific
       D3DXCOLOR m_backgroundColor;
-      XMMATRIX m_camView;
-      XMMATRIX m_camProjection;
+      Vec2i m_backbufferSize;
+
+      std::vector<IUnknown**> m_declaredObjects;
+      
+      Window* m_window;
 
       IDXGIFactory* m_dxgiFactory;
       ID3D11Device* m_dev;
@@ -71,8 +68,6 @@ namespace Core
       ID3D11SamplerState* m_samplerState;
       ID3D11Texture2D* m_depthStencilBuffer;
       ID3D11DepthStencilView* m_depthStencilView;
-
-      std::vector<IUnknown**> m_declaredObjects;
    };
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)

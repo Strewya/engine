@@ -10,113 +10,76 @@
 
 namespace Core
 {
-   bool DXShaderManager::init(ID3D11Device* device, DXPixelShader defaultPixelShader, DXVertexShader defaultVertexShader)
+   bool DXShaderManager::init(ID3D11Device* device, DXShader defaultShader)
    {
-      m_defaultPixelShader = defaultPixelShader;
-      m_defaultVertexShader = defaultVertexShader;
+      CORE_INIT_START(DXShaderManager);
 
-      CORE_STATUS(m_fileloader.init(device));
-      CORE_STATUS_AND(m_defaultPixelShader.shader != nullptr);
-      CORE_STATUS_AND(m_defaultVertexShader.shader != nullptr);
+      m_defaultShader = defaultShader;
 
-      CORE_INIT(DXShaderManager);
+      CORE_STATUS_AND(m_fileloader.init(device));
+      CORE_STATUS_AND(m_defaultShader.inputLayout != nullptr);
+      CORE_STATUS_AND(m_defaultShader.vertex != nullptr);
+      CORE_STATUS_AND(m_defaultShader.pixel != nullptr);
+
+      CORE_INIT_END(DXShaderManager);
    }
 
    bool DXShaderManager::shutdown()
    {
+      CORE_SHUTDOWN_START(DXShaderManager);
+
       //unload all existing shaders
-      m_fileloader.unload(m_defaultPixelShader);
-      m_fileloader.unload(m_defaultVertexShader);
+      m_fileloader.unload(m_defaultShader);
 
       //to not have memory leaks on shutdown, but still check if all resources were cleaned up in the game code
-      for( auto& data : m_pixelShaderData )
-      {
-         m_fileloader.unload(data);
-      }
-      for( auto& data : m_vertexShaderData )
+      for( auto& data : m_data )
       {
          m_fileloader.unload(data);
       }
 
-      CORE_STATUS(m_defaultPixelShader.shader == nullptr);
-      CORE_STATUS_AND(m_defaultVertexShader.shader == nullptr);
-      CORE_STATUS_AND(m_pixelShaderData.hasUsedHandles() == false);
-      CORE_STATUS_AND(m_vertexShaderData.hasUsedHandles() == false);
+      CORE_STATUS_AND(m_defaultShader.inputLayout == nullptr);
+      CORE_STATUS_AND(m_defaultShader.vertex == nullptr);
+      CORE_STATUS_AND(m_defaultShader.pixel == nullptr);
+      CORE_STATUS_AND(m_data.hasUsedHandles() == false);
       CORE_STATUS_AND(m_fileloader.shutdown());
-      CORE_SHUTDOWN(DXShaderManager);
+
+      CORE_SHUTDOWN_END(DXShaderManager);
    }
 
-   HPixelShader DXShaderManager::loadPixelShaderFromFile(const std::string& filename)
+   HShader DXShaderManager::loadFromFile(const std::string& filename, InputLayout ied)
    {
-      HPixelShader handle = m_pixelShaderNames.getHandle(filename);
+      HShader handle = m_names.getHandle(filename);
       if( handle.isNull() )
       {
-         auto loadedData = m_fileloader.loadPixelShader(filename);
-         if( loadedData.shader != nullptr )
+         auto loadedData = m_fileloader.load(filename, std::move(ied));
+         if( loadedData.inputLayout != nullptr && loadedData.vertex != nullptr && loadedData.pixel != nullptr )
          {
-            auto& data = m_pixelShaderData.acquire(handle);
+            auto& data = m_data.acquire(handle);
             data = loadedData;
-            m_pixelShaderNames.bind(filename, handle);
+            m_names.bind(filename, handle);
          }
       }
       return handle;
    }
 
-   HVertexShader DXShaderManager::loadVertexShaderFromFile(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied)
+   DXShader& DXShaderManager::getData(HShader handle)
    {
-      HVertexShader handle = m_vertexShaderNames.getHandle(filename);
-      if( handle.isNull() )
-      {
-         auto loadedData = m_fileloader.loadVertexShader(filename, std::move(ied));
-         if( loadedData.shader != nullptr )
-         {
-            auto& data = m_vertexShaderData.acquire(handle);
-            data = loadedData;
-            m_vertexShaderNames.bind(filename, handle);
-         }
-      }
-      return handle;
-   }
-
-   DXPixelShader& DXShaderManager::getData(HPixelShader handle)
-   {
-      auto* data = m_pixelShaderData.dereference(handle);
+      auto* data = m_data.dereference(handle);
       if( data == nullptr )
       {
-         return m_defaultPixelShader;
+         return m_defaultShader;
       }
       return *data;
    }
 
-   DXVertexShader& DXShaderManager::getData(HVertexShader handle)
+   void DXShaderManager::release(HShader handle)
    {
-      auto* data = m_vertexShaderData.dereference(handle);
-      if( data == nullptr )
-      {
-         return m_defaultVertexShader;
-      }
-      return *data;
-   }
-
-   void DXShaderManager::release(HPixelShader handle)
-   {
-      auto* data = m_pixelShaderData.dereference(handle);
+      auto* data = m_data.dereference(handle);
       if( data != nullptr )
       {
          m_fileloader.unload(*data);
-         m_pixelShaderNames.unbind(handle);
-         m_pixelShaderData.release(handle);
-      }
-   }
-
-   void DXShaderManager::release(HVertexShader handle)
-   {
-      auto* data = m_vertexShaderData.dereference(handle);
-      if( data != nullptr )
-      {
-         m_fileloader.unload(*data);
-         m_vertexShaderNames.unbind(handle);
-         m_vertexShaderData.release(handle);
+         m_names.unbind(handle);
+         m_data.release(handle);
       }
    }
 }

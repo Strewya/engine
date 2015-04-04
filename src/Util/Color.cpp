@@ -14,11 +14,6 @@ namespace Core
    {
    }
 
-   Color::Color()
-      : Color(1, 1, 1)
-   {
-   }
-
    void Color::set(float r, float g, float b, float a)
    {
       this->r = r;
@@ -43,7 +38,7 @@ namespace Core
          (uint8_t)(l.b * 255) == (uint8_t)(r.b * 255) &&
          (uint8_t)(l.a * 255) == (uint8_t)(r.a * 255);
    }
-   
+
    bool operator!=(Color l, Color r)
    {
       return !(l == r);
