@@ -59,6 +59,20 @@ namespace Core
 
       HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
 
+      CORE_STATUS_AND(SUCCEEDED(hr));
+
+      D3D11_RASTERIZER_DESC rd;
+      ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+      rd.FillMode = D3D11_FILL_SOLID;
+
+      rd.CullMode = D3D11_CULL_BACK;
+      hr = m_dev->CreateRasterizerState(&rd, &m_cullingEnabled);
+      CORE_STATUS_AND(SUCCEEDED(hr));
+
+      rd.CullMode = D3D11_CULL_NONE;
+      hr = m_dev->CreateRasterizerState(&rd, &m_cullingDisabled);
+      CORE_STATUS_AND(SUCCEEDED(hr));
+
       CORE_INIT_END(DXRenderer);
    }
 
@@ -68,6 +82,13 @@ namespace Core
 
       m_devcon = nullptr;
       m_samplerState = nullptr;
+      safeRelease(m_transparency);
+      safeRelease(m_cullingDisabled);
+      safeRelease(m_cullingEnabled);
+
+      CORE_STATUS_AND(m_transparency == nullptr);
+      CORE_STATUS_AND(m_cullingDisabled == nullptr);
+      CORE_STATUS_AND(m_cullingEnabled == nullptr);
 
       CORE_SHUTDOWN_END(DXRenderer);
    }
@@ -93,27 +114,35 @@ namespace Core
    //*****************************************************************
    void DXRenderer::setCulling(bool isEnabled)
    {
-      D3D11_RASTERIZER_DESC rd;
-      ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+      auto* state = m_cullingEnabled;
 
-      if( isEnabled )
+      if( !isEnabled )
       {
-         rd.CullMode = D3D11_CULL_BACK;
+         state = m_cullingDisabled;
       }
-      else
-      {
-         rd.CullMode = D3D11_CULL_NONE;
-      }
-      rd.FillMode = D3D11_FILL_SOLID;
 
-
-      ID3D11RasterizerState* state = nullptr;
-
-      HRESULT hr = m_dev->CreateRasterizerState(&rd, &state);
-      if( SUCCEEDED(hr) )
+      if( state != m_cullingMode )
       {
          m_devcon->RSSetState(state);
-         safeRelease(state);
+         m_cullingMode = state;
+      }
+   }
+
+   //*****************************************************************
+   //          SET TRANSPARENCY
+   //*****************************************************************
+   void DXRenderer::setTransparency(bool isEnabled)
+   {
+      auto* transparency = m_transparency;
+      if( !isEnabled )
+      {
+         transparency = nullptr;
+      }
+
+      if( transparency != m_transparencyMode )
+      {
+         m_devcon->OMSetBlendState(transparency, nullptr, 0xffffffff);
+         m_transparencyMode = transparency;
       }
    }
 
@@ -315,114 +344,5 @@ namespace Core
       HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
       assert(SUCCEEDED(hr));
       return buffer;
-   }
-
-
-
-
-
-
-   void DXRenderer::setData(VertexBuffer vertices, IndexBuffer indices, Transform transform, Color color, float fValue)
-   {
-      uint32_t vertexOffset = m_verticesToDraw.size();
-      for( auto& vx : vertices )
-      {
-         vx.health.m_.x = fValue;
-
-         XMCOLOR fillColor(color.r, color.g, color.b, color.a);
-         XMVECTOR fill = XMLoadColor(&fillColor);
-         XMVECTOR diffuse = XMLoadFloat4(&vx.diffuse.m_);
-         diffuse *= fill;
-         XMStoreFloat4(&vx.diffuse.m_, diffuse);
-
-         auto world = XMMatrixIdentity();
-         world *= XMMatrixScaling(transform.scale.x, transform.scale.y, 1.0f);
-         //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
-         //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
-         world *= XMMatrixRotationZ(transform.rotation);
-         world *= XMMatrixTranslation(transform.position.x, transform.position.y, 0);
-         world = world*m_camView*m_camProjection;
-         XMVECTOR position = XMLoadFloat4(&vx.position.m_);
-         position = XMVector3TransformCoord(position, world);
-         XMStoreFloat4(&vx.position.m_, position);
-      }
-      m_verticesToDraw.insert(m_verticesToDraw.end(), vertices.begin(), vertices.end());
-
-      for( auto& i : indices )
-      {
-         i += vertexOffset;
-      }
-      m_indicesToDraw.insert(m_indicesToDraw.end(), indices.begin(), indices.end());
-   }
-
-   void DXRenderer::drawBuffers()
-   {
-      if( m_verticesToDraw.empty() || m_indicesToDraw.empty() )
-         return;
-
-      D3D11_MAPPED_SUBRESOURCE ms;
-
-      auto* vb = makeVertexBuffer(m_dev, sizeof(Vertex), m_verticesToDraw.size());
-      auto* ib = makeIndexBuffer(m_dev, sizeof(uint32_t), m_indicesToDraw.size());
-
-      HRESULT hr = m_devcon->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      assert(SUCCEEDED(hr));
-      memcpy(ms.pData, m_verticesToDraw.data(), m_verticesToDraw.size() * sizeof(Vertex));
-      m_devcon->Unmap(vb, 0);
-
-      hr = m_devcon->Map(ib, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      assert(SUCCEEDED(hr));
-      memcpy(ms.pData, m_indicesToDraw.data(), m_indicesToDraw.size() * sizeof(uint32_t));
-      m_devcon->Unmap(ib, 0);
-
-
-      uint32_t stride = sizeof(Vertex);
-      uint32_t offset = 0;
-
-      m_devcon->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
-      m_devcon->IASetIndexBuffer(ib, DXGI_FORMAT_R32_UINT, 0);
-
-      m_devcon->DrawIndexed(m_indicesToDraw.size(), 0, 0);
-
-      m_verticesToDraw.clear();
-      m_indicesToDraw.clear();
-
-      safeRelease(ib);
-      safeRelease(vb);
-   }
-
-   IndexBuffer DXRenderer::makeSolidQuadIndices() const
-   {
-      return
-      {
-         0, 1, 3,
-         3, 2, 0
-      };
-   }
-
-   VertexBuffer DXRenderer::makeQuadVertices(Vec2f pos, Vec2f hs) const
-   {
-      /*
-      0-1
-      | |
-      2-3
-      */
-      return
-      {
-         {{pos.x - hs.x, pos.y + hs.y, 0}, {1, 1, 1, 1}, {-1, -1}},
-         {{pos.x + hs.x, pos.y + hs.y, 0}, {1, 1, 1, 1}, {-1, -1}},
-         {{pos.x - hs.x, pos.y - hs.y, 0}, {1, 1, 1, 1}, {-1, -1}},
-         {{pos.x + hs.x, pos.y - hs.y, 0}, {1, 1, 1, 1}, {-1, -1}},
-      };
-   }
-
-   void DXRenderer::setTransparency(bool isEnabled)
-   {
-      auto transpEnabled = m_transparency;
-      if( !isEnabled )
-      {
-         transpEnabled = nullptr;
-      }
-      m_devcon->OMSetBlendState(transpEnabled, nullptr, 0xffffffff);
    }
 }

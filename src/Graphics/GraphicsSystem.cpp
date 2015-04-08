@@ -176,7 +176,7 @@ namespace Core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("   initDevice failed");
+         CORE_INFO("initDevice failed");
       }
       return SUCCEEDED(hr);
    }
@@ -197,8 +197,8 @@ namespace Core
 
       DXGI_MODE_DESC& bd = swapChainDesc.BufferDesc;
       bd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-      bd.Width = m_backbufferSize.x;
-      bd.Height = m_backbufferSize.y;
+      bd.Width = m_window->getSizeX(); //m_backbufferSize.x
+      bd.Height = m_window->getSizeY(); //m_backbufferSize.y
       bd.RefreshRate.Denominator = 1;
       bd.RefreshRate.Numerator = 60;
       bd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -212,7 +212,7 @@ namespace Core
       HRESULT hr = m_dxgiFactory->CreateSwapChain(m_dev, &swapChainDesc, &m_swapchain);
       if( FAILED(hr) )
       {
-         CORE_INFO("   initSwapChain failed");
+         CORE_INFO("initSwapChain failed");
       }
       return SUCCEEDED(hr);
    }
@@ -237,7 +237,7 @@ namespace Core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("   initRenderTarget failed");
+         CORE_INFO("initRenderTarget failed");
       }
       return SUCCEEDED(hr);
    }
@@ -280,7 +280,7 @@ namespace Core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("   initSamplerState failed");
+         CORE_INFO("initSamplerState failed");
       }
       return SUCCEEDED(hr);
    }
@@ -293,8 +293,8 @@ namespace Core
       D3D11_TEXTURE2D_DESC dsd;
       ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
 
-      dsd.Width = m_backbufferSize.x;
-      dsd.Height = m_backbufferSize.y;
+      dsd.Width = m_window->getSizeX(); //m_backbufferSize.x;
+      dsd.Height = m_window->getSizeY(); //m_backbufferSize.y;
       dsd.MipLevels = 1;
       dsd.ArraySize = 1;
       dsd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -316,7 +316,7 @@ namespace Core
       }
       if( FAILED(hr) )
       {
-         CORE_INFO("   initDepthBuffer failed");
+         CORE_INFO("initDepthBuffer failed");
       }
       return SUCCEEDED(hr);
    }

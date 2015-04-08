@@ -39,17 +39,12 @@ namespace Core
       void setView(const XMMATRIX& matrix);
 
       void setCulling(bool isEnabled);
+      void setTransparency(bool isEnabled);
+
       void setTexture(const DXTexture& texture);
       void setVertexTopology(VertexTopology topology);
       void setShader(const DXShader& shader);
       void render(Transform transform, Color color, std::vector<Vertex> vertices, std::vector<uint32_t> indices);
-
-
-      void setData(VertexBuffer vertices, IndexBuffer indices, Transform transform, Color color, float fValue);
-      void drawBuffers();
-      void setTransparency(bool on);
-      IndexBuffer makeSolidQuadIndices() const;
-      VertexBuffer makeQuadVertices(Vec2f pos, Vec2f hs) const;
 
    private:
       XMMATRIX m_camView;
@@ -58,12 +53,17 @@ namespace Core
       ID3D11Device* m_dev;
       ID3D11DeviceContext* m_devcon;
       ID3D11SamplerState* m_samplerState;
+      //owning resources
       ID3D11BlendState* m_transparency;
+      ID3D11RasterizerState* m_cullingEnabled;
+      ID3D11RasterizerState* m_cullingDisabled;
 
       void* m_texture;
       void* m_inputLayout;
       void* m_vertexShader;
       void* m_pixelShader;
+      void* m_cullingMode;
+      void* m_transparencyMode;
       int32_t m_topology;
 
       std::vector<Vertex> m_verticesToDraw;

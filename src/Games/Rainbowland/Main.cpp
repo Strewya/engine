@@ -73,6 +73,11 @@ namespace Core
       } guy;
 
       Mesh mesh = makeSolidQuad({}, {1, 1});
+      mesh.vertices[0].texCoord.set(0, 0);
+      mesh.vertices[1].texCoord.set(1, 0);
+      mesh.vertices[2].texCoord.set(0, 1);
+      mesh.vertices[3].texCoord.set(1, 1);
+
       Camera camera;
       camera.setPosition({0, 0, -10});
       
@@ -86,19 +91,8 @@ namespace Core
       graphicsSystem.renderer.setTexture(graphicsSystem.textures.getData(textureAtlasHandle));
       graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainShaderHandle));
       graphicsSystem.renderer.setVertexTopology(TriangleList);
-      graphicsSystem.renderer.render(Transform{{-1,-1}}, Color{1, 0, 0}, mesh.vertices, mesh.indices);
+      graphicsSystem.renderer.render(Transform{}, Color{}, mesh.vertices, mesh.indices);
       
-      
-      //graphicsSystem.renderer.setCulling(true);
-      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainShaderHandle));
-      graphicsSystem.renderer.setVertexTopology(TriangleList);
-      //graphicsSystem.renderer.setTransparency(false);
-      auto indices = graphicsSystem.renderer.makeSolidQuadIndices();
-      auto vertices = graphicsSystem.renderer.makeQuadVertices({}, {1, 1});
-      graphicsSystem.renderer.setData(mesh.vertices, mesh.indices, {}, {0.6f, 0.6f, 0.6f}, 0);
-      graphicsSystem.renderer.drawBuffers();
-      
-
       /*
       auto& mesh = m_meshStore.getMesh(guy.visualPart.meshId);
       m_gfxProxy.renderMesh(guy.transform, guy.color, mesh);
