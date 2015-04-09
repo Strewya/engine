@@ -5,9 +5,12 @@
 #include <Graphics/GraphicsSystem.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Graphics/Mesh/Mesh.h>
 #include <Graphics/Shader/DXShaderLoader.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
+#include <Util/Color.h>
+#include <Util/Transform.h>
 #include <Util/Utility.h>
 #include <Window/Window.h>
 /******* end headers *******/
@@ -62,16 +65,22 @@ namespace Core
       DXShaderLoader shaderLoader;
       if( shaderLoader.init(m_dev) )
       {
-         DXShader defaultShader{nullptr, nullptr, nullptr};
+         DXVertexShader defaultVertexShader{nullptr, nullptr};
          {
 #include <Graphics/Shader/defaultVertexShader.h>
+
+            defaultVertexShader = shaderLoader.loadVertexShader(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
+         }
+
+         DXPixelShader defaultPixelShader{nullptr};
+         {
 #include <Graphics/Shader/defaultPixelShader.h>
 
-            defaultShader = shaderLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader), (const char*)g_PShader, sizeof(g_PShader));
+            defaultPixelShader = shaderLoader.loadPixelShader((const char*)g_PShader, sizeof(g_PShader));
          }
          shaderLoader.shutdown();
 
-         CORE_STATUS_AND(shaders.init(m_dev, defaultShader));
+         CORE_STATUS_AND(shaders.init(m_dev, defaultVertexShader, defaultPixelShader));
       }
 
       CORE_INIT_END(GraphicsSystem);
@@ -148,6 +157,18 @@ namespace Core
    void GraphicsSystem::clearCamera()
    {
       renderer.setView(XMMatrixIdentity());
+   }
+
+   //*****************************************************************
+   //          RENDER MESH
+   //*****************************************************************
+   void GraphicsSystem::renderMesh(Transform t, Color c, const Mesh& mesh)
+   {
+      renderer.setShader(shaders.getData(mesh.vshader));
+      renderer.setShader(shaders.getData(mesh.pshader));
+      renderer.setTexture(textures.getData(mesh.texture));
+      renderer.setVertexTopology(mesh.topology);
+      renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
    //*****************************************************************

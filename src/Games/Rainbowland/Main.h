@@ -22,8 +22,9 @@ namespace Core
       GraphicsSystem graphicsSystem;
 
       HTexture textureAtlasHandle;
-      HShader mainShaderHandle;
-      HShader healthShaderHandle;
+      HVertexShader mainVSHandle;
+      HPixelShader mainPSHandle;
+      HPixelShader healthPSHandle;
 
       bool init(Window& window);
       bool shutdown();

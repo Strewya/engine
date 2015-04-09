@@ -5,11 +5,12 @@
 #include <Graphics/Mesh/Mesh.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Graphics/DXRenderer.h>
 /******* end headers *******/
 
 namespace Core
 {
-   Mesh makeSolidQuad(Vec2f pos, Vec2f hs)
+   Mesh makeSolidQuad(Vec2f pos, Vec2f hs, HTexture texture, HVertexShader vshader, HPixelShader pshader)
    {
       /*
       0-1
@@ -18,12 +19,16 @@ namespace Core
       */
       return
       {
+         vshader, pshader,
+         texture,
+         TriangleList,
          //vertices
          {
-            {{pos.x - hs.x, pos.y + hs.y, 0}, {1, 1, 1, 1}, {-1, -1}, {0}},
-            {{pos.x + hs.x, pos.y + hs.y, 0}, {1, 1, 1, 1}, {-1, -1}, {0}},
-            {{pos.x - hs.x, pos.y - hs.y, 0}, {1, 1, 1, 1}, {-1, -1}, {0}},
-            {{pos.x + hs.x, pos.y - hs.y, 0}, {1, 1, 1, 1}, {-1, -1}, {0}},
+            //x             y             z  w    r  g  b  a     u   v    h
+            {{pos.x - hs.x, pos.y + hs.y, 0, 0}, {1, 1, 1, 1}, {-1, -1}, {0, 0}},
+            {{pos.x + hs.x, pos.y + hs.y, 0, 0}, {1, 1, 1, 1}, {-1, -1}, {0, 0}},
+            {{pos.x - hs.x, pos.y - hs.y, 0, 0}, {1, 1, 1, 1}, {-1, -1}, {0, 0}},
+            {{pos.x + hs.x, pos.y - hs.y, 0, 0}, {1, 1, 1, 1}, {-1, -1}, {0, 0}},
          },
          //indices
          {

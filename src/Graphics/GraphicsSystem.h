@@ -18,6 +18,9 @@
 namespace Core
 {
    class Camera;
+   class Color;
+   class Mesh;
+   class Transform;
    class Vertex;
    class Window;
 
@@ -36,6 +39,8 @@ namespace Core
       void setPerspectiveProjection();
       void applyCamera(const Camera& camera);
       void clearCamera();
+
+      void renderMesh(Transform t, Color c, const Mesh& mesh);
 
       DXRenderer renderer;
       DXTextureManager textures;

@@ -14,7 +14,8 @@
 
 namespace Core
 {
-   class DXShader;
+   class DXVertexShader;
+   class DXPixelShader;
 
    class DXShaderFileLoader
    {
@@ -22,9 +23,11 @@ namespace Core
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXShader load(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied) const;
+      DXVertexShader loadVertexShader(const std::string& filename, InputLayout ied) const;
+      DXPixelShader loadPixelShader(const std::string& filename) const;
 
-      void unload(DXShader& shader);
+      void unload(DXVertexShader& shader);
+      void unload(DXPixelShader& shader);
 
    private:
       DXShaderLoader m_loader;

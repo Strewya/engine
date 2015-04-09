@@ -178,9 +178,9 @@ namespace Core
    }
 
    //*****************************************************************
-   //          SET SHADER
+   //          SET SHADER - VERTEX
    //*****************************************************************
-   void DXRenderer::setShader(const DXShader& shader)
+   void DXRenderer::setShader(const DXVertexShader& shader)
    {
       // INPUT LAYOUT
       if( m_inputLayout != shader.inputLayout )
@@ -194,7 +194,13 @@ namespace Core
          m_devcon->VSSetShader(shader.vertex, nullptr, 0);
          m_vertexShader = shader.vertex;
       }
-      // PIXEL SHADER
+   }
+
+   //*****************************************************************
+   //          SET SHADER - PIXEL
+   //*****************************************************************
+   void DXRenderer::setShader(const DXPixelShader& shader)
+   {
       if( m_pixelShader != shader.pixel )
       {
          m_devcon->PSSetShader(shader.pixel, nullptr, 0);
@@ -205,7 +211,7 @@ namespace Core
    //*****************************************************************
    //          RENDER
    //*****************************************************************
-   void DXRenderer::render(Transform transform, Color color, std::vector<Vertex> vertices, std::vector<uint32_t> indices)
+   void DXRenderer::render(Transform transform, Color color, HealthVertexBuffer vertices, IndexBuffer indices)
    {
       if( vertices.empty() || indices.empty() )
       {
@@ -216,9 +222,9 @@ namespace Core
       {
          XMCOLOR fillColor(color.r, color.g, color.b, color.a);
          XMVECTOR fill = XMLoadColor(&fillColor);
-         XMVECTOR diffuse = XMLoadFloat4(&vx.diffuse.m_);
+         XMVECTOR diffuse = XMLoadFloat4(&vx.diffuse);
          diffuse *= fill;
-         XMStoreFloat4(&vx.diffuse.m_, diffuse);
+         XMStoreFloat4(&vx.diffuse, diffuse);
 
          auto world = XMMatrixIdentity();
          world *= XMMatrixScaling(transform.scale.x, transform.scale.y, 1.0f);
@@ -227,20 +233,20 @@ namespace Core
          world *= XMMatrixRotationZ(transform.rotation);
          world *= XMMatrixTranslation(transform.position.x, transform.position.y, 0);
          world = world*m_camView*m_camProjection;
-         XMVECTOR position = XMLoadFloat4(&vx.position.m_);
+         XMVECTOR position = XMLoadFloat4(&vx.position);
          position = XMVector3TransformCoord(position, world);
-         XMStoreFloat4(&vx.position.m_, position);
+         XMStoreFloat4(&vx.position, position);
       }
 
 
       D3D11_MAPPED_SUBRESOURCE ms;
 
-      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(Vertex), vertices.size());
+      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), vertices.size());
       auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
 
       HRESULT hr = m_devcon->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       assert(SUCCEEDED(hr));
-      memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(Vertex));
+      memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(HealthVertex));
       m_devcon->Unmap(vertexBuffer, 0);
 
       hr = m_devcon->Map(indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
@@ -249,7 +255,7 @@ namespace Core
       m_devcon->Unmap(indexBuffer, 0);
 
 
-      uint32_t stride = sizeof(Vertex);
+      uint32_t stride = sizeof(HealthVertex);
       uint32_t offset = 0;
 
       m_devcon->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);

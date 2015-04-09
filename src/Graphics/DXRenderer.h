@@ -7,6 +7,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/Typedefs.h>
 #include <Graphics/Vertex.h>
 #include <Util/Vec2Fwd.h>
 /******* end header inclusion *******/
@@ -14,12 +15,10 @@
 namespace Core
 {
    class DXTexture;
-   class DXShader;
+   class DXVertexShader;
+   class DXPixelShader;
    class Transform;
    class Color;
-
-   typedef std::vector<Vertex> VertexBuffer;
-   typedef std::vector<uint32_t> IndexBuffer;
 
    enum VertexTopology
    {
@@ -43,8 +42,9 @@ namespace Core
 
       void setTexture(const DXTexture& texture);
       void setVertexTopology(VertexTopology topology);
-      void setShader(const DXShader& shader);
-      void render(Transform transform, Color color, std::vector<Vertex> vertices, std::vector<uint32_t> indices);
+      void setShader(const DXVertexShader& shader);
+      void setShader(const DXPixelShader& shader);
+      void render(Transform transform, Color color, HealthVertexBuffer vertices, IndexBuffer indices);
 
    private:
       XMMATRIX m_camView;
@@ -66,7 +66,7 @@ namespace Core
       void* m_transparencyMode;
       int32_t m_topology;
 
-      std::vector<Vertex> m_verticesToDraw;
-      std::vector<uint32_t> m_indicesToDraw;
+      HealthVertexBuffer m_verticesToDraw;
+      IndexBuffer m_indicesToDraw;
    };
 }

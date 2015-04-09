@@ -246,6 +246,15 @@
     <ClInclude Include="..\..\..\src\Util\Transform.h">
       <Filter>Code\Framework\Util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderHandle.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureHandle.h">
+      <Filter>Code\Framework\Graphics\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Typedefs.h">
+      <Filter>Code\Framework\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Code">

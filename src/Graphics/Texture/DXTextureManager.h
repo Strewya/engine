@@ -10,16 +10,13 @@
 /******* extra headers *******/
 #include <Graphics/Texture/DXTexture.h>
 #include <Graphics/Texture/DXTextureFileLoader.h>
+#include <Graphics/Texture/DXTextureHandle.h>
 #include <Util/Cache.h>
-#include <Util/Handle.h>
 #include <Util/NameCache.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   struct tag_DXTexture;
-   typedef Handle<tag_DXTexture> HTexture;
-
    class DXTextureManager
    {
    public:

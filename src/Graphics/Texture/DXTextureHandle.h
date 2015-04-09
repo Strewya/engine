@@ -1,27 +1,18 @@
 #pragma once
 /********************************************
-*  contents:   DXVertexShader, DXPixelShader
+*  contents:   DXTexture
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Util/Handle.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXVertexShader
-   {
-   public:
-      ID3D11InputLayout* inputLayout;
-      ID3D11VertexShader* vertex;
-   };
-
-   class DXPixelShader
-   {
-   public:
-      ID3D11PixelShader* pixel;
-   };
+   struct tag_DXTexture;
+   typedef Handle<tag_DXTexture> HTexture;
 }

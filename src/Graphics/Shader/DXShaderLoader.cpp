@@ -31,50 +31,28 @@ namespace Core
       CORE_SHUTDOWN_END(DXShaderLoader);
    }
 
-   DXShader DXShaderLoader::load(InputLayout layout,
-                                 const char* vsBuffer, uint32_t vsSize,
-                                 const char* psBuffer, uint32_t psSize) const
+   DXVertexShader DXShaderLoader::loadVertexShader(InputLayout layout, const char* vsBuffer, uint32_t vsSize) const
    {
-      return
-      {
-         loadInputLayout(layout, vsBuffer, vsSize),
-         loadVertexShader(vsBuffer, vsSize),
-         loadPixelShader(psBuffer, psSize)
-      };
-   }
-
-   void DXShaderLoader::unload(DXShader& shader)
-   {
-      safeRelease(shader.inputLayout);
-      safeRelease(shader.vertex);
-      safeRelease(shader.pixel);
-   }
-
-   ID3D11InputLayout* DXShaderLoader::loadInputLayout(InputLayout layout, const char* vsBuffer, uint32_t vsSize) const
-   {
-      ID3D11InputLayout* result{nullptr};
-      if( !layout.empty() && vsBuffer != nullptr && vsSize > 0 )
-      {
-         HRESULT hr = m_dev->CreateInputLayout(layout.data(), layout.size(), vsBuffer, vsSize, &result);
-         if( FAILED(hr) )
-         {
-            CORE_INFO("Failed to create input layout for vertex shader");
-         }
-      }
-      else
-      {
-         CORE_INFO("Received empty layout or invalid vertex shader buffer or invalid buffer size");
-      }
-      return result;
-   }
-
-   ID3D11VertexShader* DXShaderLoader::loadVertexShader(const char* vsBuffer, uint32_t vsSize) const
-   {
-      ID3D11VertexShader* result{nullptr};
+      DXVertexShader result{nullptr, nullptr};
       if( vsBuffer != nullptr && vsSize > 0 )
       {
-         HRESULT hr = m_dev->CreateVertexShader(vsBuffer, vsSize, nullptr, &result);
-         if( FAILED(hr) )
+         HRESULT hr = m_dev->CreateVertexShader(vsBuffer, vsSize, nullptr, &result.vertex);
+         if( SUCCEEDED(hr) )
+         {
+            if( !layout.empty() )
+            {
+               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), vsBuffer, vsSize, &result.inputLayout);
+               if( FAILED(hr) )
+               {
+                  CORE_INFO("Failed to create input layout for vertex shader");
+               }
+            }
+            else
+            {
+               CORE_INFO("Received empty input layout");
+            }
+         }
+         else
          {
             CORE_INFO("Failed to create vertex shader");
          }
@@ -86,12 +64,12 @@ namespace Core
       return result;
    }
 
-   ID3D11PixelShader* DXShaderLoader::loadPixelShader(const char* shaderBuffer, uint32_t shaderSize) const
+   DXPixelShader DXShaderLoader::loadPixelShader(const char* shaderBuffer, uint32_t shaderSize) const
    {
-      ID3D11PixelShader* result{nullptr};
+      DXPixelShader result{nullptr};
       if( shaderBuffer != nullptr && shaderSize > 0 )
       {
-         HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &result);
+         HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &result.pixel);
          if( FAILED(hr) )
          {
             CORE_INFO("Failed to create pixel shader");
@@ -102,5 +80,16 @@ namespace Core
          CORE_INFO("Received invalid pixel shader buffer or invalid buffer size");
       }
       return result;
+   }
+
+   void DXShaderLoader::unload(DXVertexShader& shader)
+   {
+      safeRelease(shader.inputLayout);
+      safeRelease(shader.vertex);
+   }
+
+   void DXShaderLoader::unload(DXPixelShader& shader)
+   {
+      safeRelease(shader.pixel);
    }
 }

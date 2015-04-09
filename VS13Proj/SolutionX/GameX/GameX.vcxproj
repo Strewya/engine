@@ -289,11 +289,14 @@
     <ClInclude Include="..\..\..\src\Graphics\Shader\defaultVertexShader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderHandle.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderLoader.h" />
     <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderManager.h" />
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTexture.h" />
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureHandle.h" />
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureManager.h" />
+    <ClInclude Include="..\..\..\src\Graphics\Typedefs.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\Gamepad.h" />
     <ClInclude Include="..\..\..\src\Input\Keyboard.h" />

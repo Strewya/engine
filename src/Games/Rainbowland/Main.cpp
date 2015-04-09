@@ -40,12 +40,14 @@ namespace Core
       CORE_STATUS_AND(graphicsSystem.init(window, {1200, 900}));
 
       textureAtlasHandle = graphicsSystem.textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
-      mainShaderHandle = graphicsSystem.shaders.loadFromFile(CORE_RESOURCE("Shaders/shader"), Vertex::getDescription());
-      healthShaderHandle = graphicsSystem.shaders.loadFromFile(CORE_RESOURCE("Shaders/health"), Vertex::getDescription());
+      mainVSHandle = graphicsSystem.shaders.loadVertexShaderFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), HealthVertex::getDescription());
+      mainPSHandle = graphicsSystem.shaders.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
+      healthPSHandle = graphicsSystem.shaders.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
 
       CORE_STATUS_AND(textureAtlasHandle.isNull() == false);
-      CORE_STATUS_AND(mainShaderHandle.isNull() == false);
-      CORE_STATUS_AND(healthShaderHandle.isNull() == false);
+      CORE_STATUS_AND(mainVSHandle.isNull() == false);
+      CORE_STATUS_AND(mainPSHandle.isNull() == false);
+      CORE_STATUS_AND(healthPSHandle.isNull() == false);
 
       CORE_INIT_END(Rainbowland);
    }
@@ -72,11 +74,11 @@ namespace Core
          } visualPart;
       } guy;
 
-      Mesh mesh = makeSolidQuad({}, {1, 1});
-      mesh.vertices[0].texCoord.set(0, 0);
-      mesh.vertices[1].texCoord.set(1, 0);
-      mesh.vertices[2].texCoord.set(0, 1);
-      mesh.vertices[3].texCoord.set(1, 1);
+      Mesh mesh = makeSolidQuad({}, {1, 1}, textureAtlasHandle, mainVSHandle, mainPSHandle);
+      mesh.vertices[0].textureUV = {0, 0};
+      mesh.vertices[1].textureUV = {1, 0};
+      mesh.vertices[2].textureUV = {0, 1};
+      mesh.vertices[3].textureUV = {1, 1};
 
       Camera camera;
       camera.setPosition({0, 0, -10});
@@ -88,10 +90,14 @@ namespace Core
       
       //graphicsSystem.renderer.setCulling(true);
       //graphicsSystem.renderer.setTransparency(false);
+      /*
       graphicsSystem.renderer.setTexture(graphicsSystem.textures.getData(textureAtlasHandle));
-      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainShaderHandle));
+      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainVSHandle));
+      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainPSHandle));
       graphicsSystem.renderer.setVertexTopology(TriangleList);
       graphicsSystem.renderer.render(Transform{}, Color{}, mesh.vertices, mesh.indices);
+      */
+      graphicsSystem.renderMesh(Transform{}, Color{}, mesh);
       
       /*
       auto& mesh = m_meshStore.getMesh(guy.visualPart.meshId);

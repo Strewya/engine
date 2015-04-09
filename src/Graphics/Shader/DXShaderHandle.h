@@ -6,22 +6,15 @@
 /******* C++ headers *******/
 #include <string>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Util/Handle.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXVertexShader
-   {
-   public:
-      ID3D11InputLayout* inputLayout;
-      ID3D11VertexShader* vertex;
-   };
+   struct tag_DXVertexShader;
+   typedef Handle<tag_DXVertexShader> HVertexShader;
 
-   class DXPixelShader
-   {
-   public:
-      ID3D11PixelShader* pixel;
-   };
+   struct tag_DXPixelShader;
+   typedef Handle<tag_DXPixelShader> HPixelShader;
 }

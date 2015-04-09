@@ -48,25 +48,42 @@ namespace Core
       return false;
    }
 
-   DXShader DXShaderFileLoader::load(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied) const
+   DXVertexShader DXShaderFileLoader::loadVertexShader(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied) const
    {
-      DXShader result{nullptr, nullptr, nullptr};
+      DXVertexShader result{nullptr, nullptr};
       std::vector<char> vsBuffer;
-      std::vector<char> psBuffer;
-      std::string pixelShaderFilename = filename + "_ps.cso";
-      std::string vertexShaderFilename = filename + "_vs.cso";
-      if( loadFile(vertexShaderFilename, vsBuffer) && loadFile(pixelShaderFilename, psBuffer) )
+      if( loadFile(filename, vsBuffer) )
       {
-         result = m_loader.load(ied, vsBuffer.data(), vsBuffer.size(), psBuffer.data(), psBuffer.size());
+         result = m_loader.loadVertexShader(ied, vsBuffer.data(), vsBuffer.size());
       }
       else
       {
-         CORE_INFO("Failed to load shader '", pixelShaderFilename, "' or '", vertexShaderFilename, "'");
+         CORE_INFO("Failed to load shader '", filename, "'");
       }
       return result;
    }
 
-   void DXShaderFileLoader::unload(DXShader& shader)
+   DXPixelShader DXShaderFileLoader::loadPixelShader(const std::string& filename) const
+   {
+      DXPixelShader result{nullptr};
+      std::vector<char> psBuffer;
+      if( loadFile(filename, psBuffer) )
+      {
+         result = m_loader.loadPixelShader(psBuffer.data(), psBuffer.size());
+      }
+      else
+      {
+         CORE_INFO("Failed to load shader '", filename, "'");
+      }
+      return result;
+   }
+
+   void DXShaderFileLoader::unload(DXVertexShader& shader)
+   {
+      m_loader.unload(shader);
+   }
+
+   void DXShaderFileLoader::unload(DXPixelShader& shader)
    {
       m_loader.unload(shader);
    }
