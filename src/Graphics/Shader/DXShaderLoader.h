@@ -25,11 +25,11 @@ namespace Core
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXVertexShader loadVertexShader(InputLayout layout, const char* vsBuffer, uint32_t vsSize) const;
-      DXPixelShader loadPixelShader(const char* vsBuffer, uint32_t vsSize) const;
+      DXVertexShader loadVertexShader(InputLayout layout, const char* buffer, uint32_t bufferSize) const;
+      DXPixelShader loadPixelShader(const char* buffer, uint32_t bufferSize) const;
 
-      void unload(DXVertexShader& shader);
-      void unload(DXPixelShader& shader);
+      void unload(DXVertexShader& data);
+      void unload(DXPixelShader& data);
 
    private:
       ID3D11Device* m_dev;

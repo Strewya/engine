@@ -37,15 +37,6 @@
     <ClCompile Include="..\..\..\src\Window\WindowClass.cpp">
       <Filter>Code\Framework\Window\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Input\Gamepad.cpp">
-      <Filter>Code\Framework\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Input\Keyboard.cpp">
-      <Filter>Code\Framework\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Input\Mouse.cpp">
-      <Filter>Code\Framework\Input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Window\Window_general.cpp">
       <Filter>Code\Framework\Window\Windows</Filter>
     </ClCompile>
@@ -100,6 +91,33 @@
     <ClCompile Include="..\..\..\src\Util\Transform.cpp">
       <Filter>Code\Framework\Util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp">
+      <Filter>Code\Framework\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\Gamepad.cpp">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\Keyboard.cpp">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Input\Mouse.cpp">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Util\Rect.cpp">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\LoadGameResources.cpp">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Audio\FmodSoundManager.cpp">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
@@ -153,44 +171,11 @@
     <ClInclude Include="..\..\..\src\Window\WindowClass.h">
       <Filter>Code\Framework\Window\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec2.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec2Fwd.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec2Impl.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Input\Gamepad.h">
-      <Filter>Code\Framework\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Input\Keyboard.h">
-      <Filter>Code\Framework\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Input\Mouse.h">
-      <Filter>Code\Framework\Input</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Camera.h">
       <Filter>Code\Framework\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec3.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec3Fwd.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Vec3Impl.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h">
       <Filter>Code\Framework\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Cache.h">
-      <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\Handle.h">
-      <Filter>Code\Framework\Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Main.h">
       <Filter>Code\Games\Rainbowland</Filter>
@@ -200,9 +185,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\GraphicsSystem.h">
       <Filter>Code\Framework\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Util\NameCache.h">
-      <Filter>Code\Framework\Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\stdafx.h">
       <Filter>Code</Filter>
@@ -255,6 +237,75 @@
     <ClInclude Include="..\..\..\src\Graphics\Typedefs.h">
       <Filter>Code\Framework\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec2.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec2Fwd.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec2Impl.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec3.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec3Fwd.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Vec3Impl.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\InputSystem.h">
+      <Filter>Code\Framework\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Cache.h">
+      <Filter>Code\Framework\Util\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Handle.h">
+      <Filter>Code\Framework\Util\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\NameCache.h">
+      <Filter>Code\Framework\Util\Template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\Gamepad.h">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\Keyboard.h">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Input\Mouse.h">
+      <Filter>Code\Framework\Input\Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Rect.h">
+      <Filter>Code\Framework\Util\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\LoadGameResources.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameResources.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\AudioSystem.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodInclude.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodSound.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundHandle.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundManager.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundFileLoader.h">
+      <Filter>Code\Framework\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameSystems.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Code">
@@ -296,10 +347,17 @@
     <Filter Include="Code\Framework\Graphics\Mesh">
       <UniqueIdentifier>{1e7b813a-acbd-419d-8b6d-316d3d6777a1}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\src\Window\Window.pkg">
-      <Filter>Code\Framework\Window</Filter>
-    </None>
+    <Filter Include="Code\Framework\Util\Template">
+      <UniqueIdentifier>{00d1644b-7bf8-43cd-8bfe-bc038d648a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Input\Devices">
+      <UniqueIdentifier>{ea2b549d-61ac-4f42-8c85-bae97d6801b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Util\Geometry">
+      <UniqueIdentifier>{32fe215e-3092-4a9f-acd9-17067b78d58b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Audio">
+      <UniqueIdentifier>{38769727-8ce4-4b23-bd9f-9b3654c30691}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

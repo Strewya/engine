@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Graphics/Texture/DXTextureManager.h>
+#include <Audio/FmodSoundManager.h>
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Util/Utility.h>
@@ -10,23 +10,23 @@
 
 namespace Core
 {
-   bool DXTextureManager::init(ID3D11Device* device, DXTexture defaultData)
+   bool FmodSoundManager::init(FMOD::System* system, FmodSound defaultSound)
    {
-      CORE_INIT_START(DXTextureManager);
+      CORE_INIT_START(FmodSoundManager);
 
-      m_defaultData = defaultData;
+      m_defaultData = defaultSound;
 
-      CORE_STATUS_AND(m_fileloader.init(device));
-      CORE_STATUS_AND(m_defaultData.shaderResourceView != nullptr);
+      CORE_STATUS_AND(m_fileloader.init(system));
+      //CORE_STATUS_AND(m_defaultData.sound != nullptr);
 
-      CORE_INIT_END(DXTextureManager);
+      CORE_INIT_END(FmodSoundManager);
    }
 
-   bool DXTextureManager::shutdown()
+   bool FmodSoundManager::shutdown()
    {
-      CORE_SHUTDOWN_START(DXTextureManager);
+      CORE_SHUTDOWN_START(FmodSoundManager);
 
-      //unload all existing textures
+      //unload all existing Sounds
       m_fileloader.unload(m_defaultData);
       //to not have memory leaks on shutdown, but still check if all resources were cleaned up by the game code
       for( auto& data : m_data )
@@ -34,20 +34,20 @@ namespace Core
          m_fileloader.unload(data);
       }
 
-      CORE_STATUS_AND(m_defaultData.shaderResourceView == nullptr);
+      CORE_STATUS_AND(m_defaultData.sound == nullptr);
       CORE_STATUS_AND(m_data.hasUsedHandles() == false);
       CORE_STATUS_AND(m_fileloader.shutdown());
 
-      CORE_SHUTDOWN_END(DXTextureManager);
+      CORE_SHUTDOWN_END(FmodSoundManager);
    }
 
-   HTexture DXTextureManager::loadFromFile(const std::string& filename)
+   HSound FmodSoundManager::loadFromFile(const std::string& filename)
    {
-      HTexture handle = m_names.getHandle(filename);
+      HSound handle = m_names.getHandle(filename);
       if( handle.isNull() )
       {
          auto loadedData = m_fileloader.load(filename);
-         if( loadedData.shaderResourceView != nullptr && loadedData.width != 0 && loadedData.height != 0 )
+         if( loadedData.sound != nullptr )
          {
             auto& data = m_data.acquire(handle);
             data = loadedData;
@@ -57,7 +57,7 @@ namespace Core
       return handle;
    }
 
-   DXTexture& DXTextureManager::getData(HTexture handle)
+   FmodSound& FmodSoundManager::getData(HSound handle)
    {
       auto* data = m_data.dereference(handle);
       if( data == nullptr )
@@ -67,7 +67,7 @@ namespace Core
       return *data;
    }
 
-   void DXTextureManager::release(HTexture handle)
+   void FmodSoundManager::release(HSound handle)
    {
       auto* data = m_data.dereference(handle);
       if( data != nullptr )

@@ -27,12 +27,13 @@ namespace Core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool GraphicsSystem::init(Window& window, Vec2i backbufferSize)
+   bool GraphicsSystem::init(Window& window)
    {
       CORE_INIT_START(GraphicsSystem);
 
       m_window = &window;
-      m_backbufferSize = backbufferSize;
+      m_backbufferSize.x = window.getSizeX();
+      m_backbufferSize.y = window.getSizeY();
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       clearCamera();
 

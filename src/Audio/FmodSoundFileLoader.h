@@ -1,30 +1,30 @@
 #pragma once
 /********************************************
-*  contents:   DXTextureLoader
+*  contents:   FmodSoundLoader
 *  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <string>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
+#include <Audio/FmodInclude.h>
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXTexture;
+   class FmodSound;
 
-   class DXTextureFileLoader
+   class FmodSoundFileLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      bool init(FMOD::System* system);
       bool shutdown();
 
-      DXTexture load(const std::string& filename) const;
+      FmodSound load(const std::string& filename) const;
 
-      void unload(DXTexture& data) const;
+      void unload(FmodSound& texture) const;
 
    private:
-      ID3D11Device* m_dev;
+      FMOD::System* m_system;
    };
 }

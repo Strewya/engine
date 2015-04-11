@@ -21,21 +21,21 @@ namespace Core
          case WM_SYSKEYUP:
          {
             matched = true;
-            we.m_type = WindowEventType::WE_KEYBOARDKEY;
-            we.m_keyboard.m_keyCode = m_keyCodes[(uint8_t)wp];
-            we.m_keyboard.m_repeat = (uint8_t)LOWORD(lp);
-            we.m_keyboard.m_isDown = (lp & (1 << 31)) == 0;
-            we.m_keyboard.m_previouslyDown = (lp & (1 << 30)) != 0;
+            we.type = WindowEventType::WE_KEYBOARDKEY;
+            we.keyboard.key.id = m_keyCodes[(uint8_t)wp];
+            we.keyboard.key.isDown = (lp & (1 << 31)) == 0;
+            we.keyboard.repeatCount = (uint8_t)LOWORD(lp);
+            we.keyboard.firstTimeDown = (lp & (1 << 30)) == 0;
          } break;
 
          case WM_CHAR:
          {
             matched = true;
-            we.m_type = WindowEventType::WE_KEYBOARDTEXT;
-            we.m_keyboard.m_keyCode = m_keyCodes[(uint8_t)wp];
-            we.m_keyboard.m_repeat = (uint8_t)LOWORD(lp);
-            we.m_keyboard.m_isDown = true;
-            we.m_keyboard.m_previouslyDown = false;
+            we.type = WindowEventType::WE_KEYBOARDTEXT;
+            we.keyboard.key.id = m_keyCodes[(uint8_t)wp];
+            we.keyboard.key.isDown = true;
+            we.keyboard.repeatCount = (uint8_t)LOWORD(lp);
+            we.keyboard.firstTimeDown = false;
          } break;
       }
       return matched;

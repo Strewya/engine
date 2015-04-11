@@ -72,19 +72,19 @@ namespace Core
                auto y = GET_Y_LPARAM(lp) - m_centerY;
                if( x != 0 || y != 0 )
                {
-                  we.m_type = WindowEventType::WE_MOUSEMOVE;
-                  we.m_mouseMove.m_x = x;
-                  we.m_mouseMove.m_y = y;
-                  we.m_mouseMove.m_isRelative = true;
+                  we.type = WindowEventType::WE_MOUSEMOVE;
+                  we.mouse.position.x = x;
+                  we.mouse.position.y = y;
+                  we.mouse.move.relative = true;
                   SetCursorPos(m_centerX, m_centerY);
                }
             }
             else
             {
-               we.m_type = WindowEventType::WE_MOUSEMOVE;
-               we.m_mouseMove.m_x = GET_X_LPARAM(lp);
-               we.m_mouseMove.m_y = GET_Y_LPARAM(lp);
-               we.m_mouseMove.m_isRelative = false;
+               we.type = WindowEventType::WE_MOUSEMOVE;
+               we.mouse.position.x = GET_X_LPARAM(lp);
+               we.mouse.position.y = GET_Y_LPARAM(lp);
+               we.mouse.move.relative = false;
             }
          } break;
          
@@ -94,12 +94,11 @@ namespace Core
          case WM_XBUTTONDOWN:
          {
             matched = true;
-            we.m_type = WindowEventType::WE_MOUSEBUTTON;
-            we.m_mouseButton.m_clicks = 1;
-            we.m_mouseButton.m_isDown = true;
-            we.m_mouseButton.m_x = GET_X_LPARAM(lp);
-            we.m_mouseButton.m_y = GET_Y_LPARAM(lp);
-            we.m_mouseButton.m_button = toMouseKey(msg, wp);
+            we.type = WindowEventType::WE_MOUSEBUTTON;
+            we.mouse.position.x = GET_X_LPARAM(lp);
+            we.mouse.position.y = GET_Y_LPARAM(lp);
+            we.mouse.button.id = toMouseKey(msg, wp);
+            we.mouse.button.isDown = true;
          } break;
 
          case WM_LBUTTONUP:
@@ -108,21 +107,20 @@ namespace Core
          case WM_XBUTTONUP:
          {
             matched = true;
-            we.m_type = WindowEventType::WE_MOUSEBUTTON;
-            we.m_mouseButton.m_clicks = 0;
-            we.m_mouseButton.m_isDown = false;
-            we.m_mouseButton.m_x = GET_X_LPARAM(lp);
-            we.m_mouseButton.m_y = GET_Y_LPARAM(lp);
-            we.m_mouseButton.m_button = toMouseKey(msg, wp);
+            we.type = WindowEventType::WE_MOUSEBUTTON;
+            we.mouse.position.x = GET_X_LPARAM(lp);
+            we.mouse.position.y = GET_Y_LPARAM(lp);
+            we.mouse.button.id = toMouseKey(msg, wp);
+            we.mouse.button.isDown = false;
          } break;
 
          case WM_MOUSEWHEEL:
          {
             matched = true;
-            we.m_type = WindowEventType::WE_MOUSEWHEEL;
-            we.m_mouseWheel.m_scroll = GET_WHEEL_DELTA_WPARAM(wp);
-            we.m_mouseButton.m_x = GET_X_LPARAM(lp);
-            we.m_mouseButton.m_y = GET_Y_LPARAM(lp);
+            we.type = WindowEventType::WE_MOUSEWHEEL;
+            we.mouse.position.x = GET_X_LPARAM(lp);
+            we.mouse.position.y = GET_Y_LPARAM(lp);
+            we.mouse.wheel.scroll = GET_WHEEL_DELTA_WPARAM(wp);
          } break;
       }
       return matched;

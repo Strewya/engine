@@ -111,11 +111,11 @@ namespace Core
    {
       char lpName[128] = {0};
       GetCurrentDirectory(128, lpName);
-      m_resourcesDirectory.assign(lpName);
-      auto pos = m_resourcesDirectory.find_last_of('\\');
-      m_resourcesDirectory.assign(m_resourcesDirectory.substr(0, pos + 1)).append(directory).shrink_to_fit();
+      std::string dir(lpName);
+      auto pos = dir.find_last_of('\\');
+      dir.assign(dir.substr(0, pos + 1)).append(directory).shrink_to_fit();
 
-      m_monitor.AddDirectory(m_resourcesDirectory.c_str(), true, m_trackedChanges);
+      m_monitor.AddDirectory(dir.c_str(), true, m_trackedChanges);
    }
 
    void Window::setFileChangeDelay(uint32_t delay)
@@ -123,69 +123,12 @@ namespace Core
       m_fileChangeDelay = (delay > m_minFileChangeDelay ? delay : m_minFileChangeDelay);
    }
 
-   uint32_t toFileChangeType(DWORD action)
-   {
-      uint32_t returnValue = Core::FILE_BADDATA;
-      switch( action )
-      {
-         case FILE_ACTION_ADDED:
-         {
-            returnValue = Core::FILE_ADDED;
-         }
-         break;
-
-         case FILE_ACTION_MODIFIED:
-         {
-            returnValue = Core::FILE_MODIFIED;
-         }
-         break;
-
-         case FILE_ACTION_REMOVED:
-         {
-            returnValue = Core::FILE_REMOVED;
-         }
-         break;
-
-         case FILE_ACTION_RENAMED_OLD_NAME:
-         {
-            returnValue = Core::FILE_RENAMED_FROM;
-         }
-         break;
-
-         case FILE_ACTION_RENAMED_NEW_NAME:
-         {
-            returnValue = Core::FILE_RENAMED_TO;
-         }
-         break;
-
-         default:
-            break;
-      }
-      return returnValue;
-   }
-
-   bool Window::getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr)
-   {
-      if( index < m_fileChanges.size() && m_fileChanges[index].m_state == FileChangeInfo::READ_PENDING )
-      {
-         outAction = toFileChangeType(m_fileChanges[index].m_action);
-         outStr = m_fileChanges[index].m_filename;
-         replaceAll(outStr, "\\", "/");
-         m_fileChanges[index].m_state = FileChangeInfo::UNUSED;
-         m_fileChanges[index].m_action = 0;
-         m_fileChanges[index].m_filename.clear();
-         m_fileChanges[index].m_timestamp = 0;
-         return true;
-      }
-      return false;
-   }
-
    std::vector<WindowEvent> Window::collectEvents(uint64_t time)
    {
       std::vector<WindowEvent> events;
       
       auto readIndex = (m_tailIndex + 1) % m_eventQueueSize;
-      while( readIndex != m_headIndex && m_events[readIndex].m_timestamp <= time )
+      while( readIndex != m_headIndex && m_events[readIndex].timestamp <= time )
       {
          events.push_back(m_events[readIndex]);
          m_tailIndex = readIndex;

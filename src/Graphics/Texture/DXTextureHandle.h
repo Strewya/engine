@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   DXTexture
+*  contents:   HTexture
 *  usage:
 ********************************************/
 /******* C++ headers *******/

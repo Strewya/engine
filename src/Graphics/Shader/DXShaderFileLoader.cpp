@@ -30,7 +30,7 @@ namespace Core
       CORE_SHUTDOWN_END(DXShaderFileLoader);
    }
 
-   static bool loadFile(const std::string& filename, std::vector<char>& shaderBuffer)
+   static bool loadFile(const std::string& filename, std::vector<char>& buffer)
    {
       size_t shaderSize = 0;
       std::ifstream shaderFile{filename, std::ifstream::in | std::ifstream::binary};
@@ -38,23 +38,23 @@ namespace Core
       {
          shaderFile.seekg(0, std::ios::end);
          shaderSize = SIZE_T(shaderFile.tellg());
-         shaderBuffer.clear();
-         shaderBuffer.resize(shaderSize);
+         buffer.clear();
+         buffer.resize(shaderSize);
          shaderFile.seekg(0, std::ios::beg);
-         shaderFile.read(&shaderBuffer[0], shaderSize);
+         shaderFile.read(&buffer[0], shaderSize);
          shaderFile.close();
          return true;
       }
       return false;
    }
 
-   DXVertexShader DXShaderFileLoader::loadVertexShader(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied) const
+   DXVertexShader DXShaderFileLoader::loadVertexShader(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> layout) const
    {
       DXVertexShader result{nullptr, nullptr};
-      std::vector<char> vsBuffer;
-      if( loadFile(filename, vsBuffer) )
+      std::vector<char> buffer;
+      if( loadFile(filename, buffer) )
       {
-         result = m_loader.loadVertexShader(ied, vsBuffer.data(), vsBuffer.size());
+         result = m_loader.loadVertexShader(layout, buffer.data(), buffer.size());
       }
       else
       {
@@ -66,10 +66,10 @@ namespace Core
    DXPixelShader DXShaderFileLoader::loadPixelShader(const std::string& filename) const
    {
       DXPixelShader result{nullptr};
-      std::vector<char> psBuffer;
-      if( loadFile(filename, psBuffer) )
+      std::vector<char> buffer;
+      if( loadFile(filename, buffer) )
       {
-         result = m_loader.loadPixelShader(psBuffer.data(), psBuffer.size());
+         result = m_loader.loadPixelShader(buffer.data(), buffer.size());
       }
       else
       {
@@ -78,13 +78,13 @@ namespace Core
       return result;
    }
 
-   void DXShaderFileLoader::unload(DXVertexShader& shader)
+   void DXShaderFileLoader::unload(DXVertexShader& data)
    {
-      m_loader.unload(shader);
+      m_loader.unload(data);
    }
 
-   void DXShaderFileLoader::unload(DXPixelShader& shader)
+   void DXShaderFileLoader::unload(DXPixelShader& data)
    {
-      m_loader.unload(shader);
+      m_loader.unload(data);
    }
 }

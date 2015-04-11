@@ -1,0 +1,108 @@
+//headers should be ordered alphabetically, if not REORDER THEM NOW!
+/******* precompiled header *******/
+#include <stdafx.h>
+/******* personal header *******/
+#include <Audio/AudioSystem.h>
+/******* C++ headers *******/
+/******* extra headers *******/
+#include <Util/Utility.h>
+/******* end headers *******/
+
+namespace Core
+{
+   bool AudioSystem::init()
+   {
+      CORE_INIT_START(AudioSystem);
+
+      m_channel = nullptr;
+      m_musicPlaying = HSound{};
+      
+      CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
+      if( CORE_STATUS_OK )
+      {
+         CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
+         CORE_STATUS_AND(sounds.init(m_system, FmodSound{nullptr}));
+      }
+
+      CORE_INIT_END(AudioSystem);
+   }
+
+   bool AudioSystem::shutdown()
+   {
+      CORE_SHUTDOWN_START(AudioSystem);
+
+      if( m_channel != nullptr )
+      {
+         CORE_STATUS_AND(m_channel->stop() == FMOD_OK);
+         m_channel = nullptr;
+      }
+      CORE_STATUS_AND(sounds.shutdown());
+      
+      CORE_STATUS_AND(m_system->close() == FMOD_OK);
+      CORE_STATUS_AND(m_system->release() == FMOD_OK);
+
+      CORE_SHUTDOWN_END(AudioSystem);
+   }
+
+   bool AudioSystem::update()
+   {
+      FMOD_RESULT result = m_system->update();
+      if( result == FMOD_OK && m_channel != nullptr )
+      {
+         bool playing = false;
+         result = m_channel->isPlaying(&playing);
+         if( !playing )
+         {
+            m_channel = nullptr;
+            playMusic(m_musicPlaying);
+         }
+      }
+      return (result == FMOD_OK);
+   }
+
+   bool isLoaded(std::vector<FMOD::Sound*>& list, void* snd)
+   {
+      for( auto* ptr : list )
+      {
+         if( ptr == snd )
+         {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   void AudioSystem::playSfx(HSound handle)
+   {
+      if( !handle.isNull() )
+      {
+         auto sound = sounds.getData(handle);
+         FMOD::Channel* channel = nullptr;
+         m_system->playSound(sound.sound, nullptr, false, &channel);
+         channel->setVolume(0.5f);
+      }
+   }
+
+   void AudioSystem::playMusic(HSound handle)
+   {
+      if( !handle.isNull() )
+      {
+         auto sound = sounds.getData(handle);
+         if( m_channel != nullptr )
+         {
+            m_channel->stop();
+         }
+         m_musicPlaying = handle;
+         m_system->playSound(sound.sound, nullptr, false, &m_channel);
+      }
+   }
+
+   void AudioSystem::stopMusic()
+   {
+      if( m_channel != nullptr )
+      {
+         m_channel->stop();
+         m_channel = nullptr;
+      }
+   }
+}

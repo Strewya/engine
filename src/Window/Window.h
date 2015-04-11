@@ -4,12 +4,12 @@
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <atomic>
 #include <string>
 #include <vector>
 /******* common headers *******/
 #include <Window/myWindows.h>
 /******* extra headers *******/
-#include <Util/Clock.h>
 #include <Window/GamepadHandler.h>
 #include <Window/KeyboardHandler.h>
 #include <Window/MouseHandler.h>
@@ -37,7 +37,7 @@ namespace Core
    class Window
    {
    public:
-      //all platform part
+      //generic part
       void showMessagebox(const char* title, const char* text);
       void resize(uint32_t x, uint32_t y);
       void move(int32_t x, int32_t y);
@@ -95,11 +95,8 @@ namespace Core
       void processFileChanges();
       void calculateClientRect(uint32_t& outXSize, uint32_t& outYSize);
 
-      Clock m_clock;
-
-      GamepadHandler m_gamepadHandler;
-      MouseHandler m_mouseHandler;
-      KeyboardHandler m_keyboardHandler;
+      std::string m_class;
+      std::string m_title;
 
       DWORD m_trackedChanges;
       int32_t m_xPos;
@@ -111,11 +108,10 @@ namespace Core
       uint32_t m_extendedStyle;
       uint32_t m_minFileChangeDelay;
       uint32_t m_fileChangeDelay;
-      uint32_t m_headIndex;
-      uint32_t m_tailIndex;
       const uint32_t m_eventQueueSize;
 
       HWND m_hwnd;
+      HWND m_console;
 
       bool m_fullscreen;
       bool m_showCursor;
@@ -123,35 +119,14 @@ namespace Core
       bool m_relativeMouse;
       bool m_isRunning;
 
-      std::string m_class;
-      std::string m_title;
-      std::string m_resourcesDirectory;
+      GamepadHandler m_gamepadHandler;
+      MouseHandler m_mouseHandler;
+      KeyboardHandler m_keyboardHandler;
 
+      std::atomic<uint32_t> m_headIndex;
+      std::atomic<uint32_t> m_tailIndex;
       std::vector<WindowEvent> m_events;
 
-
-      struct FileChangeInfo
-      {
-         enum State
-         {
-            UNUSED,
-            EVENT_PENDING,
-            READ_PENDING
-         };
-         FileChangeInfo(uint32_t index)
-            : m_timestamp(0), m_action(0), m_index(index), m_filename(), m_state(UNUSED)
-         {
-         }
-
-         uint64_t m_timestamp;
-         DWORD m_action;
-         uint32_t m_index;
-         State m_state;
-         std::string m_filename;
-      };
-
-      std::vector<FileChangeInfo> m_fileChanges;
-      uint32_t m_nextFreeSlot;
       CReadDirectoryChanges m_monitor;
    };
 }

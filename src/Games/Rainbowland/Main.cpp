@@ -5,9 +5,11 @@
 #include <Games/Rainbowland/Main.h>
 /******* C++ headers *******/
 /******* extra headers *******/
+#include <Games/Rainbowland/LoadGameResources.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Mesh/Mesh.h>
 #include <Graphics/Vertex.h>
+#include <Input/Keyboard.h>
 #include <Util/Cache.h>
 #include <Util/Color.h>
 #include <Util/Transform.h>
@@ -21,7 +23,11 @@ namespace Core
    {
       CORE_SHUTDOWN_START(Rainbowland);
 
+      unloadGameResources(systems, assets);
+      
+      CORE_STATUS_AND(inputSystem.shutdown());
       CORE_STATUS_AND(graphicsSystem.shutdown());
+      CORE_STATUS_AND(audioSystem.shutdown());
 
       CORE_SHUTDOWN_END(Rainbowland);
    }
@@ -37,17 +43,17 @@ namespace Core
 
       //window.setFullscreen(true);
 
-      CORE_STATUS_AND(graphicsSystem.init(window, {1200, 900}));
+      CORE_STATUS_AND(audioSystem.init());
+      CORE_STATUS_AND(graphicsSystem.init(window));
+      CORE_STATUS_AND(inputSystem.init(window));
 
-      textureAtlasHandle = graphicsSystem.textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
-      mainVSHandle = graphicsSystem.shaders.loadVertexShaderFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), HealthVertex::getDescription());
-      mainPSHandle = graphicsSystem.shaders.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
-      healthPSHandle = graphicsSystem.shaders.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
-
-      CORE_STATUS_AND(textureAtlasHandle.isNull() == false);
-      CORE_STATUS_AND(mainVSHandle.isNull() == false);
-      CORE_STATUS_AND(mainPSHandle.isNull() == false);
-      CORE_STATUS_AND(healthPSHandle.isNull() == false);
+      systems.audio = &audioSystem;
+      systems.gfx = &graphicsSystem;
+      systems.input = &inputSystem;
+      
+      assets = loadGameResources(systems);
+      
+      CORE_STATUS_AND(checkGameResourcesLoaded(assets));
 
       CORE_INIT_END(Rainbowland);
    }
@@ -56,29 +62,33 @@ namespace Core
    {
       bool running = true;
 
+      inputSystem.update();
+
+      auto events = inputSystem.getEvents();
+      for( auto& e : events )
+      {
+         switch( e.type )
+         {
+            case WE_KEYBOARDKEY:
+            {
+               switch( e.keyboard.key.id )
+               {
+                  case Keyboard::Escape:
+                  {
+                     running = false;
+                  } break;
+               }
+            } break;
+         }
+      }
+
       return running;
    }
 
    void Game::tickRender(uint64_t updateTime)
    {
-      struct Dude
-      {
-         Transform transform;
-         struct VisualPart
-         {
-            Color color;
-            struct MeshId
-            {
-               int id;
-            } meshId;
-         } visualPart;
-      } guy;
-
-      Mesh mesh = makeSolidQuad({}, {1, 1}, textureAtlasHandle, mainVSHandle, mainPSHandle);
-      mesh.vertices[0].textureUV = {0, 0};
-      mesh.vertices[1].textureUV = {1, 0};
-      mesh.vertices[2].textureUV = {0, 1};
-      mesh.vertices[3].textureUV = {1, 1};
+      Mesh atlas = makeTexturedQuad({}, {1, 1}, assets.atlas, {0, 0}, {1, 1}, assets.mainVS, assets.mainPS);
+      Mesh bgr = makeTexturedQuad({}, {1, 1}, assets.background, {0, 0}, {1, 1}, assets.mainVS, assets.mainPS);
 
       Camera camera;
       camera.setPosition({0, 0, -10});
@@ -89,24 +99,10 @@ namespace Core
       graphicsSystem.applyCamera(camera);
       
       //graphicsSystem.renderer.setCulling(true);
-      //graphicsSystem.renderer.setTransparency(false);
-      /*
-      graphicsSystem.renderer.setTexture(graphicsSystem.textures.getData(textureAtlasHandle));
-      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainVSHandle));
-      graphicsSystem.renderer.setShader(graphicsSystem.shaders.getData(mainPSHandle));
-      graphicsSystem.renderer.setVertexTopology(TriangleList);
-      graphicsSystem.renderer.render(Transform{}, Color{}, mesh.vertices, mesh.indices);
-      */
-      graphicsSystem.renderMesh(Transform{}, Color{}, mesh);
+      graphicsSystem.renderer.setTransparency(true);
+
+      graphicsSystem.renderMesh(Transform{{}, {1, 1}}, Color{}, atlas);
       
-      /*
-      auto& mesh = m_meshStore.getMesh(guy.visualPart.meshId);
-      m_gfxProxy.renderMesh(guy.transform, guy.color, mesh);
-         m_graphicsSystem.setTexture(mesh.textureId);
-         m_graphicsSystem.setShader(mesh.shaderId);
-         m_graphicsSystem.setBlendMode(mesh.blendModeId);
-         m_graphicsSystem.renderMesh(guy.transform, guy.color, mesh.vertices, mesh.indices);
-      */
       graphicsSystem.present();
    }
 }

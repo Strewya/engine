@@ -1,9 +1,10 @@
 #pragma once
 /********************************************
-*  contents:   HVertexShader, HPixelShader
+*  contents:   HSound
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
@@ -12,9 +13,6 @@
 
 namespace Core
 {
-   struct tag_DXVertexShader;
-   typedef Handle<tag_DXVertexShader> HVertexShader;
-
-   struct tag_DXPixelShader;
-   typedef Handle<tag_DXPixelShader> HPixelShader;
+   struct tag_FmodSound;
+   typedef Handle<tag_FmodSound> HSound;
 }

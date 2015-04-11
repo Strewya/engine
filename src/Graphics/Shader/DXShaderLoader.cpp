@@ -31,17 +31,17 @@ namespace Core
       CORE_SHUTDOWN_END(DXShaderLoader);
    }
 
-   DXVertexShader DXShaderLoader::loadVertexShader(InputLayout layout, const char* vsBuffer, uint32_t vsSize) const
+   DXVertexShader DXShaderLoader::loadVertexShader(InputLayout layout, const char* buffer, uint32_t bufferSize) const
    {
       DXVertexShader result{nullptr, nullptr};
-      if( vsBuffer != nullptr && vsSize > 0 )
+      if( buffer != nullptr && bufferSize > 0 )
       {
-         HRESULT hr = m_dev->CreateVertexShader(vsBuffer, vsSize, nullptr, &result.vertex);
+         HRESULT hr = m_dev->CreateVertexShader(buffer, bufferSize, nullptr, &result.vertex);
          if( SUCCEEDED(hr) )
          {
             if( !layout.empty() )
             {
-               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), vsBuffer, vsSize, &result.inputLayout);
+               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), buffer, bufferSize, &result.inputLayout);
                if( FAILED(hr) )
                {
                   CORE_INFO("Failed to create input layout for vertex shader");
@@ -64,12 +64,12 @@ namespace Core
       return result;
    }
 
-   DXPixelShader DXShaderLoader::loadPixelShader(const char* shaderBuffer, uint32_t shaderSize) const
+   DXPixelShader DXShaderLoader::loadPixelShader(const char* buffer, uint32_t bufferSize) const
    {
       DXPixelShader result{nullptr};
-      if( shaderBuffer != nullptr && shaderSize > 0 )
+      if( buffer != nullptr && bufferSize > 0 )
       {
-         HRESULT hr = m_dev->CreatePixelShader(shaderBuffer, shaderSize, nullptr, &result.pixel);
+         HRESULT hr = m_dev->CreatePixelShader(buffer, bufferSize, nullptr, &result.pixel);
          if( FAILED(hr) )
          {
             CORE_INFO("Failed to create pixel shader");
@@ -82,14 +82,14 @@ namespace Core
       return result;
    }
 
-   void DXShaderLoader::unload(DXVertexShader& shader)
+   void DXShaderLoader::unload(DXVertexShader& data)
    {
-      safeRelease(shader.inputLayout);
-      safeRelease(shader.vertex);
+      safeRelease(data.inputLayout);
+      safeRelease(data.vertex);
    }
 
-   void DXShaderLoader::unload(DXPixelShader& shader)
+   void DXShaderLoader::unload(DXPixelShader& data)
    {
-      safeRelease(shader.pixel);
+      safeRelease(data.pixel);
    }
 }

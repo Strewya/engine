@@ -238,7 +238,11 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp" />
+    <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp" />
+    <ClCompile Include="..\..\..\src\Audio\FmodSoundManager.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\LoadGameResources.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\DXRenderer.cpp" />
@@ -251,6 +255,7 @@
     <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\Gamepad.cpp" />
+    <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
     <ClCompile Include="..\..\..\src\Input\Keyboard.cpp" />
     <ClCompile Include="..\..\..\src\Input\Mouse.cpp" />
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
@@ -261,6 +266,7 @@
     <ClCompile Include="..\..\..\src\Util\Color.cpp" />
     <ClCompile Include="..\..\..\src\Util\PeriodicTimer.cpp" />
     <ClCompile Include="..\..\..\src\Util\CooldownTimer.cpp" />
+    <ClCompile Include="..\..\..\src\Util\Rect.cpp" />
     <ClCompile Include="..\..\..\src\Util\Timer.cpp" />
     <ClCompile Include="..\..\..\src\Util\Clock.cpp" />
     <ClCompile Include="..\..\..\src\Util\Transform.cpp" />
@@ -277,8 +283,17 @@
     <ClCompile Include="..\..\..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\src\Audio\AudioSystem.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodInclude.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodSound.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundFileLoader.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundHandle.h" />
+    <ClInclude Include="..\..\..\src\Audio\FmodSoundManager.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameList.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameResources.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameSystems.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\LoadGameResources.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Main.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
@@ -299,6 +314,7 @@
     <ClInclude Include="..\..\..\src\Graphics\Typedefs.h" />
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h" />
     <ClInclude Include="..\..\..\src\Input\Gamepad.h" />
+    <ClInclude Include="..\..\..\src\Input\InputSystem.h" />
     <ClInclude Include="..\..\..\src\Input\Keyboard.h" />
     <ClInclude Include="..\..\..\src\Input\Mouse.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
@@ -308,6 +324,7 @@
     <ClInclude Include="..\..\..\src\Util\NameCache.h" />
     <ClInclude Include="..\..\..\src\Util\PeriodicTimer.h" />
     <ClInclude Include="..\..\..\src\Util\CooldownTimer.h" />
+    <ClInclude Include="..\..\..\src\Util\Rect.h" />
     <ClInclude Include="..\..\..\src\Util\Timer.h" />
     <ClInclude Include="..\..\..\src\Util\Clock.h" />
     <ClInclude Include="..\..\..\src\Util\TimeUnitConversions.h" />
@@ -328,9 +345,6 @@
     <ClInclude Include="..\..\..\src\Window\Window.h" />
     <ClInclude Include="..\..\..\src\Window\WindowClass.h" />
     <ClInclude Include="..\..\..\src\Window\WindowEvent.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\..\src\Window\Window.pkg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

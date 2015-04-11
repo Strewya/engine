@@ -23,11 +23,11 @@ namespace Core
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXVertexShader loadVertexShader(const std::string& filename, InputLayout ied) const;
+      DXVertexShader loadVertexShader(const std::string& filename, InputLayout layout) const;
       DXPixelShader loadPixelShader(const std::string& filename) const;
 
-      void unload(DXVertexShader& shader);
-      void unload(DXPixelShader& shader);
+      void unload(DXVertexShader& data);
+      void unload(DXPixelShader& data);
 
    private:
       DXShaderLoader m_loader;

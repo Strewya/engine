@@ -1,20 +1,21 @@
 #pragma once
 /********************************************
-*  contents:   HVertexShader, HPixelShader
+*  contents:   FmodSound
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 /******* common headers *******/
+#include <Audio/FmodInclude.h>
 /******* extra headers *******/
-#include <Util/Handle.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   struct tag_DXVertexShader;
-   typedef Handle<tag_DXVertexShader> HVertexShader;
-
-   struct tag_DXPixelShader;
-   typedef Handle<tag_DXPixelShader> HPixelShader;
+   class FmodSound
+   {
+   public:
+      FMOD::Sound* sound;
+   };
 }

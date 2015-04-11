@@ -22,7 +22,7 @@ namespace Core
       bool init(ID3D11Device* device, DXVertexShader defaultVertexShader, DXPixelShader defaultPixelShader);
       bool shutdown();
 
-      HVertexShader loadVertexShaderFromFile(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> ied);
+      HVertexShader loadVertexShaderFromFile(const std::string& filename, std::vector<D3D11_INPUT_ELEMENT_DESC> layout);
       HPixelShader loadPixelShaderFromFile(const std::string& filename);
 
       DXVertexShader& getData(HVertexShader handle);

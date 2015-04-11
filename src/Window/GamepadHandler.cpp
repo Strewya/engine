@@ -26,33 +26,33 @@ namespace Core
    void writeButton(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint8_t button, bool isDown)
    {
       events.emplace_back();
-      events.back().m_type = WE_GAMEPADBUTTON;
-      events.back().m_timestamp = timestamp;
-      events.back().m_gamepadButton.m_gamepad = id;
-      events.back().m_gamepadButton.m_button = button;
-      events.back().m_gamepadButton.m_isDown = isDown;
+      events.back().type = WE_GAMEPADBUTTON;
+      events.back().timestamp = timestamp;
+      events.back().gamepad.id = id;
+      events.back().gamepad.button.id = button;
+      events.back().gamepad.button.isDown = isDown;
    }
 
    void writeAxis(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint8_t axis, float x, float y, float mag, float norm)
    {
       events.emplace_back();
-      events.back().m_type = WE_GAMEPADAXIS;
-      events.back().m_timestamp = timestamp;
-      events.back().m_gamepadAxis.m_gamepad = id;
-      events.back().m_gamepadAxis.m_axis = axis;
-      events.back().m_gamepadAxis.m_x = x;
-      events.back().m_gamepadAxis.m_y = y;
-      events.back().m_gamepadAxis.m_magnitude = mag;
-      events.back().m_gamepadAxis.m_normalizedMagnitude = norm;
+      events.back().type = WE_GAMEPADAXIS;
+      events.back().timestamp = timestamp;
+      events.back().gamepad.id = id;
+      events.back().gamepad.axis.id = axis;
+      events.back().gamepad.axis.x = x;
+      events.back().gamepad.axis.y = y;
+      events.back().gamepad.axis.magnitude = mag;
+      events.back().gamepad.axis.normalized = norm;
    }
 
    void writeConnection(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, bool connected)
    {
       events.emplace_back();
-      events.back().m_type = WE_GAMEPADCONNECTION;
-      events.back().m_timestamp = timestamp;
-      events.back().m_gamepadConnection.m_gamepad = id;
-      events.back().m_gamepadConnection.m_isConnected = connected;
+      events.back().type = WE_GAMEPADCONNECTION;
+      events.back().timestamp = timestamp;
+      events.back().gamepad.id = id;
+      events.back().gamepad.connection.status = connected;
    }
 
    void handleButton(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, XINPUT_STATE& oldState, XINPUT_STATE& newState, uint32_t xiButton, Gamepad::Key key)

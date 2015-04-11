@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 /*** extra headers ***/
+#include <Util/Clock.h>
 #include <Util/TimeUnitConversions.h>
 #include <Util/Utility.h>
 #include <Util/Vec2.h>
@@ -56,22 +57,14 @@ namespace Core
       m_exitCode(0), m_style(0), m_extendedStyle(0),
       m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
       m_headIndex(1), m_tailIndex(0), m_eventQueueSize(1024),
-      m_hwnd(nullptr),
+      m_hwnd(nullptr), m_console(nullptr),
       m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false),
       m_isRunning(true),
-      m_class(title), m_title(title), m_resourcesDirectory(),
-      m_nextFreeSlot(0)
+      m_class(title), m_title(title)
    {
       m_events.resize(m_eventQueueSize);
 
       setFullscreen(m_fullscreen);
-
-      uint8_t count = 32;
-      m_fileChanges.reserve(count);
-      for( auto i = 0; i < count; ++i )
-      {
-         m_fileChanges.emplace_back(FileChangeInfo(i));
-      }
    }
 
    Window::~Window()
@@ -117,6 +110,12 @@ namespace Core
       InvalidateRect(m_hwnd, nullptr, true);
 #ifndef _DEBUG
       PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+      if( m_console )
+      {
+         closeConsole();
+      }
+#else
+      SetForegroundWindow(m_console);
 #endif
    }
 
@@ -150,8 +149,7 @@ namespace Core
             writeEvent();
          }
       }
-      m_clock.update();
-      auto events = m_gamepadHandler.handle(m_clock.getCurrentMicros());
+      auto events = m_gamepadHandler.handle(Clock::getRealTimeMicros());
       for( auto event : events )
       {
          auto& we = newEvent();
@@ -221,18 +219,19 @@ namespace Core
       };
       SetConsoleTitle(name);
       Sleep(40);
-      HWND hConsole = FindWindow(nullptr, name);
+      m_console = FindWindow(nullptr, name);
       RECT consoleSize;
-      GetWindowRect(hConsole, &consoleSize);
+      GetWindowRect(m_console, &consoleSize);
       auto x = consoleSize.right - consoleSize.left;
       auto y = consoleSize.bottom - consoleSize.top;
-      SetWindowPos(hConsole, 0, xPos, yPos, x, y, 0); //SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW
+      SetWindowPos(m_console, 0, xPos, yPos, x, y, 0); //SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW
       SetForegroundWindow(m_hwnd);
    }
 
    void Window::closeConsole()
    {
       FreeConsole();
+      m_console = nullptr;
    }
 
    LRESULT CALLBACK Window::messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
@@ -272,7 +271,7 @@ namespace Core
       {
          case WM_CLOSE:
          {
-            we.m_type = WindowEventType::WE_CLOSE;
+            we.type = WindowEventType::WE_CLOSE;
             result = notProcessed;
          } break;
 
@@ -296,11 +295,11 @@ namespace Core
          {
             if( LOWORD(wParam) == WA_INACTIVE )
             {
-               we.m_type = WindowEventType::WE_LOSTFOCUS;
+               we.type = WindowEventType::WE_LOSTFOCUS;
             }
             else
             {
-               we.m_type = WindowEventType::WE_GAINFOCUS;
+               we.type = WindowEventType::WE_GAINFOCUS;
                lockCursor(m_lockCursor);
                showCursor(m_showCursor);
             }

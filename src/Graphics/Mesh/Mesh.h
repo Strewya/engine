@@ -11,7 +11,7 @@
 #include <Graphics/Shader/DXShaderHandle.h>
 #include <Graphics/Texture/DXTextureHandle.h>
 #include <Graphics/Typedefs.h>
-#include <Util/Vec2.h>
+#include <Util/Vec2Fwd.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -29,6 +29,7 @@ namespace Core
       IndexBuffer indices;
    };
    
-   Mesh makeSolidQuad(Vec2f pos, Vec2f hs, HTexture texture, HVertexShader vshader, HPixelShader pshader);
-
+   Mesh makeSolidQuad(Vec2f pos, Vec2f hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeTexturedQuad(Vec2f pos, Vec2f hs, HTexture texture, Vec2f topLeftUV, Vec2f botRightUV, HVertexShader vshader, HPixelShader pshader);
+   
 }

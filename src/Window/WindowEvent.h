@@ -35,59 +35,76 @@ namespace Core
       WE_LASTEVENT
    };
 
+   struct ButtonKey
+   {
+      uint8_t id;
+      bool isDown;
+   };
+
+   typedef ButtonKey KeyboardKey;
+
    struct KeyboardEvent
    {
-      uint8_t m_keyCode;
-      uint8_t m_repeat;
-      bool m_isDown;
-      bool m_previouslyDown;
-
+      KeyboardKey key;
+      uint8_t repeatCount;
+      bool firstTimeDown;
    };
 
-   struct MouseMoveEvent
+   struct MousePosition
    {
-      int32_t m_x;
-      int32_t m_y;
-      bool m_isRelative;
+      int32_t x;
+      int32_t y;
    };
 
-   struct MouseButtonEvent
+   struct MouseWheel
    {
-      int32_t m_x;
-      int32_t m_y;
-      uint8_t m_button;
-      uint8_t m_clicks;
-      bool m_isDown;
+      int32_t scroll;
    };
 
-   struct MouseWheelEvent
+   struct MouseMove
    {
-      int32_t m_x;
-      int32_t m_y;
-      int32_t m_scroll;
+      bool relative;
+   };
+
+   typedef ButtonKey MouseButton;
+
+
+   struct MouseEvent
+   {
+      MousePosition position;
+      union
+      {
+         MouseButton button;
+         MouseWheel wheel;
+         MouseMove move;
+      };
    };
 
    struct GamepadConnection
    {
-      uint8_t m_gamepad;
-      bool m_isConnected;
+      bool status;
    };
 
-   struct GamepadButtonEvent
+   struct GamepadAxis
    {
-      uint8_t m_gamepad;
-      uint8_t m_button;
-      bool m_isDown;
+      float x;
+      float y;
+      float magnitude;
+      float normalized;
+      uint32_t id;
    };
 
-   struct GamepadAxisEvent
+   typedef ButtonKey GamepadButton;
+
+   struct GamepadEvent
    {
-      float m_x;
-      float m_y;
-      float m_magnitude;
-      float m_normalizedMagnitude;
-      uint8_t m_gamepad;
-      uint8_t m_axis;
+      uint32_t id;
+      union
+      {
+         GamepadButton button;
+         GamepadConnection connection;
+         GamepadAxis axis;
+      };
    };
 
    enum FileChangeType
@@ -100,28 +117,25 @@ namespace Core
       FILE_BADDATA
    };
 
+   static const uint32_t FilenameStringSize = 50;
    struct FileChangeEvent
    {
-      uint32_t m_index;
+      FileChangeType action;
+      char filename[FilenameStringSize + 1];
    };
-
 
 
    class WindowEvent
    {
    public:
-      uint32_t m_type;
-      uint64_t m_timestamp;
+      uint32_t type;
+      uint64_t timestamp;
       union
       {
-         KeyboardEvent m_keyboard;
-         MouseMoveEvent m_mouseMove;
-         MouseButtonEvent m_mouseButton;
-         MouseWheelEvent m_mouseWheel;
-         FileChangeEvent m_fileChange;
-         GamepadButtonEvent m_gamepadButton;
-         GamepadAxisEvent m_gamepadAxis;
-         GamepadConnection m_gamepadConnection;
+         KeyboardEvent keyboard;
+         MouseEvent mouse;
+         GamepadEvent gamepad;
+         FileChangeEvent fileChange;
       };
    };
 }

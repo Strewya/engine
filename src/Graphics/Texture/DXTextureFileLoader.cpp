@@ -63,10 +63,10 @@ namespace Core
       return result;
    }
 
-   void DXTextureFileLoader::unload(DXTexture& texture) const
+   void DXTextureFileLoader::unload(DXTexture& data) const
    {
-      safeRelease(texture.shaderResourceView);
-      texture.width = 0;
-      texture.height = 0;
+      safeRelease(data.shaderResourceView);
+      data.width = 0;
+      data.height = 0;
    }
 }

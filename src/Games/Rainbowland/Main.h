@@ -7,7 +7,11 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
+#include <Audio/AudioSystem.h>
+#include <Games/Rainbowland/GameResources.h>
+#include <Games/Rainbowland/GameSystems.h>
 #include <Graphics/GraphicsSystem.h>
+#include <Input/InputSystem.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -19,12 +23,14 @@ namespace Core
    public:
       Window* window;
 
+      AudioSystem audioSystem;
       GraphicsSystem graphicsSystem;
+      InputSystem inputSystem;
 
-      HTexture textureAtlasHandle;
-      HVertexShader mainVSHandle;
-      HPixelShader mainPSHandle;
-      HPixelShader healthPSHandle;
+      GameResources assets;
+      GameSystems systems;
+
+
 
       bool init(Window& window);
       bool shutdown();

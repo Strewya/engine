@@ -12,6 +12,7 @@
 #include <Graphics/DXRenderer.h>
 #include <Graphics/Shader/DXShaderManager.h>
 #include <Graphics/Texture/DXTextureManager.h>
+#include <Graphics/Typedefs.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -29,7 +30,7 @@ namespace Core
    class GraphicsSystem
    {
    public:
-      bool init(Window& window, Vec2i backbufferSize);
+      bool init(Window& window);
       bool shutdown();
 
       void begin();
@@ -55,8 +56,6 @@ namespace Core
       bool initViewport();
       bool initSamplerState();
       bool initDepthBuffer();
-
-      ID3D11InputLayout* createInputLayout(std::vector<D3D11_INPUT_ELEMENT_DESC> layoutDesc);
 
       D3DXCOLOR m_backgroundColor;
       Vec2i m_backbufferSize;
