@@ -48,7 +48,7 @@ namespace Core
       | |
       2-3
       */
-      return
+      Mesh mesh
       {
          vshader, pshader,
          texture,
@@ -67,6 +67,7 @@ namespace Core
             3, 2, 0
          }
       };
+      return mesh;
    }
 
 }

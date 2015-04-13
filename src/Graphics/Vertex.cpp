@@ -20,7 +20,7 @@ namespace Core
    }
 
    DefaultVertex::DefaultVertex(Vec3f position, Color color, Vec2f textureUV)
-      : position(position.x, position.x, position.z, 0),
+      : position(position.x, position.y, position.z, 0),
       diffuse(color.r, color.g, color.b, color.a),
       textureUV(textureUV.x, textureUV.y)
    {

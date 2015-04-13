@@ -99,9 +99,9 @@ namespace Core
       graphicsSystem.applyCamera(camera);
       
       //graphicsSystem.renderer.setCulling(true);
-      graphicsSystem.renderer.setTransparency(true);
+      //graphicsSystem.renderer.setTransparency(true);
 
-      graphicsSystem.renderMesh(Transform{{}, {1, 1}}, Color{}, atlas);
+      graphicsSystem.renderMesh(Transform{}, Color{}, bgr);
       
       graphicsSystem.present();
    }
