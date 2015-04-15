@@ -8,7 +8,7 @@
 /******* extra headers *******/
 #include <Audio/FmodSoundHandle.h>
 #include <Graphics/Texture/DXTextureHandle.h>
-#include <Graphics/Shader/DXShaderHandle.h>
+#include <Graphics/Shader/ShaderHandle.h>
 /******* end header inclusion *******/
 
 namespace Core

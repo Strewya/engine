@@ -67,20 +67,11 @@
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp">
       <Filter>Code\Framework\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.cpp">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderManager.cpp">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.cpp">
       <Filter>Code\Framework\Graphics\Texture</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureManager.cpp">
       <Filter>Code\Framework\Graphics\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Shader\DXShaderLoader.cpp">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Utility.cpp">
       <Filter>Code\Framework\Util</Filter>
@@ -117,6 +108,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp">
       <Filter>Code\Framework\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderFileLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderManager.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderFileLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderManager.cpp">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphics\Shader\FileLoader.cpp">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,15 +207,6 @@
     <ClInclude Include="..\..\..\src\Graphics\Vertex.h">
       <Filter>Code\Framework\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShader.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderFileLoader.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderManager.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTexture.h">
       <Filter>Code\Framework\Graphics\Texture</Filter>
     </ClInclude>
@@ -213,23 +216,11 @@
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureManager.h">
       <Filter>Code\Framework\Graphics\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderLoader.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultPixelShader.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\defaultVertexShader.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Mesh\Mesh.h">
       <Filter>Code\Framework\Graphics\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\Transform.h">
       <Filter>Code\Framework\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\Graphics\Shader\DXShaderHandle.h">
-      <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\DXTextureHandle.h">
       <Filter>Code\Framework\Graphics\Texture</Filter>
@@ -306,6 +297,42 @@
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameSystems.h">
       <Filter>Code\Games\Rainbowland</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\defaultVertexShader.h">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\defaultPixelShader.h">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\VertexShader.h">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderFileLoader.h">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderLoader.h">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderManager.h">
+      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\PixelShader.h">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderFileLoader.h">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderLoader.h">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderManager.h">
+      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\FileLoader.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Graphics\Shader\ShaderHandle.h">
+      <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Code">
@@ -358,6 +385,12 @@
     </Filter>
     <Filter Include="Code\Framework\Audio">
       <UniqueIdentifier>{38769727-8ce4-4b23-bd9f-9b3654c30691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Graphics\Shader\Pixel">
+      <UniqueIdentifier>{79a75274-7949-4131-a3d1-ecae29af3d78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\Framework\Graphics\Shader\Vertex">
+      <UniqueIdentifier>{a60334bc-2b56-4247-a4e5-25bf1bcb9c69}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

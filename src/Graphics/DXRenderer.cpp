@@ -6,7 +6,8 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Util/Color.h>
-#include <Graphics/Shader/DXShader.h>
+#include <Graphics/Shader/Vertex/VertexShader.h>
+#include <Graphics/Shader/Pixel/PixelShader.h>
 #include <Graphics/Texture/DXTexture.h>
 #include <Graphics/Vertex.h>
 #include <Util/Transform.h>
@@ -180,7 +181,7 @@ namespace Core
    //*****************************************************************
    //          SET SHADER - VERTEX
    //*****************************************************************
-   void DXRenderer::setShader(const DXVertexShader& shader)
+   void DXRenderer::setShader(const VertexShader& shader)
    {
       // INPUT LAYOUT
       if( m_inputLayout != shader.inputLayout )
@@ -199,7 +200,7 @@ namespace Core
    //*****************************************************************
    //          SET SHADER - PIXEL
    //*****************************************************************
-   void DXRenderer::setShader(const DXPixelShader& shader)
+   void DXRenderer::setShader(const PixelShader& shader)
    {
       if( m_pixelShader != shader.pixel )
       {

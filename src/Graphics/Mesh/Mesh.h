@@ -8,7 +8,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Graphics/Shader/DXShaderHandle.h>
+#include <Graphics/Shader/ShaderHandle.h>
 #include <Graphics/Texture/DXTextureHandle.h>
 #include <Graphics/Typedefs.h>
 #include <Util/Vec2Fwd.h>

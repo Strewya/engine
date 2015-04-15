@@ -6,7 +6,8 @@
 /******* C++ headers *******/
 /******* extra headers *******/
 #include <Graphics/Mesh/Mesh.h>
-#include <Graphics/Shader/DXShaderLoader.h>
+#include <Graphics/Shader/Vertex/VertexShaderLoader.h>
+#include <Graphics/Shader/Pixel/PixelShaderLoader.h>
 #include <Graphics/Camera.h>
 #include <Graphics/Vertex.h>
 #include <Util/Color.h>
@@ -63,27 +64,34 @@ namespace Core
          textureFileLoader.shutdown();
       }
 
-      DXShaderLoader shaderLoader;
-      if( shaderLoader.init(m_dev) )
+
+      VertexShader defaultVertexShader{nullptr, nullptr};
       {
-         DXVertexShader defaultVertexShader{nullptr, nullptr};
+         VertexShaderLoader shaderLoader;
+         if( shaderLoader.init(m_dev) )
          {
-#include <Graphics/Shader/defaultVertexShader.h>
+#include <Graphics/Shader/Vertex/defaultVertexShader.h>
 
-            defaultVertexShader = shaderLoader.loadVertexShader(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
+            defaultVertexShader = shaderLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
+            shaderLoader.shutdown();
          }
-
-         DXPixelShader defaultPixelShader{nullptr};
-         {
-#include <Graphics/Shader/defaultPixelShader.h>
-
-            defaultPixelShader = shaderLoader.loadPixelShader((const char*)g_PShader, sizeof(g_PShader));
-         }
-         shaderLoader.shutdown();
-
-         CORE_STATUS_AND(shaders.init(m_dev, defaultVertexShader, defaultPixelShader));
       }
 
+      PixelShader defaultPixelShader{nullptr};
+      {
+         PixelShaderLoader shaderLoader;
+         if( shaderLoader.init(m_dev) )
+         {
+#include <Graphics/Shader/Pixel/defaultPixelShader.h>
+
+            defaultPixelShader = shaderLoader.load((const char*)g_PShader, sizeof(g_PShader));
+            shaderLoader.shutdown();
+         }
+      }
+
+
+      CORE_STATUS_AND(vertexShaders.init(m_dev, defaultVertexShader));
+      CORE_STATUS_AND(pixelShaders.init(m_dev, defaultPixelShader));
       CORE_INIT_END(GraphicsSystem);
    }
 
@@ -94,9 +102,11 @@ namespace Core
    {
       CORE_SHUTDOWN_START(GraphicsSystem);
 
-      CORE_STATUS_AND(shaders.shutdown());
+      CORE_STATUS_AND(pixelShaders.shutdown());
+      CORE_STATUS_AND(vertexShaders.shutdown());
       CORE_STATUS_AND(textures.shutdown());
       CORE_STATUS_AND(renderer.shutdown());
+
       ID3D11Debug* debug = nullptr;
       HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
       for( auto** unknown : m_declaredObjects )
@@ -165,8 +175,8 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::renderMesh(Transform t, Color c, const Mesh& mesh)
    {
-      renderer.setShader(shaders.getData(mesh.vshader));
-      renderer.setShader(shaders.getData(mesh.pshader));
+      renderer.setShader(vertexShaders.getData(mesh.vshader));
+      renderer.setShader(pixelShaders.getData(mesh.pshader));
       renderer.setTexture(textures.getData(mesh.texture));
       renderer.setVertexTopology(mesh.topology);
       renderer.render(t, c, mesh.vertices, mesh.indices);

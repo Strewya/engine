@@ -58,7 +58,7 @@ namespace Core
       textureUV.y = v;
    }
 
-   std::vector<D3D11_INPUT_ELEMENT_DESC> DefaultVertex::getDescription()
+   InputLayout DefaultVertex::getDescription()
    {
       return
       {
@@ -85,7 +85,7 @@ namespace Core
       health.y = 0;
    }
 
-   std::vector<D3D11_INPUT_ELEMENT_DESC> HealthVertex::getDescription()
+   InputLayout HealthVertex::getDescription()
    {
       auto parentInputLayout = DefaultVertex::getDescription();
       parentInputLayout.push_back({"HEALTH", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0});

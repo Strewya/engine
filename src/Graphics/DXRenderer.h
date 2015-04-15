@@ -15,8 +15,8 @@
 namespace Core
 {
    class DXTexture;
-   class DXVertexShader;
-   class DXPixelShader;
+   class VertexShader;
+   class PixelShader;
    class Transform;
    class Color;
 
@@ -42,8 +42,8 @@ namespace Core
 
       void setTexture(const DXTexture& texture);
       void setVertexTopology(VertexTopology topology);
-      void setShader(const DXVertexShader& shader);
-      void setShader(const DXPixelShader& shader);
+      void setShader(const VertexShader& shader);
+      void setShader(const PixelShader& shader);
       void render(Transform transform, Color color, HealthVertexBuffer vertices, IndexBuffer indices);
 
    private:

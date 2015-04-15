@@ -1,27 +1,16 @@
 #pragma once
 /********************************************
-*  contents:   DXVertexShader, DXPixelShader
+*  contents:   File loading function
 *  usage:
 ********************************************/
 /******* C++ headers *******/
 #include <string>
+#include <vector>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXVertexShader
-   {
-   public:
-      ID3D11InputLayout* inputLayout;
-      ID3D11VertexShader* vertex;
-   };
-
-   class DXPixelShader
-   {
-   public:
-      ID3D11PixelShader* pixel;
-   };
+   bool loadFile(const std::string& filename, std::vector<char>& buffer);
 }

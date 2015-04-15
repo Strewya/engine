@@ -10,9 +10,10 @@
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
 #include <Graphics/DXRenderer.h>
-#include <Graphics/Shader/DXShaderManager.h>
-#include <Graphics/Texture/DXTextureManager.h>
 #include <Graphics/Typedefs.h>
+#include <Graphics/Shader/Pixel/PixelShaderManager.h>
+#include <Graphics/Shader/Vertex/VertexShaderManager.h>
+#include <Graphics/Texture/DXTextureManager.h>
 #include <Util/Vec2.h>
 /******* end header inclusion *******/
 
@@ -45,7 +46,8 @@ namespace Core
 
       DXRenderer renderer;
       DXTextureManager textures;
-      DXShaderManager shaders;
+      VertexShaderManager vertexShaders;
+      PixelShaderManager pixelShaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
 
    private:

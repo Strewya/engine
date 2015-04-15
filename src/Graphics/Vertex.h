@@ -8,6 +8,7 @@
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
+#include <Graphics/Typedefs.h>
 #include <Util/Vec2Fwd.h>
 #include <Util/Vec3Fwd.h>
 /******* end header inclusion *******/
@@ -32,7 +33,7 @@ namespace Core
       XMFLOAT4 diffuse;
       XMFLOAT2 textureUV;
 
-      static std::vector<D3D11_INPUT_ELEMENT_DESC> getDescription();
+      static InputLayout getDescription();
    };
 
    class HealthVertex : public DefaultVertex
@@ -44,6 +45,6 @@ namespace Core
 
       XMFLOAT2 health;
 
-      static std::vector<D3D11_INPUT_ELEMENT_DESC> getDescription();
+      static InputLayout getDescription();
    };
 }

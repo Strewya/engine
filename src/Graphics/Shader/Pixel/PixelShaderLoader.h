@@ -4,32 +4,32 @@
 *  usage:
 ********************************************/
 /******* C++ headers *******/
+#include <cstdint>
 #include <string>
 #include <vector>
 /******* common headers *******/
 #include <Graphics/DXInclude.h>
 /******* extra headers *******/
-#include <Graphics/Shader/DXShaderLoader.h>
+#include <Graphics/Typedefs.h>
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXVertexShader;
-   class DXPixelShader;
+   class PixelShader;
 
-   class DXShaderFileLoader
+   typedef std::vector<D3D11_INPUT_ELEMENT_DESC> InputLayout;
+
+   class PixelShaderLoader
    {
    public:
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXVertexShader loadVertexShader(const std::string& filename, InputLayout layout) const;
-      DXPixelShader loadPixelShader(const std::string& filename) const;
+      PixelShader load(const char* buffer, uint32_t bufferSize) const;
 
-      void unload(DXVertexShader& data);
-      void unload(DXPixelShader& data);
+      void unload(PixelShader& data);
 
    private:
-      DXShaderLoader m_loader;
+      ID3D11Device* m_dev;
    };
 }
