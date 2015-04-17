@@ -45,5 +45,6 @@ namespace Core
    void FmodSoundFileLoader::unload(FmodSound& sound) const
    {
       sound.sound->release();
+      sound.sound = nullptr;
    }
 }

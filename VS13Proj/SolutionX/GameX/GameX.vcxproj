@@ -240,7 +240,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp" />
     <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Audio\FmodSoundManager.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\LoadGameResources.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
@@ -251,12 +250,9 @@
     <ClCompile Include="..\..\..\src\Graphics\Shader\FileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderFileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderFileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.cpp" />
-    <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureManager.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Vertex.cpp" />
     <ClCompile Include="..\..\..\src\Input\Gamepad.cpp" />
     <ClCompile Include="..\..\..\src\Input\InputSystem.cpp" />
@@ -330,6 +326,7 @@
     <ClInclude Include="..\..\..\src\Util\Cache.h" />
     <ClInclude Include="..\..\..\src\Util\Color.h" />
     <ClInclude Include="..\..\..\src\Util\Handle.h" />
+    <ClInclude Include="..\..\..\src\Util\Manager.h" />
     <ClInclude Include="..\..\..\src\Util\NameCache.h" />
     <ClInclude Include="..\..\..\src\Util\PeriodicTimer.h" />
     <ClInclude Include="..\..\..\src\Util\CooldownTimer.h" />

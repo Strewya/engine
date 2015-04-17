@@ -17,5 +17,15 @@ namespace Core
    {
    public:
       FMOD::Sound* sound;
+
+      bool loaded()
+      {
+         return sound != nullptr;
+      }
+
+      bool unloaded()
+      {
+         return !loaded();
+      }
    };
 }

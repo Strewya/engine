@@ -56,42 +56,39 @@ namespace Core
 
       CORE_STATUS_AND(renderer.init(m_dev, m_devcon, m_samplerState));
 
-      DXTextureFileLoader textureFileLoader;
-      if( textureFileLoader.init(m_dev) )
+      CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
+      CORE_STATUS_AND(m_vsLoader.init(m_dev));
+      CORE_STATUS_AND(m_vsFileLoader.init(m_vsLoader));
+      CORE_STATUS_AND(m_psLoader.init(m_dev));
+      CORE_STATUS_AND(m_psFileLoader.init(m_psLoader));
+
+      if( CORE_STATUS_OK )
       {
-         auto defaultTexture = textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
-         CORE_STATUS_AND(textures.init(m_dev, defaultTexture));
-         textureFileLoader.shutdown();
+         auto defaultTexture = m_textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
+         CORE_STATUS_AND(textures.init(STR(DXTextureManager), m_textureFileLoader, defaultTexture));
       }
 
 
       VertexShader defaultVertexShader{nullptr, nullptr};
+      if( CORE_STATUS_OK )
       {
-         VertexShaderLoader shaderLoader;
-         if( shaderLoader.init(m_dev) )
-         {
 #include <Graphics/Shader/Vertex/defaultVertexShader.h>
 
-            defaultVertexShader = shaderLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
-            shaderLoader.shutdown();
-         }
+         defaultVertexShader = m_vsLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
       }
 
       PixelShader defaultPixelShader{nullptr};
+      if( CORE_STATUS_OK )
       {
-         PixelShaderLoader shaderLoader;
-         if( shaderLoader.init(m_dev) )
-         {
 #include <Graphics/Shader/Pixel/defaultPixelShader.h>
 
-            defaultPixelShader = shaderLoader.load((const char*)g_PShader, sizeof(g_PShader));
-            shaderLoader.shutdown();
-         }
+         defaultPixelShader = m_psLoader.load((const char*)g_PShader, sizeof(g_PShader));
       }
 
 
-      CORE_STATUS_AND(vertexShaders.init(m_dev, defaultVertexShader));
-      CORE_STATUS_AND(pixelShaders.init(m_dev, defaultPixelShader));
+
+      CORE_STATUS_AND(vertexShaders.init(STR(VertexShaderManager), m_vsFileLoader, defaultVertexShader));
+      CORE_STATUS_AND(pixelShaders.init(STR(PixelShaderManager), m_psFileLoader, defaultPixelShader));
       CORE_INIT_END(GraphicsSystem);
    }
 
@@ -105,6 +102,13 @@ namespace Core
       CORE_STATUS_AND(pixelShaders.shutdown());
       CORE_STATUS_AND(vertexShaders.shutdown());
       CORE_STATUS_AND(textures.shutdown());
+
+      CORE_STATUS_AND(m_psFileLoader.shutdown());
+      CORE_STATUS_AND(m_psLoader.shutdown());
+      CORE_STATUS_AND(m_vsFileLoader.shutdown());
+      CORE_STATUS_AND(m_vsLoader.shutdown());
+      CORE_STATUS_AND(m_textureFileLoader.shutdown());
+
       CORE_STATUS_AND(renderer.shutdown());
 
       ID3D11Debug* debug = nullptr;

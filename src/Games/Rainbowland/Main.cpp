@@ -38,7 +38,7 @@ namespace Core
 
       this->window = &window;
 
-      window.resize(MONITOR_RESOLUTION, MONITOR_RESOLUTION);
+      window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
       window.showCursor(true);
 
       //window.setFullscreen(true);
@@ -76,6 +76,11 @@ namespace Core
                   case Keyboard::Escape:
                   {
                      running = false;
+                  } break;
+                  case Keyboard::F1:
+                  {
+                     if(e.keyboard.firstTimeDown )
+                        window->showCursor(!window->isCursorShown());
                   } break;
                }
             } break;

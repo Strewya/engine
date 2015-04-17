@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
 #include <Graphics/Shader/Vertex/VertexShaderLoader.h>
 /******* end header inclusion *******/
@@ -19,7 +18,7 @@ namespace Core
    class VertexShaderFileLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      bool init(VertexShaderLoader& loader);
       bool shutdown();
 
       VertexShader load(const std::string& filename, InputLayout layout) const;
@@ -27,6 +26,6 @@ namespace Core
       void unload(VertexShader& data);
 
    private:
-      VertexShaderLoader m_loader;
+      VertexShaderLoader* m_loader;
    };
 }

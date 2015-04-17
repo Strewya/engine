@@ -17,5 +17,15 @@ namespace Core
    public:
       ID3D11InputLayout* inputLayout;
       ID3D11VertexShader* vertex;
+
+      bool loaded()
+      {
+         return inputLayout != nullptr && vertex != nullptr;
+      };
+
+      bool unloaded()
+      {
+         return inputLayout == nullptr && vertex == nullptr;
+      }
    };
 }

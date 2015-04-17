@@ -32,7 +32,7 @@ namespace Core
 
    WindowResult initializeWindow(Window& window);
 
-   static const uint32_t MONITOR_RESOLUTION = 0;
+   static const uint32_t USE_MONITOR_RESOLUTION = 0;
 
    class Window
    {

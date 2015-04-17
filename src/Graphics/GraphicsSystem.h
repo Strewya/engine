@@ -59,6 +59,12 @@ namespace Core
       bool initSamplerState();
       bool initDepthBuffer();
 
+      DXTextureFileLoader m_textureFileLoader;
+      VertexShaderLoader m_vsLoader;
+      VertexShaderFileLoader m_vsFileLoader;
+      PixelShaderLoader m_psLoader;
+      PixelShaderFileLoader m_psFileLoader;
+
       D3DXCOLOR m_backgroundColor;
       Vec2i m_backbufferSize;
 

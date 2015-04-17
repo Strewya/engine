@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
 /******* extra headers *******/
 #include <Graphics/Shader/Pixel/PixelShaderLoader.h>
 /******* end header inclusion *******/
@@ -19,14 +18,14 @@ namespace Core
    class PixelShaderFileLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      bool init(PixelShaderLoader& loader);
       bool shutdown();
 
-      PixelShader loadPixelShader(const std::string& filename) const;
+      PixelShader load(const std::string& filename) const;
 
       void unload(PixelShader& data);
 
    private:
-      PixelShaderLoader m_loader;
+      PixelShaderLoader* m_loader;
    };
 }

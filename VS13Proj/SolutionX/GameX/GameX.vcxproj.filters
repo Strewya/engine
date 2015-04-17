@@ -70,9 +70,6 @@
     <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureFileLoader.cpp">
       <Filter>Code\Framework\Graphics\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Texture\DXTextureManager.cpp">
-      <Filter>Code\Framework\Graphics\Texture</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Util\Utility.cpp">
       <Filter>Code\Framework\Util</Filter>
     </ClCompile>
@@ -103,9 +100,6 @@
     <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp">
       <Filter>Code\Framework\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Audio\FmodSoundManager.cpp">
-      <Filter>Code\Framework\Audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp">
       <Filter>Code\Framework\Audio</Filter>
     </ClCompile>
@@ -115,16 +109,10 @@
     <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderLoader.cpp">
       <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\VertexShaderManager.cpp">
-      <Filter>Code\Framework\Graphics\Shader\Vertex</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderFileLoader.cpp">
       <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderLoader.cpp">
-      <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\PixelShaderManager.cpp">
       <Filter>Code\Framework\Graphics\Shader\Pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\FileLoader.cpp">
@@ -332,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\ShaderHandle.h">
       <Filter>Code\Framework\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Util\Manager.h">
+      <Filter>Code\Framework\Util\Template</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

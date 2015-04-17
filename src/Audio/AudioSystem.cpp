@@ -16,12 +16,20 @@ namespace Core
 
       m_channel = nullptr;
       m_musicPlaying = HSound{};
-      
+
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
+
       if( CORE_STATUS_OK )
       {
          CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
-         CORE_STATUS_AND(sounds.init(m_system, FmodSound{nullptr}));
+      }
+
+      CORE_STATUS_AND(m_fileLoader.init(m_system));
+
+      if( CORE_STATUS_OK )
+      {
+         auto defaultSound = m_fileLoader.load(CORE_RESOURCE("Sounds/reload.wav"));
+         CORE_STATUS_AND(sounds.init(STR(FmodSoundManager), m_fileLoader, defaultSound));
       }
 
       CORE_INIT_END(AudioSystem);
@@ -36,8 +44,9 @@ namespace Core
          CORE_STATUS_AND(m_channel->stop() == FMOD_OK);
          m_channel = nullptr;
       }
+
       CORE_STATUS_AND(sounds.shutdown());
-      
+      CORE_STATUS_AND(m_fileLoader.shutdown());
       CORE_STATUS_AND(m_system->close() == FMOD_OK);
       CORE_STATUS_AND(m_system->release() == FMOD_OK);
 
@@ -58,18 +67,6 @@ namespace Core
          }
       }
       return (result == FMOD_OK);
-   }
-
-   bool isLoaded(std::vector<FMOD::Sound*>& list, void* snd)
-   {
-      for( auto* ptr : list )
-      {
-         if( ptr == snd )
-         {
-            return true;
-         }
-      }
-      return false;
    }
 
    void AudioSystem::playSfx(HSound handle)

@@ -13,11 +13,13 @@
 
 namespace Core
 {
-   bool PixelShaderFileLoader::init(ID3D11Device* device)
+   bool PixelShaderFileLoader::init(PixelShaderLoader& loader)
    {
       CORE_INIT_START(PixelShaderFileLoader);
 
-      CORE_STATUS_AND(m_loader.init(device));
+      m_loader = &loader;
+
+      CORE_STATUS_AND(m_loader != nullptr);
 
       CORE_INIT_END(PixelShaderFileLoader);
    }
@@ -26,18 +28,16 @@ namespace Core
    {
       CORE_SHUTDOWN_START(PixelShaderFileLoader);
 
-      CORE_STATUS_AND(m_loader.shutdown());
-
       CORE_SHUTDOWN_END(PixelShaderFileLoader);
    }
 
-   PixelShader PixelShaderFileLoader::loadPixelShader(const std::string& filename) const
+   PixelShader PixelShaderFileLoader::load(const std::string& filename) const
    {
       PixelShader result{nullptr};
       std::vector<char> buffer;
       if( loadFile(filename, buffer) )
       {
-         result = m_loader.load(buffer.data(), buffer.size());
+         result = m_loader->load(buffer.data(), buffer.size());
       }
       else
       {
@@ -48,6 +48,6 @@ namespace Core
 
    void PixelShaderFileLoader::unload(PixelShader& data)
    {
-      m_loader.unload(data);
+      m_loader->unload(data);
    }
 }

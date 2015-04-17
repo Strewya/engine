@@ -13,11 +13,13 @@
 
 namespace Core
 {
-   bool VertexShaderFileLoader::init(ID3D11Device* device)
+   bool VertexShaderFileLoader::init(VertexShaderLoader& loader)
    {
       CORE_INIT_START(VertexShaderFileLoader);
 
-      CORE_STATUS_AND(m_loader.init(device));
+      m_loader = &loader;
+
+      CORE_STATUS_AND(m_loader != nullptr);
 
       CORE_INIT_END(VertexShaderFileLoader);
    }
@@ -25,8 +27,6 @@ namespace Core
    bool VertexShaderFileLoader::shutdown()
    {
       CORE_SHUTDOWN_START(VertexShaderFileLoader);
-
-      CORE_STATUS_AND(m_loader.shutdown());
 
       CORE_SHUTDOWN_END(VertexShaderFileLoader);
    }
@@ -37,7 +37,7 @@ namespace Core
       std::vector<char> buffer;
       if( loadFile(filename, buffer) )
       {
-         result = m_loader.load(layout, buffer.data(), buffer.size());
+         result = m_loader->load(layout, buffer.data(), buffer.size());
       }
       else
       {
@@ -48,6 +48,6 @@ namespace Core
 
    void VertexShaderFileLoader::unload(VertexShader& data)
    {
-      m_loader.unload(data);
+      m_loader->unload(data);
    }
 }

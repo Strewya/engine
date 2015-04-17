@@ -16,5 +16,15 @@ namespace Core
    {
    public:
       ID3D11PixelShader* pixel;
+
+      bool loaded()
+      {
+         return pixel != nullptr;
+      }
+
+      bool unloaded()
+      {
+         return !loaded();
+      }
    };
 }

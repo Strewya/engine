@@ -30,7 +30,7 @@ namespace Core
       GameResources assets;
       GameSystems systems;
 
-
+      
 
       bool init(Window& window);
       bool shutdown();
