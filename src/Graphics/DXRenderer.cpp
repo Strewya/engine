@@ -239,7 +239,6 @@ namespace Core
          XMStoreFloat4(&vx.position, position);
       }
 
-
       D3D11_MAPPED_SUBRESOURCE ms;
 
       auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), vertices.size());

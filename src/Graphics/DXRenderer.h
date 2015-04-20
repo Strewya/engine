@@ -65,8 +65,5 @@ namespace Core
       void* m_cullingMode;
       void* m_transparencyMode;
       int32_t m_topology;
-
-      HealthVertexBuffer m_verticesToDraw;
-      IndexBuffer m_indicesToDraw;
    };
 }

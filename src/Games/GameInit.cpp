@@ -55,19 +55,19 @@ namespace Core
          count = l = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
          for( l; l--; )
          {
-            if( !game.tickLogic(microsPerFrame) )
+            logicTimer.updateBy(microsPerFrame);
+            if( !game.tickLogic(logicTimer.getDeltaMicros()) )
             {
                running = false;
                break;
             }
-            logicTimer.updateBy(microsPerFrame);
          }
          logicTimer.updateBy(droppedTime);
 
          uint64_t fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getLastRealTimeMicros();
          if( count > 0 )
          {
-            game.tickRender(fullUpdateTime);
+            game.tickRender(static_cast<uint32_t>(fullUpdateTime));
          }
          renderTimer.updateBy(fullUpdateTime);
       }

@@ -92,6 +92,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
       <BrowseInformation>true</BrowseInformation>
+      <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,6 +156,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
       <BrowseInformation>true</BrowseInformation>
+      <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -292,6 +294,7 @@
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameList.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameResources.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameState.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameSystems.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\LoadGameResources.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Main.h" />

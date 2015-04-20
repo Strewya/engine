@@ -12,6 +12,8 @@
 #include <Games/Rainbowland/GameSystems.h>
 #include <Graphics/GraphicsSystem.h>
 #include <Input/InputSystem.h>
+#include <Games/Rainbowland/GameState.h>
+#include <Util/Timer.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -29,13 +31,14 @@ namespace Core
 
       GameResources assets;
       GameSystems systems;
+      GameState state;
 
-      
+      Timer timer;
 
       bool init(Window& window);
       bool shutdown();
 
-      bool tickLogic(uint64_t updateTime);
-      void tickRender(uint64_t updateTime);
+      bool tickLogic(uint32_t updateTime);
+      void tickRender(uint32_t updateTime);
    };
 }

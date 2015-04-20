@@ -324,6 +324,9 @@
     <ClInclude Include="..\..\..\src\Util\Manager.h">
       <Filter>Code\Framework\Util\Template</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\GameState.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Code">
