@@ -243,6 +243,9 @@
     <ClCompile Include="..\..\..\src\Audio\AudioSystem.cpp" />
     <ClCompile Include="..\..\..\src\Audio\FmodSoundFileLoader.cpp" />
     <ClCompile Include="..\..\..\src\Games\GameInit.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameState.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Game_ClassPick.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Game_Gameplay.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\LoadGameResources.cpp" />
     <ClCompile Include="..\..\..\src\Games\Rainbowland\Main.cpp" />
     <ClCompile Include="..\..\..\src\Graphics\Camera.cpp" />
@@ -293,11 +296,16 @@
     <ClInclude Include="..\..\..\src\Audio\FmodSoundManager.h" />
     <ClInclude Include="..\..\..\src\Games\GameInit.h" />
     <ClInclude Include="..\..\..\src\Games\GameList.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Gameplay_Session.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameResources.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameState.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameSystems.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_ClassPick.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_ColorPick.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_Gameplay.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\LoadGameResources.h" />
     <ClInclude Include="..\..\..\src\Games\Rainbowland\Main.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerFwd.h" />
     <ClInclude Include="..\..\..\src\Graphics\Camera.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXInclude.h" />
     <ClInclude Include="..\..\..\src\Graphics\DXRenderer.h" />

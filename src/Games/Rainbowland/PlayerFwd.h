@@ -1,11 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   HTexture
-*  usage:
+*  contents:   Player forward declarations
+*  usage:      
 ********************************************/
 /******* C++ headers *******/
-#include <cstdint>
-#include <string>
 /******* common headers *******/
 /******* extra headers *******/
 #include <Util/Handle.h>
@@ -13,5 +11,5 @@
 
 namespace Core
 {
-   CORE_HANDLE(HTexture);
+   CORE_HANDLE(HPlayer);
 }

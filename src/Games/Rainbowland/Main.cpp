@@ -133,6 +133,8 @@ namespace Core
                         timer.getDeltaSeconds()*state.moveDirection.y,
                         timer.getDeltaSeconds()*state.moveDirection.z});
 
+      updateGame(state, systems, assets);
+
       return running;
    }
 
@@ -150,6 +152,8 @@ namespace Core
       //graphicsSystem.renderer.setTransparency(true);
 
       graphicsSystem.renderMesh(Transform{}, Color{}, bgr);
+
+      renderGame(state, systems, assets);
 
       graphicsSystem.present();
    }

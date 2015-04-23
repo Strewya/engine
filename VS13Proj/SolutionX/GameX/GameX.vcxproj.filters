@@ -118,6 +118,11 @@
     <ClCompile Include="..\..\..\src\Graphics\Shader\FileLoader.cpp">
       <Filter>Code\Framework\Graphics\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Game_Gameplay.cpp">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\GameState.cpp" />
+    <ClCompile Include="..\..\..\src\Games\Rainbowland\Game_ClassPick.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\Games\GameInit.h">
@@ -325,6 +330,15 @@
       <Filter>Code\Framework\Util\Template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\GameState.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_Gameplay.h">
+      <Filter>Code\Games\Rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_ColorPick.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Game_ClassPick.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\Gameplay_Session.h" />
+    <ClInclude Include="..\..\..\src\Games\Rainbowland\PlayerFwd.h">
       <Filter>Code\Games\Rainbowland</Filter>
     </ClInclude>
   </ItemGroup>

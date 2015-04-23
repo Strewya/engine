@@ -12,9 +12,7 @@
 
 namespace Core
 {
-   struct tag_VertexShader;
-   typedef Handle<tag_VertexShader> HVertexShader;
+   CORE_HANDLE(HVertexShader);
 
-   struct tag_PixelShader;
-   typedef Handle<tag_PixelShader> HPixelShader;
+   CORE_HANDLE(HPixelShader);
 }

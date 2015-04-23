@@ -12,6 +12,8 @@
 
 namespace Core
 {
+#define CORE_HANDLE(name) struct tag_##name; typedef Handle<tag_##name> name
+
    template<typename TAG>
    class Handle
    {

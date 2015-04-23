@@ -13,6 +13,5 @@
 
 namespace Core
 {
-   struct tag_FmodSound;
-   typedef Handle<tag_FmodSound> HSound;
+   CORE_HANDLE(HSound);
 }
