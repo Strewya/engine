@@ -1,17 +1,17 @@
 #pragma once
 /********************************************
-*  contents:   Mesh
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Graphics/Shader/ShaderHandle.h>
-#include <Graphics/Texture/DXTextureHandle.h>
-#include <Graphics/Typedefs.h>
-#include <Util/Vec2Fwd.h>
+#include <graphics/shader/shader_handle.h>
+#include <graphics/texture/texture_handle.h>
+#include <graphics/graphics_typedefs.h>
+#include <util/vec2_fwd.h>
 /******* end header inclusion *******/
 
 namespace Core

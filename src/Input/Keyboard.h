@@ -1,9 +1,9 @@
 #pragma once
 /********************************************
-*  class:   Keyboard
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <cstdint>
 #include <string>
 #include <unordered_map>

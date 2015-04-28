@@ -1,9 +1,9 @@
 #pragma once
 /********************************************
-*  class:   Mouse
+*  contents:   mouse
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <cstdint>
 #include <string>
 #include <unordered_map>

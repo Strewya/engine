@@ -1,9 +1,9 @@
 #pragma once
 /********************************************
-*  class:   Debug utilities
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <algorithm>
 #include <iostream>
 /******* common headers *******/

@@ -1,12 +1,12 @@
 #pragma once
 /********************************************
-*  class:   Camera
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec3.h>
+#include <util/vec3.h>
 /******* end header inclusion *******/
 
 namespace Core

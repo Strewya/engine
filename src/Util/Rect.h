@@ -1,12 +1,12 @@
 #pragma once
 /********************************************
-*  class:   Vec2
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec2.h>
+#include <util/vec2.h>
 /******* end header inclusion *******/
 
 namespace Core

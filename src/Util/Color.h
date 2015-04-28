@@ -1,9 +1,9 @@
 #pragma once
 /********************************************
-*  class:   Color
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/

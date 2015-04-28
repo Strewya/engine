@@ -1,13 +1,13 @@
 #pragma once
 /********************************************
-*  class:   Vec2 template
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec2Fwd.h>
+#include <util/vec2_fwd.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -63,7 +63,7 @@ namespace Core
    template<typename T> std::ostream& operator<<(std::ostream& os, Vec2<T> v);
 }
 
-#include <Util/Vec2Impl.h>
+#include <Util/vec2_impl.h>
 
 
 //

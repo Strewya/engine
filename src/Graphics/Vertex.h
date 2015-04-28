@@ -1,16 +1,16 @@
 #pragma once
 /********************************************
-*  class:   Vertex
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <vector>
 /******* common headers *******/
-#include <Graphics/DXInclude.h>
+#include <graphics/dx_include.h>
 /******* extra headers *******/
-#include <Graphics/Typedefs.h>
-#include <Util/Vec2Fwd.h>
-#include <Util/Vec3Fwd.h>
+#include <graphics/graphics_typedefs.h>
+#include <util/vec2_fwd.h>
+#include <util/vec3_fwd.h>
 /******* end header inclusion *******/
 
 namespace Core

@@ -1,9 +1,9 @@
 #pragma once
 /********************************************
-*  class:   Clock
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/

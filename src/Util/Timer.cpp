@@ -1,11 +1,11 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Timer.h>
-/******* C++ headers *******/
+#include <util/timer.h>
+/******* c++ headers *******/
 /******* extra headers *******/
-#include <Util/TimeUnitConversions.h>
+#include <util/time_unit_conversions.h>
 /******* end headers *******/
 
 namespace Core

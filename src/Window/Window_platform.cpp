@@ -1,14 +1,14 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Window/Window.h>
-/******* C++ headers *******/
+#include <window/window.h>
+/******* c++ headers *******/
 #include <algorithm>
 /******* extra headers *******/
-#include <Util/Clock.h>
-#include <Util/TimeUnitConversions.h>
-#include <Util/Utility.h>
+#include <util/clock.h>
+#include <util/time_unit_conversions.h>
+#include <util/utility.h>
 /******* end headers *******/
 
 namespace Core

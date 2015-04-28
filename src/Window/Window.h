@@ -1,20 +1,20 @@
 #pragma once
 /********************************************
-*  class:   Window
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <atomic>
 #include <string>
 #include <vector>
 /******* common headers *******/
-#include <Window/myWindows.h>
+#include <window/window_include.h>
 /******* extra headers *******/
-#include <Window/GamepadHandler.h>
-#include <Window/KeyboardHandler.h>
-#include <Window/MouseHandler.h>
-#include <Window/WindowEvent.h>
-#include <Window/ReadDirectoryChanges.h>
+#include <window/gamepad_handler.h>
+#include <window/keyboard_handler.h>
+#include <window/mouse_handler.h>
+#include <window/window_event.h>
+#include <window/read_directory_changes.h>
 /******* end header inclusion *******/
 
 namespace Core

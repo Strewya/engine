@@ -1,9 +1,9 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Color.h>
-/******* C++ headers *******/
+#include <util/color.h>
+/******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/
 

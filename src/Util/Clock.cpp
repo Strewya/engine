@@ -1,12 +1,12 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Clock.h>
-/******* C++ headers *******/
+#include <util/clock.h>
+/******* c++ headers *******/
 #include <chrono>
 /******* extra headers *******/
-#include <Util/Utility.h>
+#include <util/utility.h>
 /******* end headers *******/
 
 namespace Core
@@ -24,7 +24,7 @@ namespace Core
 #if (TIME_SOURCE == QPCC)
 #define CLOCK_TYPE HighResClock
 
-#include "Window/myWindows.h"
+#include "Window/window_include.h"
    const long long g_Frequency = []() -> long long
    {
       LARGE_INTEGER frequency;

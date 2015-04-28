@@ -1,9 +1,9 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
-#include <Util/Transform.h>
-/******* C++ headers *******/
+#include <util/transform.h>
+/******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/
 

@@ -1,13 +1,13 @@
 #pragma once
 /********************************************
-*  class:   Vec3 template
+*  contents:   #todo
 *  usage:
 ********************************************/
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
-#include <Util/Vec3Fwd.h>
+#include <util/vec3_fwd.h>
 /******* end header inclusion *******/
 
 namespace Core
@@ -63,7 +63,7 @@ namespace Core
    template<typename T> std::ostream& operator<<(std::ostream& os, Vec3<T> v);
 }
 
-#include <Util/Vec3Impl.h>
+#include <Util/vec3_impl.h>
 
 
 // #include <iostream>

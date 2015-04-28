@@ -1,24 +1,22 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
-/*** precompiled header ***/
+//headers should be ordered alphabetically!
+/******* precompiled header *******/
 #include <stdafx.h>
-/*** personal header ***/
-#include <Window/Window.h>
-/*** C++ headers ***/
+/******* personal header *******/
+#include <window/window.h>
+/******* c++ headers *******/
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
-/*** extra headers ***/
-#include <Util/Clock.h>
-#include <Util/TimeUnitConversions.h>
-#include <Util/Utility.h>
-#include <Util/Vec2.h>
-#include <Window/WindowClass.h>
-/*** end headers ***/
+/******* extra headers *******/
+#include <util/clock.h>
+#include <util/time_unit_conversions.h>
+#include <util/utility.h>
+#include <util/vec2.h>
+#include <window/window_class.h>
+/******* end headers *******/
 
 namespace Core
 {
-   
-
    WindowResult initializeWindow(Window& window)
    {
       WindowClass wndClass(window.getClass());

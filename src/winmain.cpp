@@ -1,15 +1,15 @@
-//headers should be ordered alphabetically, if not REORDER THEM NOW!
+//headers should be ordered alphabetically!
 /******* precompiled header *******/
 #include <stdafx.h>
 /******* personal header *******/
 //none
-/******* C++ headers *******/
+/******* c++ headers *******/
 #include <thread>
 /******* extra headers *******/
-#include <Games/GameInit.h>
-#include <Window/myWindows.h>
-#include <Window/Window.h>
-#include <Window/WindowClass.h>
+#include <games/game_init.h>
+#include <window/window_include.h>
+#include <window/window.h>
+#include <window/window_class.h>
 /******* end headers *******/
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
