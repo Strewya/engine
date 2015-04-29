@@ -5,11 +5,11 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
-#include <graphics/dx_include.h>
+#include "graphics/dx_include.h"
 /******* extra headers *******/
-#include <graphics/graphics_typedefs.h>
-#include <graphics/vertex.h>
-#include <util/vec2_fwd.h>
+#include "graphics/graphics_typedefs.h"
+#include "graphics/vertex.h"
+#include "util/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core

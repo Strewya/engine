@@ -1,17 +1,17 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <input/input_system.h>
+#include "input/input_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <input/gamepad.h>
-#include <input/keyboard.h>
-#include <input/mouse.h>
-#include <util/clock.h>
-#include <util/utility.h>
-#include <window/window.h>
-#include <window/window_event.h>
+#include "input/gamepad.h"
+#include "input/keyboard.h"
+#include "input/mouse.h"
+#include "util/clock.h"
+#include "util/utility.h"
+#include "window/window.h"
+#include "window/window_event.h"
 /******* end headers *******/
 
 namespace Core
@@ -46,10 +46,5 @@ namespace Core
    EventVector_t InputSystem::getEvents() const
    {
       return m_inputEvents;
-   }
-
-   uint32_t InputSystem::getEventCount() const
-   {
-      return m_inputEvents.size();
    }
 }

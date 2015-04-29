@@ -1,11 +1,11 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <window/window.h>
+#include "window/window.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <util/utility.h>
+#include "util/utility.h"
 /******* end headers *******/
 
 namespace Core

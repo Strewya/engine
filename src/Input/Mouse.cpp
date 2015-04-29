@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <input/mouse.h>
+#include "input/mouse.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/

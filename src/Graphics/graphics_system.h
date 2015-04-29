@@ -7,14 +7,14 @@
 #include <cassert>
 #include <vector>
 /******* common headers *******/
-#include <graphics/dx_include.h>
+#include "graphics/dx_include.h"
 /******* extra headers *******/
-#include <graphics/dx_renderer.h>
-#include <graphics/graphics_typedefs.h>
-#include <graphics/shader/pixel/pixel_shader_manager.h>
-#include <graphics/shader/vertex/vertex_shader_manager.h>
-#include <graphics/texture/texture_manager.h>
-#include <util/vec2.h>
+#include "graphics/dx_renderer.h"
+#include "graphics/graphics_typedefs.h"
+#include "graphics/shader/pixel/pixel_shader_manager.h"
+#include "graphics/shader/vertex/vertex_shader_manager.h"
+#include "graphics/texture/texture_manager.h"
+#include "util/vec2.h"
 /******* end header inclusion *******/
 
 namespace Core

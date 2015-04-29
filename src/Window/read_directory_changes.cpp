@@ -1,12 +1,12 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <window/read_directory_changes.h>
+#include "window/read_directory_changes.h"
 /******* c++ headers *******/
 #include <process.h>
 /******* extra headers *******/
-#include <window/read_directory_changes_private.h>
+#include "window/read_directory_changes_private.h"
 /******* end headers *******/
 
 namespace Core

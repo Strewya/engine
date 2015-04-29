@@ -1,18 +1,18 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <window/window.h>
+#include "window/window.h"
 /******* c++ headers *******/
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
 /******* extra headers *******/
-#include <util/clock.h>
-#include <util/time_unit_conversions.h>
-#include <util/utility.h>
-#include <util/vec2.h>
-#include <window/window_class.h>
+#include "util/clock.h"
+#include "util/time_unit_conversions.h"
+#include "util/utility.h"
+#include "util/vec2.h"
+#include "window/window_class.h"
 /******* end headers *******/
 
 namespace Core

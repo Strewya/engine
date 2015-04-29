@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <input/gamepad.h>
+#include "input/gamepad.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/

@@ -27,7 +27,6 @@ namespace Core
       void update();
 
       EventVector_t getEvents() const;
-      uint32_t getEventCount() const;
 
    private:
       Window* m_window;

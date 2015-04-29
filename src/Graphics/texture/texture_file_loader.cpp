@@ -1,12 +1,12 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <graphics/texture/texture_file_loader.h>
+#include "graphics/texture/texture_file_loader.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <graphics/texture/texture.h>
-#include <util/utility.h>
+#include "graphics/texture/texture.h"
+#include "util/utility.h"
 /******* end headers *******/
 
 namespace Core

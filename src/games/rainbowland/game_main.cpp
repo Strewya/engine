@@ -1,20 +1,20 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <games/rainbowland/game_main.h>
+#include "games/rainbowland/game_main.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <games/rainbowland/load_game_resources.h>
-#include <graphics/camera.h>
-#include <graphics/mesh/mesh.h>
-#include <graphics/vertex.h>
-#include <input/keyboard.h>
-#include <util/resource_cache_template.h>
-#include <util/color.h>
-#include <util/transform.h>
-#include <util/utility.h>
-#include <window/window.h>
+#include "games/rainbowland/load_game_resources.h"
+#include "graphics/camera.h"
+#include "graphics/mesh/mesh.h"
+#include "graphics/vertex.h"
+#include "input/keyboard.h"
+#include "util/resource_cache_template.h"
+#include "util/color.h"
+#include "util/transform.h"
+#include "util/utility.h"
+#include "window/window.h"
 /******* end headers *******/
 
 namespace Core
@@ -66,7 +66,7 @@ namespace Core
          state.camera.setPosition({0, 0, -20});
          state.cameraMoveDirection.set(0, 0, 0);
 
-         initializeGameState(state, systems, assets);
+         initializeGameState(timer, state, systems, assets);
       }
 
 
@@ -153,7 +153,7 @@ namespace Core
                         timer.getDeltaSeconds()*state.cameraMoveDirection.y*state.cameraMoveModifier,
                         timer.getDeltaSeconds()*state.cameraMoveDirection.z*state.cameraMoveModifier});
 
-      updateGameState(state, systems, assets);
+      running = updateGameState(timer, state, systems, assets);
 
       return running;
    }
@@ -173,7 +173,7 @@ namespace Core
 
       graphicsSystem.renderMesh(Transform{}, Color{}, bgr);
 
-      renderGameState(state, systems, assets);
+      renderGameState(timer, state, systems, assets);
 
       graphicsSystem.present();
    }

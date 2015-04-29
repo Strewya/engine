@@ -7,10 +7,10 @@
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
-#include <window/window_include.h>
+#include "window/window_include.h"
 #include <xinput.h>
 /******* extra headers *******/
-#include <window/window_event.h>
+#include "window/window_event.h"
 /******* end header inclusion *******/
 
 namespace Core

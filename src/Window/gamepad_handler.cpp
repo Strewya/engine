@@ -1,16 +1,16 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <window/gamepad_handler.h>
+#include "window/gamepad_handler.h"
 /******* c++ headers *******/
 #include <cstdint>
 #include <vector>
 /******* extra headers *******/
-#include <input/gamepad.h>
-#include <util/time_unit_conversions.h>
-#include <util/vec2.h>
-#include <window/window_event.h>
+#include "input/gamepad.h"
+#include "util/time_unit_conversions.h"
+#include "util/vec2.h"
+#include "window/window_event.h"
 /******* end headers *******/
 
 namespace Core

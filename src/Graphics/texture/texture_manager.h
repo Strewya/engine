@@ -7,10 +7,10 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include <graphics/texture/texture.h>
-#include <graphics/texture/texture_file_loader.h>
-#include <graphics/texture/texture_handle.h>
-#include <util/resource_manager_template.h>
+#include "graphics/texture/texture.h"
+#include "graphics/texture/texture_file_loader.h"
+#include "graphics/texture/texture_handle.h"
+#include "util/resource_manager_template.h"
 /******* end header inclusion *******/
 
 namespace Core

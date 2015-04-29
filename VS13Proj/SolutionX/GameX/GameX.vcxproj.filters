@@ -20,7 +20,7 @@
       <Filter>Code\games\rainbowland</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Mesh\mesh.cpp">
-      <Filter>Code\framework\graphics\Mesh</Filter>
+      <Filter>Code\framework\graphics\mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Games\Rainbowland\game_state.cpp">
       <Filter>Code\games\rainbowland</Filter>
@@ -35,22 +35,22 @@
       <Filter>Code\framework\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader_file_loader.cpp">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader_loader.cpp">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader_file_loader.cpp">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader_loader.cpp">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Shader\file_loader.cpp">
-      <Filter>Code\framework\graphics\Shader</Filter>
+      <Filter>Code\framework\graphics\shader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\Texture\texture_file_loader.cpp">
-      <Filter>Code\framework\graphics\Texture</Filter>
+      <Filter>Code\framework\graphics\texture</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphics\camera.cpp">
       <Filter>Code\framework\graphics</Filter>
@@ -59,7 +59,7 @@
       <Filter>Code\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\gamepad.cpp">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Window\keyboard_handler.cpp">
       <Filter>Code\framework\window\windows</Filter>
@@ -80,7 +80,7 @@
       <Filter>Code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\mouse.cpp">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Util\rect.cpp">
       <Filter>Code\framework\util\geometry</Filter>
@@ -119,7 +119,7 @@
       <Filter>Code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\keyboard.cpp">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -151,7 +151,7 @@
       <Filter>Code\games\rainbowland\structs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Mesh\mesh.h">
-      <Filter>Code\framework\graphics\Mesh</Filter>
+      <Filter>Code\framework\graphics\mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\game_state.h">
       <Filter>Code\games\rainbowland</Filter>
@@ -163,22 +163,22 @@
       <Filter>Code\framework\util\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\shader_handle.h">
-      <Filter>Code\framework\graphics\Shader</Filter>
+      <Filter>Code\framework\graphics\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Games\Rainbowland\game_resources.h">
       <Filter>Code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader_manager.h">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader_manager.h">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\texture_handle.h">
-      <Filter>Code\framework\graphics\Texture</Filter>
+      <Filter>Code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\texture_manager.h">
-      <Filter>Code\framework\graphics\Texture</Filter>
+      <Filter>Code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Audio\fmod_sound_handle.h">
       <Filter>Code\framework\audio</Filter>
@@ -193,37 +193,37 @@
       <Filter>Code\framework\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader.h">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader_file_loader.h">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\pixel_shader_loader.h">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Pixel\default_pixel_shader.h">
-      <Filter>Code\framework\graphics\Shader\Pixel</Filter>
+      <Filter>Code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\default_vertex_shader.h">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader.h">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader_file_loader.h">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\Vertex\vertex_shader_loader.h">
-      <Filter>Code\framework\graphics\Shader\Vertex</Filter>
+      <Filter>Code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Shader\file_loader.h">
-      <Filter>Code\framework\graphics\Shader</Filter>
+      <Filter>Code\framework\graphics\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\texture.h">
-      <Filter>Code\framework\graphics\Texture</Filter>
+      <Filter>Code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\Texture\texture_file_loader.h">
-      <Filter>Code\framework\graphics\Texture</Filter>
+      <Filter>Code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Graphics\camera.h">
       <Filter>Code\framework\graphics</Filter>
@@ -238,7 +238,7 @@
       <Filter>Code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\gamepad.h">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Window\keyboard_handler.h">
       <Filter>Code\framework\window\windows</Filter>
@@ -253,7 +253,7 @@
       <Filter>Code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\mouse.h">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Util\rect.h">
       <Filter>Code\framework\util\geometry</Filter>
@@ -331,7 +331,7 @@
       <Filter>Code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\keyboard.h">
-      <Filter>Code\framework\input\Devices</Filter>
+      <Filter>Code\framework\input\devices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -347,26 +347,8 @@
     <Filter Include="Code\framework\graphics">
       <UniqueIdentifier>{eaa1e107-5704-493f-aae2-048ac703877e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\graphics\Texture">
-      <UniqueIdentifier>{98952245-2e0d-4b12-a832-19ff29546a66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\Shader">
-      <UniqueIdentifier>{86373863-cfd8-421a-bd79-fd87b123cf75}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\Shader\Pixel">
-      <UniqueIdentifier>{79a75274-7949-4131-a3d1-ecae29af3d78}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\Shader\Vertex">
-      <UniqueIdentifier>{a60334bc-2b56-4247-a4e5-25bf1bcb9c69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\Mesh">
-      <UniqueIdentifier>{1e7b813a-acbd-419d-8b6d-316d3d6777a1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Code\framework\input">
       <UniqueIdentifier>{ded6ae73-6084-4a00-8b48-5a351f40f9d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\input\Devices">
-      <UniqueIdentifier>{ea2b549d-61ac-4f42-8c85-bae97d6801b1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Code\framework\util">
       <UniqueIdentifier>{565cb0f6-2f3c-4edb-9208-e53adeef455d}</UniqueIdentifier>
@@ -394,6 +376,24 @@
     </Filter>
     <Filter Include="Code\games\rainbowland\structs">
       <UniqueIdentifier>{d9dc53f3-844f-4de2-966e-6fd585acd37f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\graphics\mesh">
+      <UniqueIdentifier>{1e7b813a-acbd-419d-8b6d-316d3d6777a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\graphics\shader">
+      <UniqueIdentifier>{86373863-cfd8-421a-bd79-fd87b123cf75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\graphics\texture">
+      <UniqueIdentifier>{98952245-2e0d-4b12-a832-19ff29546a66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\graphics\shader\pixel">
+      <UniqueIdentifier>{79a75274-7949-4131-a3d1-ecae29af3d78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\graphics\shader\vertex">
+      <UniqueIdentifier>{a60334bc-2b56-4247-a4e5-25bf1bcb9c69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\framework\input\devices">
+      <UniqueIdentifier>{ea2b549d-61ac-4f42-8c85-bae97d6801b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

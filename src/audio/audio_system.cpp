@@ -1,11 +1,11 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <audio/audio_system.h>
+#include "audio/audio_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <util/utility.h>
+#include "util/utility.h"
 /******* end headers *******/
 
 namespace Core

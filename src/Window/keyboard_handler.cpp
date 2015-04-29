@@ -1,11 +1,11 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <window/keyboard_handler.h>
+#include "window/keyboard_handler.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <input/keyboard.h>
+#include "input/keyboard.h"
 /******* end headers *******/
 
 namespace Core

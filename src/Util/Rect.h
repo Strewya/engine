@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <util/vec2.h>
+#include "util/vec2.h"
 /******* end header inclusion *******/
 
 namespace Core

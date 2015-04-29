@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <graphics/camera.h>
+#include "graphics/camera.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/

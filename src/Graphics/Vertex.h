@@ -6,11 +6,11 @@
 /******* c++ headers *******/
 #include <vector>
 /******* common headers *******/
-#include <graphics/dx_include.h>
+#include "graphics/dx_include.h"
 /******* extra headers *******/
-#include <graphics/graphics_typedefs.h>
-#include <util/vec2_fwd.h>
-#include <util/vec3_fwd.h>
+#include "graphics/graphics_typedefs.h"
+#include "util/vec2_fwd.h"
+#include "util/vec3_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core

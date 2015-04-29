@@ -8,7 +8,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <graphics/shader/vertex/vertex_shader_loader.h>
+#include "graphics/shader/vertex/vertex_shader_loader.h"
 /******* end header inclusion *******/
 
 namespace Core

@@ -6,10 +6,10 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <graphics/camera.h>
-#include <graphics/mesh/mesh.h>
-#include <util/rect.h>
-#include <util/vec3.h>
+#include "graphics/camera.h"
+#include "graphics/mesh/mesh.h"
+#include "util/rect.h"
+#include "util/vec3.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -28,15 +28,24 @@ namespace Core
       Vec3f cameraMoveDirection;
       float cameraMoveModifier;
 
-      Mesh background;
-      Mesh player;
-
+      Mesh backgroundMesh;
+      Mesh playerMesh;
+      struct PlayerMovement
+      {
+         Vec2f position;
+         Vec2f direction;
+         float currentSpeed;
+         float maxSpeed;
+         float acceleration;
+      };
+      PlayerMovement playerMover;
    };
 
    class GameSystems;
    class GameResources;
+   class Timer;
 
-   void initializeGameState(GameState& state, GameSystems& systems, GameResources& assets);
-   void updateGameState(GameState& state, GameSystems& systems, GameResources& assets);
-   void renderGameState(GameState& state, GameSystems& systems, GameResources& assets);
+   bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
+   bool updateGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
+   void renderGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
 }

@@ -6,9 +6,9 @@
 /******* c++ headers *******/
 #include <cstdint>
 /******* common headers *******/
-#include <window/window_include.h>
+#include "window/window_include.h"
 /******* extra headers *******/
-#include <window/window_event.h>
+#include "window/window_event.h"
 /******* end header inclusion *******/
 
 namespace Core

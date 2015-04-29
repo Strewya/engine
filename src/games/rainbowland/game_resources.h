@@ -6,9 +6,9 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <audio/fmod_sound_handle.h>
-#include <graphics/texture/texture_handle.h>
-#include <graphics/shader/shader_handle.h>
+#include "audio/fmod_sound_handle.h"
+#include "graphics/texture/texture_handle.h"
+#include "graphics/shader/shader_handle.h"
 /******* end header inclusion *******/
 
 namespace Core

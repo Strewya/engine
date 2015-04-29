@@ -8,7 +8,7 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
-#include <util/resource_handle.h>
+#include "util/resource_handle.h"
 /******* end header inclusion *******/
 
 namespace Core

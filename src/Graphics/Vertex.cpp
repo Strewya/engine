@@ -1,13 +1,13 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <graphics/vertex.h>
+#include "graphics/vertex.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <util/color.h>
-#include <util/vec2.h>
-#include <util/vec3.h>
+#include "util/color.h"
+#include "util/vec2.h"
+#include "util/vec3.h"
 /******* end headers *******/
 
 namespace Core

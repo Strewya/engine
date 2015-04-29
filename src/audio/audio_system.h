@@ -7,9 +7,9 @@
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
-#include <audio/fmod_include.h>
+#include "audio/fmod_include.h"
 /******* extra headers *******/
-#include <audio/fmod_sound_manager.h>
+#include "audio/fmod_sound_manager.h"
 /******* end header inclusion *******/
 
 namespace Core

@@ -1,12 +1,12 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <audio/fmod_sound_file_loader.h>
+#include "audio/fmod_sound_file_loader.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <audio/fmod_sound.h>
-#include <util/utility.h>
+#include "audio/fmod_sound.h"
+#include "util/utility.h"
 /******* end headers *******/
 
 namespace Core

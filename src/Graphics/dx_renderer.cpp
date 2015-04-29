@@ -1,18 +1,18 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <graphics/dx_renderer.h>
+#include "graphics/dx_renderer.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <util/color.h>
-#include <graphics/shader/vertex/vertex_shader.h>
-#include <graphics/shader/pixel/pixel_shader.h>
-#include <graphics/texture/texture.h>
-#include <graphics/vertex.h>
-#include <util/transform.h>
-#include <util/utility.h>
-#include <util/vec2.h>
+#include "util/color.h"
+#include "graphics/shader/vertex/vertex_shader.h"
+#include "graphics/shader/pixel/pixel_shader.h"
+#include "graphics/texture/texture.h"
+#include "graphics/vertex.h"
+#include "util/transform.h"
+#include "util/utility.h"
+#include "util/vec2.h"
 /******* end headers *******/
 
 namespace Core

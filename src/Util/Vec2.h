@@ -7,7 +7,7 @@
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
-#include <util/vec2_fwd.h>
+#include "util/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core

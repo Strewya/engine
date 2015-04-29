@@ -1,14 +1,14 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <graphics/mesh/mesh.h>
+#include "graphics/mesh/mesh.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <graphics/dx_renderer.h>
-#include <util/color.h>
-#include <util/vec2.h>
-#include <util/vec3.h>
+#include "graphics/dx_renderer.h"
+#include "util/color.h"
+#include "util/vec2.h"
+#include "util/vec3.h"
 /******* end headers *******/
 
 namespace Core

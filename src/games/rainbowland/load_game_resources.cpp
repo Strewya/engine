@@ -1,15 +1,15 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <games/rainbowland/load_game_resources.h>
+#include "games/rainbowland/load_game_resources.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <audio/audio_system.h>
-#include <games/rainbowland/game_resources.h>
-#include <games/rainbowland/game_systems.h>
-#include <graphics/graphics_system.h>
-#include <util/utility.h>
+#include "audio/audio_system.h"
+#include "games/rainbowland/game_resources.h"
+#include "games/rainbowland/game_systems.h"
+#include "graphics/graphics_system.h"
+#include "util/utility.h"
 /******* end headers *******/
 
 namespace Core

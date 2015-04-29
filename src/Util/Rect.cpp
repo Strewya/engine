@@ -1,8 +1,8 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <util/rect.h>
+#include "util/rect.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 /******* end headers *******/

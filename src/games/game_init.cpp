@@ -1,15 +1,15 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <games/game_init.h>
+#include "games/game_init.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <util/clock.h>
-#include <util/utility.h>
-#include <window/window.h>
+#include "util/clock.h"
+#include "util/utility.h"
+#include "window/window.h"
 
-#include <games/game_list.h>
+#include "games/game_list.h"
 #include CORE_HEADER
 /******* end headers *******/
 

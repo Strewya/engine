@@ -8,10 +8,10 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include <graphics/shader/shader_handle.h>
-#include <graphics/texture/texture_handle.h>
-#include <graphics/graphics_typedefs.h>
-#include <util/vec2_fwd.h>
+#include "graphics/shader/shader_handle.h"
+#include "graphics/texture/texture_handle.h"
+#include "graphics/graphics_typedefs.h"
+#include "util/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core

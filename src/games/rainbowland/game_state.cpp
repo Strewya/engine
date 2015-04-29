@@ -1,25 +1,24 @@
 //headers should be ordered alphabetically!
 /******* precompiled header *******/
-#include <stdafx.h>
+#include "stdafx.h"
 /******* personal header *******/
-#include <games/rainbowland/game_state.h>
+#include "games/rainbowland/game_state.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include <games/rainbowland/game_resources.h>
-#include <games/rainbowland/game_systems.h>
-#include <graphics/graphics_system.h>
-#include <util/transform.h>
-#include <util/color.h>
+#include "games/rainbowland/game_resources.h"
+#include "games/rainbowland/game_systems.h"
+#include "graphics/graphics_system.h"
+#include "input/input_system.h"
+#include "util/clock.h"
+#include "util/timer.h"
+#include "util/transform.h"
+#include "util/color.h"
+#include "window/window_event.h"
 /******* end headers *******/
 
 namespace Core
 {
-   void initializeSession(GameState& state, GameSystems& systems, GameResources& assets)
-   {
-
-   }
-
-   void initializeGameState(GameState& state, GameSystems& systems, GameResources& assets)
+   bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
    {
       state.activeState = GameState::State::Session;
 
@@ -27,50 +26,55 @@ namespace Core
 
       auto backgroundTexture = systems.gfx->textures.getData(assets.background);
       auto ratio = (float)backgroundTexture.width / (float)backgroundTexture.height;
-      state.background = makeTexturedQuad({}, {ratio*15, 15}, assets.background, {}, {1, 1}, assets.mainVS, assets.mainPS);
+      state.backgroundMesh = makeTexturedQuad({}, {ratio*15, 15}, assets.background, {}, {1, 1}, assets.mainVS, assets.mainPS);
 
       auto atlasTexture = systems.gfx->textures.getData(assets.atlas);
       auto x = 1795, y = 420, w = (3085 - 1795) / 5, h = (673 - 420);
       ratio = (float)w / (float)h;
-      state.player = makeTexturedQuad({}, {ratio * 1, 1}, assets.atlas,
+      state.playerMesh = makeTexturedQuad({}, {ratio * 1, 1}, assets.atlas,
                                       Vec2f{(float)x / (float)atlasTexture.width, (float)y / (float)atlasTexture.height},
                                       Vec2f{(float)(x + w) / (float)atlasTexture.width, (float)(y + h) / (float)atlasTexture.height},
                                       assets.mainVS, assets.mainPS);
+      state.playerMover.acceleration = 1;
+      state.playerMover.maxSpeed = 5;
+      state.playerMover.currentSpeed = 0;
+      state.playerMover.position.set(0, 0);
+      state.playerMover.direction.set(1, 0);
 
-      switch( state.activeState )
-      {
-         case GameState::State::Session:
-         {
-            initializeSession(state, systems, assets);
-         } break;
-      }
-
+      return true;
    }
 
-   void updateGameState(GameState& state, GameSystems& systems, GameResources& assets)
+   bool updateGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
    {
-      switch( state.activeState )
+      bool stillRunning = true;
+      
+      auto eventList = systems.input->getEvents();
+      enum Direction
       {
-         case GameState::State::Session:
-         {
-            
-         } break;
-         case GameState::State::ClassPick:
-         {
-
-         } break;
-         case GameState::State::ColorPick:
+         Up,Down,Left,Right,Count
+      };
+      bool moveState[Direction::Count]{};
+      for( auto& e : eventList )
+      {
+         if( e.type == WindowEventType::WE_KEYBOARDKEY )
          {
 
-         } break;
+         }
       }
+
+      //movement
+      state.playerMover.currentSpeed += state.playerMover.acceleration*timer.getDeltaSeconds();
+      clamp(state.playerMover.currentSpeed, 0.0f, state.playerMover.maxSpeed);
+      state.playerMover.position += state.playerMover.direction*state.playerMover.currentSpeed*timer.getDeltaSeconds();
+
+      return stillRunning;
    }
 
-   void renderGameState(GameState& state, GameSystems& systems, GameResources& assets)
+   void renderGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
    {
       systems.gfx->renderer.setTransparency(false);
-      systems.gfx->renderMesh(Transform{}, Color{}, state.background);
+      systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
       systems.gfx->renderer.setTransparency(true);
-      systems.gfx->renderMesh(Transform{}, Color{}, state.player);
+      systems.gfx->renderMesh(Transform{}, Color{}, state.playerMesh);
    }
 }
