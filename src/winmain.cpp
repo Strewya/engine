@@ -20,9 +20,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
    if( result == Core::WindowResult::OK )
    {
-      std::thread logicThread(Core::runGame, std::ref(window));
+      std::thread logicThread(Core::runGame, window.getProxy());
 
-      while( window.isRunning() )
+      while( window.getProxy().isRunning() )
       {
          window.update();
       }

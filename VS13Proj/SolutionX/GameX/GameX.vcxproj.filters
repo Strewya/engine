@@ -64,12 +64,6 @@
     <ClCompile Include="..\..\..\src\Window\keyboard_handler.cpp">
       <Filter>Code\framework\window\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Window\window_general.cpp">
-      <Filter>Code\framework\window\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Window\window_platform.cpp">
-      <Filter>Code\framework\window\windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\Window\window_class.cpp">
       <Filter>Code\framework\window\windows</Filter>
     </ClCompile>
@@ -120,6 +114,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\Input\keyboard.cpp">
       <Filter>Code\framework\input\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\window\window_proxy.cpp">
+      <Filter>Code\framework\window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,6 +329,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\Input\keyboard.h">
       <Filter>Code\framework\input\devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\window\window_proxy.h">
+      <Filter>Code\framework\window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

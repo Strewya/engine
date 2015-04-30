@@ -15,6 +15,7 @@
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
 #include "util/vec2.h"
+#include "window/window_proxy.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -24,14 +25,12 @@ namespace Core
    class Mesh;
    class Transform;
    class Vertex;
-   class Window;
-
 
 
    class GraphicsSystem
    {
    public:
-      bool init(Window& window);
+      bool init(WindowProxy window);
       bool shutdown();
 
       void begin();
@@ -70,7 +69,7 @@ namespace Core
 
       std::vector<IUnknown**> m_declaredObjects;
       
-      Window* m_window;
+      WindowProxy m_window;
 
       IDXGIFactory* m_dxgiFactory;
       ID3D11Device* m_dev;

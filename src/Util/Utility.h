@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   Utility defines and functions
 *  usage:
 ********************************************/
 /******* c++ headers *******/

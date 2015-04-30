@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   3D vector type forward declaration
 *  usage:
 ********************************************/
 /******* c++ headers *******/

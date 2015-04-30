@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   Main window class
 *  usage:
 ********************************************/
 /******* c++ headers *******/
@@ -13,8 +13,9 @@
 #include "window/gamepad_handler.h"
 #include "window/keyboard_handler.h"
 #include "window/mouse_handler.h"
-#include "window/window_event.h"
 #include "window/read_directory_changes.h"
+#include "window/window_event.h"
+#include "window/window_proxy.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -32,71 +33,56 @@ namespace Core
 
    WindowResult initializeWindow(Window& window);
 
-   static const uint32_t USE_MONITOR_RESOLUTION = 0;
-
    class Window
    {
    public:
-      //generic part
-      void showMessagebox(const char* title, const char* text);
-      void resize(uint32_t x, uint32_t y);
-      void move(int32_t x, int32_t y);
+      WindowProxy getProxy();
 
-      void showCursor(bool isShown);
-      void lockCursor(bool isLocked);
-      void makeMouseRelative(bool isRelative);
-      void setFullscreen(bool isFullscreen);
-
-      int32_t getPositionX() const;
-      int32_t getPositionY() const;
-      uint32_t getSizeX() const;
-      uint32_t getSizeY() const;
-      bool isCursorShown() const;
-      bool isFullscreen() const;
-
-      void monitorDirectoryForChanges(const char* directory);
-      void setFileChangeDelay(uint32_t delay);
-      bool getChangedFile(uint32_t index, uint32_t& outAction, std::string& outStr);
-      
-      std::vector<WindowEvent> collectEvents(uint64_t time);
-
-      //windows specific, should not be used in game code
       static LRESULT CALLBACK messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
       Window();
       Window(const char* title);
-      Window(const std::string& title);
       ~Window();
 
+      //platform
       LRESULT CALLBACK windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
+      //platform
       bool create();
+      //platform
       void show();
+      //platform
       void update();
-      void close();
 
+      //general if argument is enumerated, platform otherwise
       void setExtendedStyle(uint32_t style);
+      //general if argument is enumerated, platform otherwise
       void setStyle(uint32_t style);
-      
+      //platform
       HWND getWindowHandle() const;
+      //general if result is enumerated, platform otherwise
       uint32_t getStyle() const;
+      //general if result is enumerated, platform otherwise
       uint32_t getExtendedStyle() const;
-      const std::string& getClass() const;
-      const std::string& getTitle() const;
+      //platform
+      const char* getClass() const;
+      //platform
+      const char* getTitle() const;
+      //platform
       int32_t getExitCode() const;
-      bool isRunning() const;
 
-      void openConsole(int32_t xPos, int32_t yPos);
-      void closeConsole();
-
-   protected:
+   private:
+      friend class WindowProxy;
+      //platform
       WindowEvent& newEvent();
+      //platform
       void writeEvent();
+      //platform
       void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
+      //platform
       void processFileChanges();
-      void calculateClientRect(uint32_t& outXSize, uint32_t& outYSize);
 
-      std::string m_class;
-      std::string m_title;
+      const char* m_class;
+      const char* m_title;
 
       DWORD m_trackedChanges;
       int32_t m_xPos;
@@ -129,4 +115,6 @@ namespace Core
 
       CReadDirectoryChanges m_monitor;
    };
+
+   void calculateClientRect(uint32_t x, uint32_t y, uint32_t style, uint32_t styleEx, uint32_t& outXSize, uint32_t& outYSize);
 }

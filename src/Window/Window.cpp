@@ -43,11 +43,6 @@ namespace Core
    {
    }
 
-   Window::Window(const std::string& title)
-      : Window(title.c_str())
-   {
-   }
-
    Window::Window(const char* title)
       : m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
       m_xPos(CW_USEDEFAULT), m_yPos(CW_USEDEFAULT),
@@ -62,7 +57,7 @@ namespace Core
    {
       m_events.resize(m_eventQueueSize);
 
-      setFullscreen(m_fullscreen);
+      getProxy().setFullscreen(m_fullscreen);
    }
 
    Window::~Window()
@@ -70,18 +65,23 @@ namespace Core
       m_monitor.Terminate();
    }
 
+   WindowProxy Window::getProxy()
+   {
+      return WindowProxy{this};
+   }
+
    bool Window::create()
    {
       uint32_t x, y;
-      calculateClientRect(x, y);
+      calculateClientRect(m_xPos, m_yPos, m_style, m_extendedStyle, x, y);
       HWND hwndParent = nullptr;
       HMENU hMenu = nullptr;
       HINSTANCE hInstance = nullptr;
 
       m_hwnd = CreateWindowEx(
          m_extendedStyle,
-         m_class.c_str(),
-         m_title.c_str(),
+         m_class,
+         m_title,
          m_style,
          m_xPos,
          m_yPos,
@@ -100,21 +100,6 @@ namespace Core
    {
       ShowWindow(m_hwnd, SW_SHOW);
       UpdateWindow(m_hwnd);
-   }
-
-   void Window::close()
-   {
-      m_lockCursor = false;
-      InvalidateRect(m_hwnd, nullptr, true);
-#ifndef _DEBUG
-      PostMessage(m_hwnd, WM_CLOSE, 0, 0);
-      if( m_console )
-      {
-         closeConsole();
-      }
-#else
-      SetForegroundWindow(m_console);
-#endif
    }
 
    void Window::update()
@@ -167,12 +152,12 @@ namespace Core
       m_extendedStyle = style;
    }
    
-   const std::string& Window::getClass() const
+   const char* Window::getClass() const
    {
       return m_class;
    }
 
-   const std::string& Window::getTitle() const
+   const char* Window::getTitle() const
    {
       return m_title;
    }
@@ -197,41 +182,6 @@ namespace Core
       return m_exitCode;
    }
    
-   bool Window::isRunning() const
-   {
-      return m_isRunning;
-   }
-
-   void Window::openConsole(int32_t xPos, int32_t yPos)
-   {
-      if( !AllocConsole() )
-         return;
-
-      freopen("CONIN$", "r", stdin);
-      freopen("CONOUT$", "w", stdout);
-      freopen("CONOUT$", "w", stderr);
-
-      char name[]
-      {
-         "CoreDebugConsole"
-      };
-      SetConsoleTitle(name);
-      Sleep(40);
-      m_console = FindWindow(nullptr, name);
-      RECT consoleSize;
-      GetWindowRect(m_console, &consoleSize);
-      auto x = consoleSize.right - consoleSize.left;
-      auto y = consoleSize.bottom - consoleSize.top;
-      SetWindowPos(m_console, 0, xPos, yPos, x, y, 0); //SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW
-      SetForegroundWindow(m_hwnd);
-   }
-
-   void Window::closeConsole()
-   {
-      FreeConsole();
-      m_console = nullptr;
-   }
-
    LRESULT CALLBACK Window::messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
    {
       Window* window = nullptr;
@@ -298,8 +248,8 @@ namespace Core
             else
             {
                we.type = WindowEventType::WE_GAINFOCUS;
-               lockCursor(m_lockCursor);
-               showCursor(m_showCursor);
+               getProxy().lockCursor(m_lockCursor);
+               getProxy().showCursor(m_showCursor);
             }
             result = notProcessed;
          } break;
@@ -318,5 +268,95 @@ namespace Core
       }
 
       return result == notProcessed ? DefWindowProc(hwnd, msg, wParam, lParam) : result;
+   }
+
+   static FileChangeType toFileChangeType(DWORD action)
+   {
+      FileChangeType returnValue = Core::FILE_BADDATA;
+      switch( action )
+      {
+         case FILE_ACTION_ADDED:
+         {
+            returnValue = Core::FILE_ADDED;
+         }
+         break;
+
+         case FILE_ACTION_MODIFIED:
+         {
+            returnValue = Core::FILE_MODIFIED;
+         }
+         break;
+
+         case FILE_ACTION_REMOVED:
+         {
+            returnValue = Core::FILE_REMOVED;
+         }
+         break;
+
+         case FILE_ACTION_RENAMED_OLD_NAME:
+         {
+            returnValue = Core::FILE_RENAMED_FROM;
+         }
+         break;
+
+         case FILE_ACTION_RENAMED_NEW_NAME:
+         {
+            returnValue = Core::FILE_RENAMED_TO;
+         }
+         break;
+
+         default:
+            break;
+      }
+      return returnValue;
+   }
+
+   WindowEvent& Window::newEvent()
+   {
+      WindowEvent& we = m_events[m_headIndex];
+      ZeroMemory(&we, sizeof(WindowEvent));
+      we.timestamp = Clock::getRealTimeMicros();
+      return we;
+   }
+
+   void Window::writeEvent()
+   {
+      if( m_headIndex == m_tailIndex )
+      {
+         CORE_INFO("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "
+                   "should increase the size of our buffer from ", m_eventQueueSize, "...");
+      }
+
+      m_headIndex = (m_headIndex + 1) % m_eventQueueSize;
+   }
+
+   void Window::processFileChanges()
+   {
+      std::string file;
+      DWORD action;
+      while( m_monitor.Pop(action, file) )
+      {
+         if( file.size() < FilenameStringSize && file.find(".") != file.npos )
+         {
+            auto& we = newEvent();
+            we.type = WE_FILECHANGE;
+            we.fileChange.action = toFileChangeType(action);
+            strncpy(we.fileChange.filename, file.c_str(), FilenameStringSize);
+            we.fileChange.filename[FilenameStringSize] = 0;
+            writeEvent();
+         }
+         else
+         {
+            CORE_INFO("Filename too long (", file.size(), ") or not a file(", file, ")");
+         }
+      }
+   }
+
+   void calculateClientRect(uint32_t x, uint32_t y, uint32_t style, uint32_t styleEx, uint32_t& outXSize, uint32_t& outYSize)
+   {
+      RECT rc = {0, 0, x, y};
+      AdjustWindowRectEx(&rc, styleEx, false, styleEx);
+      outXSize = rc.right - rc.left;
+      outYSize = rc.bottom - rc.top;
    }
 }

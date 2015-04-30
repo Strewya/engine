@@ -14,7 +14,6 @@
 #include "util/color.h"
 #include "util/transform.h"
 #include "util/utility.h"
-#include "window/window.h"
 /******* end headers *******/
 
 namespace Core
@@ -32,27 +31,31 @@ namespace Core
       CORE_SHUTDOWN_END(Rainbowland);
    }
 
-   bool Game::init(Window& window)
+   bool Game::init(WindowProxy windowProxy)
    {
       CORE_INIT_START(Rainbowland);
 
-      this->window = &window;
+      this->window = windowProxy;
 
-      window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
+      CORE_STATUS_AND(window.isValid());
+      if( CORE_STATUS_OK )
+      {
+         window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
 #ifdef MURRAY
-      window.move(window.getSizeX(), 0);
+         window.move(window.getSizeX(), 0);
 #endif
-      window.showCursor(true);
+         window.showCursor(true);
 
-      //window.setFullscreen(true);
+         //window.setFullscreen(true);
 
-      CORE_STATUS_AND(audioSystem.init());
-      CORE_STATUS_AND(graphicsSystem.init(window));
-      CORE_STATUS_AND(inputSystem.init(window));
+         CORE_STATUS_AND(audioSystem.init());
+         CORE_STATUS_AND(graphicsSystem.init(window));
+         CORE_STATUS_AND(inputSystem.init(window));
 
-      systems.audio = &audioSystem;
-      systems.gfx = &graphicsSystem;
-      systems.input = &inputSystem;
+         systems.audio = &audioSystem;
+         systems.gfx = &graphicsSystem;
+         systems.input = &inputSystem;
+      }
 
       if( CORE_STATUS_OK )
       {
@@ -68,7 +71,6 @@ namespace Core
 
          initializeGameState(timer, state, systems, assets);
       }
-
 
       CORE_INIT_END(Rainbowland);
    }
@@ -115,7 +117,7 @@ namespace Core
                   {
                      if( e.keyboard.firstTimeDown )
                      {
-                        window->showCursor(!window->isCursorShown());
+                        window.showCursor(!window.isCursorShown());
                      }
                   } break;
                   case Keyboard::Space:
@@ -153,7 +155,7 @@ namespace Core
                         timer.getDeltaSeconds()*state.cameraMoveDirection.y*state.cameraMoveModifier,
                         timer.getDeltaSeconds()*state.cameraMoveDirection.z*state.cameraMoveModifier});
 
-      running = updateGameState(timer, state, systems, assets);
+      running = running && updateGameState(timer, state, systems, assets);
 
       return running;
    }

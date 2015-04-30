@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   3D vector function implementations
 *  usage:
 ********************************************/
 /******* c++ headers *******/

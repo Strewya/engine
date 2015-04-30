@@ -7,7 +7,7 @@
 /******* extra headers *******/
 #include "util/clock.h"
 #include "util/utility.h"
-#include "window/window.h"
+#include "window/window_proxy.h"
 
 #include "games/game_list.h"
 #include CORE_HEADER
@@ -27,7 +27,7 @@
 
 namespace Core
 {
-   void runGame(Window& window)
+   void runGame(WindowProxy window)
    {
 #ifndef NO_GAME
 #ifndef DEPLOY

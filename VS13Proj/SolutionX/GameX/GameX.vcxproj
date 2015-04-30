@@ -281,8 +281,7 @@
     <ClCompile Include="..\..\..\src\Window\read_directory_changes_private.cpp" />
     <ClCompile Include="..\..\..\src\Window\window.cpp" />
     <ClCompile Include="..\..\..\src\Window\window_class.cpp" />
-    <ClCompile Include="..\..\..\src\Window\window_general.cpp" />
-    <ClCompile Include="..\..\..\src\Window\window_platform.cpp" />
+    <ClCompile Include="..\..\..\src\window\window_proxy.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -356,6 +355,7 @@
     <ClInclude Include="..\..\..\src\Window\window.h" />
     <ClInclude Include="..\..\..\src\Window\window_class.h" />
     <ClInclude Include="..\..\..\src\Window\window_event.h" />
+    <ClInclude Include="..\..\..\src\window\window_proxy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

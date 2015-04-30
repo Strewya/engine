@@ -28,11 +28,11 @@ namespace Core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool GraphicsSystem::init(Window& window)
+   bool GraphicsSystem::init(WindowProxy window)
    {
       CORE_INIT_START(GraphicsSystem);
 
-      m_window = &window;
+      m_window = window;
       m_backbufferSize.x = window.getSizeX();
       m_backbufferSize.y = window.getSizeY();
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
@@ -147,7 +147,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setOrthographicProjection()
    {
-      renderer.setProjection(XMMatrixOrthographicLH((float)m_window->getSizeX(), (float)m_window->getSizeY(), 1.0f, 100.0f));
+      renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -155,7 +155,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setPerspectiveProjection()
    {
-      renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window->getSizeX() / m_window->getSizeY(), 1.0f, 100.0f));
+      renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -227,14 +227,14 @@ namespace Core
       swapChainDesc.BufferCount = 1;
       swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
       swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-      swapChainDesc.OutputWindow = m_window->getWindowHandle();
+      swapChainDesc.OutputWindow = m_window.getRawWindow()->getWindowHandle();
       swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
       swapChainDesc.Windowed = true;
 
       DXGI_MODE_DESC& bd = swapChainDesc.BufferDesc;
       bd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-      bd.Width = m_window->getSizeX(); //m_backbufferSize.x
-      bd.Height = m_window->getSizeY(); //m_backbufferSize.y
+      bd.Width = m_window.getSizeX(); //m_backbufferSize.x
+      bd.Height = m_window.getSizeY(); //m_backbufferSize.y
       bd.RefreshRate.Denominator = 1;
       bd.RefreshRate.Numerator = 60;
       bd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -287,8 +287,8 @@ namespace Core
       ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
       vp.TopLeftX = 0;
       vp.TopLeftY = 0;
-      vp.Width = (float)m_window->getSizeX();
-      vp.Height = (float)m_window->getSizeY();
+      vp.Width = (float)m_window.getSizeX();
+      vp.Height = (float)m_window.getSizeY();
       vp.MinDepth = 0;
       vp.MaxDepth = 1;
 
@@ -329,8 +329,8 @@ namespace Core
       D3D11_TEXTURE2D_DESC dsd;
       ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
 
-      dsd.Width = m_window->getSizeX(); //m_backbufferSize.x;
-      dsd.Height = m_window->getSizeY(); //m_backbufferSize.y;
+      dsd.Width = m_window.getSizeX(); //m_backbufferSize.x;
+      dsd.Height = m_window.getSizeY(); //m_backbufferSize.y;
       dsd.MipLevels = 1;
       dsd.ArraySize = 1;
       dsd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

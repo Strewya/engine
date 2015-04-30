@@ -10,17 +10,16 @@
 #include "input/mouse.h"
 #include "util/clock.h"
 #include "util/utility.h"
-#include "window/window.h"
 #include "window/window_event.h"
 /******* end headers *******/
 
 namespace Core
 {
-   bool InputSystem::init(Window& window)
+   bool InputSystem::init(WindowProxy window)
    {
       CORE_INIT_START(InputSystem);
 
-      m_window = &window;
+      m_window = window;
 
       Gamepad::Init();
       Keyboard::Init();
@@ -40,7 +39,7 @@ namespace Core
    {
       m_inputEvents.clear();
       auto currentPeekTime = Clock::getRealTimeMicros();
-      m_inputEvents = m_window->collectEvents(currentPeekTime);
+      m_inputEvents = m_window.collectEvents(currentPeekTime);
    }
 
    EventVector_t InputSystem::getEvents() const

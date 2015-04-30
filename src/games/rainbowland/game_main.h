@@ -14,16 +14,17 @@
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
 #include "util/timer.h"
+#include "window/window_proxy.h"
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class Window;
+   class WindowProxy;
 
    class Game
    {
    public:
-      Window* window;
+      WindowProxy window;
 
       AudioSystem audioSystem;
       GraphicsSystem graphicsSystem;
@@ -35,7 +36,7 @@ namespace Core
 
       Timer timer;
 
-      bool init(Window& window);
+      bool init(WindowProxy window);
       bool shutdown();
 
       bool tickLogic(uint32_t updateTime);

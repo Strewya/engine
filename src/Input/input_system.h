@@ -8,12 +8,12 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
+#include "window/window_proxy.h"
 /******* end header inclusion *******/
 
 namespace Core
 {
    class Clock;
-   class Window;
    class WindowEvent;
 
    typedef std::vector<WindowEvent> EventVector_t;
@@ -21,7 +21,7 @@ namespace Core
    class InputSystem
    {
    public:
-      bool init(Window& window);
+      bool init(WindowProxy window);
       bool shutdown();
 
       void update();
@@ -29,7 +29,7 @@ namespace Core
       EventVector_t getEvents() const;
 
    private:
-      Window* m_window;
+      WindowProxy m_window;
       EventVector_t m_inputEvents;
    };
 }

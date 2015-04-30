@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   Rectangle type declaration
 *  usage:
 ********************************************/
 /******* c++ headers *******/
