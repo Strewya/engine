@@ -4,7 +4,7 @@
 /******* personal header *******/
 #include "graphics/shader/pixel/pixel_shader_file_loader.h"
 /******* c++ headers *******/
-#include <fstream>
+#include <vector>
 /******* extra headers *******/
 #include "graphics/shader/file_loader.h"
 #include "graphics/shader/pixel/pixel_shader.h"
@@ -31,7 +31,7 @@ namespace Core
       CORE_SHUTDOWN_END(PixelShaderFileLoader);
    }
 
-   PixelShader PixelShaderFileLoader::load(const std::string& filename) const
+   PixelShader PixelShaderFileLoader::load(const char* filename) const
    {
       PixelShader result{nullptr};
       std::vector<char> buffer;

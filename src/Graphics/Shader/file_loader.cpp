@@ -10,7 +10,7 @@
 
 namespace Core
 {
-   bool loadFile(const std::string& filename, std::vector<char>& buffer)
+   bool loadFile(const char* filename, std::vector<char>& buffer)
    {
       size_t shaderSize = 0;
       std::ifstream shaderFile{filename, std::ifstream::in | std::ifstream::binary};

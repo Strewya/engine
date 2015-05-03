@@ -1,10 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   texture resource file loader
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <string>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 /******* extra headers *******/
@@ -12,17 +11,17 @@
 
 namespace Core
 {
-   class DXTexture;
+   class Texture;
 
-   class DXTextureFileLoader
+   class TextureFileLoader
    {
    public:
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      DXTexture load(const std::string& filename) const;
+      Texture load(const char* filename) const;
 
-      void unload(DXTexture& data) const;
+      void unload(Texture& data) const;
 
    private:
       ID3D11Device* m_dev;

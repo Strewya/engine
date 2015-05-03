@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   code that tracks file changes for a specified directory
 *  usage:
 ********************************************/
 /******* c++ headers *******/

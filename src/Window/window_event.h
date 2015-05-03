@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   general window events that the OS code can send to game code
 *  usage:
 ********************************************/
 /******* c++ headers *******/

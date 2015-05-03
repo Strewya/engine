@@ -5,7 +5,7 @@
 #include "games/game_init.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "util/clock.h"
+#include "util/time/clock.h"
 #include "util/utility.h"
 #include "window/window_proxy.h"
 

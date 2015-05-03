@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   resources used by the game, stored by their handle
 *  usage:
 ********************************************/
 /******* c++ headers *******/

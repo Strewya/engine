@@ -8,10 +8,10 @@
 #include <cstdlib>
 #include <iostream>
 /******* extra headers *******/
-#include "util/clock.h"
-#include "util/time_unit_conversions.h"
+#include "util/time/clock.h"
+#include "util/time/time_unit_conversions.h"
 #include "util/utility.h"
-#include "util/vec2.h"
+#include "util/geometry/vec2.h"
 #include "window/window_class.h"
 /******* end headers *******/
 

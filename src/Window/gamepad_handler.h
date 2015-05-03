@@ -1,7 +1,7 @@
 #pragma once
 /********************************************
-*  contents:   #todo
-*  usage:
+*  contents:   handler for all gamepad related functionality
+*  usage:   uses xinput
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>

@@ -1,11 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   file loader for pixel shaders
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <string>
-#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include "graphics/shader/pixel/pixel_shader_loader.h"
@@ -21,7 +19,7 @@ namespace Core
       bool init(PixelShaderLoader& loader);
       bool shutdown();
 
-      PixelShader load(const std::string& filename) const;
+      PixelShader load(const char* filename) const;
 
       void unload(PixelShader& data);
 

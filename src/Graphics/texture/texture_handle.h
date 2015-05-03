@@ -1,17 +1,15 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   texture resource handle declaration
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
-#include <string>
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/resource_handle.h"
+#include "util/template/resource_handle_template.h"
 /******* end header inclusion *******/
 
 namespace Core
 {
-   CORE_HANDLE(HTexture);
+   CORE_RESOURCE_HANDLE(HTexture);
 }

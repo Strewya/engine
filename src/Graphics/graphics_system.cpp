@@ -39,6 +39,9 @@ namespace Core
       clearCamera();
 
       //should be declared in reverse order due to how the cleanup is performed
+      declare(m_cullingDisabled);
+      declare(m_cullingEnabled);
+      declare(m_transparency);
       declare(m_depthStencilView);
       declare(m_depthStencilBuffer);
       declare(m_samplerState);
@@ -54,7 +57,7 @@ namespace Core
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
-      CORE_STATUS_AND(renderer.init(m_dev, m_devcon, m_samplerState));
+      CORE_STATUS_AND(_renderer.init(m_dev, m_devcon, m_samplerState));
 
       CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
       CORE_STATUS_AND(m_vsLoader.init(m_dev));
@@ -65,7 +68,7 @@ namespace Core
       if( CORE_STATUS_OK )
       {
          auto defaultTexture = m_textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
-         CORE_STATUS_AND(textures.init(STR(DXTextureManager), m_textureFileLoader, defaultTexture));
+         CORE_STATUS_AND(textures.init(STR(TextureManager), m_textureFileLoader, defaultTexture));
       }
 
 
@@ -85,6 +88,39 @@ namespace Core
          defaultPixelShader = m_psLoader.load((const char*)g_PShader, sizeof(g_PShader));
       }
 
+      if( CORE_STATUS_OK )
+      {
+         D3D11_BLEND_DESC blendDesc;
+         ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+
+         blendDesc.AlphaToCoverageEnable = false;
+
+         D3D11_RENDER_TARGET_BLEND_DESC& rtbd = blendDesc.RenderTarget[0];
+         rtbd.BlendEnable = true;
+         rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+         rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+         rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+         rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+         rtbd.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+         rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+         rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+
+         HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
+
+         CORE_STATUS_AND(SUCCEEDED(hr));
+
+         D3D11_RASTERIZER_DESC rd;
+         ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+         rd.FillMode = D3D11_FILL_SOLID;
+
+         rd.CullMode = D3D11_CULL_BACK;
+         hr = m_dev->CreateRasterizerState(&rd, &m_cullingEnabled);
+         CORE_STATUS_AND(SUCCEEDED(hr));
+
+         rd.CullMode = D3D11_CULL_NONE;
+         hr = m_dev->CreateRasterizerState(&rd, &m_cullingDisabled);
+         CORE_STATUS_AND(SUCCEEDED(hr));
+      }
 
 
       CORE_STATUS_AND(vertexShaders.init(STR(VertexShaderManager), m_vsFileLoader, defaultVertexShader));
@@ -109,7 +145,7 @@ namespace Core
       CORE_STATUS_AND(m_vsLoader.shutdown());
       CORE_STATUS_AND(m_textureFileLoader.shutdown());
 
-      CORE_STATUS_AND(renderer.shutdown());
+      CORE_STATUS_AND(_renderer.shutdown());
 
       ID3D11Debug* debug = nullptr;
       HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
@@ -147,7 +183,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setOrthographicProjection()
    {
-      renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
+      _renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -155,7 +191,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::setPerspectiveProjection()
    {
-      renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
+      _renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -163,7 +199,7 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::applyCamera(const Camera& cam)
    {
-      renderer.setView(calculateCamView(cam));
+      _renderer.setView(calculateCamView(cam));
    }
 
    //*****************************************************************
@@ -171,7 +207,37 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::clearCamera()
    {
-      renderer.setView(XMMatrixIdentity());
+      _renderer.setView(XMMatrixIdentity());
+   }
+
+   //*****************************************************************
+   //          SET CULLING
+   //*****************************************************************
+   void GraphicsSystem::setCulling(bool isEnabled)
+   {
+      if( isEnabled )
+      {
+         _renderer.setRasterizerState(m_cullingEnabled);
+      }
+      else
+      {
+         _renderer.setRasterizerState(m_cullingDisabled);
+      }
+   }
+
+   //*****************************************************************
+   //          SET TRANSPARENCY
+   //*****************************************************************
+   void GraphicsSystem::setTransparency(bool isEnabled)
+   {
+      if( isEnabled )
+      {
+         _renderer.setBlendState(m_transparency);
+      }
+      else
+      {
+         _renderer.setBlendState(nullptr);
+      }
    }
 
    //*****************************************************************
@@ -179,11 +245,20 @@ namespace Core
    //*****************************************************************
    void GraphicsSystem::renderMesh(Transform t, Color c, const Mesh& mesh)
    {
-      renderer.setShader(vertexShaders.getData(mesh.vshader));
-      renderer.setShader(pixelShaders.getData(mesh.pshader));
-      renderer.setTexture(textures.getData(mesh.texture));
-      renderer.setVertexTopology(mesh.topology);
-      renderer.render(t, c, mesh.vertices, mesh.indices);
+      D3D_PRIMITIVE_TOPOLOGY topology[] = {
+         D3D_PRIMITIVE_TOPOLOGY_LINELIST,
+         D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
+         D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+         D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
+      };
+
+      auto vshader = vertexShaders.getData(mesh.vshader);
+      _renderer.setInputLayout(vshader._inputLayout);
+      _renderer.setShader(vshader._vertex);
+      _renderer.setShader(pixelShaders.getData(mesh.pshader)._pixel);
+      _renderer.setTexture(textures.getData(mesh.texture)._shaderResourceView);
+      _renderer.setVertexTopology(topology[mesh.topology]);
+      _renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
    //*****************************************************************

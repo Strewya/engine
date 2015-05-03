@@ -4,7 +4,7 @@
 /******* personal header *******/
 #include "graphics/shader/vertex/vertex_shader_file_loader.h"
 /******* c++ headers *******/
-#include <fstream>
+#include <vector>
 /******* extra headers *******/
 #include "graphics/shader/file_loader.h"
 #include "graphics/shader/vertex/vertex_shader.h"
@@ -31,7 +31,7 @@ namespace Core
       CORE_SHUTDOWN_END(VertexShaderFileLoader);
    }
 
-   VertexShader VertexShaderFileLoader::load(const std::string& filename, InputLayout layout) const
+   VertexShader VertexShaderFileLoader::load(const char* filename, InputLayout layout) const
    {
       VertexShader result{nullptr, nullptr};
       std::vector<char> buffer;

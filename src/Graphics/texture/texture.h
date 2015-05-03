@@ -1,11 +1,10 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   texture resource type
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>
-#include <string>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 /******* extra headers *******/
@@ -13,21 +12,21 @@
 
 namespace Core
 {
-   class DXTexture
+   class Texture
    {
    public:
-      ID3D11ShaderResourceView* shaderResourceView;
       uint32_t width;
       uint32_t height;
+      ID3D11ShaderResourceView* _shaderResourceView;
 
       bool loaded()
       {
-         return shaderResourceView != nullptr && width > 0 && height > 0;
+         return _shaderResourceView != nullptr && width > 0 && height > 0;
       }
 
       bool unloaded()
       {
-         return shaderResourceView == nullptr && width == 0 && height == 0;
+         return _shaderResourceView == nullptr && width == 0 && height == 0;
       }
    };
 }

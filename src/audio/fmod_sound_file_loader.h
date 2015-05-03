@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   fmod sound file loader
 *  usage:
 ********************************************/
 /******* c++ headers *******/
@@ -20,7 +20,7 @@ namespace Core
       bool init(FMOD::System* system);
       bool shutdown();
 
-      FmodSound load(const std::string& filename) const;
+      FmodSound load(const char* filename) const;
 
       void unload(FmodSound& texture) const;
 

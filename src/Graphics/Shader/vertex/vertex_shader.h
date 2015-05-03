@@ -1,10 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   vertex shader resource type
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <string>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 /******* extra headers *******/
@@ -15,17 +14,17 @@ namespace Core
    class VertexShader
    {
    public:
-      ID3D11InputLayout* inputLayout;
-      ID3D11VertexShader* vertex;
+      ID3D11InputLayout* _inputLayout;
+      ID3D11VertexShader* _vertex;
 
       bool loaded()
       {
-         return inputLayout != nullptr && vertex != nullptr;
+         return _inputLayout != nullptr && _vertex != nullptr;
       };
 
       bool unloaded()
       {
-         return inputLayout == nullptr && vertex == nullptr;
+         return _inputLayout == nullptr && _vertex == nullptr;
       }
    };
 }

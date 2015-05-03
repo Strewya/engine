@@ -1,17 +1,15 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   mesh type used for rendering
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
-#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
-#include "graphics/graphics_typedefs.h"
-#include "util/vec2_fwd.h"
+#include "graphics/graphics_types.h"
+#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core

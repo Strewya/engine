@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   handler for keyboard related messages from the OS
 *  usage:
 ********************************************/
 /******* c++ headers *******/

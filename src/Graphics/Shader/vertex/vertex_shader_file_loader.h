@@ -1,14 +1,13 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   vertex shader loader from file
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <string>
-#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 #include "graphics/shader/vertex/vertex_shader_loader.h"
+#include "graphics/graphics_types.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -21,7 +20,7 @@ namespace Core
       bool init(VertexShaderLoader& loader);
       bool shutdown();
 
-      VertexShader load(const std::string& filename, InputLayout layout) const;
+      VertexShader load(const char* filename, InputLayout layout) const;
 
       void unload(VertexShader& data);
 

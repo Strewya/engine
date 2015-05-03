@@ -1,12 +1,12 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   camera used by the graphics system to render the view of the game
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/vec3.h"
+#include "util/geometry/vec3.h"
 /******* end header inclusion *******/
 
 namespace Core

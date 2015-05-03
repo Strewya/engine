@@ -8,8 +8,8 @@
 #include <vector>
 /******* extra headers *******/
 #include "input/gamepad.h"
-#include "util/time_unit_conversions.h"
-#include "util/vec2.h"
+#include "util/time/time_unit_conversions.h"
+#include "util/geometry/vec2.h"
 #include "window/window_event.h"
 /******* end headers *******/
 

@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   gamepad key declarations
 *  usage:
 ********************************************/
 /******* c++ headers *******/

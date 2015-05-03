@@ -36,7 +36,7 @@ namespace Core
       PixelShader result{nullptr};
       if( buffer != nullptr && bufferSize > 0 )
       {
-         HRESULT hr = m_dev->CreatePixelShader(buffer, bufferSize, nullptr, &result.pixel);
+         HRESULT hr = m_dev->CreatePixelShader(buffer, bufferSize, nullptr, &result._pixel);
          if( FAILED(hr) )
          {
             CORE_INFO("Failed to create pixel shader");
@@ -51,6 +51,6 @@ namespace Core
 
    void PixelShaderLoader::unload(PixelShader& data)
    {
-      safeRelease(data.pixel);
+      safeRelease(data._pixel);
    }
 }

@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   Windows OS specific
 *  usage:
 ********************************************/
 /******* c++ headers *******/

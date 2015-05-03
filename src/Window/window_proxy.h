@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   proxy to the window type which should be fairly platform independant by declaration
 *  usage:
 ********************************************/
 /******* c++ headers *******/

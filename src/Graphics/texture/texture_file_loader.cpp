@@ -11,34 +11,34 @@
 
 namespace Core
 {
-   bool DXTextureFileLoader::init(ID3D11Device* device)
+   bool TextureFileLoader::init(ID3D11Device* device)
    {
-      CORE_INIT_START(DXTextureFileLoader);
+      CORE_INIT_START(TextureFileLoader);
 
       m_dev = device;
 
       CORE_STATUS_AND(m_dev != nullptr);
 
-      CORE_INIT_END(DXTextureFileLoader);
+      CORE_INIT_END(TextureFileLoader);
    }
 
-   bool DXTextureFileLoader::shutdown()
+   bool TextureFileLoader::shutdown()
    {
-      CORE_SHUTDOWN_START(DXTextureFileLoader);
+      CORE_SHUTDOWN_START(TextureFileLoader);
 
       m_dev = nullptr;
 
-      CORE_SHUTDOWN_END(DXTextureFileLoader);
+      CORE_SHUTDOWN_END(TextureFileLoader);
    }
 
-   DXTexture DXTextureFileLoader::load(const std::string& filename) const
+   Texture TextureFileLoader::load(const char* filename) const
    {
-      DXTexture result{nullptr, 0, 0};
-      HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename.c_str(), nullptr, nullptr, &result.shaderResourceView, nullptr);
+      Texture result{0, 0, nullptr};
+      HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename, nullptr, nullptr, &result._shaderResourceView, nullptr);
       if( SUCCEEDED(hr) )
       {
          ID3D11Resource* res = nullptr;
-         result.shaderResourceView->GetResource(&res);
+         result._shaderResourceView->GetResource(&res);
 
          ID3D11Texture2D* texture2d = nullptr;
          hr = res->QueryInterface(&texture2d);
@@ -63,9 +63,9 @@ namespace Core
       return result;
    }
 
-   void DXTextureFileLoader::unload(DXTexture& data) const
+   void TextureFileLoader::unload(Texture& data) const
    {
-      safeRelease(data.shaderResourceView);
+      safeRelease(data._shaderResourceView);
       data.width = 0;
       data.height = 0;
    }

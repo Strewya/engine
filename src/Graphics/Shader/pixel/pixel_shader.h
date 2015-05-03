@@ -1,10 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   pixel shader resource type
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <string>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 /******* extra headers *******/
@@ -15,11 +14,11 @@ namespace Core
    class PixelShader
    {
    public:
-      ID3D11PixelShader* pixel;
+      ID3D11PixelShader* _pixel;
 
       bool loaded()
       {
-         return pixel != nullptr;
+         return _pixel != nullptr;
       }
 
       bool unloaded()

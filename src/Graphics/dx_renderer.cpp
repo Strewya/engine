@@ -12,7 +12,7 @@
 #include "graphics/vertex.h"
 #include "util/transform.h"
 #include "util/utility.h"
-#include "util/vec2.h"
+#include "util/geometry/vec2.h"
 /******* end headers *******/
 
 namespace Core
@@ -33,46 +33,17 @@ namespace Core
       m_samplerState = samplerState;
       m_devcon->PSSetSamplers(0, 1, &m_samplerState);
 
-      m_topology = -1;
+      m_topology = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
       m_texture = nullptr;
-      m_vertexShader = nullptr;
       m_inputLayout = nullptr;
+      m_vertexShader = nullptr;
       m_pixelShader = nullptr;
+      m_rasterizerState = nullptr;
+      m_blendState = nullptr;
 
       CORE_STATUS_AND(m_dev != nullptr);
       CORE_STATUS_AND(m_devcon != nullptr);
       CORE_STATUS_AND(m_samplerState != nullptr);
-
-      D3D11_BLEND_DESC blendDesc;
-      ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
-
-      blendDesc.AlphaToCoverageEnable = false;
-
-      D3D11_RENDER_TARGET_BLEND_DESC& rtbd = blendDesc.RenderTarget[0];
-      rtbd.BlendEnable = true;
-      rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
-      rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-      rtbd.BlendOp = D3D11_BLEND_OP_ADD;
-      rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
-      rtbd.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-      rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
-      rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
-
-      HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
-
-      CORE_STATUS_AND(SUCCEEDED(hr));
-
-      D3D11_RASTERIZER_DESC rd;
-      ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-      rd.FillMode = D3D11_FILL_SOLID;
-
-      rd.CullMode = D3D11_CULL_BACK;
-      hr = m_dev->CreateRasterizerState(&rd, &m_cullingEnabled);
-      CORE_STATUS_AND(SUCCEEDED(hr));
-
-      rd.CullMode = D3D11_CULL_NONE;
-      hr = m_dev->CreateRasterizerState(&rd, &m_cullingDisabled);
-      CORE_STATUS_AND(SUCCEEDED(hr));
 
       CORE_INIT_END(DXRenderer);
    }
@@ -83,14 +54,7 @@ namespace Core
 
       m_devcon = nullptr;
       m_samplerState = nullptr;
-      safeRelease(m_transparency);
-      safeRelease(m_cullingDisabled);
-      safeRelease(m_cullingEnabled);
-
-      CORE_STATUS_AND(m_transparency == nullptr);
-      CORE_STATUS_AND(m_cullingDisabled == nullptr);
-      CORE_STATUS_AND(m_cullingEnabled == nullptr);
-
+      
       CORE_SHUTDOWN_END(DXRenderer);
    }
 
@@ -113,99 +77,84 @@ namespace Core
    //*****************************************************************
    //          SET CULLING
    //*****************************************************************
-   void DXRenderer::setCulling(bool isEnabled)
+   void DXRenderer::setBlendState(ID3D11BlendState* blendState)
    {
-      auto* state = m_cullingEnabled;
-
-      if( !isEnabled )
+      if( m_blendState != blendState )
       {
-         state = m_cullingDisabled;
-      }
-
-      if( state != m_cullingMode )
-      {
-         m_devcon->RSSetState(state);
-         m_cullingMode = state;
+         m_devcon->OMSetBlendState(blendState, nullptr, 0xffffffff);
+         m_blendState = blendState;
       }
    }
 
    //*****************************************************************
    //          SET TRANSPARENCY
    //*****************************************************************
-   void DXRenderer::setTransparency(bool isEnabled)
+   void DXRenderer::setRasterizerState(ID3D11RasterizerState* rasterizerState)
    {
-      auto* transparency = m_transparency;
-      if( !isEnabled )
+      if( m_rasterizerState != rasterizerState )
       {
-         transparency = nullptr;
-      }
-
-      if( transparency != m_transparencyMode )
-      {
-         m_devcon->OMSetBlendState(transparency, nullptr, 0xffffffff);
-         m_transparencyMode = transparency;
+         m_devcon->RSSetState(rasterizerState);
+         m_rasterizerState = rasterizerState;
       }
    }
 
    //*****************************************************************
    //          SET TEXTURE
    //*****************************************************************
-   void DXRenderer::setTexture(const DXTexture& texture)
+   void DXRenderer::setTexture(ID3D11ShaderResourceView* shaderResourceView)
    {
-      if( m_texture != texture.shaderResourceView )
+      if( m_texture != shaderResourceView )
       {
-         m_devcon->PSSetShaderResources(0, 1, &texture.shaderResourceView);
-         m_texture = texture.shaderResourceView;
+         m_devcon->PSSetShaderResources(0, 1, &shaderResourceView);
+         m_texture = shaderResourceView;
       }
    }
 
    //*****************************************************************
    //          SET VERTEX TOPOLOGY
    //*****************************************************************
-   void DXRenderer::setVertexTopology(VertexTopology topology)
+   void DXRenderer::setVertexTopology(D3D_PRIMITIVE_TOPOLOGY topology)
    {
-      D3D_PRIMITIVE_TOPOLOGY data[] = {
-         D3D_PRIMITIVE_TOPOLOGY_LINELIST,
-         D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
-         D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-         D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
-      };
       if( m_topology != topology )
       {
-         auto nextTopology = data[topology];
-         m_devcon->IASetPrimitiveTopology(nextTopology);
+         m_devcon->IASetPrimitiveTopology(topology);
          m_topology = topology;
+      }
+   }
+
+   //*****************************************************************
+   //          SET INPUT LAYOUT
+   //*****************************************************************
+   void DXRenderer::setInputLayout(ID3D11InputLayout* layout)
+   {
+      if( m_inputLayout != layout )
+      {
+         m_devcon->IASetInputLayout(layout);
+         m_inputLayout = layout;
       }
    }
 
    //*****************************************************************
    //          SET SHADER - VERTEX
    //*****************************************************************
-   void DXRenderer::setShader(const VertexShader& shader)
+   void DXRenderer::setShader(ID3D11VertexShader* shader)
    {
-      // INPUT LAYOUT
-      if( m_inputLayout != shader.inputLayout )
+      if( m_vertexShader != shader)
       {
-         m_devcon->IASetInputLayout(shader.inputLayout);
-         m_inputLayout = shader.inputLayout;
-      }
-      // VERTEX SHADER
-      if( m_vertexShader != shader.vertex )
-      {
-         m_devcon->VSSetShader(shader.vertex, nullptr, 0);
-         m_vertexShader = shader.vertex;
+         m_devcon->VSSetShader(shader, nullptr, 0);
+         m_vertexShader = shader;
       }
    }
 
    //*****************************************************************
    //          SET SHADER - PIXEL
    //*****************************************************************
-   void DXRenderer::setShader(const PixelShader& shader)
+   void DXRenderer::setShader(ID3D11PixelShader* shader)
    {
-      if( m_pixelShader != shader.pixel )
+      if( m_pixelShader != shader)
       {
-         m_devcon->PSSetShader(shader.pixel, nullptr, 0);
-         m_pixelShader = shader.pixel;
+         m_devcon->PSSetShader(shader, nullptr, 0);
+         m_pixelShader = shader;
       }
    }
 

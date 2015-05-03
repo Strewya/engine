@@ -1,11 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   fmod sound resource object
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
-#include <string>
 /******* common headers *******/
 #include "audio/fmod_include.h"
 /******* extra headers *******/
@@ -16,11 +14,11 @@ namespace Core
    class FmodSound
    {
    public:
-      FMOD::Sound* sound;
+      FMOD::Sound* _sound;
 
       bool loaded()
       {
-         return sound != nullptr;
+         return _sound != nullptr;
       }
 
       bool unloaded()

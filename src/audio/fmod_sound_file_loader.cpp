@@ -31,10 +31,10 @@ namespace Core
       CORE_SHUTDOWN_END(FmodSoundFileLoader);
    }
 
-   FmodSound FmodSoundFileLoader::load(const std::string& filename) const
+   FmodSound FmodSoundFileLoader::load(const char* filename) const
    {
       FmodSound result{nullptr};
-      FMOD_RESULT fr = m_system->createSound(filename.c_str(), FMOD_DEFAULT, nullptr, &result.sound);
+      FMOD_RESULT fr = m_system->createSound(filename, FMOD_DEFAULT, nullptr, &result._sound);
       if( fr != FMOD_OK )
       {
          CORE_INFO("Failed to load sound '", filename, "'");
@@ -44,7 +44,7 @@ namespace Core
 
    void FmodSoundFileLoader::unload(FmodSound& sound) const
    {
-      sound.sound->release();
-      sound.sound = nullptr;
+      sound._sound->release();
+      sound._sound = nullptr;
    }
 }

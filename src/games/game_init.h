@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   entry point for game thread
 *  usage:      
 ********************************************/
 /******* c++ headers *******/

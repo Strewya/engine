@@ -1,11 +1,10 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   handler for mouse related messages from the OS
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>
-#include <vector>
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/

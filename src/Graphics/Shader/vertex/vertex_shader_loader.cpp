@@ -36,12 +36,12 @@ namespace Core
       VertexShader result{nullptr, nullptr};
       if( buffer != nullptr && bufferSize > 0 )
       {
-         HRESULT hr = m_dev->CreateVertexShader(buffer, bufferSize, nullptr, &result.vertex);
+         HRESULT hr = m_dev->CreateVertexShader(buffer, bufferSize, nullptr, &result._vertex);
          if( SUCCEEDED(hr) )
          {
             if( !layout.empty() )
             {
-               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), buffer, bufferSize, &result.inputLayout);
+               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), buffer, bufferSize, &result._inputLayout);
                if( FAILED(hr) )
                {
                   CORE_INFO("Failed to create input layout for vertex shader");
@@ -66,7 +66,7 @@ namespace Core
 
    void VertexShaderLoader::unload(VertexShader& data)
    {
-      safeRelease(data.inputLayout);
-      safeRelease(data.vertex);
+      safeRelease(data._inputLayout);
+      safeRelease(data._vertex);
    }
 }

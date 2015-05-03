@@ -1,11 +1,9 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   main audio system interface
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
-#include <vector>
 /******* common headers *******/
 #include "audio/fmod_include.h"
 /******* extra headers *******/

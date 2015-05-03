@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   main storage for game state
 *  usage:
 ********************************************/
 /******* c++ headers *******/
@@ -8,8 +8,8 @@
 /******* extra headers *******/
 #include "graphics/camera.h"
 #include "graphics/mesh/mesh.h"
-#include "util/rect.h"
-#include "util/vec3.h"
+#include "util/geometry/rect.h"
+#include "util/geometry/vec3.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -32,11 +32,11 @@ namespace Core
       Mesh playerMesh;
       struct PlayerMovement
       {
-         Vec2f position;
-         Vec2f direction;
+         float acceleration;
          float currentSpeed;
          float maxSpeed;
-         float acceleration;
+         Vec2f direction;
+         Vec2f position;
       };
       PlayerMovement playerMover;
    };

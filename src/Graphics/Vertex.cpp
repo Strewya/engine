@@ -6,8 +6,8 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "util/color.h"
-#include "util/vec2.h"
-#include "util/vec3.h"
+#include "util/geometry/vec2.h"
+#include "util/geometry/vec3.h"
 /******* end headers *******/
 
 namespace Core

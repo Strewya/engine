@@ -1,12 +1,12 @@
 #pragma once
 /********************************************
-*  contents:   #todo
-*  usage:
+*  contents:   transform type that bundles translation, rotation and scale
+*  usage:   translation is defined to be from 0,0 dependant on the game
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/vec2.h"
+#include "util/geometry/vec2.h"
 /******* end header inclusion *******/
 
 namespace Core

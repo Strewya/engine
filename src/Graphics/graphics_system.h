@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   main graphics system interface
 *  usage:
 ********************************************/
 /******* c++ headers *******/
@@ -10,11 +10,11 @@
 #include "graphics/dx_include.h"
 /******* extra headers *******/
 #include "graphics/dx_renderer.h"
-#include "graphics/graphics_typedefs.h"
+#include "graphics/graphics_types.h"
 #include "graphics/shader/pixel/pixel_shader_manager.h"
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
-#include "util/vec2.h"
+#include "util/geometry/vec2.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
 
@@ -41,14 +41,18 @@ namespace Core
       void applyCamera(const Camera& camera);
       void clearCamera();
 
+      void setCulling(bool isEnabled);
+      void setTransparency(bool isEnabled);
+
       void renderMesh(Transform t, Color c, const Mesh& mesh);
 
-      DXRenderer renderer;
-      DXTextureManager textures;
+      TextureManager textures;
       VertexShaderManager vertexShaders;
       PixelShaderManager pixelShaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
-
+      
+      //#todo make it private later when all testing is done
+      DXRenderer _renderer;
    private:
       template<typename T> void declare(T*& ptr);
       bool initDevice();
@@ -58,7 +62,7 @@ namespace Core
       bool initSamplerState();
       bool initDepthBuffer();
 
-      DXTextureFileLoader m_textureFileLoader;
+      TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
       VertexShaderFileLoader m_vsFileLoader;
       PixelShaderLoader m_psLoader;
@@ -79,6 +83,9 @@ namespace Core
       ID3D11SamplerState* m_samplerState;
       ID3D11Texture2D* m_depthStencilBuffer;
       ID3D11DepthStencilView* m_depthStencilView;
+      ID3D11BlendState* m_transparency;
+      ID3D11RasterizerState* m_cullingEnabled;
+      ID3D11RasterizerState* m_cullingDisabled;
    };
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)

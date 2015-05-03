@@ -10,7 +10,7 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
 #include "input/keyboard.h"
-#include "util/resource_cache_template.h"
+#include "util/template/resource_cache_template.h"
 #include "util/color.h"
 #include "util/transform.h"
 #include "util/utility.h"
@@ -45,6 +45,7 @@ namespace Core
          window.move(window.getSizeX(), 0);
 #endif
          window.showCursor(true);
+         window.monitorDirectoryForChanges("resources");
 
          //window.setFullscreen(true);
 
@@ -148,6 +149,20 @@ namespace Core
                   }
                }
             } break;
+            
+            case WE_FILECHANGE:
+            {
+               if(e.fileChange.action == FILE_MODIFIED )
+               {
+                  std::string file = e.fileChange.filename;
+                  file = replaceAll(file, "\\", "/");
+                  file = "../resources/" + file;
+                  if( graphicsSystem.textures.isLoaded(file.c_str()) )
+                  {
+                     graphicsSystem.textures.reloadFromFile(file.c_str());
+                  }
+               }
+            } break;
          }
       }
 
@@ -162,18 +177,10 @@ namespace Core
 
    void Game::tickRender(uint32_t updateTime)
    {
-      Mesh atlas = makeTexturedQuad({}, {1, 1}, assets.atlas, {0, 0}, {1, 1}, assets.mainVS, assets.mainPS);
-      Mesh bgr = makeTexturedQuad({}, {1, 1}, assets.background, {0, 0}, {1, 1}, assets.mainVS, assets.mainPS);
-
       graphicsSystem.begin();
 
       graphicsSystem.setPerspectiveProjection();
       graphicsSystem.applyCamera(state.camera);
-
-      //graphicsSystem.renderer.setCulling(true);
-      //graphicsSystem.renderer.setTransparency(true);
-
-      graphicsSystem.renderMesh(Transform{}, Color{}, bgr);
 
       renderGameState(timer, state, systems, assets);
 

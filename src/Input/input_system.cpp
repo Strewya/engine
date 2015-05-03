@@ -8,7 +8,7 @@
 #include "input/gamepad.h"
 #include "input/keyboard.h"
 #include "input/mouse.h"
-#include "util/clock.h"
+#include "util/time/clock.h"
 #include "util/utility.h"
 #include "window/window_event.h"
 /******* end headers *******/

@@ -1,32 +1,24 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   direct3d specific renderer
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 #include "graphics/dx_include.h"
 /******* extra headers *******/
-#include "graphics/graphics_typedefs.h"
+#include "graphics/graphics_types.h"
 #include "graphics/vertex.h"
-#include "util/vec2_fwd.h"
+#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class DXTexture;
+   class Texture;
    class VertexShader;
    class PixelShader;
    class Transform;
    class Color;
-
-   enum VertexTopology
-   {
-      LineList,
-      LineStrip,
-      TriangleList,
-      TriangleStrip,
-   };
 
    class DXRenderer
    {
@@ -37,13 +29,14 @@ namespace Core
       void setProjection(const XMMATRIX& matrix);
       void setView(const XMMATRIX& matrix);
 
-      void setCulling(bool isEnabled);
-      void setTransparency(bool isEnabled);
+      void setVertexTopology(D3D_PRIMITIVE_TOPOLOGY topology);
+      void setTexture(ID3D11ShaderResourceView* shaderResourceView);
+      void setInputLayout(ID3D11InputLayout* layout);
+      void setShader(ID3D11VertexShader* shader);
+      void setShader(ID3D11PixelShader* shader);
 
-      void setTexture(const DXTexture& texture);
-      void setVertexTopology(VertexTopology topology);
-      void setShader(const VertexShader& shader);
-      void setShader(const PixelShader& shader);
+      void setBlendState(ID3D11BlendState* blendState);
+      void setRasterizerState(ID3D11RasterizerState* rasterizerState);
       void render(Transform transform, Color color, HealthVertexBuffer vertices, IndexBuffer indices);
 
    private:
@@ -53,17 +46,13 @@ namespace Core
       ID3D11Device* m_dev;
       ID3D11DeviceContext* m_devcon;
       ID3D11SamplerState* m_samplerState;
-      //owning resources
-      ID3D11BlendState* m_transparency;
-      ID3D11RasterizerState* m_cullingEnabled;
-      ID3D11RasterizerState* m_cullingDisabled;
-
-      void* m_texture;
-      void* m_inputLayout;
-      void* m_vertexShader;
-      void* m_pixelShader;
-      void* m_cullingMode;
-      void* m_transparencyMode;
-      int32_t m_topology;
+      
+      ID3D11ShaderResourceView* m_texture;
+      ID3D11InputLayout* m_inputLayout;
+      ID3D11VertexShader* m_vertexShader;
+      ID3D11PixelShader* m_pixelShader;
+      ID3D11BlendState* m_blendState;
+      ID3D11RasterizerState* m_rasterizerState;
+      D3D_PRIMITIVE_TOPOLOGY m_topology;
    };
 }

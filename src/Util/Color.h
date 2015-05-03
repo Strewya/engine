@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   color type class
 *  usage:
 ********************************************/
 /******* c++ headers *******/

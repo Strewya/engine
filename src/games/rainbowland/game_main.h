@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   main game class that contains game state, resources and systems
 *  usage:      
 ********************************************/
 /******* c++ headers *******/
@@ -13,7 +13,7 @@
 #include "games/rainbowland/game_state.h"
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
-#include "util/timer.h"
+#include "util/time/timer.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
 

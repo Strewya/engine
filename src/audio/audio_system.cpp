@@ -75,7 +75,7 @@ namespace Core
       {
          auto sound = sounds.getData(handle);
          FMOD::Channel* channel = nullptr;
-         m_system->playSound(sound.sound, nullptr, false, &channel);
+         m_system->playSound(sound._sound, nullptr, false, &channel);
          channel->setVolume(0.5f);
       }
    }
@@ -90,7 +90,7 @@ namespace Core
             m_channel->stop();
          }
          m_musicPlaying = handle;
-         m_system->playSound(sound.sound, nullptr, false, &m_channel);
+         m_system->playSound(sound._sound, nullptr, false, &m_channel);
       }
    }
 

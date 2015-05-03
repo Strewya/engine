@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   functions for loading, validity check and unloading of game resources
 *  usage:
 ********************************************/
 /******* c++ headers *******/
