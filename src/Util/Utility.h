@@ -94,6 +94,32 @@ namespace Core
       }
    }
 
+   template<typename T>
+   T max(T a, T b)
+   {
+      return (a < b) ? (b) : (a);
+   }
+
+   template<typename T, typename ...Args>
+   T max(T a, Args... rest)
+   {
+      auto m = max(rest...);
+      return max(a, m);
+   }
+
+   template<typename T>
+   T min(T a, T b)
+   {
+      return (a < b) ? (a) : (b);
+   }
+
+   template<typename T, typename ...Args>
+   T min(T a, Args... rest)
+   {
+      auto m = min(rest...);
+      return min(a, m);
+   }
+
    inline std::string replaceOne(std::string str, std::string from, std::string to)
    {
       size_t start_pos = str.find(from);

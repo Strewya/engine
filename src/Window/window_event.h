@@ -128,8 +128,8 @@ namespace Core
    class WindowEvent
    {
    public:
-      uint32_t type;
       uint64_t timestamp;
+      uint32_t type;
       union
       {
          KeyboardEvent keyboard;

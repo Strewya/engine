@@ -24,43 +24,28 @@ namespace Core
       }
    }
 
-   VectorOfGameEvents translateWindowEventsToGameEvents(VectorOfWindowEvents& events)
+   bool equalEvents(const WindowEvent& l, const WindowEvent& r)
+   {
+      if( l.type != r.type ) return false;
+      if( l.type == WE_KEYBOARDKEY )
+      {
+         if( l.keyboard.firstTimeDown != r.keyboard.firstTimeDown ) return false;
+         if( l.keyboard.key.isDown != r.keyboard.key.isDown ) return false;
+         if( l.keyboard.key.id != r.keyboard.key.id ) return false;
+      }
+      return true;
+   }
+
+   VectorOfGameEvents translateWindowEventsToGameEvents(VectorOfWindowEvents& events, VectorOfTranslationData& translationData)
    {
       VectorOfGameEvents gameEvents;
       for( auto& e : events )
       {
-         if( e.type == WE_KEYBOARDKEY )
+         for( auto& td : translationData )
          {
-            switch( e.keyboard.key.id )
+            if( equalEvents(e, td.windowEvent) )
             {
-               case Keyboard::S:
-               {
-                  if( e.keyboard.firstTimeDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{0.0f, -1.0f}}}});
-                  else if( !e.keyboard.key.isDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{0.0f, +1.0f}}}});
-               } break;
-               case Keyboard::W:
-               {
-                  if( e.keyboard.firstTimeDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{0.0f, +1.0f}}}});
-                  else if( !e.keyboard.key.isDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{0.0f, -1.0f}}}});
-               } break;
-               case Keyboard::A:
-               {
-                  if( e.keyboard.firstTimeDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{-1.0f, 0.0f}}}});
-                  else if( !e.keyboard.key.isDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{+1.0f, 0.0f}}}});
-               } break;
-               case Keyboard::D:
-               {
-                  if( e.keyboard.firstTimeDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{+1.0f, 0.0f}}}});
-                  else if( !e.keyboard.key.isDown )
-                     gameEvents.emplace_back(GameEvent{GE_DIRECTION_CHANGE, {GameEvent_DirectionChange{0, Vec2f{-1.0f, 0.0f}}}});
-               } break;
+               gameEvents.push_back(td.gameEvent);
             }
          }
       }
@@ -69,13 +54,45 @@ namespace Core
 
    void modifyPlayerDirectionTargets(VectorOfGameEvents& events, VectorOfDirectionTargets& directions)
    {
+      VectorOfGameEvents newEvents;
       for( auto e : events )
       {
          switch( e.type )
          {
             case GE_DIRECTION_CHANGE:
             {
-               directions[e.directionChange.playerId].direction += e.directionChange.direction;
+               auto& target = directions[e.directionChange.playerId].direction;
+               auto change = e.directionChange.direction;
+               CORE_INFO("Target ", target, ", change ", change);
+               target = target + change;
+               CORE_INFO("New target ", target);
+               if( target.isZero() )
+               {
+                  newEvents.emplace_back(GameEvent{GE_ACCELERATION_CHANGE});
+                  newEvents.back().accelerationChange.playerId = 0;
+                  newEvents.back().accelerationChange.acceleration = 0;
+               }
+               else
+               {
+                  newEvents.emplace_back(GameEvent{GE_ACCELERATION_CHANGE});
+                  newEvents.back().accelerationChange.playerId = 0;
+                  newEvents.back().accelerationChange.acceleration = 60;
+               }
+            } break;
+         }
+      }
+      events.insert(events.end(), newEvents.begin(), newEvents.end());
+   }
+
+   void modifyPlayerAcceleration(VectorOfGameEvents& events, VectorOfMovables& movables)
+   {
+      for( auto e : events )
+      {
+         switch( e.type )
+         {
+            case GE_ACCELERATION_CHANGE:
+            {
+               movables[e.accelerationChange.playerId].acceleration = e.accelerationChange.acceleration;
             } break;
          }
       }
@@ -83,24 +100,26 @@ namespace Core
 
    void updatePlayerMovementDirection(float dt, VectorOfDirectionTargets& directions, VectorOfMovables& movables)
    {
-      for( auto dir : directions )
+      for( auto& dir : directions )
       {
          auto& mover = movables[dir.objId];
+         if( mover.acceleration > 0.0f )
+         {
+            float currentRad = std::atan2f(mover.direction.y, mover.direction.x);
+            float targetRad = std::atan2f(dir.direction.y, dir.direction.x);
+            float currentDeg = Rad2Deg(currentRad);
+            float targetDeg = Rad2Deg(targetRad);
 
-         float currentRad = std::atan2f(mover.direction.y, mover.direction.x);
-         float targetRad = std::atan2f(dir.direction.y, dir.direction.x);
-         float currentDeg = Rad2Deg(currentRad);
-         float targetDeg = Rad2Deg(targetRad);
+            auto wra = targetDeg - currentDeg;
+            if( wra > 180.0f ) wra -= 360.0f;
+            if( wra < -180.0f ) wra += 360.0f;
 
-         auto wra = targetDeg - currentDeg;
-         if( wra > 180.0f ) wra -= 360.0f;
-         if( wra < -180.0f ) wra += 360.0f;
+            currentDeg += wra * 4 * dt; // player.objectTimer.getDeltaSeconds();
+            currentRad = Deg2Rad(currentDeg);
 
-         currentDeg += wra * 4 * dt; // player.objectTimer.getDeltaSeconds();
-         currentRad = Deg2Rad(currentDeg);
-
-         mover.direction.x = std::cosf(currentRad);
-         mover.direction.y = std::sinf(currentRad);
+            mover.direction.x = std::cosf(currentRad);
+            mover.direction.y = std::sinf(currentRad);
+         }
       }
    }
 

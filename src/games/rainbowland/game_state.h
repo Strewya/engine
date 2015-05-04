@@ -34,6 +34,7 @@ namespace Core
 
       std::vector<MovingThing> movingThings;
       std::vector<DirectionTarget> directions;
+      std::vector<Window2GameEvent> inputTranslation;
    };
 
    class GameSystems;

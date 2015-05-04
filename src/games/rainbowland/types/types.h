@@ -7,6 +7,7 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include "util/geometry/vec2.h"
+#include "window/window_event.h"
 /******* end header inclusion *******/
 
 namespace Core
@@ -17,9 +18,16 @@ namespace Core
       Vec2f direction;
    };
 
+   struct GameEvent_AccelerationChange
+   {
+      uint32_t playerId;
+      float acceleration;
+   };
+
    enum GameEventType
    {
-      GE_DIRECTION_CHANGE
+      GE_DIRECTION_CHANGE,
+      GE_ACCELERATION_CHANGE
    };
 
    class GameEvent
@@ -28,10 +36,17 @@ namespace Core
       GameEventType type;
       union
       {
+         GameEvent_AccelerationChange accelerationChange;
          GameEvent_DirectionChange directionChange;
       };
    };
 
+
+   struct Window2GameEvent
+   {
+      WindowEvent windowEvent;
+      GameEvent gameEvent;
+   };
 
 
    class DirectionTarget
