@@ -121,6 +121,9 @@
     <ClCompile Include="..\..\..\src\util\geometry\rect.cpp">
       <Filter>Code\framework\util\geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp">
+      <Filter>Code\games\rainbowland\logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -336,7 +339,10 @@
     <ClInclude Include="..\..\..\src\util\geometry\vec3_impl.h">
       <Filter>Code\framework\util\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\types\player.h">
+    <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h">
+      <Filter>Code\games\rainbowland\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h">
       <Filter>Code\games\rainbowland\types</Filter>
     </ClInclude>
   </ItemGroup>
@@ -400,6 +406,9 @@
     </Filter>
     <Filter Include="Code\games\rainbowland\types">
       <UniqueIdentifier>{d9dc53f3-844f-4de2-966e-6fd585acd37f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\games\rainbowland\logic">
+      <UniqueIdentifier>{5c7399e0-be04-4354-a4cc-d5ec3931ca40}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

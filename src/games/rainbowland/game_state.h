@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
+#include "games/rainbowland/types/types.h"
 #include "graphics/camera.h"
 #include "graphics/mesh/mesh.h"
 #include "util/geometry/rect.h"
@@ -30,15 +31,9 @@ namespace Core
 
       Mesh backgroundMesh;
       Mesh playerMesh;
-      struct PlayerMovement
-      {
-         float acceleration;
-         float currentSpeed;
-         float maxSpeed;
-         Vec2f direction;
-         Vec2f position;
-      };
-      PlayerMovement playerMover;
+
+      std::vector<MovingThing> movingThings;
+      std::vector<DirectionTarget> directions;
    };
 
    class GameSystems;

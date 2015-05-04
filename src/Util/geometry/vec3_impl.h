@@ -17,6 +17,11 @@ namespace Core
       this->z = z;
    }
 
+   template<typename T> bool Vec3<T>::isZero() const
+   {
+      return x == 0.0f && y == 0.0f && z == 0.0f;
+   }
+
    template<typename T> template<typename U> Vec3<T>::operator Core::Vec3<U>() const
    {
       return Vec3 < U > {static_cast<U>(x), static_cast<U>(y)};

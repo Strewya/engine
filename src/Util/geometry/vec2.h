@@ -20,6 +20,7 @@ namespace Core
       T y;
 
       void set(T x, T y);
+      bool isZero() const;
 
       template<typename U> operator Vec2<U>() const;
 
@@ -45,7 +46,9 @@ namespace Core
    template<typename T> Vec2<T> operator+(Vec2<T> v, T s);
    template<typename T> Vec2<T> operator-(Vec2<T> v, T s);
    template<typename T> Vec2<T> operator*(Vec2<T> v, T s);
+   template<typename T> Vec2<T> operator*(T s, Vec2<T> v);
    template<typename T> Vec2<T> operator/(Vec2<T> v, T s);
+   template<typename T> Vec2<T> operator/(T s, Vec2<T> v);
 
    template<typename T> Vec2<T> operator+(Vec2<T> l, Vec2<T> r);
    template<typename T> Vec2<T> operator-(Vec2<T> l, Vec2<T> r);

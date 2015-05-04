@@ -7,6 +7,7 @@
 /******* extra headers *******/
 #include "games/rainbowland/game_resources.h"
 #include "games/rainbowland/game_systems.h"
+#include "games/rainbowland/logic/logic.h"
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
 #include "input/keyboard.h"
@@ -36,11 +37,16 @@ namespace Core
                                       Vec2f{(float)x / (float)atlasTexture.width, (float)y / (float)atlasTexture.height},
                                       Vec2f{(float)(x + w) / (float)atlasTexture.width, (float)(y + h) / (float)atlasTexture.height},
                                       assets.mainVS, assets.mainPS);
-      state.playerMover.acceleration = 4;
-      state.playerMover.maxSpeed = 5;
-      state.playerMover.currentSpeed = 0;
-      state.playerMover.position.set(0, 0);
-      state.playerMover.direction.set(0, 0);
+      state.movingThings.emplace_back();
+      auto& playerMover = state.movingThings.back();
+      playerMover.acceleration = 60;
+      playerMover.velocity.set(0, 0);
+      playerMover.position.set(0, 0);
+      playerMover.direction.set(0, 0);
+      state.directions.emplace_back();
+      auto& playerDirectionTarget = state.directions.back();
+      playerDirectionTarget.objId = 0;
+      playerDirectionTarget.direction = playerMover.direction;
 
       return true;
    }
@@ -50,57 +56,12 @@ namespace Core
       bool stillRunning = true;
       
       auto eventList = systems.input->getEvents();
-      enum Direction
-      {
-         Up,Down,Left,Right,Count
-      };
-      bool moveState[Direction::Count]{};
-      struct KeyMapping
-      {
-         uint32_t key;
-         float add;
-         float* value;
-      };
-      KeyMapping map[4]
-      {
-         {Keyboard::W, +1, &state.playerMover.direction.y},
-         {Keyboard::S, -1, &state.playerMover.direction.y},
-         {Keyboard::A, -1, &state.playerMover.direction.x},
-         {Keyboard::D, +1, &state.playerMover.direction.x}
-      };
-      for( auto& e : eventList )
-      {
-         if( e.type == WindowEventType::WE_KEYBOARDKEY )
-         {
-            for( auto& check : map )
-            {
-               if( e.keyboard.key.id == check.key )
-               {
-                  if( e.keyboard.firstTimeDown )
-                  {
-                     *check.value += check.add;
-                  }
-                  else if( !e.keyboard.key.isDown )
-                  {
-                     *check.value -= check.add;
-                  }
-               }
-            }
-         }
-      }
-
-      //movement
-      if(state.playerMover.direction.x != 0 || state.playerMover.direction.y != 0)
-      {
-         state.playerMover.currentSpeed += state.playerMover.acceleration*timer.getDeltaSeconds();
-         clamp(state.playerMover.currentSpeed, 0.0f, state.playerMover.maxSpeed);
-         state.playerMover.position += state.playerMover.direction*state.playerMover.currentSpeed*timer.getDeltaSeconds();
-      }
-      else
-      {
-         state.playerMover.currentSpeed = 0;
-      }
-
+      
+      auto gameEvents = translateWindowEventsToGameEvents(eventList);
+      modifyPlayerDirectionTargets(gameEvents, state.directions);
+      updatePlayerMovementDirection(timer.getDeltaSeconds(), state.directions, state.movingThings);
+      simulateMovement(timer.getDeltaSeconds(), state.movingThings);
+      
       return stillRunning;
    }
 
@@ -109,6 +70,6 @@ namespace Core
       systems.gfx->setTransparency(false);
       systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
       systems.gfx->setTransparency(true);
-      systems.gfx->renderMesh(Transform{state.playerMover.position}, Color{}, state.playerMesh);
+      systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
    }
 }

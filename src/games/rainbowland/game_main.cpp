@@ -154,12 +154,38 @@ namespace Core
             {
                if(e.fileChange.action == FILE_MODIFIED )
                {
-                  std::string file = e.fileChange.filename;
-                  file = replaceAll(file, "\\", "/");
-                  file = "../resources/" + file;
-                  if( graphicsSystem.textures.isLoaded(file.c_str()) )
+                  auto getExtension = [](const std::string& str) -> std::string
                   {
-                     graphicsSystem.textures.reloadFromFile(file.c_str());
+                     auto lastDot = str.find_last_of('.');
+                     return str.substr(lastDot + 1);
+                  };
+                  std::string file = replaceAll(e.fileChange.filename, "\\", "/");
+                  file = "../resources/" + file;
+                  auto ext = getExtension(file);
+                  if( ext == "png" || ext == "bmp" || ext == "tif" || ext == "jpg" )
+                  {
+                     if( graphicsSystem.textures.isLoaded(file.c_str()) )
+                     {
+                        graphicsSystem.textures.reloadFromFile(file.c_str());
+                     }
+                  }
+                  else if( ext == "cso" )
+                  {
+                     if( graphicsSystem.pixelShaders.isLoaded(file.c_str()) )
+                     {
+                        graphicsSystem.pixelShaders.reloadFromFile(file.c_str());
+                     }
+                     else if( graphicsSystem.vertexShaders.isLoaded(file.c_str()) )
+                     {
+                        graphicsSystem.vertexShaders.reloadFromFile(file.c_str(), HealthVertex::getDescription());
+                     }
+                  }
+                  else if( ext == "wav" || ext == "mp3" )
+                  {
+                     if( audioSystem.sounds.isLoaded(file.c_str()) )
+                     {
+                        audioSystem.sounds.reloadFromFile(file.c_str());
+                     }
                   }
                }
             } break;

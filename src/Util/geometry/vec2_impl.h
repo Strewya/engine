@@ -16,6 +16,11 @@ namespace Core
       this->y = y;
    }
 
+   template <typename T> bool Vec2<T>::isZero() const
+   {
+      return x == 0.0f && y == 0.0f;
+   }
+
    template<typename T> template<typename U> Vec2<T>::operator Core::Vec2<U>() const
    {
       return Vec2 < U > {static_cast<U>(x), static_cast<U>(y)};
@@ -134,6 +139,14 @@ namespace Core
    {
       v /= s;
       return v;
+   }
+   template<typename T> Vec2<T> operator*(T s, Vec2<T> v)
+   {
+      return v*t;
+   }
+   template<typename T> Vec2<T> operator/(T s, Vec2<T> v)
+   {
+      return v/t;
    }
 
    template<typename T> Vec2<T> operator+(Vec2<T> l, Vec2<T> r)

@@ -21,6 +21,7 @@ namespace Core
       T z;
 
       void set(T x, T y, T z);
+      bool isZero() const;
 
       template<typename U> operator Vec3<U>() const;
 
