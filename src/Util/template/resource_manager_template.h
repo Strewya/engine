@@ -15,7 +15,7 @@
 namespace Core
 {
    template<typename DATA, typename HANDLE, typename LOADER>
-   class Manager
+   struct Manager
    {
    public:
       bool init(const char* type, LOADER& loader, DATA defaultData);

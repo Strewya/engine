@@ -15,7 +15,7 @@ namespace Core
 #define CORE_RESOURCE_HANDLE(name) struct tag_##name; typedef ResourceHandle<tag_##name> name
 
    template<typename TAG>
-   class ResourceHandle
+   struct ResourceHandle
    {
    public:
       ResourceHandle() : m_handle(0)

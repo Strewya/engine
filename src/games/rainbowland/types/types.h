@@ -15,28 +15,20 @@ namespace Core
    struct GameEvent_DirectionChange
    {
       uint32_t playerId;
-      Vec2f direction;
+      vec2f direction;
    };
-
-   struct GameEvent_AccelerationChange
-   {
-      uint32_t playerId;
-      float acceleration;
-   };
-
+   
    enum GameEventType
    {
       GE_DIRECTION_CHANGE,
-      GE_ACCELERATION_CHANGE
+      GE_AIM_CHANGE
    };
 
-   class GameEvent
+   struct GameEvent
    {
-   public:
       GameEventType type;
       union
       {
-         GameEvent_AccelerationChange accelerationChange;
          GameEvent_DirectionChange directionChange;
       };
    };
@@ -49,20 +41,24 @@ namespace Core
    };
 
 
-   class DirectionTarget
+   struct MoveDirectionTarget
    {
-   public:
       uint32_t objId;
-      Vec2f direction;
+      vec2f direction;
+   };
+
+   struct AimDirection
+   {
+      uint32_t objId;
+      vec2f direction;
    };
 
 
-   class MovingThing
+   struct MovingThing
    {
-   public:
       float acceleration;
-      Vec2f velocity;
-      Vec2f direction;
-      Vec2f position;
+      vec2f velocity;
+      vec2f direction;
+      vec2f position;
    };
 }

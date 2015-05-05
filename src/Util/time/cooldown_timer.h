@@ -13,7 +13,7 @@
 
 namespace Core
 {
-   class CooldownTimer
+   struct CooldownTimer
    {
    public:
       CooldownTimer();
@@ -29,7 +29,7 @@ namespace Core
       void setDurationMicros(uint32_t durationMicros);
       const Timer& getTimer() const;
 
-   protected:
+   private:
       Timer m_timer;
       uint32_t m_durationMicros;
    };

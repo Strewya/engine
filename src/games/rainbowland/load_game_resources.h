@@ -10,8 +10,8 @@
 
 namespace Core
 {
-   class GameResources;
-   class GameSystems;
+   struct GameResources;
+   struct GameSystems;
 
    GameResources loadGameResources(GameSystems&);
    bool checkGameResourcesLoaded(GameResources& assets);

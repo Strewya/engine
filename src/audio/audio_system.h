@@ -12,7 +12,7 @@
 
 namespace Core
 {
-   class AudioSystem
+   struct AudioSystem
    {
    public:
       bool init();

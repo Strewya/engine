@@ -13,9 +13,8 @@
 namespace Core
 {
    template<typename T>
-   class Vec3
+   struct Vec3
    {
-   public:
       T x;
       T y;
       T z;

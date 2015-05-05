@@ -13,7 +13,7 @@
 
 namespace Core
 {
-   class Keyboard
+   struct Keyboard
    {
       typedef std::unordered_map<uint32_t, std::string> Map;
       static Map m_map;

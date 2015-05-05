@@ -87,11 +87,11 @@ namespace Core
 
    struct GamepadAxis
    {
+      uint32_t id;
       float x;
       float y;
       float magnitude;
       float normalized;
-      uint32_t id;
    };
 
    typedef ButtonKey GamepadButton;
@@ -125,9 +125,8 @@ namespace Core
    };
 
 
-   class WindowEvent
+   struct WindowEvent
    {
-   public:
       uint64_t timestamp;
       uint32_t type;
       union

@@ -11,7 +11,7 @@
 
 namespace Core
 {
-   class Clock
+   struct Clock
    {
    public:
       Clock();
@@ -31,7 +31,7 @@ namespace Core
       void setTimeScale(double timeScale);
       double getTimeScale() const;
 
-   protected:
+   private:
       uint64_t m_oldRealTime;
       double m_timeScale;
       uint64_t m_lastMicros;

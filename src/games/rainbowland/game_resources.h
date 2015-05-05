@@ -13,9 +13,8 @@
 
 namespace Core
 {
-   class GameResources
+   struct GameResources
    {
-   public:
       HTexture atlas;
       HTexture background;
       HTexture font;

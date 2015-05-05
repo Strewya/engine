@@ -13,8 +13,8 @@
 
 namespace Core
 {
-   class DefaultVertex;
-   class HealthVertex;
+   struct DefaultVertex;
+   struct HealthVertex;
 
    typedef std::vector<DefaultVertex> DefaultVertexBuffer;
    typedef std::vector<HealthVertex> HealthVertexBuffer;

@@ -11,7 +11,7 @@
 
 namespace Core
 {
-   class Timer
+   struct Timer
    {
    public:
       Timer();
@@ -27,7 +27,7 @@ namespace Core
 
       void reset(uint32_t micros = 0);
 
-   protected:
+   private:
       uint32_t m_currentMicros;
       uint32_t m_deltaMicros;
       float m_deltaSeconds;

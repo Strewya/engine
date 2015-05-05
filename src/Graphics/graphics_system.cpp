@@ -21,7 +21,7 @@ namespace Core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   static XMVECTOR convert(Vec2f v);
+   static XMVECTOR convert(vec2f v);
    static XMVECTOR convert(Vec3f v);
    static XMMATRIX calculateCamView(const Camera& cam);
 
@@ -435,7 +435,7 @@ namespace Core
    //*****************************************************************
    //          FILE STATIC FUNCTION DEFINITIONS
    //*****************************************************************
-   XMVECTOR convert(Vec2f v)
+   XMVECTOR convert(vec2f v)
    {
       return XMVectorSet(v.x, v.y, 0, 0);
    }

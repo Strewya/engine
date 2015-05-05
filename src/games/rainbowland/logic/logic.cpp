@@ -27,11 +27,34 @@ namespace Core
    bool equalEvents(const WindowEvent& l, const WindowEvent& r)
    {
       if( l.type != r.type ) return false;
-      if( l.type == WE_KEYBOARDKEY )
+      switch( l.type )
       {
-         if( l.keyboard.firstTimeDown != r.keyboard.firstTimeDown ) return false;
-         if( l.keyboard.key.isDown != r.keyboard.key.isDown ) return false;
-         if( l.keyboard.key.id != r.keyboard.key.id ) return false;
+         case WE_KEYBOARDKEY:
+         {
+            if( l.keyboard.firstTimeDown != r.keyboard.firstTimeDown ) return false;
+            if( l.keyboard.key.isDown != r.keyboard.key.isDown ) return false;
+            if( l.keyboard.key.id != r.keyboard.key.id ) return false;
+         } break;
+         case WE_GAMEPADAXIS:
+         {
+            if( l.gamepad.id != r.gamepad.id ) return false;
+            if( l.gamepad.axis.id != r.gamepad.axis.id ) return false;
+         } break;
+         case WE_GAMEPADBUTTON:
+         {
+            if( l.gamepad.id != r.gamepad.id ) return false;
+            if( l.gamepad.button.id != l.gamepad.button.id ) return false;
+            if( l.gamepad.button.isDown != r.gamepad.button.isDown ) return false;
+         } break;
+         case WE_GAMEPADCONNECTION:
+         {
+            if( l.gamepad.id != r.gamepad.id ) return false;
+            if( l.gamepad.connection.status != r.gamepad.connection.status ) return false;
+         } break;
+         default:
+         {
+            return false;
+         } break;
       }
       return true;
    }
@@ -52,7 +75,7 @@ namespace Core
       return gameEvents;
    }
 
-   void modifyPlayerDirectionTargets(VectorOfGameEvents& events, VectorOfDirectionTargets& directions)
+   void modifyPlayerDirectionTargets(VectorOfGameEvents& events, VectorOfMoveDirectionTargets& directions)
    {
       VectorOfGameEvents newEvents;
       for( auto e : events )
@@ -63,46 +86,19 @@ namespace Core
             {
                auto& target = directions[e.directionChange.playerId].direction;
                auto change = e.directionChange.direction;
-               CORE_INFO("Target ", target, ", change ", change);
                target = target + change;
-               CORE_INFO("New target ", target);
-               if( target.isZero() )
-               {
-                  newEvents.emplace_back(GameEvent{GE_ACCELERATION_CHANGE});
-                  newEvents.back().accelerationChange.playerId = 0;
-                  newEvents.back().accelerationChange.acceleration = 0;
-               }
-               else
-               {
-                  newEvents.emplace_back(GameEvent{GE_ACCELERATION_CHANGE});
-                  newEvents.back().accelerationChange.playerId = 0;
-                  newEvents.back().accelerationChange.acceleration = 60;
-               }
             } break;
          }
       }
       events.insert(events.end(), newEvents.begin(), newEvents.end());
    }
 
-   void modifyPlayerAcceleration(VectorOfGameEvents& events, VectorOfMovables& movables)
-   {
-      for( auto e : events )
-      {
-         switch( e.type )
-         {
-            case GE_ACCELERATION_CHANGE:
-            {
-               movables[e.accelerationChange.playerId].acceleration = e.accelerationChange.acceleration;
-            } break;
-         }
-      }
-   }
-
-   void updatePlayerMovementDirection(float dt, VectorOfDirectionTargets& directions, VectorOfMovables& movables)
+   void updatePlayerMovementDirection(float dt, VectorOfMoveDirectionTargets& directions, VectorOfMovables& movables)
    {
       for( auto& dir : directions )
       {
          auto& mover = movables[dir.objId];
+         mover.acceleration = 60.0f*(vec2f::length2(dir.direction) > 0.0f ? 1 : 0);
          if( mover.acceleration > 0.0f )
          {
             float currentRad = std::atan2f(mover.direction.y, mover.direction.x);
@@ -123,87 +119,13 @@ namespace Core
       }
    }
 
-   /*
-   void moveMonsters()
+   void updateOrientation(VectorOfAimDirections& aimDirections)
    {
-   for( auto* monster_ptr : game.m_monsters )
-   {
-   auto& monster = *monster_ptr;
-   auto n = Vec2f::length(steer_arrive(monster.transform.position, monster.maxSpeed, monster.brain.targetLocation));
-   monster.transform.position += monster.direction*n*monster.objectTimer.getDeltaSeconds();
 
-   updateMonsterInGrid(game.m_monsterGrid, monster);
-
-   separateMonsters(monster, game.m_monsterGrid);
-   }
    }
 
-   void movePlayers()
+   void updateAim(VectorOfAimDirections& aimDirections)
    {
-   for( Player& player : game.m_players )
-   {
-   if( !player.isAimRelative )
-   {
-   if( player.directionActive[Up] || player.directionActive[Down] || player.directionActive[Left] || player.directionActive[Right] )
-   {
-   player.currentSpeed = player.maxSpeed;
 
-   Vec2f targetVector;
-   if( player.directionActive[Up] )
-   {
-   targetVector.y += 1;
    }
-   if( player.directionActive[Down] )
-   {
-   targetVector.y -= 1;
-   }
-   if( player.directionActive[Left] )
-   {
-   targetVector.x -= 1;
-   }
-   if( player.directionActive[Right] )
-   {
-   targetVector.x += 1;
-   }
-
-   player.targetDirection = Vec2f::normalize(targetVector);
-   }
-   else
-   {
-   player.currentSpeed = 0;
-   player.targetDirection = player.direction;
-   }
-   }
-
-   float currentRad = std::atan2f(player.direction.y, player.direction.x);
-   float targetRad = std::atan2f(player.targetDirection.y, player.targetDirection.x);
-   float currentDeg = Rad2Deg(currentRad);
-   float targetDeg = Rad2Deg(targetRad);
-
-   auto wra = targetDeg - currentDeg;
-   if( wra > 180.0f ) wra -= 360.0f;
-   if( wra < -180.0f ) wra += 360.0f;
-
-   currentDeg += wra * 4 * player.objectTimer.getDeltaSeconds();
-   currentRad = Deg2Rad(currentDeg);
-
-   player.direction.x = std::cosf(currentRad);
-   player.direction.y = std::sinf(currentRad);
-
-   auto velocity = player.direction*player.currentSpeed;
-   player.transform.position += (player.objectTimer.getDeltaSeconds()*velocity);
-   Circle playerCollider = player.collisionData;
-   playerCollider.center = player.transform.position;
-   if( !isCircleInsideRect(playerCollider, game.m_playingField) )
-   {
-   clamp(game.m_playingField.left() + player.collisionData.radius,
-   game.m_playingField.right() - player.collisionData.radius,
-   player.transform.position.x);
-   clamp(game.m_playingField.bottom() + player.collisionData.radius,
-   game.m_playingField.top() - player.collisionData.radius,
-   player.transform.position.y);
-   }
-   }
-   }
-   */
 }

@@ -11,7 +11,7 @@
 
 namespace Core
 {
-   class Camera
+   struct Camera
    {
    public:
       Camera();

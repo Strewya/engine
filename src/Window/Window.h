@@ -20,7 +20,7 @@
 
 namespace Core
 {
-   class Window;
+   struct Window;
 
    enum WindowResult
    {
@@ -33,7 +33,7 @@ namespace Core
 
    WindowResult initializeWindow(Window& window);
 
-   class Window
+   struct Window
    {
    public:
       WindowProxy getProxy();
@@ -71,7 +71,7 @@ namespace Core
       int32_t getExitCode() const;
 
    private:
-      friend class WindowProxy;
+      friend struct WindowProxy;
       //platform
       WindowEvent& newEvent();
       //platform

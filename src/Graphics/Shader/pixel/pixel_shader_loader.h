@@ -12,9 +12,9 @@
 
 namespace Core
 {
-   class PixelShader;
+   struct PixelShader;
 
-   class PixelShaderLoader
+   struct PixelShaderLoader
    {
    public:
       bool init(ID3D11Device* device);

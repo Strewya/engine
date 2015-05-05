@@ -11,9 +11,9 @@
 
 namespace Core
 {
-   class PixelShader;
+   struct PixelShader;
 
-   class PixelShaderFileLoader
+   struct PixelShaderFileLoader
    {
    public:
       bool init(PixelShaderLoader& loader);

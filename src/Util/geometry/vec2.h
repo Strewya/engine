@@ -13,52 +13,51 @@
 namespace Core
 {
    template<typename T>
-   class Vec2
+   struct vec2
    {
-   public:
       T x;
       T y;
 
       void set(T x, T y);
       bool isZero() const;
 
-      template<typename U> operator Vec2<U>() const;
+      template<typename U> operator vec2<U>() const;
 
-      static T length(Vec2 v);
-      static T length2(Vec2 v);
-      static Vec2 normalize(Vec2 v);
-      static T dotProduct(Vec2 l, Vec2 r);
-      static Vec2 projection(Vec2 v, Vec2 target);
+      static T length(vec2 v);
+      static T length2(vec2 v);
+      static vec2 normalize(vec2 v);
+      static T dotProduct(vec2 l, vec2 r);
+      static vec2 projection(vec2 v, vec2 target);
    };
 
-   template<typename T> Vec2<T> operator-(Vec2<T> v);
+   template<typename T> vec2<T> operator-(vec2<T> v);
 
-   template<typename T> Vec2<T>& operator+=(Vec2<T>& t, T s);
-   template<typename T> Vec2<T>& operator-=(Vec2<T>& t, T s);
-   template<typename T> Vec2<T>& operator*=(Vec2<T>& t, T s);
-   template<typename T> Vec2<T>& operator/=(Vec2<T>& t, T s);
+   template<typename T> vec2<T>& operator+=(vec2<T>& t, T s);
+   template<typename T> vec2<T>& operator-=(vec2<T>& t, T s);
+   template<typename T> vec2<T>& operator*=(vec2<T>& t, T s);
+   template<typename T> vec2<T>& operator/=(vec2<T>& t, T s);
    
-   template<typename T> Vec2<T>& operator+=(Vec2<T>& t, Vec2<T> s);
-   template<typename T> Vec2<T>& operator-=(Vec2<T>& t, Vec2<T> s);
-   template<typename T> Vec2<T>& operator*=(Vec2<T>& t, Vec2<T> s);
-   template<typename T> Vec2<T>& operator/=(Vec2<T>& t, Vec2<T> s);
+   template<typename T> vec2<T>& operator+=(vec2<T>& t, vec2<T> s);
+   template<typename T> vec2<T>& operator-=(vec2<T>& t, vec2<T> s);
+   template<typename T> vec2<T>& operator*=(vec2<T>& t, vec2<T> s);
+   template<typename T> vec2<T>& operator/=(vec2<T>& t, vec2<T> s);
 
-   template<typename T> Vec2<T> operator+(Vec2<T> v, T s);
-   template<typename T> Vec2<T> operator-(Vec2<T> v, T s);
-   template<typename T> Vec2<T> operator*(Vec2<T> v, T s);
-   template<typename T> Vec2<T> operator*(T s, Vec2<T> v);
-   template<typename T> Vec2<T> operator/(Vec2<T> v, T s);
-   template<typename T> Vec2<T> operator/(T s, Vec2<T> v);
+   template<typename T> vec2<T> operator+(vec2<T> v, T s);
+   template<typename T> vec2<T> operator-(vec2<T> v, T s);
+   template<typename T> vec2<T> operator*(vec2<T> v, T s);
+   template<typename T> vec2<T> operator*(T s, vec2<T> v);
+   template<typename T> vec2<T> operator/(vec2<T> v, T s);
+   template<typename T> vec2<T> operator/(T s, vec2<T> v);
 
-   template<typename T> Vec2<T> operator+(Vec2<T> l, Vec2<T> r);
-   template<typename T> Vec2<T> operator-(Vec2<T> l, Vec2<T> r);
-   template<typename T> Vec2<T> operator*(Vec2<T> l, Vec2<T> r);
-   template<typename T> Vec2<T> operator/(Vec2<T> l, Vec2<T> r);
+   template<typename T> vec2<T> operator+(vec2<T> l, vec2<T> r);
+   template<typename T> vec2<T> operator-(vec2<T> l, vec2<T> r);
+   template<typename T> vec2<T> operator*(vec2<T> l, vec2<T> r);
+   template<typename T> vec2<T> operator/(vec2<T> l, vec2<T> r);
 
-   template<typename T> bool operator==(Vec2<T> l, Vec2<T> r);
-   template<typename T> bool operator!=(Vec2<T> l, Vec2<T> r);
+   template<typename T> bool operator==(vec2<T> l, vec2<T> r);
+   template<typename T> bool operator!=(vec2<T> l, vec2<T> r);
 
-   template<typename T> std::ostream& operator<<(std::ostream& os, Vec2<T> v);
+   template<typename T> std::ostream& operator<<(std::ostream& os, vec2<T> v);
 }
 
 #include <Util/geometry/vec2_impl.h>

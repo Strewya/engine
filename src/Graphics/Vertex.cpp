@@ -19,7 +19,7 @@ namespace Core
    {
    }
 
-   DefaultVertex::DefaultVertex(Vec3f position, Color color, Vec2f textureUV)
+   DefaultVertex::DefaultVertex(Vec3f position, Color color, vec2f textureUV)
       : position(position.x, position.y, position.z, 0),
       diffuse(color.r, color.g, color.b, color.a),
       textureUV(textureUV.x, textureUV.y)
@@ -48,7 +48,7 @@ namespace Core
       diffuse.z = b;
       diffuse.w = a;
    }
-   void DefaultVertex::setTextureUV(Vec2f textureUV)
+   void DefaultVertex::setTextureUV(vec2f textureUV)
    {
       setTextureUV(textureUV.x, textureUV.y);
    }
@@ -74,7 +74,7 @@ namespace Core
       : HealthVertex({}, {}, {-1, -1}, 0)
    {
    }
-   HealthVertex::HealthVertex(Vec3f position, Color color, Vec2f textureUV, float health)
+   HealthVertex::HealthVertex(Vec3f position, Color color, vec2f textureUV, float health)
       : DefaultVertex(position, color, textureUV), health(health, 0)
    {
    }

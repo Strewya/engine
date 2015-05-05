@@ -11,11 +11,10 @@
 
 namespace Core
 {
-   class Rect
+   struct Rect
    {
-   public:
-      Vec2f center;
-      Vec2f halfSize;
+      vec2f center;
+      vec2f halfSize;
 
       float left() const;
       float right() const;

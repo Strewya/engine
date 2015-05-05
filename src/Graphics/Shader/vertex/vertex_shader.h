@@ -11,9 +11,8 @@
 
 namespace Core
 {
-   class VertexShader
+   struct VertexShader
    {
-   public:
       ID3D11InputLayout* _inputLayout;
       ID3D11VertexShader* _vertex;
 

@@ -12,9 +12,8 @@
 
 namespace Core
 {
-   class Texture
+   struct Texture
    {
-   public:
       uint32_t width;
       uint32_t height;
       ID3D11ShaderResourceView* _shaderResourceView;

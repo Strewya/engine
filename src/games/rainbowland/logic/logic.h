@@ -10,25 +10,29 @@
 
 namespace Core
 {
-   class MovingThing;
+   struct MovingThing;
    typedef std::vector<MovingThing> VectorOfMovables;
 
    void simulateMovement(float dt, VectorOfMovables& movables);
 
-   class WindowEvent;
+   struct WindowEvent;
    typedef std::vector<WindowEvent> VectorOfWindowEvents;
-   class GameEvent;
+   struct GameEvent;
    typedef std::vector<GameEvent> VectorOfGameEvents;
    struct Window2GameEvent;
    typedef std::vector<Window2GameEvent> VectorOfTranslationData;
 
    VectorOfGameEvents translateWindowEventsToGameEvents(VectorOfWindowEvents& events, VectorOfTranslationData& translationData);
 
-   class DirectionTarget;
-   typedef std::vector<DirectionTarget> VectorOfDirectionTargets;
+   struct MoveDirectionTarget;
+   typedef std::vector<MoveDirectionTarget> VectorOfMoveDirectionTargets;
 
-   void modifyPlayerDirectionTargets(VectorOfGameEvents& events, VectorOfDirectionTargets& directions);
-   void modifyPlayerAcceleration(VectorOfGameEvents& events, VectorOfMovables& movables);
+   void modifyPlayerDirectionTargets(VectorOfGameEvents& events, VectorOfMoveDirectionTargets& directions);
 
-   void updatePlayerMovementDirection(float dt, VectorOfDirectionTargets& directions, VectorOfMovables& movables);
+   void updatePlayerMovementDirection(float dt, VectorOfMoveDirectionTargets& directions, VectorOfMovables& movables);
+
+   struct AimDirection;
+   typedef std::vector<AimDirection> VectorOfAimDirections;
+
+   
 }

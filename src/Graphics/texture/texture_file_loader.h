@@ -11,9 +11,9 @@
 
 namespace Core
 {
-   class Texture;
+   struct Texture;
 
-   class TextureFileLoader
+   struct TextureFileLoader
    {
    public:
       bool init(ID3D11Device* device);

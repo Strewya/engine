@@ -11,10 +11,9 @@
 
 namespace Core
 {
-   class Circle
+   struct Circle
    {
-   public:
-      Vec2f center;
+      vec2f center;
       float radius;
 
       void set(float cx, float cy, float r);

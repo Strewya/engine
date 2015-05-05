@@ -13,11 +13,11 @@
 
 namespace Core
 {
-   class Window;
+   struct Window;
 
    static const uint32_t USE_MONITOR_RESOLUTION = 0;
 
-   class WindowProxy
+   struct WindowProxy
    {
    public:
       WindowProxy(Window* window = nullptr);

@@ -107,18 +107,18 @@ namespace Core
       }
    }
 
-   void handleStick(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, Vec2i oldPos, Vec2i newPos, uint32_t threshold, uint32_t maxValue, Gamepad::Key axis)
+   void handleStick(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, vec2i oldPos, vec2i newPos, uint32_t threshold, uint32_t maxValue, Gamepad::Key axis)
    {
       float on = 0.8f;
       float off = 0.2f;
 
       if( newPos != oldPos )
       {
-         Vec2f newVec = (Vec2f)newPos;
-         Vec2f oldVec = (Vec2f)oldPos;
-         auto newData = calcAnalogData(Vec2f::length(newVec), threshold, maxValue);
-         auto oldData = calcAnalogData(Vec2f::length(oldVec), threshold, maxValue);
-         newVec = Vec2f::normalize(newVec);
+         vec2f newVec = (vec2f)newPos;
+         vec2f oldVec = (vec2f)oldPos;
+         auto newData = calcAnalogData(vec2f::length(newVec), threshold, maxValue);
+         auto oldData = calcAnalogData(vec2f::length(oldVec), threshold, maxValue);
+         newVec = vec2f::normalize(newVec);
          writeAxis(events, timestamp, id, axis, newVec.x, newVec.y, newData.value, newData.normalized);
 
          if( (oldData.normalized < on && newData.normalized >= on) ||

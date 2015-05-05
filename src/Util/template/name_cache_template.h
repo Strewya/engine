@@ -13,7 +13,7 @@
 namespace Core
 {
    template<typename HANDLE>
-   class NameCache
+   struct NameCache
    {
    public:
       HANDLE getHandle(const char* name) const

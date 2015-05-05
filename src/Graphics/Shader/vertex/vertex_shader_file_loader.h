@@ -12,9 +12,9 @@
 
 namespace Core
 {
-   class VertexShader;
+   struct VertexShader;
 
-   class VertexShaderFileLoader
+   struct VertexShaderFileLoader
    {
    public:
       bool init(VertexShaderLoader& loader);

@@ -9,19 +9,19 @@
 
 namespace Core
 {
-   Transform::Transform(Vec2f p, Vec2f s, float r)
+   Transform::Transform(vec2f p, vec2f s, float r)
       : position(p), scale(s), rotation(r)
    {
    }
 
-   void Transform::set(Vec2f p, Vec2f s, float r)
+   void Transform::set(vec2f p, vec2f s, float r)
    {
       position = p;
       scale = s;
       rotation = r;
    }
 
-   void Transform::translate(Vec2f delta)
+   void Transform::translate(vec2f delta)
    {
       position += delta;
    }
@@ -31,7 +31,7 @@ namespace Core
       scale *= uniform;
    }
 
-   void Transform::rescale(Vec2f nonUniform)
+   void Transform::rescale(vec2f nonUniform)
    {
       scale *= nonUniform;
    }

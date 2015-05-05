@@ -13,9 +13,9 @@
 
 namespace Core
 {
-   class VertexShader;
+   struct VertexShader;
 
-   class VertexShaderLoader
+   struct VertexShaderLoader
    {
    public:
       bool init(ID3D11Device* device);

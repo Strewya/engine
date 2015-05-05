@@ -10,7 +10,7 @@
 
 namespace Core
 {
-   class WindowProxy;
+   struct WindowProxy;
 
    void runGame(WindowProxy window);
 }

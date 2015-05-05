@@ -13,12 +13,12 @@
 
 namespace Core
 {
-   class Clock;
-   class WindowEvent;
+   struct Clock;
+   struct WindowEvent;
 
    typedef std::vector<WindowEvent> EventVector_t;
 
-   class InputSystem
+   struct InputSystem
    {
    public:
       bool init(WindowProxy window);

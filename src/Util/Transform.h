@@ -11,22 +11,21 @@
 
 namespace Core
 {
-   class Transform
+   struct Transform
    {
-   public:
-      Transform(Vec2f p = {0, 0}, Vec2f s = {1, 1}, float r = 0);
+      Transform(vec2f p = {0, 0}, vec2f s = {1, 1}, float r = 0);
 
-      void set(Vec2f p, Vec2f s, float r);
+      void set(vec2f p, vec2f s, float r);
 
-      void translate(Vec2f delta);
+      void translate(vec2f delta);
 
       void rescale(float uniform);
-      void rescale(Vec2f nonUniform);
+      void rescale(vec2f nonUniform);
 
       void rotate(float degrees);
 
-      Vec2f position;
-      Vec2f scale;
+      vec2f position;
+      vec2f scale;
       float rotation;
    };
 }

@@ -11,13 +11,13 @@
 #include "graphics/mesh/mesh.h"
 #include "util/geometry/rect.h"
 #include "util/geometry/vec3.h"
+#include "util/transform.h"
 /******* end header inclusion *******/
 
 namespace Core
 {
-   class GameState
+   struct GameState
    {
-   public:
       enum class State
       {
          ColorPick,
@@ -32,14 +32,16 @@ namespace Core
       Mesh backgroundMesh;
       Mesh playerMesh;
 
+      std::vector<Transform> transforms;
       std::vector<MovingThing> movingThings;
-      std::vector<DirectionTarget> directions;
+      std::vector<MoveDirectionTarget> moveDirections;
+      std::vector<AimDirection> aimDirections;
       std::vector<Window2GameEvent> inputTranslation;
    };
 
-   class GameSystems;
-   class GameResources;
-   class Timer;
+   struct GameSystems;
+   struct GameResources;
+   struct Timer;
 
    bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
    bool updateGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);

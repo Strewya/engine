@@ -19,11 +19,10 @@
 
 namespace Core
 {
-   class WindowProxy;
+   struct WindowProxy;
 
-   class Game
+   struct Game
    {
-   public:
       WindowProxy window;
 
       AudioSystem audioSystem;

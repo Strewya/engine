@@ -14,7 +14,7 @@
 namespace Core
 {
    template<typename CACHE>
-   class core_iterator
+   struct core_iterator
    {
    public:
       typedef typename CACHE::DataType DataType;
@@ -58,7 +58,7 @@ namespace Core
    };
 
    template<typename DATA, typename HANDLE>
-   class Cache
+   struct Cache
    {
    public:
       typedef DATA DataType;
@@ -149,7 +149,7 @@ namespace Core
       }
 
    private:
-      friend class core_iterator<ThisType>;
+      friend struct core_iterator<ThisType>;
       DataVec m_data;
       MagicVec m_magicNumbers;
       FreeVec m_freeSlots;

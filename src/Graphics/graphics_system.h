@@ -20,14 +20,14 @@
 
 namespace Core
 {
-   class Camera;
-   class Color;
-   class Mesh;
-   class Transform;
-   class Vertex;
+   struct Camera;
+   struct Color;
+   struct Mesh;
+   struct Transform;
+   struct Vertex;
 
 
-   class GraphicsSystem
+   struct GraphicsSystem
    {
    public:
       bool init(WindowProxy window);
@@ -69,7 +69,7 @@ namespace Core
       PixelShaderFileLoader m_psFileLoader;
 
       D3DXCOLOR m_backgroundColor;
-      Vec2i m_backbufferSize;
+      vec2i m_backbufferSize;
 
       std::vector<IUnknown**> m_declaredObjects;
       

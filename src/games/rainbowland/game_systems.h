@@ -10,13 +10,12 @@
 
 namespace Core
 {
-   class AudioSystem;
-   class GraphicsSystem;
-   class InputSystem;
+   struct AudioSystem;
+   struct GraphicsSystem;
+   struct InputSystem;
 
-   class GameSystems
+   struct GameSystems
    {
-   public:
       AudioSystem* audio;
       GraphicsSystem* gfx;
       InputSystem* input;

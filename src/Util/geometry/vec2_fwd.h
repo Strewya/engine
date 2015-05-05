@@ -12,8 +12,8 @@
 namespace Core
 {
    template<typename T>
-   class Vec2;
+   struct vec2;
 
-   typedef Vec2<float> Vec2f;
-   typedef Vec2<int32_t> Vec2i;
+   typedef vec2<float> vec2f;
+   typedef vec2<int32_t> vec2i;
 }

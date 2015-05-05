@@ -11,9 +11,8 @@
 
 namespace Core
 {
-   class PixelShader
+   struct PixelShader
    {
-   public:
       ID3D11PixelShader* _pixel;
 
       bool loaded()

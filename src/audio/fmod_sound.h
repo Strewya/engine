@@ -11,9 +11,8 @@
 
 namespace Core
 {
-   class FmodSound
+   struct FmodSound
    {
-   public:
       FMOD::Sound* _sound;
 
       bool loaded()

@@ -10,9 +10,8 @@
 
 namespace Core
 {
-   class Color
+   struct Color
    {
-   public:
       float r;
       float g;
       float b;

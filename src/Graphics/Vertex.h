@@ -14,18 +14,17 @@
 
 namespace Core
 {
-   class Color;
+   struct Color;
 
-   class DefaultVertex
+   struct DefaultVertex
    {
-   public:
       DefaultVertex();
-      DefaultVertex(Vec3f position, Color color, Vec2f textureUV);
+      DefaultVertex(Vec3f position, Color color, vec2f textureUV);
       void setPosition(Vec3f position);
       void setPosition(float x, float y, float z);
       void setColor(Color color);
       void setColor(float r, float g, float b, float a);
-      void setTextureUV(Vec2f textureUV);
+      void setTextureUV(vec2f textureUV);
       void setTextureUV(float u, float v);
 
       XMFLOAT4 position;
@@ -35,11 +34,10 @@ namespace Core
       static InputLayout getDescription();
    };
 
-   class HealthVertex : public DefaultVertex
+   struct HealthVertex : public DefaultVertex
    {
-   public:
       HealthVertex();
-      HealthVertex(Vec3f position, Color color, Vec2f textureUV, float health);
+      HealthVertex(Vec3f position, Color color, vec2f textureUV, float health);
       void setHealth(float h);
 
       XMFLOAT2 health;

@@ -13,7 +13,7 @@
 
 namespace Core
 {
-   class Gamepad
+   struct Gamepad
    {
    private:
       typedef std::unordered_map<uint32_t, std::string> Map;

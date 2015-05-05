@@ -12,9 +12,9 @@
 
 namespace Core
 {
-   class FmodSound;
+   struct FmodSound;
 
-   class FmodSoundFileLoader
+   struct FmodSoundFileLoader
    {
    public:
       bool init(FMOD::System* system);

@@ -14,13 +14,13 @@
 
 namespace Core
 {
-   class Texture;
-   class VertexShader;
-   class PixelShader;
-   class Transform;
-   class Color;
+   struct Texture;
+   struct VertexShader;
+   struct PixelShader;
+   struct Transform;
+   struct Color;
 
-   class DXRenderer
+   struct DXRenderer
    {
    public:
       bool init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11SamplerState* samplerState);

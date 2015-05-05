@@ -13,7 +13,7 @@
 
 namespace Core
 {
-   class PeriodicTimer
+   struct PeriodicTimer
    {
    public:
       PeriodicTimer();
@@ -30,7 +30,7 @@ namespace Core
       void setPeriodMicros(uint32_t periodMicros);
       const Timer& getTimer() const;
 
-   protected:
+   private:
       Timer m_timer;
       uint32_t m_periodMicros;
    };
