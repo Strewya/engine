@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Gamepad::Map Gamepad::m_map;
 

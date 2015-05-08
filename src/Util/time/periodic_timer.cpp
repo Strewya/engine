@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    PeriodicTimer::PeriodicTimer()
       : PeriodicTimer(0)

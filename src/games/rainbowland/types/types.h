@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   #description
 *  usage:      
 ********************************************/
 /******* c++ headers *******/
@@ -10,7 +10,7 @@
 #include "window/window_event.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct GameEvent_DirectionChange
    {

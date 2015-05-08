@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Mouse::Map Mouse::m_map;
 

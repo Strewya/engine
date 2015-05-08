@@ -9,7 +9,7 @@
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
 
 #define QPCC 0

@@ -13,7 +13,7 @@
 #include "window/window_event.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool InputSystem::init(WindowProxy window)
    {

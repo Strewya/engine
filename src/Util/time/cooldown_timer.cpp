@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    CooldownTimer::CooldownTimer()
       : CooldownTimer(0)

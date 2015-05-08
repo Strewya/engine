@@ -11,7 +11,7 @@
 #include "graphics/graphics_types.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct VertexShader;
 

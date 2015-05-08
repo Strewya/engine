@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Transform::Transform(vec2f p, vec2f s, float r)
       : position(p), scale(s), rotation(r)

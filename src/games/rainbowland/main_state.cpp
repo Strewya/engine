@@ -2,11 +2,11 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/rainbowland/game_state.h"
+#include "games/rainbowland/main_state.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "games/rainbowland/game_resources.h"
-#include "games/rainbowland/game_systems.h"
+#include "games/rainbowland/resources.h"
+#include "games/rainbowland/systems.h"
 #include "games/rainbowland/logic/logic.h"
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
@@ -18,7 +18,7 @@
 #include "window/window_event.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
    {
@@ -104,7 +104,7 @@ namespace Core
       return true;
    }
 
-   bool updateGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
+   bool updateGameState(float dt_s, uint32_t dt_us, GameState& state, GameSystems& systems, GameResources& assets)
    {
       bool stillRunning = true;
 
@@ -162,6 +162,7 @@ namespace Core
 
       */
       
+      
 
       //input collection
       auto eventList = systems.input->getEvents();
@@ -169,14 +170,14 @@ namespace Core
       //input response
       modifyPlayerDirectionTargets(gameEvents, state.moveDirections);
       //pre-movement
-      updatePlayerMovementDirection(timer.getDeltaSeconds(), state.moveDirections, state.movingThings);
+      updatePlayerMovementDirection(dt_s, state.moveDirections, state.movingThings);
       //movement
-      simulateMovement(timer.getDeltaSeconds(), state.movingThings);
+      simulateMovement(dt_s, state.movingThings);
 
       return stillRunning;
    }
 
-   void renderGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
+   void renderGameState(float dt, GameState& state, GameSystems& systems, GameResources& assets)
    {
       systems.gfx->setTransparency(false);
       systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);

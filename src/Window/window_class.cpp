@@ -9,7 +9,7 @@
 #include "window/window.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    WindowClass::WindowClass(const char* className)
       : WindowClass(::GetModuleHandle(nullptr), className)

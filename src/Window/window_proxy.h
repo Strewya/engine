@@ -11,7 +11,7 @@
 #include "window/window_event.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct Window;
 

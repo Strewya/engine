@@ -10,7 +10,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
 #define CORE_RESOURCE_HANDLE(name) struct tag_##name; typedef ResourceHandle<tag_##name> name
 

@@ -9,7 +9,7 @@
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool FmodSoundFileLoader::init(FMOD::System* system)
    {

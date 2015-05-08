@@ -11,7 +11,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    class CReadDirectoryChanges;
 

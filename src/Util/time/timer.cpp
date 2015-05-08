@@ -8,7 +8,7 @@
 #include "util/time/time_unit_conversions.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Timer::Timer() :
       m_currentMicros(0),

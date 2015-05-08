@@ -8,7 +8,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    template <typename T> void vec2<T>::set(T x, T y)
    {
@@ -21,7 +21,7 @@ namespace Core
       return x == 0.0f && y == 0.0f;
    }
 
-   template<typename T> template<typename U> vec2<T>::operator Core::vec2<U>() const
+   template<typename T> template<typename U> vec2<T>::operator core::vec2<U>() const
    {
       return vec2 < U > {static_cast<U>(x), static_cast<U>(y)};
    }

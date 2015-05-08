@@ -8,7 +8,7 @@
 #include "window/read_directory_changes.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    // The namespace is a convenience to emphasize that these are internals
    // interfaces. The namespace can be safely removed if you need to.

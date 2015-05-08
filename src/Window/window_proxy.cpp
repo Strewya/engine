@@ -8,7 +8,7 @@
 #include "window/window.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    WindowProxy::WindowProxy(Window* window)
       : m_window(window)

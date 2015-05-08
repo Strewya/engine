@@ -15,7 +15,7 @@
 #include "util/geometry/vec2.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    static ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
    static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);

@@ -12,7 +12,7 @@
 #include "util/utility.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    template<typename DATA, typename HANDLE, typename LOADER>
    struct Manager

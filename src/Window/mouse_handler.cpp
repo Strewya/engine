@@ -8,7 +8,7 @@
 #include "input/mouse.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    MouseHandler::MouseHandler()
       : m_centerX(0), m_centerY(0), m_relativeMouseMove(false)

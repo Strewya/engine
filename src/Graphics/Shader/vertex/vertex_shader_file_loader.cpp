@@ -11,7 +11,7 @@
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool VertexShaderFileLoader::init(VertexShaderLoader& loader)
    {

@@ -10,7 +10,7 @@
 #include "util/geometry/vec3.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    //////////////// DEFAULT VERTEX
 

@@ -9,7 +9,7 @@
 #include "util/geometry/vec2.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct Rect
    {

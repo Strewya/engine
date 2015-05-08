@@ -1,21 +1,21 @@
 #pragma once
 /********************************************
-*  contents:   circle type
+*  contents:   #description
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <algorithm>
 /******* common headers *******/
 /******* extra headers *******/
-#include <util/geometry/vec2.h>
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct Circle
+   struct EntityManager
    {
-      vec2f center;
-      float radius;
+   public:
+      
 
-      void set(float cx, float cy, float r);
+   private:
    };
 }

@@ -14,7 +14,7 @@
 #include "util/transform.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct GameState
    {
@@ -44,6 +44,6 @@ namespace Core
    struct Timer;
 
    bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
-   bool updateGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
-   void renderGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets);
+   bool updateGameState(float dt_s, uint32_t dt_us, GameState& state, GameSystems& systems, GameResources& assets);
+   void renderGameState(float dt, GameState& state, GameSystems& systems, GameResources& assets);
 }

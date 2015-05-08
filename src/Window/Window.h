@@ -18,7 +18,7 @@
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct Window;
 

@@ -1,6 +1,6 @@
 #pragma once
 /********************************************
-*  contents:   #todo
+*  contents:   #description
 *  usage:
 ********************************************/
 /******* c++ headers *******/
@@ -8,7 +8,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct MovingThing;
    typedef std::vector<MovingThing> VectorOfMovables;

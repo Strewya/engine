@@ -9,7 +9,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    inline uint32_t secondsToMicros(uint32_t s)
    {

@@ -91,15 +91,6 @@
     <ClCompile Include="..\..\..\src\window\window_proxy.cpp">
       <Filter>Code\framework\window</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\game_init.cpp">
-      <Filter>Code\games</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\game_main.cpp">
-      <Filter>Code\games\rainbowland</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp">
-      <Filter>Code\games\rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp">
       <Filter>Code\games\rainbowland</Filter>
     </ClCompile>
@@ -123,6 +114,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp">
       <Filter>Code\games\rainbowland\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
+      <Filter>Code\games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp">
+      <Filter>Code\games\rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland_main.cpp">
+      <Filter>Code\games\rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -264,23 +264,8 @@
     <ClInclude Include="..\..\..\src\window\window_event.h">
       <Filter>Code\framework\window</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\game_init.h">
-      <Filter>Code\games</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_list.h">
       <Filter>Code\games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_main.h">
-      <Filter>Code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_resources.h">
-      <Filter>Code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h">
-      <Filter>Code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_systems.h">
-      <Filter>Code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
       <Filter>Code\games\rainbowland</Filter>
@@ -344,6 +329,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h">
       <Filter>Code\games\rainbowland\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\game_entry_point.h">
+      <Filter>Code\games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\systems.h">
+      <Filter>Code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\main_state.h">
+      <Filter>Code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\resources.h">
+      <Filter>Code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h">
+      <Filter>Code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\util\entity_handle.h">
+      <Filter>Code\games\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
+      <Filter>Code\games\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -409,6 +415,9 @@
     </Filter>
     <Filter Include="Code\games\rainbowland\logic">
       <UniqueIdentifier>{5c7399e0-be04-4354-a4cc-d5ec3931ca40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code\games\util">
+      <UniqueIdentifier>{fa3b9e3e-cdd7-40cd-9ea1-6bdd5b625ada}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

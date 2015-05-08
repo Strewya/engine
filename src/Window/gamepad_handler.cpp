@@ -13,7 +13,7 @@
 #include "window/window_event.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    GamepadHandler::GamepadHandler()
       : m_unconnectedReadDelay(milisToMicros(200))

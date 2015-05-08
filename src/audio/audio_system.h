@@ -10,7 +10,7 @@
 #include "audio/fmod_sound_manager.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct AudioSystem
    {

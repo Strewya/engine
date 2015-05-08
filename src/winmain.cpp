@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 #include <thread>
 /******* extra headers *******/
-#include "games/game_init.h"
+#include "games/game_entry_point.h"
 #include "window/window_include.h"
 #include "window/window.h"
 #include "window/window_class.h"
@@ -14,13 +14,13 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-   Core::Window window("CoreEngine");
+   core::Window window("CoreEngine");
 
-   int result = Core::initializeWindow(window);
+   int result = core::initializeWindow(window);
 
-   if( result == Core::WindowResult::OK )
+   if( result == core::WindowResult::OK )
    {
-      std::thread logicThread(Core::runGame, window.getProxy());
+      std::thread logicThread(core::runGame, window.getProxy());
 
       while( window.getProxy().isRunning() )
       {

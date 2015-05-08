@@ -9,7 +9,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct VertexShader
    {

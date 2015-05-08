@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/rainbowland/game_main.h"
+#include "games/rainbowland/rainbowland_main.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "games/rainbowland/load_game_resources.h"
@@ -16,7 +16,7 @@
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool Game::shutdown()
    {
@@ -196,7 +196,7 @@ namespace Core
                         timer.getDeltaSeconds()*state.cameraMoveDirection.y*state.cameraMoveModifier,
                         timer.getDeltaSeconds()*state.cameraMoveDirection.z*state.cameraMoveModifier});
 
-      running = running && updateGameState(timer, state, systems, assets);
+      running = running && updateGameState(timer.getDeltaSeconds(), timer.getDeltaMicros(), state, systems, assets);
 
       return running;
    }
@@ -208,7 +208,7 @@ namespace Core
       graphicsSystem.setPerspectiveProjection();
       graphicsSystem.applyCamera(state.camera);
 
-      renderGameState(timer, state, systems, assets);
+      renderGameState(timer.getDeltaSeconds(), state, systems, assets);
 
       graphicsSystem.present();
    }

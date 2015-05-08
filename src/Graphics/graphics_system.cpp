@@ -16,7 +16,7 @@
 #include "window/window.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS

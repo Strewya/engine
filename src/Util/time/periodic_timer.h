@@ -11,7 +11,7 @@
 #include "util/time/timer.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct PeriodicTimer
    {

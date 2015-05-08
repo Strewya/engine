@@ -9,7 +9,7 @@
 #include "graphics/shader/pixel/pixel_shader_loader.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct PixelShader;
 

@@ -12,7 +12,7 @@
 #include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct Texture;
    struct VertexShader;

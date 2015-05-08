@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/game_init.h"
+#include "games/game_entry_point.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "util/time/clock.h"
@@ -25,7 +25,7 @@
 #define CORE_STEP CORE_CLAMPED_STEP
 
 
-namespace Core
+namespace core
 {
    void runGame(WindowProxy window)
    {

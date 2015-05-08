@@ -8,7 +8,7 @@
 #include "input/keyboard.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool KeyboardHandler::handle(WindowEvent& we, uint32_t msg, WPARAM wp, LPARAM lp)
    {

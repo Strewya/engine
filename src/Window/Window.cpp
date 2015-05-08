@@ -15,7 +15,7 @@
 #include "window/window_class.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    WindowResult initializeWindow(Window& window)
    {
@@ -272,36 +272,36 @@ namespace Core
 
    static FileChangeType toFileChangeType(DWORD action)
    {
-      FileChangeType returnValue = Core::FILE_BADDATA;
+      FileChangeType returnValue = core::FILE_BADDATA;
       switch( action )
       {
          case FILE_ACTION_ADDED:
          {
-            returnValue = Core::FILE_ADDED;
+            returnValue = core::FILE_ADDED;
          }
          break;
 
          case FILE_ACTION_MODIFIED:
          {
-            returnValue = Core::FILE_MODIFIED;
+            returnValue = core::FILE_MODIFIED;
          }
          break;
 
          case FILE_ACTION_REMOVED:
          {
-            returnValue = Core::FILE_REMOVED;
+            returnValue = core::FILE_REMOVED;
          }
          break;
 
          case FILE_ACTION_RENAMED_OLD_NAME:
          {
-            returnValue = Core::FILE_RENAMED_FROM;
+            returnValue = core::FILE_RENAMED_FROM;
          }
          break;
 
          case FILE_ACTION_RENAMED_NEW_NAME:
          {
-            returnValue = Core::FILE_RENAMED_TO;
+            returnValue = core::FILE_RENAMED_TO;
          }
          break;
 

@@ -1,21 +1,23 @@
 #pragma once
 /********************************************
-*  contents:   circle type
+*  contents:   declaration of systems used by the game
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include <util/geometry/vec2.h>
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct Circle
-   {
-      vec2f center;
-      float radius;
+   struct AudioSystem;
+   struct GraphicsSystem;
+   struct InputSystem;
 
-      void set(float cx, float cy, float r);
+   struct GameSystems
+   {
+      AudioSystem* audio;
+      GraphicsSystem* gfx;
+      InputSystem* input;
    };
 }

@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Camera::Camera()
       : m_position({0, 0, 0}), m_lookAtAxis({0, 0, 1}), m_upAxis({0, 1, 0}), m_speed(0)

@@ -9,7 +9,7 @@
 #include "window/read_directory_changes_private.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    ///////////////////////////////////////////////////////////////////////////
    // CReadDirectoryChanges

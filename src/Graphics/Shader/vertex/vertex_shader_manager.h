@@ -12,7 +12,7 @@
 #include "util/template/resource_manager_template.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    typedef Manager<VertexShader, HVertexShader, VertexShaderFileLoader> VertexShaderManager;
 }

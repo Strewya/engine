@@ -9,7 +9,7 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    bool loadFile(const char* filename, std::vector<char>& buffer);
 }

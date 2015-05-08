@@ -11,7 +11,7 @@
 #include "util/geometry/vec3.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Mesh makeSolidQuad(vec2f pos, vec2f hs, HVertexShader vshader, HPixelShader pshader)
    {

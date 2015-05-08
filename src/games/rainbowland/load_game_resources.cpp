@@ -6,13 +6,13 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "audio/audio_system.h"
-#include "games/rainbowland/game_resources.h"
-#include "games/rainbowland/game_systems.h"
+#include "games/rainbowland/resources.h"
+#include "games/rainbowland/systems.h"
 #include "graphics/graphics_system.h"
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    GameResources loadGameResources(GameSystems& sys)
    {

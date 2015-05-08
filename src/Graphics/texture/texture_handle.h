@@ -9,7 +9,7 @@
 #include "util/template/resource_handle_template.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    CORE_RESOURCE_HANDLE(HTexture);
 }

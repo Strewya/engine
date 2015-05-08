@@ -9,7 +9,7 @@
 #include "util/utility.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    bool VertexShaderLoader::init(ID3D11Device* device)
    {

@@ -11,7 +11,7 @@
 #include "window/window_event.h"
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    void simulateMovement(float dt, VectorOfMovables& movables)
    {

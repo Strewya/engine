@@ -7,7 +7,7 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace Core
+namespace core
 {
    Color::Color(float r, float g, float b, float a)
       : r(r), g(g), b(b), a(a)

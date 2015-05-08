@@ -8,16 +8,16 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include "audio/audio_system.h"
-#include "games/rainbowland/game_resources.h"
-#include "games/rainbowland/game_systems.h"
-#include "games/rainbowland/game_state.h"
+#include "games/rainbowland/resources.h"
+#include "games/rainbowland/systems.h"
+#include "games/rainbowland/main_state.h"
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
 #include "util/time/timer.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
    struct WindowProxy;
 
