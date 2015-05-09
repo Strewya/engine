@@ -61,4 +61,5 @@ namespace core
       vec2f direction;
       vec2f position;
    };
+
 }

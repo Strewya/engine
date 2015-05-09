@@ -34,7 +34,7 @@
 
 #define CORE_GAME Game
 #define CORE_PKG
-#define CORE_HEADER "games/rainbowland/game_main.h"
+#define CORE_HEADER "games/rainbowland/rainbowland_main.h"
 
 #else
 

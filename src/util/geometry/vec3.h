@@ -58,7 +58,7 @@ namespace core
    template<typename T> std::ostream& operator<<(std::ostream& os, Vec3<T> v);
 }
 
-#include <Util/geometry/vec3_impl.h>
+#include "util/geometry/vec3_impl.h"
 
 
 // #include <iostream>

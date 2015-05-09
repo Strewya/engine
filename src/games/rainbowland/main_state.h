@@ -7,6 +7,7 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include "games/rainbowland/types/types.h"
+#include "games/util/entity_manager.h"
 #include "graphics/camera.h"
 #include "graphics/mesh/mesh.h"
 #include "util/geometry/rect.h"
@@ -24,6 +25,7 @@ namespace core
          ClassPick,
          Session
       };
+
       State activeState;
       Camera camera;
       Vec3f cameraMoveDirection;
@@ -31,6 +33,8 @@ namespace core
 
       Mesh backgroundMesh;
       Mesh playerMesh;
+
+      EntityManager entities;
 
       std::vector<Transform> transforms;
       std::vector<MovingThing> movingThings;

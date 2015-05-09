@@ -9,10 +9,45 @@
 /******* extra headers *******/
 /******* end header inclusion *******/
 
-namespace Core
+namespace core
 {
+
    struct EntityHandle
    {
+      enum
+      {
+         INDEX_BITS = 24,
+         INDEX_MASK = (1 << INDEX_BITS) - 1,
+         GENERATION_MASK = ~INDEX_MASK
+      };
       uint32_t id;
+
+      uint32_t index()
+      {
+         auto result = id & INDEX_MASK;
+
+         return result;
+      }
+
+      uint32_t generation()
+      {
+         auto result = (id & GENERATION_MASK) >> INDEX_BITS;
+
+         return result;
+      }
    };
+
+   inline bool operator==(const EntityHandle& l, const EntityHandle& r)
+   {
+      auto result = l.id == r.id;
+
+      return result;
+   }
+
+   inline bool operator<(const EntityHandle& l, const EntityHandle& r)
+   {
+      auto result = l.id < r.id;
+
+      return result;
+   }
 }

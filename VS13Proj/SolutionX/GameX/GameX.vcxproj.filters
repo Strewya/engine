@@ -2,427 +2,436 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\..\src\stdafx_builder.cpp">
-      <Filter>Code</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\winmain.cpp">
-      <Filter>Code</Filter>
+      <Filter>code</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\audio\audio_system.cpp">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\audio\fmod_sound_file_loader.cpp">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp">
-      <Filter>Code\framework\graphics\mesh</Filter>
+      <Filter>code\framework\graphics\mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.cpp">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.cpp">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.cpp">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.cpp">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\file_loader.cpp">
-      <Filter>Code\framework\graphics\shader</Filter>
+      <Filter>code\framework\graphics\shader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\texture\texture_file_loader.cpp">
-      <Filter>Code\framework\graphics\texture</Filter>
+      <Filter>code\framework\graphics\texture</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\camera.cpp">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\vertex.cpp">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\input\input_system.cpp">
-      <Filter>Code\framework\input</Filter>
+      <Filter>code\framework\input</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\input\gamepad.cpp">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\input\keyboard.cpp">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\input\mouse.cpp">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\utility.cpp">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\transform.cpp">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\color.cpp">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\gamepad_handler.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\keyboard_handler.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\mouse_handler.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\read_directory_changes.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\read_directory_changes_private.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\window.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\window_class.cpp">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\window\window_proxy.cpp">
-      <Filter>Code\framework\window</Filter>
+      <Filter>code\framework\window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\time\clock.cpp">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\time\cooldown_timer.cpp">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\time\periodic_timer.cpp">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\time\timer.cpp">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\geometry\circle.cpp">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\geometry\rect.cpp">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp">
-      <Filter>Code\games\rainbowland\logic</Filter>
+      <Filter>code\games\rainbowland\logic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
-      <Filter>Code\games</Filter>
+      <Filter>code\games</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland_main.cpp">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp">
+      <Filter>code\games\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\ring_buffer.cpp">
+      <Filter>code\framework\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
-      <Filter>Code</Filter>
+      <Filter>code</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\audio_system.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_include.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_sound.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_sound_file_loader.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_sound_handle.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_sound_manager.h">
-      <Filter>Code\framework\audio</Filter>
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h">
-      <Filter>Code\framework\graphics\mesh</Filter>
+      <Filter>code\framework\graphics\mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\default_pixel_shader.h">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader.h">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.h">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.h">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_manager.h">
-      <Filter>Code\framework\graphics\shader\pixel</Filter>
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\default_vertex_shader.h">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader.h">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.h">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.h">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_manager.h">
-      <Filter>Code\framework\graphics\shader\vertex</Filter>
+      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\file_loader.h">
-      <Filter>Code\framework\graphics\shader</Filter>
+      <Filter>code\framework\graphics\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\shader_handle.h">
-      <Filter>Code\framework\graphics\shader</Filter>
+      <Filter>code\framework\graphics\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\texture\texture.h">
-      <Filter>Code\framework\graphics\texture</Filter>
+      <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\texture\texture_file_loader.h">
-      <Filter>Code\framework\graphics\texture</Filter>
+      <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\texture\texture_handle.h">
-      <Filter>Code\framework\graphics\texture</Filter>
+      <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\texture\texture_manager.h">
-      <Filter>Code\framework\graphics\texture</Filter>
+      <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\camera.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\dx_include.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\dx_renderer.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\graphics_system.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\vertex.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\input\input_system.h">
-      <Filter>Code\framework\input</Filter>
+      <Filter>code\framework\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\input\gamepad.h">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\input\keyboard.h">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\input\mouse.h">
-      <Filter>Code\framework\input\devices</Filter>
+      <Filter>code\framework\input\devices</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\utility.h">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\transform.h">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\color.h">
-      <Filter>Code\framework\util</Filter>
+      <Filter>code\framework\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\gamepad_handler.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\keyboard_handler.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\mouse_handler.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\read_directory_changes.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\read_directory_changes_private.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\window.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\window_class.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\window_include.h">
-      <Filter>Code\framework\window\windows</Filter>
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\window_proxy.h">
-      <Filter>Code\framework\window</Filter>
+      <Filter>code\framework\window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\window_event.h">
-      <Filter>Code\framework\window</Filter>
+      <Filter>code\framework\window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_list.h">
-      <Filter>Code\games</Filter>
+      <Filter>code\games</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h">
-      <Filter>Code\framework\graphics</Filter>
+      <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\time\clock.h">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\time\cooldown_timer.h">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\time\periodic_timer.h">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\time\time_unit_conversions.h">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\time\timer.h">
-      <Filter>Code\framework\util\time</Filter>
+      <Filter>code\framework\util\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\template\name_cache_template.h">
-      <Filter>Code\framework\util\template</Filter>
+      <Filter>code\framework\util\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\template\resource_cache_template.h">
-      <Filter>Code\framework\util\template</Filter>
+      <Filter>code\framework\util\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\template\resource_handle_template.h">
-      <Filter>Code\framework\util\template</Filter>
+      <Filter>code\framework\util\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\template\resource_manager_template.h">
-      <Filter>Code\framework\util\template</Filter>
+      <Filter>code\framework\util\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\circle.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\rect.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec2.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec2_fwd.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec2_impl.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec3_fwd.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec3_impl.h">
-      <Filter>Code\framework\util\geometry</Filter>
+      <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h">
-      <Filter>Code\games\rainbowland\logic</Filter>
+      <Filter>code\games\rainbowland\logic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h">
-      <Filter>Code\games\rainbowland\types</Filter>
+      <Filter>code\games\rainbowland\types</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_entry_point.h">
-      <Filter>Code\games</Filter>
+      <Filter>code\games</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\main_state.h">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\resources.h">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h">
-      <Filter>Code\games\rainbowland</Filter>
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\util\entity_handle.h">
-      <Filter>Code\games\util</Filter>
+      <Filter>code\games\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
-      <Filter>Code\games\util</Filter>
+      <Filter>code\games\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\ring_buffer.h">
+      <Filter>code\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Code">
+    <Filter Include="code">
       <UniqueIdentifier>{7396be76-2094-4582-9c39-3a43f5c88af6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework">
+    <Filter Include="code\framework">
       <UniqueIdentifier>{6d866dbf-8d0e-422d-abdc-3c377019301b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\audio">
+    <Filter Include="code\framework\audio">
       <UniqueIdentifier>{38769727-8ce4-4b23-bd9f-9b3654c30691}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\graphics">
+    <Filter Include="code\framework\graphics">
       <UniqueIdentifier>{eaa1e107-5704-493f-aae2-048ac703877e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\input">
-      <UniqueIdentifier>{ded6ae73-6084-4a00-8b48-5a351f40f9d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\util">
-      <UniqueIdentifier>{565cb0f6-2f3c-4edb-9208-e53adeef455d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\window">
-      <UniqueIdentifier>{8bbf906b-4ef6-4407-8979-d1c7f15135b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\util\geometry">
-      <UniqueIdentifier>{32fe215e-3092-4a9f-acd9-17067b78d58b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\util\template">
-      <UniqueIdentifier>{00d1644b-7bf8-43cd-8bfe-bc038d648a46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\util\time">
-      <UniqueIdentifier>{9f53bd47-2c17-4739-88dd-38660f29f11a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\window\windows">
-      <UniqueIdentifier>{fb75e8cc-9af9-493c-8ff7-4b3b996f36a4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\games">
-      <UniqueIdentifier>{b7cb840d-e593-43b7-9cf2-570ce4574a57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\games\rainbowland">
-      <UniqueIdentifier>{61078100-e572-45d1-a0e0-5654390f3945}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\mesh">
+    <Filter Include="code\framework\graphics\mesh">
       <UniqueIdentifier>{1e7b813a-acbd-419d-8b6d-316d3d6777a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\graphics\shader">
+    <Filter Include="code\framework\graphics\shader">
       <UniqueIdentifier>{86373863-cfd8-421a-bd79-fd87b123cf75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\graphics\texture">
-      <UniqueIdentifier>{98952245-2e0d-4b12-a832-19ff29546a66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Code\framework\graphics\shader\pixel">
+    <Filter Include="code\framework\graphics\shader\pixel">
       <UniqueIdentifier>{79a75274-7949-4131-a3d1-ecae29af3d78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\graphics\shader\vertex">
+    <Filter Include="code\framework\graphics\shader\vertex">
       <UniqueIdentifier>{a60334bc-2b56-4247-a4e5-25bf1bcb9c69}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\framework\input\devices">
+    <Filter Include="code\framework\graphics\texture">
+      <UniqueIdentifier>{98952245-2e0d-4b12-a832-19ff29546a66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\input">
+      <UniqueIdentifier>{ded6ae73-6084-4a00-8b48-5a351f40f9d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\input\devices">
       <UniqueIdentifier>{ea2b549d-61ac-4f42-8c85-bae97d6801b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\games\rainbowland\types">
+    <Filter Include="code\framework\util">
+      <UniqueIdentifier>{565cb0f6-2f3c-4edb-9208-e53adeef455d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\util\geometry">
+      <UniqueIdentifier>{32fe215e-3092-4a9f-acd9-17067b78d58b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\util\template">
+      <UniqueIdentifier>{00d1644b-7bf8-43cd-8bfe-bc038d648a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\util\time">
+      <UniqueIdentifier>{9f53bd47-2c17-4739-88dd-38660f29f11a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\window">
+      <UniqueIdentifier>{8bbf906b-4ef6-4407-8979-d1c7f15135b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\window\windows">
+      <UniqueIdentifier>{fb75e8cc-9af9-493c-8ff7-4b3b996f36a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\games">
+      <UniqueIdentifier>{b7cb840d-e593-43b7-9cf2-570ce4574a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\games\rainbowland">
+      <UniqueIdentifier>{61078100-e572-45d1-a0e0-5654390f3945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\games\rainbowland\types">
       <UniqueIdentifier>{d9dc53f3-844f-4de2-966e-6fd585acd37f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\games\rainbowland\logic">
+    <Filter Include="code\games\rainbowland\logic">
       <UniqueIdentifier>{5c7399e0-be04-4354-a4cc-d5ec3931ca40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Code\games\util">
+    <Filter Include="code\games\util">
       <UniqueIdentifier>{fa3b9e3e-cdd7-40cd-9ea1-6bdd5b625ada}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\graphics\shader\default_shader.hlsl">
-      <Filter>Code\framework\graphics\shader</Filter>
+      <Filter>code\framework\graphics\shader</Filter>
     </None>
   </ItemGroup>
 </Project>

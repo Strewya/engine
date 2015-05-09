@@ -41,7 +41,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;TOLUA_API=extern __declspec(dllimport);NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -55,11 +55,11 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\toLua++\exe\tolua.c" />
-    <ClCompile Include="..\..\..\src\toLua++\exe\toluabind.c" />
+    <ClInclude Include="..\..\..\src\to_lua++\exe\toluabind.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\toLua++\exe\toluabind.h" />
+    <ClCompile Include="..\..\..\src\to_lua++\exe\tolua.c" />
+    <ClCompile Include="..\..\..\src\to_lua++\exe\toluabind.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

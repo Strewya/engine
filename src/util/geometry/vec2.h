@@ -60,7 +60,7 @@ namespace core
    template<typename T> std::ostream& operator<<(std::ostream& os, vec2<T> v);
 }
 
-#include <Util/geometry/vec2_impl.h>
+#include "util/geometry/vec2_impl.h"
 
 
 //

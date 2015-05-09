@@ -75,7 +75,7 @@ namespace core
       VertexShader defaultVertexShader{nullptr, nullptr};
       if( CORE_STATUS_OK )
       {
-#include <Graphics/Shader/Vertex/default_vertex_shader.h>
+#include "graphics/shader/vertex/default_vertex_shader.h"
 
          defaultVertexShader = m_vsLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
       }
@@ -83,7 +83,7 @@ namespace core
       PixelShader defaultPixelShader{nullptr};
       if( CORE_STATUS_OK )
       {
-#include <Graphics/Shader/Pixel/default_pixel_shader.h>
+#include "graphics/shader/pixel/default_pixel_shader.h"
 
          defaultPixelShader = m_psLoader.load((const char*)g_PShader, sizeof(g_PShader));
       }

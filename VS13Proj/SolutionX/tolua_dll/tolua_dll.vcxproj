@@ -41,7 +41,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;TOLUA_API=extern __declspec(dllexport);NDEBUG;_WINDOWS;_USRDLL;TOLUA_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformation>false</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -58,14 +58,14 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\toLua++\dll\tolua_event.c" />
-    <ClCompile Include="..\..\..\src\toLua++\dll\tolua_is.c" />
-    <ClCompile Include="..\..\..\src\toLua++\dll\tolua_map.c" />
-    <ClCompile Include="..\..\..\src\toLua++\dll\tolua_push.c" />
-    <ClCompile Include="..\..\..\src\toLua++\dll\tolua_to.c" />
+    <ClInclude Include="..\..\..\src\to_lua++\dll\tolua_event.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\toLua++\dll\tolua_event.h" />
+    <ClCompile Include="..\..\..\src\to_lua++\dll\tolua_event.c" />
+    <ClCompile Include="..\..\..\src\to_lua++\dll\tolua_is.c" />
+    <ClCompile Include="..\..\..\src\to_lua++\dll\tolua_map.c" />
+    <ClCompile Include="..\..\..\src\to_lua++\dll\tolua_push.c" />
+    <ClCompile Include="..\..\..\src\to_lua++\dll\tolua_to.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

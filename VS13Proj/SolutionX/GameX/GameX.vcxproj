@@ -18,6 +18,7 @@
     <ProjectGuid>{A0FDD4E0-D78E-495A-A0D9-505A373A349D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GameX</RootNamespace>
+    <ProjectName>GameX</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -247,6 +248,7 @@
     <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
+    <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp" />
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
@@ -270,6 +272,7 @@
     <ClCompile Include="..\..\..\src\util\color.cpp" />
     <ClCompile Include="..\..\..\src\util\geometry\circle.cpp" />
     <ClCompile Include="..\..\..\src\util\geometry\rect.cpp" />
+    <ClCompile Include="..\..\..\src\util\ring_buffer.cpp" />
     <ClCompile Include="..\..\..\src\util\time\clock.cpp" />
     <ClCompile Include="..\..\..\src\util\time\cooldown_timer.cpp" />
     <ClCompile Include="..\..\..\src\util\time\periodic_timer.cpp" />
@@ -341,6 +344,7 @@
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec3_fwd.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec3_impl.h" />
+    <ClInclude Include="..\..\..\src\util\ring_buffer.h" />
     <ClInclude Include="..\..\..\src\util\template\name_cache_template.h" />
     <ClInclude Include="..\..\..\src\util\template\resource_cache_template.h" />
     <ClInclude Include="..\..\..\src\util\template\resource_handle_template.h" />
