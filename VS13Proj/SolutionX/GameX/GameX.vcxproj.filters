@@ -351,14 +351,14 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\util\entity_handle.h">
-      <Filter>code\games\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
       <Filter>code\games\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\ring_buffer.h">
       <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\util\entity.h">
+      <Filter>code\games\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

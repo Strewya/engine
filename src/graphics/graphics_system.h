@@ -14,6 +14,7 @@
 #include "graphics/shader/pixel/pixel_shader_manager.h"
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
+#include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
@@ -23,9 +24,22 @@ namespace core
    struct Camera;
    struct Color;
    struct Mesh;
+   struct Rect;
    struct Transform;
    struct Vertex;
-
+   struct FontDescriptor
+   {
+      HTexture fontTexture;
+      Rect glyphs[128 - 32];
+      uint32_t height;
+   };
+   
+   enum TextJustification
+   {
+      Left, Right,
+      Top = Left, Bottom = Right,
+      Center, Middle = Center
+   };
 
    struct GraphicsSystem
    {
@@ -45,6 +59,7 @@ namespace core
       void setTransparency(bool isEnabled);
 
       void renderMesh(Transform t, Color c, const Mesh& mesh);
+      void renderText(const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y);
 
       TextureManager textures;
       VertexShaderManager vertexShaders;

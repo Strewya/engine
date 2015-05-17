@@ -13,14 +13,14 @@
 
 namespace core
 {
-   struct EntityHandle;
+   struct Entity;
 
    struct EntityManager
    {
    public:
-      EntityHandle create();
-      bool alive(EntityHandle e);
-      void kill(EntityHandle e);
+      Entity create();
+      bool alive(Entity e);
+      void kill(Entity e);
       
    private:
       RingBuffer m_freeIndex;

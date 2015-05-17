@@ -13,6 +13,7 @@
 #include "util/color.h"
 #include "util/transform.h"
 #include "util/utility.h"
+#include "util/geometry/rect.h"
 #include "window/window.h"
 /******* end headers *******/
 
@@ -259,6 +260,11 @@ namespace core
       _renderer.setTexture(textures.getData(mesh.texture)._shaderResourceView);
       _renderer.setVertexTopology(topology[mesh.topology]);
       _renderer.render(t, c, mesh.vertices, mesh.indices);
+   }
+
+   void GraphicsSystem::renderText(const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
+   {
+
    }
 
    //*****************************************************************

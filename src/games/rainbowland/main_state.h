@@ -19,14 +19,22 @@ namespace core
 {
    struct GameState
    {
-      enum class State
+      enum class GlobalGameState
       {
-         ColorPick,
+         MainMenu,
+         Gameplay,
+         Score
+      };
+
+      enum class GameplayState
+      {
+         //ColorPick,
          ClassPick,
          Session
       };
 
-      State activeState;
+      GlobalGameState globalGameState;
+      GameplayState gameplayState;
       Camera camera;
       Vec3f cameraMoveDirection;
       float cameraMoveModifier;
@@ -35,6 +43,7 @@ namespace core
       Mesh playerMesh;
 
       EntityManager entities;
+      MovementData movement;
 
       std::vector<Transform> transforms;
       std::vector<MovingThing> movingThings;

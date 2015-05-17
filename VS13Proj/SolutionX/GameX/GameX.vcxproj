@@ -305,7 +305,7 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h" />
-    <ClInclude Include="..\..\..\src\games\util\entity_handle.h" />
+    <ClInclude Include="..\..\..\src\games\util\entity.h" />
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h" />
     <ClInclude Include="..\..\..\src\graphics\camera.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_include.h" />

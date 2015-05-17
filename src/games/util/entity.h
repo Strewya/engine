@@ -12,7 +12,7 @@
 namespace core
 {
 
-   struct EntityHandle
+   struct Entity
    {
       enum
       {
@@ -37,14 +37,14 @@ namespace core
       }
    };
 
-   inline bool operator==(const EntityHandle& l, const EntityHandle& r)
+   inline bool operator==(const Entity& l, const Entity& r)
    {
       auto result = l.id == r.id;
 
       return result;
    }
 
-   inline bool operator<(const EntityHandle& l, const EntityHandle& r)
+   inline bool operator<(const Entity& l, const Entity& r)
    {
       auto result = l.id < r.id;
 
