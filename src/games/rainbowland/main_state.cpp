@@ -20,12 +20,18 @@
 
 namespace core
 {
+   static FontDescriptor fd;
+
    bool initializeGameState(Timer& timer, GameState& state, GameSystems& systems, GameResources& assets)
    {
       state.globalGameState = GameState::GlobalGameState::MainMenu;
       state.gameplayState = GameState::GameplayState::ClassPick;
 
       state.cameraMoveModifier = 1;
+
+      fd = loadFont(CORE_RESOURCE("Defs/font.font"), systems.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png")));
+      fd.vshader = assets.mainVS;
+      fd.pshader = assets.mainPS;
 
       auto backgroundTexture = systems.gfx->textures.getData(assets.background);
       auto ratio = (float)backgroundTexture.width / (float)backgroundTexture.height;
@@ -248,48 +254,45 @@ namespace core
 
    void renderGameState(float dt, GameState& state, GameSystems& systems, GameResources& assets)
    {
+/*
+      systems.gfx->setTransparency(false);
+      systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
+      systems.gfx->setTransparency(true);
+      systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
+      systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
+*/
 
-      /*
-            systems.gfx->setTransparency(false);
-            systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
-            systems.gfx->setTransparency(true);
-            systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
-            systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
-            */
 
-      
       Rect wholeScreenBox;
       wholeScreenBox.center.set(0, 0);
       wholeScreenBox.halfSize.set(0.5f, 0.5f);
-      
-      FontDescriptor fd = loadFont(CORE_RESOURCE("Defs/font.font"), systems.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png")));
-      
-      systems.gfx->setOrthographicProjection();
-      
+
+      /*systems.gfx->setOrthographicProjection();*/
+
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            systems.gfx->renderText("Main menu", fd, wholeScreenBox, Center, Center);
+            systems.gfx->renderText("Main menu", fd, wholeScreenBox, Left, Left);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
-            systems.gfx->renderText("Gameplay", fd, wholeScreenBox, Center, Center);
+            systems.gfx->renderText("Gameplay", fd, wholeScreenBox, Left, Left);
             switch( state.gameplayState )
             {
                case GameState::GameplayState::ClassPick:
                {
-                  systems.gfx->renderText("Class pick", fd, wholeScreenBox, Center, Center);
+                  systems.gfx->renderText("Class pick", fd, wholeScreenBox, Left, Left);
                } break;
                case GameState::GameplayState::Session:
                {
-                  systems.gfx->renderText("Session", fd, wholeScreenBox, Center, Center);
+                  systems.gfx->renderText("Session", fd, wholeScreenBox, Left, Left);
                } break;
             }
          } break;
          case GameState::GlobalGameState::Score:
          {
-            systems.gfx->renderText("Score", fd, wholeScreenBox, Center, Center);
+            systems.gfx->renderText("Score", fd, wholeScreenBox, Left, Left);
          } break;
       }
 

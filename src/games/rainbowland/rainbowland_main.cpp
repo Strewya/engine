@@ -121,7 +121,7 @@ namespace core
                         window.showCursor(!window.isCursorShown());
                      }
                   } break;
-                  case Keyboard::Space:
+                  case Keyboard::Shift:
                   {
                      if( e.keyboard.firstTimeDown )
                      {

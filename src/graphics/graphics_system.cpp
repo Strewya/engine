@@ -264,10 +264,11 @@ namespace core
 
    void GraphicsSystem::renderText(const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
    {
+      auto textLength = strlen(text);
       auto texture = textures.getData(fd.fontTexture);
-      std::vector<HealthVertex> vertices(strlen(text) * 4);
-      box.halfSize.x *= m_window.getSizeX()*0.5f;
-      box.halfSize.y *= m_window.getSizeY()*0.5f;
+      std::vector<HealthVertex> vertices(textLength * 4);
+      box.halfSize.x *= m_window.getSizeX();
+      box.halfSize.y *= m_window.getSizeY();
 
       uint32_t i = 0;
       uint32_t v = 0;
@@ -282,13 +283,13 @@ namespace core
       {
          char c = text[i];
          Rect r = fd.glyphs[c - 32];
-         float tv_top = r.top() / h;
-         float tv_bot = r.bottom() / h;
+         float tv_top = r.bottom() / h;
+         float tv_bot = r.top() / h;
          float tu_left = r.left() / w;
          float tu_rght = r.right() / w;
-
          float chw = r.halfSize.x * 2;
-         if( cw + chw >= bw )
+         
+         /*if( cw + chw >= bw )
          {
             if( justify_x != Left )
             {
@@ -305,8 +306,8 @@ namespace core
             {
                break; // while(text[i])
             }
-         }
-
+         }*/
+         
          vertices[v].setPosition(cw, -ch, 0);
          vertices[v].setColor(1, 1, 1, 1);
          vertices[v].setTextureUV(tu_left, tv_bot);
@@ -327,8 +328,55 @@ namespace core
          cw += chw;
          ++i;
       }
+      /*float offset = (bw - cw)*0.5f*justify_x;
+      for( uint32_t mv = lineStart; mv < v; ++mv )
+      {
+         vertices[mv].position.x += offset;
+      }*/
+
+      std::vector<uint32_t> indices;
+      indices.reserve(textLength * 6);
+      for( uint32_t i = 0; i < textLength; ++i )
+      {
+         auto x = i * 4;
+         indices.emplace_back(x + 0);
+         indices.emplace_back(x + 1);
+         indices.emplace_back(x + 2);
+         indices.emplace_back(x + 2);
+         indices.emplace_back(x + 3);
+         indices.emplace_back(x + 0);
+      }
+
+      auto vshader = vertexShaders.getData(fd.vshader);
+      auto pshader = pixelShaders.getData(fd.pshader);
 
 
+      std::vector<HealthVertex> verts(4);
+      std::vector<uint32_t> inds(6);
+      verts[0].setPosition(0, 0, 0);
+      verts[1].setPosition(0, 1, 0);
+      verts[2].setPosition(1, 1, 0);
+      verts[3].setPosition(1, 0, 0);
+      verts[0].setTextureUV(0, 1);
+      verts[1].setTextureUV(0, 0);
+      verts[2].setTextureUV(1, 0);
+      verts[3].setTextureUV(1, 1);
+      verts[0].setColor(1, 1, 1, 1);
+      verts[1].setColor(1, 1, 1, 1);
+      verts[2].setColor(1, 1, 1, 1);
+      verts[3].setColor(1, 1, 1, 1);
+
+      auto fnt = makeTexturedQuad({}, {1, 1}, fd.fontTexture, {0.257812500f, 0.4f}, {0.290625006, 0.6}, fd.vshader, fd.pshader);
+      renderMesh({}, {}, fnt);
+/*
+      _renderer.setBlendState(m_transparency);
+      _renderer.setRasterizerState(m_cullingDisabled);
+      _renderer.setInputLayout(vshader._inputLayout);
+      _renderer.setShader(vshader._vertex);
+      _renderer.setShader(pshader._pixel);
+      _renderer.setTexture(texture._shaderResourceView);
+      _renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      _renderer.render(Transform{{}, {10,10}}, Color{}, verts, inds);*/
    }
 
    //*****************************************************************

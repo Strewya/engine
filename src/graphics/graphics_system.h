@@ -30,6 +30,8 @@ namespace core
    struct FontDescriptor
    {
       HTexture fontTexture;
+      HVertexShader vshader;
+      HPixelShader pshader;
       Rect glyphs[128 - 32];
       uint32_t height;
    };
