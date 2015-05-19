@@ -130,6 +130,21 @@
     <ClCompile Include="..\..\..\src\util\ring_buffer.cpp">
       <Filter>code\framework\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\lua\lua_stack.cpp">
+      <Filter>code\framework\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lua\lua_stack_impl.cpp">
+      <Filter>code\framework\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lua\lua_system.cpp">
+      <Filter>code\framework\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lua\lua_system_playground.cpp">
+      <Filter>code\framework\lua</Filter>
+    </ClCompile>
+    <ClCompile Include="W:\src\util\ring_buffer_playground.cpp">
+      <Filter>code\framework\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -360,6 +375,18 @@
     <ClInclude Include="..\..\..\src\games\util\entity.h">
       <Filter>code\games\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\lua\lua_stack.h">
+      <Filter>code\framework\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\lua\lua_stack_impl.h">
+      <Filter>code\framework\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\lua\lua_system.h">
+      <Filter>code\framework\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\lua\lua_include.h">
+      <Filter>code\framework\lua</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="code">
@@ -427,6 +454,9 @@
     </Filter>
     <Filter Include="code\games\util">
       <UniqueIdentifier>{fa3b9e3e-cdd7-40cd-9ea1-6bdd5b625ada}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\lua">
+      <UniqueIdentifier>{c8d983e7-3d8b-4c38-9cf7-649cddbf2133}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

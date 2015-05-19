@@ -103,7 +103,6 @@ namespace core
       we.type = WE_MOUSEMOVE;
 
 
-
       state.movement.allocate(8);
 
       auto e = state.entities.create();
@@ -263,11 +262,8 @@ namespace core
       wholeScreenBox.center.set(0, 0);
       wholeScreenBox.halfSize.set(0.5f, 0.5f);
       
-      FontDescriptor fd;
-      fd.fontTexture = systems.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png"));
-      fd.height = 32;
-      fd.glyphs;
-
+      FontDescriptor fd = loadFont(CORE_RESOURCE("Defs/font.font"), systems.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png")));
+      
       systems.gfx->setOrthographicProjection();
       
       switch( state.globalGameState )

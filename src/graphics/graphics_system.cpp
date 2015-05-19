@@ -264,6 +264,70 @@ namespace core
 
    void GraphicsSystem::renderText(const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
    {
+      auto texture = textures.getData(fd.fontTexture);
+      std::vector<HealthVertex> vertices(strlen(text) * 4);
+      box.halfSize.x *= m_window.getSizeX()*0.5f;
+      box.halfSize.y *= m_window.getSizeY()*0.5f;
+
+      uint32_t i = 0;
+      uint32_t v = 0;
+      uint32_t lineStart = 0;
+      float w = (float)texture.width;
+      float h = (float)texture.height;
+      float bw = box.halfSize.x * 2;
+      float bh = box.halfSize.y * 2;
+      float cw = 0;
+      float ch = 0;
+      while( text[i] )
+      {
+         char c = text[i];
+         Rect r = fd.glyphs[c - 32];
+         float tv_top = r.top() / h;
+         float tv_bot = r.bottom() / h;
+         float tu_left = r.left() / w;
+         float tu_rght = r.right() / w;
+
+         float chw = r.halfSize.x * 2;
+         if( cw + chw >= bw )
+         {
+            if( justify_x != Left )
+            {
+               float offset = (bw - cw)*0.5f*justify_x;
+               for( uint32_t mv = lineStart; mv < v; ++mv )
+               {
+                  vertices[mv].position.x += offset;
+               }
+               lineStart = v;
+            }
+            cw = 0;
+            ch += fd.height;
+            if( ch >= bh )
+            {
+               break; // while(text[i])
+            }
+         }
+
+         vertices[v].setPosition(cw, -ch, 0);
+         vertices[v].setColor(1, 1, 1, 1);
+         vertices[v].setTextureUV(tu_left, tv_bot);
+         ++v;
+         vertices[v].setPosition(cw, ch, 0);
+         vertices[v].setColor(1, 1, 1, 1);
+         vertices[v].setTextureUV(tu_left, tv_top);
+         ++v;
+         vertices[v].setPosition(cw+chw, ch, 0);
+         vertices[v].setColor(1, 1, 1, 1);
+         vertices[v].setTextureUV(tu_rght, tv_top);
+         ++v;
+         vertices[v].setPosition(cw+chw, -ch, 0);
+         vertices[v].setColor(1, 1, 1, 1);
+         vertices[v].setTextureUV(tu_rght, tv_bot);
+         ++v;
+
+         cw += chw;
+         ++i;
+      }
+
 
    }
 
@@ -463,5 +527,61 @@ namespace core
       lookAt = rot + pos;
 
       return XMMatrixLookAtLH(pos, lookAt, up);
+   }
+}
+
+#include "lua/lua_system.h"
+
+namespace core
+{
+   FontDescriptor loadFont(const char* filename, HTexture texture)
+   {
+      FontDescriptor result{};
+
+      LuaSystem LS;
+      LS.init();
+
+      auto lua = LS.getStack();
+      if( !lua.doFile(filename) )
+      {
+         auto str = lua.to<std::string>();
+         lua.pop();
+         CORE_INFO(str);
+         return result;
+      }
+
+      for( lua.pairs(); lua.next(); lua.pop(1) )
+      {
+         if( !lua.is<std::string>(-2) || !lua.is<LuaTable>(-1) )
+         {
+            return result;
+         }
+         result.height = get(lua, "size", 0);
+         if( result.height == 0 )
+         {
+            return result;
+         }
+         for( lua.ipairs("glyphs"); lua.next(); lua.pop(1) )
+         {
+            if( lua.is<uint32_t>(-2) && lua.is<LuaTable>(-1) )
+            {
+               auto ascii = get<char>(lua, "char", 0);
+               auto left = get(lua, "left", -1);
+               auto right = get(lua, "right", -1);
+               auto top = get(lua, "top", -1);
+               if( ascii != 0 && left != -1 && right != -1 && top != -1 )
+               {
+                  auto i = ascii - 32;
+                  result.glyphs[i].center.set((left + right)*0.5f, top + result.height*0.5f);
+                  result.glyphs[i].halfSize.set((right - left)*0.5f, result.height*0.5f);
+               }
+            }
+         }
+      }
+      lua.pop();
+      result.fontTexture = texture;
+      LS.shutdown();
+
+      return result;
    }
 }

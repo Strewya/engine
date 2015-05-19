@@ -13,11 +13,13 @@ namespace core
    struct AudioSystem;
    struct GraphicsSystem;
    struct InputSystem;
+   struct LuaSystem;
 
    struct GameSystems
    {
       AudioSystem* audio;
       GraphicsSystem* gfx;
       InputSystem* input;
+      LuaSystem* lua;
    };
 }

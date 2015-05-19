@@ -33,5 +33,5 @@ namespace core
       uint32_t m_increment;
    };
 
-   void test_ring_buffer();
+   void test_ringBuffer();
 }

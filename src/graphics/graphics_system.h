@@ -36,10 +36,15 @@ namespace core
    
    enum TextJustification
    {
-      Left, Right,
-      Top = Left, Bottom = Right,
-      Center, Middle = Center
+      Left = 0,
+      Center = 1,
+      Right = 2,
+      Top = Left,
+      Bottom = Right,
+      Middle = Center
    };
+
+   FontDescriptor loadFont(const char* filename, HTexture texture);
 
    struct GraphicsSystem
    {
