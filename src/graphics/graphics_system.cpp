@@ -254,6 +254,7 @@ namespace core
       };
 
       auto vshader = vertexShaders.getData(mesh.vshader);
+
       _renderer.setInputLayout(vshader._inputLayout);
       _renderer.setShader(vshader._vertex);
       _renderer.setShader(pixelShaders.getData(mesh.pshader)._pixel);
@@ -266,72 +267,98 @@ namespace core
    {
       auto textLength = strlen(text);
       auto texture = textures.getData(fd.fontTexture);
-      std::vector<HealthVertex> vertices(textLength * 4);
-      box.halfSize.x *= m_window.getSizeX();
-      box.halfSize.y *= m_window.getSizeY();
+      std::vector<HealthVertex> vertices;
+      vertices.reserve(textLength * 4);
+      
+      float textureWidth = (float)texture.width;
+      float textureHeight = (float)texture.height;
 
-      uint32_t i = 0;
-      uint32_t v = 0;
-      uint32_t lineStart = 0;
-      float w = (float)texture.width;
-      float h = (float)texture.height;
-      float bw = box.halfSize.x * 2;
-      float bh = box.halfSize.y * 2;
-      float cw = 0;
-      float ch = 0;
-      while( text[i] )
+      auto generateVertices = [&](uint32_t start, uint32_t end, float x, float y) -> float
       {
-         char c = text[i];
-         Rect r = fd.glyphs[c - 32];
-         float tv_top = r.bottom() / h;
-         float tv_bot = r.top() / h;
-         float tu_left = r.left() / w;
-         float tu_rght = r.right() / w;
-         float chw = r.halfSize.x * 2;
-         
-         /*if( cw + chw >= bw )
+         while( start != end )
          {
-            if( justify_x != Left )
-            {
-               float offset = (bw - cw)*0.5f*justify_x;
-               for( uint32_t mv = lineStart; mv < v; ++mv )
-               {
-                  vertices[mv].position.x += offset;
-               }
-               lineStart = v;
-            }
-            cw = 0;
-            ch += fd.height;
-            if( ch >= bh )
-            {
-               break; // while(text[i])
-            }
-         }*/
-         
-         vertices[v].setPosition(cw, -ch, 0);
-         vertices[v].setColor(1, 1, 1, 1);
-         vertices[v].setTextureUV(tu_left, tv_bot);
-         ++v;
-         vertices[v].setPosition(cw, ch, 0);
-         vertices[v].setColor(1, 1, 1, 1);
-         vertices[v].setTextureUV(tu_left, tv_top);
-         ++v;
-         vertices[v].setPosition(cw+chw, ch, 0);
-         vertices[v].setColor(1, 1, 1, 1);
-         vertices[v].setTextureUV(tu_rght, tv_top);
-         ++v;
-         vertices[v].setPosition(cw+chw, -ch, 0);
-         vertices[v].setColor(1, 1, 1, 1);
-         vertices[v].setTextureUV(tu_rght, tv_bot);
-         ++v;
+            char character = text[start];
+            Rect characterRect = fd.glyphs[character - 32];
+            float tv_top = characterRect.bottom() / textureHeight;
+            float tv_bot = characterRect.top() / textureHeight;
+            float tu_left = characterRect.left() / textureWidth;
+            float tu_rght = characterRect.right() / textureWidth;
+            float characterWidth = characterRect.halfSize.x * 2;
+            float characterHeight = characterRect.halfSize.y * 2;
 
-         cw += chw;
-         ++i;
+            vertices.push_back({{x, y - characterHeight, 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
+            vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_left, tv_top}, 0});
+            x += characterWidth;
+            vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_rght, tv_top}, 0});
+            vertices.push_back({{x, y - characterHeight, 0}, {1, 1, 1, 1}, {tu_rght, tv_bot}, 0});
+
+            ++start;
+         }
+         return x;
+      };
+
+      auto justifyVerts = [&](uint32_t vert, float lineEnd, float boxHW)
+      {
+         lineEnd += boxHW;
+         auto boxEnd = boxHW * 2;
+         auto offset = (boxEnd - lineEnd)*0.5f*justify_x;
+         for( ; vert < vertices.size(); ++vert )
+         {
+            vertices[vert].position.x += offset;
+         }
+      };
+
+
+
+      uint32_t characterIndex = 0;
+      uint32_t lineStart = 0;
+      float boxWidth = box.halfSize.x * 2;
+      float boxHeight = box.halfSize.y * 2;
+      float currentLinePosX = -box.halfSize.x;
+      float currentLinePosY = box.halfSize.y;
+
+      float currentLineWidth = 0;
+      uint32_t lastValidBreakpoint = 0;
+      for( ;; )
+      {
+         char character = text[characterIndex];
+         if( character == 0 )
+         {
+            auto vertStart = vertices.size();
+            auto x = generateVertices(lineStart, characterIndex, currentLinePosX, currentLinePosY);
+            justifyVerts(vertStart, x, box.halfSize.x);
+            break;
+         }
+         Rect characterRect = fd.glyphs[character - 32];
+         float characterWidth = characterRect.halfSize.x * 2;
+         if( character == ' ' )
+         {
+            lastValidBreakpoint = characterIndex;
+         }
+         if( currentLineWidth + characterWidth >= boxWidth )
+         {
+            auto vertStart = vertices.size();
+            auto x = generateVertices(lineStart, lastValidBreakpoint, currentLinePosX, currentLinePosY);
+            justifyVerts(vertStart, x, box.halfSize.x);
+            characterIndex = lineStart = lastValidBreakpoint + 1;
+            currentLineWidth = 0;
+            currentLinePosX = -box.halfSize.x;
+            currentLinePosY -= fd.height;
+         }
+         else
+         {
+            currentLineWidth += characterWidth;
+            ++characterIndex;
+         }
       }
+
+
+
+      
       /*float offset = (bw - cw)*0.5f*justify_x;
       for( uint32_t mv = lineStart; mv < v; ++mv )
       {
-         vertices[mv].position.x += offset;
+      vertices[mv].position.x += offset;
       }*/
 
       std::vector<uint32_t> indices;
@@ -350,33 +377,12 @@ namespace core
       auto vshader = vertexShaders.getData(fd.vshader);
       auto pshader = pixelShaders.getData(fd.pshader);
 
-
-      std::vector<HealthVertex> verts(4);
-      std::vector<uint32_t> inds(6);
-      verts[0].setPosition(0, 0, 0);
-      verts[1].setPosition(0, 1, 0);
-      verts[2].setPosition(1, 1, 0);
-      verts[3].setPosition(1, 0, 0);
-      verts[0].setTextureUV(0, 1);
-      verts[1].setTextureUV(0, 0);
-      verts[2].setTextureUV(1, 0);
-      verts[3].setTextureUV(1, 1);
-      verts[0].setColor(1, 1, 1, 1);
-      verts[1].setColor(1, 1, 1, 1);
-      verts[2].setColor(1, 1, 1, 1);
-      verts[3].setColor(1, 1, 1, 1);
-
-      auto fnt = makeTexturedQuad({}, {1, 1}, fd.fontTexture, {0.257812500f, 0.4f}, {0.290625006, 0.6}, fd.vshader, fd.pshader);
-      renderMesh({}, {}, fnt);
-/*
-      _renderer.setBlendState(m_transparency);
-      _renderer.setRasterizerState(m_cullingDisabled);
       _renderer.setInputLayout(vshader._inputLayout);
       _renderer.setShader(vshader._vertex);
       _renderer.setShader(pshader._pixel);
       _renderer.setTexture(texture._shaderResourceView);
       _renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-      _renderer.render(Transform{{}, {10,10}}, Color{}, verts, inds);*/
+      _renderer.render(Transform{vec2f{0, 0}, {1, 1}}, {}, vertices, indices);
    }
 
    //*****************************************************************

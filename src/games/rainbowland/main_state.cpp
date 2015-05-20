@@ -197,7 +197,7 @@ namespace core
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            if( contains(Keyboard::G) )
+            if( contains(Keyboard::M) )
             {
                CORE_INFO("Switching to gameplay class pick state");
                state.globalGameState = GameState::GlobalGameState::Gameplay;
@@ -210,7 +210,7 @@ namespace core
             {
                case GameState::GameplayState::ClassPick:
                {
-                  if( contains(Keyboard::S) )
+                  if( contains(Keyboard::P) )
                   {
                      CORE_INFO("Switching to gameplay session state");
                      state.gameplayState = GameState::GameplayState::Session;
@@ -218,7 +218,7 @@ namespace core
                } break;
                case GameState::GameplayState::Session:
                {
-                  if( contains(Keyboard::K) )
+                  if( contains(Keyboard::S) )
                   {
                      CORE_INFO("Switching to score state");
                      state.globalGameState = GameState::GlobalGameState::Score;
@@ -228,7 +228,7 @@ namespace core
          } break;
          case GameState::GlobalGameState::Score:
          {
-            if( contains(Keyboard::M) )
+            if( contains(Keyboard::S) )
             {
                CORE_INFO("Switching to main menu state");
                state.globalGameState = GameState::GlobalGameState::MainMenu;
@@ -254,6 +254,7 @@ namespace core
 
    void renderGameState(float dt, GameState& state, GameSystems& systems, GameResources& assets)
    {
+      systems.gfx->setPerspectiveProjection();
 /*
       systems.gfx->setTransparency(false);
       systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
@@ -262,39 +263,44 @@ namespace core
       systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
 */
 
+      systems.gfx->setOrthographicProjection();
 
-      Rect wholeScreenBox;
-      wholeScreenBox.center.set(0, 0);
-      wholeScreenBox.halfSize.set(0.5f, 0.5f);
+      Rect box;
+      box.center.set(0, 0);
+      box.halfSize.set(120, 120);
 
-      /*systems.gfx->setOrthographicProjection();*/
+      auto boxMesh = makeOutlineQuad(box.center, box.halfSize, assets.mainVS, assets.mainPS);
+      systems.gfx->renderMesh({}, {}, boxMesh);
+      systems.gfx->renderText("A somewhat larger amount of text so i can see if line breaks work properly.", fd, box, Right, Left);
+/*
 
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            systems.gfx->renderText("Main menu", fd, wholeScreenBox, Left, Left);
+            systems.gfx->renderText("Main menu", fd, box, Left, Left);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
-            systems.gfx->renderText("Gameplay", fd, wholeScreenBox, Left, Left);
+            systems.gfx->renderText("Gameplay", fd, box, Left, Left);
+            box.halfSize.y -= 40;
             switch( state.gameplayState )
             {
                case GameState::GameplayState::ClassPick:
                {
-                  systems.gfx->renderText("Class pick", fd, wholeScreenBox, Left, Left);
+                  systems.gfx->renderText("Class pick", fd, box, Left, Left);
                } break;
                case GameState::GameplayState::Session:
                {
-                  systems.gfx->renderText("Session", fd, wholeScreenBox, Left, Left);
+                  systems.gfx->renderText("Session", fd, box, Left, Left);
                } break;
             }
          } break;
          case GameState::GlobalGameState::Score:
          {
-            systems.gfx->renderText("Score", fd, wholeScreenBox, Left, Left);
+            systems.gfx->renderText("Score", fd, box, Left, Left);
          } break;
-      }
+      }*/
 
    }
 }
