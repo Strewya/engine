@@ -297,7 +297,7 @@ namespace core
          return x;
       };
 
-      auto justifyVerts = [&](uint32_t vert, float lineEnd, float boxHW)
+      auto xAxisJustify = [&](uint32_t vert, float lineEnd, float boxHW)
       {
          lineEnd += boxHW;
          auto boxEnd = boxHW * 2;
@@ -308,6 +308,16 @@ namespace core
          }
       };
 
+      auto yAxisJustify = [&](uint32_t fontHeight, float rowEnd, float boxHH)
+      {
+         auto bottom = rowEnd - fontHeight - boxHH;
+         auto boxEnd = boxHH * 2;
+         auto offset = (boxEnd + bottom)*0.5f*justify_y; //bottom is negative
+         for( auto& vert : vertices )
+         {
+            vert.position.y -= offset;
+         }
+      };
 
 
       uint32_t characterIndex = 0;
@@ -326,7 +336,7 @@ namespace core
          {
             auto vertStart = vertices.size();
             auto x = generateVertices(lineStart, characterIndex, currentLinePosX, currentLinePosY);
-            justifyVerts(vertStart, x, box.halfSize.x);
+            xAxisJustify(vertStart, x, box.halfSize.x);
             break;
          }
          Rect characterRect = fd.glyphs[character - 32];
@@ -339,7 +349,7 @@ namespace core
          {
             auto vertStart = vertices.size();
             auto x = generateVertices(lineStart, lastValidBreakpoint, currentLinePosX, currentLinePosY);
-            justifyVerts(vertStart, x, box.halfSize.x);
+            xAxisJustify(vertStart, x, box.halfSize.x);
             characterIndex = lineStart = lastValidBreakpoint + 1;
             currentLineWidth = 0;
             currentLinePosX = -box.halfSize.x;
@@ -352,8 +362,8 @@ namespace core
          }
       }
 
-
-
+      yAxisJustify(fd.height, currentLinePosY, box.halfSize.y);
+      
       
       /*float offset = (bw - cw)*0.5f*justify_x;
       for( uint32_t mv = lineStart; mv < v; ++mv )

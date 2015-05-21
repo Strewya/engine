@@ -123,6 +123,10 @@ namespace core
 
       return true;
    }
+   TextJustification justifyX = Left;
+   TextJustification justifyY = Top;
+   char modifyJustification = ' ';
+   int32_t justificationChange = -1;
 
    bool updateGameState(float dt_s, uint32_t dt_us, GameState& state, GameSystems& systems, GameResources& assets)
    {
@@ -193,6 +197,56 @@ namespace core
          }
          return false;
       };
+
+      if( contains(Keyboard::X) )
+      {
+         modifyJustification = 'x';
+      }
+      else if( contains(Keyboard::Y) )
+      {
+         modifyJustification = 'y';
+      }
+      if( contains(Keyboard::_0) )
+      {
+         if( modifyJustification == 'x' )
+         {
+            justifyX = Left;
+            modifyJustification = ' ';
+         }
+         if( modifyJustification == 'y' )
+         {
+            justifyY = Top;
+            modifyJustification = ' ';
+         }
+      }
+      else if( contains(Keyboard::_1) )
+      {
+         if( modifyJustification == 'x' )
+         {
+            justifyX = Center;
+            modifyJustification = ' ';
+         }
+         if( modifyJustification == 'y' )
+         {
+            justifyY = Middle;
+            modifyJustification = ' ';
+         }
+      }
+      else if( contains(Keyboard::_2) )
+      {
+         if( modifyJustification == 'x' )
+         {
+            justifyX = Right;
+            modifyJustification = ' ';
+         }
+         if( modifyJustification == 'y' )
+         {
+            justifyY = Bottom;
+            modifyJustification = ' ';
+         }
+      }
+
+
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
@@ -255,52 +309,52 @@ namespace core
    void renderGameState(float dt, GameState& state, GameSystems& systems, GameResources& assets)
    {
       systems.gfx->setPerspectiveProjection();
-/*
-      systems.gfx->setTransparency(false);
-      systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
-      systems.gfx->setTransparency(true);
-      systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
-      systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
-*/
+      /*
+            systems.gfx->setTransparency(false);
+            systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
+            systems.gfx->setTransparency(true);
+            systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
+            systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
+            */
 
       systems.gfx->setOrthographicProjection();
 
       Rect box;
       box.center.set(0, 0);
-      box.halfSize.set(120, 120);
+      box.halfSize.set(120, 220);
 
       auto boxMesh = makeOutlineQuad(box.center, box.halfSize, assets.mainVS, assets.mainPS);
       systems.gfx->renderMesh({}, {}, boxMesh);
-      systems.gfx->renderText("A somewhat larger amount of text so i can see if line breaks work properly.", fd, box, Right, Left);
-/*
+      systems.gfx->renderText("A somewhat larger amount of text so i can see if line breaks work properly.", fd, box, justifyX, justifyY);
+      /*
 
-      switch( state.globalGameState )
-      {
-         case GameState::GlobalGameState::MainMenu:
-         {
+            switch( state.globalGameState )
+            {
+            case GameState::GlobalGameState::MainMenu:
+            {
             systems.gfx->renderText("Main menu", fd, box, Left, Left);
-         } break;
-         case GameState::GlobalGameState::Gameplay:
-         {
+            } break;
+            case GameState::GlobalGameState::Gameplay:
+            {
             systems.gfx->renderText("Gameplay", fd, box, Left, Left);
             box.halfSize.y -= 40;
             switch( state.gameplayState )
             {
-               case GameState::GameplayState::ClassPick:
-               {
-                  systems.gfx->renderText("Class pick", fd, box, Left, Left);
-               } break;
-               case GameState::GameplayState::Session:
-               {
-                  systems.gfx->renderText("Session", fd, box, Left, Left);
-               } break;
+            case GameState::GameplayState::ClassPick:
+            {
+            systems.gfx->renderText("Class pick", fd, box, Left, Left);
+            } break;
+            case GameState::GameplayState::Session:
+            {
+            systems.gfx->renderText("Session", fd, box, Left, Left);
+            } break;
             }
-         } break;
-         case GameState::GlobalGameState::Score:
-         {
+            } break;
+            case GameState::GlobalGameState::Score:
+            {
             systems.gfx->renderText("Score", fd, box, Left, Left);
-         } break;
-      }*/
+            } break;
+            }*/
 
    }
 }
