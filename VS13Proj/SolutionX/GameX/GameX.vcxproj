@@ -58,7 +58,6 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
@@ -89,23 +88,19 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>SyncCThrow</ExceptionHandling>
-      <BrowseInformation>true</BrowseInformation>
       <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
-      <StringPooling>true</StringPooling>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(SX_LIB)\$(Configuration)\Box2D.lib;$(SX_LIB)\fmod_vc.lib;$(SX_LIB)\lua51.lib;$(SX_LIB)\lua5.1.lib;$(SX_LIB)\tolua++.lib;d3d11.lib;d3dx11.lib;dxgi.lib;xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AssemblyLinkResource>
       </AssemblyLinkResource>
       <ForceFileOutput>
       </ForceFileOutput>
-      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
       <Command>

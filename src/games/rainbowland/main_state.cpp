@@ -101,32 +101,36 @@ namespace core
       we.keyboard.key.id = Keyboard::A;
       ge.directionChange.direction.set(+1, 0);
       state.inputTranslation.push_back({we, ge});
-      //
-      we.keyboard.key.id = Keyboard::D;
-      ge.directionChange.direction.set(-1, 0);
-      state.inputTranslation.push_back({we, ge});
-      //
-      we.type = WE_MOUSEMOVE;
+//
+we.keyboard.key.id = Keyboard::D;
+ge.directionChange.direction.set(-1, 0);
+state.inputTranslation.push_back({we, ge});
+//
+we.type = WE_MOUSEMOVE;
 
 
-      state.movement.allocate(8);
+state.movement.allocate(8);
 
-      auto e = state.entities.create();
-      state.movement.make(e);
+auto e = state.entities.create();
+state.movement.make(e);
 
-      auto ec = state.movement.getComponentData(e);
-      float& eacc = state.movement.acceleration(ec);
-      eacc += 10;
+auto ec = state.movement.getComponentData(e);
+float& eacc = state.movement.acceleration(ec);
+eacc += 10;
 
-      state.movement.destroy(e);
+state.movement.destroy(e);
 
 
-      return true;
+return true;
    }
+
+   // #delete after testing
    TextJustification justifyX = Left;
    TextJustification justifyY = Top;
-   char modifyJustification = ' ';
+   char axisToModify = ' ';
    int32_t justificationChange = -1;
+   Rect box{{}, {100, 100}};
+   bool fasterMod = false;
 
    bool updateGameState(float dt_s, uint32_t dt_us, GameState& state, GameSystems& systems, GameResources& assets)
    {
@@ -186,11 +190,16 @@ namespace core
 
       */
       auto eventList = systems.input->getEvents();
-      auto contains = [&eventList](Keyboard::Key k) -> bool
+      enum
+      {
+         STATE,
+         ACTION,
+      };
+      auto contains = [&eventList](Keyboard::Key k, uint32_t s) -> bool
       {
          for( auto e : eventList )
          {
-            if( e.type == WE_KEYBOARDKEY && e.keyboard.key.id == k && e.keyboard.firstTimeDown )
+            if( e.type == WE_KEYBOARDKEY && e.keyboard.key.id == k && (s == STATE || e.keyboard.firstTimeDown) )
             {
                return true;
             }
@@ -198,51 +207,89 @@ namespace core
          return false;
       };
 
-      if( contains(Keyboard::X) )
+      auto it = std::find_if(eventList.begin(), eventList.end(), [](const WindowEvent& e)
       {
-         modifyJustification = 'x';
+         return(e.type == WE_KEYBOARDKEY && e.keyboard.key.id == Keyboard::Shift);
+      });
+      if( it != eventList.end() )
+      {
+         if( it->keyboard.firstTimeDown )
+         {
+            fasterMod = true;
+         }
+         else if( it->keyboard.key.isDown == false )
+         {
+            fasterMod = false;
+         }
       }
-      else if( contains(Keyboard::Y) )
+      
+      float modSpeed = fasterMod ? 3.0f : 1.0f;
+
+      if( contains(Keyboard::X, ACTION) )
       {
-         modifyJustification = 'y';
+         axisToModify = 'x';
       }
-      if( contains(Keyboard::_0) )
+      else if( contains(Keyboard::Y, ACTION) )
       {
-         if( modifyJustification == 'x' )
+         axisToModify = 'y';
+      }
+      else if( contains(Keyboard::Backspace, ACTION) )
+      {
+         axisToModify = ' ';
+      }
+      if( contains(Keyboard::_1, ACTION) )
+      {
+         if( axisToModify == 'x' )
          {
             justifyX = Left;
-            modifyJustification = ' ';
          }
-         if( modifyJustification == 'y' )
+         if( axisToModify == 'y' )
          {
             justifyY = Top;
-            modifyJustification = ' ';
          }
       }
-      else if( contains(Keyboard::_1) )
+      else if( contains(Keyboard::_2, ACTION) )
       {
-         if( modifyJustification == 'x' )
+         if( axisToModify == 'x' )
          {
             justifyX = Center;
-            modifyJustification = ' ';
          }
-         if( modifyJustification == 'y' )
+         if( axisToModify == 'y' )
          {
             justifyY = Middle;
-            modifyJustification = ' ';
          }
       }
-      else if( contains(Keyboard::_2) )
+      else if( contains(Keyboard::_3, ACTION) )
       {
-         if( modifyJustification == 'x' )
+         if( axisToModify == 'x' )
          {
             justifyX = Right;
-            modifyJustification = ' ';
          }
-         if( modifyJustification == 'y' )
+         if( axisToModify == 'y' )
          {
             justifyY = Bottom;
-            modifyJustification = ' ';
+         }
+      }
+      else if( contains(Keyboard::NumSubtract, STATE) )
+      {
+         if( axisToModify == 'x' )
+         {
+            box.halfSize.x -= modSpeed;
+         }
+         if( axisToModify == 'y' )
+         {
+            box.halfSize.y -= modSpeed;
+         }
+      }
+      else if( contains(Keyboard::NumAdd, STATE) )
+      {
+         if( axisToModify == 'x' )
+         {
+            box.halfSize.x += modSpeed;
+         }
+         if( axisToModify == 'y' )
+         {
+            box.halfSize.y += modSpeed;
          }
       }
 
@@ -251,7 +298,7 @@ namespace core
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            if( contains(Keyboard::M) )
+            if( contains(Keyboard::M, ACTION) )
             {
                CORE_INFO("Switching to gameplay class pick state");
                state.globalGameState = GameState::GlobalGameState::Gameplay;
@@ -264,7 +311,7 @@ namespace core
             {
                case GameState::GameplayState::ClassPick:
                {
-                  if( contains(Keyboard::P) )
+                  if( contains(Keyboard::P, ACTION) )
                   {
                      CORE_INFO("Switching to gameplay session state");
                      state.gameplayState = GameState::GameplayState::Session;
@@ -272,7 +319,7 @@ namespace core
                } break;
                case GameState::GameplayState::Session:
                {
-                  if( contains(Keyboard::S) )
+                  if( contains(Keyboard::S, ACTION) )
                   {
                      CORE_INFO("Switching to score state");
                      state.globalGameState = GameState::GlobalGameState::Score;
@@ -282,7 +329,7 @@ namespace core
          } break;
          case GameState::GlobalGameState::Score:
          {
-            if( contains(Keyboard::S) )
+            if( contains(Keyboard::S, ACTION) )
             {
                CORE_INFO("Switching to main menu state");
                state.globalGameState = GameState::GlobalGameState::MainMenu;
@@ -318,14 +365,23 @@ namespace core
             */
 
       systems.gfx->setOrthographicProjection();
-
-      Rect box;
-      box.center.set(0, 0);
-      box.halfSize.set(120, 220);
+      systems.gfx->setTransparency(true);
 
       auto boxMesh = makeOutlineQuad(box.center, box.halfSize, assets.mainVS, assets.mainPS);
-      systems.gfx->renderMesh({}, {}, boxMesh);
-      systems.gfx->renderText("A somewhat larger amount of text so i can see if line breaks work properly.", fd, box, justifyX, justifyY);
+
+      auto* text = "A somewhat larger amount of text so i can see if line breaks work properly. Also,\ntesting\nnew\nlines! a_really_long_word_that_doesnt_fit";
+
+      vec2f pos{-200, -200};
+      systems.gfx->renderMesh(pos, {}, boxMesh);
+      systems.gfx->renderText(Transform{pos, {0.5f, 0.5f}, 0}, Color{}, text, fd, box, justifyX, justifyY);
+
+      pos = {200, 200};
+      systems.gfx->renderMesh(pos, {}, boxMesh);
+      systems.gfx->renderText(Transform{pos, {1, 1}, 0}, Color{1, 0, 0}, text, fd, box, justifyX, justifyY);
+
+      pos = {-200, 200};
+      systems.gfx->renderMesh(pos, {}, boxMesh);
+      systems.gfx->renderText(Transform{pos, {1.5f, 1.5f}, 0}, Color{1, 1, 0}, text, fd, box, justifyX, justifyY);
       /*
 
             switch( state.globalGameState )

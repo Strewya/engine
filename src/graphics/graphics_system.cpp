@@ -263,13 +263,20 @@ namespace core
       _renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
-   void GraphicsSystem::renderText(const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
+   void GraphicsSystem::renderText(Transform t, Color c, const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
    {
+      // #todo refactor the shit out of this function
+      // maybe split it out from the graphics system into a font rendering system
+      // things to deal with:
+      // - scaling
+      // - clipping in the box
+      // - new lines \n
+      // - 
       auto textLength = strlen(text);
       auto texture = textures.getData(fd.fontTexture);
       std::vector<HealthVertex> vertices;
       vertices.reserve(textLength * 4);
-      
+
       float textureWidth = (float)texture.width;
       float textureHeight = (float)texture.height;
 
@@ -283,14 +290,13 @@ namespace core
             float tv_bot = characterRect.top() / textureHeight;
             float tu_left = characterRect.left() / textureWidth;
             float tu_rght = characterRect.right() / textureWidth;
-            float characterWidth = characterRect.halfSize.x * 2;
-            float characterHeight = characterRect.halfSize.y * 2;
+            characterRect.halfSize *= t.scale;
 
-            vertices.push_back({{x, y - characterHeight, 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
+            vertices.push_back({{x, y - characterRect.height(), 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
             vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_left, tv_top}, 0});
-            x += characterWidth;
+            x += characterRect.width();
             vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_rght, tv_top}, 0});
-            vertices.push_back({{x, y - characterHeight, 0}, {1, 1, 1, 1}, {tu_rght, tv_bot}, 0});
+            vertices.push_back({{x, y - characterRect.height(), 0}, {1, 1, 1, 1}, {tu_rght, tv_bot}, 0});
 
             ++start;
          }
@@ -308,7 +314,7 @@ namespace core
          }
       };
 
-      auto yAxisJustify = [&](uint32_t fontHeight, float rowEnd, float boxHH)
+      auto yAxisJustify = [&](float fontHeight, float rowEnd, float boxHH)
       {
          auto bottom = rowEnd - fontHeight - boxHH;
          auto boxEnd = boxHH * 2;
@@ -326,11 +332,26 @@ namespace core
       float boxHeight = box.halfSize.y * 2;
       float currentLinePosX = -box.halfSize.x;
       float currentLinePosY = box.halfSize.y;
+      float fontHeight = fd.height*t.scale.y;
 
       float currentLineWidth = 0;
       uint32_t lastValidBreakpoint = 0;
+      auto do_vertex_generation = [&](uint32_t end)
+      {
+         auto vertStart = vertices.size();
+         auto x = generateVertices(lineStart, end, currentLinePosX, currentLinePosY);
+         xAxisJustify(vertStart, x, box.halfSize.x);
+         characterIndex = lineStart = lastValidBreakpoint = end + 1;
+         currentLineWidth = 0;
+         currentLinePosY -= fontHeight;
+      };
       for( ;; )
       {
+         if( currentLinePosY - fontHeight <= -box.halfSize.y )
+         {
+            currentLinePosY += fontHeight;
+            break;
+         }
          char character = text[characterIndex];
          if( character == 0 )
          {
@@ -339,37 +360,44 @@ namespace core
             xAxisJustify(vertStart, x, box.halfSize.x);
             break;
          }
-         Rect characterRect = fd.glyphs[character - 32];
-         float characterWidth = characterRect.halfSize.x * 2;
-         if( character == ' ' )
+         if( character >= 32 && character <= 127 )
          {
-            lastValidBreakpoint = characterIndex;
+            Rect characterRect = fd.glyphs[character - 32];
+            characterRect.halfSize *= t.scale;
+            float characterWidth = characterRect.width();
+            if( character == ' ' )
+            {
+               lastValidBreakpoint = characterIndex;
+            }
+            if( currentLineWidth + characterWidth >= boxWidth )
+            {
+               if( lineStart == lastValidBreakpoint )
+               {
+                  currentLineWidth += characterWidth;
+                  ++characterIndex;
+               }
+               else
+               {
+                  do_vertex_generation(lastValidBreakpoint);
+               }
+            }
+            else
+            {
+               currentLineWidth += characterWidth;
+               ++characterIndex;
+            }
          }
-         if( currentLineWidth + characterWidth >= boxWidth )
+         else if( character == '\n' )
          {
-            auto vertStart = vertices.size();
-            auto x = generateVertices(lineStart, lastValidBreakpoint, currentLinePosX, currentLinePosY);
-            xAxisJustify(vertStart, x, box.halfSize.x);
-            characterIndex = lineStart = lastValidBreakpoint + 1;
-            currentLineWidth = 0;
-            currentLinePosX = -box.halfSize.x;
-            currentLinePosY -= fd.height;
+            do_vertex_generation(characterIndex);
          }
          else
          {
-            currentLineWidth += characterWidth;
             ++characterIndex;
          }
       }
 
-      yAxisJustify(fd.height, currentLinePosY, box.halfSize.y);
-      
-      
-      /*float offset = (bw - cw)*0.5f*justify_x;
-      for( uint32_t mv = lineStart; mv < v; ++mv )
-      {
-      vertices[mv].position.x += offset;
-      }*/
+      yAxisJustify(fontHeight, currentLinePosY, box.halfSize.y);
 
       std::vector<uint32_t> indices;
       indices.reserve(textLength * 6);
@@ -392,7 +420,8 @@ namespace core
       _renderer.setShader(pshader._pixel);
       _renderer.setTexture(texture._shaderResourceView);
       _renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-      _renderer.render(Transform{vec2f{0, 0}, {1, 1}}, {}, vertices, indices);
+      t.scale.set(1, 1);
+      _renderer.render(t, c, vertices, indices);
    }
 
    //*****************************************************************

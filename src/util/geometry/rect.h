@@ -21,6 +21,9 @@ namespace core
       float top() const;
       float bottom() const;
 
+      float width() const;
+      float height() const;
+
       void set(float cx, float cy, float hw, float hh);
    };
 }

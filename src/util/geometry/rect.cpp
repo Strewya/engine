@@ -29,6 +29,16 @@ namespace core
       return center.y - halfSize.y;
    }
 
+   float Rect::width() const
+   {
+      return halfSize.x * 2;
+   }
+
+   float Rect::height() const
+   {
+      return halfSize.y * 2;
+   }
+
    void Rect::set(float cx, float cy, float hw, float hh)
    {
       center.set(cx, cy);
