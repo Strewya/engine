@@ -145,6 +145,12 @@
     <ClCompile Include="W:\src\util\ring_buffer_playground.cpp">
       <Filter>code\framework\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp">
+      <Filter>code\games\rainbowland\data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp">
+      <Filter>code\framework\graphics\font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -349,7 +355,7 @@
       <Filter>code\games\rainbowland\logic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h">
-      <Filter>code\games\rainbowland\types</Filter>
+      <Filter>code\games\rainbowland\data</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_entry_point.h">
       <Filter>code\games</Filter>
@@ -386,6 +392,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\lua\lua_include.h">
       <Filter>code\framework\lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\types\movement.h">
+      <Filter>code\games\rainbowland\data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\font\font_descriptor.h">
+      <Filter>code\framework\graphics\font</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -446,9 +458,6 @@
     <Filter Include="code\games\rainbowland">
       <UniqueIdentifier>{61078100-e572-45d1-a0e0-5654390f3945}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\games\rainbowland\types">
-      <UniqueIdentifier>{d9dc53f3-844f-4de2-966e-6fd585acd37f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\games\rainbowland\logic">
       <UniqueIdentifier>{5c7399e0-be04-4354-a4cc-d5ec3931ca40}</UniqueIdentifier>
     </Filter>
@@ -457,6 +466,12 @@
     </Filter>
     <Filter Include="code\framework\lua">
       <UniqueIdentifier>{c8d983e7-3d8b-4c38-9cf7-649cddbf2133}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\games\rainbowland\data">
+      <UniqueIdentifier>{d9dc53f3-844f-4de2-966e-6fd585acd37f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\graphics\font">
+      <UniqueIdentifier>{35778f1b-e723-444c-9b01-b2ccc29cbd9f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

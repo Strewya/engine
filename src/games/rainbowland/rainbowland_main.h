@@ -13,6 +13,7 @@
 #include "games/rainbowland/main_state.h"
 #include "graphics/graphics_system.h"
 #include "input/input_system.h"
+#include "lua/lua_system.h"
 #include "util/time/timer.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
@@ -28,6 +29,7 @@ namespace core
       AudioSystem audioSystem;
       GraphicsSystem graphicsSystem;
       InputSystem inputSystem;
+      LuaSystem luaSystem;
 
       GameResources assets;
       GameSystems systems;

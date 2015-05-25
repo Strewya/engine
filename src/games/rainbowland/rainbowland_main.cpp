@@ -24,6 +24,7 @@ namespace core
 
       unloadGameResources(systems, assets);
 
+      CORE_STATUS_AND(luaSystem.shutdown());
       CORE_STATUS_AND(inputSystem.shutdown());
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
@@ -52,10 +53,12 @@ namespace core
          CORE_STATUS_AND(audioSystem.init());
          CORE_STATUS_AND(graphicsSystem.init(window));
          CORE_STATUS_AND(inputSystem.init(window));
+         CORE_STATUS_AND(luaSystem.init());
 
          systems.audio = &audioSystem;
          systems.gfx = &graphicsSystem;
          systems.input = &inputSystem;
+         systems.lua = &luaSystem;
       }
 
       if( CORE_STATUS_OK )
@@ -68,7 +71,6 @@ namespace core
       if( CORE_STATUS_OK )
       {
          state.camera.setPosition({0, 0, -20});
-         state.cameraMoveDirection.set(0, 0, 0);
 
          initializeGameState(timer, state, systems, assets);
       }
@@ -83,23 +85,6 @@ namespace core
       timer.updateBy(updateTime);
 
       inputSystem.update();
-
-      struct SimpleKey
-      {
-         Keyboard::Key id;
-         float* target;
-         float change;
-      };
-
-      SimpleKey checkers[]
-      {
-         {Keyboard::ArrowUp, &state.cameraMoveDirection.y, +2},
-         {Keyboard::ArrowDown, &state.cameraMoveDirection.y, -2},
-         {Keyboard::ArrowLeft, &state.cameraMoveDirection.x, -2},
-         {Keyboard::ArrowRight, &state.cameraMoveDirection.x, +2},
-         {Keyboard::PageDown, &state.cameraMoveDirection.z, -2},
-         {Keyboard::PageUp, &state.cameraMoveDirection.z, +2}
-      };
 
       auto events = inputSystem.getEvents();
       for( auto& e : events )
@@ -121,32 +106,6 @@ namespace core
                         window.showCursor(!window.isCursorShown());
                      }
                   } break;
-                  case Keyboard::Shift:
-                  {
-                     if( e.keyboard.firstTimeDown )
-                     {
-                        state.cameraMoveModifier = 10;
-                     }
-                     else if( e.keyboard.key.isDown == false )
-                     {
-                        state.cameraMoveModifier = 1;
-                     }
-                  } break;
-               }
-
-               for( auto& key : checkers )
-               {
-                  if( key.id == e.keyboard.key.id )
-                  {
-                     if( e.keyboard.firstTimeDown )
-                     {
-                        *key.target += key.change;
-                     }
-                     else if( e.keyboard.key.isDown == false )
-                     {
-                        *key.target -= key.change;
-                     }
-                  }
                }
             } break;
             
@@ -192,13 +151,9 @@ namespace core
          }
       }
 
-      state.camera.move({timer.getDeltaSeconds()*state.cameraMoveDirection.x*state.cameraMoveModifier,
-                        timer.getDeltaSeconds()*state.cameraMoveDirection.y*state.cameraMoveModifier,
-                        timer.getDeltaSeconds()*state.cameraMoveDirection.z*state.cameraMoveModifier});
+      auto logic_ok = updateGameState(timer.getDeltaSeconds(), timer.getDeltaMicros(), state, systems, assets);
 
-      running = running && updateGameState(timer.getDeltaSeconds(), timer.getDeltaMicros(), state, systems, assets);
-
-      return running;
+      return running && logic_ok;
    }
 
    void Game::tickRender(uint32_t updateTime)

@@ -6,13 +6,8 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "games/rainbowland/types/types.h"
-#include "games/util/entity_manager.h"
 #include "graphics/camera.h"
-#include "graphics/mesh/mesh.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec3.h"
-#include "util/transform.h"
+#include "graphics/font/font_descriptor.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -36,20 +31,8 @@ namespace core
       GlobalGameState globalGameState;
       GameplayState gameplayState;
       Camera camera;
-      Vec3f cameraMoveDirection;
-      float cameraMoveModifier;
-
-      Mesh backgroundMesh;
-      Mesh playerMesh;
-
-      EntityManager entities;
-      MovementData movement;
-
-      std::vector<Transform> transforms;
-      std::vector<MovingThing> movingThings;
-      std::vector<MoveDirectionTarget> moveDirections;
-      std::vector<AimDirection> aimDirections;
-      std::vector<Window2GameEvent> inputTranslation;
+      // #test
+      FontDescriptor fontDesc;
    };
 
    struct GameSystems;

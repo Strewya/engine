@@ -5,6 +5,7 @@
 #include "graphics/graphics_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "graphics/font/font_descriptor.h"
 #include "graphics/mesh/mesh.h"
 #include "graphics/shader/vertex/vertex_shader_loader.h"
 #include "graphics/shader/pixel/pixel_shader_loader.h"
@@ -58,7 +59,7 @@ namespace core
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
-      CORE_STATUS_AND(_renderer.init(m_dev, m_devcon, m_samplerState));
+      CORE_STATUS_AND(m_renderer.init(m_dev, m_devcon, m_samplerState));
 
       CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
       CORE_STATUS_AND(m_vsLoader.init(m_dev));
@@ -146,7 +147,7 @@ namespace core
       CORE_STATUS_AND(m_vsLoader.shutdown());
       CORE_STATUS_AND(m_textureFileLoader.shutdown());
 
-      CORE_STATUS_AND(_renderer.shutdown());
+      CORE_STATUS_AND(m_renderer.shutdown());
 
       ID3D11Debug* debug = nullptr;
       HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
@@ -184,7 +185,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::setOrthographicProjection()
    {
-      _renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
+      m_renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -192,7 +193,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::setPerspectiveProjection()
    {
-      _renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
+      m_renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -200,7 +201,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::applyCamera(const Camera& cam)
    {
-      _renderer.setView(calculateCamView(cam));
+      m_renderer.setView(calculateCamView(cam));
    }
 
    //*****************************************************************
@@ -208,7 +209,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::clearCamera()
    {
-      _renderer.setView(XMMatrixIdentity());
+      m_renderer.setView(XMMatrixIdentity());
    }
 
    //*****************************************************************
@@ -218,11 +219,11 @@ namespace core
    {
       if( isEnabled )
       {
-         _renderer.setRasterizerState(m_cullingEnabled);
+         m_renderer.setRasterizerState(m_cullingEnabled);
       }
       else
       {
-         _renderer.setRasterizerState(m_cullingDisabled);
+         m_renderer.setRasterizerState(m_cullingDisabled);
       }
    }
 
@@ -233,11 +234,11 @@ namespace core
    {
       if( isEnabled )
       {
-         _renderer.setBlendState(m_transparency);
+         m_renderer.setBlendState(m_transparency);
       }
       else
       {
-         _renderer.setBlendState(nullptr);
+         m_renderer.setBlendState(nullptr);
       }
    }
 
@@ -255,12 +256,12 @@ namespace core
 
       auto vshader = vertexShaders.getData(mesh.vshader);
 
-      _renderer.setInputLayout(vshader._inputLayout);
-      _renderer.setShader(vshader._vertex);
-      _renderer.setShader(pixelShaders.getData(mesh.pshader)._pixel);
-      _renderer.setTexture(textures.getData(mesh.texture)._shaderResourceView);
-      _renderer.setVertexTopology(topology[mesh.topology]);
-      _renderer.render(t, c, mesh.vertices, mesh.indices);
+      m_renderer.setInputLayout(vshader._inputLayout);
+      m_renderer.setShader(vshader._vertex);
+      m_renderer.setShader(pixelShaders.getData(mesh.pshader)._pixel);
+      m_renderer.setTexture(textures.getData(mesh.texture)._shaderResourceView);
+      m_renderer.setVertexTopology(topology[mesh.topology]);
+      m_renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
    void GraphicsSystem::renderText(Transform t, Color c, const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
@@ -269,8 +270,9 @@ namespace core
       // maybe split it out from the graphics system into a font rendering system
       // things to deal with:
       // - scaling
-      // - clipping in the box
+      // - clipping inside the box on both axii
       // - new lines \n
+      // - line breaks on words
       // - 
       auto textLength = strlen(text);
       auto texture = textures.getData(fd.fontTexture);
@@ -415,13 +417,13 @@ namespace core
       auto vshader = vertexShaders.getData(fd.vshader);
       auto pshader = pixelShaders.getData(fd.pshader);
 
-      _renderer.setInputLayout(vshader._inputLayout);
-      _renderer.setShader(vshader._vertex);
-      _renderer.setShader(pshader._pixel);
-      _renderer.setTexture(texture._shaderResourceView);
-      _renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+      m_renderer.setInputLayout(vshader._inputLayout);
+      m_renderer.setShader(vshader._vertex);
+      m_renderer.setShader(pshader._pixel);
+      m_renderer.setTexture(texture._shaderResourceView);
+      m_renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
       t.scale.set(1, 1);
-      _renderer.render(t, c, vertices, indices);
+      m_renderer.render(t, c, vertices, indices);
    }
 
    //*****************************************************************
@@ -623,58 +625,3 @@ namespace core
    }
 }
 
-#include "lua/lua_system.h"
-
-namespace core
-{
-   FontDescriptor loadFont(const char* filename, HTexture texture)
-   {
-      FontDescriptor result{};
-
-      LuaSystem LS;
-      LS.init();
-
-      auto lua = LS.getStack();
-      if( !lua.doFile(filename) )
-      {
-         auto str = lua.to<std::string>();
-         lua.pop();
-         CORE_INFO(str);
-         return result;
-      }
-
-      for( lua.pairs(); lua.next(); lua.pop(1) )
-      {
-         if( !lua.is<std::string>(-2) || !lua.is<LuaTable>(-1) )
-         {
-            return result;
-         }
-         result.height = get(lua, "size", 0);
-         if( result.height == 0 )
-         {
-            return result;
-         }
-         for( lua.ipairs("glyphs"); lua.next(); lua.pop(1) )
-         {
-            if( lua.is<uint32_t>(-2) && lua.is<LuaTable>(-1) )
-            {
-               auto ascii = get<char>(lua, "char", 0);
-               auto left = get(lua, "left", -1);
-               auto right = get(lua, "right", -1);
-               auto top = get(lua, "top", -1);
-               if( ascii != 0 && left != -1 && right != -1 && top != -1 )
-               {
-                  auto i = ascii - 32;
-                  result.glyphs[i].center.set((left + right)*0.5f, top + result.height*0.5f);
-                  result.glyphs[i].halfSize.set((right - left)*0.5f, result.height*0.5f);
-               }
-            }
-         }
-      }
-      lua.pop();
-      result.fontTexture = texture;
-      LS.shutdown();
-
-      return result;
-   }
-}

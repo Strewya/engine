@@ -245,9 +245,11 @@
     <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp" />
+    <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp" />
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\file_loader.cpp" />
@@ -306,12 +308,14 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\types\movement.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h" />
     <ClInclude Include="..\..\..\src\games\util\entity.h" />
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h" />
     <ClInclude Include="..\..\..\src\graphics\camera.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_include.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_renderer.h" />
+    <ClInclude Include="..\..\..\src\graphics\font\font_descriptor.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_system.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h" />
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h" />

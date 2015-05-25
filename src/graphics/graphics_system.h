@@ -27,26 +27,9 @@ namespace core
    struct Rect;
    struct Transform;
    struct Vertex;
-   struct FontDescriptor
-   {
-      HTexture fontTexture;
-      HVertexShader vshader;
-      HPixelShader pshader;
-      Rect glyphs[128 - 32];
-      uint32_t height;
-   };
+   struct FontDescriptor;
    
-   enum TextJustification
-   {
-      Left = 0,
-      Center = 1,
-      Right = 2,
-      Top = Left,
-      Bottom = Right,
-      Middle = Center
-   };
-
-   FontDescriptor loadFont(const char* filename, HTexture texture);
+   enum TextJustification;
 
    struct GraphicsSystem
    {
@@ -73,8 +56,6 @@ namespace core
       PixelShaderManager pixelShaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
       
-      //#todo make it private later when all testing is done
-      DXRenderer _renderer;
    private:
       template<typename T> void declare(T*& ptr);
       bool initDevice();
@@ -89,6 +70,7 @@ namespace core
       VertexShaderFileLoader m_vsFileLoader;
       PixelShaderLoader m_psLoader;
       PixelShaderFileLoader m_psFileLoader;
+      DXRenderer m_renderer;
 
       D3DXCOLOR m_backgroundColor;
       vec2i m_backbufferSize;
