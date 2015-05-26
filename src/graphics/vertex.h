@@ -19,8 +19,8 @@ namespace core
    struct DefaultVertex
    {
       DefaultVertex();
-      DefaultVertex(Vec3f position, Color color, vec2f textureUV);
-      void setPosition(Vec3f position);
+      DefaultVertex(vec3f position, Color color, vec2f textureUV);
+      void setPosition(vec3f position);
       void setPosition(float x, float y, float z);
       void setColor(Color color);
       void setColor(float r, float g, float b, float a);
@@ -37,7 +37,7 @@ namespace core
    struct HealthVertex : public DefaultVertex
    {
       HealthVertex();
-      HealthVertex(Vec3f position, Color color, vec2f textureUV, float health);
+      HealthVertex(vec3f position, Color color, vec2f textureUV, float health);
       void setHealth(float h);
 
       XMFLOAT2 health;

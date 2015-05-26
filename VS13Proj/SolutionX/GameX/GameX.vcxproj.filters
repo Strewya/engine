@@ -151,6 +151,9 @@
     <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp">
       <Filter>code\framework\graphics\font</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp">
+      <Filter>code\framework\graphics\font</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -397,6 +400,9 @@
       <Filter>code\games\rainbowland\data</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\font\font_descriptor.h">
+      <Filter>code\framework\graphics\font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\font\font_system.h">
       <Filter>code\framework\graphics\font</Filter>
     </ClInclude>
   </ItemGroup>

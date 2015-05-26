@@ -49,8 +49,7 @@ namespace core
       void setTransparency(bool isEnabled);
 
       void renderMesh(Transform t, Color c, const Mesh& mesh);
-      void renderText(Transform t, Color c, const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y);
-
+      
       TextureManager textures;
       VertexShaderManager vertexShaders;
       PixelShaderManager pixelShaders;

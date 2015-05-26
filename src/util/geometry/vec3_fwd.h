@@ -12,8 +12,8 @@
 namespace core
 {
    template<typename T>
-   struct Vec3;
+   struct vec3;
 
-   typedef Vec3<float> Vec3f;
-   typedef Vec3<int32_t> Vec3i;
+   typedef vec3<float> vec3f;
+   typedef vec3<int32_t> vec3i;
 }

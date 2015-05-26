@@ -24,7 +24,7 @@ namespace core
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
    static XMVECTOR convert(vec2f v);
-   static XMVECTOR convert(Vec3f v);
+   static XMVECTOR convert(vec3f v);
    static XMMATRIX calculateCamView(const Camera& cam);
 
    //*****************************************************************
@@ -264,168 +264,6 @@ namespace core
       m_renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
-   void GraphicsSystem::renderText(Transform t, Color c, const char* text, const FontDescriptor& fd, Rect box, TextJustification justify_x, TextJustification justify_y)
-   {
-      // #todo refactor the shit out of this function
-      // maybe split it out from the graphics system into a font rendering system
-      // things to deal with:
-      // - scaling
-      // - clipping inside the box on both axii
-      // - new lines \n
-      // - line breaks on words
-      // - 
-      auto textLength = strlen(text);
-      auto texture = textures.getData(fd.fontTexture);
-      std::vector<HealthVertex> vertices;
-      vertices.reserve(textLength * 4);
-
-      float textureWidth = (float)texture.width;
-      float textureHeight = (float)texture.height;
-
-      auto generateVertices = [&](uint32_t start, uint32_t end, float x, float y) -> float
-      {
-         while( start != end )
-         {
-            char character = text[start];
-            Rect characterRect = fd.glyphs[character - 32];
-            float tv_top = characterRect.bottom() / textureHeight;
-            float tv_bot = characterRect.top() / textureHeight;
-            float tu_left = characterRect.left() / textureWidth;
-            float tu_rght = characterRect.right() / textureWidth;
-            characterRect.halfSize *= t.scale;
-
-            vertices.push_back({{x, y - characterRect.height(), 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
-            vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_left, tv_top}, 0});
-            x += characterRect.width();
-            vertices.push_back({{x, y - 0, 0}, {1, 1, 1, 1}, {tu_rght, tv_top}, 0});
-            vertices.push_back({{x, y - characterRect.height(), 0}, {1, 1, 1, 1}, {tu_rght, tv_bot}, 0});
-
-            ++start;
-         }
-         return x;
-      };
-
-      auto xAxisJustify = [&](uint32_t vert, float lineEnd, float boxHW)
-      {
-         lineEnd += boxHW;
-         auto boxEnd = boxHW * 2;
-         auto offset = (boxEnd - lineEnd)*0.5f*justify_x;
-         for( ; vert < vertices.size(); ++vert )
-         {
-            vertices[vert].position.x += offset;
-         }
-      };
-
-      auto yAxisJustify = [&](float fontHeight, float rowEnd, float boxHH)
-      {
-         auto bottom = rowEnd - fontHeight - boxHH;
-         auto boxEnd = boxHH * 2;
-         auto offset = (boxEnd + bottom)*0.5f*justify_y; //bottom is negative
-         for( auto& vert : vertices )
-         {
-            vert.position.y -= offset;
-         }
-      };
-
-
-      uint32_t characterIndex = 0;
-      uint32_t lineStart = 0;
-      float boxWidth = box.halfSize.x * 2;
-      float boxHeight = box.halfSize.y * 2;
-      float currentLinePosX = -box.halfSize.x;
-      float currentLinePosY = box.halfSize.y;
-      float fontHeight = fd.height*t.scale.y;
-
-      float currentLineWidth = 0;
-      uint32_t lastValidBreakpoint = 0;
-      auto do_vertex_generation = [&](uint32_t end)
-      {
-         auto vertStart = vertices.size();
-         auto x = generateVertices(lineStart, end, currentLinePosX, currentLinePosY);
-         xAxisJustify(vertStart, x, box.halfSize.x);
-         characterIndex = lineStart = lastValidBreakpoint = end + 1;
-         currentLineWidth = 0;
-         currentLinePosY -= fontHeight;
-      };
-      for( ;; )
-      {
-         if( currentLinePosY - fontHeight <= -box.halfSize.y )
-         {
-            currentLinePosY += fontHeight;
-            break;
-         }
-         char character = text[characterIndex];
-         if( character == 0 )
-         {
-            auto vertStart = vertices.size();
-            auto x = generateVertices(lineStart, characterIndex, currentLinePosX, currentLinePosY);
-            xAxisJustify(vertStart, x, box.halfSize.x);
-            break;
-         }
-         if( character >= 32 && character <= 127 )
-         {
-            Rect characterRect = fd.glyphs[character - 32];
-            characterRect.halfSize *= t.scale;
-            float characterWidth = characterRect.width();
-            if( character == ' ' )
-            {
-               lastValidBreakpoint = characterIndex;
-            }
-            if( currentLineWidth + characterWidth >= boxWidth )
-            {
-               if( lineStart == lastValidBreakpoint )
-               {
-                  currentLineWidth += characterWidth;
-                  ++characterIndex;
-               }
-               else
-               {
-                  do_vertex_generation(lastValidBreakpoint);
-               }
-            }
-            else
-            {
-               currentLineWidth += characterWidth;
-               ++characterIndex;
-            }
-         }
-         else if( character == '\n' )
-         {
-            do_vertex_generation(characterIndex);
-         }
-         else
-         {
-            ++characterIndex;
-         }
-      }
-
-      yAxisJustify(fontHeight, currentLinePosY, box.halfSize.y);
-
-      std::vector<uint32_t> indices;
-      indices.reserve(textLength * 6);
-      for( uint32_t i = 0; i < textLength; ++i )
-      {
-         auto x = i * 4;
-         indices.emplace_back(x + 0);
-         indices.emplace_back(x + 1);
-         indices.emplace_back(x + 2);
-         indices.emplace_back(x + 2);
-         indices.emplace_back(x + 3);
-         indices.emplace_back(x + 0);
-      }
-
-      auto vshader = vertexShaders.getData(fd.vshader);
-      auto pshader = pixelShaders.getData(fd.pshader);
-
-      m_renderer.setInputLayout(vshader._inputLayout);
-      m_renderer.setShader(vshader._vertex);
-      m_renderer.setShader(pshader._pixel);
-      m_renderer.setTexture(texture._shaderResourceView);
-      m_renderer.setVertexTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-      t.scale.set(1, 1);
-      m_renderer.render(t, c, vertices, indices);
-   }
-
    //*****************************************************************
    //          INIT DEVICE
    //*****************************************************************
@@ -605,7 +443,7 @@ namespace core
       return XMVectorSet(v.x, v.y, 0, 0);
    }
 
-   XMVECTOR convert(Vec3f v)
+   XMVECTOR convert(vec3f v)
    {
       return XMVectorSet(v.x, v.y, v.z, 0);
    }

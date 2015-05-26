@@ -29,9 +29,10 @@ namespace core
       void reloadFromFile(const char* filename, Args&&... rest);
       void reloadFromFile(const char* filename);
 
-      bool isLoaded(const char* filename);
+      bool isLoaded(const char* filename) const;
 
       DATA& getData(HANDLE handle);
+      const DATA& getData(HANDLE handle) const;
 
       void release(HANDLE handle);
 
@@ -157,7 +158,7 @@ namespace core
    }
 
    template<typename DATA, typename HANDLE, typename LOADER>
-   bool Manager<DATA, HANDLE, LOADER>::isLoaded(const char* filename)
+   bool Manager<DATA, HANDLE, LOADER>::isLoaded(const char* filename) const
    {
       auto handle = m_names.getHandle(filename);
       return handle.isNull() == false;
@@ -165,6 +166,17 @@ namespace core
 
    template<typename DATA, typename HANDLE, typename LOADER>
    DATA& Manager<DATA, HANDLE, LOADER>::getData(HANDLE handle)
+   {
+      auto* data = m_data.dereference(handle);
+      if( data == nullptr )
+      {
+         return m_defaultData;
+      }
+      return *data;
+   }
+
+   template<typename DATA, typename HANDLE, typename LOADER>
+   const DATA& Manager<DATA, HANDLE, LOADER>::getData(HANDLE handle) const
    {
       auto* data = m_data.dereference(handle);
       if( data == nullptr )

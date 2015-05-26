@@ -13,6 +13,9 @@
 #include "util/utility.h"
 #include "util/color.h"
 #include "util/transform.h"
+
+#include "graphics/font/font_system.h"
+#include "graphics/mesh/mesh.h"
 /******* end headers *******/
 
 namespace core
@@ -26,6 +29,8 @@ namespace core
 
       return true;
    }
+
+   vec2i tj{Left, Top};
 
    bool updateGameState(float dt_s, uint32_t dt_us, GameState& state, GameSystems& systems, GameResources& assets)
    {
@@ -102,6 +107,9 @@ namespace core
          return false;
       };
 
+
+      
+
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
@@ -155,34 +163,43 @@ namespace core
       systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
 */
 
+      FontSystem fontSystem;
+      fontSystem.init(systems.gfx->textures);
 
       systems.gfx->setOrthographicProjection();
       systems.gfx->setTransparency(true);
+
+      
 
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            systems.gfx->renderText(Transform{vec2f{0, 0}}, Color{}, "Main menu", state.fontDesc, Rect{{}, {200, 20}}, Center, Middle);
+            auto mesh = fontSystem.makeTextMesh("Main menu", state.fontDesc, {1, 1}, {Left, Middle});
+            systems.gfx->renderMesh({}, {}, mesh);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
-            systems.gfx->renderText(Transform{vec2f{0, 0}}, Color{}, "Gameplay", state.fontDesc, Rect{{}, {200, 20}}, Center, Middle);
+            auto mesh = fontSystem.makeTextMesh("Gameplay", state.fontDesc, {1, 1}, {Center, Middle}, Rect{{}, {200, 20}});
+            systems.gfx->renderMesh({}, {}, mesh);
             switch( state.gameplayState )
             {
                case GameState::GameplayState::ClassPick:
                {
-                  systems.gfx->renderText(Transform{vec2f{0, -40}}, Color{}, "Class picking", state.fontDesc, Rect{{}, {200, 20}}, Center, Middle);
+                  mesh = fontSystem.makeTextMesh("Class picking", state.fontDesc, {1, 1}, {Center, Middle}, Rect{{}, {200, 20}});
+                  systems.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
                } break;
                case GameState::GameplayState::Session:
                {
-                  systems.gfx->renderText(Transform{vec2f{0, -40}}, Color{}, "Session", state.fontDesc, Rect{{}, {200, 20}}, Center, Middle);
+                  mesh = fontSystem.makeTextMesh("Session", state.fontDesc, {1, 1}, {Center, Middle}, Rect{{}, {200, 20}});
+                  systems.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
                } break;
             }
          } break;
          case GameState::GlobalGameState::Score:
          {
-            systems.gfx->renderText(Transform{vec2f{0, 0}}, Color{}, "Score screen", state.fontDesc, Rect{{}, {200, 20}}, Center, Middle);
+            auto mesh = fontSystem.makeTextMesh("Score screen", state.fontDesc, {1, 1}, {Center, Middle}, Rect{{}, {200, 20}});
+            systems.gfx->renderMesh({}, {}, mesh);
          } break;
       }
 

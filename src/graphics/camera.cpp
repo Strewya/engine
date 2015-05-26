@@ -14,32 +14,32 @@ namespace core
    {
    }
 
-   void Camera::move(Vec3f translation)
+   void Camera::move(vec3f translation)
    {
       m_position += translation;
    }
 
-   void Camera::rotate(Vec3f rotation)
+   void Camera::rotate(vec3f rotation)
    {
       m_rotation += rotation;
    }
 
-   Vec3f Camera::getPosition() const
+   vec3f Camera::getPosition() const
    {
       return m_position;
    }
 
-   Vec3f Camera::getLookAtAxis() const
+   vec3f Camera::getLookAtAxis() const
    {
       return m_lookAtAxis;
    }
 
-   Vec3f Camera::getUpAxis() const
+   vec3f Camera::getUpAxis() const
    {
       return m_upAxis;
    }
 
-   Vec3f Camera::getRotation() const
+   vec3f Camera::getRotation() const
    {
       return m_rotation;
    }
@@ -49,22 +49,22 @@ namespace core
       return m_speed;
    }
 
-   void Camera::setPosition(Vec3f pos)
+   void Camera::setPosition(vec3f pos)
    {
       m_position = pos;
    }
 
-   void Camera::setUpAxis(Vec3f upAxis)
+   void Camera::setUpAxis(vec3f upAxis)
    {
       m_upAxis = upAxis;
    }
 
-   void Camera::setLookAtAxis(Vec3f lookAtAxis)
+   void Camera::setLookAtAxis(vec3f lookAtAxis)
    {
       m_lookAtAxis = lookAtAxis;
    }
 
-   void Camera::setRotation(Vec3f rot)
+   void Camera::setRotation(vec3f rot)
    {
       m_rotation = rot;
    }

@@ -5,7 +5,7 @@
 #include "graphics/mesh/mesh.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "graphics/dx_renderer.h"
+#include "graphics/vertex.h"
 #include "util/color.h"
 #include "util/geometry/vec2.h"
 #include "util/geometry/vec3.h"

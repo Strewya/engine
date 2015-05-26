@@ -250,6 +250,7 @@
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp" />
     <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp" />
+    <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\file_loader.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="..\..\..\src\graphics\dx_include.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_renderer.h" />
     <ClInclude Include="..\..\..\src\graphics\font\font_descriptor.h" />
+    <ClInclude Include="..\..\..\src\graphics\font\font_system.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_system.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h" />
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h" />

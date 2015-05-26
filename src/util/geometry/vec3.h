@@ -13,7 +13,7 @@
 namespace core
 {
    template<typename T>
-   struct Vec3
+   struct vec3
    {
       T x;
       T y;
@@ -22,40 +22,40 @@ namespace core
       void set(T x, T y, T z);
       bool isZero() const;
 
-      template<typename U> operator Vec3<U>() const;
+      template<typename U> operator vec3<U>() const;
 
-      static T length(Vec3 v);
-      static T length2(Vec3 v);
-      static Vec3 normalize(Vec3 v);
-      static T dotProduct(Vec3 l, Vec3 r);
+      static T length(vec3 v);
+      static T length2(vec3 v);
+      static vec3 normalize(vec3 v);
+      static T dotProduct(vec3 l, vec3 r);
    };
 
-   template<typename T> Vec3<T>& operator+=(Vec3<T>& v, T s);
-   template<typename T> Vec3<T>& operator-=(Vec3<T>& v, T s);
-   template<typename T> Vec3<T>& operator*=(Vec3<T>& v, T s);
-   template<typename T> Vec3<T>& operator/=(Vec3<T>& v, T s);
+   template<typename T> vec3<T>& operator+=(vec3<T>& v, T s);
+   template<typename T> vec3<T>& operator-=(vec3<T>& v, T s);
+   template<typename T> vec3<T>& operator*=(vec3<T>& v, T s);
+   template<typename T> vec3<T>& operator/=(vec3<T>& v, T s);
 
-   template<typename T> Vec3<T>& operator+=(Vec3<T>& l, Vec3<T> r);
-   template<typename T> Vec3<T>& operator-=(Vec3<T>& l, Vec3<T> r);
-   template<typename T> Vec3<T>& operator*=(Vec3<T>& l, Vec3<T> r);
-   template<typename T> Vec3<T>& operator/=(Vec3<T>& l, Vec3<T> r);
+   template<typename T> vec3<T>& operator+=(vec3<T>& l, vec3<T> r);
+   template<typename T> vec3<T>& operator-=(vec3<T>& l, vec3<T> r);
+   template<typename T> vec3<T>& operator*=(vec3<T>& l, vec3<T> r);
+   template<typename T> vec3<T>& operator/=(vec3<T>& l, vec3<T> r);
 
-   template<typename T> Vec3<T> operator-(Vec3<T> v);
+   template<typename T> vec3<T> operator-(vec3<T> v);
 
-   template<typename T> Vec3<T> operator+(Vec3<T> v, T s);
-   template<typename T> Vec3<T> operator-(Vec3<T> v, T s);
-   template<typename T> Vec3<T> operator*(Vec3<T> v, T s);
-   template<typename T> Vec3<T> operator/(Vec3<T> v, T s);
+   template<typename T> vec3<T> operator+(vec3<T> v, T s);
+   template<typename T> vec3<T> operator-(vec3<T> v, T s);
+   template<typename T> vec3<T> operator*(vec3<T> v, T s);
+   template<typename T> vec3<T> operator/(vec3<T> v, T s);
 
-   template<typename T> Vec3<T> operator+(Vec3<T> l, Vec3<T> r);
-   template<typename T> Vec3<T> operator-(Vec3<T> l, Vec3<T> r);
-   template<typename T> Vec3<T> operator*(Vec3<T> l, Vec3<T> r);
-   template<typename T> Vec3<T> operator/(Vec3<T> l, Vec3<T> r);
+   template<typename T> vec3<T> operator+(vec3<T> l, vec3<T> r);
+   template<typename T> vec3<T> operator-(vec3<T> l, vec3<T> r);
+   template<typename T> vec3<T> operator*(vec3<T> l, vec3<T> r);
+   template<typename T> vec3<T> operator/(vec3<T> l, vec3<T> r);
 
-   template<typename T> bool operator==(Vec3<T> l, Vec3<T> r);
-   template<typename T> bool operator!=(Vec3<T> l, Vec3<T> r);
+   template<typename T> bool operator==(vec3<T> l, vec3<T> r);
+   template<typename T> bool operator!=(vec3<T> l, vec3<T> r);
 
-   template<typename T> std::ostream& operator<<(std::ostream& os, Vec3<T> v);
+   template<typename T> std::ostream& operator<<(std::ostream& os, vec3<T> v);
 }
 
 #include "util/geometry/vec3_impl.h"

@@ -16,26 +16,26 @@ namespace core
    public:
       Camera();
 
-      void move(Vec3f translation);
-      void rotate(Vec3f rotation);
+      void move(vec3f translation);
+      void rotate(vec3f rotation);
 
-      Vec3f getPosition() const;
-      Vec3f getLookAtAxis() const;
-      Vec3f getUpAxis() const;
-      Vec3f getRotation() const;
+      vec3f getPosition() const;
+      vec3f getLookAtAxis() const;
+      vec3f getUpAxis() const;
+      vec3f getRotation() const;
       float getSpeed() const;
 
-      void setPosition(Vec3f pos);
-      void setUpAxis(Vec3f upAxis);
-      void setLookAtAxis(Vec3f lookAtAxis);
-      void setRotation(Vec3f rot);
+      void setPosition(vec3f pos);
+      void setUpAxis(vec3f upAxis);
+      void setLookAtAxis(vec3f lookAtAxis);
+      void setRotation(vec3f rot);
       void setSpeed(float speed);
 
    private:
-      Vec3f m_position;
-      Vec3f m_lookAtAxis;
-      Vec3f m_upAxis;
-      Vec3f m_rotation;
+      vec3f m_position;
+      vec3f m_lookAtAxis;
+      vec3f m_upAxis;
+      vec3f m_rotation;
       float m_speed;
    };
 }
