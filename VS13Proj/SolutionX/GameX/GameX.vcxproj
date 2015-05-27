@@ -245,6 +245,7 @@
     <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
@@ -306,6 +307,7 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\main_state.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\state\session.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h" />

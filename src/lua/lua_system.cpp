@@ -88,7 +88,7 @@ end
       CORE_SHUTDOWN_END(LuaSystem);
    }
 
-   void LuaSystem::update()
+   void LuaSystem::collectGarbage()
    {
       lua_gc(m_L, LUA_GCSTEP, 20);
    }

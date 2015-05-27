@@ -18,7 +18,7 @@ namespace core
    {
    }
 
-   void Timer::updateBy(uint32_t deltaMicros)
+   void Timer::advanceTimeBy(uint32_t deltaMicros)
    {
       m_deltaMicros = static_cast<uint32_t>(static_cast<float>(deltaMicros)*m_timeScale);
       m_currentMicros += m_deltaMicros;

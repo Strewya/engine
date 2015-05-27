@@ -70,7 +70,7 @@ namespace core
       generateIndices(result.indices, characterCount);
       float width = generateVertices(result.vertices, text, characterCount, fd.glyphs, scale, textureWidth, textureHeight);
       justifyAxisX(result.vertices, justification.x, 0, width, 0);
-      justifyAxisY(result.vertices, justification.y, fontHeight, fontHeight, 0);
+      justifyAxisY(result.vertices, justification.y, fontHeight, 0, 0);
 
       return result;
    }
@@ -80,13 +80,13 @@ namespace core
    //*****************************************************************
    Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, vec2f scale, vec2i justification, Rect clipBox)
    {
-      // #todo refactor the shit out of this function
-      // maybe split it out from the graphics system into a font rendering system
+      // #refactor
       // things to deal with:
-      // - scaling
-      // - clipping inside the box on both axii
-      // - new lines \n
-      // - line breaks on words
+      // + scaling
+      // + new lines \n
+      // + line breaks on words
+      // + clipping inside the box for words
+      // - clipping inside the box for letters
       Mesh result{};
       result.pshader = fd.pshader;
       result.vshader = fd.vshader;

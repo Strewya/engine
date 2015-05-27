@@ -86,11 +86,11 @@ namespace core
 
       if( delta )
       {
-         updateBy(delta);
+         advanceTimeBy(delta);
       }
    }
 
-   void Clock::updateBy(uint64_t deltaMicros)
+   void Clock::advanceTimeBy(uint64_t deltaMicros)
    {
       m_lastMicros = m_currentMicros;
       m_currentMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros)*m_timeScale);

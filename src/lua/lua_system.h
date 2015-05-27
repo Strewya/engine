@@ -18,7 +18,7 @@ namespace core
    public:
       bool init();
       bool shutdown();
-      void update();
+      void collectGarbage();
 
       LuaStack getStack() const;
 

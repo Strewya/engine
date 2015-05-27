@@ -11,6 +11,7 @@
 namespace core
 {
    struct AudioSystem;
+   struct FontSystem;
    struct GraphicsSystem;
    struct InputSystem;
    struct LuaSystem;
@@ -18,6 +19,7 @@ namespace core
    struct GameSystems
    {
       AudioSystem* audio;
+      FontSystem* font;
       GraphicsSystem* gfx;
       InputSystem* input;
       LuaSystem* lua;

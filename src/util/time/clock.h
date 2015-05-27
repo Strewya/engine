@@ -17,7 +17,7 @@ namespace core
       Clock();
 
       void update();
-      void updateBy(uint64_t deltaMicros);
+      void advanceTimeBy(uint64_t deltaMicros);
 
       uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
 

@@ -19,9 +19,9 @@ namespace core
    {
    }
 
-   void PeriodicTimer::updateBy(uint32_t deltaMicros)
+   void PeriodicTimer::advanceTimeBy(uint32_t deltaMicros)
    {
-      m_timer.updateBy(deltaMicros);
+      m_timer.advanceTimeBy(deltaMicros);
    }
    bool PeriodicTimer::hasElapsed() const
    {

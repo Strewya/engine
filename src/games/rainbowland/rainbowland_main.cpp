@@ -10,10 +10,11 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
 #include "input/keyboard.h"
-#include "util/template/resource_cache_template.h"
 #include "util/color.h"
 #include "util/transform.h"
 #include "util/utility.h"
+#include "util/template/resource_cache_template.h"
+#include "util/time/clock.h"
 /******* end headers *******/
 
 namespace core
@@ -24,6 +25,7 @@ namespace core
 
       unloadGameResources(systems, assets);
 
+      CORE_STATUS_AND(fontSystem.shutdown());
       CORE_STATUS_AND(luaSystem.shutdown());
       CORE_STATUS_AND(inputSystem.shutdown());
       CORE_STATUS_AND(graphicsSystem.shutdown());
@@ -37,14 +39,15 @@ namespace core
       CORE_INIT_START(Rainbowland);
 
       this->window = windowProxy;
+      isPaused = false;
 
       CORE_STATUS_AND(window.isValid());
       if( CORE_STATUS_OK )
       {
          window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
-#ifdef MURRAY
+//#ifdef MURRAY
          window.move(window.getSizeX(), 0);
-#endif
+//#endif
          window.showCursor(true);
          window.monitorDirectoryForChanges("resources");
 
@@ -54,11 +57,13 @@ namespace core
          CORE_STATUS_AND(graphicsSystem.init(window));
          CORE_STATUS_AND(inputSystem.init(window));
          CORE_STATUS_AND(luaSystem.init());
+         CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
 
          systems.audio = &audioSystem;
          systems.gfx = &graphicsSystem;
          systems.input = &inputSystem;
          systems.lua = &luaSystem;
+         systems.font = &fontSystem;
       }
 
       if( CORE_STATUS_OK )
@@ -72,25 +77,25 @@ namespace core
       {
          state.camera.setPosition({0, 0, -20});
 
-         initializeGameState(timer, state, systems, assets);
+         game_init(state, systems, assets);
       }
 
       CORE_INIT_END(Rainbowland);
    }
 
-   bool Game::tickLogic(uint32_t updateTime)
+   bool Game::tickLogic(const Clock& logicClock)
    {
       bool running = true;
 
-      timer.updateBy(updateTime);
-
-      inputSystem.update();
-
-      auto events = inputSystem.getEvents();
+      inputSystem.gatherInputForCurrentFrame(logicClock.getCurrentMicros());
+      
+      const auto& events = inputSystem.getEvents();
       for( auto& e : events )
       {
          switch( e.type )
          {
+            // #temp this case is temporary until i get a normal menu type thing
+            // which will handle shutting the game down
             case WE_KEYBOARDKEY:
             {
                switch( e.keyboard.key.id )
@@ -109,6 +114,9 @@ namespace core
                }
             } break;
             
+            // #refactor this should probably be moved into a system of it's own
+            // that handles file change notifications and processes them based on
+            // either the extension or the entire file name
             case WE_FILECHANGE:
             {
                if(e.fileChange.action == FILE_MODIFIED )
@@ -148,22 +156,48 @@ namespace core
                   }
                }
             } break;
+
+            case WE_LOSTFOCUS:
+            {
+               isPaused = true;
+            } break;
+
+            case WE_GAINFOCUS:
+            {
+               isPaused = false;
+            } break;
          }
       }
 
-      auto logic_ok = updateGameState(timer.getDeltaSeconds(), timer.getDeltaMicros(), state, systems, assets);
+      auto logic_ok = true;
+      if( !isPaused )
+      {
+         logic_ok = game_update(logicClock.getDeltaSeconds(), logicClock.getDeltaMicros(), state, systems, assets);
+      }
+
+      luaSystem.collectGarbage();
 
       return running && logic_ok;
    }
 
-   void Game::tickRender(uint32_t updateTime)
+   void Game::tickRender(const Clock& renderClock)
    {
       graphicsSystem.begin();
 
-      graphicsSystem.setPerspectiveProjection();
-      graphicsSystem.applyCamera(state.camera);
+      systems.gfx->setOrthographicProjection();
 
-      renderGameState(timer.getDeltaSeconds(), state, systems, assets);
+      if(isPaused )
+      {
+         auto mesh = fontSystem.makeTextMesh("Paused", state.fontDesc, {1, 1}, {Center, Middle});
+         systems.gfx->renderMesh({vec2f{0, 400}}, {}, mesh);
+      }
+      else
+      {
+         auto mesh = fontSystem.makeTextMesh("Running", state.fontDesc, {1, 1}, {Center, Middle});
+         systems.gfx->renderMesh({vec2f{0, 400}}, {}, mesh);
+
+         game_render(renderClock.getDeltaSeconds(), state, systems, assets);
+      }
 
       graphicsSystem.present();
    }

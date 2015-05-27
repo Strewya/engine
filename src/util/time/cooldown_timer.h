@@ -19,7 +19,7 @@ namespace core
       CooldownTimer();
       CooldownTimer(uint32_t durationMicros);
 
-      void updateBy(uint32_t deltaMicros);
+      void advanceTimeBy(uint32_t deltaMicros);
       bool hasElapsed() const;
       uint32_t getRemainingMicros() const;
       float getPercentDone() const;

@@ -24,9 +24,9 @@ namespace core
       bool init(WindowProxy window);
       bool shutdown();
 
-      void update();
+      void gatherInputForCurrentFrame(uint64_t pollMicros);
 
-      EventVector_t getEvents() const;
+      const EventVector_t& getEvents() const;
 
    private:
       WindowProxy m_window;

@@ -1,4 +1,0 @@
-LIBRARY "DX_Renderer.dll"
-EXPORTS
-	createRendererInterface
-	destroyRendererInterface

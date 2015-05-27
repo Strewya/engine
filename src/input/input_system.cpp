@@ -35,14 +35,13 @@ namespace core
       CORE_SHUTDOWN_END(InputSystem);
    }
 
-   void InputSystem::update()
+   void InputSystem::gatherInputForCurrentFrame(uint64_t pollMicros)
    {
       m_inputEvents.clear();
-      auto currentPeekTime = Clock::getRealTimeMicros();
-      m_inputEvents = m_window.collectEvents(currentPeekTime);
+      m_inputEvents = m_window.collectEvents(pollMicros);
    }
 
-   EventVector_t InputSystem::getEvents() const
+   const EventVector_t& InputSystem::getEvents() const
    {
       return m_inputEvents;
    }

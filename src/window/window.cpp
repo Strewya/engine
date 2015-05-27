@@ -251,7 +251,7 @@ namespace core
                getProxy().lockCursor(m_lockCursor);
                getProxy().showCursor(m_showCursor);
             }
-            result = notProcessed;
+            result = 0;
          } break;
 
          default:

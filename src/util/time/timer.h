@@ -16,7 +16,7 @@ namespace core
    public:
       Timer();
 
-      void updateBy(uint32_t deltaMicros);
+      void advanceTimeBy(uint32_t deltaMicros);
 
       void setTimeScale(float timeScale);
       float getTimeScale() const;

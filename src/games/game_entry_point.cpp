@@ -35,8 +35,8 @@ namespace core
 #endif
       static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
       static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
-      Clock logicTimer;
-      Clock renderTimer;
+      Clock logicTimer{};
+      Clock renderTimer{};
       CORE_GAME game;
 
       bool running = game.init(window);
@@ -55,26 +55,25 @@ namespace core
          count = l = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
          for( l; l--; )
          {
-            logicTimer.updateBy(microsPerFrame);
-            if( !game.tickLogic(logicTimer.getDeltaMicros()) )
+            logicTimer.advanceTimeBy(microsPerFrame);
+            if( !game.tickLogic(logicTimer) )
             {
                running = false;
                break;
             }
          }
-         logicTimer.updateBy(droppedTime);
+         logicTimer.advanceTimeBy(droppedTime);
 
-         uint64_t fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getLastRealTimeMicros();
-         if( count > 0 )
-         {
-            game.tickRender(static_cast<uint32_t>(fullUpdateTime));
-         }
-         renderTimer.updateBy(fullUpdateTime);
+         uint64_t fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
+         // we might want to do interpolation ...
+         game.tickRender(renderTimer);
+         renderTimer.advanceTimeBy(fullUpdateTime);
       }
       bool shutdownStatus = game.shutdown();
       if( !shutdownStatus )
       {
          CORE_INFO("GAME SHUTDOWN HAS FAILED!!!");
+         window.showMessagebox("SRS ERRORR", "Game shutdown has failed, please review the log for errors immediately");
       }
       window.close();
 #endif
