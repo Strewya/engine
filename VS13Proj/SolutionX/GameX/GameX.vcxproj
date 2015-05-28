@@ -241,10 +241,11 @@
     <ClCompile Include="..\..\..\src\audio\audio_system.cpp" />
     <ClCompile Include="..\..\..\src\audio\fmod_sound_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland_main.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\state\main_menu.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
@@ -304,9 +305,10 @@
     <ClInclude Include="..\..\..\src\audio\fmod_sound_manager.h" />
     <ClInclude Include="..\..\..\src\games\game_entry_point.h" />
     <ClInclude Include="..\..\..\src\games\game_list.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\resources.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\main_state.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\state\main_menu.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\state\session.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />

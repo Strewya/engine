@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/rainbowland/rainbowland_main.h"
+#include "games/rainbowland/game.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "games/rainbowland/load_game_resources.h"

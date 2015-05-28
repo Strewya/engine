@@ -9,6 +9,7 @@
 #include "graphics/camera.h"
 #include "graphics/font/font_descriptor.h"
 
+#include "games/rainbowland/state/main_menu.h"
 #include "games/rainbowland/state/session.h"
 /******* end header inclusion *******/
 
@@ -36,13 +37,14 @@ namespace core
       // #test
       FontDescriptor fontDesc;
 
+      MainMenuState mainMenuState;
       SessionState sessionState;
    };
 
    struct GameSystems;
    struct GameResources;
 
-   bool game_init(GameState& state, GameSystems systems, GameResources& assets);
-   bool game_update(float dt, uint32_t deltaMicros, GameState& state, GameSystems systems, GameResources& assets);
-   void game_render(float dt, GameState& gameState, GameSystems systems, GameResources& assets);
+   bool game_init(GameState& state, GameSystems services, GameResources& assets);
+   bool game_update(float dt, uint32_t deltaMicros, GameState& state, GameSystems services, GameResources& assets);
+   void game_render(float dt, GameState& state, GameSystems services, GameResources& assets);
 }

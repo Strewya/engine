@@ -2,7 +2,7 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/rainbowland/main_state.h"
+#include "games/rainbowland/game_state.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "games/rainbowland/resources.h"
@@ -20,17 +20,19 @@
 
 namespace core
 {
-   bool game_init(GameState& state, GameSystems systems, GameResources& assets)
+   bool game_init(GameState& state, GameSystems services, GameResources& assets)
    {
       state.globalGameState = GameState::GlobalGameState::MainMenu;
       state.gameplayState = GameState::GameplayState::ClassPick;
 
       state.fontDesc = loadFont(CORE_RESOURCE("Defs/font.font"), assets.font, assets.mainVS, assets.mainPS);
 
+      mainMenu_init(state.mainMenuState, services, assets);
+
       return true;
    }
 
-   bool game_update(float dt, uint32_t deltaMicros, GameState& state, GameSystems systems, GameResources& assets)
+   bool game_update(float dt, uint32_t deltaMicros, GameState& state, GameSystems services, GameResources& assets)
    {
       bool stillRunning = true;
       enum
@@ -39,7 +41,7 @@ namespace core
          ACTION,
       };
 
-      const auto& frameEvents = systems.input->getEvents();
+      const auto& frameEvents = services.input->getEvents();
       auto contains = [&frameEvents](Keyboard::Key k, uint32_t s) -> bool
       {
          for( auto e : frameEvents )
@@ -56,6 +58,8 @@ namespace core
       {
          case GameState::GlobalGameState::MainMenu:
          {
+            mainMenu_update(dt, deltaMicros, state.mainMenuState, services, assets);
+
             if( contains(Keyboard::Space, ACTION) )
             {
                state.globalGameState = GameState::GlobalGameState::Gameplay;
@@ -71,12 +75,12 @@ namespace core
                   if( contains(Keyboard::Space, ACTION) )
                   {
                      state.gameplayState = GameState::GameplayState::Session;
-                     session_init(state.sessionState, systems, assets);
+                     session_init(state.sessionState, services, assets);
                   }
                } break;
                case GameState::GameplayState::Session:
                {
-                  session_update(dt, deltaMicros, state.sessionState, systems, assets);
+                  session_update(dt, deltaMicros, state.sessionState, services, assets);
 
                   if( contains(Keyboard::Space, ACTION) )
                   {
@@ -97,9 +101,9 @@ namespace core
       return stillRunning;
    }
 
-   void game_render(float dt, GameState& state, GameSystems systems, GameResources& assets)
+   void game_render(float dt, GameState& state, GameSystems services, GameResources& assets)
    {
-      systems.gfx->applyCamera(state.camera);
+      services.gfx->applyCamera(state.camera);
       /*
             systems.gfx->setPerspectiveProjection();
             systems.gfx->setTransparency(false);
@@ -109,40 +113,42 @@ namespace core
             systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
       */
 
-      systems.gfx->setOrthographicProjection();
-      systems.gfx->setTransparency(true);
+      services.gfx->setOrthographicProjection();
+      services.gfx->setTransparency(true);
 
       switch( state.globalGameState )
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            auto mesh = systems.font->makeTextMesh("Main menu", state.fontDesc, {1, 1}, {Center, Middle});
-            systems.gfx->renderMesh({}, {}, mesh);
+            auto mesh = services.font->makeTextMesh("Main menu", state.fontDesc, {1, 1}, {Center, Middle});
+            services.gfx->renderMesh({}, {}, mesh);
+
+            mainMenu_render(dt, state.mainMenuState, services, assets);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
-            auto mesh = systems.font->makeTextMesh("Gameplay", state.fontDesc, {1, 1}, {Center, Middle});
-            systems.gfx->renderMesh({}, {}, mesh);
+            auto mesh = services.font->makeTextMesh("Gameplay", state.fontDesc, {1, 1}, {Center, Middle});
+            services.gfx->renderMesh({}, {}, mesh);
             switch( state.gameplayState )
             {
                case GameState::GameplayState::ClassPick:
                {
-                  mesh = systems.font->makeTextMesh("Class picking", state.fontDesc, {1, 1}, {Center, Middle});
-                  systems.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
+                  mesh = services.font->makeTextMesh("Class picking", state.fontDesc, {1, 1}, {Center, Middle});
+                  services.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
                } break;
                case GameState::GameplayState::Session:
                {
-                  mesh = systems.font->makeTextMesh("Session", state.fontDesc, {1, 1}, {Center, Middle});
-                  systems.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
+                  mesh = services.font->makeTextMesh("Session", state.fontDesc, {1, 1}, {Center, Middle});
+                  services.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
                   
-                  session_render(dt, state.sessionState, systems, assets);
+                  session_render(dt, state.sessionState, services, assets);
                } break;
             }
          } break;
          case GameState::GlobalGameState::Score:
          {
-            auto mesh = systems.font->makeTextMesh("Score screen", state.fontDesc, {1, 1}, {Center, Middle});
-            systems.gfx->renderMesh({}, {}, mesh);
+            auto mesh = services.font->makeTextMesh("Score screen", state.fontDesc, {1, 1}, {Center, Middle});
+            services.gfx->renderMesh({}, {}, mesh);
          } break;
       }
 

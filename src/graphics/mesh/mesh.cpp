@@ -7,6 +7,7 @@
 /******* extra headers *******/
 #include "graphics/vertex.h"
 #include "util/color.h"
+#include "util/utility.h"
 #include "util/geometry/vec2.h"
 #include "util/geometry/vec3.h"
 /******* end headers *******/
@@ -102,4 +103,65 @@ namespace core
       return mesh;
    }
 
+   Mesh makeSolidCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   {
+      --points;
+      points |= points >> 1;
+      points |= points >> 2;
+      points |= points >> 4;
+      points |= points >> 8;
+      points |= points >> 16;
+      ++points;
+
+      Mesh result;
+      result.vshader = vshader;
+      result.pshader = pshader;
+      result.vertices.reserve(points+1);
+      float degreeOffset = 360.0f / points;
+      result.vertices.push_back({{pos.x, pos.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0});
+      for( uint32_t i = 0; i < points; ++i )
+      {
+         result.vertices.push_back({{pos.x + radius*cos(Deg2Rad(i*degreeOffset)), pos.y + radius*sin(Deg2Rad(i*degreeOffset)), 0}, {1, 1, 1, 1}, {-1, -1}, 0});
+      }
+      result.indices.reserve(points * 3);
+      for( uint32_t i = 1; i <= points; ++i )
+      {
+         result.indices.push_back(i);
+         result.indices.push_back(0);
+         result.indices.push_back((i % points) + 1);
+      }
+      result.topology = TriangleList;
+
+      return result;
+   }
+
+   Mesh makeOutlineCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   {
+      --points;
+      points |= points >> 1;
+      points |= points >> 2;
+      points |= points >> 4;
+      points |= points >> 8;
+      points |= points >> 16;
+      ++points;
+
+      Mesh result;
+      result.vshader = vshader;
+      result.pshader = pshader;
+      result.vertices.reserve(points);
+      float degreeOffset = 360.0f / points;
+      for( uint32_t i = 0; i < points; ++i )
+      {
+         result.vertices.push_back({{pos.x + radius*cos(Deg2Rad(i*degreeOffset)), pos.y + radius*sin(Deg2Rad(i*degreeOffset)), 0}, {1, 1, 1, 1}, {-1, -1}, 0});
+      }
+      result.indices.reserve(points + 1);
+      for( uint32_t i = 0; i < points; ++i )
+      {
+         result.indices.push_back(i);
+      }
+      result.indices.push_back(0);
+      result.topology = LineStrip;
+
+      return result;
+   }
 }

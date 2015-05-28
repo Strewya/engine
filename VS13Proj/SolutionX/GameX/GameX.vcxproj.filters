@@ -118,12 +118,6 @@
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
       <Filter>code\games</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\main_state.cpp">
-      <Filter>code\games\rainbowland</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland_main.cpp">
-      <Filter>code\games\rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp">
       <Filter>code\games\util</Filter>
     </ClCompile>
@@ -156,6 +150,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp">
       <Filter>code\games\rainbowland\state</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\state\main_menu.cpp">
+      <Filter>code\games\rainbowland\state</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp">
+      <Filter>code\games\rainbowland</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp">
+      <Filter>code\games\rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -369,13 +372,7 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\main_state.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\resources.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland_main.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
@@ -410,6 +407,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\state\session.h">
       <Filter>code\games\rainbowland\state</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\state\main_menu.h">
+      <Filter>code\games\rainbowland\state</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
+      <Filter>code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h">
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

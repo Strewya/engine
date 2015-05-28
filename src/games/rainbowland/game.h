@@ -16,7 +16,7 @@
 
 #include "games/rainbowland/resources.h"
 #include "games/rainbowland/systems.h"
-#include "games/rainbowland/main_state.h"
+#include "games/rainbowland/game_state.h"
 /******* end header inclusion *******/
 
 namespace core
