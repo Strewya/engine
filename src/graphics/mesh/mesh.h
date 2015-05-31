@@ -9,11 +9,12 @@
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
 #include "graphics/graphics_types.h"
-#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace core
 {
+   struct Vec2;
+
    enum VertexTopology;
 
    struct Mesh
@@ -26,11 +27,11 @@ namespace core
       IndexBuffer indices;
    };
    
-   Mesh makeSolidQuad(vec2f pos, vec2f hs, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineQuad(vec2f pos, vec2f hs, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeTexturedQuad(vec2f pos, vec2f hs, HTexture texture, vec2f topLeftUV, vec2f botRightUV, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
-   Mesh makeSolidCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
-   Mesh makeOutlineCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
 }

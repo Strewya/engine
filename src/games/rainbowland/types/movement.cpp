@@ -12,8 +12,8 @@
 namespace core
 {
    MovementData::MovementData()
-      : m_entity(nullptr), m_acceleration(nullptr), m_velocity(nullptr),
-      m_direction(nullptr), m_position(nullptr), m_inUse(0), m_allocated(0)
+      : _entity(nullptr), _acceleration(nullptr), _velocity(nullptr),
+      _direction(nullptr), _position(nullptr), _inUse(0), m_allocated(0)
    {}
 
    void MovementData::allocate(uint32_t newSize)
@@ -23,110 +23,97 @@ namespace core
          return;
       }
       std::vector<uint8_t> newMemory;
-      auto newByteCount = newSize*(sizeof(Entity) + sizeof(float) + sizeof(vec2f) * 3);
+      auto newByteCount = newSize*(sizeof(Entity) + sizeof(float) + sizeof(Vec2) * 3);
       newMemory.resize(newByteCount);
 
       Entity* newEntity = (Entity*)newMemory.data();
       float* newAcceleration = (float*)(newEntity + newSize);
-      vec2f* newVelocity = (vec2f*)(newAcceleration + newSize);
-      vec2f* newDirection = (vec2f*)(newVelocity + newSize);
-      vec2f* newPosition = (vec2f*)(newDirection + newSize);
+      Vec2* newVelocity = (Vec2*)(newAcceleration + newSize);
+      Vec2* newDirection = (Vec2*)(newVelocity + newSize);
+      Vec2* newPosition = (Vec2*)(newDirection + newSize);
 
-      memcpy(newEntity, m_entity, m_inUse*sizeof(Entity));
-      memcpy(newAcceleration, m_acceleration, m_inUse*sizeof(float));
-      memcpy(newVelocity, m_velocity, m_inUse*sizeof(vec2f));
-      memcpy(newDirection, m_direction, m_inUse*sizeof(vec2f));
-      memcpy(newPosition, m_position, m_inUse*sizeof(vec2f));
+      memcpy(newEntity, _entity, _inUse*sizeof(Entity));
+      memcpy(newAcceleration, _acceleration, _inUse*sizeof(float));
+      memcpy(newVelocity, _velocity, _inUse*sizeof(Vec2));
+      memcpy(newDirection, _direction, _inUse*sizeof(Vec2));
+      memcpy(newPosition, _position, _inUse*sizeof(Vec2));
 
       std::swap(m_memory, newMemory);
-      m_entity = newEntity;
-      m_acceleration = newAcceleration;
-      m_velocity = newVelocity;
-      m_direction = newDirection;
-      m_position = newPosition;
+      _entity = newEntity;
+      _acceleration = newAcceleration;
+      _velocity = newVelocity;
+      _direction = newDirection;
+      _position = newPosition;
 
       m_allocated = newSize;
    }
 
    void MovementData::make(Entity e)
    {
-      if( m_inUse >= m_allocated )
+      if( _inUse >= m_allocated )
       {
          allocate(m_allocated * 2);
       }
-      m_map.emplace(e.id, m_inUse);
-      ++m_inUse;
+      m_map.emplace(e.id, _inUse);
+      ++_inUse;
    }
 
    void MovementData::destroy(Entity e)
    {
-      Component c = getComponentData(e);
+      uint32_t c = makeComponent(e.id);
       auto i = getDataIndex(c);
-      auto last = m_inUse - 1;
-      Entity last_e = m_entity[last];
+      auto last = _inUse - 1;
+      Entity last_e = _entity[last];
 
-      m_entity[i] = m_entity[last];
-      m_acceleration[i] = m_acceleration[last];
-      m_velocity[i] = m_velocity[last];
-      m_direction[i] = m_direction[last];
-      m_position[i] = m_position[last];
+      _entity[i] = _entity[last];
+      _acceleration[i] = _acceleration[last];
+      _velocity[i] = _velocity[last];
+      _direction[i] = _direction[last];
+      _position[i] = _position[last];
 
       m_map[last_e.id] = i;
       m_map.erase(i);
 
-      --m_inUse;
+      --_inUse;
    }
 
-   Component MovementData::getComponentData(Entity e)
+   uint32_t MovementData::getEntitySlot(Entity e)
    {
-      Component result{0};
+      uint32_t result = 0;
       auto it = m_map.find(e.id);
       if( it != m_map.end() )
       {
          result = makeComponent(it->second);
       }
+
+//       result.entity = _entity + index;
+//       result.acceleration = _acceleration + index;
+//       result.velocity = _velocity + index;
+//       result.direction = _direction + index;
+//       result.position = _position + index;
+
       return result;
    }
 
-   float& MovementData::acceleration(Component c)
+   void doMovement(float dt, MovementData& data)
    {
-      return m_acceleration[getDataIndex(c)];
-   }
-
-   vec2f& MovementData::velocity(Component c)
-   {
-      return m_velocity[getDataIndex(c)];
-   }
-
-   vec2f& MovementData::direction(Component c)
-   {
-      return m_direction[getDataIndex(c)];
-   }
-
-   vec2f& MovementData::position(Component c)
-   {
-      return m_position[getDataIndex(c)];
-   }
-
-   void MovementData::doMovement(float dt)
-   {
-      for( uint32_t i = 0; i < m_inUse; ++i )
+      for( uint32_t i = 0; i < data._inUse; ++i )
       {
-         auto acceleration = m_direction[i] * m_acceleration[i];
-         acceleration += -m_velocity[i] * 10.0f;
-         m_position[i] = acceleration*0.5f*dt*dt + m_velocity[i] * dt + m_position[i];
-         m_velocity[i] = acceleration*dt + m_velocity[i];
+         auto acceleration = data._direction[i] * data._acceleration[i];
+         acceleration += -data._velocity[i] * 10.0f;
+         data._position[i] = acceleration*0.5f*dt*dt + data._velocity[i] * dt + data._position[i];
+         data._velocity[i] = acceleration*dt + data._velocity[i];
       }
    }
 
-   uint32_t MovementData::getDataIndex(Component c)
+   uint32_t MovementData::getDataIndex(uint32_t c)
    {
-      auto result = c.idx - 1;
+      auto result = c - 1;
       return result;
    }
-   Component MovementData::makeComponent(uint32_t idx)
+   uint32_t MovementData::makeComponent(uint32_t idx)
    {
-      Component result{idx + 1};
+      uint32_t result{idx + 1};
       return result;
    }
 }

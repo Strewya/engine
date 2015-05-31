@@ -5,23 +5,24 @@
 #include "util/transform.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "util/geometry/vec2.h"
 /******* end headers *******/
 
 namespace core
 {
-   Transform::Transform(vec2f p, vec2f s, float r)
+   Transform::Transform(Vec2 p, Vec2 s, float r)
       : position(p), scale(s), rotation(r)
    {
    }
 
-   void Transform::set(vec2f p, vec2f s, float r)
+   void Transform::set(Vec2 p, Vec2 s, float r)
    {
       position = p;
       scale = s;
       rotation = r;
    }
 
-   void Transform::translate(vec2f delta)
+   void Transform::translate(Vec2 delta)
    {
       position += delta;
    }
@@ -31,7 +32,7 @@ namespace core
       scale *= uniform;
    }
 
-   void Transform::rescale(vec2f nonUniform)
+   void Transform::rescale(Vec2 nonUniform)
    {
       scale *= nonUniform;
    }

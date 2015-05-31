@@ -8,23 +8,23 @@
 #include "graphics/dx_include.h"
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
-#include "util/geometry/vec2_fwd.h"
-#include "util/geometry/vec3_fwd.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Color;
+   struct Vec2;
+   struct Vec3;
 
    struct DefaultVertex
    {
       DefaultVertex();
-      DefaultVertex(vec3f position, Color color, vec2f textureUV);
-      void setPosition(vec3f position);
+      DefaultVertex(Vec3 position, Color color, Vec2 textureUV);
+      void setPosition(Vec3 position);
       void setPosition(float x, float y, float z);
       void setColor(Color color);
       void setColor(float r, float g, float b, float a);
-      void setTextureUV(vec2f textureUV);
+      void setTextureUV(Vec2 textureUV);
       void setTextureUV(float u, float v);
 
       XMFLOAT4 position;
@@ -37,7 +37,7 @@ namespace core
    struct HealthVertex : public DefaultVertex
    {
       HealthVertex();
-      HealthVertex(vec3f position, Color color, vec2f textureUV, float health);
+      HealthVertex(Vec3 position, Color color, Vec2 textureUV, float health);
       void setHealth(float h);
 
       XMFLOAT2 health;

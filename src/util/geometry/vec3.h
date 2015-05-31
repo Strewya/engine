@@ -1,122 +1,51 @@
 #pragma once
 /********************************************
-*  contents:   3D vector type declaration
+*  contents:   3D vector function implementations
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 #include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec3_fwd.h"
+#include "util/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   template<typename T>
-   struct vec3
+   namespace vec3
    {
-      T x;
-      T y;
-      T z;
+      bool isZero(Vec3 v);
+      float length(Vec3 v);
+      float length2(Vec3 v);
+      Vec3 normalize(Vec3 v);
+      float dotProduct(Vec3 l, Vec3 r);
+   }
 
-      void set(T x, T y, T z);
-      bool isZero() const;
+   Vec3 operator-(Vec3 v);
 
-      template<typename U> operator vec3<U>() const;
+   Vec3& operator+=(Vec3& v, float s);
+   Vec3& operator-=(Vec3& v, float s);
+   Vec3& operator*=(Vec3& v, float s);
+   Vec3& operator/=(Vec3& v, float s);
 
-      static T length(vec3 v);
-      static T length2(vec3 v);
-      static vec3 normalize(vec3 v);
-      static T dotProduct(vec3 l, vec3 r);
-   };
+   Vec3& operator+=(Vec3& l, Vec3 r);
+   Vec3& operator-=(Vec3& l, Vec3 r);
+   Vec3& operator*=(Vec3& l, Vec3 r);
+   Vec3& operator/=(Vec3& l, Vec3 r);
 
-   template<typename T> vec3<T>& operator+=(vec3<T>& v, T s);
-   template<typename T> vec3<T>& operator-=(vec3<T>& v, T s);
-   template<typename T> vec3<T>& operator*=(vec3<T>& v, T s);
-   template<typename T> vec3<T>& operator/=(vec3<T>& v, T s);
+   Vec3 operator*(Vec3 v, float s);
+   Vec3 operator/(Vec3 v, float s);
 
-   template<typename T> vec3<T>& operator+=(vec3<T>& l, vec3<T> r);
-   template<typename T> vec3<T>& operator-=(vec3<T>& l, vec3<T> r);
-   template<typename T> vec3<T>& operator*=(vec3<T>& l, vec3<T> r);
-   template<typename T> vec3<T>& operator/=(vec3<T>& l, vec3<T> r);
+   Vec3 operator*(float s, Vec3 v);
+   Vec3 operator/(float s, Vec3 v);
 
-   template<typename T> vec3<T> operator-(vec3<T> v);
+   Vec3 operator+(Vec3 l, Vec3 r);
+   Vec3 operator-(Vec3 l, Vec3 r);
+   Vec3 operator*(Vec3 l, Vec3 r);
+   Vec3 operator/(Vec3 l, Vec3 r);
 
-   template<typename T> vec3<T> operator+(vec3<T> v, T s);
-   template<typename T> vec3<T> operator-(vec3<T> v, T s);
-   template<typename T> vec3<T> operator*(vec3<T> v, T s);
-   template<typename T> vec3<T> operator/(vec3<T> v, T s);
+   bool operator==(Vec3 l, Vec3 r);
+   bool operator!=(Vec3 l, Vec3 r);
 
-   template<typename T> vec3<T> operator+(vec3<T> l, vec3<T> r);
-   template<typename T> vec3<T> operator-(vec3<T> l, vec3<T> r);
-   template<typename T> vec3<T> operator*(vec3<T> l, vec3<T> r);
-   template<typename T> vec3<T> operator/(vec3<T> l, vec3<T> r);
-
-   template<typename T> bool operator==(vec3<T> l, vec3<T> r);
-   template<typename T> bool operator!=(vec3<T> l, vec3<T> r);
-
-   template<typename T> std::ostream& operator<<(std::ostream& os, vec3<T> v);
+   std::ostream& operator<<(std::ostream& os, Vec3 v);
 }
-
-#include "util/geometry/vec3_impl.h"
-
-
-// #include <iostream>
-//namespace Util
-//{
-//	class Vec3
-//	{
-//	public:
-//		Vec3(const Vec2& v);
-//		Vec3(const Vec3& v);
-//		Vec3(float x = 0, float y = 0, float z = 0);
-//		Vec3& operator*=(const Vec3& v);
-//		Vec3& operator*=(float v);
-//		Vec3& operator/=(const Vec3& v);
-//		Vec3& operator/=(float v);
-//		Vec3& operator+=(const Vec3& v);
-//		Vec3& operator+=(float v);
-//		Vec3& operator-=(const Vec3& v);
-//		Vec3& operator-=(float v);
-//		Vec3 operator+(const Vec3& v) const;
-//		Vec3 operator+(float v) const;
-//		Vec3 operator-() const;
-//		Vec3 operator-(const Vec3& v) const;
-//		Vec3 operator-(float v) const;
-//		Vec3 operator*(const Vec3& v) const;
-//		Vec3 operator*(float v) const;
-//		Vec3 operator/(const Vec3& v) const;
-//		Vec3 operator/(float v) const;
-//		bool operator==(const Vec3& v) const;
-//		bool operator!=(const Vec3& v) const;
-//		Vec3& operator=(const Vec3& v);
-//
-//		Vec3& set(const Vec3& r);
-//		Vec3& set(float x, float y, float z);
-//
-//		float Dot(const Vec3& v) const;
-//		//Vec3 ProjectOn(const Vec3& target) const;
-//		Vec3 Normalized() const;
-//		void SetLength(float len);
-//		void Truncate(float len);
-//		float Length() const;
-//		float LengthSq() const;
-//		Vec3 Cross(const Vec3& rhs) const;
-//		float DistanceTo(const Vec3& v) const;
-//		float SquaredDistanceTo(const Vec3& v) const;
-//		bool IsZero() const;
-//		void SetZero();
-//
-//		float x, y, z;
-//	};
-//
-//	Vec3 operator+(float f, const Vec3& v);
-//	Vec3 operator-(float f, const Vec3& v);
-//	Vec3 operator*(float f, const Vec3& v);
-//	Vec3 operator/(float f, const Vec3& v);
-//	Vec3 toVec3(const Vec2& vec);
-//	Vec2 toVec2(const Vec3& vec);
-//	
-//	std::istream& operator>>(std::istream& ss, Util::Vec3& v);
-//	std::ostream& operator<<(std::ostream& ss, Util::Vec3& v);
-//}

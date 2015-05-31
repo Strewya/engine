@@ -188,13 +188,13 @@ namespace core
 
       if(isPaused )
       {
-         auto mesh = fontSystem.makeTextMesh("Paused", state.fontDesc, {1, 1}, {Center, Middle});
-         systems.gfx->renderMesh({vec2f{0, 400}}, {}, mesh);
+         auto mesh = fontSystem.makeTextMesh("Paused", state.fontDesc, {1, 1}, Center, Middle);
+         systems.gfx->renderMesh({Vec2{0, 400}}, {}, mesh);
       }
       else
       {
-         auto mesh = fontSystem.makeTextMesh("Running", state.fontDesc, {1, 1}, {Center, Middle});
-         systems.gfx->renderMesh({vec2f{0, 400}}, {}, mesh);
+         auto mesh = fontSystem.makeTextMesh("Running", state.fontDesc, {1, 1}, Center, Middle);
+         systems.gfx->renderMesh({Vec2{0, 400}}, {}, mesh);
 
          game_render(renderClock.getDeltaSeconds(), state, systems, assets);
       }

@@ -6,26 +6,26 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Transform
    {
-      Transform(vec2f p = {0, 0}, vec2f s = {1, 1}, float r = 0);
+      Transform(Vec2 p = {0, 0}, Vec2 s = {1, 1}, float r = 0);
 
-      void set(vec2f p, vec2f s, float r);
+      void set(Vec2 p, Vec2 s, float r);
 
-      void translate(vec2f delta);
+      void translate(Vec2 delta);
 
       void rescale(float uniform);
-      void rescale(vec2f nonUniform);
+      void rescale(Vec2 nonUniform);
 
       void rotate(float degrees);
 
-      vec2f position;
-      vec2f scale;
+      Vec2 position;
+      Vec2 scale;
       float rotation;
    };
 }

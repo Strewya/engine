@@ -120,26 +120,26 @@ namespace core
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            auto mesh = services.font->makeTextMesh("Main menu", state.fontDesc, {1, 1}, {Center, Middle});
+            auto mesh = services.font->makeTextMesh("Main menu", state.fontDesc, {1, 1}, Center, Middle);
             services.gfx->renderMesh({}, {}, mesh);
 
             mainMenu_render(dt, state.mainMenuState, services, assets);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
-            auto mesh = services.font->makeTextMesh("Gameplay", state.fontDesc, {1, 1}, {Center, Middle});
+            auto mesh = services.font->makeTextMesh("Gameplay", state.fontDesc, {1, 1}, Center, Middle);
             services.gfx->renderMesh({}, {}, mesh);
             switch( state.gameplayState )
             {
                case GameState::GameplayState::ClassPick:
                {
-                  mesh = services.font->makeTextMesh("Class picking", state.fontDesc, {1, 1}, {Center, Middle});
-                  services.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
+                  mesh = services.font->makeTextMesh("Class picking", state.fontDesc, {1, 1}, Center, Middle);
+                  services.gfx->renderMesh({Vec2{0, -40}}, {}, mesh);
                } break;
                case GameState::GameplayState::Session:
                {
-                  mesh = services.font->makeTextMesh("Session", state.fontDesc, {1, 1}, {Center, Middle});
-                  services.gfx->renderMesh({vec2f{0, -40}}, {}, mesh);
+                  mesh = services.font->makeTextMesh("Session", state.fontDesc, {1, 1}, Center, Middle);
+                  services.gfx->renderMesh({Vec2{0, -40}}, {}, mesh);
                   
                   session_render(dt, state.sessionState, services, assets);
                } break;
@@ -147,7 +147,7 @@ namespace core
          } break;
          case GameState::GlobalGameState::Score:
          {
-            auto mesh = services.font->makeTextMesh("Score screen", state.fontDesc, {1, 1}, {Center, Middle});
+            auto mesh = services.font->makeTextMesh("Score screen", state.fontDesc, {1, 1}, Center, Middle);
             services.gfx->renderMesh({}, {}, mesh);
          } break;
       }

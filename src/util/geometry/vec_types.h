@@ -1,19 +1,25 @@
 #pragma once
 /********************************************
-*  contents:   2D vector type forward declaration
+*  contents:   2D vector type
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core
 {
-   template<typename T>
-   struct vec2;
+   struct Vec2
+   {
+      float x;
+      float y;
+   };
 
-   typedef vec2<float> vec2f;
-   typedef vec2<int32_t> vec2i;
+   struct Vec3
+   {
+      float x;
+      float y;
+      float z;
+   };
 }

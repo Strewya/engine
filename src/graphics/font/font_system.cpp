@@ -12,7 +12,6 @@
 #include "util/color.h"
 #include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
-#include "util/geometry/vec3.h"
 #include "util/utility.h"
 /******* end headers *******/
 
@@ -21,8 +20,8 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   static float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, vec2f scale, float tw, float th);
-   static float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, vec2f scale, uint32_t start, uint32_t end, float x, float y);
+   static float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, Vec2 scale, float tw, float th);
+   static float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, Vec2 scale, uint32_t start, uint32_t end, float x, float y);
    static void generateIndices(IndexBuffer& indices, uint32_t numberOfCharacters);
    static void justifyAxisX(HealthVertexBuffer& vertices, uint32_t justify, uint32_t vert, float lineEnd, float boxHW);
    static void justifyAxisY(HealthVertexBuffer& vertices, uint32_t justify, float fontHeight, float rowEnd, float boxHH);
@@ -52,7 +51,7 @@ namespace core
    //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, vec2f scale, vec2i justification)
+   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y)
    {
       Mesh result{};
       result.pshader = fd.pshader;
@@ -69,8 +68,8 @@ namespace core
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
       float width = generateVertices(result.vertices, text, characterCount, fd.glyphs, scale, textureWidth, textureHeight);
-      justifyAxisX(result.vertices, justification.x, 0, width, 0);
-      justifyAxisY(result.vertices, justification.y, fontHeight, 0, 0);
+      justifyAxisX(result.vertices, justify_x, 0, width, 0);
+      justifyAxisY(result.vertices, justify_y, fontHeight, 0, 0);
 
       return result;
    }
@@ -78,7 +77,7 @@ namespace core
    //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, vec2f scale, vec2i justification, Rect clipBox)
+   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox)
    {
       // #refactor
       // things to deal with:
@@ -123,7 +122,7 @@ namespace core
          {
             auto vertStart = result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, characterIndex, currentLinePosX, currentLinePosY);
-            justifyAxisX(result.vertices, justification.x, vertStart, x, clipBox.halfSize.x);
+            justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
             break;
          }
          if( character >= 32 && character <= 126 )
@@ -147,7 +146,7 @@ namespace core
                   auto end = lastValidBreakpoint;
                   auto vertStart = result.vertices.size();
                   auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, end, currentLinePosX, currentLinePosY);
-                  justifyAxisX(result.vertices, justification.x, vertStart, x, clipBox.halfSize.x);
+                  justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
                   characterIndex = lineStart = lastValidBreakpoint = end + 1;
                   currentLineWidth = 0;
                   currentLinePosY -= fontHeight;
@@ -164,7 +163,7 @@ namespace core
             auto end = characterIndex;
             auto vertStart = result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, end, currentLinePosX, currentLinePosY);
-            justifyAxisX(result.vertices, justification.x, vertStart, x, clipBox.halfSize.x);
+            justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
             characterIndex = lineStart = lastValidBreakpoint = end + 1;
             currentLineWidth = 0;
             currentLinePosY -= fontHeight;
@@ -175,7 +174,7 @@ namespace core
          }
       }
 
-      justifyAxisY(result.vertices, justification.y, fontHeight, currentLinePosY, clipBox.halfSize.y);
+      justifyAxisY(result.vertices, justify_y, fontHeight, currentLinePosY, clipBox.halfSize.y);
 
       return result;
    }
@@ -203,7 +202,7 @@ namespace core
    //*****************************************************************
    //          GENERATE VERTICES
    //*****************************************************************
-   float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, vec2f scale, float tw, float th)
+   float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, Vec2 scale, float tw, float th)
    {
       float x = 0;
       float y = 0;
@@ -228,7 +227,7 @@ namespace core
    //*****************************************************************
    //          GENERATE LINE VERTICES
    //*****************************************************************
-   float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, vec2f scale, uint32_t start, uint32_t end, float x, float y)
+   float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, Vec2 scale, uint32_t start, uint32_t end, float x, float y)
    {
       while( start != end )
       {

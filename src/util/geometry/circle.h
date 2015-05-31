@@ -6,16 +6,14 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Circle
    {
-      vec2f center;
+      Vec2 center;
       float radius;
-
-      void set(float cx, float cy, float r);
    };
 }

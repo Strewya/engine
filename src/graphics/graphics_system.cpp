@@ -15,6 +15,7 @@
 #include "util/transform.h"
 #include "util/utility.h"
 #include "util/geometry/rect.h"
+#include "util/geometry/vec3.h"
 #include "window/window.h"
 /******* end headers *******/
 
@@ -23,8 +24,8 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   static XMVECTOR convert(vec2f v);
-   static XMVECTOR convert(vec3f v);
+   static XMVECTOR convert(Vec2 v);
+   static XMVECTOR convert(Vec3 v);
    static XMMATRIX calculateCamView(const Camera& cam);
 
    //*****************************************************************
@@ -35,8 +36,8 @@ namespace core
       CORE_INIT_START(GraphicsSystem);
 
       m_window = window;
-      m_backbufferSize.x = window.getSizeX();
-      m_backbufferSize.y = window.getSizeY();
+      m_backbufferSize.x = (float)window.getSizeX();
+      m_backbufferSize.y = (float)window.getSizeY();
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       clearCamera();
 
@@ -438,12 +439,12 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DEFINITIONS
    //*****************************************************************
-   XMVECTOR convert(vec2f v)
+   XMVECTOR convert(Vec2 v)
    {
       return XMVectorSet(v.x, v.y, 0, 0);
    }
 
-   XMVECTOR convert(vec3f v)
+   XMVECTOR convert(Vec3 v)
    {
       return XMVectorSet(v.x, v.y, v.z, 0);
    }

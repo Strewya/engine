@@ -8,6 +8,7 @@
 #include "games/rainbowland/types/types.h"
 #include "input/keyboard.h"
 #include "util/utility.h"
+#include "util/geometry/vec2.h"
 #include "window/window_event.h"
 /******* end headers *******/
 
@@ -18,7 +19,7 @@ namespace core
       for( auto& mover : movables )
       {
          auto acceleration = mover.direction*mover.acceleration;
-         acceleration += -mover.velocity*10.0f;
+         acceleration += (-mover.velocity*10.0f);
          mover.position = acceleration*0.5f*dt*dt + mover.velocity*dt + mover.position;
          mover.velocity = acceleration*dt + mover.velocity;
       }
@@ -98,7 +99,7 @@ namespace core
       for( auto& dir : directions )
       {
          auto& mover = movables[dir.objId];
-         mover.acceleration = 60.0f*(vec2f::length2(dir.direction) > 0.0f ? 1 : 0);
+         mover.acceleration = 60.0f*(vec2::length2(dir.direction) > 0.0f ? 1 : 0);
          if( mover.acceleration > 0.0f )
          {
             float currentRad = std::atan2f(mover.direction.y, mover.direction.x);

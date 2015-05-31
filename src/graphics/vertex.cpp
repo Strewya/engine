@@ -6,8 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "util/color.h"
-#include "util/geometry/vec2.h"
-#include "util/geometry/vec3.h"
+#include "util/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core
@@ -19,14 +18,14 @@ namespace core
    {
    }
 
-   DefaultVertex::DefaultVertex(vec3f position, Color color, vec2f textureUV)
+   DefaultVertex::DefaultVertex(Vec3 position, Color color, Vec2 textureUV)
       : position(position.x, position.y, position.z, 0),
       diffuse(color.r, color.g, color.b, color.a),
       textureUV(textureUV.x, textureUV.y)
    {
    }
 
-   void DefaultVertex::setPosition(vec3f pos)
+   void DefaultVertex::setPosition(Vec3 pos)
    {
       setPosition(pos.x, pos.y, pos.z);
    }
@@ -48,7 +47,7 @@ namespace core
       diffuse.z = b;
       diffuse.w = a;
    }
-   void DefaultVertex::setTextureUV(vec2f textureUV)
+   void DefaultVertex::setTextureUV(Vec2 textureUV)
    {
       setTextureUV(textureUV.x, textureUV.y);
    }
@@ -74,7 +73,7 @@ namespace core
       : HealthVertex({}, {}, {-1, -1}, 0)
    {
    }
-   HealthVertex::HealthVertex(vec3f position, Color color, vec2f textureUV, float health)
+   HealthVertex::HealthVertex(Vec3 position, Color color, Vec2 textureUV, float health)
       : DefaultVertex(position, color, textureUV), health(health, 0)
    {
    }

@@ -8,11 +8,12 @@
 /******* common headers *******/
 /******* extra headers *******/
 #include "games/util/entity.h"
-#include "util/geometry/vec2.h"
 /******* end header inclusion *******/
 
 namespace core
 {
+   struct Vec2;
+
    struct MovingThing;
    typedef std::vector<MovingThing> VectorOfMovables;
 

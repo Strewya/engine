@@ -41,7 +41,7 @@ namespace core
 
    void Rect::set(float cx, float cy, float hw, float hh)
    {
-      center.set(cx, cy);
-      halfSize.set(hw, hh);
+      center = {cx, cy};
+      halfSize = {hw, hh};
    }
 }

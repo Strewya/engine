@@ -49,8 +49,8 @@ namespace core
                if( ascii != 0 && left != -1 && right != -1 && top != -1 )
                {
                   auto i = ascii - 32;
-                  result.glyphs[i].center.set((left + right)*0.5f, top + result.height*0.5f);
-                  result.glyphs[i].halfSize.set((right - left)*0.5f, result.height*0.5f);
+                  result.glyphs[i].center = {(left + right)*0.5f, top + result.height*0.5f};
+                  result.glyphs[i].halfSize = {(right - left)*0.5f, result.height*0.5f};
                }
             }
          }

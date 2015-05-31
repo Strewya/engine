@@ -8,7 +8,6 @@
 /******* extra headers *******/
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_manager.h"
-#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -16,6 +15,9 @@ namespace core
    struct FontDescriptor;
    struct Mesh;
    struct Rect;
+   struct Vec2;
+
+   enum TextJustification;
 
    struct FontSystem
    {
@@ -23,8 +25,8 @@ namespace core
       bool init(const TextureManager& textures);
       bool shutdown();
 
-      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, vec2f scale, vec2i textJustification);
-      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, vec2f scale, vec2i textJustification, Rect clipBox);
+      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y);
+      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
 
    private:
       const TextureManager* m_textures;

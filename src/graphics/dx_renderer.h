@@ -9,7 +9,6 @@
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
 #include "graphics/vertex.h"
-#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace core

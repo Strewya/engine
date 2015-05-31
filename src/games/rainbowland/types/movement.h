@@ -1,24 +1,18 @@
 #pragma once
 /********************************************
 *  contents:   #description
-*  usage:      
+*  usage:
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec2_fwd.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Entity;
-
-   struct Component
-   {
-      // 0 is invalid
-      uint32_t idx;
-   };
+   struct Vec2;
 
    struct MovementData
    {
@@ -29,28 +23,24 @@ namespace core
       void make(Entity e);
       void destroy(Entity e);
 
-      Component getComponentData(Entity e);
+      uint32_t getEntitySlot(Entity e);
 
-      float& acceleration(Component c);
-      vec2f& velocity(Component c);
-      vec2f& direction(Component c);
-      vec2f& position(Component c);
+      Entity* _entity;
+      float* _acceleration;
+      Vec2* _velocity;
+      Vec2* _direction;
+      Vec2* _position;
 
-      void doMovement(float dt);
+      uint32_t _inUse;
 
    private:
-
-      uint32_t getDataIndex(Component c);
-      Component makeComponent(uint32_t idx);
-
-      Entity* m_entity;
-      float* m_acceleration;
-      vec2f* m_velocity;
-      vec2f* m_direction;
-      vec2f* m_position;
-      uint32_t m_inUse;
       uint32_t m_allocated;
       std::vector<uint8_t> m_memory;
       std::unordered_map<uint32_t, uint32_t> m_map;
+
+      uint32_t getDataIndex(uint32_t c);
+      uint32_t makeComponent(uint32_t idx);
    };
+
+   void doMovement(float dt, MovementData& data);
 }

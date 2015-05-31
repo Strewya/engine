@@ -7,7 +7,7 @@
 #include <cassert>
 /******* extra headers *******/
 #include "util/utility.h"
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core
@@ -260,8 +260,8 @@ namespace core
 /*
       stack.pull("test5", 0);
       assert(stack.is<LuaFunction>());
-      vec2f v{5, 5};
-      called = stack.call(LuaCustom{&v, STR(vec2f)});
+      Vec2 v{5, 5};
+      called = stack.call(LuaCustom{&v, STR(Vec2)});
       assert(called);
       assert(stack.getTop() == 0);
       assert(v.x == 1 && v.y == 1);

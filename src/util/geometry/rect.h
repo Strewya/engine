@@ -6,15 +6,15 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Rect
    {
-      vec2f center;
-      vec2f halfSize;
+      Vec2 center;
+      Vec2 halfSize;
 
       float left() const;
       float right() const;

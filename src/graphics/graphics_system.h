@@ -15,7 +15,7 @@
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
 #include "util/geometry/rect.h"
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 #include "window/window_proxy.h"
 /******* end header inclusion *******/
 
@@ -72,7 +72,7 @@ namespace core
       DXRenderer m_renderer;
 
       D3DXCOLOR m_backgroundColor;
-      vec2i m_backbufferSize;
+      Vec2 m_backbufferSize;
 
       std::vector<IUnknown**> m_declaredObjects;
       

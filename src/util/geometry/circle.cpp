@@ -9,9 +9,4 @@
 
 namespace core
 {
-   void Circle::set(float cx, float cy, float r)
-   {
-      center.set(cx, cy);
-      radius = r;
-   }
 }

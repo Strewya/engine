@@ -5,6 +5,7 @@
 #include "graphics/camera.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "util/geometry/vec3.h"
 /******* end headers *******/
 
 namespace core
@@ -14,32 +15,32 @@ namespace core
    {
    }
 
-   void Camera::move(vec3f translation)
+   void Camera::move(Vec3 translation)
    {
       m_position += translation;
    }
 
-   void Camera::rotate(vec3f rotation)
+   void Camera::rotate(Vec3 rotation)
    {
       m_rotation += rotation;
    }
 
-   vec3f Camera::getPosition() const
+   Vec3 Camera::getPosition() const
    {
       return m_position;
    }
 
-   vec3f Camera::getLookAtAxis() const
+   Vec3 Camera::getLookAtAxis() const
    {
       return m_lookAtAxis;
    }
 
-   vec3f Camera::getUpAxis() const
+   Vec3 Camera::getUpAxis() const
    {
       return m_upAxis;
    }
 
-   vec3f Camera::getRotation() const
+   Vec3 Camera::getRotation() const
    {
       return m_rotation;
    }
@@ -49,22 +50,22 @@ namespace core
       return m_speed;
    }
 
-   void Camera::setPosition(vec3f pos)
+   void Camera::setPosition(Vec3 pos)
    {
       m_position = pos;
    }
 
-   void Camera::setUpAxis(vec3f upAxis)
+   void Camera::setUpAxis(Vec3 upAxis)
    {
       m_upAxis = upAxis;
    }
 
-   void Camera::setLookAtAxis(vec3f lookAtAxis)
+   void Camera::setLookAtAxis(Vec3 lookAtAxis)
    {
       m_lookAtAxis = lookAtAxis;
    }
 
-   void Camera::setRotation(vec3f rot)
+   void Camera::setRotation(Vec3 rot)
    {
       m_rotation = rot;
    }

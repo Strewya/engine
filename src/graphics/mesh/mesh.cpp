@@ -8,13 +8,12 @@
 #include "graphics/vertex.h"
 #include "util/color.h"
 #include "util/utility.h"
-#include "util/geometry/vec2.h"
 #include "util/geometry/vec3.h"
 /******* end headers *******/
 
 namespace core
 {
-   Mesh makeSolidQuad(vec2f pos, vec2f hs, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result
       {
@@ -43,7 +42,7 @@ namespace core
       return result;
    }
 
-   Mesh makeOutlineQuad(vec2f pos, vec2f hs, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeOutlineQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result
       {
@@ -74,7 +73,7 @@ namespace core
       return result;
    }
 
-   Mesh makeTexturedQuad(vec2f pos, vec2f hs, HTexture texture, vec2f topLeftUV, vec2f botRightUV, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh mesh
       {
@@ -103,7 +102,7 @@ namespace core
       return mesh;
    }
 
-   Mesh makeSolidCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
    {
       --points;
       points |= points >> 1;
@@ -135,7 +134,7 @@ namespace core
       return result;
    }
 
-   Mesh makeOutlineCircle(vec2f pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
    {
       --points;
       points |= points >> 1;

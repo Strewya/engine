@@ -12,7 +12,7 @@
 #include "graphics/vertex.h"
 #include "util/transform.h"
 #include "util/utility.h"
-#include "util/geometry/vec2.h"
+#include "util/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core
