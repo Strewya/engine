@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include "games/util/entity_manager.h"
 /******* c++ headers *******/
+#include <cassert>
 /******* extra headers *******/
 #include "games/util/entity.h"
 /******* end headers *******/

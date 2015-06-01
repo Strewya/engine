@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <chrono>
-#include <stdint.h>
+#include <cstdint>
 #include <functional>
 #include <list>
 #include <map>

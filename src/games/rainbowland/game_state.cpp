@@ -27,8 +27,6 @@ namespace core
 
       state.fontDesc = loadFont(CORE_RESOURCE("Defs/font.font"), assets.font, assets.mainVS, assets.mainPS);
 
-      mainMenu_init(state.mainMenuState, services, assets);
-
       return true;
    }
 
@@ -58,8 +56,6 @@ namespace core
       {
          case GameState::GlobalGameState::MainMenu:
          {
-            mainMenu_update(dt, deltaMicros, state.mainMenuState, services, assets);
-
             if( contains(Keyboard::Space, ACTION) )
             {
                state.globalGameState = GameState::GlobalGameState::Gameplay;
@@ -75,13 +71,10 @@ namespace core
                   if( contains(Keyboard::Space, ACTION) )
                   {
                      state.gameplayState = GameState::GameplayState::Session;
-                     session_init(state.sessionState, services, assets);
                   }
                } break;
                case GameState::GameplayState::Session:
                {
-                  session_update(dt, deltaMicros, state.sessionState, services, assets);
-
                   if( contains(Keyboard::Space, ACTION) )
                   {
                      state.globalGameState = GameState::GlobalGameState::Score;
@@ -122,8 +115,6 @@ namespace core
          {
             auto mesh = services.font->makeTextMesh("Main menu", state.fontDesc, {1, 1}, Center, Middle);
             services.gfx->renderMesh({}, {}, mesh);
-
-            mainMenu_render(dt, state.mainMenuState, services, assets);
          } break;
          case GameState::GlobalGameState::Gameplay:
          {
@@ -140,8 +131,6 @@ namespace core
                {
                   mesh = services.font->makeTextMesh("Session", state.fontDesc, {1, 1}, Center, Middle);
                   services.gfx->renderMesh({Vec2{0, -40}}, {}, mesh);
-                  
-                  session_render(dt, state.sessionState, services, assets);
                } break;
             }
          } break;

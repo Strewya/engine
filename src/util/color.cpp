@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include "util/color.h"
 /******* c++ headers *******/
+#include <cstdint>
 /******* extra headers *******/
 /******* end headers *******/
 

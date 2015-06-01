@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include "graphics/dx_renderer.h"
 /******* c++ headers *******/
+#include <cassert>
 /******* extra headers *******/
 #include "util/color.h"
 #include "graphics/shader/vertex/vertex_shader.h"

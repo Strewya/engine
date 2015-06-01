@@ -148,12 +148,6 @@
     <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp">
       <Filter>code\framework\graphics\font</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp">
-      <Filter>code\games\rainbowland\state</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\state\main_menu.cpp">
-      <Filter>code\games\rainbowland\state</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp">
       <Filter>code\games\rainbowland</Filter>
     </ClCompile>
@@ -165,6 +159,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\geometry\vec2.cpp">
       <Filter>code\framework\util\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp">
+      <Filter>code\games\rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -393,12 +390,6 @@
     <ClInclude Include="..\..\..\src\graphics\font\font_system.h">
       <Filter>code\framework\graphics\font</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\state\session.h">
-      <Filter>code\games\rainbowland\state</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\state\main_menu.h">
-      <Filter>code\games\rainbowland\state</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
@@ -413,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h">
       <Filter>code\framework\util\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\memory_sizes.h">
+      <Filter>code\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -487,9 +481,6 @@
     </Filter>
     <Filter Include="code\framework\graphics\font">
       <UniqueIdentifier>{35778f1b-e723-444c-9b01-b2ccc29cbd9f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\games\rainbowland\state">
-      <UniqueIdentifier>{c62a0746-6fe7-4f74-84af-06176465b808}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

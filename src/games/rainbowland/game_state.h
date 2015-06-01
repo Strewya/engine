@@ -8,9 +8,6 @@
 /******* extra headers *******/
 #include "graphics/camera.h"
 #include "graphics/font/font_descriptor.h"
-
-#include "games/rainbowland/state/main_menu.h"
-#include "games/rainbowland/state/session.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -36,9 +33,6 @@ namespace core
       Camera camera;
       // #test
       FontDescriptor fontDesc;
-
-      MainMenuState mainMenuState;
-      SessionState sessionState;
    };
 
    struct GameSystems;

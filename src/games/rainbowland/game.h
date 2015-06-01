@@ -36,6 +36,7 @@ namespace core
 
       GameResources assets;
       GameSystems systems;
+
       GameState state;
 
       bool isPaused;

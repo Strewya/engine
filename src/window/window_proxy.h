@@ -4,7 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/

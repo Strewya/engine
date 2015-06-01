@@ -5,6 +5,8 @@
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>
+#include <unordered_map>
+#include <vector>
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/

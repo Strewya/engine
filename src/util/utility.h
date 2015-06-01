@@ -5,9 +5,12 @@
 ********************************************/
 /******* c++ headers *******/
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
+#include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/memory_sizes.h"
 /******* end header inclusion *******/
 
 namespace core

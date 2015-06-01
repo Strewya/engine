@@ -65,10 +65,10 @@
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
     <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -90,8 +90,9 @@
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MinimalRebuild>false</MinimalRebuild>
-      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,20 +142,19 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;NOMINMAX</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)%(Directory)</ObjectFileName>
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
-      <BrowseInformation>true</BrowseInformation>
       <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,7 +168,8 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -184,7 +185,8 @@
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
@@ -245,7 +247,6 @@
     <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\state\main_menu.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
@@ -310,8 +311,6 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\state\main_menu.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\state\session.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\systems.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h" />
@@ -359,6 +358,7 @@
     <ClInclude Include="..\..\..\src\util\geometry\vec_types.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec2.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h" />
+    <ClInclude Include="..\..\..\src\util\memory_sizes.h" />
     <ClInclude Include="..\..\..\src\util\ring_buffer.h" />
     <ClInclude Include="..\..\..\src\util\template\name_cache_template.h" />
     <ClInclude Include="..\..\..\src\util\template\resource_cache_template.h" />
