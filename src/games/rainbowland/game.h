@@ -7,6 +7,7 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
+   //services
 #include "audio/audio_system.h"
 #include "graphics/graphics_system.h"
 #include "graphics/font/font_system.h"
@@ -14,15 +15,12 @@
 #include "lua/lua_system.h"
 #include "window/window_proxy.h"
 
-#include "games/rainbowland/resources.h"
-#include "games/rainbowland/systems.h"
-#include "games/rainbowland/game_state.h"
+#include "games/rainbowland/logic/code.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Clock;
-   struct WindowProxy;
 
    struct Game
    {
@@ -34,13 +32,11 @@ namespace core
       LuaSystem luaSystem;
       FontSystem fontSystem;
 
+      //game state stuff
       GameResources assets;
-      GameSystems systems;
-
-      GameState state;
+      GameState game;
 
       bool isPaused;
-
       bool init(WindowProxy window);
       bool shutdown();
 

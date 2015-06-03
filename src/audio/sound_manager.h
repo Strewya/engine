@@ -14,5 +14,5 @@
 
 namespace core
 {
-   typedef Manager<FmodSound, HSound, FmodSoundFileLoader> FmodSoundManager;
+   typedef Manager<FmodSound, HSound, FmodSoundFileLoader> SoundManager;
 }

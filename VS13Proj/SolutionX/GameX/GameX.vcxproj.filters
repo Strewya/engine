@@ -91,9 +91,6 @@
     <ClCompile Include="..\..\..\src\window\window_proxy.cpp">
       <Filter>code\framework\window</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp">
-      <Filter>code\games\rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\time\clock.cpp">
       <Filter>code\framework\util\time</Filter>
     </ClCompile>
@@ -151,17 +148,14 @@
     <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp">
       <Filter>code\games\rainbowland</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp">
-      <Filter>code\games\rainbowland</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\util\geometry\vec3.cpp">
       <Filter>code\framework\util\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\util\geometry\vec2.cpp">
       <Filter>code\framework\util\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp">
-      <Filter>code\games\rainbowland</Filter>
+    <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp">
+      <Filter>code\games\rainbowland\logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +175,6 @@
       <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_sound_handle.h">
-      <Filter>code\framework\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\audio\fmod_sound_manager.h">
       <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h">
@@ -306,9 +297,6 @@
     <ClInclude Include="..\..\..\src\games\game_list.h">
       <Filter>code\games</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h">
       <Filter>code\framework\graphics</Filter>
     </ClInclude>
@@ -345,20 +333,8 @@
     <ClInclude Include="..\..\..\src\util\geometry\rect.h">
       <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h">
-      <Filter>code\games\rainbowland\logic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h">
-      <Filter>code\games\rainbowland\data</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_entry_point.h">
       <Filter>code\games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\systems.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\resources.h">
-      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
       <Filter>code\games\util</Filter>
@@ -393,9 +369,6 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\util\geometry\vec_types.h">
       <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
@@ -407,6 +380,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\memory_sizes.h">
       <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\audio\sound_manager.h">
+      <Filter>code\framework\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h">
+      <Filter>code\games\rainbowland\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
+      <Filter>code\games\rainbowland\logic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -486,6 +468,9 @@
   <ItemGroup>
     <None Include="..\..\..\src\graphics\shader\default_shader.hlsl">
       <Filter>code\framework\graphics\shader</Filter>
+    </None>
+    <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
+      <Filter>code\games\rainbowland\logic</Filter>
     </None>
   </ItemGroup>
 </Project>

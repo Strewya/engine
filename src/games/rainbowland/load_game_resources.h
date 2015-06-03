@@ -6,14 +6,17 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
+#include "audio/sound_manager.h"
+#include "graphics/shader/pixel/pixel_shader_manager.h"
+#include "graphics/shader/vertex/vertex_shader_manager.h"
+#include "graphics/texture/texture_manager.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct GameResources;
-   struct GameSystems;
 
-   GameResources loadGameResources(GameSystems&);
+   GameResources loadGameResources(SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures);
    bool checkGameResourcesLoaded(GameResources& assets);
-   void unloadGameResources(GameSystems&, GameResources&);
+   void unloadGameResources(GameResources& assets, SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures);
 }

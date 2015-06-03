@@ -6,31 +6,30 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "audio/audio_system.h"
-#include "games/rainbowland/resources.h"
-#include "games/rainbowland/systems.h"
 #include "graphics/graphics_system.h"
 #include "util/utility.h"
+#include "games/rainbowland/logic/code.h"
 /******* end headers *******/
 
 namespace core
 {
-   GameResources loadGameResources(GameSystems& sys)
+   GameResources loadGameResources(SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
       GameResources assets;
-      assets.atlas = sys.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
-      assets.background = sys.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/background.png"));
-      assets.font = sys.gfx->textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png"));
+      assets.atlas = textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
+      assets.background = textures.loadFromFile(CORE_RESOURCE("Textures/background.png"));
+      assets.font = textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png"));
 
-      assets.mainVS = sys.gfx->vertexShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), HealthVertex::getDescription());
-      assets.mainPS = sys.gfx->pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
-      assets.healthPS = sys.gfx->pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
+      assets.mainVS = vertexShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), HealthVertex::getDescription());
+      assets.mainPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
+      assets.healthPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
       
-      assets.reload = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/reload.wav"));
-      assets.pistol = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
-      assets.shotgun = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
-      assets.uzi = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
-      assets.sniper = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
-      assets.rpg = sys.audio->sounds.loadFromFile(CORE_RESOURCE("Sounds/missile.wav"));
+      assets.reload = sounds.loadFromFile(CORE_RESOURCE("Sounds/reload.wav"));
+      assets.pistol = sounds.loadFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
+      assets.shotgun = sounds.loadFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
+      assets.uzi = sounds.loadFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
+      assets.sniper = sounds.loadFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
+      assets.rpg = sounds.loadFromFile(CORE_RESOURCE("Sounds/missile.wav"));
 
       return assets;
    }
@@ -55,20 +54,20 @@ namespace core
               reload && pistol && shotgun && uzi && sniper && rpg);
    }
 
-   void unloadGameResources(GameSystems& sys, GameResources& assets)
+   void unloadGameResources(GameResources& assets, SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
-      sys.audio->sounds.release(assets.rpg);
-      sys.audio->sounds.release(assets.sniper);
-      sys.audio->sounds.release(assets.uzi);
-      sys.audio->sounds.release(assets.shotgun);
-      sys.audio->sounds.release(assets.pistol);
-      sys.audio->sounds.release(assets.reload);
+      sounds.release(assets.rpg);
+      sounds.release(assets.sniper);
+      sounds.release(assets.uzi);
+      sounds.release(assets.shotgun);
+      sounds.release(assets.pistol);
+      sounds.release(assets.reload);
 
-      sys.gfx->pixelShaders.release(assets.healthPS);
-      sys.gfx->pixelShaders.release(assets.mainPS);
-      sys.gfx->vertexShaders.release(assets.mainVS);
-      sys.gfx->textures.release(assets.font);
-      sys.gfx->textures.release(assets.background);
-      sys.gfx->textures.release(assets.atlas);
+      pixelShaders.release(assets.healthPS);
+      pixelShaders.release(assets.mainPS);
+      vertexShaders.release(assets.mainVS);
+      textures.release(assets.font);
+      textures.release(assets.background);
+      textures.release(assets.atlas);
    }
 }

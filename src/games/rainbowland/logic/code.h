@@ -1,17 +1,45 @@
 #pragma once
 /********************************************
-*  contents:   main storage for game state
+*  contents:   #description
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
-#include "graphics/camera.h"
+#include "graphics/texture/texture_handle.h"
+#include "graphics/shader/shader_handle.h"
+#include "audio/fmod_sound_handle.h"
 #include "graphics/font/font_descriptor.h"
+#include "graphics/camera.h"
 /******* end header inclusion *******/
 
 namespace core
 {
+   struct GameResources
+   {
+      HTexture atlas;
+      HTexture background;
+      HTexture font;
+      HVertexShader mainVS;
+      HPixelShader mainPS;
+      HPixelShader healthPS;
+      HSound reload;
+      HSound pistol;
+      HSound uzi;
+      HSound rpg;
+      HSound sniper;
+      HSound shotgun;
+   };
+
+   struct Time
+   {
+      uint32_t deltaMicrosReal;
+      uint32_t deltaMicrosVirt;
+      float deltaTimeReal;
+      float deltaTimeVirt;
+   };
+
    struct GameState
    {
       enum class GlobalGameState
@@ -34,11 +62,4 @@ namespace core
       // #test
       FontDescriptor fontDesc;
    };
-
-   struct GameSystems;
-   struct GameResources;
-
-   bool game_init(GameState& state, GameSystems services, GameResources& assets);
-   bool game_update(float dt, uint32_t deltaMicros, GameState& state, GameSystems services, GameResources& assets);
-   void game_render(float dt, GameState& state, GameSystems services, GameResources& assets);
 }

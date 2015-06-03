@@ -45,15 +45,15 @@ namespace core
          float fraction = 0;
          uint64_t unusedMicros = 0;
          uint64_t droppedTime = 0;
-         
+
          const uint32_t maxUpdateCount = static_cast<uint32_t>(maxUpdateTime / microsPerFrame);
          const uint32_t updateCount = logicTimer.getFixedStepUpdateCount(microsPerFrame, fraction, unusedMicros);
          droppedTime = updateCount > maxUpdateCount ? updateCount - maxUpdateCount : 0;
          droppedTime *= microsPerFrame;
-         
+
          uint32_t count, l;
          count = l = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
-         for( l; l--; )
+         while( l-- )
          {
             logicTimer.advanceTimeBy(microsPerFrame);
             if( !game.tickLogic(logicTimer) )

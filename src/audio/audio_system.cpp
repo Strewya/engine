@@ -29,7 +29,7 @@ namespace core
       if( CORE_STATUS_OK )
       {
          auto defaultSound = m_fileLoader.load(CORE_RESOURCE("Sounds/reload.wav"));
-         CORE_STATUS_AND(sounds.init(STR(FmodSoundManager), m_fileLoader, defaultSound));
+         CORE_STATUS_AND(sounds.init(STR(SoundManager), m_fileLoader, defaultSound));
       }
 
       CORE_INIT_END(AudioSystem);

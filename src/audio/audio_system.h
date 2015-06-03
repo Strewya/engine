@@ -7,7 +7,7 @@
 /******* common headers *******/
 #include "audio/fmod_include.h"
 /******* extra headers *******/
-#include "audio/fmod_sound_manager.h"
+#include "audio/sound_manager.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -23,7 +23,7 @@ namespace core
       void playMusic(HSound sound);
       void stopMusic();
 
-      FmodSoundManager sounds;
+      SoundManager sounds;
 
    private:
       FmodSoundFileLoader m_fileLoader;

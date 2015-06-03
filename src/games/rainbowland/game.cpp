@@ -5,7 +5,6 @@
 #include "games/rainbowland/game.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "games/rainbowland/load_game_resources.h"
 #include "graphics/camera.h"
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
@@ -15,7 +14,11 @@
 #include "util/utility.h"
 #include "util/template/resource_cache_template.h"
 #include "util/time/clock.h"
+
+#include "games/rainbowland/load_game_resources.h"
+#include "games/rainbowland/logic/code.cpp"
 /******* end headers *******/
+
 
 namespace core
 {
@@ -23,7 +26,7 @@ namespace core
    {
       CORE_SHUTDOWN_START(Rainbowland);
 
-      unloadGameResources(systems, assets);
+      unloadGameResources(assets, audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
 
       CORE_STATUS_AND(fontSystem.shutdown());
       CORE_STATUS_AND(luaSystem.shutdown());
@@ -58,26 +61,18 @@ namespace core
          CORE_STATUS_AND(inputSystem.init(window));
          CORE_STATUS_AND(luaSystem.init());
          CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
-
-         systems.audio = &audioSystem;
-         systems.gfx = &graphicsSystem;
-         systems.input = &inputSystem;
-         systems.lua = &luaSystem;
-         systems.font = &fontSystem;
       }
 
       if( CORE_STATUS_OK )
       {
-         assets = loadGameResources(systems);
+         assets = loadGameResources(audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
 
          CORE_STATUS_AND(checkGameResourcesLoaded(assets));
       }
 
       if( CORE_STATUS_OK )
       {
-         state.camera.setPosition({0, 0, -20});
-
-         game_init(state, systems, assets);
+         game_init(game, assets);
       }
 
       CORE_INIT_END(Rainbowland);
@@ -87,10 +82,12 @@ namespace core
    {
       bool running = true;
 
+      //call service updates that the game shouldn't know anything about
       inputSystem.gatherInputForCurrentFrame(logicClock.getCurrentMicros());
       
-      const auto& events = inputSystem.getEvents();
-      for( auto& e : events )
+      // #todo think about where this part should be, out here or in the game
+      const auto& frameEvents = inputSystem.getEvents();
+      for( auto& e : frameEvents )
       {
          switch( e.type )
          {
@@ -157,11 +154,11 @@ namespace core
                }
             } break;
 
+            // #todo think about if this should stay
             case WE_LOSTFOCUS:
             {
                isPaused = true;
             } break;
-
             case WE_GAINFOCUS:
             {
                isPaused = false;
@@ -169,34 +166,44 @@ namespace core
          }
       }
 
-      auto logic_ok = true;
-      if( !isPaused )
-      {
-         logic_ok = game_update(logicClock.getDeltaSeconds(), logicClock.getDeltaMicros(), state, systems, assets);
-      }
+      Time time{};
+      time.deltaMicrosReal = logicClock.getDeltaMicros();
+      time.deltaTimeReal = logicClock.getDeltaSeconds();
+      time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
+      time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeReal;
 
+      auto logic_ok = game_update(time, game, frameEvents, assets, audioSystem, luaSystem.getStack());
+      
       luaSystem.collectGarbage();
+      audioSystem.update();
 
       return running && logic_ok;
    }
 
-   void Game::tickRender(const Clock& renderClock)
+   void Game::tickRender(const Clock& clock)
    {
       graphicsSystem.begin();
 
-      systems.gfx->setOrthographicProjection();
+      graphicsSystem.setOrthographicProjection();
 
       if(isPaused )
       {
-         auto mesh = fontSystem.makeTextMesh("Paused", state.fontDesc, {1, 1}, Center, Middle);
-         systems.gfx->renderMesh({Vec2{0, 400}}, {}, mesh);
+         /*auto mesh = fontSystem.makeTextMesh("Paused", gameData.fontDesc, {1, 1}, Center, Middle);
+         graphicsSystem.renderMesh({Vec2{0, 400}}, {}, mesh);*/
       }
       else
       {
-         auto mesh = fontSystem.makeTextMesh("Running", state.fontDesc, {1, 1}, Center, Middle);
-         systems.gfx->renderMesh({Vec2{0, 400}}, {}, mesh);
+         /*auto mesh = fontSystem.makeTextMesh("Running", gameData.fontDesc, {1, 1}, Center, Middle);
+         graphicsSystem.renderMesh({Vec2{0, 400}}, {}, mesh);*/
 
-         game_render(renderClock.getDeltaSeconds(), state, systems, assets);
+
+         Time time{};
+         time.deltaMicrosReal = clock.getDeltaMicros();
+         time.deltaTimeReal = clock.getDeltaSeconds();
+         time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
+         time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeVirt;
+
+         game_render(time, game, assets, graphicsSystem, fontSystem);
       }
 
       graphicsSystem.present();

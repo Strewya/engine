@@ -2,11 +2,10 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/rainbowland/state/session.h"
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "games/rainbowland/resources.h"
-#include "games/rainbowland/systems.h"
+#include "games/rainbowland/services.h"
 #include "games/util/entity.h"
 #include "graphics/graphics_system.h"
 #include "graphics/mesh/mesh.h"

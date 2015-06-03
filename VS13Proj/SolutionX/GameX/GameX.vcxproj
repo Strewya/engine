@@ -244,10 +244,10 @@
     <ClCompile Include="..\..\..\src\audio\fmod_sound_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\game_state.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\state\session.cpp" />
+    <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
     <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
@@ -305,17 +305,13 @@
     <ClInclude Include="..\..\..\src\audio\fmod_sound.h" />
     <ClInclude Include="..\..\..\src\audio\fmod_sound_file_loader.h" />
     <ClInclude Include="..\..\..\src\audio\fmod_sound_handle.h" />
-    <ClInclude Include="..\..\..\src\audio\fmod_sound_manager.h" />
+    <ClInclude Include="..\..\..\src\audio\sound_manager.h" />
     <ClInclude Include="..\..\..\src\games\game_entry_point.h" />
     <ClInclude Include="..\..\..\src\games\game_list.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\resources.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\game_state.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\systems.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\logic\logic.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\types\movement.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\types\types.h" />
     <ClInclude Include="..\..\..\src\games\util\entity.h" />
     <ClInclude Include="..\..\..\src\games\util\entity_manager.h" />
     <ClInclude Include="..\..\..\src\graphics\camera.h" />
