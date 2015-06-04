@@ -26,7 +26,7 @@ namespace core
    {
       CORE_SHUTDOWN_START(Rainbowland);
 
-      unloadGameResources(assets, audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
+      unloadGameResources(game.assets, audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
 
       CORE_STATUS_AND(fontSystem.shutdown());
       CORE_STATUS_AND(luaSystem.shutdown());
@@ -48,9 +48,9 @@ namespace core
       if( CORE_STATUS_OK )
       {
          window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
-//#ifdef MURRAY
+         //#ifdef MURRAY
          window.move(window.getSizeX(), 0);
-//#endif
+         //#endif
          window.showCursor(true);
          window.monitorDirectoryForChanges("resources");
 
@@ -65,14 +65,10 @@ namespace core
 
       if( CORE_STATUS_OK )
       {
-         assets = loadGameResources(audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
+         game.constants.windowWidth = (float)window.getSizeX();
+         game.constants.windowHeight = (float)window.getSizeY();
 
-         CORE_STATUS_AND(checkGameResourcesLoaded(assets));
-      }
-
-      if( CORE_STATUS_OK )
-      {
-         game_init(game, assets);
+         CORE_STATUS_AND(game_init(game, audioSystem, graphicsSystem, luaSystem.getStack()));
       }
 
       CORE_INIT_END(Rainbowland);
@@ -84,7 +80,7 @@ namespace core
 
       //call service updates that the game shouldn't know anything about
       inputSystem.gatherInputForCurrentFrame(logicClock.getCurrentMicros());
-      
+
       // #todo think about where this part should be, out here or in the game
       const auto& frameEvents = inputSystem.getEvents();
       for( auto& e : frameEvents )
@@ -110,13 +106,13 @@ namespace core
                   } break;
                }
             } break;
-            
+
             // #refactor this should probably be moved into a system of it's own
             // that handles file change notifications and processes them based on
             // either the extension or the entire file name
             case WE_FILECHANGE:
             {
-               if(e.fileChange.action == FILE_MODIFIED )
+               if( e.fileChange.action == FILE_MODIFIED )
                {
                   auto getExtension = [](const std::string& str) -> std::string
                   {
@@ -172,8 +168,8 @@ namespace core
       time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
       time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeReal;
 
-      auto logic_ok = game_update(time, game, frameEvents, assets, audioSystem, luaSystem.getStack());
-      
+      auto logic_ok = game_update(time, game, frameEvents, audioSystem, luaSystem.getStack());
+
       luaSystem.collectGarbage();
       audioSystem.update();
 
@@ -184,27 +180,13 @@ namespace core
    {
       graphicsSystem.begin();
 
-      graphicsSystem.setOrthographicProjection();
+      Time time{};
+      time.deltaMicrosReal = clock.getDeltaMicros();
+      time.deltaTimeReal = clock.getDeltaSeconds();
+      time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
+      time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeVirt;
 
-      if(isPaused )
-      {
-         /*auto mesh = fontSystem.makeTextMesh("Paused", gameData.fontDesc, {1, 1}, Center, Middle);
-         graphicsSystem.renderMesh({Vec2{0, 400}}, {}, mesh);*/
-      }
-      else
-      {
-         /*auto mesh = fontSystem.makeTextMesh("Running", gameData.fontDesc, {1, 1}, Center, Middle);
-         graphicsSystem.renderMesh({Vec2{0, 400}}, {}, mesh);*/
-
-
-         Time time{};
-         time.deltaMicrosReal = clock.getDeltaMicros();
-         time.deltaTimeReal = clock.getDeltaSeconds();
-         time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
-         time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeVirt;
-
-         game_render(time, game, assets, graphicsSystem, fontSystem);
-      }
+      game_render(time, game, graphicsSystem, fontSystem);
 
       graphicsSystem.present();
    }

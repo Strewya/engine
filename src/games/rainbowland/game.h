@@ -33,7 +33,6 @@ namespace core
       FontSystem fontSystem;
 
       //game state stuff
-      GameResources assets;
       GameState game;
 
       bool isPaused;

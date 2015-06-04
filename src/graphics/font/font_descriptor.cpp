@@ -11,14 +11,10 @@
 
 namespace core
 {
-   FontDescriptor loadFont(const char* filename, HTexture texture, HVertexShader vshader, HPixelShader pshader)
+   FontDescriptor loadFont(LuaStack lua, const char* filename, HTexture texture, HVertexShader vshader, HPixelShader pshader)
    {
       FontDescriptor result{};
 
-      LuaSystem LS;
-      LS.init();
-
-      auto lua = LS.getStack();
       if( !lua.doFile(filename) )
       {
          auto str = lua.to<std::string>();
@@ -59,7 +55,7 @@ namespace core
          result.pshader = pshader;
       }
       lua.pop();
-      LS.shutdown();
+      assert(lua.getTop() == 0);
 
       return result;
    }

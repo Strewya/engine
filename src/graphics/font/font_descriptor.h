@@ -14,6 +14,8 @@
 
 namespace core
 {
+   struct LuaStack;
+
    struct FontDescriptor
    {
       HTexture fontTexture;
@@ -33,5 +35,5 @@ namespace core
       Middle = Center
    };
 
-   FontDescriptor loadFont(const char* filename, HTexture texture, HVertexShader vshader, HPixelShader pshader);
+   FontDescriptor loadFont(LuaStack lua, const char* filename, HTexture texture, HVertexShader vshader, HPixelShader pshader);
 }
