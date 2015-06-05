@@ -29,6 +29,12 @@ namespace core
          return result;
       }
 
+      float dotProduct(Vec2 l, Vec2 r)
+      {
+         auto result = l.x*r.x + l.y*r.y;
+         return result;
+      }
+
       Vec2 normalize(Vec2 v)
       {
          Vec2 result{0, 0};
@@ -41,18 +47,17 @@ namespace core
          return result;
       }
 
-      float dotProduct(Vec2 l, Vec2 r)
-      {
-         auto result = l.x*r.x + l.y*r.y;
-         return result;
-      }
-
       Vec2 projection(Vec2 v, Vec2 target)
       {
          auto dpv = dotProduct(v, target);
          auto dpt = dotProduct(target, target);
          auto result = (dpv / dpt)*target;
          return result;
+      }
+
+      Vec2 setLength(Vec2 v, float len)
+      {
+         return normalize(v)*len;
       }
    }
 

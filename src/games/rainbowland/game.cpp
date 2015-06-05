@@ -34,6 +34,10 @@ namespace core
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
 
+      window.makeMouseRelative(false);
+      window.showCursor(true);
+      window.lockCursor(false);
+
       CORE_SHUTDOWN_END(Rainbowland);
    }
 
@@ -49,12 +53,15 @@ namespace core
       {
          window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
          //#ifdef MURRAY
-         window.move(window.getSizeX(), 0);
+         //window.move(window.getSizeX(), 0);
          //#endif
-         window.showCursor(true);
+         window.showCursor(false);
+         window.lockCursor(true);
+         window.makeMouseRelative(true);
+
          window.monitorDirectoryForChanges("resources");
 
-         //window.setFullscreen(true);
+         window.setFullscreen(true);
 
          CORE_STATUS_AND(audioSystem.init());
          CORE_STATUS_AND(graphicsSystem.init(window));
@@ -154,10 +161,16 @@ namespace core
             case WE_LOSTFOCUS:
             {
                isPaused = true;
+               window.showCursor(true);
+               window.lockCursor(false);
+               window.makeMouseRelative(false);
             } break;
             case WE_GAINFOCUS:
             {
                isPaused = false;
+               window.showCursor(false);
+               window.lockCursor(true);
+               window.makeMouseRelative(true);
             } break;
          }
       }
@@ -168,7 +181,7 @@ namespace core
       time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
       time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeReal;
 
-      auto logic_ok = game_update(time, game, frameEvents, audioSystem, luaSystem.getStack());
+      auto logic_ok = game_update(time, game, frameEvents, audioSystem, luaSystem.getStack(), graphicsSystem);
 
       luaSystem.collectGarbage();
       audioSystem.update();

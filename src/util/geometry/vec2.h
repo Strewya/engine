@@ -18,9 +18,10 @@ namespace core
 
       float length(Vec2 v);
       float length2(Vec2 v);
-      Vec2 normalize(Vec2 v);
       float dotProduct(Vec2 l, Vec2 r);
+      Vec2 normalize(Vec2 v);
       Vec2 projection(Vec2 v, Vec2 target);
+      Vec2 setLength(Vec2 v, float len);
    }
 
    Vec2 operator-(Vec2 v);

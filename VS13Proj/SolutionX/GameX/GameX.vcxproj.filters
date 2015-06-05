@@ -109,9 +109,6 @@
     <ClCompile Include="..\..\..\src\util\geometry\rect.cpp">
       <Filter>code\framework\util\geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\logic\logic.cpp">
-      <Filter>code\games\rainbowland\logic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
       <Filter>code\games</Filter>
     </ClCompile>
@@ -156,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp">
       <Filter>code\games\rainbowland\logic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\util\collision_checks.cpp">
+      <Filter>code\framework\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,6 +389,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
       <Filter>code\games\rainbowland\logic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\collision_checks.h">
+      <Filter>code\framework\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

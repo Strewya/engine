@@ -12,6 +12,7 @@
 #include "input/gamepad.h"
 #include "input/keyboard.h"
 #include "input/mouse.h"
+#include "util/collision_checks.h"
 /******* end headers *******/
 
 namespace core
@@ -76,27 +77,33 @@ namespace core
       game.fontDesc = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
       game.constants.playerAcceleration = 60;
+      game.constants.playerAimLength = 4;
 
       return true;
    }
 
-   void makePlayer(SessionState& session)
+   static void makePlayer(SessionState& session)
    {
       session.deltaTime.push_back({0, 0, 1});
       session.position.push_back({Vec2{0, 0}});
-      session.render.push_back({Color{1, 1, 1}, GreenPlayer});
+      session.render.push_back({Color{0, 1, 0}, GreenPlayer});
       session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}});
       session.aim.push_back({Vec2{0, 0}});
       session.targetDirection.push_back({0, 0});
+      session.collision.push_back({{CollisionShape::CircleShape, {}}, 0, 0x1, 0xffff});
+      session.collision.back().shape.circle = {{}, 1};
+
       assert(session.deltaTime.size() == session.position.size() &&
              session.deltaTime.size() == session.render.size() &&
              session.deltaTime.size() == session.movement.size() &&
              session.deltaTime.size() == session.aim.size() &&
+             session.deltaTime.size() == session.collision.size() &&
              session.deltaTime.size() == session.targetDirection.size());
    }
 
    static bool session_init(GameState& game, SessionState& session)
    {
+      session = SessionState();
       makePlayer(session);
 
       return true;
@@ -104,7 +111,139 @@ namespace core
 
    inline float pow2(float v)
    {
-      return v*v;
+      auto result = v*v;
+      return result;
+   }
+
+   inline float radians(Vec2 v)
+   {
+      auto result = std::atan2(v.y, v.x);
+      return result;
+   }
+
+   struct CollisionCheckResult
+   {
+      Vec2 displacement;
+      bool colliding;
+   };
+
+   static CollisionCheckResult areInCollision(CollisionShape one, CollisionShape two)
+   {
+      CollisionCheckResult result{};
+      result.colliding = false;
+      if( one.type > two.type )
+      {
+         auto varSwitch = one;
+         one = two;
+         two = varSwitch;
+      }
+      if( one.type == CollisionShape::PointShape )
+      {
+         if( two.type == CollisionShape::CircleShape )
+         {
+            result.colliding = isPointInsideCircle(one.point, two.circle);
+            result.displacement = getDisplacementPointFromCircle(one.point, two.circle);
+         }
+         else if( two.type == CollisionShape::RectShape )
+         {
+            result.colliding = isPointInsideRect(one.point, two.rect);
+            result.displacement = getDisplacementPointFromRect(one.point, two.rect);
+         }
+      }
+      else if( one.type == CollisionShape::CircleShape )
+      {
+         if( two.type == CollisionShape::CircleShape )
+         {
+            result.colliding = isCircleTouchingCircle(one.circle, two.circle);
+            result.displacement = getDisplacementCircleFromCircle(one.circle, two.circle);
+         }
+         else if( two.type == CollisionShape::RectShape )
+         {
+            result.colliding = isCircleTouchingRect(one.circle, two.rect);
+            result.displacement = getDisplacementCircleFromRect(one.circle, two.rect);
+         }
+      }
+      else if( one.type == CollisionShape::RectShape )
+      {
+         if( two.type == CollisionShape::RectShape )
+         {
+            result.colliding = isRectTouchingRect(one.rect, two.rect);
+            result.displacement = getDisplacementRectFromRect(one.rect, two.rect);
+         }
+      }
+      return result;
+   }
+
+   static bool shouldCollide(const CollisionData& d1, const CollisionData& d2)
+   {
+      if( d1.collisionGroup == d2.collisionGroup && d1.collisionGroup != 0 )
+      {
+         return d1.collisionGroup > 0;
+      }
+
+      bool masks = (d1.selfTypeBits & d2.targetTypeBits) != 0 &&
+         (d2.selfTypeBits & d1.targetTypeBits) != 0;
+      return masks;
+   }
+
+   static std::vector<CollisionPair> findCollisions(SessionState& session)
+   {
+      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      {
+         switch( session.collision[e].shape.type )
+         {
+            case CollisionShape::RectShape:
+            {
+               session.collision[e].shape.rect.center = session.movement[e].position;
+            } break;
+            case CollisionShape::CircleShape:
+            {
+               session.collision[e].shape.circle.center = session.movement[e].position;
+            } break;
+            case CollisionShape::PointShape:
+            {
+               session.collision[e].shape.point = session.movement[e].position;
+            } break;
+         }
+      }
+
+      std::vector<CollisionPair> result;
+      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      {
+         for( uint32_t r = e + 1; r < session.collision.size(); ++r )
+         {
+            bool testCollision = shouldCollide(session.collision[e], session.collision[r]);
+
+            if( testCollision )
+            {
+               auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
+               if( testResult.colliding )
+               {
+                  result.push_back({e, r, testResult.displacement});
+               }
+            }
+         }
+      }
+
+      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      {
+         switch( session.collision[e].shape.type )
+         {
+            case CollisionShape::RectShape:
+            {
+               session.collision[e].shape.rect.center = {};
+            } break;
+            case CollisionShape::CircleShape:
+            {
+               session.collision[e].shape.circle.center = {};
+            } break;
+            case CollisionShape::PointShape:
+            {
+               session.collision[e].shape.point = {};
+            } break;
+         }
+      }
+      return result;
    }
 
    //*****************************************************************
@@ -130,7 +269,7 @@ namespace core
       };
    };
 
-   std::vector<GameMessage> session_translateInput(EventVector_t frameEvents)
+   static std::vector<GameMessage> session_translateInput(EventVector_t frameEvents)
    {
       std::vector<GameMessage> result;
       for( const auto& e : frameEvents )
@@ -212,19 +351,20 @@ namespace core
                if( e.gamepad.axis.id == Gamepad::LeftStick )
                {
                   ge.type = GameMessage::Type::DirectionChange;
-                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude;
+                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
                   result.push_back(ge);
                }
                else if( e.gamepad.axis.id == Gamepad::RightStick )
                {
-                  ge.type = GameMessage::Type::AimChange;
-                  ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude;
-                  result.push_back(ge);
-                  GameMessage fire{};
-                  fire.entity = e.gamepad.id;
-                  ge.isAnalogue = true;
                   if( e.gamepad.axis.normalized >= 0.1 )
                   {
+                     ge.type = GameMessage::Type::AimChange;
+                     ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
+                     result.push_back(ge);
+
+                     GameMessage fire{};
+                     fire.entity = e.gamepad.id;
+                     ge.isAnalogue = true;
                      fire.shooting = true;
                      result.push_back(fire);
                   }
@@ -258,7 +398,7 @@ namespace core
       return result;
    }
 
-   static bool session_update(Time time, GameState& game, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua)
+   static bool session_update(Time time, GameState& game, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       //    preamble
       //       - update all timers
@@ -313,14 +453,24 @@ namespace core
             {
                if( ge.isAnalogue )
                {
-                  session.aim[ge.entity].aim = ge.aim;
+                  session.aim[ge.entity].aim = ge.aim*game.constants.playerAimLength;
                }
                else
                {
-                  Vec2 window{game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f};
-                  Vec2 aim = ge.aim - window;
-                  aim.y = -aim.y;
-                  session.aim[ge.entity].aim = aim / window;
+                  auto window = Vec2{game.constants.windowWidth, game.constants.windowHeight}*0.5f;
+                  gfx.setPerspectiveProjection();
+                  auto aim = session.aim[ge.entity].aim;
+                  aim = gfx.worldToScreen(game.camera, aim);
+                  aim += ge.aim;
+                  aim = gfx.screenToWorld(game.camera, aim);
+                  if( vec2::length2(aim) > pow2(game.constants.playerAimLength) )
+                  {
+                     session.aim[ge.entity].aim = vec2::setLength(aim, game.constants.playerAimLength);
+                  }
+                  else
+                  {
+                     session.aim[ge.entity].aim = aim;
+                  }
                }
             } break;
             //       - start/stop weapon fire
@@ -348,9 +498,9 @@ namespace core
       {
          if( session.movement[e].acceleration > 0.0f )
          {
-            float currentRad = std::atan2f(session.movement[e].direction.y, session.movement[e].direction.x);
+            float currentRad = radians(session.movement[e].direction);
             auto target = vec2::normalize(session.targetDirection[e]);
-            float targetRad = std::atan2f(target.y, target.x);
+            float targetRad = radians(target);
             float currentDeg = Rad2Deg(currentRad);
             float targetDeg = Rad2Deg(targetRad);
 
@@ -373,14 +523,23 @@ namespace core
       {
          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
          acceleration += -session.movement[e].velocity * 10.0f;
-         session.position[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
+         session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.movement[e].position;
          session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
       }
 
       //       - find collisions for new position
+      auto collisionPairs = findCollisions(session);
       //       - [resolve collisions via displacement vector]->optional depending on performance
       //       - accept new position with displacement vector added
-      //       - fix camera to new position
+      for( uint32_t e = 0; e < session.movement.size(); ++e )
+      {
+         session.position[e].position = session.movement[e].position;
+      }
+      for( auto& pair : collisionPairs )
+      {
+         session.position[pair.collider].position += pair.displacement;
+      }
+      //       - fix camera to new position and zoom level
       //    gameplay update:
       //       - collision response
       //       - damage calculation
@@ -405,14 +564,14 @@ namespace core
       //       - change orientation based on aim direction
       for( uint32_t e = 0; e < session.render.size(); ++e )
       {
-         session.render[e].rotationRadians = std::atan2(session.aim[e].aim.y, session.aim[e].aim.x);
+         session.render[e].rotationRadians = radians(session.aim[e].aim);
       }
       //       - animation
       //       - transparency
       return true;
    }
 
-   static bool game_update(Time time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua)
+   static bool game_update(Time time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       bool stillRunning = true;
       enum
@@ -457,7 +616,7 @@ namespace core
                } break;
                case GameState::GameplayState::Session:
                {
-                  session_update(time, game, game.session, frameEvents, audio, lua);
+                  session_update(time, game, game.session, frameEvents, audio, lua, gfx);
 
                   if( contains(Keyboard::Space, ACTION) )
                   {
@@ -485,7 +644,11 @@ namespace core
 
       for( uint32_t e = 0; e < session.render.size(); ++e )
       {
-         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, session.render[e].color, game.meshes[session.render[e].mesh]);
+         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
+         auto aimMesh = makeSolidCircle({}, 0.2f, 8, game.assets.mainVS, game.assets.mainPS);
+         gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
+         auto collisionMesh = makeOutlineCircle(session.collision[e].shape.circle.center, session.collision[e].shape.circle.radius, 16, game.assets.mainVS, game.assets.mainPS);
+         gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
       }
    }
 
@@ -537,6 +700,5 @@ namespace core
       caption += subcaption;
       auto mesh = font.makeTextMesh(caption.c_str(), game.fontDesc, {1, 1}, Left, Top);
       gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
-
    }
 }

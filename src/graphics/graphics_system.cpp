@@ -214,6 +214,39 @@ namespace core
    }
 
    //*****************************************************************
+   //          WORLD TO SCREEN
+   //*****************************************************************
+   Vec2 GraphicsSystem::worldToScreen(const Camera& cam, Vec2 worldPos)
+   {
+      auto world = XMMatrixIdentity();
+      //world *= XMMatrixScaling(transform.scale.x, transform.scale.y, 1.0f);
+      //m_world *= XMMatrixRotationX(XMConvertToRadians(rotationX));
+      //m_world *= XMMatrixRotationY(XMConvertToRadians(rotationY));
+      //world *= XMMatrixRotationZ(transform.rotation);
+      world *= XMMatrixTranslation(worldPos.x, worldPos.y, 0);
+      world = world*m_renderer.getView()*m_renderer.getProjection();
+
+      XMVECTOR position = XMVector3Project(convert(worldPos), 0, 0, (float)m_window.getSizeX(), (float)m_window.getSizeY(), 0.0f, 1.0f,
+                                           m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
+
+      Vec2 result{position.m128_f32[0], position.m128_f32[1]};
+      return result;
+   }
+
+   //*****************************************************************
+   //          SCREEN TO WORLD
+   //*****************************************************************
+   Vec2 GraphicsSystem::screenToWorld(const Camera& cam, Vec2 screen)
+   {
+      auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window.getSizeX(), (float)m_window.getSizeY(), 0.0f, 1.0f,
+                                            m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
+      auto camPos = convert(cam.getPosition());
+      auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
+      auto loc = XMPlaneIntersectLine(plane, objectSpace, camPos);
+      return Vec2{loc.m128_f32[0], loc.m128_f32[1]};
+   }
+
+   //*****************************************************************
    //          SET CULLING
    //*****************************************************************
    void GraphicsSystem::setCulling(bool isEnabled)

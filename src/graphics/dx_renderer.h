@@ -27,6 +27,9 @@ namespace core
 
       void setProjection(const XMMATRIX& matrix);
       void setView(const XMMATRIX& matrix);
+      
+      const XMMATRIX& getProjection() const;
+      const XMMATRIX& getView() const;
 
       void setVertexTopology(D3D_PRIMITIVE_TOPOLOGY topology);
       void setTexture(ID3D11ShaderResourceView* shaderResourceView);

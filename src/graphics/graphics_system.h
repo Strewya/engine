@@ -44,11 +44,14 @@ namespace core
       void setPerspectiveProjection();
       void applyCamera(const Camera& camera);
       void clearCamera();
+      Vec2 screenToWorld(const Camera& cam, Vec2 screenPos);
+      Vec2 worldToScreen(const Camera& cam, Vec2 worldPos);
 
       void setCulling(bool isEnabled);
       void setTransparency(bool isEnabled);
 
       void renderMesh(Transform t, Color c, const Mesh& mesh);
+
       
       TextureManager textures;
       VertexShaderManager vertexShaders;

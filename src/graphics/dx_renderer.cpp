@@ -75,6 +75,16 @@ namespace core
       m_camView = matrix;
    }
 
+   const XMMATRIX& DXRenderer::getProjection() const
+   {
+      return m_camProjection;
+   }
+
+   const XMMATRIX& DXRenderer::getView() const
+   {
+      return m_camView;
+   }
+
    //*****************************************************************
    //          SET CULLING
    //*****************************************************************

@@ -14,6 +14,8 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
+#include "util/geometry/circle.h"
+#include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
 #include "util/color.h"
 /******* end header inclusion *******/
@@ -41,6 +43,7 @@ namespace core
       float windowWidth;
       float windowHeight;
       float playerAcceleration;
+      float playerAimLength;
    };
 
    struct Time
@@ -77,6 +80,41 @@ namespace core
       float acceleration;
       Vec2 direction;
       Vec2 velocity;
+      Vec2 position;
+   };
+
+   struct CollisionShape
+   {
+      enum Type
+      {
+         PointShape,
+         //LineShape,
+         CircleShape,
+         RectShape,
+      };
+      Type type;
+      union
+      {
+         Vec2 point;
+         //Line line???
+         Circle circle;
+         Rect rect;
+      };
+   };
+
+   struct CollisionData
+   {
+      CollisionShape shape;
+      uint32_t collisionGroup;
+      uint16_t selfTypeBits;
+      uint16_t targetTypeBits;
+   };
+
+   struct CollisionPair
+   {
+      uint32_t collider;
+      uint32_t collidee;
+      Vec2 displacement;
    };
 
    struct AimData
@@ -91,6 +129,7 @@ namespace core
       std::vector<PositionData> position;
       std::vector<MovementData> movement;
       std::vector<AimData> aim;
+      std::vector<CollisionData> collision;
       std::vector<Vec2> targetDirection;
    };
 
