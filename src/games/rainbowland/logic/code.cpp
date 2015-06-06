@@ -106,6 +106,11 @@ namespace core
       session = SessionState();
       makePlayer(session);
 
+      makePlayer(session);
+      session.movement.back().position.x = session.position.back().position.x = 12;
+      session.collision.back().shape.type = CollisionShape::RectShape;
+      session.collision.back().shape.rect = {{}, {1, 1}};
+
       return true;
    }
 
@@ -131,12 +136,7 @@ namespace core
    {
       CollisionCheckResult result{};
       result.colliding = false;
-      if( one.type > two.type )
-      {
-         auto varSwitch = one;
-         one = two;
-         two = varSwitch;
-      }
+
       if( one.type == CollisionShape::PointShape )
       {
          if( two.type == CollisionShape::CircleShape )
@@ -169,6 +169,11 @@ namespace core
          {
             result.colliding = isRectTouchingRect(one.rect, two.rect);
             result.displacement = getDisplacementRectFromRect(one.rect, two.rect);
+         }
+         else if( two.type == CollisionShape::CircleShape )
+         {
+            result.colliding = isRectTouchingCircle(one.rect, two.circle);
+            result.displacement = getDisplacementRectFromCircle(one.rect, two.circle);
          }
       }
       return result;
@@ -220,6 +225,8 @@ namespace core
                if( testResult.colliding )
                {
                   result.push_back({e, r, testResult.displacement});
+                  // #test
+                  areInCollision(session.collision[e].shape, session.collision[r].shape);
                }
             }
          }
@@ -257,6 +264,11 @@ namespace core
          AimChange,
          Fire,
          Ability,
+         //#test
+         Player_Circle,
+         Player_Rect,
+         Tree_Circle,
+         Tree_Rect,
       };
       Type type;
       uint32_t entity;
@@ -307,6 +319,26 @@ namespace core
                      {
                         ge.type = GameMessage::Type::DirectionChange;
                         ge.direction = {+1, 0};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::_1:
+                     {
+                        ge.type = GameMessage::Type::Player_Circle;
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::_2:
+                     {
+                        ge.type = GameMessage::Type::Player_Rect;
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::_3:
+                     {
+                        ge.type = GameMessage::Type::Tree_Circle;
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::_4:
+                     {
+                        ge.type = GameMessage::Type::Tree_Rect;
                         result.push_back(ge);
                      } break;
                   }
@@ -485,6 +517,26 @@ namespace core
             } break;
             //optional cases like opening menus, pausing the game, etc
             //       - open pause menu
+            case GameMessage::Type::Player_Circle:
+            {
+               session.collision[0].shape.type = CollisionShape::CircleShape;
+               session.collision[0].shape.circle = {{}, 1};
+            } break;
+            case GameMessage::Type::Player_Rect:
+            {
+               session.collision[0].shape.type = CollisionShape::RectShape;
+               session.collision[0].shape.rect = {{}, {1, 1}};
+            } break;
+            case GameMessage::Type::Tree_Circle:
+            {
+               session.collision[1].shape.type = CollisionShape::CircleShape;
+               session.collision[1].shape.circle = {{}, 1};
+            } break;
+            case GameMessage::Type::Tree_Rect:
+            {
+               session.collision[1].shape.type = CollisionShape::RectShape;
+               session.collision[1].shape.rect = {{}, {1, 1}};
+            } break;
          }
       }
 
@@ -523,7 +575,7 @@ namespace core
       {
          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
          acceleration += -session.movement[e].velocity * 10.0f;
-         session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.movement[e].position;
+         session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
          session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
       }
 
@@ -533,7 +585,10 @@ namespace core
       //       - accept new position with displacement vector added
       for( uint32_t e = 0; e < session.movement.size(); ++e )
       {
-         session.position[e].position = session.movement[e].position;
+         if( session.position[e].position != session.movement[e].position )
+         {
+            session.position[e].position = session.movement[e].position;
+         }
       }
       for( auto& pair : collisionPairs )
       {
@@ -647,7 +702,18 @@ namespace core
          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
          auto aimMesh = makeSolidCircle({}, 0.2f, 8, game.assets.mainVS, game.assets.mainPS);
          gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
-         auto collisionMesh = makeOutlineCircle(session.collision[e].shape.circle.center, session.collision[e].shape.circle.radius, 16, game.assets.mainVS, game.assets.mainPS);
+         Mesh collisionMesh{};
+         switch( session.collision[e].shape.type )
+         {
+            case CollisionShape::CircleShape:
+            {
+               collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, game.assets.mainVS, game.assets.mainPS);
+            } break;
+            case CollisionShape::RectShape:
+            {
+               collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, game.assets.mainVS, game.assets.mainPS);
+            } break;
+         }
          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
       }
    }

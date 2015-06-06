@@ -22,6 +22,7 @@ namespace core
       Vec2 normalize(Vec2 v);
       Vec2 projection(Vec2 v, Vec2 target);
       Vec2 setLength(Vec2 v, float len);
+      Vec2 absolute(Vec2 v);
    }
 
    Vec2 operator-(Vec2 v);
@@ -49,6 +50,7 @@ namespace core
 
    bool operator==(Vec2 l, Vec2 r);
    bool operator!=(Vec2 l, Vec2 r);
+   bool operator<(Vec2 l, Vec2 r);
 
    std::ostream& operator<<(std::ostream& os, Vec2 v);
 }

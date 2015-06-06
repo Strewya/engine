@@ -133,45 +133,52 @@ namespace core
 
    Vec2 getDisplacementPointFromRect(Vec2 point, Rect rect)
    {
-      auto l = point.x - rect.left();
-      auto r = rect.right() - point.x;
-      auto t = rect.top() - point.y;
-      auto b = point.y - rect.bottom();
-
-      Vec2 result = {min(l, r), min(t, b)};
-      if( l < r )
+      auto toLeft = point.x - rect.left();
+      auto toRight = rect.right() - point.x;
+      auto toTop = rect.top() - point.y;
+      auto toBottom = point.y - rect.bottom();
+      Vec2 result{min(toLeft, toRight), min(toTop, toBottom)};
+      if( abs(result.x) < abs(result.y) )
       {
-         result.x = -result.x;
+         result.y = 0;
       }
-      if( b < t )
+      else
       {
-         result.y = -result.y;
+         result.x = 0;
       }
-
+      result *= vec2::normalize((point - rect.center)*vec2::normalize(result));
+      
       return result;
    }
 
    Vec2 getDisplacementPointFromCircle(Vec2 point, Circle circle)
    {
       auto diff = point - circle.center;
-      auto distance2 = vec2::length2(diff);
-      auto radius2 = circle.radius*circle.radius;
+      auto distance = vec2::length(diff);
+      auto radius = circle.radius;
 
-      Vec2 result = vec2::normalize(diff)*sqrt(radius2 - distance2);
+      Vec2 result{};
+      if( distance < radius )
+      {
+         result = vec2::normalize(diff)*(radius - distance);
+      }
       return result;
    }
 
    Vec2 getDisplacementCircleFromRect(Circle circle, Rect rect)
    {
-      rect.halfSize.x += circle.radius;
-      rect.halfSize.y += circle.radius;
-      auto result = getDisplacementPointFromRect(circle.center, rect);
+      auto V = circle.center - rect.center;
+      clamp(V.x, -rect.halfSize.x, rect.halfSize.x);
+      clamp(V.y, -rect.halfSize.y, rect.halfSize.y);
+      auto Bc = rect.center + V;
+      auto D = circle.center - Bc;
+      auto result = vec2::normalize(D)*(circle.radius - vec2::length(D));
       return result;
    }
 
    Vec2 getDisplacementCircleFromCircle(Circle l, Circle r)
    {
-      l.radius += r.radius;
+      r.radius += l.radius;
       auto result = getDisplacementPointFromCircle(l.center, r);
       return result;
    }

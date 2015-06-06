@@ -123,6 +123,16 @@ namespace core
       return min(a, m);
    }
 
+   template<typename T>
+   T abs(T v)
+   {
+      if( v < 0 )
+      {
+         v = -v;
+      }
+      return v;
+   }
+
    inline std::string replaceOne(std::string str, std::string from, std::string to)
    {
       size_t start_pos = str.find(from);

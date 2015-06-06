@@ -13,6 +13,8 @@
 
 namespace core
 {
+   struct Circle;
+   struct Rect;
    struct Vec2;
 
    enum VertexTopology;
@@ -28,10 +30,15 @@ namespace core
    };
    
    Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
    Mesh makeOutlineQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
    Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeTexturedQuad(Rect rect, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
    Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
    Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader);
 }

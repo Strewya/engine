@@ -8,11 +8,19 @@
 #include "graphics/vertex.h"
 #include "util/color.h"
 #include "util/utility.h"
+#include "util/geometry/circle.h"
+#include "util/geometry/rect.h"
 #include "util/geometry/vec3.h"
 /******* end headers *******/
 
 namespace core
 {
+   Mesh makeSolidQuad(Rect rect, HVertexShader vshader, HPixelShader pshader)
+   {
+      auto result = makeSolidQuad(rect.center, rect.halfSize, vshader, pshader);
+      return result;
+   }
+
    Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result
@@ -39,6 +47,12 @@ namespace core
             3, 2, 0
          }
       };
+      return result;
+   }
+
+   Mesh makeOutlineQuad(Rect rect, HVertexShader vshader, HPixelShader pshader)
+   {
+      auto result = makeOutlineQuad(rect.center, rect.halfSize, vshader, pshader);
       return result;
    }
 
@@ -73,6 +87,12 @@ namespace core
       return result;
    }
 
+   Mesh makeTexturedQuad(Rect rect, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader)
+   {
+      auto result = makeTexturedQuad(rect.center, rect.halfSize, texture, topLeftUV, botRightUV, vshader, pshader);
+      return result;
+   }
+
    Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh mesh
@@ -100,6 +120,12 @@ namespace core
          }
       };
       return mesh;
+   }
+
+   Mesh makeSolidCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   {
+      auto result = makeSolidCircle(circle.center, circle.radius, points, vshader, pshader);
+      return result;
    }
 
    Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
@@ -131,6 +157,12 @@ namespace core
       }
       result.topology = TriangleList;
 
+      return result;
+   }
+
+   Mesh makeOutlineCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   {
+      auto result = makeOutlineCircle(circle.center, circle.radius, points, vshader, pshader);
       return result;
    }
 

@@ -57,7 +57,15 @@ namespace core
 
       Vec2 setLength(Vec2 v, float len)
       {
-         return normalize(v)*len;
+         auto result = normalize(v)*len;
+         return result;
+      }
+
+      Vec2 absolute(Vec2 v)
+      {
+         if( v.x < 0 ) { v.x = -v.x; }
+         if( v.y < 0 ) { v.y = -v.y; }
+         return v;
       }
    }
 
@@ -181,6 +189,12 @@ namespace core
    bool operator!=(Vec2 l, Vec2 r)
    {
       auto result = !(l == r);
+      return result;
+   }
+
+   bool operator<(Vec2 l, Vec2 r)
+   {
+      auto result = (l.x < r.x) && (l.y < r.y);
       return result;
    }
 
