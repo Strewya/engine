@@ -218,7 +218,8 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -229,7 +230,8 @@
       </Command>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>

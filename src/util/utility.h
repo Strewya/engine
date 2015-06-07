@@ -63,7 +63,7 @@ namespace core
 #define CORE_STATUS_AND(x) status = (x) && status
 #define CORE_STATUS_OR(x) status = (x) || status
 
-#define CORE_RESOURCE(x) "../resources/"x
+#define CORE_RESOURCE(x) "resources/"x
 
 #define CORE_PI 3.14159265358979f
 #define Deg2Rad(deg) ((deg)*CORE_PI/180.0f)

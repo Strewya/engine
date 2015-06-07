@@ -70,7 +70,7 @@ namespace core
 
       if( CORE_STATUS_OK )
       {
-         auto defaultTexture = m_textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
+         auto defaultTexture = m_textureFileLoader.load(CORE_RESOURCE("default_texture.png"));
          CORE_STATUS_AND(textures.init(STR(TextureManager), m_textureFileLoader, defaultTexture));
       }
 

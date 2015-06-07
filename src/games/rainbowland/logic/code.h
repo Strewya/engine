@@ -29,21 +29,16 @@ namespace core
       HTexture font;
       HVertexShader mainVS;
       HPixelShader mainPS;
-      HPixelShader healthPS;
-      HSound reload;
-      HSound pistol;
-      HSound uzi;
-      HSound rpg;
-      HSound sniper;
-      HSound shotgun;
+      HSound song;
    };
 
    struct Constants
    {
       float windowWidth;
       float windowHeight;
-      float playerAcceleration;
-      float playerAimLength;
+      bool showCursor;
+      bool lockCursor;
+      bool relativeCursor;
    };
 
    struct Time
@@ -117,18 +112,12 @@ namespace core
       Vec2 displacement;
    };
 
-   struct AimData
-   {
-      Vec2 aim;
-   };
-
    struct SessionState
    {
       std::vector<DeltaTimeData> deltaTime;
       std::vector<RenderData> render;
       std::vector<PositionData> position;
       std::vector<MovementData> movement;
-      std::vector<AimData> aim;
       std::vector<CollisionData> collision;
       std::vector<Vec2> targetDirection;
    };
@@ -137,27 +126,19 @@ namespace core
    {
       enum class GlobalGameState
       {
-         MainMenu,
          Gameplay,
-         Score
-      };
-
-      enum class GameplayState
-      {
-         //ColorPick,
-         ClassPick,
-         Session
       };
 
       Constants constants;
       SessionState session;
       GlobalGameState globalGameState;
-      GameplayState gameplayState;
       Camera camera;
       GameResources assets;
       // #test
       FontDescriptor fontDesc;
       // #todo make this a mesh cache thingamabob
       std::vector<Mesh> meshes;
+
+      bool musicPlaying;
    };
 }

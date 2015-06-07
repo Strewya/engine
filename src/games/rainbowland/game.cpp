@@ -55,13 +55,9 @@ namespace core
          //#ifdef MURRAY
          //window.move(window.getSizeX(), 0);
          //#endif
-         window.showCursor(false);
-         window.lockCursor(true);
-         window.makeMouseRelative(true);
 
-         window.monitorDirectoryForChanges("resources");
-
-         window.setFullscreen(true);
+         window.resize(1024, 768);
+         window.setFullscreen(false);
 
          CORE_STATUS_AND(audioSystem.init());
          CORE_STATUS_AND(graphicsSystem.init(window));
@@ -74,6 +70,9 @@ namespace core
       {
          game.constants.windowWidth = (float)window.getSizeX();
          game.constants.windowHeight = (float)window.getSizeY();
+         game.constants.showCursor = true;
+         game.constants.lockCursor = false;
+         game.constants.relativeCursor = false;
 
          CORE_STATUS_AND(game_init(game, audioSystem, graphicsSystem, luaSystem.getStack()));
       }
@@ -114,49 +113,6 @@ namespace core
                }
             } break;
 
-            // #refactor this should probably be moved into a system of it's own
-            // that handles file change notifications and processes them based on
-            // either the extension or the entire file name
-            case WE_FILECHANGE:
-            {
-               if( e.fileChange.action == FILE_MODIFIED )
-               {
-                  auto getExtension = [](const std::string& str) -> std::string
-                  {
-                     auto lastDot = str.find_last_of('.');
-                     return str.substr(lastDot + 1);
-                  };
-                  std::string file = replaceAll(e.fileChange.filename, "\\", "/");
-                  file = "../resources/" + file;
-                  auto ext = getExtension(file);
-                  if( ext == "png" || ext == "bmp" || ext == "tif" || ext == "jpg" )
-                  {
-                     if( graphicsSystem.textures.isLoaded(file.c_str()) )
-                     {
-                        graphicsSystem.textures.reloadFromFile(file.c_str());
-                     }
-                  }
-                  else if( ext == "cso" )
-                  {
-                     if( graphicsSystem.pixelShaders.isLoaded(file.c_str()) )
-                     {
-                        graphicsSystem.pixelShaders.reloadFromFile(file.c_str());
-                     }
-                     else if( graphicsSystem.vertexShaders.isLoaded(file.c_str()) )
-                     {
-                        graphicsSystem.vertexShaders.reloadFromFile(file.c_str(), HealthVertex::getDescription());
-                     }
-                  }
-                  else if( ext == "wav" || ext == "mp3" )
-                  {
-                     if( audioSystem.sounds.isLoaded(file.c_str()) )
-                     {
-                        audioSystem.sounds.reloadFromFile(file.c_str());
-                     }
-                  }
-               }
-            } break;
-
             // #todo think about if this should stay
             case WE_LOSTFOCUS:
             {
@@ -168,9 +124,9 @@ namespace core
             case WE_GAINFOCUS:
             {
                isPaused = false;
-               window.showCursor(false);
-               window.lockCursor(true);
-               window.makeMouseRelative(true);
+               window.showCursor(game.constants.showCursor);
+               window.lockCursor(game.constants.lockCursor);
+               window.makeMouseRelative(game.constants.relativeCursor);
             } break;
          }
       }

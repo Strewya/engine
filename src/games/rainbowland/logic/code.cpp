@@ -45,18 +45,51 @@ namespace core
 
    enum MeshId
    {
-      YellowPlayer,
-      BluePlayer,
-      GreenPlayer,
-      PurplePlayer,
-      RedPlayer,
+      Bunny1,
+      Bunny2,
+      Bunny3,
+      Bunny1Dino1,
+      Bunny2Dino1,
+      Bunny3Dino1,
+      Bunny1Dino2,
+      Bunny2Dino2,
+      Bunny3Dino2,
+      Penguin,
+      BackgroundUpperPart,
+      BackgroundLowerPart,
+      Count
    };
+
+   static Mesh makeMesh(float x, float y, float w, float h, TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
+   {
+      auto txtr = textures.getData(texture);
+      float tw = (float)txtr.width;
+      float th = (float)txtr.height;
+      float hw = w * 0.5f;
+      float hh = h * 0.5f;
+      float smallerDimension = hw > hh ? hh : hw;
+      hw /= smallerDimension;
+      hh /= smallerDimension;
+      auto result = makeTexturedQuad({}, {hw, hh}, texture, {x / tw, y / th}, {(x + w) / tw, (y + h) / th}, vertex, pixel);
+      return result;
+   }
 
    static std::vector<Mesh> loadMeshes(GameState& game, TextureManager& textures)
    {
       std::vector<Mesh> result{};
-      //players
-      loadMeshBundle(1795, 420, 3085, 673, 5, 1, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS, result);
+      result.resize(MeshId::Count);
+      result[Bunny1] = makeMesh(17, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2] = makeMesh(167, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3] = makeMesh(0, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino1] = makeMesh(402, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino1] = makeMesh(552, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino1] = makeMesh(385, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino2] = makeMesh(787, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino2] = makeMesh(937, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino2] = makeMesh(770, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Penguin] = makeMesh(517, 511, 163, 192, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[BackgroundUpperPart] = makeMesh(0, 0, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
+      result[BackgroundLowerPart] = makeMesh(0, 384, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
 
       return result;
    }
@@ -71,13 +104,10 @@ namespace core
       game.meshes = loadMeshes(game, gfx.textures);
 
       game.camera.setPosition({0, 0, -50});
-      game.globalGameState = GameState::GlobalGameState::MainMenu;
-      game.gameplayState = GameState::GameplayState::ClassPick;
 
-      game.fontDesc = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
+      game.fontDesc = loadFont(lua, CORE_RESOURCE("font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
-      game.constants.playerAcceleration = 60;
-      game.constants.playerAimLength = 4;
+      game.musicPlaying = false;
 
       return true;
    }
@@ -86,9 +116,8 @@ namespace core
    {
       session.deltaTime.push_back({0, 0, 1});
       session.position.push_back({Vec2{0, 0}});
-      session.render.push_back({Color{0, 1, 0}, GreenPlayer});
+      session.render.push_back({Color{0, 1, 0}, Bunny1});
       session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}});
-      session.aim.push_back({Vec2{0, 0}});
       session.targetDirection.push_back({0, 0});
       session.collision.push_back({{CollisionShape::CircleShape, {}}, 0, 0x1, 0xffff});
       session.collision.back().shape.circle = {{}, 1};
@@ -96,7 +125,6 @@ namespace core
       assert(session.deltaTime.size() == session.position.size() &&
              session.deltaTime.size() == session.render.size() &&
              session.deltaTime.size() == session.movement.size() &&
-             session.deltaTime.size() == session.aim.size() &&
              session.deltaTime.size() == session.collision.size() &&
              session.deltaTime.size() == session.targetDirection.size());
    }
@@ -260,24 +288,14 @@ namespace core
    {
       enum class Type
       {
-         DirectionChange,
-         AimChange,
-         Fire,
-         Ability,
-         //#test
-         Player_Circle,
-         Player_Rect,
-         Tree_Circle,
-         Tree_Rect,
+
       };
       Type type;
       uint32_t entity;
       bool isAnalogue;
       union
       {
-         Vec2 direction;
-         Vec2 aim;
-         bool shooting;
+         uint32_t temp;
       };
    };
 
@@ -290,140 +308,22 @@ namespace core
          {
             case WE_KEYBOARDKEY:
             {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               if( e.keyboard.firstTimeDown )
-               {
-                  switch( e.keyboard.key.id )
-                  {
-                     case Keyboard::W:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, +1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::S:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, -1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::A:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {-1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::D:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {+1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_1:
-                     {
-                        ge.type = GameMessage::Type::Player_Circle;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_2:
-                     {
-                        ge.type = GameMessage::Type::Player_Rect;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_3:
-                     {
-                        ge.type = GameMessage::Type::Tree_Circle;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_4:
-                     {
-                        ge.type = GameMessage::Type::Tree_Rect;
-                        result.push_back(ge);
-                     } break;
-                  }
-               }
-               else if( e.keyboard.key.isDown == false )
-               {
-                  switch( e.keyboard.key.id )
-                  {
-                     case Keyboard::W:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, -1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::S:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, +1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::A:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {+1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::D:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {-1, 0};
-                        result.push_back(ge);
-                     } break;
-                  }
-               }
+
             } break;
 
             case WE_GAMEPADAXIS:
             {
-               GameMessage ge{};
-               ge.entity = e.gamepad.id;
-               ge.isAnalogue = true;
-               if( e.gamepad.axis.id == Gamepad::LeftStick )
-               {
-                  ge.type = GameMessage::Type::DirectionChange;
-                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
-                  result.push_back(ge);
-               }
-               else if( e.gamepad.axis.id == Gamepad::RightStick )
-               {
-                  if( e.gamepad.axis.normalized >= 0.1 )
-                  {
-                     ge.type = GameMessage::Type::AimChange;
-                     ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
-                     result.push_back(ge);
 
-                     GameMessage fire{};
-                     fire.entity = e.gamepad.id;
-                     ge.isAnalogue = true;
-                     fire.shooting = true;
-                     result.push_back(fire);
-                  }
-               }
             } break;
 
             case WE_MOUSEBUTTON:
             {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               ge.type = GameMessage::Type::Fire;
-               if( e.mouse.button.id == Mouse::LeftButton )
-               {
-                  ge.shooting = e.mouse.button.isDown;
-                  result.push_back(ge);
-               }
+
             } break;
 
             case WE_MOUSEMOVE:
             {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               ge.type = GameMessage::Type::AimChange;
-               ge.aim = {(float)e.mouse.position.x, (float)e.mouse.position.y};
-               result.push_back(ge);
+
             } break;
          }
       }
@@ -465,79 +365,7 @@ namespace core
 
       for( auto& ge : gameEvents )
       {
-         switch( ge.type )
-         {
-            //       - movement direction target (implies start/stop moving)
-            case GameMessage::Type::DirectionChange:
-            {
-               if( ge.isAnalogue )
-               {
-                  session.targetDirection[ge.entity] = ge.direction;
-               }
-               else
-               {
-                  session.targetDirection[ge.entity] += ge.direction;
-               }
-               session.movement[ge.entity].acceleration = game.constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
-            } break;
-            //       - aim
-            case GameMessage::Type::AimChange:
-            {
-               if( ge.isAnalogue )
-               {
-                  session.aim[ge.entity].aim = ge.aim*game.constants.playerAimLength;
-               }
-               else
-               {
-                  auto window = Vec2{game.constants.windowWidth, game.constants.windowHeight}*0.5f;
-                  gfx.setPerspectiveProjection();
-                  auto aim = session.aim[ge.entity].aim;
-                  aim = gfx.worldToScreen(game.camera, aim);
-                  aim += ge.aim;
-                  aim = gfx.screenToWorld(game.camera, aim);
-                  if( vec2::length2(aim) > pow2(game.constants.playerAimLength) )
-                  {
-                     session.aim[ge.entity].aim = vec2::setLength(aim, game.constants.playerAimLength);
-                  }
-                  else
-                  {
-                     session.aim[ge.entity].aim = aim;
-                  }
-               }
-            } break;
-            //       - start/stop weapon fire
-            case GameMessage::Type::Fire:
-            {
-               //state.shooting[ge.entity] = ge.shooting;
-            } break;
-            //       - ability use
-            case GameMessage::Type::Ability:
-            {
-               //state.activateAbility[ge.entity] = true;
-            } break;
-            //optional cases like opening menus, pausing the game, etc
-            //       - open pause menu
-            case GameMessage::Type::Player_Circle:
-            {
-               session.collision[0].shape.type = CollisionShape::CircleShape;
-               session.collision[0].shape.circle = {{}, 1};
-            } break;
-            case GameMessage::Type::Player_Rect:
-            {
-               session.collision[0].shape.type = CollisionShape::RectShape;
-               session.collision[0].shape.rect = {{}, {1, 1}};
-            } break;
-            case GameMessage::Type::Tree_Circle:
-            {
-               session.collision[1].shape.type = CollisionShape::CircleShape;
-               session.collision[1].shape.circle = {{}, 1};
-            } break;
-            case GameMessage::Type::Tree_Rect:
-            {
-               session.collision[1].shape.type = CollisionShape::RectShape;
-               session.collision[1].shape.rect = {{}, {1, 1}};
-            } break;
-         }
+
       }
 
       //    AI updates:
@@ -617,10 +445,6 @@ namespace core
       //       - difficulty increase
       //    visual updates:
       //       - change orientation based on aim direction
-      for( uint32_t e = 0; e < session.render.size(); ++e )
-      {
-         session.render[e].rotationRadians = radians(session.aim[e].aim);
-      }
       //       - animation
       //       - transparency
       return true;
@@ -647,124 +471,49 @@ namespace core
          return false;
       };
 
-      switch( game.globalGameState )
+      if( contains(Keyboard::Space, ACTION) )
       {
-         case GameState::GlobalGameState::MainMenu:
+         if( game.musicPlaying )
          {
-            if( contains(Keyboard::Space, ACTION) )
-            {
-               game.globalGameState = GameState::GlobalGameState::Gameplay;
-               game.gameplayState = GameState::GameplayState::ClassPick;
-            }
-         } break;
-         case GameState::GlobalGameState::Gameplay:
+            audio.stopMusic();
+            game.musicPlaying = false;
+         }
+         else
          {
-            switch( game.gameplayState )
-            {
-               case GameState::GameplayState::ClassPick:
-               {
-                  if( contains(Keyboard::Space, ACTION) )
-                  {
-                     game.gameplayState = GameState::GameplayState::Session;
-                     session_init(game, game.session);
-                  }
-               } break;
-               case GameState::GameplayState::Session:
-               {
-                  session_update(time, game, game.session, frameEvents, audio, lua, gfx);
-
-                  if( contains(Keyboard::Space, ACTION) )
-                  {
-                     game.globalGameState = GameState::GlobalGameState::Score;
-                  }
-               } break;
-            }
-         } break;
-         case GameState::GlobalGameState::Score:
-         {
-            if( contains(Keyboard::Space, ACTION) )
-            {
-               game.globalGameState = GameState::GlobalGameState::MainMenu;
-            }
-         } break;
+            audio.playMusic(game.assets.song);
+            game.musicPlaying = true;
+         }
       }
 
+      session_update(time, game, game.session, frameEvents, audio, lua, gfx);
       return stillRunning;
    }
 
    static void session_render(Time time, GameState& game, SessionState& session, GraphicsSystem& gfx, FontSystem& font)
    {
+      gfx.setOrthographicProjection();
+      gfx.setTransparency(false);
+
+      gfx.renderMesh({{0, 200}, {200, 200}}, {}, game.meshes[BackgroundUpperPart]);
+
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
-
       for( uint32_t e = 0; e < session.render.size(); ++e )
       {
-         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
-         auto aimMesh = makeSolidCircle({}, 0.2f, 8, game.assets.mainVS, game.assets.mainPS);
-         gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
-         Mesh collisionMesh{};
-         switch( session.collision[e].shape.type )
-         {
-            case CollisionShape::CircleShape:
-            {
-               collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, game.assets.mainVS, game.assets.mainPS);
-            } break;
-            case CollisionShape::RectShape:
-            {
-               collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, game.assets.mainVS, game.assets.mainPS);
-            } break;
-         }
-         gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
+         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[Bunny1]);
       }
+      gfx.renderMesh({{3, 3}, {1, 1}, 0}, {}, game.meshes[Bunny1]);
+
+      gfx.setOrthographicProjection();
+      gfx.setTransparency(false);
+      gfx.renderMesh({{0, -200}, {200, 200}}, {}, game.meshes[BackgroundLowerPart]);
    }
 
    static void game_render(Time time, GameState& game, GraphicsSystem& gfx, FontSystem& font)
    {
       gfx.applyCamera(game.camera);
-      /*
-      systems.gfx->setPerspectiveProjection();
-      systems.gfx->setTransparency(false);
-      systems.gfx->renderMesh(Transform{}, Color{}, state.backgroundMesh);
-      systems.gfx->setTransparency(true);
-      systems.gfx->renderMesh(Transform{state.movingThings[0].position}, Color{}, state.playerMesh);
-      systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
-      */
 
-      std::string caption, subcaption;
-      switch( game.globalGameState )
-      {
-         case GameState::GlobalGameState::MainMenu:
-         {
-            caption = "Main menu";
-         } break;
-         case GameState::GlobalGameState::Gameplay:
-         {
-            caption = "Gameplay";
-            switch( game.gameplayState )
-            {
-               case GameState::GameplayState::ClassPick:
-               {
-                  subcaption = "\nClass picking";
-               } break;
-               case GameState::GameplayState::Session:
-               {
-                  subcaption = "\nSession";
+      session_render(time, game, game.session, gfx, font);
 
-                  session_render(time, game, game.session, gfx, font);
-               } break;
-            }
-         } break;
-         case GameState::GlobalGameState::Score:
-         {
-            caption = "Score screen";
-         } break;
-      }
-
-      gfx.setOrthographicProjection();
-      gfx.setTransparency(true);
-      caption += (time.deltaMicrosVirt == 0 ? " (paused)" : " (running)");
-      caption += subcaption;
-      auto mesh = font.makeTextMesh(caption.c_str(), game.fontDesc, {1, 1}, Left, Top);
-      gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
    }
 }
