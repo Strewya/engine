@@ -157,6 +157,9 @@
     <ClCompile Include="..\..\..\src\util\collision_checks.cpp">
       <Filter>code\framework\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\util\random.cpp">
+      <Filter>code\framework\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -391,6 +394,9 @@
       <Filter>code\games\rainbowland\logic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\collision_checks.h">
+      <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\random.h">
       <Filter>code\framework\util</Filter>
     </ClInclude>
   </ItemGroup>

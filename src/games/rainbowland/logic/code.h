@@ -36,6 +36,7 @@ namespace core
    {
       float windowWidth;
       float windowHeight;
+      float dinoChance;
       bool showCursor;
       bool lockCursor;
       bool relativeCursor;
@@ -112,14 +113,28 @@ namespace core
       Vec2 displacement;
    };
 
+   struct EntityType
+   {
+      uint32_t variant;
+   };
+
+   struct Animation
+   {
+      uint32_t frame;
+      uint32_t microsPerFrame;
+      uint32_t micros;
+   };
+
    struct SessionState
    {
+      std::vector<uint32_t> freeSlot;
       std::vector<DeltaTimeData> deltaTime;
       std::vector<RenderData> render;
       std::vector<PositionData> position;
       std::vector<MovementData> movement;
       std::vector<CollisionData> collision;
-      std::vector<Vec2> targetDirection;
+      std::vector<EntityType> type;
+      std::vector<Animation> animation;
    };
 
    struct GameState
@@ -139,6 +154,11 @@ namespace core
       // #todo make this a mesh cache thingamabob
       std::vector<Mesh> meshes;
 
+      Vec2 backgroundPos;
+      Rect spawnPoint;
+      uint32_t dinosCaught;
+      uint32_t rabbitsCaught;
       bool musicPlaying;
+
    };
 }

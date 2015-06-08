@@ -16,10 +16,10 @@ namespace core
    bool isPointInsideRect(Vec2 point, Rect rect)
    {
       auto result = true;
-      if( point.x < rect.center.x - rect.halfSize.x ) result = false;
-      else if( point.x > rect.center.x + rect.halfSize.x ) result = false;
-      else if( point.y < rect.center.y - rect.halfSize.y ) result = false;
-      else if( point.y > rect.center.y + rect.halfSize.y ) result = false;
+      if( point.x < rect.left() ) result = false;
+      else if( point.x > rect.right()  ) result = false;
+      else if( point.y < rect.bottom() ) result = false;
+      else if( point.y > rect.top() ) result = false;
       return result;
    }
 

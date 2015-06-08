@@ -13,6 +13,8 @@
 #include "input/keyboard.h"
 #include "input/mouse.h"
 #include "util/collision_checks.h"
+#include "util/random.h"
+#include "util/time/time_unit_conversions.h"
 /******* end headers *******/
 
 namespace core
@@ -78,20 +80,117 @@ namespace core
    {
       std::vector<Mesh> result{};
       result.resize(MeshId::Count);
-      result[Bunny1] = makeMesh(17, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2] = makeMesh(167, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3] = makeMesh(0, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny1Dino1] = makeMesh(402, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2Dino1] = makeMesh(552, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3Dino1] = makeMesh(385, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny1Dino2] = makeMesh(787, 0, 351, 177, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2Dino2] = makeMesh(937, 185, 189, 146, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3Dino2] = makeMesh(770, 339, 385, 142, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1] = makeMesh(18, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2] = makeMesh(168, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3] = makeMesh(1, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino1] = makeMesh(401, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino1] = makeMesh(553, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino1] = makeMesh(386, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino2] = makeMesh(788, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino2] = makeMesh(938, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino2] = makeMesh(771, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
       result[Penguin] = makeMesh(517, 511, 163, 192, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
       result[BackgroundUpperPart] = makeMesh(0, 0, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
       result[BackgroundLowerPart] = makeMesh(0, 384, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
 
       return result;
+   }
+
+   enum BunnyVariant
+   {
+      Plain,
+      Dino,
+      GreyDino,
+   };
+
+   struct BunnyData
+   {
+      float timeFactor;
+      Vec2 startingPosition;
+      MeshId startingMesh;
+      Vec2 impulse;
+      Vec2 collisionHalfsize;
+      uint32_t variant;
+   };
+
+   static bool isDino(uint32_t variant)
+   {
+      auto result = variant == Dino || variant == GreyDino;
+      return result;
+   }
+
+   static void makeBunny(SessionState& session, BunnyData bunny)
+   {
+      session.deltaTime.emplace_back();
+      session.position.emplace_back();
+      session.render.emplace_back();
+      session.movement.emplace_back();
+      session.collision.emplace_back();
+      session.type.emplace_back();
+      session.animation.emplace_back();
+      uint32_t e = session.deltaTime.size() - 1;
+
+      session.deltaTime[e] = {0, 0, bunny.timeFactor};
+      session.position[e] = {bunny.startingPosition};
+      session.render[e] = {Color{1, 1, 1}, bunny.startingMesh};
+      session.movement[e] = {60, vec2::normalize(bunny.impulse), bunny.impulse, bunny.startingPosition};
+      session.collision[e] = {{CollisionShape::RectShape, {}}, 0, 0x1, 0xffff};
+      session.collision[e].shape.rect = {{}, bunny.collisionHalfsize};
+      session.type[e] = {bunny.variant};
+      session.animation[e] = {0, milisToMicros(100)};
+
+      assert(session.deltaTime.size() == session.position.size() &&
+             session.deltaTime.size() == session.render.size() &&
+             session.deltaTime.size() == session.movement.size() &&
+             session.deltaTime.size() == session.collision.size() &&
+             session.deltaTime.size() == session.animation.size() &&
+             session.deltaTime.size() == session.type.size());
+   }
+
+   static void removeBunny(SessionState& session, uint32_t e)
+   {
+      session.deltaTime.erase(session.deltaTime.begin() + e);
+      session.position.erase(session.position.begin() + e);
+      session.render.erase(session.render.begin() + e);
+      session.movement.erase(session.movement.begin() + e);
+      session.collision.erase(session.collision.begin() + e);
+      session.type.erase(session.type.begin() + e);
+      session.animation.erase(session.animation.begin() + e);
+   }
+
+   static void spawnRandomBunny(GameState& game, SessionState& session)
+   {
+      Random rand;
+      BunnyData bunny;
+      bunny.timeFactor = 1;
+      bunny.collisionHalfsize = {1.5f, 1.5f};
+
+      bunny.impulse = {(float)rand.randInt(10, 16), (float)rand.randInt(10, 16)};
+      bunny.startingPosition = game.spawnPoint.center +
+         Vec2{(float)rand.randInt((int32_t)-game.spawnPoint.halfSize.x, (int32_t)game.spawnPoint.halfSize.x),
+         (float)rand.randInt((int32_t)-game.spawnPoint.halfSize.y, (int32_t)game.spawnPoint.halfSize.y)};
+
+      float dinoChance = 0.15f;
+      auto chance = rand.randFloat();
+      if( chance < dinoChance )
+      {
+         bunny.variant = rand.randInt(1, 3);
+      }
+      else
+      {
+         bunny.variant = 0;
+      }
+      bunny.startingMesh = (MeshId)(bunny.variant * 3);
+      makeBunny(session, bunny);
+   }
+
+   static bool session_init(GameState& game, SessionState& session)
+   {
+      session = SessionState();
+
+      spawnRandomBunny(game, session);
+
+      return true;
    }
 
    static bool game_init(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
@@ -107,37 +206,13 @@ namespace core
 
       game.fontDesc = loadFont(lua, CORE_RESOURCE("font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
+      game.dinosCaught = 0;
+      game.rabbitsCaught = 0;
       game.musicPlaying = false;
 
-      return true;
-   }
-
-   static void makePlayer(SessionState& session)
-   {
-      session.deltaTime.push_back({0, 0, 1});
-      session.position.push_back({Vec2{0, 0}});
-      session.render.push_back({Color{0, 1, 0}, Bunny1});
-      session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}});
-      session.targetDirection.push_back({0, 0});
-      session.collision.push_back({{CollisionShape::CircleShape, {}}, 0, 0x1, 0xffff});
-      session.collision.back().shape.circle = {{}, 1};
-
-      assert(session.deltaTime.size() == session.position.size() &&
-             session.deltaTime.size() == session.render.size() &&
-             session.deltaTime.size() == session.movement.size() &&
-             session.deltaTime.size() == session.collision.size() &&
-             session.deltaTime.size() == session.targetDirection.size());
-   }
-
-   static bool session_init(GameState& game, SessionState& session)
-   {
-      session = SessionState();
-      makePlayer(session);
-
-      makePlayer(session);
-      session.movement.back().position.x = session.position.back().position.x = 12;
-      session.collision.back().shape.type = CollisionShape::RectShape;
-      session.collision.back().shape.rect = {{}, {1, 1}};
+      game.spawnPoint = {{-10, -3}, {10, 2}};
+      game.backgroundPos = {511.5f, 198.5f};
+      session_init(game, game.session);
 
       return true;
    }
@@ -288,14 +363,16 @@ namespace core
    {
       enum class Type
       {
-
+         Click,
+         Move,
       };
       Type type;
       uint32_t entity;
       bool isAnalogue;
       union
       {
-         uint32_t temp;
+         Vec2 clickLocation;
+         Vec2 move;
       };
    };
 
@@ -306,24 +383,40 @@ namespace core
       {
          switch( e.type )
          {
-            case WE_KEYBOARDKEY:
-            {
-
-            } break;
-
-            case WE_GAMEPADAXIS:
-            {
-
-            } break;
-
             case WE_MOUSEBUTTON:
             {
-
+               if( e.mouse.button.id == Mouse::LeftButton && e.mouse.button.isDown )
+               {
+                  GameMessage ge{};
+                  ge.clickLocation = {(float)e.mouse.position.x, (float)e.mouse.position.y};
+                  result.push_back(ge);
+               }
             } break;
-
-            case WE_MOUSEMOVE:
+            case WE_KEYBOARDKEY:
             {
-
+               GameMessage ge{};
+               ge.type = GameMessage::Type::Move;
+               float m = 0.5f;
+               if( e.keyboard.key.id == Keyboard::ArrowLeft )
+               {
+                  ge.move = {-m, 0};
+                  result.push_back(ge);
+               }
+               else if( e.keyboard.key.id == Keyboard::ArrowRight )
+               {
+                  ge.move = {m, 0};
+                  result.push_back(ge);
+               }
+               else if( e.keyboard.key.id == Keyboard::ArrowUp )
+               {
+                  ge.move = {0, m};
+                  result.push_back(ge);
+               }
+               else if( e.keyboard.key.id == Keyboard::ArrowDown )
+               {
+                  ge.move = {0, -m};
+                  result.push_back(ge);
+               }
             } break;
          }
       }
@@ -363,52 +456,48 @@ namespace core
          return l.type < r.type;
       });
 
-      for( auto& ge : gameEvents )
-      {
-
-      }
-
       //    AI updates:
       //       - decide if should be moving
       //       - decide location to move to, calculate movement direction target
       //       - update aim based on movement direction
       //    simulation updates:
       //       - update movement direction based on target direction
-      for( uint32_t e = 0; e < session.targetDirection.size(); ++e )
-      {
-         if( session.movement[e].acceleration > 0.0f )
-         {
-            float currentRad = radians(session.movement[e].direction);
-            auto target = vec2::normalize(session.targetDirection[e]);
-            float targetRad = radians(target);
-            float currentDeg = Rad2Deg(currentRad);
-            float targetDeg = Rad2Deg(targetRad);
-
-            auto wra = targetDeg - currentDeg;
-            if( wra > 180.0f ) wra -= 360.0f;
-            if( wra < -180.0f ) wra += 360.0f;
-
-            currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
-            currentRad = Deg2Rad(currentDeg);
-
-            session.movement[e].direction.x = std::cosf(currentRad);
-            session.movement[e].direction.y = std::sinf(currentRad);
-         }
-      }
       //       - propose movement in current direction
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
+      Vec2 gravity = {0, -9};
       for( uint32_t e = 0; e < session.movement.size(); ++e )
       {
-         auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
-         acceleration += -session.movement[e].velocity * 10.0f;
+         auto acceleration = vec2::normalize(session.movement[e].velocity) * session.movement[e].acceleration;
+         acceleration = gravity;
          session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
-         session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
+         session.movement[e].velocity = (acceleration)*session.deltaTime[e].deltaTime + session.movement[e].velocity;
       }
 
       //       - find collisions for new position
-      auto collisionPairs = findCollisions(session);
+      std::vector<uint32_t> clickedRabbits{};
+      for( auto& ge : gameEvents )
+      {
+         if( ge.type == GameMessage::Type::Click )
+         {
+            CollisionShape point{};
+            point.type = CollisionShape::PointShape;
+            gfx.setPerspectiveProjection();
+            point.point = gfx.screenToWorld(game.camera, ge.clickLocation);
+            for( uint32_t e = 0; e < session.collision.size(); ++e )
+            {
+               session.collision[e].shape.rect.center = session.movement[e].position;
+               auto result = areInCollision(point, session.collision[e].shape);
+               if( result.colliding )
+               {
+                  clickedRabbits.push_back(e);
+               }
+               session.collision[e].shape.rect.center = {};
+            }
+         }
+      }
+
       //       - [resolve collisions via displacement vector]->optional depending on performance
       //       - accept new position with displacement vector added
       for( uint32_t e = 0; e < session.movement.size(); ++e )
@@ -418,13 +507,41 @@ namespace core
             session.position[e].position = session.movement[e].position;
          }
       }
-      for( auto& pair : collisionPairs )
+      /*for( auto& pair : collisionPairs )
       {
-         session.position[pair.collider].position += pair.displacement;
-      }
+      session.position[pair.collider].position += pair.displacement;
+      }*/
       //       - fix camera to new position and zoom level
       //    gameplay update:
       //       - collision response
+      // check if rabbit should go away because it's not visible anymore
+      for( auto e : clickedRabbits )
+      {
+         if( isDino(session.type[e].variant) )
+         {
+            ++game.dinosCaught;
+         }
+         else
+         {
+            ++game.rabbitsCaught;
+         }
+         removeBunny(session, e);
+      }
+      //check if rabbit is over
+      for( uint32_t e = 0; e < session.position.size(); )
+      {
+         if( session.position[e].position.y + session.collision[e].shape.rect.halfSize.y < 0 &&
+            session.position[e].position.x - session.collision[e].shape.rect.halfSize.x > 0 )
+         {
+            removeBunny(session, e);
+         }
+         else
+         {
+            ++e;
+         }
+      }
+      //spawn new random rabbits
+
       //       - damage calculation
       //       - bullets hurt monsters
       //       - blasts hurt monsters
@@ -446,6 +563,17 @@ namespace core
       //    visual updates:
       //       - change orientation based on aim direction
       //       - animation
+      for( uint32_t e = 0; e < session.animation.size(); ++e )
+      {
+         session.animation[e].micros += session.deltaTime[e].deltaMicros;
+         if( session.animation[e].micros >= session.animation[e].microsPerFrame )
+         {
+            session.animation[e].micros -= session.animation[e].microsPerFrame;
+            session.animation[e].frame = (session.animation[e].frame + 1) % 3;
+            auto meshId = session.animation[e].frame + 3 * session.type[e].variant;
+            session.render[e].mesh = (MeshId)meshId;
+         }
+      }
       //       - transparency
       return true;
    }
@@ -471,47 +599,50 @@ namespace core
          return false;
       };
 
-      if( contains(Keyboard::Space, ACTION) )
-      {
-         if( game.musicPlaying )
-         {
-            audio.stopMusic();
-            game.musicPlaying = false;
-         }
-         else
-         {
-            audio.playMusic(game.assets.song);
-            game.musicPlaying = true;
-         }
-      }
-
       session_update(time, game, game.session, frameEvents, audio, lua, gfx);
       return stillRunning;
    }
 
    static void session_render(Time time, GameState& game, SessionState& session, GraphicsSystem& gfx, FontSystem& font)
    {
-      gfx.setOrthographicProjection();
+      gfx.setPerspectiveProjection();
       gfx.setTransparency(false);
 
-      gfx.renderMesh({{0, 200}, {200, 200}}, {}, game.meshes[BackgroundUpperPart]);
+      auto scale = Vec2{10, 10};
+      auto worldPos = gfx.screenToWorld(game.camera, game.backgroundPos);
+      gfx.renderMesh({worldPos, scale}, {}, game.meshes[BackgroundUpperPart]);
 
-      gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
+
       for( uint32_t e = 0; e < session.render.size(); ++e )
       {
-         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[Bunny1]);
-      }
-      gfx.renderMesh({{3, 3}, {1, 1}, 0}, {}, game.meshes[Bunny1]);
+         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
 
-      gfx.setOrthographicProjection();
+         auto collisionMesh = makeOutlineQuad(session.collision[e].shape.rect.center, session.collision[e].shape.rect.halfSize, game.assets.mainVS, game.assets.mainPS);
+         gfx.renderMesh(session.position[e].position, session.render[e].color, collisionMesh);
+      }
+
+      auto spawnMesh = makeOutlineQuad(game.spawnPoint, game.assets.mainVS, game.assets.mainPS);
+      gfx.renderMesh({}, {}, spawnMesh);
+
+      auto lineMesh = makeSolidQuad({}, {100, 0.1f}, game.assets.mainVS, game.assets.mainPS);
+      //gfx.renderMesh({}, {}, lineMesh);
+
       gfx.setTransparency(false);
-      gfx.renderMesh({{0, -200}, {200, 200}}, {}, game.meshes[BackgroundLowerPart]);
+      gfx.renderMesh({-worldPos, scale}, {}, game.meshes[BackgroundLowerPart]);
+
+      gfx.setTransparency(true);
+      gfx.setOrthographicProjection();
+      std::string str = "Dino ulovljen: ";
+      str += std::to_string(game.dinosCaught);
+      auto caughtMesh = font.makeTextMesh(str.c_str(), game.fontDesc, {1, 1}, Left, Top);
+      gfx.renderMesh({Vec2{-520, 380}}, {}, caughtMesh);
    }
 
    static void game_render(Time time, GameState& game, GraphicsSystem& gfx, FontSystem& font)
    {
       gfx.applyCamera(game.camera);
+
 
       session_render(time, game, game.session, gfx, font);
 
