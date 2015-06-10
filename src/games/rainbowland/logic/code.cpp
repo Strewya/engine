@@ -52,6 +52,20 @@ namespace core
       RedPlayer,
    };
 
+   static Mesh makeMesh(float x, float y, float w, float h, TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
+   {
+      auto txtr = textures.getData(texture);
+      float tw = (float)txtr.width;
+      float th = (float)txtr.height;
+      float hw = w * 0.5f;
+      float hh = h * 0.5f;
+      float smallerDimension = hw > hh ? hh : hw;
+      hw /= smallerDimension;
+      hh /= smallerDimension;
+      auto result = makeTexturedQuad({}, {hw, hh}, texture, {x / tw, y / th}, {(x + w) / tw, (y + h) / th}, vertex, pixel);
+      return result;
+   }
+
    static std::vector<Mesh> loadMeshes(GameState& game, TextureManager& textures)
    {
       std::vector<Mesh> result{};
@@ -78,6 +92,9 @@ namespace core
 
       game.constants.playerAcceleration = 60;
       game.constants.playerAimLength = 4;
+      game.constants.showCursor = false;
+      game.constants.lockCursor = true;
+      game.constants.relativeCursor = true;
 
       return true;
    }
@@ -715,6 +732,8 @@ namespace core
             } break;
          }
          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
+         auto moveDir = makeLine(Vec2{}, session.movement[e].direction, game.assets.mainVS, game.assets.mainPS);
+         gfx.renderMesh(session.position[e].position, {}, moveDir);
       }
    }
 

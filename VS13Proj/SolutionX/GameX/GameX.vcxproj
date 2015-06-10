@@ -282,6 +282,7 @@
     <ClCompile Include="..\..\..\src\util\geometry\rect.cpp" />
     <ClCompile Include="..\..\..\src\util\geometry\vec2.cpp" />
     <ClCompile Include="..\..\..\src\util\geometry\vec3.cpp" />
+    <ClCompile Include="..\..\..\src\util\random.cpp" />
     <ClCompile Include="..\..\..\src\util\ring_buffer.cpp" />
     <ClCompile Include="..\..\..\src\util\time\clock.cpp" />
     <ClCompile Include="..\..\..\src\util\time\cooldown_timer.cpp" />
@@ -357,6 +358,7 @@
     <ClInclude Include="..\..\..\src\util\geometry\vec2.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h" />
     <ClInclude Include="..\..\..\src\util\memory_sizes.h" />
+    <ClInclude Include="..\..\..\src\util\random.h" />
     <ClInclude Include="..\..\..\src\util\ring_buffer.h" />
     <ClInclude Include="..\..\..\src\util\template\name_cache_template.h" />
     <ClInclude Include="..\..\..\src\util\template\resource_cache_template.h" />

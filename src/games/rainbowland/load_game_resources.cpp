@@ -15,7 +15,7 @@ namespace core
 {
    GameResources loadGameResources(SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
-      GameResources assets;
+      GameResources assets{};
       assets.atlas = textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
       assets.background = textures.loadFromFile(CORE_RESOURCE("Textures/background.png"));
       assets.font = textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png"));

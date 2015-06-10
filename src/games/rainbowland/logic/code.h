@@ -44,6 +44,9 @@ namespace core
       float windowHeight;
       float playerAcceleration;
       float playerAimLength;
+      bool showCursor;
+      bool lockCursor;
+      bool relativeCursor;
    };
 
    struct Time

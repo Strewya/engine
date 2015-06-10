@@ -41,4 +41,6 @@ namespace core
    // rounds 'points' to the next power of 2
    Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
    Mesh makeOutlineCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+
+   Mesh makeLine(Vec2 a, Vec2 b, HVertexShader vshader, HPixelShader pshader);
 }

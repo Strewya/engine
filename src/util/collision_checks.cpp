@@ -16,10 +16,10 @@ namespace core
    bool isPointInsideRect(Vec2 point, Rect rect)
    {
       auto result = true;
-      if( point.x < rect.center.x - rect.halfSize.x ) result = false;
-      else if( point.x > rect.center.x + rect.halfSize.x ) result = false;
-      else if( point.y < rect.center.y - rect.halfSize.y ) result = false;
-      else if( point.y > rect.center.y + rect.halfSize.y ) result = false;
+      if( point.x < rect.left() ) result = false;
+      else if( point.x > rect.right() ) result = false;
+      else if( point.y < rect.bottom() ) result = false;
+      else if( point.y > rect.top() ) result = false;
       return result;
    }
 
@@ -87,11 +87,12 @@ namespace core
 
    bool isCircleTouchingRect(Circle circle, Rect rect)
    {
-      auto result = true;
-      if( circle.center.x + circle.radius < rect.left() ) result = false;
-      else if( circle.center.x - circle.radius > rect.right() ) result = false;
-      else if( circle.center.y + circle.radius < rect.bottom() ) result = false;
-      else if( circle.center.y - circle.radius > rect.top() ) result = false;
+      auto V = circle.center - rect.center;
+      clamp(V.x, -rect.halfSize.x, rect.halfSize.x);
+      clamp(V.y, -rect.halfSize.y, rect.halfSize.y);
+      auto Bc = rect.center + V;
+      auto D = circle.center - Bc;
+      auto result = (circle.radius >= vec2::length(D));
       return result;
    }
 

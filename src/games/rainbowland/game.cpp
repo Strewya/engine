@@ -168,9 +168,9 @@ namespace core
             case WE_GAINFOCUS:
             {
                isPaused = false;
-               window.showCursor(false);
-               window.lockCursor(true);
-               window.makeMouseRelative(true);
+               window.showCursor(game.constants.showCursor);
+               window.lockCursor(game.constants.lockCursor);
+               window.makeMouseRelative(game.constants.relativeCursor);
             } break;
          }
       }

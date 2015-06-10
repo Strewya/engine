@@ -195,4 +195,18 @@ namespace core
 
       return result;
    }
+
+   Mesh makeLine(Vec2 a, Vec2 b, HVertexShader vshader, HPixelShader pshader)
+   {
+      Mesh result{};
+      result.pshader = pshader;
+      result.vshader = vshader;
+      result.topology = LineList;
+      result.indices = {0, 1};
+      result.vertices = {
+         {{a.x, a.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0},
+         {{b.x, b.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0},
+      };
+      return result;
+   }
 }
