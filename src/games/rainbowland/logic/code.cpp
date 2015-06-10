@@ -13,7 +13,6 @@
 #include "input/keyboard.h"
 #include "input/mouse.h"
 #include "util/collision_checks.h"
-#include "util/random.h"
 #include "util/time/time_unit_conversions.h"
 /******* end headers *******/
 
@@ -80,16 +79,16 @@ namespace core
    {
       std::vector<Mesh> result{};
       result.resize(MeshId::Count);
-      result[Bunny1] = makeMesh(18, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2] = makeMesh(168, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3] = makeMesh(1, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny1Dino1] = makeMesh(401, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2Dino1] = makeMesh(553, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3Dino1] = makeMesh(386, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny1Dino2] = makeMesh(788, 2, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny2Dino2] = makeMesh(938, 186, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Bunny3Dino2] = makeMesh(771, 340, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
-      result[Penguin] = makeMesh(517, 511, 163, 192, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1] = makeMesh(25, 9, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2] = makeMesh(175, 193, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3] = makeMesh(8, 347, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino1] = makeMesh(408, 9, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino1] = makeMesh(560, 193, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino1] = makeMesh(393, 347, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny1Dino2] = makeMesh(795, 9, 349, 173, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny2Dino2] = makeMesh(945, 193, 187, 144, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Bunny3Dino2] = makeMesh(778, 347, 383, 140, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
+      result[Penguin] = makeMesh(524, 518, 163, 190, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS);
       result[BackgroundUpperPart] = makeMesh(0, 0, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
       result[BackgroundLowerPart] = makeMesh(0, 384, 1466, 384, textures, game.assets.background, game.assets.mainVS, game.assets.mainPS);
 
@@ -160,7 +159,7 @@ namespace core
 
    static void spawnRandomBunny(GameState& game, SessionState& session)
    {
-      Random rand;
+      Random& rand = game.randGen;
       BunnyData bunny;
       bunny.timeFactor = 1;
       bunny.collisionHalfsize = {1.5f, 1.5f};
@@ -207,11 +206,16 @@ namespace core
       game.fontDesc = loadFont(lua, CORE_RESOURCE("font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
       game.dinosCaught = 0;
-      game.rabbitsCaught = 0;
+      game.bunniesCaught = 0;
       game.musicPlaying = false;
-
-      game.spawnPoint = {{-10, -3}, {10, 2}};
+      game.spawnBunnyMicros = 0;
+      game.spawnBunnyPeriodMicros = milisToMicros(250);
+      game.spawnPoint = {{-14, -3}, {10, 2}};
       game.backgroundPos = {511.5f, 198.5f};
+      game.penguinPos = {24, -17};
+
+      audio.playMusic(game.assets.song);
+
       session_init(game, game.session);
 
       return true;
@@ -476,7 +480,7 @@ namespace core
       }
 
       //       - find collisions for new position
-      std::vector<uint32_t> clickedRabbits{};
+      std::vector<uint32_t> clickedBunnies{};
       for( auto& ge : gameEvents )
       {
          if( ge.type == GameMessage::Type::Click )
@@ -485,16 +489,23 @@ namespace core
             point.type = CollisionShape::PointShape;
             gfx.setPerspectiveProjection();
             point.point = gfx.screenToWorld(game.camera, ge.clickLocation);
-            for( uint32_t e = 0; e < session.collision.size(); ++e )
+            if( point.point.y >= 0 )
             {
-               session.collision[e].shape.rect.center = session.movement[e].position;
-               auto result = areInCollision(point, session.collision[e].shape);
-               if( result.colliding )
+               for( uint32_t e = 0; e < session.collision.size(); ++e )
                {
-                  clickedRabbits.push_back(e);
+                  session.collision[e].shape.rect.center = session.movement[e].position;
+                  auto result = areInCollision(point, session.collision[e].shape);
+                  if( result.colliding )
+                  {
+                     clickedBunnies.push_back(e);
+                  }
+                  session.collision[e].shape.rect.center = {};
                }
-               session.collision[e].shape.rect.center = {};
             }
+         }
+         else if( ge.type == GameMessage::Type::Move )
+         {
+            game.penguinPos += ge.move;
          }
       }
 
@@ -514,8 +525,8 @@ namespace core
       //       - fix camera to new position and zoom level
       //    gameplay update:
       //       - collision response
-      // check if rabbit should go away because it's not visible anymore
-      for( auto e : clickedRabbits )
+      // check if bunny should go away because it was clicked on
+      for( auto e : clickedBunnies )
       {
          if( isDino(session.type[e].variant) )
          {
@@ -523,14 +534,14 @@ namespace core
          }
          else
          {
-            ++game.rabbitsCaught;
+            ++game.bunniesCaught;
          }
          removeBunny(session, e);
       }
-      //check if rabbit is over
+      //check if bunny is not visible anymore
       for( uint32_t e = 0; e < session.position.size(); )
       {
-         if( session.position[e].position.y + session.collision[e].shape.rect.halfSize.y < 0 &&
+         if( session.position[e].position.y + session.collision[e].shape.rect.halfSize.y < -1 &&
             session.position[e].position.x - session.collision[e].shape.rect.halfSize.x > 0 )
          {
             removeBunny(session, e);
@@ -540,8 +551,13 @@ namespace core
             ++e;
          }
       }
-      //spawn new random rabbits
-
+      //spawn new bunnies
+      game.spawnBunnyMicros += time.deltaMicrosVirt;
+      if( game.spawnBunnyMicros >= game.spawnBunnyPeriodMicros )
+      {
+         game.spawnBunnyMicros -= game.spawnBunnyPeriodMicros;
+         spawnRandomBunny(game, session);
+      }
       //       - damage calculation
       //       - bullets hurt monsters
       //       - blasts hurt monsters
@@ -617,26 +633,25 @@ namespace core
       for( uint32_t e = 0; e < session.render.size(); ++e )
       {
          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
-
-         auto collisionMesh = makeOutlineQuad(session.collision[e].shape.rect.center, session.collision[e].shape.rect.halfSize, game.assets.mainVS, game.assets.mainPS);
-         gfx.renderMesh(session.position[e].position, session.render[e].color, collisionMesh);
       }
 
       auto spawnMesh = makeOutlineQuad(game.spawnPoint, game.assets.mainVS, game.assets.mainPS);
       gfx.renderMesh({}, {}, spawnMesh);
 
-      auto lineMesh = makeSolidQuad({}, {100, 0.1f}, game.assets.mainVS, game.assets.mainPS);
-      //gfx.renderMesh({}, {}, lineMesh);
-
       gfx.setTransparency(false);
       gfx.renderMesh({-worldPos, scale}, {}, game.meshes[BackgroundLowerPart]);
 
+
       gfx.setTransparency(true);
+      gfx.renderMesh({game.penguinPos, {2, 2}}, {}, game.meshes[MeshId::Penguin]);
       gfx.setOrthographicProjection();
-      std::string str = "Dino ulovljen: ";
-      str += std::to_string(game.dinosCaught);
+      std::string str = "Dinolovka!";
       auto caughtMesh = font.makeTextMesh(str.c_str(), game.fontDesc, {1, 1}, Left, Top);
-      gfx.renderMesh({Vec2{-520, 380}}, {}, caughtMesh);
+      gfx.renderMesh({Vec2{-500, 360}}, colorFromHex(0xFF7811), caughtMesh);
+      str = "Ulovljeno nevinih zecova : " + std::to_string(game.bunniesCaught);
+      str += "\nDino ulovljen " + std::to_string(game.dinosCaught) + " puta.";
+      caughtMesh = font.makeTextMesh(str.c_str(), game.fontDesc, {1, 1}, Left, Top);
+      gfx.renderMesh({Vec2{-100, 360}}, colorFromHex(0xFF7811), caughtMesh);
    }
 
    static void game_render(Time time, GameState& game, GraphicsSystem& gfx, FontSystem& font)

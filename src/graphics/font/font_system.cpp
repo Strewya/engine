@@ -68,8 +68,6 @@ namespace core
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
       
-      //float width = generateVertices(result.vertices, text, characterCount, fd.glyphs, scale, textureWidth, textureHeight);
-
       uint32_t lastNewline = 0;
       float yPosition = 0;
       for( uint32_t charIndex = 0; charIndex < characterCount; ++charIndex )
@@ -78,13 +76,14 @@ namespace core
          {
             auto verts = result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lastNewline, charIndex, 0, yPosition);
-            justifyAxisX(result.vertices, justify_x, 0, x, 0);
+            justifyAxisX(result.vertices, justify_x, verts, x, 0);
             lastNewline = charIndex + 1;
             yPosition -= fontHeight;
          }
       }
+      auto verts = result.vertices.size();
       auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lastNewline, characterCount, 0, yPosition);
-      justifyAxisX(result.vertices, justify_x, 0, x, 0);
+      justifyAxisX(result.vertices, justify_x, verts, x, 0);
       justifyAxisY(result.vertices, justify_y, fontHeight, 0, 0);
 
       return result;

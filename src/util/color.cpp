@@ -44,5 +44,15 @@ namespace core
    {
       return !(l == r);
    }
+
+   Color colorFromHex(uint32_t hexValue)
+   {
+      uint8_t r = hexValue >> 16 & 0xff;
+      uint8_t g = hexValue >> 8 & 0xff;
+      uint8_t b = hexValue >> 0 & 0xff;
+
+      Color result{r / 255.0f, g / 255.0f, b / 255.0f, 1};
+      return result;
+   }
 }
 

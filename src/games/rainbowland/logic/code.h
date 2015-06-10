@@ -14,10 +14,11 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
+#include "util/color.h"
+#include "util/random.h"
 #include "util/geometry/circle.h"
 #include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
-#include "util/color.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -154,10 +155,14 @@ namespace core
       // #todo make this a mesh cache thingamabob
       std::vector<Mesh> meshes;
 
+      Random randGen;
       Vec2 backgroundPos;
+      Vec2 penguinPos;
       Rect spawnPoint;
       uint32_t dinosCaught;
-      uint32_t rabbitsCaught;
+      uint32_t bunniesCaught;
+      uint32_t spawnBunnyPeriodMicros;
+      uint32_t spawnBunnyMicros;
       bool musicPlaying;
 
    };

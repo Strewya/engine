@@ -25,4 +25,6 @@ namespace core
 
    bool operator==(Color l, Color r);
    bool operator!=(Color l, Color r);
+
+   Color colorFromHex(uint32_t hexValue);
 }
