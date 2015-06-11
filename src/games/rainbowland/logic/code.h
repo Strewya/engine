@@ -86,12 +86,17 @@ namespace core
       Vec2 position;
    };
 
+   struct Line
+   {
+      Vec2 lineFromOrigin;
+   };
+
    struct CollisionShape
    {
       enum Type
       {
          PointShape,
-         //LineShape,
+         LineShape,
          CircleShape,
          RectShape,
       };
@@ -99,7 +104,7 @@ namespace core
       union
       {
          Vec2 point;
-         //Line line???
+         Line line;
          Circle circle;
          Rect rect;
       };
@@ -111,6 +116,9 @@ namespace core
       uint32_t collisionGroup;
       uint16_t selfTypeBits;
       uint16_t targetTypeBits;
+      bool sensor;
+      bool previouslyInCollision;
+      bool currentlyInCollision;
    };
 
    struct CollisionPair
@@ -127,6 +135,7 @@ namespace core
 
    struct SessionState
    {
+      uint32_t entityCount;
       std::vector<DeltaTimeData> deltaTime;
       std::vector<RenderData> render;
       std::vector<PositionData> position;

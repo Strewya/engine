@@ -8,6 +8,7 @@
 /******* personal header *******/
 #include "games/rainbowland/logic/code.h"
 /******* c++ headers *******/
+#include <unordered_set>
 /******* extra headers *******/
 #include "input/gamepad.h"
 #include "input/keyboard.h"
@@ -50,6 +51,7 @@ namespace core
       GreenPlayer,
       PurplePlayer,
       RedPlayer,
+      LineMesh,
    };
 
    static Mesh makeMesh(float x, float y, float w, float h, TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
@@ -83,6 +85,8 @@ namespace core
       result = checkGameResourcesLoaded(game.assets);
 
       game.meshes = loadMeshes(game, gfx.textures);
+      game.meshes.push_back({});
+      game.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
 
       game.camera.setPosition({0, 0, -50});
       game.globalGameState = GameState::GlobalGameState::MainMenu;
@@ -99,34 +103,116 @@ namespace core
       return true;
    }
 
-   static void makePlayer(SessionState& session)
+   inline void assertEntity(SessionState& session)
    {
-      session.deltaTime.push_back({0, 0, 1});
-      session.position.push_back({Vec2{0, 0}});
-      session.render.push_back({Color{0, 1, 0}, GreenPlayer});
-      session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}});
-      session.aim.push_back({Vec2{0, 0}});
-      session.targetDirection.push_back({0, 0});
-      session.collision.push_back({{CollisionShape::CircleShape, {}}, 0, 0x1, 0xffff});
-      session.collision.back().shape.circle = {{}, 1};
+      assert(session.entityCount == session.deltaTime.size() &&
+             session.entityCount == session.position.size() &&
+             session.entityCount == session.render.size() &&
+             session.entityCount == session.movement.size() &&
+             session.entityCount == session.aim.size() &&
+             session.entityCount == session.collision.size() &&
+             session.entityCount == session.targetDirection.size());
+   }
 
-      assert(session.deltaTime.size() == session.position.size() &&
-             session.deltaTime.size() == session.render.size() &&
-             session.deltaTime.size() == session.movement.size() &&
-             session.deltaTime.size() == session.aim.size() &&
-             session.deltaTime.size() == session.collision.size() &&
-             session.deltaTime.size() == session.targetDirection.size());
+   struct PlayerData
+   {
+      float timeFactor;
+      Vec2 startingPosition;
+      Color color;
+      MeshId startingMeshId;
+      Vec2 startingAim;
+      CollisionShape collisionShape;
+      bool sensor;
+   };
+
+   inline PlayerData defaultPlayerData()
+   {
+      PlayerData result{};
+      
+      result.timeFactor = 1;
+      result.startingPosition = {0, 0};
+      result.color = {1, 1, 1};
+      result.startingMeshId = (MeshId)0;
+      result.startingAim = {1, 0};
+      result.collisionShape.type = CollisionShape::CircleShape;
+      result.collisionShape.circle = {{}, 1};
+      result.sensor = false;
+      
+      return result;
+   }
+
+   static void makePlayer(SessionState& session, const PlayerData& data)
+   {
+      ++session.entityCount;
+      session.deltaTime.push_back({0, 0, data.timeFactor});
+      session.position.push_back({data.startingPosition});
+      session.render.push_back({data.color, data.startingMeshId});
+      session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}, data.startingPosition});
+      session.aim.push_back({data.startingAim});
+      session.targetDirection.push_back({0, 0});
+      session.collision.push_back({data.collisionShape, 0, 0x01, 0xffff, data.sensor, false, false});
+
+      assertEntity(session);
+   }
+
+   struct BulletData
+   {
+      float timeFactor;
+      Vec2 startingPosition;
+      Vec2 direction;
+      float speed;
+   };
+
+   inline BulletData defaultBulletData()
+   {
+      BulletData result{};
+
+      result.timeFactor = 1;
+      result.startingPosition = {0, 0};
+      result.direction = {0, 0};
+      result.speed = 1;
+
+      return result;
+   }
+
+   static void makeBullet(SessionState& session, const BulletData& data)
+   {
+      ++session.entityCount;
+      session.deltaTime.push_back({0, 0, data.timeFactor});
+      session.position.push_back({data.startingPosition});
+      session.render.push_back({});
+      session.movement.push_back({0, data.direction, data.direction*data.speed, data.startingPosition});
+      session.aim.push_back({});
+      session.targetDirection.push_back({});
+      CollisionShape shape;
+      shape.type = CollisionShape::LineShape;
+      shape.line.lineFromOrigin = {-1, 0};
+      session.collision.push_back({shape});
+
+      assertEntity(session);
    }
 
    static bool session_init(GameState& game, SessionState& session)
    {
-      session = SessionState();
-      makePlayer(session);
+      session = SessionState{0};
+      session.deltaTime.reserve(500);
+      session.render.reserve(500);
+      session.position.reserve(500);
+      session.movement.reserve(500);
+      session.aim.reserve(500);
+      session.collision.reserve(500);
+      session.targetDirection.reserve(500);
 
-      makePlayer(session);
-      session.movement.back().position.x = session.position.back().position.x = 12;
-      session.collision.back().shape.type = CollisionShape::RectShape;
-      session.collision.back().shape.rect = {{}, {1, 1}};
+      auto data = defaultPlayerData();
+
+      data.sensor = true;
+      makePlayer(session, data);
+      
+      data.startingPosition.x = 12;
+      data.collisionShape.type = CollisionShape::RectShape;
+      data.collisionShape.rect = {{}, {1, 1}};
+      data.sensor = false;
+      makePlayer(session, data);
 
       return true;
    }
@@ -208,9 +294,21 @@ namespace core
       return masks;
    }
 
+   static bool isStartCollision(const CollisionData& d)
+   {
+      auto result = d.previouslyInCollision == false && d.currentlyInCollision == true;
+      return result;
+   }
+
+   static bool isEndCollision(const CollisionData& d)
+   {
+      auto result = d.previouslyInCollision == true && d.currentlyInCollision == false;
+      return result;
+   }
+
    static std::vector<CollisionPair> findCollisions(SessionState& session)
    {
-      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          switch( session.collision[e].shape.type )
          {
@@ -227,29 +325,35 @@ namespace core
                session.collision[e].shape.point = session.movement[e].position;
             } break;
          }
+         session.collision[e].previouslyInCollision = session.collision[e].currentlyInCollision;
+         session.collision[e].currentlyInCollision = false;
       }
 
       std::vector<CollisionPair> result;
-      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         for( uint32_t r = e + 1; r < session.collision.size(); ++r )
+         for( uint32_t r = e + 1; r < session.entityCount; ++r )
          {
             bool testCollision = shouldCollide(session.collision[e], session.collision[r]);
-
+            
             if( testCollision )
             {
                auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
                if( testResult.colliding )
                {
                   result.push_back({e, r, testResult.displacement});
-                  // #test
-                  areInCollision(session.collision[e].shape, session.collision[r].shape);
+                  if( session.collision[e].sensor || session.collision[r].sensor )
+                  {
+                     result.back().displacement = {};
+                  }
                }
+               session.collision[e].currentlyInCollision = session.collision[e].currentlyInCollision || testResult.colliding;
+               session.collision[r].currentlyInCollision = session.collision[r].currentlyInCollision || testResult.colliding;
             }
          }
       }
 
-      for( uint32_t e = 0; e < session.collision.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          switch( session.collision[e].shape.type )
          {
@@ -286,6 +390,7 @@ namespace core
          Player_Rect,
          Tree_Circle,
          Tree_Rect,
+         Player_Sensor,
       };
       Type type;
       uint32_t entity;
@@ -356,6 +461,11 @@ namespace core
                      case Keyboard::_4:
                      {
                         ge.type = GameMessage::Type::Tree_Rect;
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::_5:
+                     {
+                        ge.type = GameMessage::Type::Player_Sensor;
                         result.push_back(ge);
                      } break;
                   }
@@ -554,6 +664,10 @@ namespace core
                session.collision[1].shape.type = CollisionShape::RectShape;
                session.collision[1].shape.rect = {{}, {1, 1}};
             } break;
+            case GameMessage::Type::Player_Sensor:
+            {
+               session.collision[0].sensor = !session.collision[0].sensor;
+            } break;
          }
       }
 
@@ -563,7 +677,7 @@ namespace core
       //       - update aim based on movement direction
       //    simulation updates:
       //       - update movement direction based on target direction
-      for( uint32_t e = 0; e < session.targetDirection.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          if( session.movement[e].acceleration > 0.0f )
          {
@@ -588,7 +702,7 @@ namespace core
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
-      for( uint32_t e = 0; e < session.movement.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
          acceleration += -session.movement[e].velocity * 10.0f;
@@ -600,7 +714,7 @@ namespace core
       auto collisionPairs = findCollisions(session);
       //       - [resolve collisions via displacement vector]->optional depending on performance
       //       - accept new position with displacement vector added
-      for( uint32_t e = 0; e < session.movement.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          if( session.position[e].position != session.movement[e].position )
          {
@@ -610,6 +724,17 @@ namespace core
       for( auto& pair : collisionPairs )
       {
          session.position[pair.collider].position += pair.displacement;
+      }
+      for( uint32_t e = 0; e < session.entityCount; ++e )
+      {
+         if( isStartCollision(session.collision[e]) )
+         {
+            session.render[e].color = {1, 0, 0};
+         }
+         else if( isEndCollision(session.collision[e]) )
+         {
+            session.render[e].color = {0, 1, 0};
+         }
       }
       //       - fix camera to new position and zoom level
       //    gameplay update:
@@ -634,7 +759,7 @@ namespace core
       //       - difficulty increase
       //    visual updates:
       //       - change orientation based on aim direction
-      for( uint32_t e = 0; e < session.render.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          session.render[e].rotationRadians = radians(session.aim[e].aim);
       }
@@ -714,7 +839,7 @@ namespace core
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
 
-      for( uint32_t e = 0; e < session.render.size(); ++e )
+      for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
          auto aimMesh = makeSolidCircle({}, 0.2f, 8, game.assets.mainVS, game.assets.mainPS);
