@@ -13,6 +13,102 @@
 
 namespace core
 {
+   CollisionResult checkCollision(Vec2 point, Rect rect)
+   {
+      auto toLeft = point.x - rect.left();
+      auto toRight = rect.right() - point.x;
+      auto toTop = rect.top() - point.y;
+      auto toBottom = point.y - rect.bottom();
+
+      CollisionResult result{};
+      result.isColliding = (toLeft > 0 && toRight > 0 && toTop > 0 && toBottom > 0);
+      result.displacement = {min(toLeft, toRight), min(toTop, toBottom)};
+
+      if( abs(result.displacement.x) < abs(result.displacement.y) )
+      {
+         result.displacement.y = 0;
+      }
+      else
+      {
+         result.displacement.x = 0;
+      }
+      result.displacement *= vec2::normalize((point - rect.center)*vec2::normalize(result.displacement));
+
+      return result;
+   }
+
+   CollisionResult checkCollision(Rect rect, Vec2 point)
+   {
+      auto result = checkCollision(point, rect);
+      return result;
+   }
+
+   CollisionResult checkCollision(Vec2 point, Circle circle)
+   {
+      auto direction = point - circle.center;
+      auto l = vec2::length(direction);
+      auto r = circle.radius;
+      
+      CollisionResult result{};
+      result.isColliding = (l <= r);
+      result.displacement = vec2::normalize(direction)*(r - l);
+
+      return result;
+   }
+
+   CollisionResult checkCollision(Circle circle, Vec2 point)
+   {
+      auto result = checkCollision(point, circle);
+      return result;
+   }
+
+   CollisionResult checkCollision(Circle a, Circle b)
+   {
+      b.radius += a.radius;
+
+      auto result = checkCollision(a.center, b);
+      return result;
+   }
+
+   CollisionResult checkCollision(Rect a, Rect b)
+   {
+      b.halfSize += a.halfSize;
+
+      auto result = checkCollision(a.center, b);
+      return result;
+   }
+
+   CollisionResult checkCollision(Circle circle, Rect rect)
+   {
+      auto V = circle.center - rect.center;
+      clamp(V.x, -rect.halfSize.x, rect.halfSize.x);
+      clamp(V.y, -rect.halfSize.y, rect.halfSize.y);
+      auto Bc = rect.center + V;
+      auto D = circle.center - Bc;
+      auto Dlen = vec2::length(D);
+      
+      CollisionResult result{};
+      result.isColliding = (circle.radius >= Dlen);
+      result.displacement = vec2::normalize(D)*(circle.radius - Dlen);
+
+      return result;
+   }
+
+   CollisionResult checkCollision(Rect rect, Circle circle)
+   {
+      auto result = checkCollision(circle, rect);
+      result.displacement = -result.displacement;
+      return result;
+   }
+
+
+
+
+
+
+
+
+
    bool isPointInsideRect(Vec2 point, Rect rect)
    {
       auto result = true;

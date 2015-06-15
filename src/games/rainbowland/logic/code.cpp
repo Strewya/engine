@@ -229,54 +229,49 @@ namespace core
       return result;
    }
 
-   struct CollisionCheckResult
+   static CollisionResult areInCollision(CollisionShape one, CollisionShape two)
    {
-      Vec2 displacement;
-      bool colliding;
-   };
-
-   static CollisionCheckResult areInCollision(CollisionShape one, CollisionShape two)
-   {
-      CollisionCheckResult result{};
-      result.colliding = false;
+      CollisionResult result{};
 
       if( one.type == CollisionShape::PointShape )
       {
          if( two.type == CollisionShape::CircleShape )
          {
-            result.colliding = isPointInsideCircle(one.point, two.circle);
-            result.displacement = getDisplacementPointFromCircle(one.point, two.circle);
+            result = checkCollision(one.point, two.circle);
          }
          else if( two.type == CollisionShape::RectShape )
          {
-            result.colliding = isPointInsideRect(one.point, two.rect);
-            result.displacement = getDisplacementPointFromRect(one.point, two.rect);
+            result = checkCollision(one.point, two.rect);
          }
       }
       else if( one.type == CollisionShape::CircleShape )
       {
          if( two.type == CollisionShape::CircleShape )
          {
-            result.colliding = isCircleTouchingCircle(one.circle, two.circle);
-            result.displacement = getDisplacementCircleFromCircle(one.circle, two.circle);
+            result = checkCollision(one.circle, two.circle);
          }
          else if( two.type == CollisionShape::RectShape )
          {
-            result.colliding = isCircleTouchingRect(one.circle, two.rect);
-            result.displacement = getDisplacementCircleFromRect(one.circle, two.rect);
+            result = checkCollision(one.circle, two.rect);
+         }
+         else if( two.type == CollisionShape::PointShape )
+         {
+            result = checkCollision(one.circle, two.point);
          }
       }
       else if( one.type == CollisionShape::RectShape )
       {
          if( two.type == CollisionShape::RectShape )
          {
-            result.colliding = isRectTouchingRect(one.rect, two.rect);
-            result.displacement = getDisplacementRectFromRect(one.rect, two.rect);
+            result = checkCollision(one.rect, two.rect);
          }
          else if( two.type == CollisionShape::CircleShape )
          {
-            result.colliding = isRectTouchingCircle(one.rect, two.circle);
-            result.displacement = getDisplacementRectFromCircle(one.rect, two.circle);
+            result = checkCollision(one.rect, two.circle);
+         }
+         else if( two.type == CollisionShape::PointShape )
+         {
+            result = checkCollision(one.rect, two.point);
          }
       }
       return result;
@@ -339,7 +334,7 @@ namespace core
             if( testCollision )
             {
                auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
-               if( testResult.colliding )
+               if( testResult.isColliding )
                {
                   result.push_back({e, r, testResult.displacement});
                   if( session.collision[e].sensor || session.collision[r].sensor )
@@ -347,8 +342,8 @@ namespace core
                      result.back().displacement = {};
                   }
                }
-               session.collision[e].currentlyInCollision = session.collision[e].currentlyInCollision || testResult.colliding;
-               session.collision[r].currentlyInCollision = session.collision[r].currentlyInCollision || testResult.colliding;
+               session.collision[e].currentlyInCollision = session.collision[e].currentlyInCollision || testResult.isColliding;
+               session.collision[r].currentlyInCollision = session.collision[r].currentlyInCollision || testResult.isColliding;
             }
          }
       }

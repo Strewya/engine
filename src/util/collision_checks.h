@@ -6,13 +6,31 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/geometry/vec2.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Circle;
    struct Rect;
-   struct Vec2;
+
+   struct CollisionResult
+   {
+      Vec2 displacement;
+      bool isColliding;
+   };
+
+   CollisionResult checkCollision(Vec2 point, Rect rect);
+   CollisionResult checkCollision(Rect rect, Vec2 point);
+   CollisionResult checkCollision(Vec2 point, Circle circle);
+   CollisionResult checkCollision(Circle circle, Vec2 point);
+   CollisionResult checkCollision(Circle a, Circle b);
+   CollisionResult checkCollision(Rect a, Rect b);
+   CollisionResult checkCollision(Rect rect, Circle circle);
+   CollisionResult checkCollision(Circle circle, Rect rect);
+
+
+
 
    bool isPointInsideRect(Vec2 point, Rect rect);
    bool isPointInsideCircle(Vec2 point, Circle circle);

@@ -25,7 +25,7 @@ namespace core
 
       float length2(Vec2 v)
       {
-         auto result = v.x*v.x + v.y*v.y;
+         auto result = dotProduct(v, v);
          return result;
       }
 
