@@ -128,7 +128,7 @@ namespace core
    inline PlayerData defaultPlayerData()
    {
       PlayerData result{};
-      
+
       result.timeFactor = 1;
       result.startingPosition = {0, 0};
       result.color = {1, 1, 1};
@@ -137,7 +137,7 @@ namespace core
       result.collisionShape.type = CollisionShape::CircleShape;
       result.collisionShape.circle = {{}, 1};
       result.sensor = false;
-      
+
       return result;
    }
 
@@ -207,10 +207,10 @@ namespace core
 
       data.sensor = true;
       makePlayer(session, data);
-      
+
       data.startingPosition.x = 12;
       data.collisionShape.type = CollisionShape::RectShape;
-      data.collisionShape.rect = {{}, {1, 1}};
+      data.collisionShape.rect = {{}, {4, 4}};
       data.sensor = false;
       makePlayer(session, data);
 
@@ -229,50 +229,93 @@ namespace core
       return result;
    }
 
+   template<typename T>
+   static CollisionResult areInCollision(T one, CollisionShape two)
+   {
+      CollisionResult result{};
+
+      switch( two.type )
+      {
+         case CollisionShape::PointShape:
+         {
+            result = checkCollision(one, two.point);
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            result = checkCollision(one, two.circle);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = checkCollision(one, two.rect);
+         } break;
+      }
+
+      return result;
+   }
+
    static CollisionResult areInCollision(CollisionShape one, CollisionShape two)
    {
       CollisionResult result{};
 
-      if( one.type == CollisionShape::PointShape )
+      switch( one.type )
       {
-         if( two.type == CollisionShape::CircleShape )
+         case CollisionShape::PointShape:
          {
-            result = checkCollision(one.point, two.circle);
-         }
-         else if( two.type == CollisionShape::RectShape )
+            result = areInCollision(one.point, two);
+         } break;
+         case CollisionShape::CircleShape:
          {
-            result = checkCollision(one.point, two.rect);
-         }
+            result = areInCollision(one.circle, two);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = areInCollision(one.rect, two);
+         } break;
       }
-      else if( one.type == CollisionShape::CircleShape )
+
+      return result;
+   }
+
+   template<typename T>
+   static bool fullyContained(T one, CollisionShape two)
+   {
+      auto result = false;
+      switch( two.type )
       {
-         if( two.type == CollisionShape::CircleShape )
+         case CollisionShape::PointShape:
          {
-            result = checkCollision(one.circle, two.circle);
-         }
-         else if( two.type == CollisionShape::RectShape )
+            result = isFullyWithin(one, two.point);
+         } break;
+         case CollisionShape::CircleShape:
          {
-            result = checkCollision(one.circle, two.rect);
-         }
-         else if( two.type == CollisionShape::PointShape )
+            result = isFullyWithin(one, two.circle);
+         } break;
+         case CollisionShape::RectShape:
          {
-            result = checkCollision(one.circle, two.point);
-         }
+            result = isFullyWithin(one, two.rect);
+         } break;
       }
-      else if( one.type == CollisionShape::RectShape )
+
+      return result;
+   }
+
+   static bool fullyContained(CollisionShape one, CollisionShape two)
+   {
+      auto result = false;
+      switch( one.type )
       {
-         if( two.type == CollisionShape::RectShape )
+         case CollisionShape::PointShape:
          {
-            result = checkCollision(one.rect, two.rect);
-         }
-         else if( two.type == CollisionShape::CircleShape )
+            result = fullyContained(one.point, two);
+         } break;
+         case CollisionShape::CircleShape:
          {
-            result = checkCollision(one.rect, two.circle);
-         }
-         else if( two.type == CollisionShape::PointShape )
+            result = fullyContained(one.circle, two);
+         } break;
+         case CollisionShape::RectShape:
          {
-            result = checkCollision(one.rect, two.point);
-         }
+            result = fullyContained(one.rect, two);
+         } break;
       }
       return result;
    }
@@ -301,28 +344,48 @@ namespace core
       return result;
    }
 
-   static std::vector<CollisionPair> findCollisions(SessionState& session)
+   enum class CollisionCenteringType
+   {
+      Clear,
+      Center,
+   };
+
+   static void setCollisionCenter(SessionState& session, CollisionCenteringType type)
    {
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
+         auto setValue = (type == CollisionCenteringType::Clear ? Vec2{} : session.movement[e].position);
          switch( session.collision[e].shape.type )
          {
             case CollisionShape::RectShape:
             {
-               session.collision[e].shape.rect.center = session.movement[e].position;
+               session.collision[e].shape.rect.center = setValue;
             } break;
             case CollisionShape::CircleShape:
             {
-               session.collision[e].shape.circle.center = session.movement[e].position;
+               session.collision[e].shape.circle.center = setValue;
             } break;
             case CollisionShape::PointShape:
             {
-               session.collision[e].shape.point = session.movement[e].position;
+               session.collision[e].shape.point = setValue;
             } break;
          }
+      }
+   }
+
+   static void toggleCollisionState(SessionState& session)
+   {
+      for( uint32_t e = 0; e < session.entityCount; ++e )
+      {
          session.collision[e].previouslyInCollision = session.collision[e].currentlyInCollision;
          session.collision[e].currentlyInCollision = false;
       }
+   }
+
+   static std::vector<CollisionPair> findCollisions(SessionState& session)
+   {
+      setCollisionCenter(session, CollisionCenteringType::Center);
+      toggleCollisionState(session);
 
       std::vector<CollisionPair> result;
       for( uint32_t e = 0; e < session.entityCount; ++e )
@@ -330,7 +393,7 @@ namespace core
          for( uint32_t r = e + 1; r < session.entityCount; ++r )
          {
             bool testCollision = shouldCollide(session.collision[e], session.collision[r]);
-            
+
             if( testCollision )
             {
                auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
@@ -348,24 +411,7 @@ namespace core
          }
       }
 
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         switch( session.collision[e].shape.type )
-         {
-            case CollisionShape::RectShape:
-            {
-               session.collision[e].shape.rect.center = {};
-            } break;
-            case CollisionShape::CircleShape:
-            {
-               session.collision[e].shape.circle.center = {};
-            } break;
-            case CollisionShape::PointShape:
-            {
-               session.collision[e].shape.point = {};
-            } break;
-         }
-      }
+      setCollisionCenter(session, CollisionCenteringType::Clear);
       return result;
    }
 
@@ -652,12 +698,12 @@ namespace core
             case GameMessage::Type::Tree_Circle:
             {
                session.collision[1].shape.type = CollisionShape::CircleShape;
-               session.collision[1].shape.circle = {{}, 1};
+               session.collision[1].shape.circle = {{}, 5};
             } break;
             case GameMessage::Type::Tree_Rect:
             {
                session.collision[1].shape.type = CollisionShape::RectShape;
-               session.collision[1].shape.rect = {{}, {1, 1}};
+               session.collision[1].shape.rect = {{}, {4, 4}};
             } break;
             case GameMessage::Type::Player_Sensor:
             {
@@ -716,21 +762,34 @@ namespace core
             session.position[e].position = session.movement[e].position;
          }
       }
+      setCollisionCenter(session, CollisionCenteringType::Center);
       for( auto& pair : collisionPairs )
       {
          session.position[pair.collider].position += pair.displacement;
+
+         if( fullyContained(session.collision[pair.collider].shape, session.collision[pair.collidee].shape) )
+         {
+            session.render[pair.collider].color = {1, 0, 0};
+            session.render[pair.collidee].color = {1, 0, 0};
+         }
+         else
+         {
+            session.render[pair.collider].color = {0, 1, 0};
+            session.render[pair.collidee].color = {0, 1, 0};
+         }
       }
-      for( uint32_t e = 0; e < session.entityCount; ++e )
+      setCollisionCenter(session, CollisionCenteringType::Clear);
+      /*for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         if( isStartCollision(session.collision[e]) )
-         {
-            session.render[e].color = {1, 0, 0};
-         }
-         else if( isEndCollision(session.collision[e]) )
-         {
-            session.render[e].color = {0, 1, 0};
-         }
+      if( isStartCollision(session.collision[e]) )
+      {
+      session.render[e].color = {1, 0, 0};
       }
+      else if( isEndCollision(session.collision[e]) )
+      {
+      session.render[e].color = {0, 1, 0};
+      }
+      }*/
       //       - fix camera to new position and zoom level
       //    gameplay update:
       //       - collision response

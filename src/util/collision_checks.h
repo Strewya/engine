@@ -24,31 +24,26 @@ namespace core
    CollisionResult checkCollision(Rect rect, Vec2 point);
    CollisionResult checkCollision(Vec2 point, Circle circle);
    CollisionResult checkCollision(Circle circle, Vec2 point);
-   CollisionResult checkCollision(Circle a, Circle b);
-   CollisionResult checkCollision(Rect a, Rect b);
    CollisionResult checkCollision(Rect rect, Circle circle);
    CollisionResult checkCollision(Circle circle, Rect rect);
+   CollisionResult checkCollision(Vec2 a, Vec2 b);
+   CollisionResult checkCollision(Circle a, Circle b);
+   CollisionResult checkCollision(Rect a, Rect b);
+   template<typename T, typename U> CollisionResult checkCollision(T a, U b)
+   {
+      return CollisionResult{{}, false};
+   }
 
+   bool isFullyWithin(Vec2 inner, Rect outer);
+   bool isFullyWithin(Vec2 inner, Circle outer);
+   bool isFullyWithin(Rect inner, Rect outer);
+   bool isFullyWithin(Rect inner, Circle outer);
+   bool isFullyWithin(Circle inner, Circle outer);
+   bool isFullyWithin(Circle inner, Rect outer);
+   template<typename T, typename U> bool isFullyWithin(T a, U b)
+   {
+      return false;
+   }
 
-
-
-   bool isPointInsideRect(Vec2 point, Rect rect);
-   bool isPointInsideCircle(Vec2 point, Circle circle);
-   bool isRectInsideRect(Rect inner, Rect outer);
-   bool isCircleInsideCircle(Circle inner, Circle outer);
-   bool isRectInsideCircle(Rect rect, Circle circle);
-   bool isCircleInsideRect(Circle circle, Rect rect);
-
-   bool isRectTouchingCircle(Rect rect, Circle circle);
-   bool isCircleTouchingRect(Circle circle, Rect rect);
-   bool isRectTouchingRect(Rect l, Rect r);
-   bool isCircleTouchingCircle(Circle l, Circle r);
    bool isLineTouchingCircle(Vec2 A, Vec2 B, Circle circle);
-
-   Vec2 getDisplacementPointFromRect(Vec2 point, Rect rect);
-   Vec2 getDisplacementPointFromCircle(Vec2 point, Circle circle);
-   Vec2 getDisplacementCircleFromRect(Circle circle, Rect rect);
-   Vec2 getDisplacementCircleFromCircle(Circle l, Circle r);
-   Vec2 getDisplacementRectFromCircle(Rect rect, Circle circle);
-   Vec2 getDisplacementRectFromRect(Rect l, Rect r);
 }
