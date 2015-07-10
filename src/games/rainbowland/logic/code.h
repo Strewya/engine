@@ -133,6 +133,21 @@ namespace core
       Vec2 aim;
    };
 
+   struct SharedDataState
+   {
+      Camera camera;
+   };
+
+   struct MainMenuState
+   {
+
+   };
+
+   struct ClassPickState
+   {
+
+   };
+
    struct SessionState
    {
       uint32_t entityCount;
@@ -143,6 +158,11 @@ namespace core
       std::vector<AimData> aim;
       std::vector<CollisionData> collision;
       std::vector<Vec2> targetDirection;
+   };
+
+   struct ScoreState
+   {
+
    };
 
    struct GameState
@@ -161,15 +181,19 @@ namespace core
          Session
       };
 
-      Constants constants;
-      SessionState session;
       GlobalGameState globalGameState;
       GameplayState gameplayState;
-      Camera camera;
+
       GameResources assets;
-      // #test
+      // #temp These two should be in a cache, and handles should be stored in assets.
       FontDescriptor fontDesc;
-      // #todo make this a mesh cache thingamabob
       std::vector<Mesh> meshes;
+
+      SharedDataState sharedData; //data that should be shared across ALL states
+      Constants constants; //
+      MainMenuState mainMenu;
+      ClassPickState classPick;
+      SessionState session;
+      ScoreState score;
    };
 }

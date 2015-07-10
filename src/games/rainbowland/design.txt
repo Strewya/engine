@@ -1,0 +1,35 @@
+Data required for game:
+   Player data
+      - Timer
+      * Position
+      - Direction
+      - Velocity
+      - Acceleration
+      * Target direction
+      - Collision shape
+      - Collision response
+      - Collision filter
+      * Health
+      * Health regeneration
+      + Current weapon
+      + Available perks
+      + Acquired perks
+      + 
+   Enemy data
+   Projectile data
+   Pickup data
+   Weapon data
+   Perk data
+   Ability data
+   Statistics
+   Map data
+
+Systems:
+   Movement
+   Aiming
+   Collision detection
+   Collision response
+   Attacking
+   Health
+   Spawning
+   

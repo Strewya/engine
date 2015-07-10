@@ -482,4 +482,9 @@
       <Filter>code\games\rainbowland\logic</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\src\games\rainbowland\design.txt">
+      <Filter>code\games\rainbowland</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

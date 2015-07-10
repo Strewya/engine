@@ -8,6 +8,7 @@
 /******* personal header *******/
 #include "games/rainbowland/logic/code.h"
 /******* c++ headers *******/
+#include <future>
 #include <unordered_set>
 /******* extra headers *******/
 #include "input/gamepad.h"
@@ -444,7 +445,7 @@ namespace core
       };
    };
 
-   static std::vector<GameMessage> session_translateInput(EventVector_t frameEvents)
+   static std::vector<GameMessage> session_translateInput(const EventVector_t& frameEvents)
    {
       std::vector<GameMessage> result;
       for( const auto& e : frameEvents )
@@ -598,15 +599,21 @@ namespace core
       return result;
    }
 
-   static bool session_update(Time time, GameState& game, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   static void updateAllTimers(Time time, std::vector<DeltaTimeData>& deltaTime)
    {
-      //    preamble
-      //       - update all timers
-      for( auto& dt : session.deltaTime )
+      for( auto& dt : deltaTime )
       {
          dt.deltaMicros = static_cast<uint32_t>(time.deltaMicrosVirt*dt.factor);
          dt.deltaTime = time.deltaTimeVirt*dt.factor;
       }
+   }
+
+   static bool session_update(Time time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
+   {
+      //    preamble
+      //       - update all timers
+      updateAllTimers(time, session.deltaTime);
+      
 
       //    player input based updates (for specific player):
       /*
@@ -646,26 +653,26 @@ namespace core
                {
                   session.targetDirection[ge.entity] += ge.direction;
                }
-               session.movement[ge.entity].acceleration = game.constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
+               session.movement[ge.entity].acceleration = constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
             } break;
             //       - aim
             case GameMessage::Type::AimChange:
             {
                if( ge.isAnalogue )
                {
-                  session.aim[ge.entity].aim = ge.aim*game.constants.playerAimLength;
+                  session.aim[ge.entity].aim = ge.aim*constants.playerAimLength;
                }
                else
                {
-                  auto window = Vec2{game.constants.windowWidth, game.constants.windowHeight}*0.5f;
+                  auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
                   gfx.setPerspectiveProjection();
                   auto aim = session.aim[ge.entity].aim;
-                  aim = gfx.worldToScreen(game.camera, aim);
+                  aim = gfx.worldToScreen(camera, aim);
                   aim += ge.aim;
-                  aim = gfx.screenToWorld(game.camera, aim);
-                  if( vec2::length2(aim) > pow2(game.constants.playerAimLength) )
+                  aim = gfx.screenToWorld(camera, aim);
+                  if( vec2::length2(aim) > pow2(constants.playerAimLength) )
                   {
-                     session.aim[ge.entity].aim = vec2::setLength(aim, game.constants.playerAimLength);
+                     session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
                   }
                   else
                   {
@@ -743,6 +750,7 @@ namespace core
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
+      
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
@@ -867,7 +875,7 @@ namespace core
                } break;
                case GameState::GameplayState::Session:
                {
-                  session_update(time, game, game.session, frameEvents, audio, lua, gfx);
+                  session_update(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.camera);
 
                   if( contains(Keyboard::Space, ACTION) )
                   {
@@ -888,30 +896,30 @@ namespace core
       return stillRunning;
    }
 
-   static void session_render(Time time, GameState& game, SessionState& session, GraphicsSystem& gfx, FontSystem& font)
+   static void session_render(Time time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
    {
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
 
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, game.meshes[session.render[e].mesh]);
-         auto aimMesh = makeSolidCircle({}, 0.2f, 8, game.assets.mainVS, game.assets.mainPS);
+         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, meshes[session.render[e].mesh]);
+         auto aimMesh = makeSolidCircle({}, 0.2f, 8, assets.mainVS, assets.mainPS);
          gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
          Mesh collisionMesh{};
          switch( session.collision[e].shape.type )
          {
             case CollisionShape::CircleShape:
             {
-               collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, game.assets.mainVS, game.assets.mainPS);
+               collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, assets.mainVS, assets.mainPS);
             } break;
             case CollisionShape::RectShape:
             {
-               collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, game.assets.mainVS, game.assets.mainPS);
+               collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, assets.mainVS, assets.mainPS);
             } break;
          }
          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
-         auto moveDir = makeLine(Vec2{}, session.movement[e].direction, game.assets.mainVS, game.assets.mainPS);
+         auto moveDir = makeLine(Vec2{}, session.movement[e].direction, assets.mainVS, assets.mainPS);
          gfx.renderMesh(session.position[e].position, {}, moveDir);
       }
    }
@@ -948,7 +956,7 @@ namespace core
                {
                   subcaption = "\nSession";
 
-                  session_render(time, game, game.session, gfx, font);
+                  session_render(time, game.session, game.assets, gfx, font, game.meshes);
                } break;
             }
          } break;
@@ -965,4 +973,5 @@ namespace core
       auto mesh = font.makeTextMesh(caption.c_str(), game.fontDesc, {1, 1}, Left, Top);
       gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
    }
+
 }
