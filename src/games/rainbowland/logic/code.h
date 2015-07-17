@@ -49,12 +49,17 @@ namespace core
       bool relativeCursor;
    };
 
+
    struct Time
    {
-      uint32_t deltaMicrosReal;
-      uint32_t deltaMicrosVirt;
-      float deltaTimeReal;
-      float deltaTimeVirt;
+      uint32_t micros;
+      float seconds;
+   };
+
+   struct DeltaTime
+   {
+      Time real;
+      Time virt;
    };
 
    enum MeshId;
@@ -133,6 +138,42 @@ namespace core
       Vec2 aim;
    };
 
+   struct InternalId
+   {
+      uint32_t id;
+   };
+
+   bool operator==(InternalId l, InternalId r);
+   bool operator<(InternalId l, InternalId r);
+
+   struct EntityId
+   {
+      uint32_t id;
+   };
+
+   inline bool operator==(EntityId l, EntityId r);
+   inline bool operator<(EntityId l, EntityId r);
+}
+
+namespace std
+{
+   template <> struct hash < core::EntityId >
+   {
+      size_t operator()(core::EntityId id) const
+      {
+         return hash<int>()(id.id);
+      }
+   };
+}
+
+namespace core
+{
+   struct DeltaTimeComponentCache
+   {
+      std::vector<DeltaTimeData> m_data;
+      std::unordered_map<EntityId, InternalId> m_entityToInternalIdMap;
+   };
+
    struct SharedDataState
    {
       Camera camera;
@@ -140,7 +181,7 @@ namespace core
 
    struct MainMenuState
    {
-
+      DeltaTimeComponentCache cTimer;
    };
 
    struct ClassPickState
@@ -167,23 +208,16 @@ namespace core
 
    struct GameState
    {
-      enum class GlobalGameState
+      enum class State
       {
          MainMenu,
-         Gameplay,
+         Gameplay_ClassPick,
+         Gameplay_Session,
          Score
       };
 
-      enum class GameplayState
-      {
-         //ColorPick,
-         ClassPick,
-         Session
-      };
-
-      GlobalGameState globalGameState;
-      GameplayState gameplayState;
-
+      State gameState;
+      
       GameResources assets;
       // #temp These two should be in a cache, and handles should be stored in assets.
       FontDescriptor fontDesc;

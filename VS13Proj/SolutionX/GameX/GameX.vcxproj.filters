@@ -481,10 +481,6 @@
     <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
       <Filter>code\games\rainbowland\logic</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\..\src\games\rainbowland\design.txt">
-      <Filter>code\games\rainbowland</Filter>
-    </Text>
+    <None Include="..\..\..\src\games\rainbowland\design.txt" />
   </ItemGroup>
 </Project>

@@ -75,7 +75,7 @@ namespace core
          game.constants.windowWidth = (float)window.getSizeX();
          game.constants.windowHeight = (float)window.getSizeY();
 
-         CORE_STATUS_AND(game_init(game, audioSystem, graphicsSystem, luaSystem.getStack()));
+         CORE_STATUS_AND(init_game(game, audioSystem, graphicsSystem, luaSystem.getStack()));
       }
 
       CORE_INIT_END(Rainbowland);
@@ -175,13 +175,13 @@ namespace core
          }
       }
 
-      Time time{};
-      time.deltaMicrosReal = logicClock.getDeltaMicros();
-      time.deltaTimeReal = logicClock.getDeltaSeconds();
-      time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
-      time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeReal;
+      DeltaTime time{};
+      time.real.micros = logicClock.getDeltaMicros();
+      time.real.seconds = logicClock.getDeltaSeconds();
+      time.virt.micros = isPaused ? 0 : time.real.micros;
+      time.virt.seconds = isPaused ? 0 : time.real.seconds;
 
-      auto logic_ok = game_update(time, game, frameEvents, audioSystem, luaSystem.getStack(), graphicsSystem);
+      auto logic_ok = update_game(time, game, frameEvents, audioSystem, luaSystem.getStack(), graphicsSystem);
 
       luaSystem.collectGarbage();
       audioSystem.update();
@@ -193,13 +193,13 @@ namespace core
    {
       graphicsSystem.begin();
 
-      Time time{};
-      time.deltaMicrosReal = clock.getDeltaMicros();
-      time.deltaTimeReal = clock.getDeltaSeconds();
-      time.deltaMicrosVirt = isPaused ? 0 : time.deltaMicrosReal;
-      time.deltaTimeVirt = isPaused ? 0 : time.deltaTimeVirt;
+      DeltaTime time{};
+      time.real.micros = clock.getDeltaMicros();
+      time.real.seconds = clock.getDeltaSeconds();
+      time.virt.micros = isPaused ? 0 : time.real.micros;
+      time.virt.seconds = isPaused ? 0 : time.real.seconds;
 
-      game_render(time, game, graphicsSystem, fontSystem);
+      render_game(time, game, graphicsSystem, fontSystem);
 
       graphicsSystem.present();
    }

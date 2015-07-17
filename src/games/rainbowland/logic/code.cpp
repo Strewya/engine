@@ -19,6 +19,77 @@
 
 namespace core
 {
+   bool operator==(InternalId l, InternalId r)
+   {
+      auto result = (l.id == r.id);
+      return result;
+   }
+
+   bool operator<(InternalId l, InternalId r)
+   {
+      auto result = (l.id < r.id);
+      return result;
+   }
+
+   bool operator==(EntityId l, EntityId r)
+   {
+      auto result = (l.id == r.id);
+      return result;
+   }
+
+   bool operator<(EntityId l, EntityId r)
+   {
+      auto result = (l.id < r.id);
+      return result;
+   }
+
+   struct RequestResult
+   {
+      InternalId id;
+      bool created;
+   };
+
+   static RequestResult requestData(DeltaTimeComponentCache& cache, EntityId entityId)
+   {
+      auto it = cache.m_entityToInternalIdMap.find(entityId);
+      if( it != cache.m_entityToInternalIdMap.end() )
+      {
+         return{it->second, false};
+      }
+      InternalId internalId{cache.m_data.size()};
+      cache.m_data.emplace_back();
+      cache.m_entityToInternalIdMap[entityId] = internalId;
+      return{internalId, true};
+   }
+
+   static void updateComponents(DeltaTimeComponentCache& cache, Time dt)
+   {
+      for( auto data : cache.m_data )
+      {
+         data.deltaMicros = static_cast<uint32_t>(dt.micros*data.factor);
+         data.deltaTime = dt.seconds*data.factor;
+      }
+   }
+
+   static bool init_mainMenu(MainMenuState& state, SharedDataState& shared, Constants& constants, GameResources& assets)
+   {
+      auto result = true;
+
+
+
+      return result;
+   }
+
+   static bool update_mainMenu(DeltaTime time, MainMenuState& state, SharedDataState& shared, Constants& constants, const EventVector_t& frameEvents,
+                               AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   {
+      updateComponents(state.cTimer, time.real);
+
+
+
+      return true;
+   }
+
    static void loadMeshBundle(float left, float top, float right, float bottom, uint32_t columns, uint32_t rows,
                               TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel,
                               std::vector<Mesh>& outMeshes)
@@ -78,28 +149,32 @@ namespace core
       return result;
    }
 
-   static bool game_init(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
+   static bool init_game(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
    {
       bool result = true;
       game.assets = loadGameResources(audio.sounds, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
 
       result = checkGameResourcesLoaded(game.assets);
 
-      game.meshes = loadMeshes(game, gfx.textures);
-      game.meshes.push_back({});
-      game.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
+      if( result )
+      {
+         game.meshes = loadMeshes(game, gfx.textures);
+         game.meshes.push_back({});
+         game.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
 
-      game.camera.setPosition({0, 0, -50});
-      game.globalGameState = GameState::GlobalGameState::MainMenu;
-      game.gameplayState = GameState::GameplayState::ClassPick;
+         game.fontDesc = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
-      game.fontDesc = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
+         game.sharedData.camera.setPosition({0, 0, -50});
 
-      game.constants.playerAcceleration = 60;
-      game.constants.playerAimLength = 4;
-      game.constants.showCursor = false;
-      game.constants.lockCursor = true;
-      game.constants.relativeCursor = true;
+         game.constants.playerAcceleration = 60;
+         game.constants.playerAimLength = 4;
+         game.constants.showCursor = false;
+         game.constants.lockCursor = true;
+         game.constants.relativeCursor = true;
+
+         game.gameState = GameState::State::MainMenu;
+         result = init_mainMenu(game.mainMenu, game.sharedData, game.constants, game.assets);
+      }
 
       return true;
    }
@@ -193,7 +268,7 @@ namespace core
       assertEntity(session);
    }
 
-   static bool session_init(GameState& game, SessionState& session)
+   static bool init_session(GameState& game, SessionState& session)
    {
       session = SessionState{0};
       session.deltaTime.reserve(500);
@@ -445,7 +520,7 @@ namespace core
       };
    };
 
-   static std::vector<GameMessage> session_translateInput(const EventVector_t& frameEvents)
+   static std::vector<GameMessage> translateInput_gameplay_session(const EventVector_t& frameEvents)
    {
       std::vector<GameMessage> result;
       for( const auto& e : frameEvents )
@@ -603,17 +678,17 @@ namespace core
    {
       for( auto& dt : deltaTime )
       {
-         dt.deltaMicros = static_cast<uint32_t>(time.deltaMicrosVirt*dt.factor);
-         dt.deltaTime = time.deltaTimeVirt*dt.factor;
+         dt.deltaMicros = static_cast<uint32_t>(time.micros*dt.factor);
+         dt.deltaTime = time.seconds*dt.factor;
       }
    }
 
-   static bool session_update(Time time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
+   static bool update_gameplay_session(DeltaTime time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
    {
       //    preamble
       //       - update all timers
-      updateAllTimers(time, session.deltaTime);
-      
+      updateAllTimers(time.virt, session.deltaTime);
+
 
       //    player input based updates (for specific player):
       /*
@@ -631,7 +706,7 @@ namespace core
       */
       //the translator is a system with registered mappings from WindowEvent to GameEvent
       //done in the init function when we know how many players we have and which input device they are using
-      auto gameEvents = session_translateInput(frameEvents);
+      auto gameEvents = translateInput_gameplay_session(frameEvents);
 
       std::sort(gameEvents.begin(), gameEvents.end(), [](const GameMessage& l, const GameMessage& r)
       {
@@ -750,7 +825,7 @@ namespace core
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
-      
+
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
@@ -774,17 +849,6 @@ namespace core
       for( auto& pair : collisionPairs )
       {
          session.position[pair.collider].position += pair.displacement;
-
-         if( fullyContained(session.collision[pair.collider].shape, session.collision[pair.collidee].shape) )
-         {
-            session.render[pair.collider].color = {1, 0, 0};
-            session.render[pair.collidee].color = {1, 0, 0};
-         }
-         else
-         {
-            session.render[pair.collider].color = {0, 1, 0};
-            session.render[pair.collidee].color = {0, 1, 0};
-         }
       }
       setCollisionCenter(session, CollisionCenteringType::Clear);
       /*for( uint32_t e = 0; e < session.entityCount; ++e )
@@ -830,73 +894,7 @@ namespace core
       return true;
    }
 
-   static bool game_update(Time time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
-   {
-      bool stillRunning = true;
-      enum
-      {
-         STATE,
-         ACTION,
-      };
-
-      auto contains = [&frameEvents](Keyboard::Key k, uint32_t s) -> bool
-      {
-         for( auto e : frameEvents )
-         {
-            if( e.type == WE_KEYBOARDKEY && e.keyboard.key.id == k && e.keyboard.key.isDown && (s == STATE || e.keyboard.firstTimeDown) )
-            {
-               return true;
-            }
-         }
-         return false;
-      };
-
-      switch( game.globalGameState )
-      {
-         case GameState::GlobalGameState::MainMenu:
-         {
-            if( contains(Keyboard::Space, ACTION) )
-            {
-               game.globalGameState = GameState::GlobalGameState::Gameplay;
-               game.gameplayState = GameState::GameplayState::ClassPick;
-            }
-         } break;
-         case GameState::GlobalGameState::Gameplay:
-         {
-            switch( game.gameplayState )
-            {
-               case GameState::GameplayState::ClassPick:
-               {
-                  if( contains(Keyboard::Space, ACTION) )
-                  {
-                     game.gameplayState = GameState::GameplayState::Session;
-                     session_init(game, game.session);
-                  }
-               } break;
-               case GameState::GameplayState::Session:
-               {
-                  session_update(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.camera);
-
-                  if( contains(Keyboard::Space, ACTION) )
-                  {
-                     game.globalGameState = GameState::GlobalGameState::Score;
-                  }
-               } break;
-            }
-         } break;
-         case GameState::GlobalGameState::Score:
-         {
-            if( contains(Keyboard::Space, ACTION) )
-            {
-               game.globalGameState = GameState::GlobalGameState::MainMenu;
-            }
-         } break;
-      }
-
-      return stillRunning;
-   }
-
-   static void session_render(Time time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
+   static void render_gameplay_session(DeltaTime time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
    {
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
@@ -924,9 +922,70 @@ namespace core
       }
    }
 
-   static void game_render(Time time, GameState& game, GraphicsSystem& gfx, FontSystem& font)
+   static bool update_game(DeltaTime time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
-      gfx.applyCamera(game.camera);
+      bool stillRunning = true;
+      enum
+      {
+         STATE,
+         ACTION,
+      };
+
+      auto contains = [&frameEvents](Keyboard::Key k, uint32_t s) -> bool
+      {
+         for( auto e : frameEvents )
+         {
+            if( e.type == WE_KEYBOARDKEY && e.keyboard.key.id == k && e.keyboard.key.isDown && (s == STATE || e.keyboard.firstTimeDown) )
+            {
+               return true;
+            }
+         }
+         return false;
+      };
+
+      switch( game.gameState )
+      {
+         case GameState::State::MainMenu:
+         {
+            update_mainMenu(time, game.mainMenu, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+
+            if( contains(Keyboard::Space, ACTION) )
+            {
+               game.gameState = GameState::State::Gameplay_ClassPick;
+            }
+         } break;
+         case GameState::State::Gameplay_ClassPick:
+         {
+            if( contains(Keyboard::Space, ACTION) )
+            {
+               game.gameState = GameState::State::Gameplay_Session;
+               init_session(game, game.session);
+            }
+         } break;
+         case GameState::State::Gameplay_Session:
+         {
+            update_gameplay_session(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
+
+            if( contains(Keyboard::Space, ACTION) )
+            {
+               game.gameState = GameState::State::Score;
+            }
+         } break;
+         case GameState::State::Score:
+         {
+            if( contains(Keyboard::Space, ACTION) )
+            {
+               game.gameState = GameState::State::MainMenu;
+            }
+         } break;
+      }
+
+      return stillRunning;
+   }
+
+   static void render_game(DeltaTime time, GameState& game, GraphicsSystem& gfx, FontSystem& font)
+   {
+      gfx.applyCamera(game.sharedData.camera);
       /*
       systems.gfx->setPerspectiveProjection();
       systems.gfx->setTransparency(false);
@@ -937,30 +996,25 @@ namespace core
       */
 
       std::string caption, subcaption;
-      switch( game.globalGameState )
+      switch( game.gameState )
       {
-         case GameState::GlobalGameState::MainMenu:
+         case GameState::State::MainMenu:
          {
             caption = "Main menu";
          } break;
-         case GameState::GlobalGameState::Gameplay:
+         case GameState::State::Gameplay_ClassPick:
          {
             caption = "Gameplay";
-            switch( game.gameplayState )
-            {
-               case GameState::GameplayState::ClassPick:
-               {
-                  subcaption = "\nClass picking";
-               } break;
-               case GameState::GameplayState::Session:
-               {
-                  subcaption = "\nSession";
-
-                  session_render(time, game.session, game.assets, gfx, font, game.meshes);
-               } break;
-            }
+            subcaption = "\nClass picking";
          } break;
-         case GameState::GlobalGameState::Score:
+         case GameState::State::Gameplay_Session:
+         {
+            caption = "Gameplay";
+            subcaption = "\nSession";
+
+            render_gameplay_session(time, game.session, game.assets, gfx, font, game.meshes);
+         } break;
+         case GameState::State::Score:
          {
             caption = "Score screen";
          } break;
@@ -968,7 +1022,7 @@ namespace core
 
       gfx.setOrthographicProjection();
       gfx.setTransparency(true);
-      caption += (time.deltaMicrosVirt == 0 ? " (paused)" : " (running)");
+      caption += (time.virt.micros == 0 ? " (paused)" : " (running)");
       caption += subcaption;
       auto mesh = font.makeTextMesh(caption.c_str(), game.fontDesc, {1, 1}, Left, Top);
       gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
