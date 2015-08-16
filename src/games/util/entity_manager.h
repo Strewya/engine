@@ -18,12 +18,12 @@ namespace core
    struct EntityManager
    {
    public:
-      Entity create();
+   /*   Entity create();
       bool alive(Entity e);
       void kill(Entity e);
       
    private:
       RingBuffer m_freeIndex;
-      std::vector<uint8_t> m_generation;
+      std::vector<uint8_t> m_generation;*/
    };
 }

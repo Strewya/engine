@@ -18,6 +18,8 @@
 #include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
 #include "util/color.h"
+
+#include "games/util/entity.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -44,9 +46,6 @@ namespace core
       float windowHeight;
       float playerAcceleration;
       float playerAimLength;
-      bool showCursor;
-      bool lockCursor;
-      bool relativeCursor;
    };
 
 
@@ -143,50 +142,85 @@ namespace core
       uint32_t id;
    };
 
-   bool operator==(InternalId l, InternalId r);
-   bool operator<(InternalId l, InternalId r);
-
-   struct EntityId
-   {
-      uint32_t id;
-   };
-
-   inline bool operator==(EntityId l, EntityId r);
-   inline bool operator<(EntityId l, EntityId r);
-}
-
-namespace std
-{
-   template <> struct hash < core::EntityId >
-   {
-      size_t operator()(core::EntityId id) const
-      {
-         return hash<int>()(id.id);
-      }
-   };
-}
-
-namespace core
-{
    struct DeltaTimeComponentCache
    {
       std::vector<DeltaTimeData> m_data;
-      std::unordered_map<EntityId, InternalId> m_entityToInternalIdMap;
+      std::unordered_map<Entity, InternalId> m_entityToInternalIdMap;
    };
 
-   struct SharedDataState
+   struct SharedData
    {
       Camera camera;
+      // #temp This should be in a cache, and handles should be stored in assets.
+      FontDescriptor font;
+      std::vector<Mesh> meshes;
+
+      bool showCursor;
+      bool lockCursor;
+      bool relativeCursor;
+   };
+
+   enum class State
+   {
+      MainMenu,
+      GameplaySetup,
+      GameplaySession,
+      Score,
+      Quit,
+      Startup,
+      Shutdown
+   };
+
+   enum ButtonState
+   {
+      IDLE,
+      HOVER,
+      HOT,
+      COUNT
+   };
+
+   template<int COUNT>
+   struct Button
+   {
+      Vec2 position[COUNT];
+      Vec2 halfsize[COUNT];
+      std::string caption[COUNT];
    };
 
    struct MainMenuState
    {
-      DeltaTimeComponentCache cTimer;
+      enum
+      {
+         START_GAME,
+         QUIT,
+         BUTTON_COUNT
+      };
+
+      uint32_t hoverButton;
+      uint32_t hotButton;
+      State nextState;
+      Vec2 mousePosition;
+      Color buttonColors[ButtonState::COUNT];
+      Button<BUTTON_COUNT> buttons;
    };
 
-   struct ClassPickState
+   struct Player
    {
+      enum Color
+      {
+         BLUE,
+         YELLOW,
+         GREEN,
+         CYAN,
+         RED,
+         COUNT
+      };
+   };
 
+   struct GameplaySetupState
+   {
+      uint32_t activePlayerCount;
+      uint32_t playerId[COUNT];
    };
 
    struct SessionState
@@ -208,25 +242,15 @@ namespace core
 
    struct GameState
    {
-      enum class State
-      {
-         MainMenu,
-         Gameplay_ClassPick,
-         Gameplay_Session,
-         Score
-      };
+      State currentState;
+      State nextState;
 
-      State gameState;
-      
       GameResources assets;
-      // #temp These two should be in a cache, and handles should be stored in assets.
-      FontDescriptor fontDesc;
-      std::vector<Mesh> meshes;
 
-      SharedDataState sharedData; //data that should be shared across ALL states
+      SharedData sharedData; //data that should be shared across ALL states
       Constants constants; //
       MainMenuState mainMenu;
-      ClassPickState classPick;
+      GameplaySetupState gameplaySetup;
       SessionState session;
       ScoreState score;
    };

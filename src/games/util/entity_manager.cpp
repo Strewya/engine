@@ -11,6 +11,7 @@
 
 namespace core
 {
+/*
    Entity EntityManager::create()
    {
       uint32_t idx;
@@ -43,4 +44,5 @@ namespace core
       ++m_generation[idx];
       m_freeIndex.push_back(idx);
    }
+*/
 }

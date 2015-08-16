@@ -22,6 +22,20 @@
 
 namespace core
 {
+   static const bool Lock = true;
+   static const bool Unlock = false;
+   static const bool Hide = false;
+   static const bool Show = true;
+   static const bool Absolute = false;
+   static const bool Relative = true;
+
+   static void updateCursorStuff(WindowProxy window, bool show, bool lock, bool relative)
+   {
+      window.makeMouseRelative(relative);
+      window.showCursor(show);
+      window.lockCursor(lock);
+   }
+
    bool Game::shutdown()
    {
       CORE_SHUTDOWN_START(Rainbowland);
@@ -34,9 +48,7 @@ namespace core
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
 
-      window.makeMouseRelative(false);
-      window.showCursor(true);
-      window.lockCursor(false);
+      updateCursorStuff(window, Show, Unlock, Absolute);
 
       CORE_SHUTDOWN_END(Rainbowland);
    }
@@ -55,10 +67,6 @@ namespace core
          //#ifdef MURRAY
          //window.move(window.getSizeX(), 0);
          //#endif
-         window.showCursor(false);
-         window.lockCursor(true);
-         window.makeMouseRelative(true);
-
          window.monitorDirectoryForChanges("resources");
 
          window.setFullscreen(true);
@@ -76,6 +84,8 @@ namespace core
          game.constants.windowHeight = (float)window.getSizeY();
 
          CORE_STATUS_AND(init_game(game, audioSystem, graphicsSystem, luaSystem.getStack()));
+
+         updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
       CORE_INIT_END(Rainbowland);
@@ -94,26 +104,6 @@ namespace core
       {
          switch( e.type )
          {
-            // #temp this case is temporary until i get a normal menu type thing
-            // which will handle shutting the game down
-            case WE_KEYBOARDKEY:
-            {
-               switch( e.keyboard.key.id )
-               {
-                  case Keyboard::Escape:
-                  {
-                     running = false;
-                  } break;
-                  case Keyboard::F1:
-                  {
-                     if( e.keyboard.firstTimeDown )
-                     {
-                        window.showCursor(!window.isCursorShown());
-                     }
-                  } break;
-               }
-            } break;
-
             // #refactor this should probably be moved into a system of it's own
             // that handles file change notifications and processes them based on
             // either the extension or the entire file name
@@ -161,16 +151,12 @@ namespace core
             case WE_LOSTFOCUS:
             {
                isPaused = true;
-               window.showCursor(true);
-               window.lockCursor(false);
-               window.makeMouseRelative(false);
+               updateCursorStuff(window, Show, Unlock, Absolute);
             } break;
             case WE_GAINFOCUS:
             {
                isPaused = false;
-               window.showCursor(game.constants.showCursor);
-               window.lockCursor(game.constants.lockCursor);
-               window.makeMouseRelative(game.constants.relativeCursor);
+               updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
             } break;
          }
       }
@@ -182,6 +168,11 @@ namespace core
       time.virt.seconds = isPaused ? 0 : time.real.seconds;
 
       auto logic_ok = update_game(time, game, frameEvents, audioSystem, luaSystem.getStack(), graphicsSystem);
+
+      if( !isPaused )
+      {
+         updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+      }
 
       luaSystem.collectGarbage();
       audioSystem.update();

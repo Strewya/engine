@@ -19,37 +19,13 @@
 
 namespace core
 {
-   bool operator==(InternalId l, InternalId r)
-   {
-      auto result = (l.id == r.id);
-      return result;
-   }
-
-   bool operator<(InternalId l, InternalId r)
-   {
-      auto result = (l.id < r.id);
-      return result;
-   }
-
-   bool operator==(EntityId l, EntityId r)
-   {
-      auto result = (l.id == r.id);
-      return result;
-   }
-
-   bool operator<(EntityId l, EntityId r)
-   {
-      auto result = (l.id < r.id);
-      return result;
-   }
-
    struct RequestResult
    {
       InternalId id;
       bool created;
    };
 
-   static RequestResult requestData(DeltaTimeComponentCache& cache, EntityId entityId)
+   static RequestResult requestData(DeltaTimeComponentCache& cache, Entity entityId)
    {
       auto it = cache.m_entityToInternalIdMap.find(entityId);
       if( it != cache.m_entityToInternalIdMap.end() )
@@ -71,23 +47,199 @@ namespace core
       }
    }
 
-   static bool init_mainMenu(MainMenuState& state, SharedDataState& shared, Constants& constants, GameResources& assets)
+   static bool init_mainMenu(MainMenuState& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
 
+      shared.lockCursor = true;
+      shared.relativeCursor = false;
+      shared.showCursor = false;
 
+      state.hoverButton = state.BUTTON_COUNT;
+      state.hotButton = state.BUTTON_COUNT;
+      state.nextState = State::MainMenu;
+
+      state.buttonColors[ButtonState::IDLE] = {1, 1, 1};
+      state.buttonColors[ButtonState::HOVER] = {1, 1, 0};
+      state.buttonColors[ButtonState::HOT] = {1, 0, 0};
+      
+      auto i = 0;
+      state.buttons.position[i++] = {0, 100};
+      state.buttons.position[i++] = {0, -100};
+
+      i = 0;
+      state.buttons.halfsize[i++] = {200, 50};
+      state.buttons.halfsize[i++] = {200, 50};
+
+      i = 0;
+      state.buttons.caption[i++] = "Start game";
+      state.buttons.caption[i++] = "Quit";
 
       return result;
    }
 
-   static bool update_mainMenu(DeltaTime time, MainMenuState& state, SharedDataState& shared, Constants& constants, const EventVector_t& frameEvents,
-                               AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   static Vec2 orthoMousePosition(MousePosition mouse, float windowWidth, float windowHeight)
    {
-      updateComponents(state.cTimer, time.real);
+      Vec2 result;
 
+      result.x = mouse.x - windowWidth / 2;
+      result.y = -mouse.y + windowHeight / 2;
 
+      return result;
+   }
 
-      return true;
+   static void handle_mouseMove(MainMenuState& state)
+   {
+      state.hoverButton = state.BUTTON_COUNT;
+      for( auto i = 0; i < state.BUTTON_COUNT; ++i )
+      {
+         auto result = checkCollision(state.mousePosition, Rect{state.buttons.position[i], state.buttons.halfsize[i]});
+         if( result.isColliding )
+         {
+            state.hoverButton = i;
+         }
+      }
+   }
+
+   static void handle_mouseDown(MainMenuState& state)
+   {
+      state.hotButton = state.hoverButton;
+   }
+
+   static void handle_mouseUp(MainMenuState& state)
+   {
+      if( state.hotButton == state.hoverButton )
+      {
+         switch( state.hotButton )
+         {
+            case MainMenuState::QUIT:
+            {
+               state.nextState = State::Quit;
+            } break;
+            case MainMenuState::START_GAME:
+            {
+               state.nextState = State::GameplaySetup;
+            } break;
+         }
+      }
+      state.hotButton = state.BUTTON_COUNT;
+   }
+
+   static State update_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+                                AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   {
+      for( auto event : frameEvents )
+      {
+         switch( event.type )
+         {
+            case WE_MOUSEMOVE:
+            {
+               if( event.mouse.move.relative == false )
+               {
+                  state.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
+                  handle_mouseMove(state);
+               }
+            } break;
+
+            case WE_MOUSEBUTTON:
+            {
+               if( event.mouse.button.id == Mouse::LeftButton )
+               {
+                  if( event.mouse.button.isDown )
+                  {
+                     handle_mouseDown(state);
+                  }
+                  else
+                  {
+                     handle_mouseUp(state);
+                  }
+               }
+            } break;
+         }
+      }
+
+      return state.nextState;
+   }
+
+   static void render_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
+                               GraphicsSystem& gfx, FontSystem& font)
+   {
+      gfx.setOrthographicProjection();
+
+      for( auto i = 0U; i < state.BUTTON_COUNT; ++i )
+      {
+         Transform buttonTransform{state.buttons.position[i]};
+         Color color = state.buttonColors[ButtonState::IDLE];
+         if( i == state.hoverButton )
+         {
+            color = state.buttonColors[ButtonState::HOVER];
+            if( i == state.hotButton )
+            {
+               color = state.buttonColors[ButtonState::HOT];
+            }
+         }
+         auto buttonFrameMesh = makeOutlineQuad({}, state.buttons.halfsize[i], assets.mainVS, assets.mainPS);
+         gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
+
+         auto buttonTextMesh = font.makeTextMesh(state.buttons.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
+         gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
+      }
+
+      auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
+      gfx.renderMesh({state.mousePosition}, {}, cursorMesh);
+   }
+
+   enum MeshId
+   {
+      YellowPlayer,
+      BluePlayer,
+      GreenPlayer,
+      PurplePlayer,
+      RedPlayer,
+      LineMesh,
+   };
+
+   static bool init_gameplaySetup(GameplaySetupState& state, SharedData& shared, const Constants& constants, const GameResources& assets)
+   {
+      auto result = true;
+
+      //do the initialization
+      shared.lockCursor = false;
+      shared.relativeCursor = false;
+      shared.showCursor = true;
+
+      state.activePlayerCount = 1;
+
+      //Generate a unique instance id which will be used for this entity as long as it is alive.
+      //When it dies, the id should be returned to the provider.
+      //Entity eid = state.instanceIdProvider.requestId();
+      //This entity will have movement capabilities, so we ask the movement system to create some data for it.
+      //The system will track the data internally and keep a map of the entity id to data id.
+      //The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
+      //InternalId internalId = createData(state.movementSystem, eid);
+      
+      
+
+      return result;
+   }
+
+   static State update_gameplaySetup(DeltaTime time, GameplaySetupState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+                                     AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   {
+      //do the update
+      return State::GameplaySetup;
+   }
+
+   static void render_gameplaySetup(DeltaTime time, GameplaySetupState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
+                                    GraphicsSystem& gfx, FontSystem& font)
+   {
+      gfx.setPerspectiveProjection();
+
+      //do the draw
+      /*for( auto i = 0U; i < state.activePlayers; ++i )
+      {
+         gfx.renderMesh({state.players.position[i]}, {}, shared.meshes[state.players.render[i].mesh]);
+      }*/
    }
 
    static void loadMeshBundle(float left, float top, float right, float bottom, uint32_t columns, uint32_t rows,
@@ -116,16 +268,6 @@ namespace core
       }
    }
 
-   enum MeshId
-   {
-      YellowPlayer,
-      BluePlayer,
-      GreenPlayer,
-      PurplePlayer,
-      RedPlayer,
-      LineMesh,
-   };
-
    static Mesh makeMesh(float x, float y, float w, float h, TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
    {
       auto txtr = textures.getData(texture);
@@ -147,36 +289,6 @@ namespace core
       loadMeshBundle(1795, 420, 3085, 673, 5, 1, textures, game.assets.atlas, game.assets.mainVS, game.assets.mainPS, result);
 
       return result;
-   }
-
-   static bool init_game(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
-   {
-      bool result = true;
-      game.assets = loadGameResources(audio.sounds, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
-
-      result = checkGameResourcesLoaded(game.assets);
-
-      if( result )
-      {
-         game.meshes = loadMeshes(game, gfx.textures);
-         game.meshes.push_back({});
-         game.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
-
-         game.fontDesc = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
-
-         game.sharedData.camera.setPosition({0, 0, -50});
-
-         game.constants.playerAcceleration = 60;
-         game.constants.playerAimLength = 4;
-         game.constants.showCursor = false;
-         game.constants.lockCursor = true;
-         game.constants.relativeCursor = true;
-
-         game.gameState = GameState::State::MainMenu;
-         result = init_mainMenu(game.mainMenu, game.sharedData, game.constants, game.assets);
-      }
-
-      return true;
    }
 
    inline void assertEntity(SessionState& session)
@@ -683,7 +795,7 @@ namespace core
       }
    }
 
-   static bool update_gameplay_session(DeltaTime time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
+   static State update_gameplaySession(DeltaTime time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
    {
       //    preamble
       //       - update all timers
@@ -891,10 +1003,10 @@ namespace core
       }
       //       - animation
       //       - transparency
-      return true;
+      return State::GameplaySession;
    }
 
-   static void render_gameplay_session(DeltaTime time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
+   static void render_gameplaySession(DeltaTime time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
    {
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
@@ -922,6 +1034,67 @@ namespace core
       }
    }
 
+
+
+   static bool transition_state(GameState& game)
+   {
+      auto result = true;
+      if( game.nextState != game.currentState )
+      {
+         // #todo cleanup call for the current state before switching
+         game.currentState = game.nextState;
+         switch( game.currentState )
+         {
+            case State::MainMenu:
+            {
+               result = init_mainMenu(game.mainMenu, game.sharedData, game.constants, game.assets);
+            } break;
+
+            case State::GameplaySetup:
+            {
+               result = init_gameplaySetup(game.gameplaySetup, game.sharedData, game.constants, game.assets);
+            } break;
+
+            case State::GameplaySession:
+            {
+               result = init_session(game, game.session);
+            } break;
+         }
+      }
+      return result;
+   }
+
+   static bool init_game(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
+   {
+      bool result = true;
+      game.assets = loadGameResources(audio.sounds, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
+
+      result = checkGameResourcesLoaded(game.assets);
+
+      if( result )
+      {
+         game.sharedData.meshes = loadMeshes(game, gfx.textures);
+         game.sharedData.meshes.push_back({});
+         game.sharedData.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
+
+         game.sharedData.font = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
+
+         game.sharedData.camera.setPosition({0, 0, -50});
+
+         game.constants.playerAcceleration = 60;
+         game.constants.playerAimLength = 4;
+         game.sharedData.showCursor = false;
+         game.sharedData.lockCursor = true;
+         game.sharedData.relativeCursor = true;
+
+         game.currentState = State::Startup;
+         game.nextState = State::MainMenu;
+         result = transition_state(game);
+      }
+
+      return true;
+   }
+
    static bool update_game(DeltaTime time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       bool stillRunning = true;
@@ -943,42 +1116,44 @@ namespace core
          return false;
       };
 
-      switch( game.gameState )
+      switch( game.currentState )
       {
-         case GameState::State::MainMenu:
+         case State::MainMenu:
          {
-            update_mainMenu(time, game.mainMenu, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+            game.nextState = update_mainMenu(time, game.mainMenu, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+         } break;
+         case State::GameplaySetup:
+         {
+            game.nextState = update_gameplaySetup(time, game.gameplaySetup, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
 
             if( contains(Keyboard::Space, ACTION) )
             {
-               game.gameState = GameState::State::Gameplay_ClassPick;
+               game.nextState = State::GameplaySession;
             }
          } break;
-         case GameState::State::Gameplay_ClassPick:
+         case State::GameplaySession:
          {
-            if( contains(Keyboard::Space, ACTION) )
-            {
-               game.gameState = GameState::State::Gameplay_Session;
-               init_session(game, game.session);
-            }
-         } break;
-         case GameState::State::Gameplay_Session:
-         {
-            update_gameplay_session(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
+            game.nextState = update_gameplaySession(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
 
             if( contains(Keyboard::Space, ACTION) )
             {
-               game.gameState = GameState::State::Score;
+               game.nextState = State::Score;
             }
          } break;
-         case GameState::State::Score:
+         case State::Score:
          {
             if( contains(Keyboard::Space, ACTION) )
             {
-               game.gameState = GameState::State::MainMenu;
+               game.nextState = State::MainMenu;
             }
+         } break;
+         case State::Quit:
+         {
+            stillRunning = false;
          } break;
       }
+
+      stillRunning = stillRunning && transition_state(game);
 
       return stillRunning;
    }
@@ -995,36 +1170,49 @@ namespace core
       systems.gfx->renderMesh(Transform{state.movingThings[0].position + state.movingThings[0].direction, {0.1f, 0.1f}}, Color{}, makeSolidQuad({}, {1, 1}, assets.mainVS, assets.mainPS));
       */
 
-      std::string caption, subcaption;
-      switch( game.gameState )
+      std::string caption;
+      switch( game.currentState )
       {
-         case GameState::State::MainMenu:
+         case State::MainMenu:
          {
             caption = "Main menu";
-         } break;
-         case GameState::State::Gameplay_ClassPick:
-         {
-            caption = "Gameplay";
-            subcaption = "\nClass picking";
-         } break;
-         case GameState::State::Gameplay_Session:
-         {
-            caption = "Gameplay";
-            subcaption = "\nSession";
 
-            render_gameplay_session(time, game.session, game.assets, gfx, font, game.meshes);
+            render_mainMenu(time, game.mainMenu, game.sharedData, game.constants, game.assets, gfx, font);
          } break;
-         case GameState::State::Score:
+         case State::GameplaySetup:
+         {
+            caption = "Gameplay setup";
+
+            render_gameplaySetup(time, game.gameplaySetup, game.sharedData, game.constants, game.assets, gfx, font);
+         } break;
+         case State::GameplaySession:
+         {
+            caption = "Gameplay session";
+
+            render_gameplaySession(time, game.session, game.assets, gfx, font, game.sharedData.meshes);
+         } break;
+         case State::Score:
          {
             caption = "Score screen";
+         } break;
+         case State::Quit:
+         {
+            caption = "Quitting...";
+         } break;
+         case State::Shutdown:
+         {
+            caption = "Shutdown";
+         } break;
+         case State::Startup:
+         {
+            caption = "Startup";
          } break;
       }
 
       gfx.setOrthographicProjection();
       gfx.setTransparency(true);
       caption += (time.virt.micros == 0 ? " (paused)" : " (running)");
-      caption += subcaption;
-      auto mesh = font.makeTextMesh(caption.c_str(), game.fontDesc, {1, 1}, Left, Top);
+      auto mesh = font.makeTextMesh(caption.c_str(), game.sharedData.font, {1, 1}, Left, Top);
       gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
    }
 

@@ -354,7 +354,7 @@ namespace core
    void calculateClientRect(uint32_t x, uint32_t y, uint32_t style, uint32_t styleEx, uint32_t& outXSize, uint32_t& outYSize)
    {
       RECT rc = {0, 0, x, y};
-      AdjustWindowRectEx(&rc, styleEx, false, styleEx);
+      AdjustWindowRectEx(&rc, style, false, styleEx);
       outXSize = rc.right - rc.left;
       outYSize = rc.bottom - rc.top;
    }

@@ -11,43 +11,40 @@
 
 namespace core
 {
-
    struct Entity
    {
-      enum
-      {
-         INDEX_BITS = 24,
-         INDEX_MASK = (1 << INDEX_BITS) - 1,
-         GENERATION_MASK = ~INDEX_MASK
-      };
       uint32_t id;
-
-      uint32_t index()
-      {
-         auto result = id & INDEX_MASK;
-
-         return result;
-      }
-
-      uint32_t generation()
-      {
-         auto result = (id & GENERATION_MASK) >> INDEX_BITS;
-
-         return result;
-      }
    };
 
-   inline bool operator==(const Entity& l, const Entity& r)
+   inline bool operator==(Entity l, Entity r)
    {
-      auto result = l.id == r.id;
+      auto result = (l.id == r.id);
 
       return result;
    }
 
-   inline bool operator<(const Entity& l, const Entity& r)
+   inline bool operator<(Entity l, Entity r)
    {
-      auto result = l.id < r.id;
+      auto result = (l.id < r.id);
 
       return result;
    }
+
+   inline bool operator!=(Entity l, Entity r)
+   {
+      auto result = !(l == r);
+
+      return result;
+   }
+}
+
+namespace std
+{
+   template <> struct hash < core::Entity >
+   {
+      size_t operator()(core::Entity e) const
+      {
+         return hash<int>()(e.id);
+      }
+   };
 }
