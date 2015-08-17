@@ -4,6 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <array>
 #include <cstdint>
 #include <vector>
 /******* common headers *******/
@@ -182,9 +183,20 @@ namespace core
    template<int COUNT>
    struct Button
    {
-      Vec2 position[COUNT];
-      Vec2 halfsize[COUNT];
-      std::string caption[COUNT];
+      std::array<Vec2, COUNT> position;
+      std::array<Vec2, COUNT> halfsize;
+      std::array<std::string, COUNT> caption;
+   };
+
+   template<int BUTTON_COUNT>
+   struct GuiData
+   {
+      Vec2 mousePosition;
+      uint32_t hoverButton;
+      uint32_t hotButton;
+      uint32_t activatedButton;
+      Button<BUTTON_COUNT> button;
+      std::array<Color, ButtonState::COUNT> buttonColors;
    };
 
    struct MainMenuState
@@ -193,15 +205,11 @@ namespace core
       {
          START_GAME,
          QUIT,
-         BUTTON_COUNT
+         COUNT
       };
 
-      uint32_t hoverButton;
-      uint32_t hotButton;
-      State nextState;
-      Vec2 mousePosition;
-      Color buttonColors[ButtonState::COUNT];
-      Button<BUTTON_COUNT> buttons;
+      uint32_t buttonFunctionToExecute;
+      GuiData<COUNT> gui;
    };
 
    struct Player
@@ -219,8 +227,12 @@ namespace core
 
    struct GameplaySetupState
    {
-      uint32_t activePlayerCount;
-      uint32_t playerId[COUNT];
+      enum
+      {
+         BACK,
+         COUNT
+      };
+      GuiData<COUNT> gui;
    };
 
    struct SessionState

@@ -55,25 +55,26 @@ namespace core
       shared.relativeCursor = false;
       shared.showCursor = false;
 
-      state.hoverButton = state.BUTTON_COUNT;
-      state.hotButton = state.BUTTON_COUNT;
-      state.nextState = State::MainMenu;
+      state.buttonFunctionToExecute = MainMenuState::COUNT;
 
-      state.buttonColors[ButtonState::IDLE] = {1, 1, 1};
-      state.buttonColors[ButtonState::HOVER] = {1, 1, 0};
-      state.buttonColors[ButtonState::HOT] = {1, 0, 0};
-      
+      state.gui.hoverButton = state.COUNT;
+      state.gui.hotButton = state.COUNT;
+
+      state.gui.buttonColors[ButtonState::IDLE] = {1, 1, 1};
+      state.gui.buttonColors[ButtonState::HOVER] = {1, 1, 0};
+      state.gui.buttonColors[ButtonState::HOT] = {1, 0, 0};
+
       auto i = 0;
-      state.buttons.position[i++] = {0, 100};
-      state.buttons.position[i++] = {0, -100};
+      state.gui.button.position[i++] = {0, 100};
+      state.gui.button.position[i++] = {0, -100};
 
       i = 0;
-      state.buttons.halfsize[i++] = {200, 50};
-      state.buttons.halfsize[i++] = {200, 50};
+      state.gui.button.halfsize[i++] = {200, 50};
+      state.gui.button.halfsize[i++] = {200, 50};
 
       i = 0;
-      state.buttons.caption[i++] = "Start game";
-      state.buttons.caption[i++] = "Quit";
+      state.gui.button.caption[i++] = "Start game";
+      state.gui.button.caption[i++] = "Quit";
 
       return result;
    }
@@ -88,46 +89,42 @@ namespace core
       return result;
    }
 
-   static void handle_mouseMove(MainMenuState& state)
+   template<int BUTTONS>
+   static void handle_mouseMove(GuiData<BUTTONS>& gui)
    {
-      state.hoverButton = state.BUTTON_COUNT;
-      for( auto i = 0; i < state.BUTTON_COUNT; ++i )
+      gui.hoverButton = BUTTONS;
+      for( auto i = 0; i < BUTTONS; ++i )
       {
-         auto result = checkCollision(state.mousePosition, Rect{state.buttons.position[i], state.buttons.halfsize[i]});
+         auto result = checkCollision(gui.mousePosition, Rect{gui.button.position[i], gui.button.halfsize[i]});
          if( result.isColliding )
          {
-            state.hoverButton = i;
+            gui.hoverButton = i;
          }
       }
    }
 
-   static void handle_mouseDown(MainMenuState& state)
+   template<int BUTTONS>
+   static void handle_mouseDown(GuiData<BUTTONS>& gui)
    {
-      state.hotButton = state.hoverButton;
+      gui.hotButton = gui.hoverButton;
    }
 
-   static void handle_mouseUp(MainMenuState& state)
+   template<int BUTTONS>
+   static uint32_t handle_mouseUp(GuiData<BUTTONS>& gui)
    {
-      if( state.hotButton == state.hoverButton )
+      uint32_t activateButton = BUTTONS;
+      if( gui.hotButton == gui.hoverButton )
       {
-         switch( state.hotButton )
-         {
-            case MainMenuState::QUIT:
-            {
-               state.nextState = State::Quit;
-            } break;
-            case MainMenuState::START_GAME:
-            {
-               state.nextState = State::GameplaySetup;
-            } break;
-         }
+         activateButton = gui.hotButton;
       }
-      state.hotButton = state.BUTTON_COUNT;
+      gui.hotButton = BUTTONS;
+      return activateButton;
    }
-
-   static State update_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
-                                AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   
+   template<int BUTTONS>
+   static uint32_t handle_guiInput(GuiData<BUTTONS>& gui, const Constants& constants, const EventVector_t& frameEvents)
    {
+      uint32_t activatedButton = BUTTONS;
       for( auto event : frameEvents )
       {
          switch( event.type )
@@ -136,8 +133,8 @@ namespace core
             {
                if( event.mouse.move.relative == false )
                {
-                  state.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
-                  handle_mouseMove(state);
+                  gui.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
+                  handle_mouseMove(gui);
                }
             } break;
 
@@ -147,46 +144,75 @@ namespace core
                {
                   if( event.mouse.button.isDown )
                   {
-                     handle_mouseDown(state);
+                     handle_mouseDown(gui);
                   }
                   else
                   {
-                     handle_mouseUp(state);
+                     activatedButton = handle_mouseUp(gui);
                   }
                }
             } break;
          }
       }
+      return activatedButton;
+   }
 
-      return state.nextState;
+   static State update_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+                                AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   {
+      auto nextState = State::MainMenu;
+      auto activateButton = handle_guiInput(state.gui, constants, frameEvents);
+
+      if( activateButton != MainMenuState::COUNT )
+      {
+         switch( activateButton )
+         {
+            case MainMenuState::START_GAME:
+            {
+               nextState = State::GameplaySetup;
+            } break;
+            case MainMenuState::QUIT:
+            {
+               nextState = State::Quit;
+            } break;
+         }
+      }
+
+      return nextState;
+   }
+
+   template<int BUTTONS>
+   static void render_guiData(GuiData<BUTTONS>& gui, SharedData& shared, const GameResources& assets, GraphicsSystem& gfx, FontSystem& font)
+   {
+      gfx.setOrthographicProjection();
+
+      for( auto i = 0U; i < BUTTONS; ++i )
+      {
+         Transform buttonTransform{gui.button.position[i]};
+         Color color = gui.buttonColors[ButtonState::IDLE];
+         if( i == gui.hoverButton )
+         {
+            color = gui.buttonColors[ButtonState::HOVER];
+            if( i == gui.hotButton )
+            {
+               color = gui.buttonColors[ButtonState::HOT];
+            }
+         }
+         auto buttonFrameMesh = makeOutlineQuad({}, gui.button.halfsize[i], assets.mainVS, assets.mainPS);
+         gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
+
+         auto buttonTextMesh = font.makeTextMesh(gui.button.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
+         gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
+      }
+
+      auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
+      gfx.renderMesh({gui.mousePosition}, {}, cursorMesh);
    }
 
    static void render_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                GraphicsSystem& gfx, FontSystem& font)
    {
-      gfx.setOrthographicProjection();
-
-      for( auto i = 0U; i < state.BUTTON_COUNT; ++i )
-      {
-         Transform buttonTransform{state.buttons.position[i]};
-         Color color = state.buttonColors[ButtonState::IDLE];
-         if( i == state.hoverButton )
-         {
-            color = state.buttonColors[ButtonState::HOVER];
-            if( i == state.hotButton )
-            {
-               color = state.buttonColors[ButtonState::HOT];
-            }
-         }
-         auto buttonFrameMesh = makeOutlineQuad({}, state.buttons.halfsize[i], assets.mainVS, assets.mainPS);
-         gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
-
-         auto buttonTextMesh = font.makeTextMesh(state.buttons.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
-         gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
-      }
-
-      auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
-      gfx.renderMesh({state.mousePosition}, {}, cursorMesh);
+      render_guiData(state.gui, shared, assets, gfx, font);
    }
 
    enum MeshId
@@ -208,8 +234,6 @@ namespace core
       shared.relativeCursor = false;
       shared.showCursor = true;
 
-      state.activePlayerCount = 1;
-
       //Generate a unique instance id which will be used for this entity as long as it is alive.
       //When it dies, the id should be returned to the provider.
       //Entity eid = state.instanceIdProvider.requestId();
@@ -217,8 +241,22 @@ namespace core
       //The system will track the data internally and keep a map of the entity id to data id.
       //The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
       //InternalId internalId = createData(state.movementSystem, eid);
-      
-      
+
+      state.gui.hoverButton = state.COUNT;
+      state.gui.hotButton = state.COUNT;
+
+      state.gui.buttonColors[ButtonState::IDLE] = {1, 1, 1};
+      state.gui.buttonColors[ButtonState::HOVER] = {1, 1, 0};
+      state.gui.buttonColors[ButtonState::HOT] = {1, 0, 0};
+
+      auto i = 0;
+      state.gui.button.position[i++] = {250 - constants.windowWidth/2, constants.windowHeight/2 - 150};
+
+      i = 0;
+      state.gui.button.halfsize[i++] = {200, 50};
+
+      i = 0;
+      state.gui.button.caption[i++] = "Back to main menu";
 
       return result;
    }
@@ -227,19 +265,21 @@ namespace core
                                      AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       //do the update
-      return State::GameplaySetup;
+      auto nextState = State::GameplaySetup;
+      uint32_t activatedButton = handle_guiInput(state.gui, constants, frameEvents);
+
+      if( activatedButton == GameplaySetupState::BACK )
+      {
+         nextState = State::MainMenu;
+      }
+
+      return nextState;
    }
 
    static void render_gameplaySetup(DeltaTime time, GameplaySetupState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                     GraphicsSystem& gfx, FontSystem& font)
    {
-      gfx.setPerspectiveProjection();
-
-      //do the draw
-      /*for( auto i = 0U; i < state.activePlayers; ++i )
-      {
-         gfx.renderMesh({state.players.position[i]}, {}, shared.meshes[state.players.render[i].mesh]);
-      }*/
+      render_guiData(state.gui, shared, assets, gfx, font);
    }
 
    static void loadMeshBundle(float left, float top, float right, float bottom, uint32_t columns, uint32_t rows,
@@ -1121,6 +1161,11 @@ namespace core
          case State::MainMenu:
          {
             game.nextState = update_mainMenu(time, game.mainMenu, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+
+            if( contains(Keyboard::Space, ACTION) )
+            {
+               game.nextState = State::GameplaySetup;
+            }
          } break;
          case State::GameplaySetup:
          {
