@@ -151,6 +151,7 @@ namespace core
 
    struct SharedData
    {
+      Vec2 mousePosition;
       Camera camera;
       // #temp This should be in a cache, and handles should be stored in assets.
       FontDescriptor font;
@@ -185,21 +186,23 @@ namespace core
    {
       std::array<Vec2, COUNT> position;
       std::array<Vec2, COUNT> halfsize;
+      // #todo at some point, these should be texture handles probably
+      std::array<Color, COUNT> idleColor;
+      std::array<Color, COUNT> hoverColor;
+      std::array<Color, COUNT> hotColor;
       std::array<std::string, COUNT> caption;
    };
 
    template<int BUTTON_COUNT>
    struct GuiData
    {
-      Vec2 mousePosition;
       uint32_t hoverButton;
       uint32_t hotButton;
       uint32_t activatedButton;
       Button<BUTTON_COUNT> button;
-      std::array<Color, ButtonState::COUNT> buttonColors;
    };
 
-   struct MainMenuState
+   struct MainMenuData
    {
       enum
       {
@@ -225,16 +228,6 @@ namespace core
       };
    };
 
-   struct GameplaySetupState
-   {
-      enum
-      {
-         BACK,
-         COUNT
-      };
-      GuiData<COUNT> gui;
-   };
-
    struct SessionState
    {
       uint32_t entityCount;
@@ -247,12 +240,18 @@ namespace core
       std::vector<Vec2> targetDirection;
    };
 
-   struct ScoreState
+   struct GameplayData
    {
+      enum
+      {
+         BACK,
+         COUNT
+      };
+      GuiData<COUNT> setupGui; // #temp
 
    };
 
-   struct GameState
+   struct GameData
    {
       State currentState;
       State nextState;
@@ -260,10 +259,8 @@ namespace core
       GameResources assets;
 
       SharedData sharedData; //data that should be shared across ALL states
-      Constants constants; //
-      MainMenuState mainMenu;
-      GameplaySetupState gameplaySetup;
-      SessionState session;
-      ScoreState score;
+      Constants constants;
+      MainMenuData mainMenu;
+      GameplayData gameplay;
    };
 }

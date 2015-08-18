@@ -47,22 +47,22 @@ namespace core
       }
    }
 
-   static bool init_mainMenu(MainMenuState& state, SharedData& shared, const Constants& constants, const GameResources& assets)
+   static bool init_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
-
+/*
       shared.lockCursor = true;
-      shared.relativeCursor = false;
+      shared.relativeCursor = true;
       shared.showCursor = false;
-
-      state.buttonFunctionToExecute = MainMenuState::COUNT;
+*/
+      state.buttonFunctionToExecute = MainMenuData::COUNT;
 
       state.gui.hoverButton = state.COUNT;
       state.gui.hotButton = state.COUNT;
 
-      state.gui.buttonColors[ButtonState::IDLE] = {1, 1, 1};
-      state.gui.buttonColors[ButtonState::HOVER] = {1, 1, 0};
-      state.gui.buttonColors[ButtonState::HOT] = {1, 0, 0};
+      Color defaultIdleColor{1, 1, 1};
+      Color defaultHoverColor{1, 1, 0};
+      Color defaultHotColor{1, 0, 0};
 
       auto i = 0;
       state.gui.button.position[i++] = {0, 100};
@@ -73,8 +73,21 @@ namespace core
       state.gui.button.halfsize[i++] = {200, 50};
 
       i = 0;
+      state.gui.button.idleColor[i++] = {0, 1, 0};
+      state.gui.button.idleColor[i++] = {0, 1, 1};
+
+      i = 0;
+      state.gui.button.hoverColor[i++] = defaultHoverColor;
+      state.gui.button.hoverColor[i++] = defaultHoverColor;
+
+      i = 0;
+      state.gui.button.hotColor[i++] = defaultHotColor;
+      state.gui.button.hotColor[i++] = defaultHotColor;
+
+      i = 0;
       state.gui.button.caption[i++] = "Start game";
       state.gui.button.caption[i++] = "Quit";
+
 
       return result;
    }
@@ -90,12 +103,12 @@ namespace core
    }
 
    template<int BUTTONS>
-   static void handle_mouseMove(GuiData<BUTTONS>& gui)
+   static void handle_mouseMove(GuiData<BUTTONS>& gui, Vec2 mousePosition)
    {
       gui.hoverButton = BUTTONS;
       for( auto i = 0; i < BUTTONS; ++i )
       {
-         auto result = checkCollision(gui.mousePosition, Rect{gui.button.position[i], gui.button.halfsize[i]});
+         auto result = checkCollision(mousePosition, Rect{gui.button.position[i], gui.button.halfsize[i]});
          if( result.isColliding )
          {
             gui.hoverButton = i;
@@ -120,9 +133,9 @@ namespace core
       gui.hotButton = BUTTONS;
       return activateButton;
    }
-   
+
    template<int BUTTONS>
-   static uint32_t handle_guiInput(GuiData<BUTTONS>& gui, const Constants& constants, const EventVector_t& frameEvents)
+   static uint32_t handle_guiInput(GuiData<BUTTONS>& gui, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents)
    {
       uint32_t activatedButton = BUTTONS;
       for( auto event : frameEvents )
@@ -131,11 +144,15 @@ namespace core
          {
             case WE_MOUSEMOVE:
             {
-               if( event.mouse.move.relative == false )
+               if( shared.relativeCursor != event.mouse.move.relative )
                {
-                  gui.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
-                  handle_mouseMove(gui);
+                  shared.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
                }
+               else
+               {
+                  shared.mousePosition += {(float)event.mouse.position.x, -(float)event.mouse.position.y};
+               }
+               handle_mouseMove(gui, shared.mousePosition);
             } break;
 
             case WE_MOUSEBUTTON:
@@ -157,21 +174,21 @@ namespace core
       return activatedButton;
    }
 
-   static State update_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+   static State update_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
                                 AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       auto nextState = State::MainMenu;
-      auto activateButton = handle_guiInput(state.gui, constants, frameEvents);
+      auto activateButton = handle_guiInput(state.gui, shared, constants, frameEvents);
 
-      if( activateButton != MainMenuState::COUNT )
+      if( activateButton != MainMenuData::COUNT )
       {
          switch( activateButton )
          {
-            case MainMenuState::START_GAME:
+            case MainMenuData::START_GAME:
             {
                nextState = State::GameplaySetup;
             } break;
-            case MainMenuState::QUIT:
+            case MainMenuData::QUIT:
             {
                nextState = State::Quit;
             } break;
@@ -189,13 +206,13 @@ namespace core
       for( auto i = 0U; i < BUTTONS; ++i )
       {
          Transform buttonTransform{gui.button.position[i]};
-         Color color = gui.buttonColors[ButtonState::IDLE];
+         Color color = gui.button.idleColor[i];
          if( i == gui.hoverButton )
          {
-            color = gui.buttonColors[ButtonState::HOVER];
+            color = gui.button.hoverColor[i];
             if( i == gui.hotButton )
             {
-               color = gui.buttonColors[ButtonState::HOT];
+               color = gui.button.hotColor[i];
             }
          }
          auto buttonFrameMesh = makeOutlineQuad({}, gui.button.halfsize[i], assets.mainVS, assets.mainPS);
@@ -206,10 +223,10 @@ namespace core
       }
 
       auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
-      gfx.renderMesh({gui.mousePosition}, {}, cursorMesh);
+      gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
    }
 
-   static void render_mainMenu(DeltaTime time, MainMenuState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
+   static void render_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                GraphicsSystem& gfx, FontSystem& font)
    {
       render_guiData(state.gui, shared, assets, gfx, font);
@@ -225,50 +242,60 @@ namespace core
       LineMesh,
    };
 
-   static bool init_gameplaySetup(GameplaySetupState& state, SharedData& shared, const Constants& constants, const GameResources& assets)
+   static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
-
-      //do the initialization
+/*
       shared.lockCursor = false;
-      shared.relativeCursor = false;
+      shared.relativeCursor = true;
       shared.showCursor = true;
+*/
+      state.setupGui.hoverButton = state.COUNT;
+      state.setupGui.hotButton = state.COUNT;
 
-      //Generate a unique instance id which will be used for this entity as long as it is alive.
-      //When it dies, the id should be returned to the provider.
-      //Entity eid = state.instanceIdProvider.requestId();
-      //This entity will have movement capabilities, so we ask the movement system to create some data for it.
-      //The system will track the data internally and keep a map of the entity id to data id.
-      //The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
-      //InternalId internalId = createData(state.movementSystem, eid);
-
-      state.gui.hoverButton = state.COUNT;
-      state.gui.hotButton = state.COUNT;
-
-      state.gui.buttonColors[ButtonState::IDLE] = {1, 1, 1};
-      state.gui.buttonColors[ButtonState::HOVER] = {1, 1, 0};
-      state.gui.buttonColors[ButtonState::HOT] = {1, 0, 0};
+      Color defaultIdleColor{1, 1, 1};
+      Color defaultHoverColor{1, 1, 0};
+      Color defaultHotColor{1, 0, 0};
 
       auto i = 0;
-      state.gui.button.position[i++] = {250 - constants.windowWidth/2, constants.windowHeight/2 - 150};
+      state.setupGui.button.position[i++] = {250 - constants.windowWidth / 2, constants.windowHeight / 2 - 150};
 
       i = 0;
-      state.gui.button.halfsize[i++] = {200, 50};
+      state.setupGui.button.halfsize[i++] = {200, 50};
 
       i = 0;
-      state.gui.button.caption[i++] = "Back to main menu";
+      state.setupGui.button.idleColor[i++] = defaultIdleColor;
+
+      i = 0;
+      state.setupGui.button.hoverColor[i++] = defaultHoverColor;
+
+      i = 0;
+      state.setupGui.button.hotColor[i++] = defaultHotColor;
+
+      i = 0;
+      state.setupGui.button.caption[i++] = "Back to main menu";
+
+      //*** Generate a unique instance id which will be used for this entity as long as it is alive.
+      //*** When it dies, the id should be returned to the provider.
+      //Entity eid = state.instanceIdProvider.requestId();
+      //*** This entity will have movement capabilities, so we ask the movement system to create some data for it.
+      //*** The system will track the data internally and keep a map of the entity id to data id.
+      //*** The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
+      //InternalId internalId = createData(state.movementSystem, eid);
+
+
 
       return result;
    }
 
-   static State update_gameplaySetup(DeltaTime time, GameplaySetupState& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+   static State update_gameplaySetup(DeltaTime time, GameplayData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
                                      AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       //do the update
       auto nextState = State::GameplaySetup;
-      uint32_t activatedButton = handle_guiInput(state.gui, constants, frameEvents);
+      uint32_t activatedButton = handle_guiInput(state.setupGui, shared, constants, frameEvents);
 
-      if( activatedButton == GameplaySetupState::BACK )
+      if( activatedButton == GameplayData::BACK )
       {
          nextState = State::MainMenu;
       }
@@ -276,10 +303,10 @@ namespace core
       return nextState;
    }
 
-   static void render_gameplaySetup(DeltaTime time, GameplaySetupState& state, SharedData& shared, const Constants& constants, const GameResources& assets,
+   static void render_gameplaySetup(DeltaTime time, GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                     GraphicsSystem& gfx, FontSystem& font)
    {
-      render_guiData(state.gui, shared, assets, gfx, font);
+      render_guiData(state.setupGui, shared, assets, gfx, font);
    }
 
    static void loadMeshBundle(float left, float top, float right, float bottom, uint32_t columns, uint32_t rows,
@@ -322,7 +349,7 @@ namespace core
       return result;
    }
 
-   static std::vector<Mesh> loadMeshes(GameState& game, TextureManager& textures)
+   static std::vector<Mesh> loadMeshes(GameData& game, TextureManager& textures)
    {
       std::vector<Mesh> result{};
       //players
@@ -420,7 +447,7 @@ namespace core
       assertEntity(session);
    }
 
-   static bool init_session(GameState& game, SessionState& session)
+   static bool init_session(GameData& game, SessionState& session)
    {
       session = SessionState{0};
       session.deltaTime.reserve(500);
@@ -1076,7 +1103,7 @@ namespace core
 
 
 
-   static bool transition_state(GameState& game)
+   static bool transition_state(GameData& game)
    {
       auto result = true;
       if( game.nextState != game.currentState )
@@ -1092,19 +1119,19 @@ namespace core
 
             case State::GameplaySetup:
             {
-               result = init_gameplaySetup(game.gameplaySetup, game.sharedData, game.constants, game.assets);
+               result = init_gameplaySetup(game.gameplay, game.sharedData, game.constants, game.assets);
             } break;
 
             case State::GameplaySession:
             {
-               result = init_session(game, game.session);
+               //result = init_session(game, game.session);
             } break;
          }
       }
       return result;
    }
 
-   static bool init_game(GameState& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
+   static bool init_game(GameData& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
    {
       bool result = true;
       game.assets = loadGameResources(audio.sounds, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
@@ -1120,6 +1147,7 @@ namespace core
          game.sharedData.font = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 
          game.sharedData.camera.setPosition({0, 0, -50});
+         game.sharedData.mousePosition = {0, 0};
 
          game.constants.playerAcceleration = 60;
          game.constants.playerAimLength = 4;
@@ -1135,7 +1163,7 @@ namespace core
       return true;
    }
 
-   static bool update_game(DeltaTime time, GameState& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   static bool update_game(DeltaTime time, GameData& game, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       bool stillRunning = true;
       enum
@@ -1169,7 +1197,7 @@ namespace core
          } break;
          case State::GameplaySetup:
          {
-            game.nextState = update_gameplaySetup(time, game.gameplaySetup, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+            game.nextState = update_gameplaySetup(time, game.gameplay, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
 
             if( contains(Keyboard::Space, ACTION) )
             {
@@ -1178,7 +1206,7 @@ namespace core
          } break;
          case State::GameplaySession:
          {
-            game.nextState = update_gameplaySession(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
+            //game.nextState = update_gameplaySession(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
 
             if( contains(Keyboard::Space, ACTION) )
             {
@@ -1203,7 +1231,7 @@ namespace core
       return stillRunning;
    }
 
-   static void render_game(DeltaTime time, GameState& game, GraphicsSystem& gfx, FontSystem& font)
+   static void render_game(DeltaTime time, GameData& game, GraphicsSystem& gfx, FontSystem& font)
    {
       gfx.applyCamera(game.sharedData.camera);
       /*
@@ -1228,13 +1256,13 @@ namespace core
          {
             caption = "Gameplay setup";
 
-            render_gameplaySetup(time, game.gameplaySetup, game.sharedData, game.constants, game.assets, gfx, font);
+            render_gameplaySetup(time, game.gameplay, game.sharedData, game.constants, game.assets, gfx, font);
          } break;
          case State::GameplaySession:
          {
             caption = "Gameplay session";
 
-            render_gameplaySession(time, game.session, game.assets, gfx, font, game.sharedData.meshes);
+            //render_gameplaySession(time, game.session, game.assets, gfx, font, game.sharedData.meshes);
          } break;
          case State::Score:
          {

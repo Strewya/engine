@@ -33,7 +33,7 @@ namespace core
       FontSystem fontSystem;
 
       //game state stuff
-      GameState game;
+      GameData game;
 
       bool isPaused;
       bool init(WindowProxy window);
