@@ -143,12 +143,6 @@ namespace core
       uint32_t id;
    };
 
-   struct DeltaTimeComponentCache
-   {
-      std::vector<DeltaTimeData> m_data;
-      std::unordered_map<Entity, InternalId> m_entityToInternalIdMap;
-   };
-
    struct SharedData
    {
       Vec2 mousePosition;
@@ -240,6 +234,38 @@ namespace core
       std::vector<Vec2> targetDirection;
    };
 
+   typedef std::unordered_map<Entity, InternalId> EntityInternalIdMap;
+
+   struct ComponentDeltaTime
+   {
+      std::vector<DeltaTimeData> m_data;
+      EntityInternalIdMap m_entityToInternalIdMap;
+   };
+
+   struct InstanceProvider
+   {
+   public:
+      InstanceProvider() : m_idCounter(0)
+      {
+      }
+      Entity requestId()
+      {
+         return{++m_idCounter};
+      }
+      void returnId(Entity id)
+      {
+         //nothing for now...
+      }
+   private:
+      uint32_t m_idCounter;
+   };
+
+   struct World
+   {
+      InstanceProvider instanceProvider;
+      ComponentDeltaTime deltaTime;
+   };
+
    struct GameplayData
    {
       enum
@@ -247,8 +273,8 @@ namespace core
          BACK,
          COUNT
       };
-      GuiData<COUNT> setupGui; // #temp
-
+      GuiData<COUNT> setupGui; // #temp because the gameplay setup part of the game should not have any visible buttons (i think)
+      World world;
    };
 
    struct GameData

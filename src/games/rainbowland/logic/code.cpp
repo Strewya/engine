@@ -19,26 +19,126 @@
 
 namespace core
 {
-   struct RequestResult
-   {
-      InternalId id;
-      bool created;
-   };
+   static const InternalId InvalidInternalId{(std::numeric_limits<uint32_t>::max())};
 
-   static RequestResult requestData(DeltaTimeComponentCache& cache, Entity entityId)
+   static bool operator==(InternalId l, InternalId r)
    {
-      auto it = cache.m_entityToInternalIdMap.find(entityId);
-      if( it != cache.m_entityToInternalIdMap.end() )
-      {
-         return{it->second, false};
-      }
-      InternalId internalId{cache.m_data.size()};
-      cache.m_data.emplace_back();
-      cache.m_entityToInternalIdMap[entityId] = internalId;
-      return{internalId, true};
+      auto result = l.id == r.id;
+      return result;
+   }
+   static bool operator!=(InternalId l, InternalId r)
+   {
+      auto result = !(l == r);
+      return result;
    }
 
-   static void updateComponents(DeltaTimeComponentCache& cache, Time dt)
+
+   namespace component_impl
+   {
+      template<typename DATA>
+      static InternalId createData(DATA& data, EntityInternalIdMap& mapping, Entity e)
+      {
+         InternalId id{mapping.size()};
+         auto insertResult = mapping.insert({e, id});
+         if( insertResult.second && data.size() < mapping.size() ) //pair was inserted, meaning no entity was previously mapped
+         {
+            data.emplace_back();
+         }
+         return id;
+      }
+
+      static InternalId getInternalId(EntityInternalIdMap& mapping, Entity e)
+      {
+         auto result = InvalidInternalId;
+         auto it = mapping.find(e);
+         if( it != std::end(mapping) )
+         {
+            result = it->second;
+         }
+         return result;
+      }
+
+      static bool containsData(EntityInternalIdMap& mapping, Entity e)
+      {
+         auto id = getInternalId(mapping, e);
+         auto result = (id != InvalidInternalId);
+         return result;
+      }
+
+      template<typename DATA>
+      static void releaseData(DATA& data, EntityInternalIdMap& mapping, Entity e)
+      {
+         auto id = component_impl::getInternalId(mapping, e);
+         if( id != InvalidInternalId )
+         {
+            auto last = mapping.size() - 1;
+            std::swap(data[id.id], data[last]);
+            auto it = std::find_if(std::begin(mapping), std::end(mapping),
+                                   [last](EntityInternalIdMap::value_type& v)
+            {
+               auto result = (v.second.id == last);
+               return result;
+            });
+            it->second = id;
+         }
+      }
+   }
+
+   float readTimeFactor(ComponentDeltaTime& cache, InternalId id)
+   {
+      auto result = cache.m_data[id.id].factor;
+      return result;
+   }
+
+   float readDeltaTime(ComponentDeltaTime& cache, InternalId id)
+   {
+      auto result = cache.m_data[id.id].deltaTime;
+      return result;
+   }
+
+   uint32_t readDeltaMicros(ComponentDeltaTime& cache, InternalId id)
+   {
+      auto result = cache.m_data[id.id].deltaMicros;
+      return result;
+   }
+
+   void writeTimeFactor(ComponentDeltaTime& cache, InternalId id, float factor)
+   {
+      cache.m_data[id.id].factor = factor;
+   }
+
+   static InternalId createData(ComponentDeltaTime& cache, Entity e, float timeFactor = 1.0f)
+   {
+      auto result = component_impl::createData(cache.m_data, cache.m_entityToInternalIdMap, e);
+      writeTimeFactor(cache, result, timeFactor);
+      return result;
+   }
+
+   // All InternalIds for this cache are potentially invalidated and should be reacquired
+   static void releaseData(ComponentDeltaTime& cache, Entity e)
+   {
+      component_impl::releaseData(cache.m_data, cache.m_entityToInternalIdMap, e);
+   }
+
+   static bool containsData(ComponentDeltaTime& cache, Entity e)
+   {
+      auto result = component_impl::containsData(cache.m_entityToInternalIdMap, e);
+      return result;
+   }
+
+   static InternalId getInternalId(ComponentDeltaTime& cache, Entity e)
+   {
+      auto result = component_impl::getInternalId(cache.m_entityToInternalIdMap, e);
+      return result;
+   }
+
+
+
+
+
+
+
+   static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
    {
       for( auto data : cache.m_data )
       {
@@ -46,6 +146,8 @@ namespace core
          data.deltaTime = dt.seconds*data.factor;
       }
    }
+
+
 
    static bool init_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
@@ -277,13 +379,22 @@ namespace core
 
       //*** Generate a unique instance id which will be used for this entity as long as it is alive.
       //*** When it dies, the id should be returned to the provider.
-      //Entity eid = state.instanceIdProvider.requestId();
+      Entity eid = state.world.instanceProvider.requestId();
       //*** This entity will have movement capabilities, so we ask the movement system to create some data for it.
       //*** The system will track the data internally and keep a map of the entity id to data id.
       //*** The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
-      //InternalId internalId = createData(state.movementSystem, eid);
-
-
+      InternalId internalId = createData(state.world.deltaTime, eid);
+      //*** The internal data id can be retrieved by calling getInternalId
+      InternalId internalId2 = getInternalId(state.world.deltaTime, eid);
+      assert(internalId == internalId2);
+      //*** We can also check to see if a system has data for a specific entity by checking that the internalId is valid
+      bool exists = (internalId != InvalidInternalId);
+      //*** Another is calling the hasData function, which does the above check
+      exists = containsData(state.world.deltaTime, eid);
+      //*** Data can be read and written by calling readXXX and writeXXX
+      float factor = readTimeFactor(state.world.deltaTime, internalId);
+      factor *= 0.5f;
+      writeTimeFactor(state.world.deltaTime, internalId, factor);
 
       return result;
    }
