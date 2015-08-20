@@ -49,7 +49,6 @@ namespace core
       float playerAimLength;
    };
 
-
    struct Time
    {
       uint32_t micros;
@@ -63,33 +62,6 @@ namespace core
    };
 
    enum MeshId;
-
-   struct DeltaTimeData
-   {
-      uint32_t deltaMicros;
-      float deltaTime;
-      float factor;
-   };
-
-   struct RenderData
-   {
-      Color color;
-      MeshId mesh;
-      float rotationRadians;
-   };
-
-   struct PositionData
-   {
-      Vec2 position;
-   };
-
-   struct MovementData
-   {
-      float acceleration;
-      Vec2 direction;
-      Vec2 velocity;
-      Vec2 position;
-   };
 
    struct Line
    {
@@ -136,11 +108,6 @@ namespace core
    struct AimData
    {
       Vec2 aim;
-   };
-
-   struct InternalId
-   {
-      uint32_t id;
    };
 
    struct SharedData
@@ -222,26 +189,6 @@ namespace core
       };
    };
 
-   struct SessionState
-   {
-      uint32_t entityCount;
-      std::vector<DeltaTimeData> deltaTime;
-      std::vector<RenderData> render;
-      std::vector<PositionData> position;
-      std::vector<MovementData> movement;
-      std::vector<AimData> aim;
-      std::vector<CollisionData> collision;
-      std::vector<Vec2> targetDirection;
-   };
-
-   typedef std::unordered_map<Entity, InternalId> EntityInternalIdMap;
-
-   struct ComponentDeltaTime
-   {
-      std::vector<DeltaTimeData> m_data;
-      EntityInternalIdMap m_entityToInternalIdMap;
-   };
-
    struct InstanceProvider
    {
    public:
@@ -260,10 +207,55 @@ namespace core
       uint32_t m_idCounter;
    };
 
+   struct DataId
+   {
+      uint32_t id;
+   };
+
+   typedef std::unordered_map<Entity, DataId> EntityDataIdMap;
+   typedef std::vector<Entity> EntityVector;
+
+   struct ComponentDeltaTime
+   {
+      EntityDataIdMap m_mapping;
+      EntityVector m_entity;
+      std::vector<uint32_t> m_deltaMicros;
+      std::vector<float> m_deltaTime;
+      std::vector<float> m_factor;
+   };
+
+   struct ComponentMovement
+   {
+      EntityDataIdMap m_mapping;
+      EntityVector m_entity;
+      std::vector<float> m_acceleration;
+      std::vector<Vec2> m_direction;
+      std::vector<Vec2> m_velocity;
+      std::vector<Vec2> m_position;
+   };
+
+   struct ComponentPosition
+   {
+      EntityDataIdMap m_mapping;
+      EntityVector m_entity;
+      std::vector<Vec2> m_position;
+   };
+
+   struct ComponentVisual
+   {
+      EntityDataIdMap m_mapping;
+      EntityVector m_entity;
+      std::vector<Color> m_color;
+      std::vector<MeshId> m_meshId;
+      std::vector<float> m_rotationRadians;
+   };
+
    struct World
    {
       InstanceProvider instanceProvider;
       ComponentDeltaTime deltaTime;
+      ComponentMovement movement;
+      ComponentPosition position;
    };
 
    struct GameplayData

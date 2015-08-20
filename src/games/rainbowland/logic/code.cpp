@@ -19,14 +19,26 @@
 
 namespace core
 {
-   static const InternalId InvalidInternalId{(std::numeric_limits<uint32_t>::max())};
+   inline float pow2(float v)
+   {
+      auto result = v*v;
+      return result;
+   }
 
-   static bool operator==(InternalId l, InternalId r)
+   inline float radians(Vec2 v)
+   {
+      auto result = std::atan2(v.y, v.x);
+      return result;
+   }
+
+   static const DataId InvalidDataId{(std::numeric_limits<uint32_t>::max())};
+
+   static bool operator==(DataId l, DataId r)
    {
       auto result = l.id == r.id;
       return result;
    }
-   static bool operator!=(InternalId l, InternalId r)
+   static bool operator!=(DataId l, DataId r)
    {
       auto result = !(l == r);
       return result;
@@ -35,21 +47,29 @@ namespace core
 
    namespace component_impl
    {
-      template<typename DATA>
-      static InternalId createData(DATA& data, EntityInternalIdMap& mapping, Entity e)
+      static DataId requestSlot(EntityDataIdMap& mapping, Entity e)
       {
-         InternalId id{mapping.size()};
-         auto insertResult = mapping.insert({e, id});
-         if( insertResult.second && data.size() < mapping.size() ) //pair was inserted, meaning no entity was previously mapped
-         {
-            data.emplace_back();
-         }
+         DataId id{mapping.size()};
+         mapping.insert({e, id});
          return id;
       }
 
-      static InternalId getInternalId(EntityInternalIdMap& mapping, Entity e)
+      template<typename DATA>
+      static void requestSlot(DATA& data, DataId i, typename DATA::value_type defaultValue = {})
       {
-         auto result = InvalidInternalId;
+         if( data.size() == i.id )
+         {
+            data.emplace_back();
+         }
+         else
+         {
+            data[i.id] = defaultValue;
+         }
+      }
+
+      static DataId getDataId(EntityDataIdMap& mapping, Entity e)
+      {
+         auto result = InvalidDataId;
          auto it = mapping.find(e);
          if( it != std::end(mapping) )
          {
@@ -58,105 +78,246 @@ namespace core
          return result;
       }
 
-      static bool containsData(EntityInternalIdMap& mapping, Entity e)
+      static bool containsData(EntityDataIdMap& mapping, Entity e)
       {
-         auto id = getInternalId(mapping, e);
-         auto result = (id != InvalidInternalId);
+         auto id = getDataId(mapping, e);
+         auto result = (id != InvalidDataId);
          return result;
       }
 
-      template<typename DATA>
-      static void releaseData(DATA& data, EntityInternalIdMap& mapping, Entity e)
+      std::pair<DataId, DataId> releaseSlot(EntityDataIdMap& mapping, Entity e)
       {
-         auto id = component_impl::getInternalId(mapping, e);
-         if( id != InvalidInternalId )
+         std::pair<DataId, DataId> result{InvalidDataId, InvalidDataId};
+         auto id = component_impl::getDataId(mapping, e);
+         if( id != InvalidDataId )
          {
             auto last = mapping.size() - 1;
-            std::swap(data[id.id], data[last]);
+            result.first = id;
+            result.second = {last};
             auto it = std::find_if(std::begin(mapping), std::end(mapping),
-                                   [last](EntityInternalIdMap::value_type& v)
+                                   [last](EntityDataIdMap::value_type& v)
             {
                auto result = (v.second.id == last);
                return result;
             });
             it->second = id;
+            mapping.erase(e);
+         }
+         return result;
+      }
+
+      template<typename DATA>
+      void releaseSlot(DATA& data, DataId toRelease, DataId lastActive)
+      {
+         if( toRelease != InvalidDataId && lastActive != InvalidDataId )
+         {
+            std::swap(data[toRelease.id], data[lastActive.id]);
          }
       }
    }
 
-   float readTimeFactor(ComponentDeltaTime& cache, InternalId id)
+   //*******************************************************
+   //********************* CREATE DATA *********************
+   //*******************************************************
+   static DataId createData(ComponentDeltaTime& cache, Entity e)
    {
-      auto result = cache.m_data[id.id].factor;
-      return result;
+      auto iid = component_impl::requestSlot(cache.m_mapping, e);
+      component_impl::requestSlot(cache.m_entity, iid, e);
+      component_impl::requestSlot(cache.m_deltaMicros, iid, 0);
+      component_impl::requestSlot(cache.m_deltaTime, iid, 0);
+      component_impl::requestSlot(cache.m_factor, iid, 1.0f);
+      return iid;
    }
-
-   float readDeltaTime(ComponentDeltaTime& cache, InternalId id)
+   static DataId createData(ComponentMovement& cache, Entity e)
    {
-      auto result = cache.m_data[id.id].deltaTime;
-      return result;
+      auto iid = component_impl::requestSlot(cache.m_mapping, e);
+      component_impl::requestSlot(cache.m_entity, iid, e);
+      component_impl::requestSlot(cache.m_acceleration, iid, 0);
+      component_impl::requestSlot(cache.m_direction, iid, {0, 0});
+      component_impl::requestSlot(cache.m_velocity, iid, {0, 0});
+      component_impl::requestSlot(cache.m_position, iid, {0, 0});
+      return iid;
    }
-
-   uint32_t readDeltaMicros(ComponentDeltaTime& cache, InternalId id)
+   static DataId createData(ComponentPosition& cache, Entity e)
    {
-      auto result = cache.m_data[id.id].deltaMicros;
-      return result;
+      auto iid = component_impl::requestSlot(cache.m_mapping, e);
+      component_impl::requestSlot(cache.m_entity, iid, e);
+      component_impl::requestSlot(cache.m_position, iid, {0, 0});
+      return iid;
    }
-
-   void writeTimeFactor(ComponentDeltaTime& cache, InternalId id, float factor)
+   static DataId createData(ComponentVisual& cache, Entity e)
    {
-      cache.m_data[id.id].factor = factor;
+      auto iid = component_impl::requestSlot(cache.m_mapping, e);
+      component_impl::requestSlot(cache.m_entity, iid, e);
+      component_impl::requestSlot(cache.m_color, iid, {});
+      component_impl::requestSlot(cache.m_meshId, iid);
+      component_impl::requestSlot(cache.m_rotationRadians, iid, 0);
+      return iid;
    }
-
-   static InternalId createData(ComponentDeltaTime& cache, Entity e, float timeFactor = 1.0f)
-   {
-      auto result = component_impl::createData(cache.m_data, cache.m_entityToInternalIdMap, e);
-      writeTimeFactor(cache, result, timeFactor);
-      return result;
-   }
-
-   // All InternalIds for this cache are potentially invalidated and should be reacquired
+   //********************************************************
+   //********************* RELEASE DATA *********************
+   //********************************************************
    static void releaseData(ComponentDeltaTime& cache, Entity e)
    {
-      component_impl::releaseData(cache.m_data, cache.m_entityToInternalIdMap, e);
+      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
+      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_deltaMicros, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_deltaTime, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_factor, ids.first, ids.second);
    }
-
+   static void releaseData(ComponentMovement& cache, Entity e)
+   {
+      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
+      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_acceleration, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_direction, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_velocity, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_position, ids.first, ids.second);
+   }
+   static void releaseData(ComponentPosition& cache, Entity e)
+   {
+      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
+      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_position, ids.first, ids.second);
+   }
+   static DataId releaseData(ComponentVisual& cache, Entity e)
+   {
+      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
+      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_color, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_meshId, ids.first, ids.second);
+      component_impl::releaseSlot(cache.m_rotationRadians, ids.first, ids.second);
+   }
+   //*********************************************************
+   //********************* CONTAINS DATA *********************
+   //*********************************************************
    static bool containsData(ComponentDeltaTime& cache, Entity e)
    {
-      auto result = component_impl::containsData(cache.m_entityToInternalIdMap, e);
+      auto result = component_impl::containsData(cache.m_mapping, e);
       return result;
    }
-
-   static InternalId getInternalId(ComponentDeltaTime& cache, Entity e)
+   static bool containsData(ComponentMovement& cache, Entity e)
    {
-      auto result = component_impl::getInternalId(cache.m_entityToInternalIdMap, e);
+      auto result = component_impl::containsData(cache.m_mapping, e);
       return result;
    }
-
-
-
-
-
-
-
+   static bool containsData(ComponentPosition& cache, Entity e)
+   {
+      auto result = component_impl::containsData(cache.m_mapping, e);
+      return result;
+   }
+   static bool containsData(ComponentVisual& cache, Entity e)
+   {
+      auto result = component_impl::containsData(cache.m_mapping, e);
+      return result;
+   }
+   //*******************************************************
+   //********************* GET DATA ID *********************
+   //*******************************************************
+   static DataId getDataId(ComponentDeltaTime& cache, Entity e)
+   {
+      auto result = component_impl::getDataId(cache.m_mapping, e);
+      return result;
+   }
+   static DataId getDataId(ComponentMovement& cache, Entity e)
+   {
+      auto result = component_impl::getDataId(cache.m_mapping, e);
+      return result;
+   }
+   static DataId getDataId(ComponentPosition& cache, Entity e)
+   {
+      auto result = component_impl::getDataId(cache.m_mapping, e);
+      return result;
+   }
+   static DataId getDataId(ComponentVisual& cache, Entity e)
+   {
+      auto result = component_impl::getDataId(cache.m_mapping, e);
+      return result;
+   }
+   //************************************************
+   //********************* READ *********************
+   //************************************************
+#define READ_FN(type, field, storage, name) static type read##name(storage& cache, DataId id) { auto result = cache.m_##field[id.id]; return result; }
+   READ_FN(float, factor, ComponentDeltaTime, TimeFactor);
+   READ_FN(float, deltaTime, ComponentDeltaTime, DeltaTime);
+   static uint32_t readDeltaMicros(ComponentDeltaTime& cache, DataId id)
+   {
+      auto result = cache.m_deltaMicros[id.id];
+      return result;
+   }
+   static Vec2 readPosition(ComponentMovement& cache, DataId i)
+   {
+      auto result = cache.m_position[i.id];
+      return result;
+   }
+   static Vec2 readPosition(ComponentPosition& cache, DataId i)
+   {
+      auto result = cache.m_position[i.id];
+      return result;
+   }
+#undef READ_FN
+   //*************************************************
+   //********************* WRITE *********************
+   //*************************************************
+   static void writeTimeFactor(ComponentDeltaTime& cache, DataId id, float value)
+   {
+      cache.m_factor[id.id] = value;
+   }
+   static void writePosition(ComponentMovement& cache, DataId i, Vec2 value)
+   {
+      cache.m_position[i.id] = value;
+   }
+   static void writeAcceleration(ComponentMovement& cache, DataId i, float value)
+   {
+      cache.m_acceleration[i.id] = value;
+   }
+   //*************************************************************
+   //********************* SYSTEM OPERATIONS *********************
+   //*************************************************************
    static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
    {
-      for( auto data : cache.m_data )
+      auto count = cache.m_mapping.size();
+      for( auto i = 0U; i < count; ++i )
       {
-         data.deltaMicros = static_cast<uint32_t>(dt.micros*data.factor);
-         data.deltaTime = dt.seconds*data.factor;
+         auto factor = cache.m_factor[i];
+         cache.m_deltaMicros[i] = static_cast<uint32_t>(dt.micros*factor);
+         cache.m_deltaTime[i] = dt.seconds*factor;
       }
    }
+   static void moveEntities(ComponentMovement& movement, ComponentDeltaTime& deltaTimes, Time defaultDeltaTime)
+   {
+      auto count = movement.m_mapping.size();
+      for( auto i = 0U; i < count; ++i )
+      {
+         auto dt = defaultDeltaTime.seconds;
+         auto e = movement.m_entity[i];
+         auto iid = getDataId(deltaTimes, e);
+         if( iid != InvalidDataId )
+         {
+            dt = readDeltaTime(deltaTimes, iid);
+         }
+         auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
+         acceleration += -movement.m_velocity[i] * 10.0f;
+         movement.m_position[i] = acceleration*0.5f*pow2(dt) + movement.m_velocity[i] * dt + movement.m_position[i];
+         movement.m_velocity[i] = acceleration*dt + movement.m_velocity[i];
+      }
+   }
+
+
+
+
+
 
 
 
    static bool init_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
-/*
-      shared.lockCursor = true;
-      shared.relativeCursor = true;
-      shared.showCursor = false;
-*/
+      /*
+            shared.lockCursor = true;
+            shared.relativeCursor = true;
+            shared.showCursor = false;
+            */
       state.buttonFunctionToExecute = MainMenuData::COUNT;
 
       state.gui.hoverButton = state.COUNT;
@@ -347,11 +508,11 @@ namespace core
    static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
-/*
-      shared.lockCursor = false;
-      shared.relativeCursor = true;
-      shared.showCursor = true;
-*/
+      /*
+            shared.lockCursor = false;
+            shared.relativeCursor = true;
+            shared.showCursor = true;
+            */
       state.setupGui.hoverButton = state.COUNT;
       state.setupGui.hotButton = state.COUNT;
 
@@ -377,24 +538,7 @@ namespace core
       i = 0;
       state.setupGui.button.caption[i++] = "Back to main menu";
 
-      //*** Generate a unique instance id which will be used for this entity as long as it is alive.
-      //*** When it dies, the id should be returned to the provider.
       Entity eid = state.world.instanceProvider.requestId();
-      //*** This entity will have movement capabilities, so we ask the movement system to create some data for it.
-      //*** The system will track the data internally and keep a map of the entity id to data id.
-      //*** The createData call takes the entity id for which to create the data, and returns the internal data id for optional fast access.
-      InternalId internalId = createData(state.world.deltaTime, eid);
-      //*** The internal data id can be retrieved by calling getInternalId
-      InternalId internalId2 = getInternalId(state.world.deltaTime, eid);
-      assert(internalId == internalId2);
-      //*** We can also check to see if a system has data for a specific entity by checking that the internalId is valid
-      bool exists = (internalId != InvalidInternalId);
-      //*** Another is calling the hasData function, which does the above check
-      exists = containsData(state.world.deltaTime, eid);
-      //*** Data can be read and written by calling readXXX and writeXXX
-      float factor = readTimeFactor(state.world.deltaTime, internalId);
-      factor *= 0.5f;
-      writeTimeFactor(state.world.deltaTime, internalId, factor);
 
       return result;
    }
@@ -469,17 +613,7 @@ namespace core
       return result;
    }
 
-   inline void assertEntity(SessionState& session)
-   {
-      assert(session.entityCount == session.deltaTime.size() &&
-             session.entityCount == session.position.size() &&
-             session.entityCount == session.render.size() &&
-             session.entityCount == session.movement.size() &&
-             session.entityCount == session.aim.size() &&
-             session.entityCount == session.collision.size() &&
-             session.entityCount == session.targetDirection.size());
-   }
-
+/*
    struct PlayerData
    {
       float timeFactor;
@@ -491,36 +625,6 @@ namespace core
       bool sensor;
    };
 
-   inline PlayerData defaultPlayerData()
-   {
-      PlayerData result{};
-
-      result.timeFactor = 1;
-      result.startingPosition = {0, 0};
-      result.color = {1, 1, 1};
-      result.startingMeshId = (MeshId)0;
-      result.startingAim = {1, 0};
-      result.collisionShape.type = CollisionShape::CircleShape;
-      result.collisionShape.circle = {{}, 1};
-      result.sensor = false;
-
-      return result;
-   }
-
-   static void makePlayer(SessionState& session, const PlayerData& data)
-   {
-      ++session.entityCount;
-      session.deltaTime.push_back({0, 0, data.timeFactor});
-      session.position.push_back({data.startingPosition});
-      session.render.push_back({data.color, data.startingMeshId});
-      session.movement.push_back({0, Vec2{0, 0}, Vec2{0, 0}, data.startingPosition});
-      session.aim.push_back({data.startingAim});
-      session.targetDirection.push_back({0, 0});
-      session.collision.push_back({data.collisionShape, 0, 0x01, 0xffff, data.sensor, false, false});
-
-      assertEntity(session);
-   }
-
    struct BulletData
    {
       float timeFactor;
@@ -528,73 +632,7 @@ namespace core
       Vec2 direction;
       float speed;
    };
-
-   inline BulletData defaultBulletData()
-   {
-      BulletData result{};
-
-      result.timeFactor = 1;
-      result.startingPosition = {0, 0};
-      result.direction = {0, 0};
-      result.speed = 1;
-
-      return result;
-   }
-
-   static void makeBullet(SessionState& session, const BulletData& data)
-   {
-      ++session.entityCount;
-      session.deltaTime.push_back({0, 0, data.timeFactor});
-      session.position.push_back({data.startingPosition});
-      session.render.push_back({});
-      session.movement.push_back({0, data.direction, data.direction*data.speed, data.startingPosition});
-      session.aim.push_back({});
-      session.targetDirection.push_back({});
-      CollisionShape shape;
-      shape.type = CollisionShape::LineShape;
-      shape.line.lineFromOrigin = {-1, 0};
-      session.collision.push_back({shape});
-
-      assertEntity(session);
-   }
-
-   static bool init_session(GameData& game, SessionState& session)
-   {
-      session = SessionState{0};
-      session.deltaTime.reserve(500);
-      session.render.reserve(500);
-      session.position.reserve(500);
-      session.movement.reserve(500);
-      session.aim.reserve(500);
-      session.collision.reserve(500);
-      session.targetDirection.reserve(500);
-
-      auto data = defaultPlayerData();
-
-      data.sensor = true;
-      makePlayer(session, data);
-
-      data.startingPosition.x = 12;
-      data.collisionShape.type = CollisionShape::RectShape;
-      data.collisionShape.rect = {{}, {4, 4}};
-      data.sensor = false;
-      makePlayer(session, data);
-
-      return true;
-   }
-
-   inline float pow2(float v)
-   {
-      auto result = v*v;
-      return result;
-   }
-
-   inline float radians(Vec2 v)
-   {
-      auto result = std::atan2(v.y, v.x);
-      return result;
-   }
-
+*/
    template<typename T>
    static CollisionResult areInCollision(T one, CollisionShape two)
    {
@@ -716,6 +754,7 @@ namespace core
       Center,
    };
 
+/*
    static void setCollisionCenter(SessionState& session, CollisionCenteringType type)
    {
       for( uint32_t e = 0; e < session.entityCount; ++e )
@@ -779,7 +818,7 @@ namespace core
 
       setCollisionCenter(session, CollisionCenteringType::Clear);
       return result;
-   }
+   }*/
 
    //*****************************************************************
    //          SESSION TRANSLATE INPUT
@@ -964,20 +1003,11 @@ namespace core
       return result;
    }
 
-   static void updateAllTimers(Time time, std::vector<DeltaTimeData>& deltaTime)
-   {
-      for( auto& dt : deltaTime )
-      {
-         dt.deltaMicros = static_cast<uint32_t>(time.micros*dt.factor);
-         dt.deltaTime = time.seconds*dt.factor;
-      }
-   }
-
-   static State update_gameplaySession(DeltaTime time, Constants& constants, SessionState& session, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
+   static State update_gameplaySession(DeltaTime time, Constants& constants, GameplayData& state, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
    {
       //    preamble
       //       - update all timers
-      updateAllTimers(time.virt, session.deltaTime);
+      advanceTimeForEntities(state.world.deltaTime, time.real);
 
 
       //    player input based updates (for specific player):
@@ -1012,37 +1042,37 @@ namespace core
             {
                if( ge.isAnalogue )
                {
-                  session.targetDirection[ge.entity] = ge.direction;
+                  //session.targetDirection[ge.entity] = ge.direction;
                }
                else
                {
-                  session.targetDirection[ge.entity] += ge.direction;
+                  //session.targetDirection[ge.entity] += ge.direction;
                }
-               session.movement[ge.entity].acceleration = constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
+               //session.movement[ge.entity].acceleration = constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
             } break;
             //       - aim
             case GameMessage::Type::AimChange:
             {
                if( ge.isAnalogue )
                {
-                  session.aim[ge.entity].aim = ge.aim*constants.playerAimLength;
+                  //session.aim[ge.entity].aim = ge.aim*constants.playerAimLength;
                }
                else
                {
-                  auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
-                  gfx.setPerspectiveProjection();
-                  auto aim = session.aim[ge.entity].aim;
-                  aim = gfx.worldToScreen(camera, aim);
-                  aim += ge.aim;
-                  aim = gfx.screenToWorld(camera, aim);
-                  if( vec2::length2(aim) > pow2(constants.playerAimLength) )
-                  {
-                     session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
-                  }
-                  else
-                  {
-                     session.aim[ge.entity].aim = aim;
-                  }
+//                   auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
+//                   gfx.setPerspectiveProjection();
+//                   auto aim = session.aim[ge.entity].aim;
+//                   aim = gfx.worldToScreen(camera, aim);
+//                   aim += ge.aim;
+//                   aim = gfx.screenToWorld(camera, aim);
+//                   if( vec2::length2(aim) > pow2(constants.playerAimLength) )
+//                   {
+//                      session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
+//                   }
+//                   else
+//                   {
+//                      session.aim[ge.entity].aim = aim;
+//                   }
                }
             } break;
             //       - start/stop weapon fire
@@ -1059,27 +1089,27 @@ namespace core
             //       - open pause menu
             case GameMessage::Type::Player_Circle:
             {
-               session.collision[0].shape.type = CollisionShape::CircleShape;
-               session.collision[0].shape.circle = {{}, 1};
+//                session.collision[0].shape.type = CollisionShape::CircleShape;
+//                session.collision[0].shape.circle = {{}, 1};
             } break;
             case GameMessage::Type::Player_Rect:
             {
-               session.collision[0].shape.type = CollisionShape::RectShape;
-               session.collision[0].shape.rect = {{}, {1, 1}};
+//                session.collision[0].shape.type = CollisionShape::RectShape;
+//                session.collision[0].shape.rect = {{}, {1, 1}};
             } break;
             case GameMessage::Type::Tree_Circle:
             {
-               session.collision[1].shape.type = CollisionShape::CircleShape;
-               session.collision[1].shape.circle = {{}, 5};
+//                session.collision[1].shape.type = CollisionShape::CircleShape;
+//                session.collision[1].shape.circle = {{}, 5};
             } break;
             case GameMessage::Type::Tree_Rect:
             {
-               session.collision[1].shape.type = CollisionShape::RectShape;
-               session.collision[1].shape.rect = {{}, {4, 4}};
+//                session.collision[1].shape.type = CollisionShape::RectShape;
+//                session.collision[1].shape.rect = {{}, {4, 4}};
             } break;
             case GameMessage::Type::Player_Sensor:
             {
-               session.collision[0].sensor = !session.collision[0].sensor;
+/*               session.collision[0].sensor = !session.collision[0].sensor;*/
             } break;
          }
       }
@@ -1090,57 +1120,57 @@ namespace core
       //       - update aim based on movement direction
       //    simulation updates:
       //       - update movement direction based on target direction
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         if( session.movement[e].acceleration > 0.0f )
-         {
-            float currentRad = radians(session.movement[e].direction);
-            auto target = vec2::normalize(session.targetDirection[e]);
-            float targetRad = radians(target);
-            float currentDeg = Rad2Deg(currentRad);
-            float targetDeg = Rad2Deg(targetRad);
-
-            auto wra = targetDeg - currentDeg;
-            if( wra > 180.0f ) wra -= 360.0f;
-            if( wra < -180.0f ) wra += 360.0f;
-
-            currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
-            currentRad = Deg2Rad(currentDeg);
-
-            session.movement[e].direction.x = std::cosf(currentRad);
-            session.movement[e].direction.y = std::sinf(currentRad);
-         }
-      }
+//       for( uint32_t e = 0; e < session.entityCount; ++e )
+//       {
+//          if( session.movement[e].acceleration > 0.0f )
+//          {
+//             float currentRad = radians(session.movement[e].direction);
+//             auto target = vec2::normalize(session.targetDirection[e]);
+//             float targetRad = radians(target);
+//             float currentDeg = Rad2Deg(currentRad);
+//             float targetDeg = Rad2Deg(targetRad);
+// 
+//             auto wra = targetDeg - currentDeg;
+//             if( wra > 180.0f ) wra -= 360.0f;
+//             if( wra < -180.0f ) wra += 360.0f;
+// 
+//             currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
+//             currentRad = Deg2Rad(currentDeg);
+// 
+//             session.movement[e].direction.x = std::cosf(currentRad);
+//             session.movement[e].direction.y = std::sinf(currentRad);
+//          }
+//       }
       //       - propose movement in current direction
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
 
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
-         acceleration += -session.movement[e].velocity * 10.0f;
-         session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
-         session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
-      }
+//       for( uint32_t e = 0; e < session.entityCount; ++e )
+//       {
+//          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
+//          acceleration += -session.movement[e].velocity * 10.0f;
+//          session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
+//          session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
+//       }
 
       //       - find collisions for new position
-      auto collisionPairs = findCollisions(session);
+//      auto collisionPairs = findCollisions(session);
       //       - [resolve collisions via displacement vector]->optional depending on performance
       //       - accept new position with displacement vector added
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         if( session.position[e].position != session.movement[e].position )
-         {
-            session.position[e].position = session.movement[e].position;
-         }
-      }
-      setCollisionCenter(session, CollisionCenteringType::Center);
-      for( auto& pair : collisionPairs )
-      {
-         session.position[pair.collider].position += pair.displacement;
-      }
-      setCollisionCenter(session, CollisionCenteringType::Clear);
+//       for( uint32_t e = 0; e < session.entityCount; ++e )
+//       {
+//          if( session.position[e].position != session.movement[e].position )
+//          {
+//             session.position[e].position = session.movement[e].position;
+//          }
+//       }
+//       setCollisionCenter(session, CollisionCenteringType::Center);
+//       for( auto& pair : collisionPairs )
+//       {
+//          session.position[pair.collider].position += pair.displacement;
+//       }
+//       setCollisionCenter(session, CollisionCenteringType::Clear);
       /*for( uint32_t e = 0; e < session.entityCount; ++e )
       {
       if( isStartCollision(session.collision[e]) )
@@ -1175,41 +1205,41 @@ namespace core
       //       - difficulty increase
       //    visual updates:
       //       - change orientation based on aim direction
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         session.render[e].rotationRadians = radians(session.aim[e].aim);
-      }
+//       for( uint32_t e = 0; e < session.entityCount; ++e )
+//       {
+//          session.render[e].rotationRadians = radians(session.aim[e].aim);
+//       }
       //       - animation
       //       - transparency
       return State::GameplaySession;
    }
 
-   static void render_gameplaySession(DeltaTime time, SessionState& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
+   static void render_gameplaySession(DeltaTime time, GameplayData& session, GameResources assets, GraphicsSystem& gfx, FontSystem& font, /*temp*/ std::vector<Mesh>& meshes)
    {
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
 
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-         gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, meshes[session.render[e].mesh]);
-         auto aimMesh = makeSolidCircle({}, 0.2f, 8, assets.mainVS, assets.mainPS);
-         gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
-         Mesh collisionMesh{};
-         switch( session.collision[e].shape.type )
-         {
-            case CollisionShape::CircleShape:
-            {
-               collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, assets.mainVS, assets.mainPS);
-            } break;
-            case CollisionShape::RectShape:
-            {
-               collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, assets.mainVS, assets.mainPS);
-            } break;
-         }
-         gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
-         auto moveDir = makeLine(Vec2{}, session.movement[e].direction, assets.mainVS, assets.mainPS);
-         gfx.renderMesh(session.position[e].position, {}, moveDir);
-      }
+//       for( uint32_t e = 0; e < session.entityCount; ++e )
+//       {
+//          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, meshes[session.render[e].mesh]);
+//          auto aimMesh = makeSolidCircle({}, 0.2f, 8, assets.mainVS, assets.mainPS);
+//          gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
+//          Mesh collisionMesh{};
+//          switch( session.collision[e].shape.type )
+//          {
+//             case CollisionShape::CircleShape:
+//             {
+//                collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, assets.mainVS, assets.mainPS);
+//             } break;
+//             case CollisionShape::RectShape:
+//             {
+//                collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, assets.mainVS, assets.mainPS);
+//             } break;
+//          }
+//          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
+//          auto moveDir = makeLine(Vec2{}, session.movement[e].direction, assets.mainVS, assets.mainPS);
+//          gfx.renderMesh(session.position[e].position, {}, moveDir);
+//       }
    }
 
 
