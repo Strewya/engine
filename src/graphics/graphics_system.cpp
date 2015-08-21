@@ -324,7 +324,7 @@ namespace core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("initDevice failed");
+         /* #log */ CORE_LOG("initDevice failed");
       }
       return SUCCEEDED(hr);
    }
@@ -360,7 +360,7 @@ namespace core
       HRESULT hr = m_dxgiFactory->CreateSwapChain(m_dev, &swapChainDesc, &m_swapchain);
       if( FAILED(hr) )
       {
-         CORE_INFO("initSwapChain failed");
+         /* #log */ CORE_LOG("initSwapChain failed");
       }
       return SUCCEEDED(hr);
    }
@@ -385,7 +385,7 @@ namespace core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("initRenderTarget failed");
+         /* #log */ CORE_LOG("initRenderTarget failed");
       }
       return SUCCEEDED(hr);
    }
@@ -428,7 +428,7 @@ namespace core
 
       if( FAILED(hr) )
       {
-         CORE_INFO("initSamplerState failed");
+         /* #log */ CORE_LOG("initSamplerState failed");
       }
       return SUCCEEDED(hr);
    }
@@ -464,7 +464,7 @@ namespace core
       }
       if( FAILED(hr) )
       {
-         CORE_INFO("initDepthBuffer failed");
+         /* #log */ CORE_LOG("initDepthBuffer failed");
       }
       return SUCCEEDED(hr);
    }

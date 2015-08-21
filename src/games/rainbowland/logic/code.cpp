@@ -47,19 +47,12 @@ namespace core
 
    namespace component_impl
    {
-      static DataId requestSlot(EntityDataIdMap& mapping, Entity e)
-      {
-         DataId id{mapping.size()};
-         mapping.insert({e, id});
-         return id;
-      }
-
       template<typename DATA>
       static void requestSlot(DATA& data, DataId i, typename DATA::value_type defaultValue = {})
       {
          if( data.size() == i.id )
          {
-            data.emplace_back();
+            data.emplace_back(defaultValue);
          }
          else
          {
@@ -67,172 +60,141 @@ namespace core
          }
       }
 
-      static DataId getDataId(EntityDataIdMap& mapping, Entity e)
+      static DataId requestSlot(ComponentBase& cmp, Entity e)
       {
-         auto result = InvalidDataId;
-         auto it = mapping.find(e);
-         if( it != std::end(mapping) )
+         DataId id{cmp.m_mapping.size()};
+         cmp.m_mapping.insert({e, id});
+         requestSlot(cmp.m_entity, id, e);
+         return id;
+      }
+
+      template<typename DATA>
+      void releaseSlot(DATA& data, std::pair<DataId, DataId> ids)
+      {
+         if( ids.first != InvalidDataId && ids.second != InvalidDataId )
          {
-            result = it->second;
+            std::swap(data[ids.first.id], data[ids.second.id]);
          }
-         return result;
       }
 
-      static bool containsData(EntityDataIdMap& mapping, Entity e)
-      {
-         auto id = getDataId(mapping, e);
-         auto result = (id != InvalidDataId);
-         return result;
-      }
-
-      std::pair<DataId, DataId> releaseSlot(EntityDataIdMap& mapping, Entity e)
+      std::pair<DataId, DataId> releaseSlot(ComponentBase& cmp, Entity e)
       {
          std::pair<DataId, DataId> result{InvalidDataId, InvalidDataId};
-         auto id = component_impl::getDataId(mapping, e);
-         if( id != InvalidDataId )
+         auto it = cmp.m_mapping.find(e);
+         if( it != std::end(cmp.m_mapping) )
          {
-            auto last = mapping.size() - 1;
-            result.first = id;
+            auto last = cmp.m_mapping.size() - 1;
+            result.first = it->second;
             result.second = {last};
-            auto it = std::find_if(std::begin(mapping), std::end(mapping),
+            auto lastIt = std::find_if(std::begin(cmp.m_mapping), std::end(cmp.m_mapping),
                                    [last](EntityDataIdMap::value_type& v)
             {
                auto result = (v.second.id == last);
                return result;
             });
-            it->second = id;
-            mapping.erase(e);
+            lastIt->second = it->second;
+            cmp.m_mapping.erase(it);
+            releaseSlot(cmp.m_entity, result);
          }
          return result;
       }
-
-      template<typename DATA>
-      void releaseSlot(DATA& data, DataId toRelease, DataId lastActive)
-      {
-         if( toRelease != InvalidDataId && lastActive != InvalidDataId )
-         {
-            std::swap(data[toRelease.id], data[lastActive.id]);
-         }
-      }
    }
-
+   //*******************************************************
+   //********************* GET DATA ID *********************
+   //*******************************************************
+   static DataId getDataId(ComponentBase& cache, Entity e)
+   {
+      auto result = InvalidDataId;
+      auto it = cache.m_mapping.find(e);
+      if( it != std::end(cache.m_mapping) )
+      {
+         result = it->second;
+      }
+      return result;
+   }
+   //*********************************************************
+   //********************* CONTAINS DATA *********************
+   //*********************************************************
+   static bool containsData(ComponentBase& cache, Entity e)
+   {
+      auto id = getDataId(cache, e);
+      auto result = (id != InvalidDataId);
+      return result;
+   }
+   //*****************************************************
+   //********************* GET COUNT *********************
+   //*****************************************************
+   static uint32_t getCount(ComponentBase& cache)
+   {
+      auto result = cache.m_mapping.size();
+      return result;
+   }
    //*******************************************************
    //********************* CREATE DATA *********************
    //*******************************************************
    static DataId createData(ComponentDeltaTime& cache, Entity e)
    {
-      auto iid = component_impl::requestSlot(cache.m_mapping, e);
-      component_impl::requestSlot(cache.m_entity, iid, e);
-      component_impl::requestSlot(cache.m_deltaMicros, iid, 0);
-      component_impl::requestSlot(cache.m_deltaTime, iid, 0);
+      auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_deltaMicros, iid);
+      component_impl::requestSlot(cache.m_deltaTime, iid);
       component_impl::requestSlot(cache.m_factor, iid, 1.0f);
       return iid;
    }
    static DataId createData(ComponentMovement& cache, Entity e)
    {
-      auto iid = component_impl::requestSlot(cache.m_mapping, e);
-      component_impl::requestSlot(cache.m_entity, iid, e);
-      component_impl::requestSlot(cache.m_acceleration, iid, 0);
-      component_impl::requestSlot(cache.m_direction, iid, {0, 0});
-      component_impl::requestSlot(cache.m_velocity, iid, {0, 0});
-      component_impl::requestSlot(cache.m_position, iid, {0, 0});
+      auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_acceleration, iid);
+      component_impl::requestSlot(cache.m_direction, iid);
+      component_impl::requestSlot(cache.m_velocity, iid);
+      component_impl::requestSlot(cache.m_position, iid);
       return iid;
    }
    static DataId createData(ComponentPosition& cache, Entity e)
    {
-      auto iid = component_impl::requestSlot(cache.m_mapping, e);
-      component_impl::requestSlot(cache.m_entity, iid, e);
-      component_impl::requestSlot(cache.m_position, iid, {0, 0});
+      auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_position, iid);
       return iid;
    }
    static DataId createData(ComponentVisual& cache, Entity e)
    {
-      auto iid = component_impl::requestSlot(cache.m_mapping, e);
-      component_impl::requestSlot(cache.m_entity, iid, e);
-      component_impl::requestSlot(cache.m_color, iid, {});
+      auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_color, iid);
+      component_impl::requestSlot(cache.m_scale, iid);
       component_impl::requestSlot(cache.m_meshId, iid);
-      component_impl::requestSlot(cache.m_rotationRadians, iid, 0);
+      component_impl::requestSlot(cache.m_rotationRadians, iid);
       return iid;
    }
    //********************************************************
    //********************* RELEASE DATA *********************
    //********************************************************
+
    static void releaseData(ComponentDeltaTime& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
-      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_deltaMicros, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_deltaTime, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_factor, ids.first, ids.second);
+      auto ids = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_deltaMicros, ids);
+      component_impl::releaseSlot(cache.m_deltaTime, ids);
+      component_impl::releaseSlot(cache.m_factor, ids);
    }
    static void releaseData(ComponentMovement& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
-      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_acceleration, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_direction, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_velocity, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_position, ids.first, ids.second);
+      auto ids = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_acceleration, ids);
+      component_impl::releaseSlot(cache.m_direction, ids);
+      component_impl::releaseSlot(cache.m_velocity, ids);
+      component_impl::releaseSlot(cache.m_position, ids);
    }
    static void releaseData(ComponentPosition& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
-      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_position, ids.first, ids.second);
+      auto ids = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_position, ids);
    }
    static DataId releaseData(ComponentVisual& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache.m_mapping, e);
-      component_impl::releaseSlot(cache.m_entity, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_color, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_meshId, ids.first, ids.second);
-      component_impl::releaseSlot(cache.m_rotationRadians, ids.first, ids.second);
-   }
-   //*********************************************************
-   //********************* CONTAINS DATA *********************
-   //*********************************************************
-   static bool containsData(ComponentDeltaTime& cache, Entity e)
-   {
-      auto result = component_impl::containsData(cache.m_mapping, e);
-      return result;
-   }
-   static bool containsData(ComponentMovement& cache, Entity e)
-   {
-      auto result = component_impl::containsData(cache.m_mapping, e);
-      return result;
-   }
-   static bool containsData(ComponentPosition& cache, Entity e)
-   {
-      auto result = component_impl::containsData(cache.m_mapping, e);
-      return result;
-   }
-   static bool containsData(ComponentVisual& cache, Entity e)
-   {
-      auto result = component_impl::containsData(cache.m_mapping, e);
-      return result;
-   }
-   //*******************************************************
-   //********************* GET DATA ID *********************
-   //*******************************************************
-   static DataId getDataId(ComponentDeltaTime& cache, Entity e)
-   {
-      auto result = component_impl::getDataId(cache.m_mapping, e);
-      return result;
-   }
-   static DataId getDataId(ComponentMovement& cache, Entity e)
-   {
-      auto result = component_impl::getDataId(cache.m_mapping, e);
-      return result;
-   }
-   static DataId getDataId(ComponentPosition& cache, Entity e)
-   {
-      auto result = component_impl::getDataId(cache.m_mapping, e);
-      return result;
-   }
-   static DataId getDataId(ComponentVisual& cache, Entity e)
-   {
-      auto result = component_impl::getDataId(cache.m_mapping, e);
-      return result;
+      auto ids = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_color, ids);
+      component_impl::releaseSlot(cache.m_scale, ids);
+      component_impl::releaseSlot(cache.m_meshId, ids);
+      component_impl::releaseSlot(cache.m_rotationRadians, ids);
    }
    //************************************************
    //********************* READ *********************
@@ -240,43 +202,30 @@ namespace core
 #define READ_FN(type, field, storage, name) static type read##name(storage& cache, DataId id) { auto result = cache.m_##field[id.id]; return result; }
    READ_FN(float, factor, ComponentDeltaTime, TimeFactor);
    READ_FN(float, deltaTime, ComponentDeltaTime, DeltaTime);
-   static uint32_t readDeltaMicros(ComponentDeltaTime& cache, DataId id)
-   {
-      auto result = cache.m_deltaMicros[id.id];
-      return result;
-   }
-   static Vec2 readPosition(ComponentMovement& cache, DataId i)
-   {
-      auto result = cache.m_position[i.id];
-      return result;
-   }
-   static Vec2 readPosition(ComponentPosition& cache, DataId i)
-   {
-      auto result = cache.m_position[i.id];
-      return result;
-   }
+   READ_FN(uint32_t, deltaMicros, ComponentDeltaTime, DeltaMicros);
+   READ_FN(Vec2, position, ComponentMovement, Position);
+   READ_FN(Vec2, position, ComponentPosition, Position);
 #undef READ_FN
    //*************************************************
    //********************* WRITE *********************
    //*************************************************
-   static void writeTimeFactor(ComponentDeltaTime& cache, DataId id, float value)
-   {
-      cache.m_factor[id.id] = value;
-   }
-   static void writePosition(ComponentMovement& cache, DataId i, Vec2 value)
-   {
-      cache.m_position[i.id] = value;
-   }
-   static void writeAcceleration(ComponentMovement& cache, DataId i, float value)
-   {
-      cache.m_acceleration[i.id] = value;
-   }
+#define WRITE_FN(type, field, storage, name) static void write##name(storage& cache, DataId id, type value) { cache.m_##field[id.id] = value; }
+   WRITE_FN(float, factor, ComponentDeltaTime, TimeFactor);
+   WRITE_FN(Vec2, position, ComponentMovement, Position);
+   WRITE_FN(float, acceleration, ComponentMovement, Acceleration);
+   WRITE_FN(Color, color, ComponentVisual, Color);
+   WRITE_FN(MeshId, meshId, ComponentVisual, MeshId);
+   WRITE_FN(Vec2, scale, ComponentVisual, Scale);
+   WRITE_FN(float, rotationRadians, ComponentVisual, RotationRad);
+#undef WRITE_FN
    //*************************************************************
    //********************* SYSTEM OPERATIONS *********************
    //*************************************************************
+   
+   // ComponentDeltaTime internal function
    static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
    {
-      auto count = cache.m_mapping.size();
+      auto count = getCount(cache);
       for( auto i = 0U; i < count; ++i )
       {
          auto factor = cache.m_factor[i];
@@ -284,25 +233,32 @@ namespace core
          cache.m_deltaTime[i] = dt.seconds*factor;
       }
    }
-   static void moveEntities(ComponentMovement& movement, ComponentDeltaTime& deltaTimes, Time defaultDeltaTime)
+   static void moveEntities(ComponentMovement& movement, ComponentDeltaTime& deltaTimes)
    {
       auto count = movement.m_mapping.size();
       for( auto i = 0U; i < count; ++i )
       {
-         auto dt = defaultDeltaTime.seconds;
          auto e = movement.m_entity[i];
          auto iid = getDataId(deltaTimes, e);
-         if( iid != InvalidDataId )
-         {
-            dt = readDeltaTime(deltaTimes, iid);
-         }
+         auto dt = readDeltaTime(deltaTimes, iid);
          auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
          acceleration += -movement.m_velocity[i] * 10.0f;
          movement.m_position[i] = acceleration*0.5f*pow2(dt) + movement.m_velocity[i] * dt + movement.m_position[i];
          movement.m_velocity[i] = acceleration*dt + movement.m_velocity[i];
       }
    }
-
+   static void renderEntities(ComponentVisual& visual, ComponentPosition& position,
+                              SharedData& shared, const Constants& constants, const GameResources& assets,
+                              GraphicsSystem& gfx, FontSystem& font)
+   {
+      auto count = getCount(visual);
+      for( auto i = 0U; i < count; ++i )
+      {
+         auto iid = getDataId(position, visual.m_entity[i]);
+         Transform tf{readPosition(position, iid), visual.m_scale[i], visual.m_rotationRadians[i]};
+         gfx.renderMesh(tf, visual.m_color[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
+      }
+   }
 
 
 
@@ -495,15 +451,12 @@ namespace core
       render_guiData(state.gui, shared, assets, gfx, font);
    }
 
-   enum MeshId
+   enum class MeshId
    {
-      YellowPlayer,
-      BluePlayer,
-      GreenPlayer,
-      PurplePlayer,
-      RedPlayer,
-      LineMesh,
+      StartArea,
+      MeshCount
    };
+
 
    static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
@@ -539,6 +492,12 @@ namespace core
       state.setupGui.button.caption[i++] = "Back to main menu";
 
       Entity eid = state.world.instanceProvider.requestId();
+      auto iid = createData(state.world.deltaTime, eid);
+      iid = createData(state.world.position, eid);
+      iid = createData(state.world.visual, eid);
+      writeMeshId(state.world.visual, iid, MeshId::StartArea);
+      writeColor(state.world.visual, iid, {1, 1, 1, 0.5f});
+      writeScale(state.world.visual, iid, {10, 10});
 
       return result;
    }
@@ -561,6 +520,9 @@ namespace core
    static void render_gameplaySetup(DeltaTime time, GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                     GraphicsSystem& gfx, FontSystem& font)
    {
+      gfx.setPerspectiveProjection();
+      renderEntities(state.world.visual, state.world.position, shared, constants, assets, gfx, font);
+
       render_guiData(state.setupGui, shared, assets, gfx, font);
    }
 
@@ -1281,9 +1243,11 @@ namespace core
 
       if( result )
       {
-         game.sharedData.meshes = loadMeshes(game, gfx.textures);
-         game.sharedData.meshes.push_back({});
-         game.sharedData.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
+         game.sharedData.meshes.reserve((uint32_t)MeshId::MeshCount);
+         //game.sharedData.meshes = loadMeshes(game, gfx.textures);
+         //game.sharedData.meshes.push_back({});
+         //game.sharedData.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
+         game.sharedData.meshes.emplace_back(makeSolidCircle({}, 1, 32, game.assets.mainVS, game.assets.mainPS));
 
          game.sharedData.font = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);
 

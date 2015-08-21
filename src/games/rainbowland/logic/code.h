@@ -61,7 +61,7 @@ namespace core
       Time virt;
    };
 
-   enum MeshId;
+   enum class MeshId;
 
    struct Line
    {
@@ -215,37 +215,36 @@ namespace core
    typedef std::unordered_map<Entity, DataId> EntityDataIdMap;
    typedef std::vector<Entity> EntityVector;
 
-   struct ComponentDeltaTime
+   struct ComponentBase
    {
       EntityDataIdMap m_mapping;
       EntityVector m_entity;
+   };
+
+   struct ComponentDeltaTime : public ComponentBase
+   {
       std::vector<uint32_t> m_deltaMicros;
       std::vector<float> m_deltaTime;
       std::vector<float> m_factor;
    };
 
-   struct ComponentMovement
+   struct ComponentMovement : public ComponentBase
    {
-      EntityDataIdMap m_mapping;
-      EntityVector m_entity;
       std::vector<float> m_acceleration;
       std::vector<Vec2> m_direction;
       std::vector<Vec2> m_velocity;
       std::vector<Vec2> m_position;
    };
 
-   struct ComponentPosition
+   struct ComponentPosition : public ComponentBase
    {
-      EntityDataIdMap m_mapping;
-      EntityVector m_entity;
       std::vector<Vec2> m_position;
    };
 
-   struct ComponentVisual
+   struct ComponentVisual : public ComponentBase
    {
-      EntityDataIdMap m_mapping;
-      EntityVector m_entity;
       std::vector<Color> m_color;
+      std::vector<Vec2> m_scale;
       std::vector<MeshId> m_meshId;
       std::vector<float> m_rotationRadians;
    };
@@ -256,6 +255,7 @@ namespace core
       ComponentDeltaTime deltaTime;
       ComponentMovement movement;
       ComponentPosition position;
+      ComponentVisual visual;
    };
 
    struct GameplayData

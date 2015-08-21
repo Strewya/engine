@@ -39,12 +39,12 @@ namespace core
          HRESULT hr = m_dev->CreatePixelShader(buffer, bufferSize, nullptr, &result._pixel);
          if( FAILED(hr) )
          {
-            CORE_INFO("Failed to create pixel shader");
+            /* #log */ CORE_LOG("Failed to create pixel shader");
          }
       }
       else
       {
-         CORE_INFO("Received invalid pixel shader buffer or invalid buffer size");
+         /* #log */ CORE_LOG("Received invalid pixel shader buffer or invalid buffer size");
       }
       return result;
    }

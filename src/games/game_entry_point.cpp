@@ -30,9 +30,6 @@ namespace core
    void runGame(WindowProxy window)
    {
 #ifndef NO_GAME
-#ifndef DEPLOY
-      window.openConsole(10, 10);
-#endif
       static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
       static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
       Clock logicTimer{};
@@ -72,7 +69,7 @@ namespace core
       bool shutdownStatus = game.shutdown();
       if( !shutdownStatus )
       {
-         CORE_INFO("GAME SHUTDOWN HAS FAILED!!!");
+         /* #log */ CORE_LOG("GAME SHUTDOWN HAS FAILED!!!");
          window.showMessagebox("SRS ERRORR", "Game shutdown has failed, please review the log for errors immediately");
       }
       window.close();

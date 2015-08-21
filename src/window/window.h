@@ -97,7 +97,6 @@ namespace core
       const uint32_t m_eventQueueSize;
 
       HWND m_hwnd;
-      HWND m_console;
 
       bool m_fullscreen;
       bool m_showCursor;

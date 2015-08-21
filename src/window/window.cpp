@@ -49,7 +49,7 @@ namespace core
       m_exitCode(0), m_style(0), m_extendedStyle(0),
       m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
       m_headIndex(1), m_tailIndex(0), m_eventQueueSize(1024),
-      m_hwnd(nullptr), m_console(nullptr),
+      m_hwnd(nullptr),
       m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false),
       m_isRunning(true),
       m_class(title), m_title(title)
@@ -322,7 +322,7 @@ namespace core
    {
       if( m_headIndex == m_tailIndex )
       {
-         CORE_INFO("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "
+         /* #log */ CORE_LOG("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "
                    "should increase the size of our buffer from ", m_eventQueueSize, "...");
       }
 
@@ -346,7 +346,7 @@ namespace core
          }
          else
          {
-            CORE_INFO("Filename too long (", file.size(), ") or not a file(", file, ")");
+            /* #log */ CORE_LOG("Filename too long (", file.size(), ") or not a file(", file, ")");
          }
       }
    }

@@ -38,8 +38,6 @@ namespace core
       bool isCursorShown() const;
       bool isFullscreen() const;
       bool isRunning() const;
-      void openConsole(int32_t xPos, int32_t yPos) const;
-      void closeConsole() const;
       void monitorDirectoryForChanges(const char* directory) const;
       void setFileChangeDelay(uint32_t delay) const;
       std::vector<WindowEvent> collectEvents(uint64_t time) const;

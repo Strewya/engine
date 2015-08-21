@@ -44,22 +44,22 @@ namespace core
                hr = m_dev->CreateInputLayout(layout.data(), layout.size(), buffer, bufferSize, &result._inputLayout);
                if( FAILED(hr) )
                {
-                  CORE_INFO("Failed to create input layout for vertex shader");
+                  /* #log */ CORE_LOG("Failed to create input layout for vertex shader");
                }
             }
             else
             {
-               CORE_INFO("Received empty input layout");
+               /* #log */ CORE_LOG("Received empty input layout");
             }
          }
          else
          {
-            CORE_INFO("Failed to create vertex shader");
+            /* #log */ CORE_LOG("Failed to create vertex shader");
          }
       }
       else
       {
-         CORE_INFO("Received invalid vertex shader buffer or invalid buffer size");
+         /* #log */ CORE_LOG("Received invalid vertex shader buffer or invalid buffer size");
       }
       return result;
    }

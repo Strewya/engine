@@ -55,7 +55,7 @@ namespace core
       auto loaded = stack.loadFile(CORE_RESOURCE("Defs/hedgehog.shee"));
       assert(!loaded);
       assert(stack.is<std::string>());
-      CORE_INFO(stack.to<std::string>());
+      /* #log */ CORE_LOG(stack.to<std::string>());
       stack.pop(1); //string error message
       assert(stack.getTop() == 0);
 
@@ -78,14 +78,14 @@ namespace core
       {
          assert(stack.is<std::string>(-2));
          assert(stack.is<LuaTable>(-1));
-         CORE_INFO("table name: ", stack.to<std::string>(-2));
+         /* #log */ CORE_LOG("table name: ", stack.to<std::string>(-2));
       }
 
       for( stack.pairs("images"); stack.next(); stack.pop(1) )
       {
          assert(stack.is<std::string>(-2));
          assert(stack.is<LuaTable>());
-         CORE_INFO("table name: ", stack.to<std::string>(-2));
+         /* #log */ CORE_LOG("table name: ", stack.to<std::string>(-2));
          stack.pull("pos");
          assert(stack.is<LuaTable>());
          stack.pull(1);
@@ -97,7 +97,7 @@ namespace core
             assert(stack.is<int32_t>());
          }
          float x = stack.to<float>();
-         CORE_INFO("x: ", x);
+         /* #log */ CORE_LOG("x: ", x);
          stack.pop(1); //number
          stack.pull(2);
          assert(stack.is<int32_t>() || stack.is<nullptr_t>());
@@ -108,7 +108,7 @@ namespace core
             assert(stack.is<int32_t>());
          }
          float y = stack.to<float>();
-         CORE_INFO("y: ", y);
+         /* #log */ CORE_LOG("y: ", y);
          stack.pop(1); //number
          stack.pull(3);
          assert(stack.is<nullptr_t>());
@@ -118,7 +118,7 @@ namespace core
          if( stack.is<uint32_t>() )
          {
             uint32_t height = stack.to<uint32_t>();
-            CORE_INFO("height: ", height);
+            /* #log */ CORE_LOG("height: ", height);
          }
          stack.pop(1); //either nil or table
          stack.pull("width");
@@ -126,7 +126,7 @@ namespace core
          if( stack.is<uint32_t>() )
          {
             uint32_t width = stack.to<uint32_t>();
-            CORE_INFO("width: ", width);
+            /* #log */ CORE_LOG("width: ", width);
          }
          stack.pop(1); //either nil or table
       }
@@ -136,13 +136,13 @@ namespace core
       {
          assert(stack.is<std::string>(-2));
          assert(stack.is<LuaTable>(-1));
-         CORE_INFO("table name: ", stack.to<std::string>(-2));
+         /* #log */ CORE_LOG("table name: ", stack.to<std::string>(-2));
          stack.pull("loop");
          assert(stack.is<nullptr_t>() || stack.is<bool>());
          if( stack.is<bool>() )
          {
             bool loops = stack.to<bool>();
-            CORE_INFO("loops: ", loops);
+            /* #log */ CORE_LOG("loops: ", loops);
          }
          stack.pop(1); // nil or bool
          stack.pull("duration");
@@ -150,7 +150,7 @@ namespace core
          if( stack.is<float>() )
          {
             float duration = stack.to<float>();
-            CORE_INFO("duration: ", duration);
+            /* #log */ CORE_LOG("duration: ", duration);
          }
          stack.pop(1); //nil or number
          stack.pull("images");
@@ -160,7 +160,7 @@ namespace core
             assert(stack.is<uint32_t>(-2));
             assert(stack.is<std::string>(-1));
             auto img = stack.to<std::string>();
-            CORE_INFO("image name: ", img);
+            /* #log */ CORE_LOG("image name: ", img);
          }
          stack.pop(1);
       }
@@ -174,16 +174,16 @@ namespace core
       {
          assert(stack.is<std::string>(-2));
          assert(stack.is<LuaTable>(-1));
-         CORE_INFO("table name: ", stack.to<std::string>(-2));
+         /* #log */ CORE_LOG("table name: ", stack.to<std::string>(-2));
          stack.pull("texture");
          assert(stack.is<std::string>());
          auto tex = stack.to<std::string>();
-         CORE_INFO("texture: ", tex);
+         /* #log */ CORE_LOG("texture: ", tex);
          stack.pop(1); //texture string
          stack.pull("size");
          assert(stack.is<uint32_t>());
          uint32_t size = stack.to<uint32_t>();
-         CORE_INFO("size: ", size);
+         /* #log */ CORE_LOG("size: ", size);
          stack.pop(1); //size number
          for( stack.ipairs("glyphs"); stack.next(); stack.pop(1) )
          {
@@ -192,22 +192,22 @@ namespace core
             stack.pull("char");
             assert(stack.is<std::string>());
             char ascii = stack.to<std::string>().at(0);
-            CORE_INFO("ascii: ", ascii);
+            /* #log */ CORE_LOG("ascii: ", ascii);
             stack.pop(1); //char string
             stack.pull("left");
             assert(stack.is<uint32_t>());
             uint32_t left = stack.to<uint32_t>();
-            CORE_INFO("left: ", left);
+            /* #log */ CORE_LOG("left: ", left);
             stack.pop(1); //left number
             stack.pull("right");
             assert(stack.is<uint32_t>());
             uint32_t right = stack.to<uint32_t>();
-            CORE_INFO("right: ", right);
+            /* #log */ CORE_LOG("right: ", right);
             stack.pop(1); //right number
             stack.pull("top");
             assert(stack.is<uint32_t>());
             uint32_t top = stack.to<uint32_t>();
-            CORE_INFO("top: ", top);
+            /* #log */ CORE_LOG("top: ", top);
             stack.pop(1); //top number
          }
       }

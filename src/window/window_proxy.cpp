@@ -24,15 +24,7 @@ namespace core
    {
       m_window->m_lockCursor = false;
       InvalidateRect(m_window->m_hwnd, nullptr, true);
-#ifndef _DEBUG
-      PostMessage(m_window->m_hwnd, WM_CLOSE, 0, 0);
-      if( m_window->m_console )
-      {
-         closeConsole();
-      }
-#else
-      SetForegroundWindow(m_window->m_console);
-#endif
+      m_window->m_isRunning = false;
    }
 
    void WindowProxy::showMessagebox(const char* title, const char* text) const
@@ -135,36 +127,6 @@ namespace core
    bool WindowProxy::isRunning() const
    {
       return m_window->m_isRunning;
-   }
-
-   void WindowProxy::openConsole(int32_t xPos, int32_t yPos) const
-   {
-      if( m_window->m_console || !AllocConsole() )
-         return;
-
-      freopen("CONIN$", "r", stdin);
-      freopen("CONOUT$", "w", stdout);
-      freopen("CONOUT$", "w", stderr);
-
-      char name[]
-      {
-         "CoreDebugConsole"
-      };
-      SetConsoleTitle(name);
-      Sleep(40);
-      m_window->m_console = FindWindow(nullptr, name);
-      RECT consoleSize;
-      GetWindowRect(m_window->m_console, &consoleSize);
-      auto x = consoleSize.right - consoleSize.left;
-      auto y = consoleSize.bottom - consoleSize.top;
-      SetWindowPos(m_window->m_console, 0, xPos, yPos, x, y, 0); //SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_SHOWWINDOW
-      SetForegroundWindow(m_window->m_hwnd);
-   }
-
-   void WindowProxy::closeConsole() const
-   {
-      FreeConsole();
-      m_window->m_console = nullptr;
    }
 
    void WindowProxy::monitorDirectoryForChanges(const char* directory) const

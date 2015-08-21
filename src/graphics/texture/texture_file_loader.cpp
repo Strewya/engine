@@ -51,14 +51,14 @@ namespace core
          }
          else
          {
-            CORE_INFO("Failed to read dimensions for texture '", filename, "'");
+            /* #log */ CORE_LOG("Failed to read dimensions for texture '", filename, "'");
          }
          safeRelease(texture2d);
          safeRelease(res);
       }
       else
       {
-         CORE_INFO("Failed to load texture '", filename, "'");
+         /* #log */ CORE_LOG("Failed to load texture '", filename, "'");
       }
       return result;
    }

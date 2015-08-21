@@ -15,34 +15,42 @@
 
 namespace core
 {
+   std::ostream& getLogFileStream();
+
+   void writeHeaderToLogStream(std::ostream& stream, const char* file, int line);
+
+   inline void writeContentToLogStream(std::ostream& stream)
+   {
+      stream << std::endl;
+   }
+   template<typename T, typename... Args> void writeContentToLogStream(std::ostream& stream, T t, Args... args)
+   {
+      stream << t; writeContentToLogStream(stream, args...);
+   }
+   template<typename... Args> void writeLog(const char* file, int line, Args... args)
+   {
+      auto& logStream = getLogFileStream();
+      writeHeaderToLogStream(logStream, file, line);
+      writeContentToLogStream(logStream, args...);
+   }
+
 #ifndef CORE_DEPLOY
 
-   inline void debugPrint()
-   {
-      std::cout << std::endl;
-   }
-   template<typename T, typename... Args> void debugPrint(T t, Args... args)
-   {
-      std::cout << t; debugPrint(args...);
-   }
-
-#define CORE_INFO(...) debugPrint(__VA_ARGS__)
+#define CORE_LOG_DEBUG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
 
 #else
-#define CORE_INFO(...) (void)0
+#define CORE_LOG_DEBUG(...) (void)0
 #endif
-   extern uint32_t g_indent;
 
-#define UP_INDENT ++g_indent
-#define DOWN_INDENT --g_indent
+#define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
 
 #define STR(type) #type
 
 #define CORE_PHASE_INIT "init"
 #define CORE_PHASE_SHUTDOWN "shutdown"
-#define CORE_PHASE_LOG(obj, phase, text) CORE_INFO( std::string(g_indent, ' '), obj, " "phase" ", text)
-#define CORE_START_PHASE(obj, phase) UP_INDENT; CORE_PHASE_LOG(obj, phase, "start"); bool status = true
-#define CORE_END_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, status ? "OK" : "FAILED"); DOWN_INDENT; return status
+#define CORE_PHASE_LOG(obj, phase, text) CORE_LOG_DEBUG( obj, " "phase" ", text)
+#define CORE_START_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, "start"); bool status = true
+#define CORE_END_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, status ? "OK" : "FAILED"); return status
 
 
 #define CORE_INIT_START_STR(c) CORE_START_PHASE(c, CORE_PHASE_INIT)

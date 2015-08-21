@@ -19,7 +19,7 @@ namespace core
       {
          auto str = lua.to<std::string>();
          lua.pop();
-         CORE_INFO(str);
+         /* #log */ CORE_LOG(str);
          return result;
       }
 
