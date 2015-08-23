@@ -69,7 +69,7 @@ namespace core
       bool shutdownStatus = game.shutdown();
       if( !shutdownStatus )
       {
-         /* #log */ CORE_LOG("GAME SHUTDOWN HAS FAILED!!!");
+         CORE_LOG("Game shutdown failed...");
          window.showMessagebox("SRS ERRORR", "Game shutdown has failed, please review the log for errors immediately");
       }
       window.close();

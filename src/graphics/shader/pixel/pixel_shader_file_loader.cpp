@@ -41,7 +41,7 @@ namespace core
       }
       else
       {
-         /* #log */ CORE_LOG("Failed to load shader '", filename, "'");
+         CORE_LOG("Failed to load shader '", filename, "'");
       }
       return result;
    }

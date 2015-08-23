@@ -8,7 +8,7 @@
 /******* personal header *******/
 #include "games/rainbowland/logic/code.h"
 /******* c++ headers *******/
-#include <future>
+#include <functional>
 #include <unordered_set>
 /******* extra headers *******/
 #include "input/gamepad.h"
@@ -30,6 +30,101 @@ namespace core
       auto result = std::atan2(v.y, v.x);
       return result;
    }
+
+   template<typename T>
+   static CollisionResult areInCollision(T one, CollisionShape two)
+   {
+      CollisionResult result{};
+
+      switch( two.type )
+      {
+         case CollisionShape::PointShape:
+         {
+            result = checkCollision(one, two.point);
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            result = checkCollision(one, two.circle);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = checkCollision(one, two.rect);
+         } break;
+      }
+
+      return result;
+   }
+
+   static CollisionResult areInCollision(CollisionShape one, CollisionShape two)
+   {
+      CollisionResult result{};
+
+      switch( one.type )
+      {
+         case CollisionShape::PointShape:
+         {
+            result = areInCollision(one.point, two);
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            result = areInCollision(one.circle, two);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = areInCollision(one.rect, two);
+         } break;
+      }
+
+      return result;
+   }
+
+   template<typename T>
+   static bool fullyContained(T one, CollisionShape two)
+   {
+      auto result = false;
+      switch( two.type )
+      {
+         case CollisionShape::PointShape:
+         {
+            result = isFullyWithin(one, two.point);
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            result = isFullyWithin(one, two.circle);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = isFullyWithin(one, two.rect);
+         } break;
+      }
+
+      return result;
+   }
+
+   static bool fullyContained(CollisionShape one, CollisionShape two)
+   {
+      auto result = false;
+      switch( one.type )
+      {
+         case CollisionShape::PointShape:
+         {
+            result = fullyContained(one.point, two);
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            result = fullyContained(one.circle, two);
+         } break;
+         case CollisionShape::RectShape:
+         {
+            result = fullyContained(one.rect, two);
+         } break;
+      }
+      return result;
+   }
+
+
+
+
 
    static const DataId InvalidDataId{(std::numeric_limits<uint32_t>::max())};
 
@@ -87,7 +182,7 @@ namespace core
             result.first = it->second;
             result.second = {last};
             auto lastIt = std::find_if(std::begin(cmp.m_mapping), std::end(cmp.m_mapping),
-                                   [last](EntityDataIdMap::value_type& v)
+                                       [last](EntityDataIdMap::value_type& v)
             {
                auto result = (v.second.id == last);
                return result;
@@ -121,6 +216,13 @@ namespace core
       auto result = (id != InvalidDataId);
       return result;
    }
+   //*************************************************
+   //********************* CLEAR *********************
+   //*************************************************
+   static void clearAll(ComponentBase& cache)
+   {
+      cache.m_mapping.clear();
+   }
    //*****************************************************
    //********************* GET COUNT *********************
    //*****************************************************
@@ -137,7 +239,7 @@ namespace core
       auto iid = component_impl::requestSlot(cache, e);
       component_impl::requestSlot(cache.m_deltaMicros, iid);
       component_impl::requestSlot(cache.m_deltaTime, iid);
-      component_impl::requestSlot(cache.m_factor, iid, 1.0f);
+      component_impl::requestSlot(cache.m_timeFactor, iid, 1.0f);
       return iid;
    }
    static DataId createData(ComponentMovement& cache, Entity e)
@@ -158,77 +260,109 @@ namespace core
    static DataId createData(ComponentVisual& cache, Entity e)
    {
       auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_transform, iid);
       component_impl::requestSlot(cache.m_color, iid);
-      component_impl::requestSlot(cache.m_scale, iid);
       component_impl::requestSlot(cache.m_meshId, iid);
-      component_impl::requestSlot(cache.m_rotationRadians, iid);
+      return iid;
+   }
+   static DataId createData(ComponentCollision& cache, Entity e)
+   {
+      auto iid = component_impl::requestSlot(cache, e);
+      component_impl::requestSlot(cache.m_shape, iid);
+      component_impl::requestSlot(cache.m_collisionGroup, iid);
+      component_impl::requestSlot(cache.m_selfTypeBits, iid);
+      component_impl::requestSlot(cache.m_targetTypeBits, iid);
+      component_impl::requestSlot(cache.m_sensor, iid);
+      component_impl::requestSlot(cache.m_previouslyColliding, iid);
+      component_impl::requestSlot(cache.m_colliding, iid);
       return iid;
    }
    //********************************************************
    //********************* RELEASE DATA *********************
    //********************************************************
-
    static void releaseData(ComponentDeltaTime& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache, e);
-      component_impl::releaseSlot(cache.m_deltaMicros, ids);
-      component_impl::releaseSlot(cache.m_deltaTime, ids);
-      component_impl::releaseSlot(cache.m_factor, ids);
+      auto iid = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_deltaMicros, iid);
+      component_impl::releaseSlot(cache.m_deltaTime, iid);
+      component_impl::releaseSlot(cache.m_timeFactor, iid);
    }
    static void releaseData(ComponentMovement& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache, e);
-      component_impl::releaseSlot(cache.m_acceleration, ids);
-      component_impl::releaseSlot(cache.m_direction, ids);
-      component_impl::releaseSlot(cache.m_velocity, ids);
-      component_impl::releaseSlot(cache.m_position, ids);
+      auto iid = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_acceleration, iid);
+      component_impl::releaseSlot(cache.m_direction, iid);
+      component_impl::releaseSlot(cache.m_velocity, iid);
+      component_impl::releaseSlot(cache.m_position, iid);
    }
    static void releaseData(ComponentPosition& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache, e);
-      component_impl::releaseSlot(cache.m_position, ids);
+      auto iid = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_position, iid);
    }
-   static DataId releaseData(ComponentVisual& cache, Entity e)
+   static void releaseData(ComponentVisual& cache, Entity e)
    {
-      auto ids = component_impl::releaseSlot(cache, e);
-      component_impl::releaseSlot(cache.m_color, ids);
-      component_impl::releaseSlot(cache.m_scale, ids);
-      component_impl::releaseSlot(cache.m_meshId, ids);
-      component_impl::releaseSlot(cache.m_rotationRadians, ids);
+      auto iid = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_transform, iid);
+      component_impl::releaseSlot(cache.m_color, iid);
+      component_impl::releaseSlot(cache.m_meshId, iid);
+   }
+   static void releaseData(ComponentCollision& cache, Entity e)
+   {
+      auto iid = component_impl::releaseSlot(cache, e);
+      component_impl::releaseSlot(cache.m_shape, iid);
+      component_impl::releaseSlot(cache.m_collisionGroup, iid);
+      component_impl::releaseSlot(cache.m_selfTypeBits, iid);
+      component_impl::releaseSlot(cache.m_targetTypeBits, iid);
+      component_impl::releaseSlot(cache.m_sensor, iid);
+      component_impl::releaseSlot(cache.m_previouslyColliding, iid);
+      component_impl::releaseSlot(cache.m_colliding, iid);
+   }
+   //*********************************************************************
+   //********************* MAKE DESTRUCTION CALLBACK *********************
+   //*********************************************************************
+   template<typename COMPONENT>
+   static DestructionCallback makeDestructionCallback(COMPONENT& cmp)
+   {
+      return std::bind<void(COMPONENT&, Entity)>(releaseData, std::ref(cmp), std::placeholders::_1);
    }
    //************************************************
    //********************* READ *********************
    //************************************************
-#define READ_FN(type, field, storage, name) static type read##name(storage& cache, DataId id) { auto result = cache.m_##field[id.id]; return result; }
-   READ_FN(float, factor, ComponentDeltaTime, TimeFactor);
-   READ_FN(float, deltaTime, ComponentDeltaTime, DeltaTime);
-   READ_FN(uint32_t, deltaMicros, ComponentDeltaTime, DeltaMicros);
-   READ_FN(Vec2, position, ComponentMovement, Position);
-   READ_FN(Vec2, position, ComponentPosition, Position);
+#define READ_FN(storage, field) \
+static auto read_##field(storage& cache, DataId id) -> std::remove_reference<decltype(cache.m_##field[id.id])>::type { return cache.m_##field[id.id]; }
+   //************************************************
+   READ_FN(ComponentDeltaTime, timeFactor);
+   READ_FN(ComponentDeltaTime, deltaTime);
+   READ_FN(ComponentDeltaTime, deltaMicros);
+   READ_FN(ComponentMovement, position);
+   READ_FN(ComponentPosition, position);
+   READ_FN(ComponentVisual, transform);
 #undef READ_FN
    //*************************************************
    //********************* WRITE *********************
+   //************************************************
+#define WRITE_FN(storage, field) \
+static void write_##field(storage& cache, DataId id, std::remove_reference<decltype(cache.m_##field[id.id])>::type value) { cache.m_##field[id.id] = value; }
    //*************************************************
-#define WRITE_FN(type, field, storage, name) static void write##name(storage& cache, DataId id, type value) { cache.m_##field[id.id] = value; }
-   WRITE_FN(float, factor, ComponentDeltaTime, TimeFactor);
-   WRITE_FN(Vec2, position, ComponentMovement, Position);
-   WRITE_FN(float, acceleration, ComponentMovement, Acceleration);
-   WRITE_FN(Color, color, ComponentVisual, Color);
-   WRITE_FN(MeshId, meshId, ComponentVisual, MeshId);
-   WRITE_FN(Vec2, scale, ComponentVisual, Scale);
-   WRITE_FN(float, rotationRadians, ComponentVisual, RotationRad);
+   WRITE_FN(ComponentDeltaTime, timeFactor);
+   WRITE_FN(ComponentPosition, position);
+   WRITE_FN(ComponentMovement, position);
+   WRITE_FN(ComponentMovement, acceleration);
+   WRITE_FN(ComponentMovement, direction);
+   WRITE_FN(ComponentVisual, transform);
+   WRITE_FN(ComponentVisual, color);
+   WRITE_FN(ComponentVisual, meshId);
 #undef WRITE_FN
    //*************************************************************
    //********************* SYSTEM OPERATIONS *********************
    //*************************************************************
-   
-   // ComponentDeltaTime internal function
    static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
    {
       auto count = getCount(cache);
       for( auto i = 0U; i < count; ++i )
       {
-         auto factor = cache.m_factor[i];
+         auto factor = cache.m_timeFactor[i];
          cache.m_deltaMicros[i] = static_cast<uint32_t>(dt.micros*factor);
          cache.m_deltaTime[i] = dt.seconds*factor;
       }
@@ -240,11 +374,33 @@ namespace core
       {
          auto e = movement.m_entity[i];
          auto iid = getDataId(deltaTimes, e);
-         auto dt = readDeltaTime(deltaTimes, iid);
+         auto dt = read_deltaTime(deltaTimes, iid);
          auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
          acceleration += -movement.m_velocity[i] * 10.0f;
          movement.m_position[i] = acceleration*0.5f*pow2(dt) + movement.m_velocity[i] * dt + movement.m_position[i];
          movement.m_velocity[i] = acceleration*dt + movement.m_velocity[i];
+      }
+   }
+   static void syncPositionAfterMovement(ComponentMovement& movement, ComponentPosition& position)
+   {
+      auto count = getCount(movement);
+      for( auto i = 0U; i < count; ++i )
+      {
+         auto entity = movement.m_entity[i];
+         auto iid = getDataId(position, entity);
+         write_position(position, iid, movement.m_position[i]);
+      }
+   }
+   static void syncPositionForRendering(ComponentPosition& position, ComponentVisual& visual)
+   {
+      auto count = getCount(position);
+      for( auto i = 0U; i < count; ++i )
+      {
+         auto entity = position.m_entity[i];
+         auto iid = getDataId(visual, entity);
+         auto tf = read_transform(visual, iid);
+         tf.position = position.m_position[i];
+         write_transform(visual, iid, tf);
       }
    }
    static void renderEntities(ComponentVisual& visual, ComponentPosition& position,
@@ -254,13 +410,9 @@ namespace core
       auto count = getCount(visual);
       for( auto i = 0U; i < count; ++i )
       {
-         auto iid = getDataId(position, visual.m_entity[i]);
-         Transform tf{readPosition(position, iid), visual.m_scale[i], visual.m_rotationRadians[i]};
-         gfx.renderMesh(tf, visual.m_color[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
+         gfx.renderMesh(visual.m_transform[i], visual.m_color[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
       }
    }
-
-
 
 
 
@@ -363,7 +515,7 @@ namespace core
          {
             case WE_MOUSEMOVE:
             {
-               if( shared.relativeCursor != event.mouse.move.relative )
+               if( !event.mouse.move.relative )
                {
                   shared.mousePosition = orthoMousePosition(event.mouse.position, constants.windowWidth, constants.windowHeight);
                }
@@ -457,6 +609,22 @@ namespace core
       MeshCount
    };
 
+   static void clearWorld(World& world)
+   {
+      world.destructionNotifier.clear();
+      clearAll(world.deltaTime);
+      clearAll(world.position);
+      clearAll(world.movement);
+      clearAll(world.visual);
+   }
+
+   static void initWorld(World& world)
+   {
+      world.destructionNotifier.registerCallback(makeDestructionCallback(world.deltaTime));
+      world.destructionNotifier.registerCallback(makeDestructionCallback(world.position));
+      world.destructionNotifier.registerCallback(makeDestructionCallback(world.movement));
+      world.destructionNotifier.registerCallback(makeDestructionCallback(world.visual));
+   }
 
    static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
@@ -491,14 +659,17 @@ namespace core
       i = 0;
       state.setupGui.button.caption[i++] = "Back to main menu";
 
-      Entity eid = state.world.instanceProvider.requestId();
+      //circle entity for detecting game start 
+      Entity eid = state.world.entityManager.create();
+      state.entities.emplace_back(eid);
       auto iid = createData(state.world.deltaTime, eid);
       iid = createData(state.world.position, eid);
       iid = createData(state.world.visual, eid);
-      writeMeshId(state.world.visual, iid, MeshId::StartArea);
-      writeColor(state.world.visual, iid, {1, 1, 1, 0.5f});
-      writeScale(state.world.visual, iid, {10, 10});
-
+      write_transform(state.world.visual, iid, {{}, {10, 10}});
+      write_color(state.world.visual, iid, {1, 1, 1, 0.5f});
+      write_meshId(state.world.visual, iid, MeshId::StartArea);
+      iid = createData(state.world.collision, eid);
+      
       return result;
    }
 
@@ -513,6 +684,9 @@ namespace core
       {
          nextState = State::MainMenu;
       }
+      advanceTimeForEntities(state.world.deltaTime, time.virt);
+      moveEntities(state.world.movement, state.world.deltaTime);
+      syncPositionAfterMovement(state.world.movement, state.world.position);
 
       return nextState;
    }
@@ -521,6 +695,9 @@ namespace core
                                     GraphicsSystem& gfx, FontSystem& font)
    {
       gfx.setPerspectiveProjection();
+
+      //prepare the renderable data only before actually rendering
+      syncPositionForRendering(state.world.position, state.world.visual);
       renderEntities(state.world.visual, state.world.position, shared, constants, assets, gfx, font);
 
       render_guiData(state.setupGui, shared, assets, gfx, font);
@@ -575,9 +752,9 @@ namespace core
       return result;
    }
 
-/*
-   struct PlayerData
-   {
+   /*
+      struct PlayerData
+      {
       float timeFactor;
       Vec2 startingPosition;
       Color color;
@@ -585,106 +762,19 @@ namespace core
       Vec2 startingAim;
       CollisionShape collisionShape;
       bool sensor;
-   };
+      };
 
-   struct BulletData
-   {
+      struct BulletData
+      {
       float timeFactor;
       Vec2 startingPosition;
       Vec2 direction;
       float speed;
-   };
-*/
-   template<typename T>
-   static CollisionResult areInCollision(T one, CollisionShape two)
-   {
-      CollisionResult result{};
+      };
+      */
 
-      switch( two.type )
-      {
-         case CollisionShape::PointShape:
-         {
-            result = checkCollision(one, two.point);
-         } break;
-         case CollisionShape::CircleShape:
-         {
-            result = checkCollision(one, two.circle);
-         } break;
-         case CollisionShape::RectShape:
-         {
-            result = checkCollision(one, two.rect);
-         } break;
-      }
 
-      return result;
-   }
 
-   static CollisionResult areInCollision(CollisionShape one, CollisionShape two)
-   {
-      CollisionResult result{};
-
-      switch( one.type )
-      {
-         case CollisionShape::PointShape:
-         {
-            result = areInCollision(one.point, two);
-         } break;
-         case CollisionShape::CircleShape:
-         {
-            result = areInCollision(one.circle, two);
-         } break;
-         case CollisionShape::RectShape:
-         {
-            result = areInCollision(one.rect, two);
-         } break;
-      }
-
-      return result;
-   }
-
-   template<typename T>
-   static bool fullyContained(T one, CollisionShape two)
-   {
-      auto result = false;
-      switch( two.type )
-      {
-         case CollisionShape::PointShape:
-         {
-            result = isFullyWithin(one, two.point);
-         } break;
-         case CollisionShape::CircleShape:
-         {
-            result = isFullyWithin(one, two.circle);
-         } break;
-         case CollisionShape::RectShape:
-         {
-            result = isFullyWithin(one, two.rect);
-         } break;
-      }
-
-      return result;
-   }
-
-   static bool fullyContained(CollisionShape one, CollisionShape two)
-   {
-      auto result = false;
-      switch( one.type )
-      {
-         case CollisionShape::PointShape:
-         {
-            result = fullyContained(one.point, two);
-         } break;
-         case CollisionShape::CircleShape:
-         {
-            result = fullyContained(one.circle, two);
-         } break;
-         case CollisionShape::RectShape:
-         {
-            result = fullyContained(one.rect, two);
-         } break;
-      }
-      return result;
-   }
 
    static bool shouldCollide(const CollisionData& d1, const CollisionData& d2)
    {
@@ -716,71 +806,71 @@ namespace core
       Center,
    };
 
-/*
-   static void setCollisionCenter(SessionState& session, CollisionCenteringType type)
-   {
+   /*
+      static void setCollisionCenter(SessionState& session, CollisionCenteringType type)
+      {
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         auto setValue = (type == CollisionCenteringType::Clear ? Vec2{} : session.movement[e].position);
-         switch( session.collision[e].shape.type )
-         {
-            case CollisionShape::RectShape:
-            {
-               session.collision[e].shape.rect.center = setValue;
-            } break;
-            case CollisionShape::CircleShape:
-            {
-               session.collision[e].shape.circle.center = setValue;
-            } break;
-            case CollisionShape::PointShape:
-            {
-               session.collision[e].shape.point = setValue;
-            } break;
-         }
+      auto setValue = (type == CollisionCenteringType::Clear ? Vec2{} : session.movement[e].position);
+      switch( session.collision[e].shape.type )
+      {
+      case CollisionShape::RectShape:
+      {
+      session.collision[e].shape.rect.center = setValue;
+      } break;
+      case CollisionShape::CircleShape:
+      {
+      session.collision[e].shape.circle.center = setValue;
+      } break;
+      case CollisionShape::PointShape:
+      {
+      session.collision[e].shape.point = setValue;
+      } break;
       }
-   }
+      }
+      }
 
-   static void toggleCollisionState(SessionState& session)
-   {
+      static void toggleCollisionState(SessionState& session)
+      {
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         session.collision[e].previouslyInCollision = session.collision[e].currentlyInCollision;
-         session.collision[e].currentlyInCollision = false;
+      session.collision[e].previouslyInCollision = session.collision[e].currentlyInCollision;
+      session.collision[e].currentlyInCollision = false;
       }
-   }
+      }
 
-   static std::vector<CollisionPair> findCollisions(SessionState& session)
-   {
+      static std::vector<CollisionPair> findCollisions(SessionState& session)
+      {
       setCollisionCenter(session, CollisionCenteringType::Center);
       toggleCollisionState(session);
 
       std::vector<CollisionPair> result;
       for( uint32_t e = 0; e < session.entityCount; ++e )
       {
-         for( uint32_t r = e + 1; r < session.entityCount; ++r )
-         {
-            bool testCollision = shouldCollide(session.collision[e], session.collision[r]);
+      for( uint32_t r = e + 1; r < session.entityCount; ++r )
+      {
+      bool testCollision = shouldCollide(session.collision[e], session.collision[r]);
 
-            if( testCollision )
-            {
-               auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
-               if( testResult.isColliding )
-               {
-                  result.push_back({e, r, testResult.displacement});
-                  if( session.collision[e].sensor || session.collision[r].sensor )
-                  {
-                     result.back().displacement = {};
-                  }
-               }
-               session.collision[e].currentlyInCollision = session.collision[e].currentlyInCollision || testResult.isColliding;
-               session.collision[r].currentlyInCollision = session.collision[r].currentlyInCollision || testResult.isColliding;
-            }
-         }
+      if( testCollision )
+      {
+      auto testResult = areInCollision(session.collision[e].shape, session.collision[r].shape);
+      if( testResult.isColliding )
+      {
+      result.push_back({e, r, testResult.displacement});
+      if( session.collision[e].sensor || session.collision[r].sensor )
+      {
+      result.back().displacement = {};
+      }
+      }
+      session.collision[e].currentlyInCollision = session.collision[e].currentlyInCollision || testResult.isColliding;
+      session.collision[r].currentlyInCollision = session.collision[r].currentlyInCollision || testResult.isColliding;
+      }
+      }
       }
 
       setCollisionCenter(session, CollisionCenteringType::Clear);
       return result;
-   }*/
+      }*/
 
    //*****************************************************************
    //          SESSION TRANSLATE INPUT
@@ -1021,20 +1111,20 @@ namespace core
                }
                else
                {
-//                   auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
-//                   gfx.setPerspectiveProjection();
-//                   auto aim = session.aim[ge.entity].aim;
-//                   aim = gfx.worldToScreen(camera, aim);
-//                   aim += ge.aim;
-//                   aim = gfx.screenToWorld(camera, aim);
-//                   if( vec2::length2(aim) > pow2(constants.playerAimLength) )
-//                   {
-//                      session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
-//                   }
-//                   else
-//                   {
-//                      session.aim[ge.entity].aim = aim;
-//                   }
+                  //                   auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
+                  //                   gfx.setPerspectiveProjection();
+                  //                   auto aim = session.aim[ge.entity].aim;
+                  //                   aim = gfx.worldToScreen(camera, aim);
+                  //                   aim += ge.aim;
+                  //                   aim = gfx.screenToWorld(camera, aim);
+                  //                   if( vec2::length2(aim) > pow2(constants.playerAimLength) )
+                  //                   {
+                  //                      session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
+                  //                   }
+                  //                   else
+                  //                   {
+                  //                      session.aim[ge.entity].aim = aim;
+                  //                   }
                }
             } break;
             //       - start/stop weapon fire
@@ -1051,27 +1141,27 @@ namespace core
             //       - open pause menu
             case GameMessage::Type::Player_Circle:
             {
-//                session.collision[0].shape.type = CollisionShape::CircleShape;
-//                session.collision[0].shape.circle = {{}, 1};
+               //                session.collision[0].shape.type = CollisionShape::CircleShape;
+               //                session.collision[0].shape.circle = {{}, 1};
             } break;
             case GameMessage::Type::Player_Rect:
             {
-//                session.collision[0].shape.type = CollisionShape::RectShape;
-//                session.collision[0].shape.rect = {{}, {1, 1}};
+               //                session.collision[0].shape.type = CollisionShape::RectShape;
+               //                session.collision[0].shape.rect = {{}, {1, 1}};
             } break;
             case GameMessage::Type::Tree_Circle:
             {
-//                session.collision[1].shape.type = CollisionShape::CircleShape;
-//                session.collision[1].shape.circle = {{}, 5};
+               //                session.collision[1].shape.type = CollisionShape::CircleShape;
+               //                session.collision[1].shape.circle = {{}, 5};
             } break;
             case GameMessage::Type::Tree_Rect:
             {
-//                session.collision[1].shape.type = CollisionShape::RectShape;
-//                session.collision[1].shape.rect = {{}, {4, 4}};
+               //                session.collision[1].shape.type = CollisionShape::RectShape;
+               //                session.collision[1].shape.rect = {{}, {4, 4}};
             } break;
             case GameMessage::Type::Player_Sensor:
             {
-/*               session.collision[0].sensor = !session.collision[0].sensor;*/
+               /*               session.collision[0].sensor = !session.collision[0].sensor;*/
             } break;
          }
       }
@@ -1082,57 +1172,57 @@ namespace core
       //       - update aim based on movement direction
       //    simulation updates:
       //       - update movement direction based on target direction
-//       for( uint32_t e = 0; e < session.entityCount; ++e )
-//       {
-//          if( session.movement[e].acceleration > 0.0f )
-//          {
-//             float currentRad = radians(session.movement[e].direction);
-//             auto target = vec2::normalize(session.targetDirection[e]);
-//             float targetRad = radians(target);
-//             float currentDeg = Rad2Deg(currentRad);
-//             float targetDeg = Rad2Deg(targetRad);
-// 
-//             auto wra = targetDeg - currentDeg;
-//             if( wra > 180.0f ) wra -= 360.0f;
-//             if( wra < -180.0f ) wra += 360.0f;
-// 
-//             currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
-//             currentRad = Deg2Rad(currentDeg);
-// 
-//             session.movement[e].direction.x = std::cosf(currentRad);
-//             session.movement[e].direction.y = std::sinf(currentRad);
-//          }
-//       }
+      //       for( uint32_t e = 0; e < session.entityCount; ++e )
+      //       {
+      //          if( session.movement[e].acceleration > 0.0f )
+      //          {
+      //             float currentRad = radians(session.movement[e].direction);
+      //             auto target = vec2::normalize(session.targetDirection[e]);
+      //             float targetRad = radians(target);
+      //             float currentDeg = Rad2Deg(currentRad);
+      //             float targetDeg = Rad2Deg(targetRad);
+      // 
+      //             auto wra = targetDeg - currentDeg;
+      //             if( wra > 180.0f ) wra -= 360.0f;
+      //             if( wra < -180.0f ) wra += 360.0f;
+      // 
+      //             currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
+      //             currentRad = Deg2Rad(currentDeg);
+      // 
+      //             session.movement[e].direction.x = std::cosf(currentRad);
+      //             session.movement[e].direction.y = std::sinf(currentRad);
+      //          }
+      //       }
       //       - propose movement in current direction
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
       //       - blasts are a bit more tricky, might have to change how they work entirely
 
-//       for( uint32_t e = 0; e < session.entityCount; ++e )
-//       {
-//          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
-//          acceleration += -session.movement[e].velocity * 10.0f;
-//          session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
-//          session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
-//       }
+      //       for( uint32_t e = 0; e < session.entityCount; ++e )
+      //       {
+      //          auto acceleration = session.movement[e].direction * session.movement[e].acceleration;
+      //          acceleration += -session.movement[e].velocity * 10.0f;
+      //          session.movement[e].position = acceleration*0.5f*pow2(session.deltaTime[e].deltaTime) + session.movement[e].velocity * session.deltaTime[e].deltaTime + session.position[e].position;
+      //          session.movement[e].velocity = acceleration*session.deltaTime[e].deltaTime + session.movement[e].velocity;
+      //       }
 
       //       - find collisions for new position
-//      auto collisionPairs = findCollisions(session);
+      //      auto collisionPairs = findCollisions(session);
       //       - [resolve collisions via displacement vector]->optional depending on performance
       //       - accept new position with displacement vector added
-//       for( uint32_t e = 0; e < session.entityCount; ++e )
-//       {
-//          if( session.position[e].position != session.movement[e].position )
-//          {
-//             session.position[e].position = session.movement[e].position;
-//          }
-//       }
-//       setCollisionCenter(session, CollisionCenteringType::Center);
-//       for( auto& pair : collisionPairs )
-//       {
-//          session.position[pair.collider].position += pair.displacement;
-//       }
-//       setCollisionCenter(session, CollisionCenteringType::Clear);
+      //       for( uint32_t e = 0; e < session.entityCount; ++e )
+      //       {
+      //          if( session.position[e].position != session.movement[e].position )
+      //          {
+      //             session.position[e].position = session.movement[e].position;
+      //          }
+      //       }
+      //       setCollisionCenter(session, CollisionCenteringType::Center);
+      //       for( auto& pair : collisionPairs )
+      //       {
+      //          session.position[pair.collider].position += pair.displacement;
+      //       }
+      //       setCollisionCenter(session, CollisionCenteringType::Clear);
       /*for( uint32_t e = 0; e < session.entityCount; ++e )
       {
       if( isStartCollision(session.collision[e]) )
@@ -1167,10 +1257,10 @@ namespace core
       //       - difficulty increase
       //    visual updates:
       //       - change orientation based on aim direction
-//       for( uint32_t e = 0; e < session.entityCount; ++e )
-//       {
-//          session.render[e].rotationRadians = radians(session.aim[e].aim);
-//       }
+      //       for( uint32_t e = 0; e < session.entityCount; ++e )
+      //       {
+      //          session.render[e].rotationRadians = radians(session.aim[e].aim);
+      //       }
       //       - animation
       //       - transparency
       return State::GameplaySession;
@@ -1181,27 +1271,27 @@ namespace core
       gfx.setPerspectiveProjection();
       gfx.setTransparency(true);
 
-//       for( uint32_t e = 0; e < session.entityCount; ++e )
-//       {
-//          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, meshes[session.render[e].mesh]);
-//          auto aimMesh = makeSolidCircle({}, 0.2f, 8, assets.mainVS, assets.mainPS);
-//          gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
-//          Mesh collisionMesh{};
-//          switch( session.collision[e].shape.type )
-//          {
-//             case CollisionShape::CircleShape:
-//             {
-//                collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, assets.mainVS, assets.mainPS);
-//             } break;
-//             case CollisionShape::RectShape:
-//             {
-//                collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, assets.mainVS, assets.mainPS);
-//             } break;
-//          }
-//          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
-//          auto moveDir = makeLine(Vec2{}, session.movement[e].direction, assets.mainVS, assets.mainPS);
-//          gfx.renderMesh(session.position[e].position, {}, moveDir);
-//       }
+      //       for( uint32_t e = 0; e < session.entityCount; ++e )
+      //       {
+      //          gfx.renderMesh({session.position[e].position, {1, 1}, session.render[e].rotationRadians}, {}, meshes[session.render[e].mesh]);
+      //          auto aimMesh = makeSolidCircle({}, 0.2f, 8, assets.mainVS, assets.mainPS);
+      //          gfx.renderMesh({session.position[e].position + session.aim[e].aim}, session.render[e].color, aimMesh);
+      //          Mesh collisionMesh{};
+      //          switch( session.collision[e].shape.type )
+      //          {
+      //             case CollisionShape::CircleShape:
+      //             {
+      //                collisionMesh = makeOutlineCircle(session.collision[e].shape.circle, 16, assets.mainVS, assets.mainPS);
+      //             } break;
+      //             case CollisionShape::RectShape:
+      //             {
+      //                collisionMesh = makeOutlineQuad(session.collision[e].shape.rect, assets.mainVS, assets.mainPS);
+      //             } break;
+      //          }
+      //          gfx.renderMesh({session.position[e].position}, session.render[e].color, collisionMesh);
+      //          auto moveDir = makeLine(Vec2{}, session.movement[e].direction, assets.mainVS, assets.mainPS);
+      //          gfx.renderMesh(session.position[e].position, {}, moveDir);
+      //       }
    }
 
 
@@ -1258,7 +1348,7 @@ namespace core
          game.constants.playerAimLength = 4;
          game.sharedData.showCursor = false;
          game.sharedData.lockCursor = true;
-         game.sharedData.relativeCursor = true;
+         game.sharedData.relativeCursor = false;
 
          game.currentState = State::Startup;
          game.nextState = State::MainMenu;

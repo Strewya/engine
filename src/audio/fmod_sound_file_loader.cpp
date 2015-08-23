@@ -37,7 +37,7 @@ namespace core
       FMOD_RESULT fr = m_system->createSound(filename, FMOD_DEFAULT, nullptr, &result._sound);
       if( fr != FMOD_OK )
       {
-         /* #log */ CORE_LOG("Failed to load sound '", filename, "'");
+         CORE_LOG("Failed to load sound '", filename, "'");
       }
       return result;
    }

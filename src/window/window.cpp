@@ -322,8 +322,8 @@ namespace core
    {
       if( m_headIndex == m_tailIndex )
       {
-         /* #log */ CORE_LOG("WHOOPS, overwriting a previous event. This is a BAD THING! Maybe we "
-                   "should increase the size of our buffer from ", m_eventQueueSize, "...");
+         CORE_LOG("WHOOPS, overwriting a previous input event. Maybe we "
+                  "should increase the size of the buffer (currently ", m_eventQueueSize, ")...");
       }
 
       m_headIndex = (m_headIndex + 1) % m_eventQueueSize;
@@ -346,7 +346,7 @@ namespace core
          }
          else
          {
-            /* #log */ CORE_LOG("Filename too long (", file.size(), ") or not a file(", file, ")");
+            CORE_LOG_DEBUG("Filename too long (", file.size(), ") or not a file(", file, ")");
          }
       }
    }

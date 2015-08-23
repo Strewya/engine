@@ -19,6 +19,8 @@
 #include "util/geometry/rect.h"
 #include "util/geometry/vec2.h"
 #include "util/color.h"
+#include "util/ring_buffer.h"
+#include "util/transform.h"
 
 #include "games/util/entity.h"
 /******* end header inclusion *******/
@@ -189,31 +191,87 @@ namespace core
       };
    };
 
-   struct InstanceProvider
-   {
-   public:
-      InstanceProvider() : m_idCounter(0)
-      {
-      }
-      Entity requestId()
-      {
-         return{++m_idCounter};
-      }
-      void returnId(Entity id)
-      {
-         //nothing for now...
-      }
-   private:
-      uint32_t m_idCounter;
-   };
-
    struct DataId
    {
       uint32_t id;
    };
 
+   typedef std::function<void(Entity)> DestructionCallback;
+   typedef std::vector<DestructionCallback> Callbacks;
    typedef std::unordered_map<Entity, DataId> EntityDataIdMap;
    typedef std::vector<Entity> EntityVector;
+
+   struct EntityManager
+   {
+   public:
+      Entity create()
+      {
+         Entity e{m_idCounter};
+         if( m_freeIds.empty() )
+         {
+            ++m_idCounter;
+         }
+         else
+         {
+            e.id = m_freeIds.front();
+            m_freeIds.pop_front();
+         }
+         m_liveEntities.insert(e);
+         return e;
+      }
+      void returnId(Entity e)
+      {
+         auto n = m_liveEntities.erase(e);
+         if( n )
+         {
+            m_freeIds.push_back(e.id);
+         }
+      }
+      bool isAlive(Entity e)
+      {
+         auto result = m_liveEntities.find(e) != m_liveEntities.end();
+         return result;
+      }
+   private:
+      RingBuffer m_freeIds;
+      std::unordered_set<Entity> m_liveEntities;
+      uint32_t m_idCounter;
+   };
+
+   struct DestructionNotifier
+   {
+   public:
+      void registerCallback(DestructionCallback call)
+      {
+         m_registeredCallbacks.emplace_back(call);
+      }
+      void clear()
+      {
+         m_registeredCallbacks.clear();
+      }
+      void notifyDestruction(Entity e)
+      {
+         for( auto call : m_registeredCallbacks )
+         {
+            call(e);
+         }
+      }
+      void notifyDestruction(const EntityVector& v)
+      {
+         if( !v.empty() && !m_registeredCallbacks.empty() )
+         {
+            for( auto call : m_registeredCallbacks )
+            {
+               for( auto e : v )
+               {
+                  call(e);
+               }
+            }
+         }
+      }
+   private:
+      Callbacks m_registeredCallbacks;
+   };
 
    struct ComponentBase
    {
@@ -225,7 +283,7 @@ namespace core
    {
       std::vector<uint32_t> m_deltaMicros;
       std::vector<float> m_deltaTime;
-      std::vector<float> m_factor;
+      std::vector<float> m_timeFactor;
    };
 
    struct ComponentMovement : public ComponentBase
@@ -243,18 +301,31 @@ namespace core
 
    struct ComponentVisual : public ComponentBase
    {
+      std::vector<Transform> m_transform;
       std::vector<Color> m_color;
-      std::vector<Vec2> m_scale;
       std::vector<MeshId> m_meshId;
-      std::vector<float> m_rotationRadians;
+   };
+
+   struct ComponentCollision : public ComponentBase
+   {
+      std::vector<CollisionShape> m_shape;
+      std::vector<uint32_t> m_collisionGroup;
+      std::vector<uint16_t> m_selfTypeBits;
+      std::vector<uint16_t> m_targetTypeBits;
+      std::vector<char> m_sensor;
+      std::vector<char> m_previouslyColliding;
+      std::vector<char> m_colliding;
    };
 
    struct World
    {
-      InstanceProvider instanceProvider;
+      EntityManager entityManager;
+      DestructionNotifier destructionNotifier;
+
       ComponentDeltaTime deltaTime;
-      ComponentMovement movement;
       ComponentPosition position;
+      ComponentMovement movement;
+      ComponentCollision collision;
       ComponentVisual visual;
    };
 
@@ -267,6 +338,11 @@ namespace core
       };
       GuiData<COUNT> setupGui; // #temp because the gameplay setup part of the game should not have any visible buttons (i think)
       World world;
+      EntityVector entities;
+      EntityVector players;
+      EntityVector projectiles;
+      EntityVector enemies;
+      EntityVector pickups;
    };
 
    struct GameData

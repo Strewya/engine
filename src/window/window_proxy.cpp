@@ -22,9 +22,8 @@ namespace core
 
    void WindowProxy::close() const
    {
-      m_window->m_lockCursor = false;
       InvalidateRect(m_window->m_hwnd, nullptr, true);
-      m_window->m_isRunning = false;
+      PostMessage(m_window->m_hwnd, WM_CLOSE, 0, 0);
    }
 
    void WindowProxy::showMessagebox(const char* title, const char* text) const
@@ -134,8 +133,7 @@ namespace core
       char lpName[128] = {0};
       GetCurrentDirectory(128, lpName);
       std::string dir(lpName);
-      auto pos = dir.find_last_of('\\');
-      dir.assign(dir.substr(0, pos + 1)).append(directory).shrink_to_fit();
+      dir.append("\\").append(directory).shrink_to_fit();
 
       m_window->m_monitor.AddDirectory(dir.c_str(), true, m_window->m_trackedChanges);
    }

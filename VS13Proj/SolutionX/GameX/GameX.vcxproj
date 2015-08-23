@@ -58,21 +58,21 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
+    <OutDir>$(SXROOT)\output\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
     <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
+    <OutDir>$(SXROOT)\output\</OutDir>
     <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SXROOT)\output\$(Configuration)\</OutDir>
+    <OutDir>$(SXROOT)\output\</OutDir>
     <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
     <IncludePath>$(SX_INC)\fmod;$(SX_INC)\lua;$(SX_INC)\tolua++;$(IncludePath);$(DXSDK_DIR)\Include</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)\Lib\x86</LibraryPath>
