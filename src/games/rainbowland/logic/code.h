@@ -27,6 +27,13 @@
 
 namespace core
 {
+   static const bool Cursor_Lock = true;
+   static const bool Cursor_Unlock = false;
+   static const bool Cursor_Hide = false;
+   static const bool Cursor_Show = true;
+   static const bool Cursor_Absolute = false;
+   static const bool Cursor_Relative = true;
+
    struct GameResources
    {
       HTexture atlas;
@@ -204,38 +211,39 @@ namespace core
    struct EntityManager
    {
    public:
+      EntityManager()
+         : m_freeIds(32)
+      {
+         m_liveEntities.reserve(32);
+      }
       Entity create()
       {
-         Entity e{m_idCounter};
+         Entity e{m_liveEntities.size()};
          if( m_freeIds.empty() )
          {
-            ++m_idCounter;
+            m_liveEntities.push_back(true);
          }
          else
          {
             e.id = m_freeIds.front();
             m_freeIds.pop_front();
+            m_liveEntities[e.id] = true;
          }
-         m_liveEntities.insert(e);
          return e;
       }
       void returnId(Entity e)
       {
-         auto n = m_liveEntities.erase(e);
-         if( n )
-         {
-            m_freeIds.push_back(e.id);
-         }
+         m_liveEntities[e.id] = false;
+         m_freeIds.push_back(e.id);
       }
-      bool isAlive(Entity e)
+      bool isAlive(Entity e) const
       {
-         auto result = m_liveEntities.find(e) != m_liveEntities.end();
+         auto result = m_liveEntities[e.id];
          return result;
       }
    private:
       RingBuffer m_freeIds;
-      std::unordered_set<Entity> m_liveEntities;
-      uint32_t m_idCounter;
+      std::vector<bool> m_liveEntities;
    };
 
    struct DestructionNotifier
@@ -294,15 +302,17 @@ namespace core
       std::vector<Vec2> m_position;
    };
 
-   struct ComponentPosition : public ComponentBase
+   struct ComponentTransform : public ComponentBase
    {
       std::vector<Vec2> m_position;
+      std::vector<Vec2> m_scale;
+      std::vector<float> m_rotation;
    };
 
    struct ComponentVisual : public ComponentBase
    {
       std::vector<Transform> m_transform;
-      std::vector<Color> m_color;
+      std::vector<Color> m_diffuse;
       std::vector<MeshId> m_meshId;
    };
 
@@ -323,7 +333,7 @@ namespace core
       DestructionNotifier destructionNotifier;
 
       ComponentDeltaTime deltaTime;
-      ComponentPosition position;
+      ComponentTransform transform;
       ComponentMovement movement;
       ComponentCollision collision;
       ComponentVisual visual;
@@ -336,13 +346,19 @@ namespace core
          BACK,
          COUNT
       };
+      struct Numbers
+      {
+         enum
+         {
+            PlayersCount = 5,
+            GearCount = 4,
+         };
+      };
       GuiData<COUNT> setupGui; // #temp because the gameplay setup part of the game should not have any visible buttons (i think)
       World world;
-      EntityVector entities;
-      EntityVector players;
-      EntityVector projectiles;
-      EntityVector enemies;
-      EntityVector pickups;
+      Entity startArea;
+      Entity players[Numbers::PlayersCount];
+      Entity gear[Numbers::GearCount];
    };
 
    struct GameData

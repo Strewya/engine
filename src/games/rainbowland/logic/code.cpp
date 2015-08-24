@@ -31,6 +31,16 @@ namespace core
       return result;
    }
 
+   static Vec2 orthoMousePosition(MousePosition mouse, float windowWidth, float windowHeight)
+   {
+      Vec2 result;
+
+      result.x = mouse.x - windowWidth / 2;
+      result.y = -mouse.y + windowHeight / 2;
+
+      return result;
+   }
+
    template<typename T>
    static CollisionResult areInCollision(T one, CollisionShape two)
    {
@@ -197,7 +207,7 @@ namespace core
    //*******************************************************
    //********************* GET DATA ID *********************
    //*******************************************************
-   static DataId getDataId(ComponentBase& cache, Entity e)
+   static DataId getDataId(const ComponentBase& cache, Entity e)
    {
       auto result = InvalidDataId;
       auto it = cache.m_mapping.find(e);
@@ -210,7 +220,7 @@ namespace core
    //*********************************************************
    //********************* CONTAINS DATA *********************
    //*********************************************************
-   static bool containsData(ComponentBase& cache, Entity e)
+   static bool containsData(const ComponentBase& cache, Entity e)
    {
       auto id = getDataId(cache, e);
       auto result = (id != InvalidDataId);
@@ -226,7 +236,7 @@ namespace core
    //*****************************************************
    //********************* GET COUNT *********************
    //*****************************************************
-   static uint32_t getCount(ComponentBase& cache)
+   static uint32_t getCount(const ComponentBase& cache)
    {
       auto result = cache.m_mapping.size();
       return result;
@@ -251,17 +261,19 @@ namespace core
       component_impl::requestSlot(cache.m_position, iid);
       return iid;
    }
-   static DataId createData(ComponentPosition& cache, Entity e)
+   static DataId createData(ComponentTransform& cache, Entity e)
    {
       auto iid = component_impl::requestSlot(cache, e);
       component_impl::requestSlot(cache.m_position, iid);
+      component_impl::requestSlot(cache.m_scale, iid, {1, 1});
+      component_impl::requestSlot(cache.m_rotation, iid);
       return iid;
    }
    static DataId createData(ComponentVisual& cache, Entity e)
    {
       auto iid = component_impl::requestSlot(cache, e);
       component_impl::requestSlot(cache.m_transform, iid);
-      component_impl::requestSlot(cache.m_color, iid);
+      component_impl::requestSlot(cache.m_diffuse, iid);
       component_impl::requestSlot(cache.m_meshId, iid);
       return iid;
    }
@@ -295,16 +307,18 @@ namespace core
       component_impl::releaseSlot(cache.m_velocity, iid);
       component_impl::releaseSlot(cache.m_position, iid);
    }
-   static void releaseData(ComponentPosition& cache, Entity e)
+   static void releaseData(ComponentTransform& cache, Entity e)
    {
       auto iid = component_impl::releaseSlot(cache, e);
       component_impl::releaseSlot(cache.m_position, iid);
+      component_impl::releaseSlot(cache.m_scale, iid);
+      component_impl::releaseSlot(cache.m_rotation, iid);
    }
    static void releaseData(ComponentVisual& cache, Entity e)
    {
       auto iid = component_impl::releaseSlot(cache, e);
       component_impl::releaseSlot(cache.m_transform, iid);
-      component_impl::releaseSlot(cache.m_color, iid);
+      component_impl::releaseSlot(cache.m_diffuse, iid);
       component_impl::releaseSlot(cache.m_meshId, iid);
    }
    static void releaseData(ComponentCollision& cache, Entity e)
@@ -329,31 +343,45 @@ namespace core
    //************************************************
    //********************* READ *********************
    //************************************************
-#define READ_FN(storage, field) \
-static auto read_##field(storage& cache, DataId id) -> std::remove_reference<decltype(cache.m_##field[id.id])>::type { return cache.m_##field[id.id]; }
+#define forbid(storage, field)
+#define getter(storage, field) \
+static auto read_##field(const storage& component, DataId id) -> std::remove_reference<decltype(component.m_##field[id.id])>::type { return component.m_##field[id.id]; }
    //************************************************
-   READ_FN(ComponentDeltaTime, timeFactor);
-   READ_FN(ComponentDeltaTime, deltaTime);
-   READ_FN(ComponentDeltaTime, deltaMicros);
-   READ_FN(ComponentMovement, position);
-   READ_FN(ComponentPosition, position);
-   READ_FN(ComponentVisual, transform);
-#undef READ_FN
+   getter(ComponentDeltaTime, timeFactor)
+   getter(ComponentDeltaTime, deltaTime)
+   getter(ComponentDeltaTime, deltaMicros)
+   getter(ComponentMovement, acceleration)
+   getter(ComponentMovement, velocity)
+   getter(ComponentMovement, direction)
+   getter(ComponentMovement, position)
+   getter(ComponentTransform, position)
+   getter(ComponentTransform, scale)
+   getter(ComponentTransform, rotation)
+   forbid(ComponentVisual, transform)
+   forbid(ComponentVisual, diffuse)
+   forbid(ComponentVisual, meshId)
+#undef getter
    //*************************************************
    //********************* WRITE *********************
    //************************************************
-#define WRITE_FN(storage, field) \
-static void write_##field(storage& cache, DataId id, std::remove_reference<decltype(cache.m_##field[id.id])>::type value) { cache.m_##field[id.id] = value; }
+#define setter(storage, field) \
+static void write_##field(storage& component, DataId id, std::remove_reference<decltype(component.m_##field[id.id])>::type value) { component.m_##field[id.id] = value; }
    //*************************************************
-   WRITE_FN(ComponentDeltaTime, timeFactor);
-   WRITE_FN(ComponentPosition, position);
-   WRITE_FN(ComponentMovement, position);
-   WRITE_FN(ComponentMovement, acceleration);
-   WRITE_FN(ComponentMovement, direction);
-   WRITE_FN(ComponentVisual, transform);
-   WRITE_FN(ComponentVisual, color);
-   WRITE_FN(ComponentVisual, meshId);
-#undef WRITE_FN
+   setter(ComponentDeltaTime, timeFactor)
+   forbid(ComponentDeltaTime, deltaTime)
+   forbid(ComponentDeltaTime, deltaMicros)
+   setter(ComponentMovement, acceleration)
+   setter(ComponentMovement, velocity)
+   setter(ComponentMovement, direction)
+   setter(ComponentMovement, position)
+   setter(ComponentTransform, position)
+   setter(ComponentTransform, scale)
+   setter(ComponentTransform, rotation)
+   setter(ComponentVisual, transform)
+   setter(ComponentVisual, diffuse)
+   setter(ComponentVisual, meshId)
+#undef setter
+#undef not_available
    //*************************************************************
    //********************* SYSTEM OPERATIONS *********************
    //*************************************************************
@@ -367,13 +395,14 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
          cache.m_deltaTime[i] = dt.seconds*factor;
       }
    }
-   static void moveEntities(ComponentMovement& movement, ComponentDeltaTime& deltaTimes)
+   static void moveEntities(ComponentMovement& movement, const ComponentDeltaTime& deltaTimes)
    {
       auto count = movement.m_mapping.size();
       for( auto i = 0U; i < count; ++i )
       {
          auto e = movement.m_entity[i];
          auto iid = getDataId(deltaTimes, e);
+         CORE_ASSERT_DEBUG(iid != InvalidDataId, "Moveable entity [id=",e,"] lacks a DeltaTime component!");
          auto dt = read_deltaTime(deltaTimes, iid);
          auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
          acceleration += -movement.m_velocity[i] * 10.0f;
@@ -381,36 +410,35 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
          movement.m_velocity[i] = acceleration*dt + movement.m_velocity[i];
       }
    }
-   static void syncPositionAfterMovement(ComponentMovement& movement, ComponentPosition& position)
+   static void syncPositionAfterMovement(const ComponentMovement& movement, ComponentTransform& transform)
    {
       auto count = getCount(movement);
       for( auto i = 0U; i < count; ++i )
       {
          auto entity = movement.m_entity[i];
-         auto iid = getDataId(position, entity);
-         write_position(position, iid, movement.m_position[i]);
+         auto iid = getDataId(transform, entity);
+         write_position(transform, iid, movement.m_position[i]);
       }
    }
-   static void syncPositionForRendering(ComponentPosition& position, ComponentVisual& visual)
+   static void syncPositionForRendering(const ComponentTransform& transform, ComponentVisual& visual)
    {
-      auto count = getCount(position);
+      auto count = getCount(transform);
       for( auto i = 0U; i < count; ++i )
       {
-         auto entity = position.m_entity[i];
+         auto entity = transform.m_entity[i];
          auto iid = getDataId(visual, entity);
-         auto tf = read_transform(visual, iid);
-         tf.position = position.m_position[i];
+         Transform tf{transform.m_position[i], transform.m_scale[i], transform.m_rotation[i]};
          write_transform(visual, iid, tf);
       }
    }
-   static void renderEntities(ComponentVisual& visual, ComponentPosition& position,
+   static void renderEntities(const ComponentVisual& visual,
                               SharedData& shared, const Constants& constants, const GameResources& assets,
                               GraphicsSystem& gfx, FontSystem& font)
    {
       auto count = getCount(visual);
       for( auto i = 0U; i < count; ++i )
       {
-         gfx.renderMesh(visual.m_transform[i], visual.m_color[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
+         gfx.renderMesh(visual.m_transform[i], visual.m_diffuse[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
       }
    }
 
@@ -422,9 +450,9 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
    {
       auto result = true;
       /*
-            shared.lockCursor = true;
-            shared.relativeCursor = true;
-            shared.showCursor = false;
+            shared.lockCursor = Cursor_Lock;
+            shared.relativeCursor = Cursor_Relative;
+            shared.showCursor = Cursor_Hide;
             */
       state.buttonFunctionToExecute = MainMenuData::COUNT;
 
@@ -458,17 +486,6 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       i = 0;
       state.gui.button.caption[i++] = "Start game";
       state.gui.button.caption[i++] = "Quit";
-
-
-      return result;
-   }
-
-   static Vec2 orthoMousePosition(MousePosition mouse, float windowWidth, float windowHeight)
-   {
-      Vec2 result;
-
-      result.x = mouse.x - windowWidth / 2;
-      result.y = -mouse.y + windowHeight / 2;
 
       return result;
    }
@@ -545,30 +562,6 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       return activatedButton;
    }
 
-   static State update_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
-                                AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
-   {
-      auto nextState = State::MainMenu;
-      auto activateButton = handle_guiInput(state.gui, shared, constants, frameEvents);
-
-      if( activateButton != MainMenuData::COUNT )
-      {
-         switch( activateButton )
-         {
-            case MainMenuData::START_GAME:
-            {
-               nextState = State::GameplaySetup;
-            } break;
-            case MainMenuData::QUIT:
-            {
-               nextState = State::Quit;
-            } break;
-         }
-      }
-
-      return nextState;
-   }
-
    template<int BUTTONS>
    static void render_guiData(GuiData<BUTTONS>& gui, SharedData& shared, const GameResources& assets, GraphicsSystem& gfx, FontSystem& font)
    {
@@ -597,6 +590,30 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
    }
 
+   static State update_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
+                                AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
+   {
+      auto nextState = State::MainMenu;
+      auto activateButton = handle_guiInput(state.gui, shared, constants, frameEvents);
+
+      if( activateButton != MainMenuData::COUNT )
+      {
+         switch( activateButton )
+         {
+            case MainMenuData::START_GAME:
+            {
+               nextState = State::GameplaySetup;
+            } break;
+            case MainMenuData::QUIT:
+            {
+               nextState = State::Quit;
+            } break;
+         }
+      }
+
+      return nextState;
+   }
+
    static void render_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets,
                                GraphicsSystem& gfx, FontSystem& font)
    {
@@ -613,26 +630,30 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
    {
       world.destructionNotifier.clear();
       clearAll(world.deltaTime);
-      clearAll(world.position);
+      clearAll(world.transform);
       clearAll(world.movement);
       clearAll(world.visual);
+      clearAll(world.collision);
    }
 
    static void initWorld(World& world)
    {
-      world.destructionNotifier.registerCallback(makeDestructionCallback(world.deltaTime));
-      world.destructionNotifier.registerCallback(makeDestructionCallback(world.position));
-      world.destructionNotifier.registerCallback(makeDestructionCallback(world.movement));
-      world.destructionNotifier.registerCallback(makeDestructionCallback(world.visual));
+#define REG_CALLBACK(what) world.destructionNotifier.registerCallback(makeDestructionCallback(what))
+      REG_CALLBACK(world.deltaTime);
+      REG_CALLBACK(world.transform);
+      REG_CALLBACK(world.movement);
+      REG_CALLBACK(world.visual);
+      REG_CALLBACK(world.collision);
+#undef REG_CALLBACK
    }
 
    static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
       /*
-            shared.lockCursor = false;
-            shared.relativeCursor = true;
-            shared.showCursor = true;
+            shared.lockCursor = Cursor_Unlock;
+            shared.relativeCursor = Cursor_Relative;
+            shared.showCursor = Cursor_Show;
             */
       state.setupGui.hoverButton = state.COUNT;
       state.setupGui.hotButton = state.COUNT;
@@ -659,16 +680,22 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       i = 0;
       state.setupGui.button.caption[i++] = "Back to main menu";
 
-      //circle entity for detecting game start 
-      Entity eid = state.world.entityManager.create();
-      state.entities.emplace_back(eid);
-      auto iid = createData(state.world.deltaTime, eid);
-      iid = createData(state.world.position, eid);
+      //circle entity for detecting setup state
+      auto eid = state.startArea = state.world.entityManager.create();
+
+      auto iid = createData(state.world.transform, eid);
+      write_position(state.world.transform, iid, {0, 0});
+      write_scale(state.world.transform, iid, {10, 10});
+      write_rotation(state.world.transform, iid, 0);
+
       iid = createData(state.world.visual, eid);
       write_transform(state.world.visual, iid, {{}, {10, 10}});
-      write_color(state.world.visual, iid, {1, 1, 1, 0.5f});
+      write_diffuse(state.world.visual, iid, {1, 1, 1, 0.5f});
       write_meshId(state.world.visual, iid, MeshId::StartArea);
+      
       iid = createData(state.world.collision, eid);
+
+      iid = createData(state.world.movement, eid);
       
       return result;
    }
@@ -686,7 +713,7 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       }
       advanceTimeForEntities(state.world.deltaTime, time.virt);
       moveEntities(state.world.movement, state.world.deltaTime);
-      syncPositionAfterMovement(state.world.movement, state.world.position);
+      syncPositionAfterMovement(state.world.movement, state.world.transform);
 
       return nextState;
    }
@@ -697,8 +724,8 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
       gfx.setPerspectiveProjection();
 
       //prepare the renderable data only before actually rendering
-      syncPositionForRendering(state.world.position, state.world.visual);
-      renderEntities(state.world.visual, state.world.position, shared, constants, assets, gfx, font);
+      syncPositionForRendering(state.world.transform, state.world.visual);
+      renderEntities(state.world.visual, shared, constants, assets, gfx, font);
 
       render_guiData(state.setupGui, shared, assets, gfx, font);
    }
@@ -1346,9 +1373,9 @@ static void write_##field(storage& cache, DataId id, std::remove_reference<declt
 
          game.constants.playerAcceleration = 60;
          game.constants.playerAimLength = 4;
-         game.sharedData.showCursor = false;
-         game.sharedData.lockCursor = true;
-         game.sharedData.relativeCursor = false;
+         game.sharedData.showCursor = Cursor_Hide;
+         game.sharedData.lockCursor = Cursor_Lock;
+         game.sharedData.relativeCursor = Cursor_Absolute;
 
          game.currentState = State::Startup;
          game.nextState = State::MainMenu;

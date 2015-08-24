@@ -36,6 +36,12 @@ namespace core
 
       return result;
    }
+
+   inline std::ostream& operator<<(std::ostream& stream, Entity e)
+   {
+      stream << e.id;
+      return stream;
+   }
 }
 
 namespace std

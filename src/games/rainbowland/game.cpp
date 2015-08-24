@@ -22,13 +22,6 @@
 
 namespace core
 {
-   static const bool Lock = true;
-   static const bool Unlock = false;
-   static const bool Hide = false;
-   static const bool Show = true;
-   static const bool Absolute = false;
-   static const bool Relative = true;
-
    static void updateCursorStuff(WindowProxy window, bool show, bool lock, bool relative)
    {
       window.makeMouseRelative(relative);
@@ -48,7 +41,7 @@ namespace core
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
 
-      updateCursorStuff(window, Show, Unlock, Absolute);
+      updateCursorStuff(window, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
 
       CORE_SHUTDOWN_END(Rainbowland);
    }
@@ -151,7 +144,7 @@ namespace core
             case WE_LOSTFOCUS:
             {
                isPaused = true;
-               updateCursorStuff(window, Show, Unlock, Absolute);
+               updateCursorStuff(window, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
             } break;
             case WE_GAINFOCUS:
             {

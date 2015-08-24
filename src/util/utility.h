@@ -34,15 +34,28 @@ namespace core
       writeContentToLogStream(logStream, args...);
    }
 
-#ifndef CORE_DEPLOY
-
-#define CORE_LOG_DEBUG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-
-#else
-#define CORE_LOG_DEBUG(...) (void)0
-#endif
+   // #todo think about what to do with this
+   enum class AssertLevel
+   {
+      CodeError,
+      DataError,
+   };
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
+#define CORE_ASSERT(condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); *(int*)0 = 42; } } while(condition)
+
+#ifndef CORE_DEPLOY
+
+#define CORE_LOG_DEBUG(...) CORE_LOG(__VA_ARGS__)
+#define CORE_ASSERT_DEBUG(condition, ...) CORE_ASSERT(condition, __VA_ARGS__)
+
+#else
+
+#define CORE_LOG_DEBUG(...) (void)0
+#define CORE_ASSERT_DEBUG(...) (void)0
+
+#endif
+
 
 #define STR(type) #type
 
