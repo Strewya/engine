@@ -109,8 +109,8 @@ namespace core
 
    struct CollisionPair
    {
-      uint32_t collider;
-      uint32_t collidee;
+      Entity collider;
+      Entity collidee;
       Vec2 displacement;
    };
 

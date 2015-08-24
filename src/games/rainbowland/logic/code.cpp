@@ -132,6 +132,53 @@ namespace core
       return result;
    }
 
+   static bool shouldCollide(uint32_t group1, uint32_t group2, uint16_t selfType1, uint16_t selfType2, uint16_t targetType1, uint16_t targetType2)
+   {
+      if( group1 == group2 && group1 != 0 )
+      {
+         return group1 > 0;
+      }
+
+      bool shouldCollide = (selfType1 & targetType2) != 0 &&
+         (selfType2 & targetType1) != 0;
+
+      return shouldCollide;
+   }
+
+   static void setCollisionShapePosition(CollisionShape& shape, Vec2 position)
+   {
+      switch( shape.type )
+      {
+         case CollisionShape::RectShape:
+         {
+            shape.rect.center += position;
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            shape.circle.center += position;
+         } break;
+         case CollisionShape::PointShape:
+         {
+            shape.point += position;
+         } break;
+      }
+   }
+
+   static void setCollisionShapeScale(CollisionShape& shape, Vec2 scale)
+   {
+      switch( shape.type )
+      {
+         case CollisionShape::RectShape:
+         {
+            shape.rect.halfSize *= scale;
+         } break;
+         case CollisionShape::CircleShape:
+         {
+            shape.circle.radius *= scale.x;
+         } break;
+      }
+   }
+
 
 
 
@@ -281,7 +328,7 @@ namespace core
    {
       auto iid = component_impl::requestSlot(cache, e);
       component_impl::requestSlot(cache.m_shape, iid);
-      component_impl::requestSlot(cache.m_collisionGroup, iid);
+      component_impl::requestSlot(cache.m_collisionGroup, iid, 1);
       component_impl::requestSlot(cache.m_selfTypeBits, iid);
       component_impl::requestSlot(cache.m_targetTypeBits, iid);
       component_impl::requestSlot(cache.m_sensor, iid);
@@ -348,44 +395,58 @@ namespace core
 static auto read_##field(const storage& component, DataId id) -> std::remove_reference<decltype(component.m_##field[id.id])>::type { return component.m_##field[id.id]; }
    //************************************************
    getter(ComponentDeltaTime, timeFactor)
-   getter(ComponentDeltaTime, deltaTime)
-   getter(ComponentDeltaTime, deltaMicros)
-   getter(ComponentMovement, acceleration)
-   getter(ComponentMovement, velocity)
-   getter(ComponentMovement, direction)
-   getter(ComponentMovement, position)
-   getter(ComponentTransform, position)
-   getter(ComponentTransform, scale)
-   getter(ComponentTransform, rotation)
-   forbid(ComponentVisual, transform)
-   forbid(ComponentVisual, diffuse)
-   forbid(ComponentVisual, meshId)
+      getter(ComponentDeltaTime, deltaTime)
+      getter(ComponentDeltaTime, deltaMicros)
+      getter(ComponentMovement, acceleration)
+      getter(ComponentMovement, velocity)
+      getter(ComponentMovement, direction)
+      getter(ComponentMovement, position)
+      getter(ComponentTransform, position)
+      getter(ComponentTransform, scale)
+      getter(ComponentTransform, rotation)
+      forbid(ComponentVisual, transform)
+      forbid(ComponentVisual, diffuse)
+      forbid(ComponentVisual, meshId)
+      getter(ComponentCollision, shape)
+      getter(ComponentCollision, collisionGroup)
+      getter(ComponentCollision, selfTypeBits)
+      getter(ComponentCollision, targetTypeBits)
+      getter(ComponentCollision, sensor)
+      getter(ComponentCollision, previouslyColliding)
+      getter(ComponentCollision, colliding)
 #undef getter
-   //*************************************************
-   //********************* WRITE *********************
-   //************************************************
+      //*************************************************
+      //********************* WRITE *********************
+      //************************************************
 #define setter(storage, field) \
 static void write_##field(storage& component, DataId id, std::remove_reference<decltype(component.m_##field[id.id])>::type value) { component.m_##field[id.id] = value; }
-   //*************************************************
-   setter(ComponentDeltaTime, timeFactor)
-   forbid(ComponentDeltaTime, deltaTime)
-   forbid(ComponentDeltaTime, deltaMicros)
-   setter(ComponentMovement, acceleration)
-   setter(ComponentMovement, velocity)
-   setter(ComponentMovement, direction)
-   setter(ComponentMovement, position)
-   setter(ComponentTransform, position)
-   setter(ComponentTransform, scale)
-   setter(ComponentTransform, rotation)
-   setter(ComponentVisual, transform)
-   setter(ComponentVisual, diffuse)
-   setter(ComponentVisual, meshId)
+      //*************************************************
+      setter(ComponentDeltaTime, timeFactor)
+      forbid(ComponentDeltaTime, deltaTime)
+      forbid(ComponentDeltaTime, deltaMicros)
+      setter(ComponentMovement, acceleration)
+      setter(ComponentMovement, velocity)
+      setter(ComponentMovement, direction)
+      setter(ComponentMovement, position)
+      setter(ComponentTransform, position)
+      setter(ComponentTransform, scale)
+      setter(ComponentTransform, rotation)
+      setter(ComponentVisual, transform)
+      setter(ComponentVisual, diffuse)
+      setter(ComponentVisual, meshId)
+      setter(ComponentCollision, shape)
+      setter(ComponentCollision, collisionGroup)
+      setter(ComponentCollision, selfTypeBits)
+      setter(ComponentCollision, targetTypeBits)
+      setter(ComponentCollision, sensor)
+      setter(ComponentCollision, previouslyColliding)
+      setter(ComponentCollision, colliding)
 #undef setter
 #undef not_available
-   //*************************************************************
-   //********************* SYSTEM OPERATIONS *********************
-   //*************************************************************
-   static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
+      //*************************************************************
+      //********************* SYSTEM OPERATIONS *********************
+      //*************************************************************
+      static void advanceTimeForEntities(ComponentDeltaTime& cache, Time dt)
    {
       auto count = getCount(cache);
       for( auto i = 0U; i < count; ++i )
@@ -402,7 +463,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       {
          auto e = movement.m_entity[i];
          auto iid = getDataId(deltaTimes, e);
-         CORE_ASSERT_DEBUG(iid != InvalidDataId, "Moveable entity [id=",e,"] lacks a DeltaTime component!");
+         CORE_ASSERT_DEBUG(iid != InvalidDataId, "Moveable entity [id=", e, "] lacks a DeltaTime component!");
          auto dt = read_deltaTime(deltaTimes, iid);
          auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
          acceleration += -movement.m_velocity[i] * 10.0f;
@@ -440,6 +501,40 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       {
          gfx.renderMesh(visual.m_transform[i], visual.m_diffuse[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
       }
+   }
+   static std::vector<CollisionPair> findCollisions(const ComponentCollision& collision, const ComponentTransform& transforms)
+   {
+      std::vector<CollisionPair> collidingEntities;
+      auto count = getCount(collision);
+      for( auto i = 0U; i < count; ++i )
+      {
+         for( auto j = i + 1; j < count; ++j )
+         {
+            if( shouldCollide(collision.m_collisionGroup[i], collision.m_collisionGroup[j],
+               collision.m_selfTypeBits[i], collision.m_selfTypeBits[j],
+               collision.m_targetTypeBits[i], collision.m_targetTypeBits[j]) )
+            {
+               auto shape1 = collision.m_shape[i];
+               auto shape2 = collision.m_shape[j];
+               auto eid1 = collision.m_entity[i];
+               auto eid2 = collision.m_entity[j];
+               auto iid1 = getDataId(transforms, eid1);
+               auto iid2 = getDataId(transforms, eid2);
+               CORE_ASSERT_DEBUG(iid1 != InvalidDataId, "Colliding entity [id=", eid1, "] has no transform");
+               CORE_ASSERT_DEBUG(iid2 != InvalidDataId, "Colliding entity [id=", eid2, "] has no transform");
+               setCollisionShapePosition(shape1, read_position(transforms, iid1));
+               setCollisionShapePosition(shape2, read_position(transforms, iid2));
+               setCollisionShapeScale(shape1, read_scale(transforms, iid1));
+               setCollisionShapeScale(shape2, read_scale(transforms, iid2));
+               auto collisionResult = areInCollision(shape1, shape2);
+               if( collisionResult.isColliding )
+               {
+                  collidingEntities.push_back(CollisionPair{eid1, eid2, collisionResult.displacement});
+               }
+            }
+         }
+      }
+      return collidingEntities;
    }
 
 
@@ -623,6 +718,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
    enum class MeshId
    {
       StartArea,
+      KeyboardPlayer,
       MeshCount
    };
 
@@ -684,19 +780,33 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       auto eid = state.startArea = state.world.entityManager.create();
 
       auto iid = createData(state.world.transform, eid);
-      write_position(state.world.transform, iid, {0, 0});
       write_scale(state.world.transform, iid, {10, 10});
-      write_rotation(state.world.transform, iid, 0);
 
       iid = createData(state.world.visual, eid);
       write_transform(state.world.visual, iid, {{}, {10, 10}});
       write_diffuse(state.world.visual, iid, {1, 1, 1, 0.5f});
       write_meshId(state.world.visual, iid, MeshId::StartArea);
-      
-      iid = createData(state.world.collision, eid);
 
+      iid = createData(state.world.collision, eid);
+      CollisionShape shape;
+      shape.type = CollisionShape::Type::CircleShape;
+      shape.circle.center = {0, 0};
+      shape.circle.radius = 5;
+      write_shape(state.world.collision, iid, shape);
+      //other data
+
+
+      eid = state.players[0] = state.world.entityManager.create();
+
+      iid = createData(state.world.deltaTime, eid);
+      iid = createData(state.world.transform, eid);
       iid = createData(state.world.movement, eid);
-      
+      iid = createData(state.world.visual, eid);
+      write_meshId(state.world.visual, iid, MeshId::KeyboardPlayer);
+      iid = createData(state.world.collision, eid);
+      shape.circle.radius = 0.5f;
+      write_shape(state.world.collision, iid, shape);
+
       return result;
    }
 
@@ -714,6 +824,9 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       advanceTimeForEntities(state.world.deltaTime, time.virt);
       moveEntities(state.world.movement, state.world.deltaTime);
       syncPositionAfterMovement(state.world.movement, state.world.transform);
+      auto collisions = findCollisions(state.world.collision, state.world.transform);
+      //check if one entity is the start circle, and the other a player
+      
 
       return nextState;
    }
@@ -803,17 +916,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
 
 
 
-   static bool shouldCollide(const CollisionData& d1, const CollisionData& d2)
-   {
-      if( d1.collisionGroup == d2.collisionGroup && d1.collisionGroup != 0 )
-      {
-         return d1.collisionGroup > 0;
-      }
 
-      bool masks = (d1.selfTypeBits & d2.targetTypeBits) != 0 &&
-         (d2.selfTypeBits & d1.targetTypeBits) != 0;
-      return masks;
-   }
 
    static bool isStartCollision(const CollisionData& d)
    {
@@ -834,28 +937,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
    };
 
    /*
-      static void setCollisionCenter(SessionState& session, CollisionCenteringType type)
-      {
-      for( uint32_t e = 0; e < session.entityCount; ++e )
-      {
-      auto setValue = (type == CollisionCenteringType::Clear ? Vec2{} : session.movement[e].position);
-      switch( session.collision[e].shape.type )
-      {
-      case CollisionShape::RectShape:
-      {
-      session.collision[e].shape.rect.center = setValue;
-      } break;
-      case CollisionShape::CircleShape:
-      {
-      session.collision[e].shape.circle.center = setValue;
-      } break;
-      case CollisionShape::PointShape:
-      {
-      session.collision[e].shape.point = setValue;
-      } break;
-      }
-      }
-      }
+
 
       static void toggleCollisionState(SessionState& session)
       {
@@ -1364,6 +1446,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
          //game.sharedData.meshes = loadMeshes(game, gfx.textures);
          //game.sharedData.meshes.push_back({});
          //game.sharedData.meshes[LineMesh] = makeLine({0, 0}, {-1, 0}, game.assets.mainVS, game.assets.mainPS);
+         game.sharedData.meshes.emplace_back(makeSolidCircle({}, 1, 32, game.assets.mainVS, game.assets.mainPS));
          game.sharedData.meshes.emplace_back(makeSolidCircle({}, 1, 32, game.assets.mainVS, game.assets.mainPS));
 
          game.sharedData.font = loadFont(lua, CORE_RESOURCE("Defs/font.font"), game.assets.font, game.assets.mainVS, game.assets.mainPS);

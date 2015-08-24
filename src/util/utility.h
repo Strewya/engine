@@ -42,7 +42,7 @@ namespace core
    };
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-#define CORE_ASSERT(condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); *(int*)0 = 42; } } while(condition)
+#define CORE_ASSERT(condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); *(int*)0 = 42; } } while(!(condition))
 
 #ifndef CORE_DEPLOY
 
