@@ -96,27 +96,11 @@ namespace core
       };
    };
 
-   struct CollisionData
-   {
-      CollisionShape shape;
-      uint32_t collisionGroup;
-      uint16_t selfTypeBits;
-      uint16_t targetTypeBits;
-      bool sensor;
-      bool previouslyInCollision;
-      bool currentlyInCollision;
-   };
-
    struct CollisionPair
    {
       Entity collider;
       Entity collidee;
       Vec2 displacement;
-   };
-
-   struct AimData
-   {
-      Vec2 aim;
    };
 
    struct SharedData
@@ -297,6 +281,7 @@ namespace core
    struct ComponentMovement : public ComponentBase
    {
       std::vector<float> m_acceleration;
+      std::vector<Vec2> m_turnDirection;
       std::vector<Vec2> m_direction;
       std::vector<Vec2> m_velocity;
       std::vector<Vec2> m_position;
@@ -341,10 +326,13 @@ namespace core
 
    struct GameplayData
    {
-      enum
+      struct GuiButton
       {
-         BACK,
-         COUNT
+         enum
+         {
+            BACK,
+            COUNT
+         };
       };
       struct Numbers
       {
@@ -354,11 +342,11 @@ namespace core
             GearCount = 4,
          };
       };
-      GuiData<COUNT> setupGui; // #temp because the gameplay setup part of the game should not have any visible buttons (i think)
+      GuiData<GuiButton::COUNT> setupGui; // #temp because the gameplay setup part of the game should not have any visible buttons (i think)
       World world;
       Entity startArea;
-      Entity players[Numbers::PlayersCount];
-      Entity gear[Numbers::GearCount];
+      std::array<Entity, Numbers::PlayersCount> players;
+      std::array<Entity, Numbers::GearCount> gear;
    };
 
    struct GameData

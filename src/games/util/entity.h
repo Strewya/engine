@@ -13,6 +13,7 @@ namespace core
 {
    struct Entity
    {
+      //explicit Entity(uint32_t i) : id(i) {}
       uint32_t id;
    };
 

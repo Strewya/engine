@@ -19,6 +19,43 @@
 
 namespace core
 {
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  globals
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+
+   static const DataId InvalidDataId{(std::numeric_limits<uint32_t>::max())};
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  enums
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   enum class MeshId
+   {
+      StartArea,
+      KeyboardPlayer,
+      MeshCount
+   };
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  utility code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+
+   static bool operator==(DataId l, DataId r)
+   {
+      auto result = l.id == r.id;
+      return result;
+   }
+   static bool operator!=(DataId l, DataId r)
+   {
+      auto result = !(l == r);
+      return result;
+   }
+
    inline float pow2(float v)
    {
       auto result = v*v;
@@ -40,6 +77,12 @@ namespace core
 
       return result;
    }
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  collision detection code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
 
    template<typename T>
    static CollisionResult areInCollision(T one, CollisionShape two)
@@ -181,22 +224,11 @@ namespace core
 
 
 
-
-
-   static const DataId InvalidDataId{(std::numeric_limits<uint32_t>::max())};
-
-   static bool operator==(DataId l, DataId r)
-   {
-      auto result = l.id == r.id;
-      return result;
-   }
-   static bool operator!=(DataId l, DataId r)
-   {
-      auto result = !(l == r);
-      return result;
-   }
-
-
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  ECS code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
    namespace component_impl
    {
       template<typename DATA>
@@ -456,6 +488,33 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
          cache.m_deltaTime[i] = dt.seconds*factor;
       }
    }
+   static void turnEntities(ComponentMovement& movement, ComponentDeltaTime& deltaTime)
+   {
+      auto count = getCount(movement);
+      for( auto i = 0U; i < count; ++i )
+      {
+         auto target = movement.m_turnDirection[i];
+         if( !vec2::isZero(target) && movement.m_acceleration[i] > 0.0f )
+         {
+            float currentRad = radians(movement.m_direction[i]);
+            float targetRad = radians(vec2::normalize(target));
+            float currentDeg = Rad2Deg(currentRad);
+            float targetDeg = Rad2Deg(targetRad);
+
+            auto wra = targetDeg - currentDeg;
+            if( wra > 180.0f ) wra -= 360.0f;
+            if( wra < -180.0f ) wra += 360.0f;
+
+            //this 4 should be turn speed or something
+            auto iid = getDataId(deltaTime, movement.m_entity[i]);
+            currentDeg += wra * 4 * read_deltaTime(deltaTime, iid);
+            currentRad = Deg2Rad(currentDeg);
+
+            movement.m_direction[i].x = std::cosf(currentRad);
+            movement.m_direction[i].y = std::sinf(currentRad);
+         }
+      }
+   }
    static void moveEntities(ComponentMovement& movement, const ComponentDeltaTime& deltaTimes)
    {
       auto count = movement.m_mapping.size();
@@ -502,7 +561,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
          gfx.renderMesh(visual.m_transform[i], visual.m_diffuse[i], shared.meshes[(uint32_t)visual.m_meshId[i]]);
       }
    }
-   static std::vector<CollisionPair> findCollisions(const ComponentCollision& collision, const ComponentTransform& transforms)
+   static std::vector<CollisionPair> findCollisions(ComponentCollision& collision, const ComponentTransform& transforms)
    {
       std::vector<CollisionPair> collidingEntities;
       auto count = getCount(collision);
@@ -529,6 +588,14 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
                auto collisionResult = areInCollision(shape1, shape2);
                if( collisionResult.isColliding )
                {
+                  collision.m_previouslyColliding[i] = collision.m_colliding[i];
+                  collision.m_previouslyColliding[j] = collision.m_colliding[j];
+                  collision.m_colliding[i] = true;
+                  collision.m_colliding[j] = true;
+                  if( collision.m_sensor[i] || collision.m_sensor[j] )
+                  {
+                     collisionResult.displacement = {};
+                  }
                   collidingEntities.push_back(CollisionPair{eid1, eid2, collisionResult.displacement});
                }
             }
@@ -536,55 +603,28 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       }
       return collidingEntities;
    }
-
-
-
-
-
-   static bool init_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
+   static void resolveCollisions(ComponentTransform& transform, std::vector<CollisionPair>& pairs)
    {
-      auto result = true;
-      /*
-            shared.lockCursor = Cursor_Lock;
-            shared.relativeCursor = Cursor_Relative;
-            shared.showCursor = Cursor_Hide;
-            */
-      state.buttonFunctionToExecute = MainMenuData::COUNT;
-
-      state.gui.hoverButton = state.COUNT;
-      state.gui.hotButton = state.COUNT;
-
-      Color defaultIdleColor{1, 1, 1};
-      Color defaultHoverColor{1, 1, 0};
-      Color defaultHotColor{1, 0, 0};
-
-      auto i = 0;
-      state.gui.button.position[i++] = {0, 100};
-      state.gui.button.position[i++] = {0, -100};
-
-      i = 0;
-      state.gui.button.halfsize[i++] = {200, 50};
-      state.gui.button.halfsize[i++] = {200, 50};
-
-      i = 0;
-      state.gui.button.idleColor[i++] = {0, 1, 0};
-      state.gui.button.idleColor[i++] = {0, 1, 1};
-
-      i = 0;
-      state.gui.button.hoverColor[i++] = defaultHoverColor;
-      state.gui.button.hoverColor[i++] = defaultHoverColor;
-
-      i = 0;
-      state.gui.button.hotColor[i++] = defaultHotColor;
-      state.gui.button.hotColor[i++] = defaultHotColor;
-
-      i = 0;
-      state.gui.button.caption[i++] = "Start game";
-      state.gui.button.caption[i++] = "Quit";
-
-      return result;
+      auto count = getCount(transform);
+      for( auto i = 0U; i < count; ++i )
+      {
+         Vec2 totalDisplacement{};
+         for( auto p : pairs )
+         {
+            if( p.collider == transform.m_entity[i] || p.collidee == transform.m_entity[i] )
+            {
+               totalDisplacement += p.displacement;
+            }
+         }
+         transform.m_position[i] += totalDisplacement;
+      }
    }
 
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  GUI code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
    template<int BUTTONS>
    static void handle_mouseMove(GuiData<BUTTONS>& gui, Vec2 mousePosition)
    {
@@ -685,6 +725,52 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
    }
 
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  main menu code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   static bool init_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
+   {
+      auto result = true;
+
+      state.buttonFunctionToExecute = MainMenuData::COUNT;
+
+      state.gui.hoverButton = state.COUNT;
+      state.gui.hotButton = state.COUNT;
+
+      Color defaultIdleColor{1, 1, 1};
+      Color defaultHoverColor{1, 1, 0};
+      Color defaultHotColor{1, 0, 0};
+
+      auto i = 0;
+      state.gui.button.position[i++] = {0, 100};
+      state.gui.button.position[i++] = {0, -100};
+
+      i = 0;
+      state.gui.button.halfsize[i++] = {200, 50};
+      state.gui.button.halfsize[i++] = {200, 50};
+
+      i = 0;
+      state.gui.button.idleColor[i++] = {0, 1, 0};
+      state.gui.button.idleColor[i++] = {0, 1, 1};
+
+      i = 0;
+      state.gui.button.hoverColor[i++] = defaultHoverColor;
+      state.gui.button.hoverColor[i++] = defaultHoverColor;
+
+      i = 0;
+      state.gui.button.hotColor[i++] = defaultHotColor;
+      state.gui.button.hotColor[i++] = defaultHotColor;
+
+      i = 0;
+      state.gui.button.caption[i++] = "Start game";
+      state.gui.button.caption[i++] = "Quit";
+
+      return result;
+   }
+
    static State update_mainMenu(DeltaTime time, MainMenuData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
                                 AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
@@ -715,22 +801,169 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       render_guiData(state.gui, shared, assets, gfx, font);
    }
 
-   enum class MeshId
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  world code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+
+   struct GameMessage
    {
-      StartArea,
-      KeyboardPlayer,
-      MeshCount
+      enum class Type
+      {
+         DirectionChange,
+         AimChange,
+         Fire,
+         Ability,
+      };
+      Type type;
+      Entity entity;
+      union
+      {
+         Vec2 direction;
+         Vec2 aim;
+         bool shooting;
+      };
+      bool isAnalogue;
    };
 
-   static void clearWorld(World& world)
+   typedef std::vector<GameMessage> GameMessageVector;
+
+   static GameMessageVector translateInput(const EventVector_t& frameEvents, std::array<Entity, GameplayData::Numbers::PlayersCount>& players)
    {
-      world.destructionNotifier.clear();
-      clearAll(world.deltaTime);
-      clearAll(world.transform);
-      clearAll(world.movement);
-      clearAll(world.visual);
-      clearAll(world.collision);
+      GameMessageVector result;
+      for( const auto& e : frameEvents )
+      {
+         switch( e.type )
+         {
+            case WE_KEYBOARDKEY:
+            {
+               GameMessage ge{};
+               ge.entity = Entity{0}; //player 4
+               ge.isAnalogue = false;
+               if( e.keyboard.firstTimeDown )
+               {
+                  switch( e.keyboard.key.id )
+                  {
+                     case Keyboard::W:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {0, +1};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::S:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {0, -1};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::A:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {-1, 0};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::D:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {+1, 0};
+                        result.push_back(ge);
+                     } break;
+                  }
+               }
+               else if( e.keyboard.key.isDown == false )
+               {
+                  switch( e.keyboard.key.id )
+                  {
+                     case Keyboard::W:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {0, -1};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::S:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {0, +1};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::A:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {+1, 0};
+                        result.push_back(ge);
+                     } break;
+                     case Keyboard::D:
+                     {
+                        ge.type = GameMessage::Type::DirectionChange;
+                        ge.direction = {-1, 0};
+                        result.push_back(ge);
+                     } break;
+                  }
+               }
+            } break;
+
+            case WE_GAMEPADAXIS:
+            {
+               GameMessage ge{};
+               ge.entity = Entity{e.gamepad.id};
+               ge.isAnalogue = true;
+               if( e.gamepad.axis.id == Gamepad::LeftStick )
+               {
+                  ge.type = GameMessage::Type::DirectionChange;
+                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
+                  result.push_back(ge);
+               }
+               else if( e.gamepad.axis.id == Gamepad::RightStick )
+               {
+                  if( e.gamepad.axis.normalized >= 0.1 )
+                  {
+                     ge.type = GameMessage::Type::AimChange;
+                     ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
+                     result.push_back(ge);
+
+                     GameMessage fire{};
+                     fire.entity = Entity{e.gamepad.id};
+                     ge.isAnalogue = true;
+                     fire.shooting = true;
+                     result.push_back(fire);
+                  }
+               }
+            } break;
+
+            case WE_MOUSEBUTTON:
+            {
+               GameMessage ge{};
+               ge.entity = Entity{0}; //player 4
+               ge.isAnalogue = false;
+               ge.type = GameMessage::Type::Fire;
+               if( e.mouse.button.id == Mouse::LeftButton )
+               {
+                  ge.shooting = e.mouse.button.isDown;
+                  result.push_back(ge);
+               }
+            } break;
+
+            case WE_MOUSEMOVE:
+            {
+               GameMessage ge{};
+               ge.entity = Entity{0}; //player 4
+               ge.isAnalogue = false;
+               ge.type = GameMessage::Type::AimChange;
+               ge.aim = {(float)e.mouse.position.x, (float)e.mouse.position.y};
+               result.push_back(ge);
+            } break;
+         }
+      }
+      std::sort(std::begin(result), std::end(result), [](const GameMessage& l, const GameMessage& r) { return l.type < r.type; });
+      return result;
    }
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  world code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
 
    static void initWorld(World& world)
    {
@@ -743,16 +976,88 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
 #undef REG_CALLBACK
    }
 
+   static void clearWorld(World& world)
+   {
+      world.destructionNotifier.clear();
+      clearAll(world.deltaTime);
+      clearAll(world.transform);
+      clearAll(world.movement);
+      clearAll(world.visual);
+      clearAll(world.collision);
+   }
+
+   static void simulateWorld(World& world, DeltaTime time, SharedData& shared, const Constants& constants,
+                             const GameMessageVector& gameEvents)
+   {
+      advanceTimeForEntities(world.deltaTime, time.virt);
+      for( const auto& ge : gameEvents )
+      {
+         switch( ge.type )
+         {
+            case GameMessage::Type::DirectionChange: // movement direction target (implies start/stop moving)
+            {
+               if( ge.isAnalogue )
+               {
+                  auto iid = getDataId(world.movement, ge.entity);
+                  write_direction(world.movement, iid, ge.direction);
+                  //session.targetDirection[ge.entity] = ge.direction;
+               }
+               else
+               {
+                  //session.targetDirection[ge.entity] += ge.direction;
+               }
+               //session.movement[ge.entity].acceleration = constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
+            } break;
+            //       - aim
+            case GameMessage::Type::AimChange:
+            {
+               if( ge.isAnalogue )
+               {
+                  //session.aim[ge.entity].aim = ge.aim*constants.playerAimLength;
+               }
+               else
+               {
+                  //                   auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
+                  //                   gfx.setPerspectiveProjection();
+                  //                   auto aim = session.aim[ge.entity].aim;
+                  //                   aim = gfx.worldToScreen(camera, aim);
+                  //                   aim += ge.aim;
+                  //                   aim = gfx.screenToWorld(camera, aim);
+                  //                   if( vec2::length2(aim) > pow2(constants.playerAimLength) )
+                  //                   {
+                  //                      session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
+                  //                   }
+                  //                   else
+                  //                   {
+                  //                      session.aim[ge.entity].aim = aim;
+                  //                   }
+               }
+            } break;
+            //       - start/stop weapon fire
+            case GameMessage::Type::Fire:
+            {
+               //state.shooting[ge.entity] = ge.shooting;
+            } break;
+            //       - ability use
+            case GameMessage::Type::Ability:
+            {
+               //state.activateAbility[ge.entity] = true;
+            } break;
+         }
+      }
+   }
+
+   //******************************************************************************************************************
+   //******************************************************************************************************************
+   //                                  gameplay setup code
+   //******************************************************************************************************************
+   //******************************************************************************************************************
    static bool init_gameplaySetup(GameplayData& state, SharedData& shared, const Constants& constants, const GameResources& assets)
    {
       auto result = true;
-      /*
-            shared.lockCursor = Cursor_Unlock;
-            shared.relativeCursor = Cursor_Relative;
-            shared.showCursor = Cursor_Show;
-            */
-      state.setupGui.hoverButton = state.COUNT;
-      state.setupGui.hotButton = state.COUNT;
+
+      state.setupGui.hoverButton = GameplayData::GuiButton::COUNT;
+      state.setupGui.hotButton = GameplayData::GuiButton::COUNT;
 
       Color defaultIdleColor{1, 1, 1};
       Color defaultHoverColor{1, 1, 0};
@@ -793,6 +1098,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       shape.circle.center = {0, 0};
       shape.circle.radius = 5;
       write_shape(state.world.collision, iid, shape);
+      write_sensor(state.world.collision, iid, true);
       //other data
 
 
@@ -813,20 +1119,39 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
    static State update_gameplaySetup(DeltaTime time, GameplayData& state, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents,
                                      AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
-      //do the update
       auto nextState = State::GameplaySetup;
       uint32_t activatedButton = handle_guiInput(state.setupGui, shared, constants, frameEvents);
 
-      if( activatedButton == GameplayData::BACK )
+      if( activatedButton == GameplayData::GuiButton::BACK )
       {
          nextState = State::MainMenu;
       }
+
+      //phase where input events are translated to game events
+      std::vector<GameMessage> gameMsgs;
+
       advanceTimeForEntities(state.world.deltaTime, time.virt);
+      //handle input
+      //handle AI
+      //handle physics
+      turnEntities(state.world.movement, state.world.deltaTime);
       moveEntities(state.world.movement, state.world.deltaTime);
       syncPositionAfterMovement(state.world.movement, state.world.transform);
       auto collisions = findCollisions(state.world.collision, state.world.transform);
+      resolveCollisions(state.world.transform, collisions);
+      //handle collision responses
       //check if one entity is the start circle, and the other a player
-      
+      for( auto p : collisions )
+      {
+         if( p.collider == state.startArea && std::any_of(std::begin(state.players), std::end(state.players), [p](Entity e) { return p.collidee == e; }) )
+         {
+
+         }
+         else if( p.collidee == state.startArea && std::any_of(std::begin(state.players), std::end(state.players), [p](Entity e) { return p.collider == e; }) )
+         {
+
+         }
+      }
 
       return nextState;
    }
@@ -913,23 +1238,6 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       };
       */
 
-
-
-
-
-
-   static bool isStartCollision(const CollisionData& d)
-   {
-      auto result = d.previouslyInCollision == false && d.currentlyInCollision == true;
-      return result;
-   }
-
-   static bool isEndCollision(const CollisionData& d)
-   {
-      auto result = d.previouslyInCollision == true && d.currentlyInCollision == false;
-      return result;
-   }
-
    enum class CollisionCenteringType
    {
       Clear,
@@ -984,193 +1292,11 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
    //*****************************************************************
    //          SESSION TRANSLATE INPUT
    //*****************************************************************
-   struct GameMessage
-   {
-      enum class Type
-      {
-         DirectionChange,
-         AimChange,
-         Fire,
-         Ability,
-         //#test
-         Player_Circle,
-         Player_Rect,
-         Tree_Circle,
-         Tree_Rect,
-         Player_Sensor,
-      };
-      Type type;
-      uint32_t entity;
-      bool isAnalogue;
-      union
-      {
-         Vec2 direction;
-         Vec2 aim;
-         bool shooting;
-      };
-   };
-
-   static std::vector<GameMessage> translateInput_gameplay_session(const EventVector_t& frameEvents)
-   {
-      std::vector<GameMessage> result;
-      for( const auto& e : frameEvents )
-      {
-         switch( e.type )
-         {
-            case WE_KEYBOARDKEY:
-            {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               if( e.keyboard.firstTimeDown )
-               {
-                  switch( e.keyboard.key.id )
-                  {
-                     case Keyboard::W:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, +1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::S:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, -1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::A:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {-1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::D:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {+1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_1:
-                     {
-                        ge.type = GameMessage::Type::Player_Circle;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_2:
-                     {
-                        ge.type = GameMessage::Type::Player_Rect;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_3:
-                     {
-                        ge.type = GameMessage::Type::Tree_Circle;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_4:
-                     {
-                        ge.type = GameMessage::Type::Tree_Rect;
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::_5:
-                     {
-                        ge.type = GameMessage::Type::Player_Sensor;
-                        result.push_back(ge);
-                     } break;
-                  }
-               }
-               else if( e.keyboard.key.isDown == false )
-               {
-                  switch( e.keyboard.key.id )
-                  {
-                     case Keyboard::W:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, -1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::S:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {0, +1};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::A:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {+1, 0};
-                        result.push_back(ge);
-                     } break;
-                     case Keyboard::D:
-                     {
-                        ge.type = GameMessage::Type::DirectionChange;
-                        ge.direction = {-1, 0};
-                        result.push_back(ge);
-                     } break;
-                  }
-               }
-            } break;
-
-            case WE_GAMEPADAXIS:
-            {
-               GameMessage ge{};
-               ge.entity = e.gamepad.id;
-               ge.isAnalogue = true;
-               if( e.gamepad.axis.id == Gamepad::LeftStick )
-               {
-                  ge.type = GameMessage::Type::DirectionChange;
-                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
-                  result.push_back(ge);
-               }
-               else if( e.gamepad.axis.id == Gamepad::RightStick )
-               {
-                  if( e.gamepad.axis.normalized >= 0.1 )
-                  {
-                     ge.type = GameMessage::Type::AimChange;
-                     ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
-                     result.push_back(ge);
-
-                     GameMessage fire{};
-                     fire.entity = e.gamepad.id;
-                     ge.isAnalogue = true;
-                     fire.shooting = true;
-                     result.push_back(fire);
-                  }
-               }
-            } break;
-
-            case WE_MOUSEBUTTON:
-            {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               ge.type = GameMessage::Type::Fire;
-               if( e.mouse.button.id == Mouse::LeftButton )
-               {
-                  ge.shooting = e.mouse.button.isDown;
-                  result.push_back(ge);
-               }
-            } break;
-
-            case WE_MOUSEMOVE:
-            {
-               GameMessage ge{};
-               ge.entity = 0; //player 4
-               ge.isAnalogue = false;
-               ge.type = GameMessage::Type::AimChange;
-               ge.aim = {(float)e.mouse.position.x, (float)e.mouse.position.y};
-               result.push_back(ge);
-            } break;
-         }
-      }
-      return result;
-   }
 
    static State update_gameplaySession(DeltaTime time, Constants& constants, GameplayData& state, const EventVector_t& frameEvents, AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx, Camera& camera)
    {
       //    preamble
       //       - update all timers
-      advanceTimeForEntities(state.world.deltaTime, time.real);
-
-
       //    player input based updates (for specific player):
       /*
       translate window events into game events based on what the allowed controls are
@@ -1187,121 +1313,12 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
       */
       //the translator is a system with registered mappings from WindowEvent to GameEvent
       //done in the init function when we know how many players we have and which input device they are using
-      auto gameEvents = translateInput_gameplay_session(frameEvents);
-
-      std::sort(gameEvents.begin(), gameEvents.end(), [](const GameMessage& l, const GameMessage& r)
-      {
-         return l.type < r.type;
-      });
-
-      for( auto& ge : gameEvents )
-      {
-         switch( ge.type )
-         {
-            //       - movement direction target (implies start/stop moving)
-            case GameMessage::Type::DirectionChange:
-            {
-               if( ge.isAnalogue )
-               {
-                  //session.targetDirection[ge.entity] = ge.direction;
-               }
-               else
-               {
-                  //session.targetDirection[ge.entity] += ge.direction;
-               }
-               //session.movement[ge.entity].acceleration = constants.playerAcceleration*vec2::length(vec2::normalize(session.targetDirection[ge.entity]));
-            } break;
-            //       - aim
-            case GameMessage::Type::AimChange:
-            {
-               if( ge.isAnalogue )
-               {
-                  //session.aim[ge.entity].aim = ge.aim*constants.playerAimLength;
-               }
-               else
-               {
-                  //                   auto window = Vec2{constants.windowWidth, constants.windowHeight}*0.5f;
-                  //                   gfx.setPerspectiveProjection();
-                  //                   auto aim = session.aim[ge.entity].aim;
-                  //                   aim = gfx.worldToScreen(camera, aim);
-                  //                   aim += ge.aim;
-                  //                   aim = gfx.screenToWorld(camera, aim);
-                  //                   if( vec2::length2(aim) > pow2(constants.playerAimLength) )
-                  //                   {
-                  //                      session.aim[ge.entity].aim = vec2::setLength(aim, constants.playerAimLength);
-                  //                   }
-                  //                   else
-                  //                   {
-                  //                      session.aim[ge.entity].aim = aim;
-                  //                   }
-               }
-            } break;
-            //       - start/stop weapon fire
-            case GameMessage::Type::Fire:
-            {
-               //state.shooting[ge.entity] = ge.shooting;
-            } break;
-            //       - ability use
-            case GameMessage::Type::Ability:
-            {
-               //state.activateAbility[ge.entity] = true;
-            } break;
-            //optional cases like opening menus, pausing the game, etc
-            //       - open pause menu
-            case GameMessage::Type::Player_Circle:
-            {
-               //                session.collision[0].shape.type = CollisionShape::CircleShape;
-               //                session.collision[0].shape.circle = {{}, 1};
-            } break;
-            case GameMessage::Type::Player_Rect:
-            {
-               //                session.collision[0].shape.type = CollisionShape::RectShape;
-               //                session.collision[0].shape.rect = {{}, {1, 1}};
-            } break;
-            case GameMessage::Type::Tree_Circle:
-            {
-               //                session.collision[1].shape.type = CollisionShape::CircleShape;
-               //                session.collision[1].shape.circle = {{}, 5};
-            } break;
-            case GameMessage::Type::Tree_Rect:
-            {
-               //                session.collision[1].shape.type = CollisionShape::RectShape;
-               //                session.collision[1].shape.rect = {{}, {4, 4}};
-            } break;
-            case GameMessage::Type::Player_Sensor:
-            {
-               /*               session.collision[0].sensor = !session.collision[0].sensor;*/
-            } break;
-         }
-      }
-
       //    AI updates:
       //       - decide if should be moving
       //       - decide location to move to, calculate movement direction target
       //       - update aim based on movement direction
       //    simulation updates:
       //       - update movement direction based on target direction
-      //       for( uint32_t e = 0; e < session.entityCount; ++e )
-      //       {
-      //          if( session.movement[e].acceleration > 0.0f )
-      //          {
-      //             float currentRad = radians(session.movement[e].direction);
-      //             auto target = vec2::normalize(session.targetDirection[e]);
-      //             float targetRad = radians(target);
-      //             float currentDeg = Rad2Deg(currentRad);
-      //             float targetDeg = Rad2Deg(targetRad);
-      // 
-      //             auto wra = targetDeg - currentDeg;
-      //             if( wra > 180.0f ) wra -= 360.0f;
-      //             if( wra < -180.0f ) wra += 360.0f;
-      // 
-      //             currentDeg += wra * 4 * session.deltaTime[e].deltaTime;
-      //             currentRad = Deg2Rad(currentDeg);
-      // 
-      //             session.movement[e].direction.x = std::cosf(currentRad);
-      //             session.movement[e].direction.y = std::sinf(currentRad);
-      //          }
-      //       }
       //       - propose movement in current direction
       //       - players, monsters and rockets work the same
       //       - bullets could be made to work the same with some changes to their data
