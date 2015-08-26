@@ -10,20 +10,26 @@
 #include "window/window_include.h"
 #include <xinput.h>
 /******* extra headers *******/
+#include "util/types.h"
 #include "window/window_event.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   class GamepadHandler
+   struct CommunicationBuffer;
+
+   struct  GamepadHandler
    {
    public:
       GamepadHandler();
 
-      std::vector<WindowEvent> handle(uint64_t currentTime);
+      void handle(CommunicationBuffer* buffer, u64 currentTime);
 
    private:
-      static const uint8_t MAX_GAMEPADS = 4;
+      enum
+      {
+         MAX_GAMEPADS = 4,
+      };
       
       uint64_t m_unconnectedReadDelay;
 

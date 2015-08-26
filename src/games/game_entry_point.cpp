@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "util/time/clock.h"
+#include "util/memory.h"
 #include "util/utility.h"
 #include "window/window_proxy.h"
 
@@ -24,10 +25,9 @@
 #define CORE_FIXED_STEP 2
 #define CORE_STEP CORE_CLAMPED_STEP
 
-
 namespace core
 {
-   void runGame(WindowProxy window)
+   void runGame(WindowProxy window, Memory memory, CommunicationBuffer* commBuffer)
    {
 #ifndef NO_GAME
       static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
@@ -72,7 +72,9 @@ namespace core
          CORE_LOG("Game shutdown failed...");
          window.showMessagebox("SRS ERRORR", "Game shutdown has failed, please review the log for errors immediately");
       }
-      window.close();
+#else
+      static_assert(false, "No game defined");
 #endif
+      window.close();
    }
 }

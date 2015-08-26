@@ -10,7 +10,6 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/memory_sizes.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -30,7 +29,9 @@ namespace core
    template<typename... Args> void writeLog(const char* file, int line, Args... args)
    {
       auto& logStream = getLogFileStream();
+#ifndef DEPLOY
       writeHeaderToLogStream(logStream, file, line);
+#endif
       writeContentToLogStream(logStream, args...);
    }
 

@@ -4,18 +4,22 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <algorithm>
-#include <cstdint>
-#include <iostream>
-#include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
+
+#define Bytes(n) (n)
+#define Kilobytes(n) ((n)*1024)
+#define Megabytes(n) (Kilobytes(n)*1024)
+#define Gigabytes(n) (Megabytes(n)*1024)
+#define Terabytes(n) (Gigabytes(n)*1024)
 
 namespace core
 {
-#define Bytes(n) n
-#define Kilobytes(n) n*1024
-#define Megabytes(n) Kilobytes(n*1024)
-#define Gigabytes(n) Megabytes(n*1024)
+   struct Memory
+   {
+      u64 size;
+      void* ptr;
+   };
 }

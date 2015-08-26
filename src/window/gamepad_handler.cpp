@@ -10,6 +10,7 @@
 #include "input/gamepad.h"
 #include "util/time/time_unit_conversions.h"
 #include "util/geometry/vec2.h"
+#include "util/communication_buffer.h"
 #include "window/window_event.h"
 /******* end headers *******/
 
@@ -146,7 +147,7 @@ namespace core
       return oldConnectionState;
    }
 
-   std::vector<WindowEvent> GamepadHandler::handle(uint64_t currentTime)
+   void GamepadHandler::handle(CommunicationBuffer* buffer, u64 currentTime)
    {
       std::vector<WindowEvent> events;
       for( uint8_t i = 0; i < MAX_GAMEPADS; ++i )
@@ -189,6 +190,9 @@ namespace core
             }
          }
       }
-      return events;
+      for( auto e : events )
+      {
+         buffer->writeEvent(e);
+      }
    }
 }

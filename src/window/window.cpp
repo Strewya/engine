@@ -10,6 +10,7 @@
 /******* extra headers *******/
 #include "util/time/clock.h"
 #include "util/time/time_unit_conversions.h"
+#include "util/communication_buffer.h"
 #include "util/utility.h"
 #include "window/window_class.h"
 /******* end headers *******/
@@ -39,8 +40,7 @@ namespace core
 
    Window::Window()
       : Window("Window")
-   {
-   }
+   {}
 
    Window::Window(const char* title)
       : m_trackedChanges(FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE),
@@ -55,8 +55,6 @@ namespace core
       m_class(title), m_title(title)
    {
       m_events.resize(m_eventQueueSize);
-
-      getProxy().setFullscreen(m_fullscreen);
    }
 
    Window::~Window()
@@ -101,56 +99,58 @@ namespace core
       UpdateWindow(m_hwnd);
    }
 
-   void Window::update()
+   bool Window::processWin32Messages(CommunicationBuffer* communication)
    {
-      if( !m_hwnd )
-      {
-         MessageBox(nullptr, "Window::HandleMessage(): The window has not been created yet.", "Runtime error", MB_OK);
-         m_exitCode = WindowResult::WindowNotExistsError;
-         m_isRunning = false;
-         return;
-      }
-      static MSG msg;
+      MSG msg;
       while( PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) )
       {
          if( msg.message == WM_QUIT )
          {
             m_exitCode = msg.wParam;
-            m_isRunning = false;
-            return;
+            return false;
          }
          TranslateMessage(&msg);
          DispatchMessage(&msg);
 
-         if( m_mouseHandler.handle(newEvent(), msg.message, msg.wParam, msg.lParam) )
+         if( msg.message == WM_CLOSE )
          {
-            writeEvent();
+            WindowEvent we{};
+            we.type = WindowEventType::WE_CLOSE;
+            communication->writeEvent(we);
          }
-         if( m_keyboardHandler.handle(newEvent(), msg.message, msg.wParam, msg.lParam) )
+         else if( msg.message == WM_ACTIVATE )
          {
-            writeEvent();
+            PostQuitMessage(0);
+            WindowEvent we{};
+            if( LOWORD(msg.wParam) == WA_INACTIVE )
+            {
+               we.type = WindowEventType::WE_LOSTFOCUS;
+            }
+            else
+            {
+               we.type = WindowEventType::WE_GAINFOCUS;
+            }
+            communication->writeEvent(we);
          }
+         //write the mouse event to the input queue that goes to the game
+         m_mouseHandler.handle(communication, msg.message, msg.wParam, msg.lParam);
+         m_keyboardHandler.handle(communication, msg.message, msg.wParam, msg.lParam);
       }
-      auto events = m_gamepadHandler.handle(Clock::getRealTimeMicros());
-      for( auto event : events )
-      {
-         auto& we = newEvent();
-         we = event;
-         writeEvent();
-      }
-      processFileChanges();
+      m_gamepadHandler.handle(communication, Clock::getRealTimeMicros());
+      processFileChanges(communication);
+      return true;
    }
 
    void Window::setStyle(uint32_t style)
    {
       m_style = style;
    }
-   
+
    void Window::setExtendedStyle(uint32_t style)
    {
       m_extendedStyle = style;
    }
-   
+
    const char* Window::getClass() const
    {
       return m_class;
@@ -160,27 +160,27 @@ namespace core
    {
       return m_title;
    }
-   
+
    HWND Window::getWindowHandle() const
    {
       return m_hwnd;
    }
-   
+
    uint32_t Window::getStyle() const
    {
       return m_style;
    }
-   
+
    uint32_t Window::getExtendedStyle() const
    {
       return m_extendedStyle;
    }
-   
+
    int32_t Window::getExitCode() const
    {
       return m_exitCode;
    }
-   
+
    LRESULT CALLBACK Window::messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
    {
       Window* window = nullptr;
@@ -209,17 +209,12 @@ namespace core
 
    LRESULT WINAPI Window::windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
    {
-      //here we translate all WM_* messages to the Core::WindowMessage
-      bool eventMapped = true;
+      //here we translate window related WM_* messages to Core::WindowEvent
       LRESULT result = 0;
-      const LRESULT notProcessed = -1;
-      auto& we = newEvent();
       switch( msg )
       {
          case WM_CLOSE:
          {
-            we.type = WindowEventType::WE_CLOSE;
-            result = notProcessed;
          } break;
 
          case WM_SETCURSOR:
@@ -229,44 +224,25 @@ namespace core
             RECT rc;
             GetClientRect(m_hwnd, &rc);
             ScreenToClient(m_hwnd, &cur);
-            result = notProcessed;
             if( !m_showCursor && cur.y >= rc.top && cur.y <= rc.bottom && cur.x >= rc.left && cur.x <= rc.right )
             {
                SetCursor(nullptr);
                result = TRUE;
             }
-            eventMapped = false;
-         } break;
-
-         case WM_ACTIVATE:
-         {
-            if( LOWORD(wParam) == WA_INACTIVE )
-            {
-               we.type = WindowEventType::WE_LOSTFOCUS;
-            }
             else
             {
-               we.type = WindowEventType::WE_GAINFOCUS;
-               getProxy().lockCursor(m_lockCursor);
-               getProxy().showCursor(m_showCursor);
+               result = DefWindowProc(hwnd, msg, wParam, lParam);
             }
-            result = 0;
          } break;
 
          default:
          {
-            eventMapped = false;
-            result = notProcessed;
+            result = DefWindowProc(hwnd, msg, wParam, lParam);
          }
          break;
       }
 
-      if( eventMapped )
-      {
-         writeEvent();
-      }
-
-      return result == notProcessed ? DefWindowProc(hwnd, msg, wParam, lParam) : result;
+      return result;
    }
 
    static FileChangeType toFileChangeType(DWORD action)
@@ -329,7 +305,7 @@ namespace core
       m_headIndex = (m_headIndex + 1) % m_eventQueueSize;
    }
 
-   void Window::processFileChanges()
+   void Window::processFileChanges(CommunicationBuffer* buffer)
    {
       std::string file;
       DWORD action;
@@ -337,12 +313,12 @@ namespace core
       {
          if( file.size() < FilenameStringSize && file.find(".") != file.npos )
          {
-            auto& we = newEvent();
+            WindowEvent we{};
             we.type = WE_FILECHANGE;
             we.fileChange.action = toFileChangeType(action);
             strncpy(we.fileChange.filename, file.c_str(), FilenameStringSize);
             we.fileChange.filename[FilenameStringSize] = 0;
-            writeEvent();
+            buffer->writeEvent(we);
          }
          else
          {

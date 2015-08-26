@@ -35,8 +35,8 @@ namespace core
       //game state stuff
       GameData game;
 
-      bool isPaused;
       bool init(WindowProxy window);
+      bool isPaused;
       bool shutdown();
 
       bool tickLogic(const Clock& logicClock);

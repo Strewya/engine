@@ -352,12 +352,13 @@
     <ClInclude Include="..\..\..\src\stdafx.h" />
     <ClInclude Include="..\..\..\src\util\collision_checks.h" />
     <ClInclude Include="..\..\..\src\util\color.h" />
+    <ClInclude Include="..\..\..\src\util\communication_buffer.h" />
     <ClInclude Include="..\..\..\src\util\geometry\circle.h" />
     <ClInclude Include="..\..\..\src\util\geometry\rect.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec_types.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec2.h" />
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h" />
-    <ClInclude Include="..\..\..\src\util\memory_sizes.h" />
+    <ClInclude Include="..\..\..\src\util\memory.h" />
     <ClInclude Include="..\..\..\src\util\random.h" />
     <ClInclude Include="..\..\..\src\util\ring_buffer.h" />
     <ClInclude Include="..\..\..\src\util\template\name_cache_template.h" />
@@ -370,6 +371,7 @@
     <ClInclude Include="..\..\..\src\util\time\timer.h" />
     <ClInclude Include="..\..\..\src\util\time\time_unit_conversions.h" />
     <ClInclude Include="..\..\..\src\util\transform.h" />
+    <ClInclude Include="..\..\..\src\util\types.h" />
     <ClInclude Include="..\..\..\src\util\utility.h" />
     <ClInclude Include="..\..\..\src\window\gamepad_handler.h" />
     <ClInclude Include="..\..\..\src\window\keyboard_handler.h" />

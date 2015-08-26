@@ -6,12 +6,14 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "input/keyboard.h"
+#include "util/communication_buffer.h"
 /******* end headers *******/
 
 namespace core
 {
-   bool KeyboardHandler::handle(WindowEvent& we, uint32_t msg, WPARAM wp, LPARAM lp)
+   void KeyboardHandler::handle(CommunicationBuffer* buffer, u32 msg, WPARAM wp, LPARAM lp)
    {
+      WindowEvent we;
       bool matched = false;
       switch( msg )
       {
@@ -22,9 +24,9 @@ namespace core
          {
             matched = true;
             we.type = WindowEventType::WE_KEYBOARDKEY;
-            we.keyboard.key.id = m_keyCodes[(uint8_t)wp];
+            we.keyboard.key.id = m_keyCodes[(u8)wp];
             we.keyboard.key.isDown = (lp & (1 << 31)) == 0;
-            we.keyboard.repeatCount = (uint8_t)LOWORD(lp);
+            we.keyboard.repeatCount = (u8)LOWORD(lp);
             we.keyboard.firstTimeDown = (lp & (1 << 30)) == 0;
          } break;
 
@@ -32,13 +34,16 @@ namespace core
          {
             matched = true;
             we.type = WindowEventType::WE_KEYBOARDTEXT;
-            we.keyboard.key.id = m_keyCodes[(uint8_t)wp];
+            we.keyboard.key.id = m_keyCodes[(u8)wp];
             we.keyboard.key.isDown = true;
-            we.keyboard.repeatCount = (uint8_t)LOWORD(lp);
+            we.keyboard.repeatCount = (u8)LOWORD(lp);
             we.keyboard.firstTimeDown = false;
          } break;
       }
-      return matched;
+      if( matched )
+      {
+         buffer->writeEvent(we);
+      }
    }
 
 

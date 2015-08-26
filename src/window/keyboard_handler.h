@@ -8,21 +8,27 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "util/types.h"
 #include "window/window_event.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   class KeyboardHandler
+   struct CommunicationBuffer;
+
+   struct KeyboardHandler
    {
    public:
       KeyboardHandler();
 
-      bool handle(WindowEvent& we, uint32_t msg, WPARAM wp, LPARAM lp);
+      void handle(CommunicationBuffer* buffer, u32 msg, WPARAM wp, LPARAM lp);
 
    private:
-      static const uint32_t MAX_KEYS = 255;
+      enum
+      {
+         MAX_KEYS = 255
+      };
       
-      int8_t m_keyCodes[MAX_KEYS];
+      i8 m_keyCodes[MAX_KEYS];
    };
 }

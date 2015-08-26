@@ -10,7 +10,9 @@
 
 namespace core
 {
+   struct CommunicationBuffer;
+   struct Memory;
    struct WindowProxy;
 
-   void runGame(WindowProxy window);
+   void runGame(WindowProxy window, Memory memory, CommunicationBuffer* communication);
 }

@@ -381,9 +381,6 @@
     <ClInclude Include="..\..\..\src\util\geometry\vec3.h">
       <Filter>code\framework\util\geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\util\memory_sizes.h">
-      <Filter>code\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\audio\sound_manager.h">
       <Filter>code\framework\audio</Filter>
     </ClInclude>
@@ -397,6 +394,15 @@
       <Filter>code\framework\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\util\random.h">
+      <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\memory.h">
+      <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\types.h">
+      <Filter>code\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\util\communication_buffer.h">
       <Filter>code\framework\util</Filter>
     </ClInclude>
   </ItemGroup>

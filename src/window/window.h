@@ -20,6 +20,7 @@
 
 namespace core
 {
+   struct CommunicationBuffer;
    struct Window;
 
    enum WindowResult
@@ -27,8 +28,7 @@ namespace core
       OK = 0,
       WindowClassRegistrationError,
       WindowCreationError,
-      WindowNotExistsError,
-      WindowClosing
+      InsufficientMemory,
    };
 
    WindowResult initializeWindow(Window& window);
@@ -51,7 +51,7 @@ namespace core
       //platform
       void show();
       //platform
-      void update();
+      bool processWin32Messages(CommunicationBuffer* communication);
 
       //general if argument is enumerated, platform otherwise
       void setExtendedStyle(uint32_t style);
@@ -79,7 +79,7 @@ namespace core
       //platform
       void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
       //platform
-      void processFileChanges();
+      void processFileChanges(CommunicationBuffer* buffer);
 
       const char* m_class;
       const char* m_title;

@@ -13,7 +13,9 @@
 
 namespace core
 {
-   class MouseHandler
+   struct CommunicationBuffer;
+
+   struct MouseHandler
    {
    public:
       MouseHandler();
@@ -21,7 +23,7 @@ namespace core
       void setRelativeMouseMove(bool isRelative, uint32_t centerX, uint32_t centerY);
 
 
-      bool handle(WindowEvent& we, uint32_t msg, WPARAM wp, LPARAM lp);
+      void handle(CommunicationBuffer* buffer, uint32_t msg, WPARAM wp, LPARAM lp);
 
    private:
       uint32_t m_centerX;

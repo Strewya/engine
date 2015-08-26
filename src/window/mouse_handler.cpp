@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "input/mouse.h"
+#include "util/communication_buffer.h"
 /******* end headers *******/
 
 namespace core
@@ -58,8 +59,9 @@ namespace core
       return key;
    }
 
-   bool MouseHandler::handle(WindowEvent& we, uint32_t msg, WPARAM wp, LPARAM lp)
+   void MouseHandler::handle(CommunicationBuffer* buffer, uint32_t msg, WPARAM wp, LPARAM lp)
    {
+      WindowEvent we;
       bool matched = false;
       switch( msg )
       {
@@ -123,6 +125,9 @@ namespace core
             we.mouse.wheel.scroll = GET_WHEEL_DELTA_WPARAM(wp);
          } break;
       }
-      return matched;
+      if( matched )
+      {
+         buffer->writeEvent(we);
+      }
    }
 }

@@ -14,6 +14,7 @@
 #include "util/utility.h"
 #include "util/template/resource_cache_template.h"
 #include "util/time/clock.h"
+#include "util/memory.h"
 
 #include "games/rainbowland/load_game_resources.h"
 #include "games/rainbowland/logic/code.cpp"
@@ -22,6 +23,13 @@
 
 namespace core
 {
+   bool initializeGame(WindowProxy window, Memory memory)
+   {
+      return false;
+   }
+
+
+
    static void updateCursorStuff(WindowProxy window, bool show, bool lock, bool relative)
    {
       window.makeMouseRelative(relative);
