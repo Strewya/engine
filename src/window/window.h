@@ -10,6 +10,7 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "util/types.h"
 #include "window/gamepad_handler.h"
 #include "window/keyboard_handler.h"
 #include "window/mouse_handler.h"
@@ -38,14 +39,14 @@ namespace core
    public:
       WindowProxy getProxy();
 
-      static LRESULT CALLBACK messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
+      core_class_scope LRESULT CALLBACK messageRouter(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam);
 
       Window();
       Window(const char* title);
       ~Window();
 
       //platform
-      LRESULT CALLBACK windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
+      LRESULT CALLBACK windowProc(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam);
       //platform
       bool create();
       //platform
@@ -54,30 +55,24 @@ namespace core
       bool processWin32Messages(CommunicationBuffer* communication);
 
       //general if argument is enumerated, platform otherwise
-      void setExtendedStyle(uint32_t style);
+      void setExtendedStyle(u32 style);
       //general if argument is enumerated, platform otherwise
-      void setStyle(uint32_t style);
+      void setStyle(u32 style);
       //platform
       HWND getWindowHandle() const;
       //general if result is enumerated, platform otherwise
-      uint32_t getStyle() const;
+      u32 getStyle() const;
       //general if result is enumerated, platform otherwise
-      uint32_t getExtendedStyle() const;
+      u32 getExtendedStyle() const;
       //platform
       const char* getClass() const;
       //platform
       const char* getTitle() const;
       //platform
-      int32_t getExitCode() const;
+      i32 getExitCode() const;
 
    private:
       friend struct WindowProxy;
-      //platform
-      WindowEvent& newEvent();
-      //platform
-      void writeEvent();
-      //platform
-      void newFileChange(uint64_t timestamp, DWORD action, const std::string& file);
       //platform
       void processFileChanges(CommunicationBuffer* buffer);
 
@@ -85,16 +80,16 @@ namespace core
       const char* m_title;
 
       DWORD m_trackedChanges;
-      int32_t m_xPos;
-      int32_t m_yPos;
-      int32_t m_xSize;
-      int32_t m_ySize;
-      uint32_t m_exitCode;
-      uint32_t m_style;
-      uint32_t m_extendedStyle;
-      uint32_t m_minFileChangeDelay;
-      uint32_t m_fileChangeDelay;
-      const uint32_t m_eventQueueSize;
+      i32 m_xPos;
+      i32 m_yPos;
+      i32 m_xSize;
+      i32 m_ySize;
+      u32 m_exitCode;
+      u32 m_style;
+      u32 m_extendedStyle;
+      u32 m_minFileChangeDelay;
+      u32 m_fileChangeDelay;
+      const u32 m_eventQueueSize;
 
       HWND m_hwnd;
 
@@ -108,12 +103,12 @@ namespace core
       MouseHandler m_mouseHandler;
       KeyboardHandler m_keyboardHandler;
 
-      std::atomic<uint32_t> m_headIndex;
-      std::atomic<uint32_t> m_tailIndex;
+      std::atomic<u32> m_headIndex;
+      std::atomic<u32> m_tailIndex;
       std::vector<WindowEvent> m_events;
 
       CReadDirectoryChanges m_monitor;
    };
 
-   void calculateClientRect(uint32_t x, uint32_t y, uint32_t style, uint32_t styleEx, uint32_t& outXSize, uint32_t& outYSize);
+   void calculateClientRect(u32 x, u32 y, u32 style, u32 styleEx, u32& outXSize, u32& outYSize);
 }

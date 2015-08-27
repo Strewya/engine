@@ -14,12 +14,13 @@
 
 namespace core
 {
-   static std::ofstream gLogFileStream;
-
-   static std::string getCurrentDate()
+   core_internal std::string getCurrentDate()
    {
-      //                               YYYY_mm_dd         \0
-      static const uint32_t dateSize = 4 + 1 + 2 + 1 + 2 + 1;
+      enum
+      {
+         //         YYYY_mm_dd         \0
+         dateSize = 4 + 1 + 2 + 1 + 2 + 1
+      };
       char dateBuffer[dateSize] = {};
 
       auto now = time(nullptr);
@@ -27,11 +28,15 @@ namespace core
       return dateBuffer;
    }
 
-   static std::string getCurrentTime()
+   core_internal std::string getCurrentTime()
    {
-      //                                   hh : mm : ss : ms        \0
-      static const uint32_t timeTextSize = 2 + 1 + 2 + 1 + 2 + 1 + 3 + 1;
+      enum
+      {
+         //             hh : mm : ss : ms        \0
+         timeTextSize = 2 + 1 + 2 + 1 + 2 + 1 + 3 + 1
+      };
       char timeBuffer[timeTextSize] = {};
+
       //general time
       auto now = time(nullptr);
       auto msBuffer = timeBuffer + std::strftime(timeBuffer, timeTextSize, "%H:%M:%S.", localtime(&now));
@@ -45,7 +50,7 @@ namespace core
       return timeBuffer;
    }
 
-   static std::string getFilename()
+   core_internal std::string getFilename()
    {
       std::string filename = "log_" + getCurrentDate() + ".log";
       return filename;
@@ -53,6 +58,8 @@ namespace core
 
    std::ostream& getLogFileStream()
    {
+      core_local_persist std::ofstream gLogFileStream;
+
       if( !gLogFileStream.is_open() )
       {
          gLogFileStream.open(getFilename().c_str(), std::ios_base::app);

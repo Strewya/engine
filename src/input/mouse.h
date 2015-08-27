@@ -4,28 +4,21 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <string>
-#include <unordered_map>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Mouse
    {
-   private:
-      typedef std::unordered_map<uint32_t, std::string> Map;
-      static Map m_map;
+      typedef u8 Key;
+      core_class_scope Key code(std::string name);
+      core_class_scope std::string name(Key code);
 
-   public:
-      static void Init();
-      static int32_t Code(const std::string& name);
-      static std::string Name(uint32_t code);
-
-      static const int32_t Unknown = -1;
-      enum Key : uint8_t
+      enum : u8
       {
          LeftButton,
          RightButton,
@@ -33,7 +26,8 @@ namespace core
          XButton1,
          XButton2,
 
-         KeyCount
+         KeyCount,
+         Unknown = KeyCount,
       };
    };
 }

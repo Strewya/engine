@@ -15,7 +15,10 @@ namespace core
 {
    struct Window;
 
-   static const uint32_t USE_MONITOR_RESOLUTION = 0;
+   enum : u32
+   {
+      USE_MONITOR_RESOLUTION = 0,
+   };
 
    struct WindowProxy
    {

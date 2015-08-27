@@ -22,3 +22,7 @@ typedef double    f64;
 //add vector types
 //add container types?
 
+#define core_internal static
+#define core_class_scope static
+#define core_local_persist static
+

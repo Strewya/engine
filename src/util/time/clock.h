@@ -7,6 +7,7 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -17,26 +18,26 @@ namespace core
       Clock();
 
       void update();
-      void advanceTimeBy(uint64_t deltaMicros);
+      void advanceTimeBy(u64 deltaMicros);
 
-      uint32_t getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime);
+      u32 getFixedStepUpdateCount(u64 frameTime, float& ratio, u64& remainderTime);
 
-      static uint64_t getRealTimeMicros();
-      uint64_t getLastRealTimeMicros() const;
+      core_class_scope u64 getRealTimeMicros();
+      u64 getLastRealTimeMicros() const;
 
-      uint64_t getCurrentMicros() const;
-      uint32_t getDeltaMicros() const;
+      u64 getCurrentMicros() const;
+      u32 getDeltaMicros() const;
       float getDeltaSeconds() const;
 
       void setTimeScale(double timeScale);
       double getTimeScale() const;
 
    private:
-      uint64_t m_oldRealTime;
+      u64 m_oldRealTime;
       double m_timeScale;
-      uint64_t m_lastMicros;
-      uint64_t m_currentMicros;
-      uint64_t m_deltaMicros;
+      u64 m_lastMicros;
+      u64 m_currentMicros;
+      u64 m_deltaMicros;
       float m_deltaSeconds;
    };
 }

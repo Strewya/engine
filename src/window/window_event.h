@@ -7,6 +7,7 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -35,9 +36,19 @@ namespace core
       WE_LASTEVENT
    };
 
+   enum FileChangeType
+   {
+      FILE_ADDED,
+      FILE_MODIFIED,
+      FILE_REMOVED,
+      FILE_RENAMED_FROM,
+      FILE_RENAMED_TO,
+      FILE_BADDATA
+   };
+
    struct ButtonKey
    {
-      uint8_t id;
+      u8 id;
       bool isDown;
    };
 
@@ -46,19 +57,19 @@ namespace core
    struct KeyboardEvent
    {
       KeyboardKey key;
-      uint8_t repeatCount;
+      u8 repeatCount;
       bool firstTimeDown;
    };
 
    struct MousePosition
    {
-      int32_t x;
-      int32_t y;
+      i32 x;
+      i32 y;
    };
 
    struct MouseWheel
    {
-      int32_t scroll;
+      i32 scroll;
    };
 
    struct MouseMove
@@ -87,18 +98,18 @@ namespace core
 
    struct GamepadAxis
    {
-      uint32_t id;
-      float x;
-      float y;
-      float magnitude;
-      float normalized;
+      u32 id;
+      f32 x;
+      f32 y;
+      f32 magnitude;
+      f32 normalized;
    };
 
    typedef ButtonKey GamepadButton;
 
    struct GamepadEvent
    {
-      uint32_t id;
+      u32 id;
       union
       {
          GamepadButton button;
@@ -106,29 +117,21 @@ namespace core
          GamepadAxis axis;
       };
    };
-
-   enum FileChangeType
-   {
-      FILE_ADDED,
-      FILE_MODIFIED,
-      FILE_REMOVED,
-      FILE_RENAMED_FROM,
-      FILE_RENAMED_TO,
-      FILE_BADDATA
-   };
-
-   static const uint32_t FilenameStringSize = 50;
+   
    struct FileChangeEvent
    {
+      enum
+      {
+         FilenameStringSize = 50 + 1, //+1 for \0
+      };
       FileChangeType action;
-      char filename[FilenameStringSize + 1];
+      char filename[FilenameStringSize];
    };
-
 
    struct WindowEvent
    {
-      uint64_t timestamp;
-      uint32_t type;
+      u64 timestamp;
+      u32 type;
       union
       {
          KeyboardEvent keyboard;

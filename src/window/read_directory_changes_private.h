@@ -9,6 +9,7 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -45,7 +46,7 @@ namespace core
 
       protected:
 
-         static VOID CALLBACK NotificationCompletion(
+         core_class_scope VOID CALLBACK NotificationCompletion(
             DWORD dwErrorCode,               // completion code
             DWORD dwNumberOfBytesTransfered, // number of bytes transferred
             LPOVERLAPPED lpOverlapped);      // I/O information buffer
@@ -83,13 +84,13 @@ namespace core
       public:
          CReadChangesServer(CReadDirectoryChanges* parent);
 
-         static unsigned int WINAPI ThreadStartProc(LPVOID arg);
+         core_class_scope unsigned int WINAPI ThreadStartProc(LPVOID arg);
 
          // Called by QueueUserAPC to start orderly shutdown.
-         static void CALLBACK TerminateProc(__in  ULONG_PTR arg);
+         core_class_scope void CALLBACK TerminateProc(__in  ULONG_PTR arg);
 
          // Called by QueueUserAPC to add another directory.
-         static void CALLBACK AddDirectoryProc(__in  ULONG_PTR arg);
+         core_class_scope void CALLBACK AddDirectoryProc(__in  ULONG_PTR arg);
 
          CReadDirectoryChanges* m_pParent;
 

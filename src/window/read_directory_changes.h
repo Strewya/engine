@@ -10,6 +10,7 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -38,18 +39,18 @@ namespace core
 
       bool CheckOverflow();
 
-      uint32_t GetThreadId();
+      u32 GetThreadId();
 
    protected:
       std::unique_ptr<RDCPrivate::CReadChangesServer> m_pServer;
 
       HANDLE m_threadHandle;
 
-      uint32_t m_threadId;
+      u32 m_threadId;
 
       std::vector<TDirectoryChangeNotification> m_notifications;
-      uint32_t m_notificationQueueSize;
-      uint32_t m_head;
-      uint32_t m_tail;
+      u32 m_notificationQueueSize;
+      u32 m_head;
+      u32 m_tail;
    };
 }

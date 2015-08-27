@@ -8,6 +8,7 @@
 #include <cstdint>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -27,7 +28,7 @@ namespace core
          assert(isNull());
          assert(index <= MAX_INDEX);
 
-         static uint16_t s_autoMagic = 0;
+         core_local_persist uint16_t s_autoMagic = 0;
          if( ++s_autoMagic > MAX_MAGIC )
          {
             s_autoMagic = 1; //0 is used for null handle

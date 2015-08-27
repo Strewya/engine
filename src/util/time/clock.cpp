@@ -38,10 +38,10 @@ namespace core
       typedef std::nano                               period;
       typedef std::chrono::duration<rep, period>      duration;
       typedef std::chrono::time_point<HighResClock>   time_point;
-      static const bool is_steady = true;
+      core_class_scope const bool is_steady = true;
 
 
-      static time_point now()
+      core_class_scope time_point now()
       {
          LARGE_INTEGER count;
          QueryPerformanceCounter(&count);
@@ -59,7 +59,7 @@ namespace core
    class TimeSource
    {
    public:
-      uint64_t getSystemMicroseconds()
+      u64 getSystemMicroseconds()
       {
          auto now = CLOCK_TYPE::now();
          return std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()).count();
@@ -80,8 +80,8 @@ namespace core
 
    void Clock::update()
    {
-      uint64_t now = getRealTimeMicros();
-      uint64_t delta = now - m_oldRealTime;
+      u64 now = getRealTimeMicros();
+      u64 delta = now - m_oldRealTime;
       m_oldRealTime = now;
 
       if( delta )
@@ -90,60 +90,60 @@ namespace core
       }
    }
 
-   void Clock::advanceTimeBy(uint64_t deltaMicros)
+   void Clock::advanceTimeBy(u64 deltaMicros)
    {
       m_lastMicros = m_currentMicros;
-      m_currentMicros += static_cast<uint64_t>(static_cast<double>(deltaMicros)*m_timeScale);
+      m_currentMicros += static_cast<u64>(static_cast<f64>(deltaMicros)*m_timeScale);
       m_deltaMicros = m_currentMicros - m_lastMicros;
-      m_deltaSeconds = static_cast<float>(m_deltaMicros)*0.001f*0.001f;
+      m_deltaSeconds = static_cast<f32>(m_deltaMicros)*0.001f*0.001f;
    }
 
-   uint32_t Clock::getFixedStepUpdateCount(uint64_t frameTime, float& ratio, uint64_t& remainderTime)
+   u32 Clock::getFixedStepUpdateCount(u64 frameTime, f32& ratio, u64& remainderTime)
    {
-      uint64_t now = getRealTimeMicros();
-      uint64_t delta = now - m_oldRealTime;
+      u64 now = getRealTimeMicros();
+      u64 delta = now - m_oldRealTime;
 
-      uint32_t count = static_cast<uint32_t>(delta / frameTime);
-      uint64_t addMe = count * frameTime;
+      u32 count = static_cast<u32>(delta / frameTime);
+      u64 addMe = count * frameTime;
       m_oldRealTime += addMe;
       remainderTime = delta - addMe;
 
-      ratio = static_cast<float>(static_cast<double>(addMe) / static_cast<double>(frameTime));
+      ratio = static_cast<f32>(static_cast<f64>(addMe) / static_cast<f64>(frameTime));
       return count;
    }
 
-   uint64_t Clock::getRealTimeMicros()
+   u64 Clock::getRealTimeMicros()
    {
       TimeSource source;
       return source.getSystemMicroseconds();
    }
 
-   uint64_t Clock::getLastRealTimeMicros() const
+   u64 Clock::getLastRealTimeMicros() const
    {
       return m_oldRealTime;
    }
 
-   uint64_t Clock::getCurrentMicros() const
+   u64 Clock::getCurrentMicros() const
    {
       return m_currentMicros;
    }
 
-   uint32_t Clock::getDeltaMicros() const
+   u32 Clock::getDeltaMicros() const
    {
-      return static_cast<uint32_t>(m_deltaMicros);
+      return static_cast<u32>(m_deltaMicros);
    }
 
-   float Clock::getDeltaSeconds() const
+   f32 Clock::getDeltaSeconds() const
    {
       return m_deltaSeconds;
    }
 
-   void Clock::setTimeScale(double timeScale)
+   void Clock::setTimeScale(f64 timeScale)
    {
       m_timeScale = timeScale;
    }
 
-   double Clock::getTimeScale() const
+   f64 Clock::getTimeScale() const
    {
       return m_timeScale;
    }

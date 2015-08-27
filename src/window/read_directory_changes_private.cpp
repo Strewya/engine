@@ -88,7 +88,6 @@ namespace core
          m_mainBuffer.resize(m_bufferSize);
       }
 
-      //static
       VOID CALLBACK CReadChangesRequest::NotificationCompletion(
          DWORD dwErrorCode,               // completion code
          DWORD dwNumberOfBytesTransfered, // number of bytes transferred

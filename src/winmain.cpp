@@ -45,10 +45,16 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       {
          core::CommunicationBuffer* communication = (core::CommunicationBuffer*)mainMemory.ptr;
          gameMemory.ptr = (u8*)mainMemory.ptr + communicationBufferSize;
-
+         
          //std::thread logicThread(core::runGame, window.getProxy(), gameMemory, communication);
 
-         while( window.processWin32Messages(communication) ) {} //INFINITE LOOP MESSAGE PUMP
+         while( window.processWin32Messages(communication) )  //INFINITE LOOP MESSAGE PUMP
+         {
+            // #think
+            //maybe read messages from the game to the window? it might be a nice way of cross thread communication...
+            //could be used as a means for the game to ask the window to close because it is dead...
+            //and could be used to ask the window stuff from the game without actually doing it through a pointer/proxy...
+         }
 
          core::WindowEvent kill;
          kill.type = core::WindowEventType::WE_LASTEVENT;

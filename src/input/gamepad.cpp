@@ -9,46 +9,52 @@
 
 namespace core
 {
-   Gamepad::Map Gamepad::m_map;
-
-   int32_t Gamepad::Code(std::string name)
+   Gamepad::Key Gamepad::code(std::string name)
    {
-      Map::iterator it = m_map.begin();
-      Map::iterator end = m_map.end();
-      for( auto& p : m_map )
+      if( name == "DPadUp" ) { return Gamepad::DPadUp; }
+      else if( name == "DPadDown" ) { return Gamepad::DPadDown; }
+      else if( name == "DPadLeft" ) { return Gamepad::DPadLeft; }
+      else if( name == "DPadRight" ) { return Gamepad::DPadRight; }
+      else if( name == "LeftButton" ) { return Gamepad::LeftButton; }
+      else if( name == "TopButton" ) { return Gamepad::TopButton; }
+      else if( name == "RightButton" ) { return Gamepad::RightButton; }
+      else if( name == "BottomButton" ) { return Gamepad::BottomButton; }
+      else if( name == "LeftThumb" ) { return Gamepad::LeftThumb; }
+      else if( name == "RightThumb" ) { return Gamepad::RightThumb; }
+      else if( name == "LeftShoulder" ) { return Gamepad::LeftShoulder; }
+      else if( name == "RightShoulder" ) { return Gamepad::RightShoulder; }
+      else if( name == "Start" ) { return Gamepad::Start; }
+      else if( name == "Back" ) { return Gamepad::Back; }
+      else if( name == "LeftStick" ) { return Gamepad::LeftStick; }
+      else if( name == "RightStick" ) { return Gamepad::RightStick; }
+      else if( name == "LeftTrigger" ) { return Gamepad::LeftTrigger; }
+      else if( name == "RightTrigger" ) { return Gamepad::RightTrigger; }
+      return Gamepad::Unknown;
+   }
+
+   std::string Gamepad::name(Gamepad::Key code)
+   {
+      switch( code )
       {
-         if( p.second == name )
-            return p.first;
+         case Gamepad::DPadUp: { return "DPadUp"; } break;
+         case Gamepad::DPadDown: { return "DPadDown"; } break;
+         case Gamepad::DPadLeft: { return "DPadLeft"; } break;
+         case Gamepad::DPadRight: { return "DPadRight"; } break;
+         case Gamepad::LeftButton: { return "LeftButton"; } break;
+         case Gamepad::TopButton: { return "TopButton"; } break;
+         case Gamepad::RightButton: { return "RightButton"; } break;
+         case Gamepad::BottomButton: { return "BottomButton"; } break;
+         case Gamepad::LeftThumb: { return "LeftThumb"; } break;
+         case Gamepad::RightThumb: { return "RightThumb"; } break;
+         case Gamepad::LeftShoulder: { return "LeftShoulder"; } break;
+         case Gamepad::RightShoulder: { return "RightShoulder"; } break;
+         case Gamepad::Start: { return "Start"; } break;
+         case Gamepad::Back: { return "Back"; } break;
+         case Gamepad::LeftStick: { return "LeftStick"; } break;
+         case Gamepad::RightStick: { return "RightStick"; } break;
+         case Gamepad::LeftTrigger: { return "LeftTrigger"; } break;
+         case Gamepad::RightTrigger: { return "RightTrigger"; } break;
       }
-      return Unknown;
-   }
-
-   std::string Gamepad::Name(uint32_t code)
-   {
-      Map::iterator it = m_map.find(code);
-      return (it != m_map.end() ? it->second : "");
-   }
-
-   void Gamepad::Init()
-   {
-      m_map.clear();
-      m_map.emplace(Gamepad::DPadUp, "DPadUp");
-      m_map.emplace(Gamepad::DPadDown, "DPadDown");
-      m_map.emplace(Gamepad::DPadLeft, "DPadLeft");
-      m_map.emplace(Gamepad::DPadRight, "DPadRight");
-      m_map.emplace(Gamepad::LeftButton, "LeftButton");
-      m_map.emplace(Gamepad::TopButton, "TopButton");
-      m_map.emplace(Gamepad::RightButton, "RightButton");
-      m_map.emplace(Gamepad::BottomButton, "BottomButton");
-      m_map.emplace(Gamepad::LeftThumb, "LeftThumb");
-      m_map.emplace(Gamepad::RightThumb, "RightThumb");
-      m_map.emplace(Gamepad::LeftShoulder, "LeftShoulder");
-      m_map.emplace(Gamepad::RightShoulder, "RightShoulder");
-      m_map.emplace(Gamepad::Start, "Start");
-      m_map.emplace(Gamepad::Back, "Back");
-      m_map.emplace(Gamepad::LeftStick, "LeftStick");
-      m_map.emplace(Gamepad::RightStick, "RightStick");
-      m_map.emplace(Gamepad::LeftTrigger, "LeftTrigger");
-      m_map.emplace(Gamepad::RightTrigger, "RightTrigger");
+      return "";
    }
 }

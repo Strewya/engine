@@ -69,7 +69,7 @@ namespace core
 
    bool Window::create()
    {
-      uint32_t x, y;
+      u32 x, y;
       calculateClientRect(m_xPos, m_yPos, m_style, m_extendedStyle, x, y);
       HWND hwndParent = nullptr;
       HMENU hMenu = nullptr;
@@ -141,12 +141,12 @@ namespace core
       return true;
    }
 
-   void Window::setStyle(uint32_t style)
+   void Window::setStyle(u32 style)
    {
       m_style = style;
    }
 
-   void Window::setExtendedStyle(uint32_t style)
+   void Window::setExtendedStyle(u32 style)
    {
       m_extendedStyle = style;
    }
@@ -166,22 +166,22 @@ namespace core
       return m_hwnd;
    }
 
-   uint32_t Window::getStyle() const
+   u32 Window::getStyle() const
    {
       return m_style;
    }
 
-   uint32_t Window::getExtendedStyle() const
+   u32 Window::getExtendedStyle() const
    {
       return m_extendedStyle;
    }
 
-   int32_t Window::getExitCode() const
+   i32 Window::getExitCode() const
    {
       return m_exitCode;
    }
 
-   LRESULT CALLBACK Window::messageRouter(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
+   LRESULT CALLBACK Window::messageRouter(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam)
    {
       Window* window = nullptr;
 
@@ -207,7 +207,7 @@ namespace core
       return ::DefWindowProc(hwnd, msg, wParam, lParam);
    }
 
-   LRESULT WINAPI Window::windowProc(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)
+   LRESULT WINAPI Window::windowProc(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam)
    {
       //here we translate window related WM_* messages to Core::WindowEvent
       LRESULT result = 0;
@@ -245,7 +245,7 @@ namespace core
       return result;
    }
 
-   static FileChangeType toFileChangeType(DWORD action)
+   core_internal FileChangeType toFileChangeType(DWORD action)
    {
       FileChangeType returnValue = core::FILE_BADDATA;
       switch( action )
@@ -255,54 +255,31 @@ namespace core
             returnValue = core::FILE_ADDED;
          }
          break;
-
          case FILE_ACTION_MODIFIED:
          {
             returnValue = core::FILE_MODIFIED;
          }
          break;
-
          case FILE_ACTION_REMOVED:
          {
             returnValue = core::FILE_REMOVED;
          }
          break;
-
          case FILE_ACTION_RENAMED_OLD_NAME:
          {
             returnValue = core::FILE_RENAMED_FROM;
          }
          break;
-
          case FILE_ACTION_RENAMED_NEW_NAME:
          {
             returnValue = core::FILE_RENAMED_TO;
          }
          break;
-
          default:
-            break;
+         {
+         } break;
       }
       return returnValue;
-   }
-
-   WindowEvent& Window::newEvent()
-   {
-      WindowEvent& we = m_events[m_headIndex];
-      ZeroMemory(&we, sizeof(WindowEvent));
-      we.timestamp = Clock::getRealTimeMicros();
-      return we;
-   }
-
-   void Window::writeEvent()
-   {
-      if( m_headIndex == m_tailIndex )
-      {
-         CORE_LOG("WHOOPS, overwriting a previous input event. Maybe we "
-                  "should increase the size of the buffer (currently ", m_eventQueueSize, ")...");
-      }
-
-      m_headIndex = (m_headIndex + 1) % m_eventQueueSize;
    }
 
    void Window::processFileChanges(CommunicationBuffer* buffer)
@@ -311,13 +288,13 @@ namespace core
       DWORD action;
       while( m_monitor.Pop(action, file) )
       {
-         if( file.size() < FilenameStringSize && file.find(".") != file.npos )
+         if( file.size() < FileChangeEvent::FilenameStringSize && file.find(".") != file.npos )
          {
             WindowEvent we{};
             we.type = WE_FILECHANGE;
             we.fileChange.action = toFileChangeType(action);
-            strncpy(we.fileChange.filename, file.c_str(), FilenameStringSize);
-            we.fileChange.filename[FilenameStringSize] = 0;
+            strncpy(we.fileChange.filename, file.c_str(), FileChangeEvent::FilenameStringSize);
+            we.fileChange.filename[FileChangeEvent::FilenameStringSize] = 0;
             buffer->writeEvent(we);
          }
          else
@@ -327,7 +304,7 @@ namespace core
       }
    }
 
-   void calculateClientRect(uint32_t x, uint32_t y, uint32_t style, uint32_t styleEx, uint32_t& outXSize, uint32_t& outYSize)
+   void calculateClientRect(u32 x, u32 y, u32 style, u32 styleEx, u32& outXSize, u32& outYSize)
    {
       RECT rc = {0, 0, x, y};
       AdjustWindowRectEx(&rc, style, false, styleEx);

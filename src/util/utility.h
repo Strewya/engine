@@ -10,6 +10,7 @@
 #include <string>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -22,6 +23,7 @@ namespace core
    {
       stream << std::endl;
    }
+
    template<typename T, typename... Args> void writeContentToLogStream(std::ostream& stream, T t, Args... args)
    {
       stream << t; writeContentToLogStream(stream, args...);

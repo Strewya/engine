@@ -4,27 +4,22 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <string>
-#include <unordered_map>
 /******* common headers *******/
 /******* extra headers *******/
+#include "util/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Keyboard
    {
-      typedef std::unordered_map<uint32_t, std::string> Map;
-      static Map m_map;
+      typedef u8 Key;
 
-   public:
-      static void Init();
-      static int32_t Code(const std::string& name);
-      static std::string Name(uint32_t code);
+      core_class_scope Key code(std::string name);
+      core_class_scope std::string name(Key code);
 
-      static const int32_t Unknown = -1;
-      enum Key : uint8_t
+      enum : u8
       {
          Escape,
          Enter,
@@ -131,7 +126,8 @@ namespace core
          Num8,
          Num9,
 
-         KeyCount
+         KeyCount,
+         Unknown = KeyCount,
       };
    };
 }

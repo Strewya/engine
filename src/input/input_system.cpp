@@ -21,10 +21,6 @@ namespace core
 
       m_window = window;
 
-      Gamepad::Init();
-      Keyboard::Init();
-      Mouse::Init();
-
       CORE_INIT_END(InputSystem);
    }
 

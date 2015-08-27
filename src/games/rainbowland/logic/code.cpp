@@ -1494,7 +1494,7 @@ static void write_##field(storage& component, DataId id, std::remove_reference<d
          ACTION,
       };
 
-      auto contains = [&frameEvents](Keyboard::Key k, uint32_t s) -> bool
+      auto contains = [&frameEvents](u32 k, uint32_t s) -> bool
       {
          for( auto e : frameEvents )
          {

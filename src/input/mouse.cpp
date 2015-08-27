@@ -9,33 +9,26 @@
 
 namespace core
 {
-   Mouse::Map Mouse::m_map;
-
-   int32_t Mouse::Code(const std::string& name)
+   Mouse::Key Mouse::code(std::string name)
    {
-      Map::iterator it = m_map.begin();
-      Map::iterator end = m_map.end();
-      for( auto& p : m_map )
-      {
-         if( p.second == name )
-            return p.first;
-      }
+      if(name == "LeftButton") { return Mouse::LeftButton; }
+      else if(name == "RightButton") { return Mouse::RightButton; }
+      else if(name == "MiddleButton") { return Mouse::MiddleButton; }
+      else if(name == "XButton1") { return Mouse::XButton1; }
+      else if(name == "XButton2") { return Mouse::XButton2; }
       return Unknown;
    }
 
-   std::string Mouse::Name(uint32_t code)
+   std::string Mouse::name(Mouse::Key code)
    {
-      Map::iterator it = m_map.find(code);
-      return (it != m_map.end() ? it->second : "");
-   }
-
-   void Mouse::Init()
-   {
-      m_map.clear();
-      m_map.insert(std::make_pair(Mouse::LeftButton, "LeftButton"));
-      m_map.insert(std::make_pair(Mouse::RightButton, "RightButton"));
-      m_map.insert(std::make_pair(Mouse::MiddleButton, "MiddleButton"));
-      m_map.insert(std::make_pair(Mouse::XButton1, "XButton1"));
-      m_map.insert(std::make_pair(Mouse::XButton2, "XButton2"));
+      switch( code )
+      {
+         case Mouse::LeftButton: { return "LeftButton"; } break;
+         case Mouse::RightButton: { return "RightButton"; } break;
+         case Mouse::MiddleButton: { return "MiddleButton"; } break;
+         case Mouse::XButton1: { return "XButton1"; } break;
+         case Mouse::XButton2: { return "XButton2"; } break;
+      }
+      return "";
    }
 }
