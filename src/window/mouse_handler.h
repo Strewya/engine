@@ -8,7 +8,7 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "window/window_event.h"
+#include "window/window_message.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -20,14 +20,14 @@ namespace core
    public:
       MouseHandler();
 
-      void setRelativeMouseMove(bool isRelative, uint32_t centerX, uint32_t centerY);
+      void setRelativeMouseMove(bool isRelative, u32 centerX, u32 centerY);
 
 
-      void handle(CommunicationBuffer* buffer, uint32_t msg, WPARAM wp, LPARAM lp);
+      void handle(CommunicationBuffer* buffer, u32 msg, WPARAM wp, LPARAM lp);
 
    private:
-      uint32_t m_centerX;
-      uint32_t m_centerY;
+      u32 m_centerX;
+      u32 m_centerY;
       bool m_relativeMouseMove;
    };
 }

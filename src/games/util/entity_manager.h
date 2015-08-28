@@ -8,7 +8,7 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/ring_buffer.h"
+#include "utility/ring_buffer.h"
 /******* end header inclusion *******/
 
 namespace core

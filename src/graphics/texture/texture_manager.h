@@ -9,7 +9,7 @@
 #include "graphics/texture/texture.h"
 #include "graphics/texture/texture_file_loader.h"
 #include "graphics/texture/texture_handle.h"
-#include "util/template/resource_manager_template.h"
+#include "utility/template/resource_manager_template.h"
 /******* end header inclusion *******/
 
 namespace core

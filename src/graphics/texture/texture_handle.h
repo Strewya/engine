@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/template/resource_handle_template.h"
+#include "utility/template/resource_handle_template.h"
 /******* end header inclusion *******/
 
 namespace core

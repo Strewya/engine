@@ -8,8 +8,8 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "util/types.h"
-#include "window/window_event.h"
+#include "utility/types.h"
+#include "window/window_message.h"
 /******* end header inclusion *******/
 
 namespace core

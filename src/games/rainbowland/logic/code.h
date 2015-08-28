@@ -15,24 +15,27 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
-#include "util/geometry/circle.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec2.h"
-#include "util/color.h"
-#include "util/ring_buffer.h"
-#include "util/transform.h"
+#include "utility/geometry/circle.h"
+#include "utility/geometry/rect.h"
+#include "utility/geometry/vec2.h"
+#include "utility/color.h"
+#include "utility/ring_buffer.h"
+#include "utility/transform.h"
 
 #include "games/util/entity.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   static const bool Cursor_Lock = true;
-   static const bool Cursor_Unlock = false;
-   static const bool Cursor_Hide = false;
-   static const bool Cursor_Show = true;
-   static const bool Cursor_Absolute = false;
-   static const bool Cursor_Relative = true;
+   enum
+   {
+      Cursor_Lock = true,
+      Cursor_Unlock = false,
+      Cursor_Hide = false,
+      Cursor_Show = true,
+      Cursor_Absolute = false,
+      Cursor_Relative = true,
+   };
 
    struct GameResources
    {
@@ -52,16 +55,16 @@ namespace core
 
    struct Constants
    {
-      float windowWidth;
-      float windowHeight;
-      float playerAcceleration;
-      float playerAimLength;
+      f32 windowWidth;
+      f32 windowHeight;
+      f32 playerAcceleration;
+      f32 playerAimLength;
    };
 
    struct Time
    {
-      uint32_t micros;
-      float seconds;
+      u32 micros;
+      f32 seconds;
    };
 
    struct DeltaTime
@@ -79,7 +82,7 @@ namespace core
 
    struct CollisionShape
    {
-      enum Type
+      enum class Type
       {
          PointShape,
          LineShape,
@@ -150,9 +153,9 @@ namespace core
    template<int BUTTON_COUNT>
    struct GuiData
    {
-      uint32_t hoverButton;
-      uint32_t hotButton;
-      uint32_t activatedButton;
+      u32 hoverButton;
+      u32 hotButton;
+      u32 activatedButton;
       Button<BUTTON_COUNT> button;
    };
 
@@ -165,7 +168,7 @@ namespace core
          COUNT
       };
 
-      uint32_t buttonFunctionToExecute;
+      u32 buttonFunctionToExecute;
       GuiData<COUNT> gui;
    };
 
@@ -184,7 +187,7 @@ namespace core
 
    struct DataId
    {
-      uint32_t id;
+      u32 id;
    };
 
    typedef std::function<void(Entity)> DestructionCallback;
@@ -273,14 +276,14 @@ namespace core
 
    struct ComponentDeltaTime : public ComponentBase
    {
-      std::vector<uint32_t> m_deltaMicros;
-      std::vector<float> m_deltaTime;
-      std::vector<float> m_timeFactor;
+      std::vector<u32> m_deltaMicros;
+      std::vector<f32> m_deltaTime;
+      std::vector<f32> m_timeFactor;
    };
 
    struct ComponentMovement : public ComponentBase
    {
-      std::vector<float> m_acceleration;
+      std::vector<f32> m_acceleration;
       std::vector<Vec2> m_turnDirection;
       std::vector<Vec2> m_direction;
       std::vector<Vec2> m_velocity;
@@ -291,7 +294,7 @@ namespace core
    {
       std::vector<Vec2> m_position;
       std::vector<Vec2> m_scale;
-      std::vector<float> m_rotation;
+      std::vector<f32> m_rotation;
    };
 
    struct ComponentVisual : public ComponentBase
@@ -304,9 +307,9 @@ namespace core
    struct ComponentCollision : public ComponentBase
    {
       std::vector<CollisionShape> m_shape;
-      std::vector<uint32_t> m_collisionGroup;
-      std::vector<uint16_t> m_selfTypeBits;
-      std::vector<uint16_t> m_targetTypeBits;
+      std::vector<u32> m_collisionGroup;
+      std::vector<u16> m_selfTypeBits;
+      std::vector<u16> m_targetTypeBits;
       std::vector<char> m_sensor;
       std::vector<char> m_previouslyColliding;
       std::vector<char> m_colliding;

@@ -5,8 +5,8 @@
 #include "graphics/vertex.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "util/color.h"
-#include "util/geometry/vec_types.h"
+#include "utility/color.h"
+#include "utility/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core

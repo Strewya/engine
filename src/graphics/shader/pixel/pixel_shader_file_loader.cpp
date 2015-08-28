@@ -8,7 +8,7 @@
 /******* extra headers *******/
 #include "graphics/shader/file_loader.h"
 #include "graphics/shader/pixel/pixel_shader.h"
-#include "util/utility.h"
+#include "utility/utility.h"
 /******* end headers *******/
 
 namespace core

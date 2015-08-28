@@ -5,50 +5,55 @@
 #include "games/game_entry_point.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "util/time/clock.h"
-#include "util/memory.h"
-#include "util/utility.h"
-#include "window/window_proxy.h"
+#include "utility/time/clock.h"
+#include "utility/communication_buffer.h"
+#include "utility/memory.h"
+#include "utility/utility.h"
+#include "window/window_message.h"
 
 #include "games/game_list.h"
 #include CORE_HEADER
 /******* end headers *******/
 
-#define CORE_FIXED_STEP_FPS 60ULL
-#define CORE_CLAMPED_STEP_MIN_FPS 15ULL
-
-#define CORE_MICROS_PER_FRAME     1000000ULL/CORE_FIXED_STEP_FPS
-#define CORE_MAX_MICROS_PER_FRAME 1000000ULL/CORE_CLAMPED_STEP_MIN_FPS
-
-#define CORE_VARIABLE_STEP 0
-#define CORE_CLAMPED_STEP 1
-#define CORE_FIXED_STEP 2
-#define CORE_STEP CORE_CLAMPED_STEP
+enum
+{
+   CORE_FIXED_STEP_FPS = 60ULL,
+   CORE_CLAMPED_STEP_MIN_FPS = 15ULL,
+   CORE_MICROS_PER_FRAME     = 1000000ULL/CORE_FIXED_STEP_FPS,
+   CORE_MAX_MICROS_PER_FRAME = 1000000ULL/CORE_CLAMPED_STEP_MIN_FPS,
+   CORE_VARIABLE_STEP = 0,
+   CORE_CLAMPED_STEP = 1,
+   CORE_FIXED_STEP = 2,
+   CORE_STEP = CORE_CLAMPED_STEP,
+};
 
 namespace core
 {
-   void runGame(WindowProxy window, Memory memory, CommunicationBuffer* commBuffer)
+   void runGame(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
 #ifndef NO_GAME
-      static const uint64_t microsPerFrame = CORE_MICROS_PER_FRAME;
-      static const uint64_t maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL;
+      enum
+      {
+         microsPerFrame = CORE_MICROS_PER_FRAME,
+         maxUpdateTime = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
+      };
       Clock logicTimer{};
       Clock renderTimer{};
       CORE_GAME game;
 
-      bool running = game.init(window);
-      while( running && window.isRunning() )
+      bool running = game.init(fromMain, toMain);
+      while( running )
       {
-         float fraction = 0;
-         uint64_t unusedMicros = 0;
-         uint64_t droppedTime = 0;
+         f32 fraction = 0;
+         u64 unusedMicros = 0;
+         u64 droppedTime = 0;
 
-         const uint32_t maxUpdateCount = static_cast<uint32_t>(maxUpdateTime / microsPerFrame);
-         const uint32_t updateCount = logicTimer.getFixedStepUpdateCount(microsPerFrame, fraction, unusedMicros);
+         const u32 maxUpdateCount = static_cast<u32>(maxUpdateTime / microsPerFrame);
+         const u32 updateCount = logicTimer.getFixedStepUpdateCount(microsPerFrame, fraction, unusedMicros);
          droppedTime = updateCount > maxUpdateCount ? updateCount - maxUpdateCount : 0;
          droppedTime *= microsPerFrame;
 
-         uint32_t count, l;
+         u32 count, l;
          count = l = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
          while( l-- )
          {
@@ -61,7 +66,7 @@ namespace core
          }
          logicTimer.advanceTimeBy(droppedTime);
 
-         uint64_t fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
+         u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
          // we might want to do interpolation ...
          game.tickRender(renderTimer);
          renderTimer.advanceTimeBy(fullUpdateTime);
@@ -70,11 +75,12 @@ namespace core
       if( !shutdownStatus )
       {
          CORE_LOG("Game shutdown failed...");
-         window.showMessagebox("SRS ERRORR", "Game shutdown has failed, please review the log for errors immediately");
       }
 #else
       static_assert(false, "No game defined");
 #endif
-      window.close();
+      WinMsg msg{};
+      msg.type = WinMsgType::Close;
+      toMain->writeEvent(msg);
    }
 }

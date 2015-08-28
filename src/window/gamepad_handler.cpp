@@ -8,10 +8,10 @@
 #include <vector>
 /******* extra headers *******/
 #include "input/gamepad.h"
-#include "util/time/time_unit_conversions.h"
-#include "util/geometry/vec2.h"
-#include "util/communication_buffer.h"
-#include "window/window_event.h"
+#include "utility/time/time_unit_conversions.h"
+#include "utility/geometry/vec2.h"
+#include "utility/communication_buffer.h"
+#include "window/window_message.h"
 /******* end headers *******/
 
 namespace core
@@ -24,20 +24,20 @@ namespace core
       memset(m_gamepadLastUpdateTime, 0, sizeof(m_gamepadLastUpdateTime));
    }
 
-   void writeButton(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint8_t button, bool isDown)
+   void writeButton(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, uint8_t button, bool isDown)
    {
       events.emplace_back();
-      events.back().type = WE_GAMEPADBUTTON;
+      events.back().type = WinMsgType::GamepadButton;
       events.back().timestamp = timestamp;
       events.back().gamepad.id = id;
       events.back().gamepad.button.id = button;
       events.back().gamepad.button.isDown = isDown;
    }
 
-   void writeAxis(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint8_t axis, float x, float y, float mag, float norm)
+   void writeAxis(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, uint8_t axis, f32 x, f32 y, f32 mag, f32 norm)
    {
       events.emplace_back();
-      events.back().type = WE_GAMEPADAXIS;
+      events.back().type = WinMsgType::GamepadAxis;
       events.back().timestamp = timestamp;
       events.back().gamepad.id = id;
       events.back().gamepad.axis.id = axis;
@@ -47,16 +47,16 @@ namespace core
       events.back().gamepad.axis.normalized = norm;
    }
 
-   void writeConnection(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, bool connected)
+   void writeConnection(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, bool connected)
    {
       events.emplace_back();
-      events.back().type = WE_GAMEPADCONNECTION;
+      events.back().type = WinMsgType::GamepadConnection;
       events.back().timestamp = timestamp;
       events.back().gamepad.id = id;
       events.back().gamepad.connection.status = connected;
    }
 
-   void handleButton(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, XINPUT_STATE& oldState, XINPUT_STATE& newState, uint32_t xiButton, Gamepad::Key key)
+   void handleButton(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, XINPUT_STATE& oldState, XINPUT_STATE& newState, u32 xiButton, Gamepad::Key key)
    {
       if( (oldState.Gamepad.wButtons & xiButton) != (newState.Gamepad.wButtons & xiButton) )
       {
@@ -66,18 +66,18 @@ namespace core
 
    struct AnalogData
    {
-      float value;
-      float normalized;
+      f32 value;
+      f32 normalized;
    };
 
-   AnalogData calcAnalogData(float inputValue, uint32_t deadzone, uint32_t maxValue)
+   AnalogData calcAnalogData(f32 inputValue, u32 deadzone, u32 maxValue)
    {
       AnalogData result{inputValue, 0};
       if( result.value > deadzone )
       {
          if( result.value > maxValue )
          {
-            result.value = (float)maxValue;
+            result.value = (f32)maxValue;
          }
          result.value -= deadzone;
          result.normalized = result.value / (maxValue - deadzone);
@@ -89,15 +89,15 @@ namespace core
       return result;
    }
 
-   void handleTrigger(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint32_t oldValue, uint32_t newValue, uint32_t threshold, uint32_t maxValue, Gamepad::Key axis)
+   void handleTrigger(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, u32 oldValue, u32 newValue, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
-      float on = 0.8f;
-      float off = 0.2f;
+      f32 on = 0.8f;
+      f32 off = 0.2f;
 
       if( newValue != oldValue )
       {
-         auto newData = calcAnalogData((float)newValue, threshold, maxValue);
-         auto oldData = calcAnalogData((float)oldValue, threshold, maxValue);
+         auto newData = calcAnalogData((f32)newValue, threshold, maxValue);
+         auto oldData = calcAnalogData((f32)oldValue, threshold, maxValue);
          writeAxis(events, timestamp, id, axis, 0, 0, newData.value, newData.normalized);
 
          if( (oldData.normalized < on && newData.normalized >= on) ||
@@ -108,10 +108,10 @@ namespace core
       }
    }
 
-   void handleStick(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, Vec2 oldPos, Vec2 newPos, uint32_t threshold, uint32_t maxValue, Gamepad::Key axis)
+   void handleStick(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, Vec2 oldPos, Vec2 newPos, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
-      float on = 0.8f;
-      float off = 0.2f;
+      f32 on = 0.8f;
+      f32 off = 0.2f;
 
       if( newPos != oldPos )
       {
@@ -137,7 +137,7 @@ namespace core
       }
    }
 
-   bool handleConnection(std::vector<WindowEvent>& events, uint64_t timestamp, uint8_t id, uint32_t result, bool oldConnectionState)
+   bool handleConnection(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, u32 result, bool oldConnectionState)
    {
       if( (result == ERROR_SUCCESS && oldConnectionState == false) || (result == ERROR_DEVICE_NOT_CONNECTED && oldConnectionState == true) )
       {
@@ -149,7 +149,7 @@ namespace core
 
    void GamepadHandler::handle(CommunicationBuffer* buffer, u64 currentTime)
    {
-      std::vector<WindowEvent> events;
+      std::vector<WinMsg> events;
       for( uint8_t i = 0; i < MAX_GAMEPADS; ++i )
       {
          if( m_gamepadConnected[i] || (currentTime >= m_gamepadLastUpdateTime[i] + m_unconnectedReadDelay) )

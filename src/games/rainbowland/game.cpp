@@ -9,12 +9,13 @@
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
 #include "input/keyboard.h"
-#include "util/color.h"
-#include "util/transform.h"
-#include "util/utility.h"
-#include "util/template/resource_cache_template.h"
-#include "util/time/clock.h"
-#include "util/memory.h"
+#include "utility/color.h"
+#include "utility/transform.h"
+#include "utility/utility.h"
+#include "utility/template/resource_cache_template.h"
+#include "utility/time/clock.h"
+#include "utility/memory.h"
+#include "utility/communication_buffer.h"
 
 #include "games/rainbowland/load_game_resources.h"
 #include "games/rainbowland/logic/code.cpp"
@@ -23,18 +24,30 @@
 
 namespace core
 {
-   bool initializeGame(WindowProxy window, Memory memory)
+   core_internal void updateCursorStuff(CommunicationBuffer* toMain, bool show, bool lock, bool relative)
    {
-      return false;
+      WinMsg msg;
+      msg.type = WinMsgType::ShowCursor;
+      msg.showCursor = show;
+      toMain->writeEvent(msg);
+      msg.type = WinMsgType::LockCursor;
+      msg.showCursor = lock;
+      toMain->writeEvent(msg);
+      msg.type = WinMsgType::RelativeCursor;
+      msg.showCursor = relative;
+      toMain->writeEvent(msg);
    }
 
-
-
-   static void updateCursorStuff(WindowProxy window, bool show, bool lock, bool relative)
+   void Game::onLostFocus()
    {
-      window.makeMouseRelative(relative);
-      window.showCursor(show);
-      window.lockCursor(lock);
+      isPaused = true;
+      updateCursorStuff(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
+   }
+
+   void Game::onGainFocus()
+   {
+      isPaused = false;
+      updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
    }
 
    bool Game::shutdown()
@@ -49,44 +62,66 @@ namespace core
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
 
-      updateCursorStuff(window, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
+      updateCursorStuff(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
 
       CORE_SHUTDOWN_END(Rainbowland);
    }
 
-   bool Game::init(WindowProxy windowProxy)
+   bool Game::init(CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
       CORE_INIT_START(Rainbowland);
 
-      this->window = windowProxy;
+      this->toMain = toMain;
+      this->fromMain = fromMain;
       isPaused = false;
 
-      CORE_STATUS_AND(window.isValid());
+      u64 window{};
+      WinMsg msg = fromMain->wait();
+      CORE_STATUS_AND(msg.type == WinMsgType::WindowHandle);
+      window = msg.handle;
+
       if( CORE_STATUS_OK )
       {
-         window.resize(USE_MONITOR_RESOLUTION, USE_MONITOR_RESOLUTION);
-         //#ifdef MURRAY
-         //window.move(window.getSizeX(), 0);
-         //#endif
-         window.monitorDirectoryForChanges("resources");
+         msg.type = WinMsgType::Size;
+         msg.screen.x = msg.screen.y = USE_MONITOR_RESOLUTION;
+         toMain->writeEvent(msg);
 
-         window.setFullscreen(true);
+         msg.type = WinMsgType::FileChange;
+         strcpy(msg.fileChange.name, "resources");
+         toMain->writeEvent(msg);
+
+         msg.type = WinMsgType::Fullscreen;
+         msg.fullscreen = true;
+         toMain->writeEvent(msg);
+
+         while( msg.type != WinMsgType::Size )
+         {
+            msg = fromMain->wait();
+            if( msg.type == WinMsgType::LostFocus )
+            {
+               onLostFocus();
+            }
+            else if( msg.type == WinMsgType::GainFocus )
+            {
+               onGainFocus();
+            }
+         }
+         
+         game.constants.windowWidth = (f32)msg.screen.x;
+         game.constants.windowHeight = (f32)msg.screen.y;
 
          CORE_STATUS_AND(audioSystem.init());
-         CORE_STATUS_AND(graphicsSystem.init(window));
-         CORE_STATUS_AND(inputSystem.init(window));
+         CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
+         CORE_STATUS_AND(inputSystem.init());
          CORE_STATUS_AND(luaSystem.init());
          CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
       }
 
       if( CORE_STATUS_OK )
       {
-         game.constants.windowWidth = (float)window.getSizeX();
-         game.constants.windowHeight = (float)window.getSizeY();
-
          CORE_STATUS_AND(init_game(game, audioSystem, graphicsSystem, luaSystem.getStack()));
 
-         updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+         updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
       CORE_INIT_END(Rainbowland);
@@ -95,29 +130,38 @@ namespace core
    bool Game::tickLogic(const Clock& logicClock)
    {
       bool running = true;
+      std::vector<WinMsg> inputDeviceMsgs;
 
-      //call service updates that the game shouldn't know anything about
-      inputSystem.gatherInputForCurrentFrame(logicClock.getCurrentMicros());
-
-      // #todo think about where this part should be, out here or in the game
-      const auto& frameEvents = inputSystem.getEvents();
-      for( auto& e : frameEvents )
+      WinMsg msg{};
+      auto timeLimit = logicClock.getCurrentMicros();
+      while( fromMain->peek(msg, timeLimit) )
       {
-         switch( e.type )
+         switch( msg.type )
          {
+            case WinMsgType::KeyboardKey:
+            case WinMsgType::KeyboardText:
+            case WinMsgType::MouseButton:
+            case WinMsgType::MouseMove:
+            case WinMsgType::MouseWheel:
+            case WinMsgType::GamepadAxis:
+            case WinMsgType::GamepadButton:
+            case WinMsgType::GamepadConnection:
+            {
+               inputDeviceMsgs.push_back(msg);
+            } break;
             // #refactor this should probably be moved into a system of it's own
             // that handles file change notifications and processes them based on
             // either the extension or the entire file name
-            case WE_FILECHANGE:
+            case WinMsgType::FileChange:
             {
-               if( e.fileChange.action == FILE_MODIFIED )
+               if( msg.fileChange.action == FileChangeType::Modified )
                {
                   auto getExtension = [](const std::string& str) -> std::string
                   {
                      auto lastDot = str.find_last_of('.');
                      return str.substr(lastDot + 1);
                   };
-                  std::string file = replaceAll(e.fileChange.filename, "\\", "/");
+                  std::string file = replaceAll(msg.fileChange.name, "\\", "/");
                   file = "../resources/" + file;
                   auto ext = getExtension(file);
                   if( ext == "png" || ext == "bmp" || ext == "tif" || ext == "jpg" )
@@ -147,17 +191,17 @@ namespace core
                   }
                }
             } break;
-
-            // #todo think about if this should stay
-            case WE_LOSTFOCUS:
+            case WinMsgType::LostFocus:
             {
-               isPaused = true;
-               updateCursorStuff(window, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
+               onLostFocus();
             } break;
-            case WE_GAINFOCUS:
+            case WinMsgType::GainFocus:
             {
-               isPaused = false;
-               updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+               onGainFocus();
+            } break;
+            case WinMsgType::Close:
+            {
+               return false;
             } break;
          }
       }
@@ -168,11 +212,11 @@ namespace core
       time.virt.micros = isPaused ? 0 : time.real.micros;
       time.virt.seconds = isPaused ? 0 : time.real.seconds;
 
-      auto logic_ok = update_game(time, game, frameEvents, audioSystem, luaSystem.getStack(), graphicsSystem);
+      auto logic_ok = update_game(time, game, inputDeviceMsgs, audioSystem, luaSystem.getStack(), graphicsSystem);
 
       if( !isPaused )
       {
-         updateCursorStuff(window, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+         updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
       luaSystem.collectGarbage();

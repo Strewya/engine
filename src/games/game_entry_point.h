@@ -12,7 +12,6 @@ namespace core
 {
    struct CommunicationBuffer;
    struct Memory;
-   struct WindowProxy;
 
-   void runGame(WindowProxy window, Memory memory, CommunicationBuffer* communication);
+   void runGame(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain);
 }

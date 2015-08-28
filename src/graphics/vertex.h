@@ -8,6 +8,7 @@
 #include "graphics/dx_include.h"
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
+#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -31,7 +32,7 @@ namespace core
       XMFLOAT4 diffuse;
       XMFLOAT2 textureUV;
 
-      static InputLayout getDescription();
+      core_class_scope InputLayout getDescription();
    };
 
    struct HealthVertex : public DefaultVertex
@@ -42,6 +43,6 @@ namespace core
 
       XMFLOAT2 health;
 
-      static InputLayout getDescription();
+      core_class_scope InputLayout getDescription();
    };
 }

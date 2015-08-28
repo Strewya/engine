@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "graphics/texture/texture.h"
-#include "util/utility.h"
+#include "utility/utility.h"
 /******* end headers *******/
 
 namespace core

@@ -10,13 +10,12 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "util/types.h"
+#include "utility/types.h"
 #include "window/gamepad_handler.h"
 #include "window/keyboard_handler.h"
 #include "window/mouse_handler.h"
 #include "window/read_directory_changes.h"
-#include "window/window_event.h"
-#include "window/window_proxy.h"
+#include "window/window_message.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -37,43 +36,43 @@ namespace core
    struct Window
    {
    public:
-      WindowProxy getProxy();
-
       core_class_scope LRESULT CALLBACK messageRouter(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam);
 
       Window();
       Window(const char* title);
       ~Window();
 
-      //platform
       LRESULT CALLBACK windowProc(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam);
-      //platform
       bool create();
-      //platform
       void show();
-      //platform
-      bool processWin32Messages(CommunicationBuffer* communication);
+      bool processWin32Messages(CommunicationBuffer* toGame);
+      void processCommands(CommunicationBuffer* fromGame, CommunicationBuffer* toGame);
 
-      //general if argument is enumerated, platform otherwise
       void setExtendedStyle(u32 style);
-      //general if argument is enumerated, platform otherwise
       void setStyle(u32 style);
-      //platform
       HWND getWindowHandle() const;
-      //general if result is enumerated, platform otherwise
       u32 getStyle() const;
-      //general if result is enumerated, platform otherwise
       u32 getExtendedStyle() const;
-      //platform
       const char* getClass() const;
-      //platform
       const char* getTitle() const;
-      //platform
       i32 getExitCode() const;
 
+      void close() const;
+      void showMessagebox(const char* title, const char* text) const;
+      void resize(u32 x, u32 y);
+      void move(i32 x, i32 y);
+      void setShowCursor(bool isShown);
+      void setLockCursor(bool isLocked);
+      void setRelativeCursor(bool isRelative);
+      void setFullscreen(bool isFullscreen);
+      i32 getPositionX() const;
+      i32 getPositionY() const;
+      u32 getSizeX() const;
+      u32 getSizeY() const;
+      void monitorDirectoryForChanges(const char* directory);
+      void setFileChangeDelay(u32 delay);
+
    private:
-      friend struct WindowProxy;
-      //platform
       void processFileChanges(CommunicationBuffer* buffer);
 
       const char* m_class;
@@ -89,8 +88,7 @@ namespace core
       u32 m_extendedStyle;
       u32 m_minFileChangeDelay;
       u32 m_fileChangeDelay;
-      const u32 m_eventQueueSize;
-
+      
       HWND m_hwnd;
 
       bool m_fullscreen;
@@ -102,10 +100,13 @@ namespace core
       GamepadHandler m_gamepadHandler;
       MouseHandler m_mouseHandler;
       KeyboardHandler m_keyboardHandler;
-
-      std::atomic<u32> m_headIndex;
-      std::atomic<u32> m_tailIndex;
-      std::vector<WindowEvent> m_events;
+      enum
+      {
+         AsyncMsgCount = 10
+      };
+      u32 m_readAsyncIndex;
+      u32 m_writeAsyncIndex;
+      WinMsg m_asyncMessages[AsyncMsgCount];
 
       CReadDirectoryChanges m_monitor;
    };

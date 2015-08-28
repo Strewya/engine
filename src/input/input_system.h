@@ -8,28 +8,28 @@
 #include <vector>
 /******* common headers *******/
 /******* extra headers *******/
-#include "window/window_proxy.h"
+#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Clock;
-   struct WindowEvent;
+   struct WinMsg;
+   struct CommunicationBuffer;
 
-   typedef std::vector<WindowEvent> EventVector_t;
+   typedef std::vector<WinMsg> EventVector_t;
 
    struct InputSystem
    {
    public:
-      bool init(WindowProxy window);
+      bool init();
       bool shutdown();
 
-      void gatherInputForCurrentFrame(uint64_t pollMicros);
+      void gatherInputForCurrentFrame(u64 pollMicros, CommunicationBuffer* comm);
 
       const EventVector_t& getEvents() const;
 
    private:
-      WindowProxy m_window;
       EventVector_t m_inputEvents;
    };
 }

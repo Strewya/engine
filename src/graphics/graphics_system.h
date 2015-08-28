@@ -14,9 +14,8 @@
 #include "graphics/shader/pixel/pixel_shader_manager.h"
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec_types.h"
-#include "window/window_proxy.h"
+#include "utility/geometry/rect.h"
+#include "utility/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -34,7 +33,7 @@ namespace core
    struct GraphicsSystem
    {
    public:
-      bool init(WindowProxy window);
+      bool init(u64 window, f32 width, f32 height);
       bool shutdown();
 
       void begin();
@@ -79,7 +78,9 @@ namespace core
 
       std::vector<IUnknown**> m_declaredObjects;
       
-      WindowProxy m_window;
+      u64 m_window;
+      f32 width;
+      f32 height;
 
       IDXGIFactory* m_dxgiFactory;
       ID3D11Device* m_dev;

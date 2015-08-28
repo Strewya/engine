@@ -9,10 +9,10 @@
 #include "graphics/font/font_descriptor.h"
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
-#include "util/color.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec2.h"
-#include "util/utility.h"
+#include "utility/color.h"
+#include "utility/geometry/rect.h"
+#include "utility/geometry/vec2.h"
+#include "utility/utility.h"
 /******* end headers *******/
 
 namespace core
@@ -20,11 +20,11 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   static float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, Vec2 scale, float tw, float th);
-   static float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, Vec2 scale, uint32_t start, uint32_t end, float x, float y);
-   static void generateIndices(IndexBuffer& indices, uint32_t numberOfCharacters);
-   static void justifyAxisX(HealthVertexBuffer& vertices, uint32_t justify, uint32_t vert, float lineEnd, float boxHW);
-   static void justifyAxisY(HealthVertexBuffer& vertices, uint32_t justify, float fontHeight, float rowEnd, float boxHH);
+   core_internal f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, Vec2 scale, f32 tw, f32 th);
+   core_internal f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, Vec2 scale, u32 start, u32 end, f32 x, f32 y);
+   core_internal void generateIndices(IndexBuffer& indices, u32 numberOfCharacters);
+   core_internal void justifyAxisX(HealthVertexBuffer& vertices, u32 justify, u32 vert, f32 lineEnd, f32 boxHW);
+   core_internal void justifyAxisY(HealthVertexBuffer& vertices, u32 justify, f32 fontHeight, f32 rowEnd, f32 boxHH);
 
    //*****************************************************************
    //          INIT
@@ -60,17 +60,17 @@ namespace core
       result.topology = TriangleList;
 
       auto textureData = m_textures->getData(fd.fontTexture);
-      float textureWidth = (float)textureData.width;
-      float textureHeight = (float)textureData.height;
-      float fontHeight = fd.height*scale.y;
+      f32 textureWidth = (f32)textureData.width;
+      f32 textureHeight = (f32)textureData.height;
+      f32 fontHeight = fd.height*scale.y;
 
       auto characterCount = strlen(text);
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
 
-      uint32_t lastNewline = 0;
-      float yPosition = 0;
-      for( uint32_t charIndex = 0; charIndex < characterCount; ++charIndex )
+      u32 lastNewline = 0;
+      f32 yPosition = 0;
+      for( u32 charIndex = 0; charIndex < characterCount; ++charIndex )
       {
          if( text[charIndex] == '\n' )
          {
@@ -108,22 +108,22 @@ namespace core
       result.topology = TriangleList;
 
       auto textureData = m_textures->getData(fd.fontTexture);
-      float textureWidth = (float)textureData.width;
-      float textureHeight = (float)textureData.height;
+      f32 textureWidth = (f32)textureData.width;
+      f32 textureHeight = (f32)textureData.height;
 
       auto characterCount = strlen(text);
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
 
-      uint32_t characterIndex = 0;
-      uint32_t lineStart = 0;
-      uint32_t lastValidBreakpoint = 0;
-      float boxWidth = clipBox.halfSize.x * 2;
-      float boxHeight = clipBox.halfSize.y * 2;
-      float currentLinePosX = -clipBox.halfSize.x;
-      float currentLinePosY = clipBox.halfSize.y;
-      float fontHeight = fd.height*scale.y;
-      float currentLineWidth = 0;
+      u32 characterIndex = 0;
+      u32 lineStart = 0;
+      u32 lastValidBreakpoint = 0;
+      f32 boxWidth = clipBox.halfSize.x * 2;
+      f32 boxHeight = clipBox.halfSize.y * 2;
+      f32 currentLinePosX = -clipBox.halfSize.x;
+      f32 currentLinePosY = clipBox.halfSize.y;
+      f32 fontHeight = fd.height*scale.y;
+      f32 currentLineWidth = 0;
 
       for( ;; )
       {
@@ -144,7 +144,7 @@ namespace core
          {
             Rect characterRect = fd.glyphs[character - 32];
             characterRect.halfSize *= scale;
-            float characterWidth = characterRect.width();
+            f32 characterWidth = characterRect.width();
             if( character == ' ' )
             {
                lastValidBreakpoint = characterIndex;
@@ -199,10 +199,10 @@ namespace core
    //*****************************************************************
    //          GENERATE INDICES
    //*****************************************************************
-   void generateIndices(IndexBuffer& indices, uint32_t numberOfCharacters)
+   void generateIndices(IndexBuffer& indices, u32 numberOfCharacters)
    {
       indices.reserve(numberOfCharacters * 6);
-      for( uint32_t i = 0; i < numberOfCharacters; ++i )
+      for( u32 i = 0; i < numberOfCharacters; ++i )
       {
          auto offset = i * 4;
          indices.emplace_back(offset + 0);
@@ -217,17 +217,17 @@ namespace core
    //*****************************************************************
    //          GENERATE VERTICES
    //*****************************************************************
-   float generateVertices(HealthVertexBuffer& vertices, const char* text, uint32_t characterCount, const Rect* glyphs, Vec2 scale, float tw, float th)
+   f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, Vec2 scale, f32 tw, f32 th)
    {
-      float x = 0;
-      float y = 0;
-      for( uint32_t i = 0; i < characterCount; ++i )
+      f32 x = 0;
+      f32 y = 0;
+      for( u32 i = 0; i < characterCount; ++i )
       {
          Rect glyph = glyphs[text[i] - 32];
-         float tv_top = glyph.bottom() / th;
-         float tv_bot = glyph.top() / th;
-         float tu_left = glyph.left() / tw;
-         float tu_rght = glyph.right() / tw;
+         f32 tv_top = glyph.bottom() / th;
+         f32 tv_bot = glyph.top() / th;
+         f32 tu_left = glyph.left() / tw;
+         f32 tu_rght = glyph.right() / tw;
          glyph.halfSize *= scale;
 
          vertices.push_back({{x, y - glyph.height(), 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
@@ -242,15 +242,15 @@ namespace core
    //*****************************************************************
    //          GENERATE LINE VERTICES
    //*****************************************************************
-   float generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, float tw, float th, Vec2 scale, uint32_t start, uint32_t end, float x, float y)
+   f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, Vec2 scale, u32 start, u32 end, f32 x, f32 y)
    {
       while( start != end )
       {
          Rect glyph = glyphs[text[start] - 32];
-         float tv_top = glyph.bottom() / th;
-         float tv_bot = glyph.top() / th;
-         float tu_left = glyph.left() / tw;
-         float tu_rght = glyph.right() / tw;
+         f32 tv_top = glyph.bottom() / th;
+         f32 tv_bot = glyph.top() / th;
+         f32 tu_left = glyph.left() / tw;
+         f32 tu_rght = glyph.right() / tw;
          glyph.halfSize *= scale;
 
          vertices.push_back({{x, y - glyph.height(), 0}, {1, 1, 1, 1}, {tu_left, tv_bot}, 0});
@@ -267,7 +267,7 @@ namespace core
    //*****************************************************************
    //          JUSTIFY AXIS X
    //*****************************************************************
-   void justifyAxisX(HealthVertexBuffer& vertices, uint32_t justify, uint32_t vert, float lineEnd, float boxHW)
+   void justifyAxisX(HealthVertexBuffer& vertices, u32 justify, u32 vert, f32 lineEnd, f32 boxHW)
    {
       lineEnd += boxHW;
       auto boxEnd = boxHW * 2;
@@ -281,7 +281,7 @@ namespace core
    //*****************************************************************
    //          JUSTIFY AXIS Y
    //*****************************************************************
-   void justifyAxisY(HealthVertexBuffer& vertices, uint32_t justify, float fontHeight, float rowEnd, float boxHH)
+   void justifyAxisY(HealthVertexBuffer& vertices, u32 justify, f32 fontHeight, f32 rowEnd, f32 boxHH)
    {
       auto bottom = rowEnd - fontHeight - boxHH;
       auto boxEnd = boxHH * 2;

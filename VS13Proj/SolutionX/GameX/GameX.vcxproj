@@ -276,20 +276,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Deploy|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\util\collision_checks.cpp" />
-    <ClCompile Include="..\..\..\src\util\color.cpp" />
-    <ClCompile Include="..\..\..\src\util\geometry\circle.cpp" />
-    <ClCompile Include="..\..\..\src\util\geometry\rect.cpp" />
-    <ClCompile Include="..\..\..\src\util\geometry\vec2.cpp" />
-    <ClCompile Include="..\..\..\src\util\geometry\vec3.cpp" />
-    <ClCompile Include="..\..\..\src\util\random.cpp" />
-    <ClCompile Include="..\..\..\src\util\ring_buffer.cpp" />
-    <ClCompile Include="..\..\..\src\util\time\clock.cpp" />
-    <ClCompile Include="..\..\..\src\util\time\cooldown_timer.cpp" />
-    <ClCompile Include="..\..\..\src\util\time\periodic_timer.cpp" />
-    <ClCompile Include="..\..\..\src\util\time\timer.cpp" />
-    <ClCompile Include="..\..\..\src\util\transform.cpp" />
-    <ClCompile Include="..\..\..\src\util\utility.cpp" />
+    <ClCompile Include="..\..\..\src\utility\collision_checks.cpp" />
+    <ClCompile Include="..\..\..\src\utility\color.cpp" />
+    <ClCompile Include="..\..\..\src\utility\geometry\circle.cpp" />
+    <ClCompile Include="..\..\..\src\utility\geometry\rect.cpp" />
+    <ClCompile Include="..\..\..\src\utility\geometry\vec2.cpp" />
+    <ClCompile Include="..\..\..\src\utility\geometry\vec3.cpp" />
+    <ClCompile Include="..\..\..\src\utility\random.cpp" />
+    <ClCompile Include="..\..\..\src\utility\ring_buffer.cpp" />
+    <ClCompile Include="..\..\..\src\utility\ring_buffer_playground.cpp" />
+    <ClCompile Include="..\..\..\src\utility\time\clock.cpp" />
+    <ClCompile Include="..\..\..\src\utility\time\cooldown_timer.cpp" />
+    <ClCompile Include="..\..\..\src\utility\time\periodic_timer.cpp" />
+    <ClCompile Include="..\..\..\src\utility\time\timer.cpp" />
+    <ClCompile Include="..\..\..\src\utility\transform.cpp" />
+    <ClCompile Include="..\..\..\src\utility\utility.cpp" />
     <ClCompile Include="..\..\..\src\window\gamepad_handler.cpp" />
     <ClCompile Include="..\..\..\src\window\keyboard_handler.cpp" />
     <ClCompile Include="..\..\..\src\window\mouse_handler.cpp" />
@@ -297,9 +298,7 @@
     <ClCompile Include="..\..\..\src\window\read_directory_changes_private.cpp" />
     <ClCompile Include="..\..\..\src\window\window.cpp" />
     <ClCompile Include="..\..\..\src\window\window_class.cpp" />
-    <ClCompile Include="..\..\..\src\window\window_proxy.cpp" />
     <ClCompile Include="..\..\..\src\winmain.cpp" />
-    <ClCompile Include="W:\src\util\ring_buffer_playground.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\audio\audio_system.h" />
@@ -350,29 +349,29 @@
     <ClInclude Include="..\..\..\src\lua\lua_stack_impl.h" />
     <ClInclude Include="..\..\..\src\lua\lua_system.h" />
     <ClInclude Include="..\..\..\src\stdafx.h" />
-    <ClInclude Include="..\..\..\src\util\collision_checks.h" />
-    <ClInclude Include="..\..\..\src\util\color.h" />
-    <ClInclude Include="..\..\..\src\util\communication_buffer.h" />
-    <ClInclude Include="..\..\..\src\util\geometry\circle.h" />
-    <ClInclude Include="..\..\..\src\util\geometry\rect.h" />
-    <ClInclude Include="..\..\..\src\util\geometry\vec_types.h" />
-    <ClInclude Include="..\..\..\src\util\geometry\vec2.h" />
-    <ClInclude Include="..\..\..\src\util\geometry\vec3.h" />
-    <ClInclude Include="..\..\..\src\util\memory.h" />
-    <ClInclude Include="..\..\..\src\util\random.h" />
-    <ClInclude Include="..\..\..\src\util\ring_buffer.h" />
-    <ClInclude Include="..\..\..\src\util\template\name_cache_template.h" />
-    <ClInclude Include="..\..\..\src\util\template\resource_cache_template.h" />
-    <ClInclude Include="..\..\..\src\util\template\resource_handle_template.h" />
-    <ClInclude Include="..\..\..\src\util\template\resource_manager_template.h" />
-    <ClInclude Include="..\..\..\src\util\time\clock.h" />
-    <ClInclude Include="..\..\..\src\util\time\cooldown_timer.h" />
-    <ClInclude Include="..\..\..\src\util\time\periodic_timer.h" />
-    <ClInclude Include="..\..\..\src\util\time\timer.h" />
-    <ClInclude Include="..\..\..\src\util\time\time_unit_conversions.h" />
-    <ClInclude Include="..\..\..\src\util\transform.h" />
-    <ClInclude Include="..\..\..\src\util\types.h" />
-    <ClInclude Include="..\..\..\src\util\utility.h" />
+    <ClInclude Include="..\..\..\src\utility\collision_checks.h" />
+    <ClInclude Include="..\..\..\src\utility\color.h" />
+    <ClInclude Include="..\..\..\src\utility\communication_buffer.h" />
+    <ClInclude Include="..\..\..\src\utility\geometry\circle.h" />
+    <ClInclude Include="..\..\..\src\utility\geometry\rect.h" />
+    <ClInclude Include="..\..\..\src\utility\geometry\vec2.h" />
+    <ClInclude Include="..\..\..\src\utility\geometry\vec3.h" />
+    <ClInclude Include="..\..\..\src\utility\geometry\vec_types.h" />
+    <ClInclude Include="..\..\..\src\utility\memory.h" />
+    <ClInclude Include="..\..\..\src\utility\random.h" />
+    <ClInclude Include="..\..\..\src\utility\ring_buffer.h" />
+    <ClInclude Include="..\..\..\src\utility\template\name_cache_template.h" />
+    <ClInclude Include="..\..\..\src\utility\template\resource_cache_template.h" />
+    <ClInclude Include="..\..\..\src\utility\template\resource_handle_template.h" />
+    <ClInclude Include="..\..\..\src\utility\template\resource_manager_template.h" />
+    <ClInclude Include="..\..\..\src\utility\time\clock.h" />
+    <ClInclude Include="..\..\..\src\utility\time\cooldown_timer.h" />
+    <ClInclude Include="..\..\..\src\utility\time\periodic_timer.h" />
+    <ClInclude Include="..\..\..\src\utility\time\timer.h" />
+    <ClInclude Include="..\..\..\src\utility\time\time_unit_conversions.h" />
+    <ClInclude Include="..\..\..\src\utility\transform.h" />
+    <ClInclude Include="..\..\..\src\utility\types.h" />
+    <ClInclude Include="..\..\..\src\utility\utility.h" />
     <ClInclude Include="..\..\..\src\window\gamepad_handler.h" />
     <ClInclude Include="..\..\..\src\window\keyboard_handler.h" />
     <ClInclude Include="..\..\..\src\window\mouse_handler.h" />
@@ -380,9 +379,8 @@
     <ClInclude Include="..\..\..\src\window\read_directory_changes_private.h" />
     <ClInclude Include="..\..\..\src\window\window.h" />
     <ClInclude Include="..\..\..\src\window\window_class.h" />
-    <ClInclude Include="..\..\..\src\window\window_event.h" />
+    <ClInclude Include="..\..\..\src\window\window_message.h" />
     <ClInclude Include="..\..\..\src\window\window_include.h" />
-    <ClInclude Include="..\..\..\src\window\window_proxy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\graphics\shader\default_shader.hlsl">

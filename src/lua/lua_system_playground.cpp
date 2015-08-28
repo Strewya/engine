@@ -6,8 +6,8 @@
 /******* c++ headers *******/
 #include <cassert>
 /******* extra headers *******/
-#include "util/utility.h"
-#include "util/geometry/vec_types.h"
+#include "utility/utility.h"
+#include "utility/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core

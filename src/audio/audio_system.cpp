@@ -5,7 +5,7 @@
 #include "audio/audio_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "util/utility.h"
+#include "utility/utility.h"
 /******* end headers *******/
 
 namespace core

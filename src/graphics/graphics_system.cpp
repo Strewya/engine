@@ -11,11 +11,11 @@
 #include "graphics/shader/pixel/pixel_shader_loader.h"
 #include "graphics/camera.h"
 #include "graphics/vertex.h"
-#include "util/color.h"
-#include "util/transform.h"
-#include "util/utility.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec3.h"
+#include "utility/color.h"
+#include "utility/transform.h"
+#include "utility/utility.h"
+#include "utility/geometry/rect.h"
+#include "utility/geometry/vec3.h"
 #include "window/window.h"
 /******* end headers *******/
 
@@ -24,20 +24,20 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   static XMVECTOR convert(Vec2 v);
-   static XMVECTOR convert(Vec3 v);
-   static XMMATRIX calculateCamView(const Camera& cam);
+   core_internal XMVECTOR convert(Vec2 v);
+   core_internal XMVECTOR convert(Vec3 v);
+   core_internal XMMATRIX calculateCamView(const Camera& cam);
 
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool GraphicsSystem::init(WindowProxy window)
+   bool GraphicsSystem::init(u64 handle, f32 width, f32 height)
    {
       CORE_INIT_START(GraphicsSystem);
 
-      m_window = window;
-      m_backbufferSize.x = (float)window.getSizeX();
-      m_backbufferSize.y = (float)window.getSizeY();
+      m_window = handle;
+      m_backbufferSize.x = this->width = width;
+      m_backbufferSize.y = this->height = height;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       clearCamera();
 
@@ -186,7 +186,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::setOrthographicProjection()
    {
-      m_renderer.setProjection(XMMatrixOrthographicLH((float)m_window.getSizeX(), (float)m_window.getSizeY(), 1.0f, 100.0f));
+      m_renderer.setProjection(XMMatrixOrthographicLH(width, height, 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -194,7 +194,7 @@ namespace core
    //*****************************************************************
    void GraphicsSystem::setPerspectiveProjection()
    {
-      m_renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), (float)m_window.getSizeX() / m_window.getSizeY(), 1.0f, 100.0f));
+      m_renderer.setProjection(XMMatrixPerspectiveFovLH(XMConvertToRadians(45), width / height, 1.0f, 100.0f));
    }
 
    //*****************************************************************
@@ -226,7 +226,7 @@ namespace core
       world *= XMMatrixTranslation(worldPos.x, worldPos.y, 0);
       world = world*m_renderer.getView()*m_renderer.getProjection();
 
-      XMVECTOR position = XMVector3Project(convert(worldPos), 0, 0, (float)m_window.getSizeX(), (float)m_window.getSizeY(), 0.0f, 1.0f,
+      XMVECTOR position = XMVector3Project(convert(worldPos), 0, 0, width, height, 0.0f, 1.0f,
                                            m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
 
       Vec2 result{position.m128_f32[0], position.m128_f32[1]};
@@ -238,7 +238,7 @@ namespace core
    //*****************************************************************
    Vec2 GraphicsSystem::screenToWorld(const Camera& cam, Vec2 screen)
    {
-      auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, (float)m_window.getSizeX(), (float)m_window.getSizeY(), 0.0f, 1.0f,
+      auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, width, height, 0.0f, 1.0f,
                                             m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
       auto camPos = convert(cam.getPosition());
       auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
@@ -339,14 +339,14 @@ namespace core
       swapChainDesc.BufferCount = 1;
       swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
       swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-      swapChainDesc.OutputWindow = m_window.getRawWindow()->getWindowHandle();
+      swapChainDesc.OutputWindow = (HWND)m_window;
       swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
       swapChainDesc.Windowed = true;
 
       DXGI_MODE_DESC& bd = swapChainDesc.BufferDesc;
       bd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-      bd.Width = m_window.getSizeX(); //m_backbufferSize.x
-      bd.Height = m_window.getSizeY(); //m_backbufferSize.y
+      bd.Width = (u32)width; //m_backbufferSize.x
+      bd.Height = (u32)height; //m_backbufferSize.y
       bd.RefreshRate.Denominator = 1;
       bd.RefreshRate.Numerator = 60;
       bd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -399,8 +399,8 @@ namespace core
       ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
       vp.TopLeftX = 0;
       vp.TopLeftY = 0;
-      vp.Width = (float)m_window.getSizeX();
-      vp.Height = (float)m_window.getSizeY();
+      vp.Width = width;
+      vp.Height = height;
       vp.MinDepth = 0;
       vp.MaxDepth = 1;
 
@@ -441,8 +441,8 @@ namespace core
       D3D11_TEXTURE2D_DESC dsd;
       ZeroMemory(&dsd, sizeof(D3D11_TEXTURE2D_DESC));
 
-      dsd.Width = m_window.getSizeX(); //m_backbufferSize.x;
-      dsd.Height = m_window.getSizeY(); //m_backbufferSize.y;
+      dsd.Width = (u32)width; //m_backbufferSize.x;
+      dsd.Height = (u32)height; //m_backbufferSize.y;
       dsd.MipLevels = 1;
       dsd.ArraySize = 1;
       dsd.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

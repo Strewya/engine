@@ -6,14 +6,14 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "input/keyboard.h"
-#include "util/communication_buffer.h"
+#include "utility/communication_buffer.h"
 /******* end headers *******/
 
 namespace core
 {
    void KeyboardHandler::handle(CommunicationBuffer* buffer, u32 msg, WPARAM wp, LPARAM lp)
    {
-      WindowEvent we;
+      WinMsg we;
       bool matched = false;
       switch( msg )
       {
@@ -23,7 +23,7 @@ namespace core
          case WM_SYSKEYUP:
          {
             matched = true;
-            we.type = WindowEventType::WE_KEYBOARDKEY;
+            we.type = WinMsgType::KeyboardKey;
             we.keyboard.key.id = m_keyCodes[(u8)wp];
             we.keyboard.key.isDown = (lp & (1 << 31)) == 0;
             we.keyboard.repeatCount = (u8)LOWORD(lp);
@@ -33,7 +33,7 @@ namespace core
          case WM_CHAR:
          {
             matched = true;
-            we.type = WindowEventType::WE_KEYBOARDTEXT;
+            we.type = WinMsgType::KeyboardText;
             we.keyboard.key.id = m_keyCodes[(u8)wp];
             we.keyboard.key.isDown = true;
             we.keyboard.repeatCount = (u8)LOWORD(lp);

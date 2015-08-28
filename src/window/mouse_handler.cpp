@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "input/mouse.h"
-#include "util/communication_buffer.h"
+#include "utility/communication_buffer.h"
 /******* end headers *******/
 
 namespace core
@@ -16,14 +16,14 @@ namespace core
    {
    }
 
-   void MouseHandler::setRelativeMouseMove(bool isRelative, uint32_t centerX, uint32_t centerY)
+   void MouseHandler::setRelativeMouseMove(bool isRelative, u32 centerX, u32 centerY)
    {
       m_relativeMouseMove = isRelative;
       m_centerX = centerX;
       m_centerY = centerY;
    }
 
-   Mouse::Key toMouseKey(uint32_t code, WPARAM wParam)
+   Mouse::Key toMouseKey(u32 code, WPARAM wParam)
    {
       Mouse::Key key = Mouse::KeyCount;
       switch( code )
@@ -59,9 +59,9 @@ namespace core
       return key;
    }
 
-   void MouseHandler::handle(CommunicationBuffer* buffer, uint32_t msg, WPARAM wp, LPARAM lp)
+   void MouseHandler::handle(CommunicationBuffer* buffer, u32 msg, WPARAM wp, LPARAM lp)
    {
-      WindowEvent we;
+      WinMsg we;
       bool matched = false;
       switch( msg )
       {
@@ -74,7 +74,7 @@ namespace core
                auto y = GET_Y_LPARAM(lp) - m_centerY;
                if( x != 0 || y != 0 )
                {
-                  we.type = WindowEventType::WE_MOUSEMOVE;
+                  we.type = WinMsgType::MouseMove;
                   we.mouse.position.x = x;
                   we.mouse.position.y = y;
                   we.mouse.move.relative = true;
@@ -83,7 +83,7 @@ namespace core
             }
             else
             {
-               we.type = WindowEventType::WE_MOUSEMOVE;
+               we.type = WinMsgType::MouseMove;
                we.mouse.position.x = GET_X_LPARAM(lp);
                we.mouse.position.y = GET_Y_LPARAM(lp);
                we.mouse.move.relative = false;
@@ -96,7 +96,7 @@ namespace core
          case WM_XBUTTONDOWN:
          {
             matched = true;
-            we.type = WindowEventType::WE_MOUSEBUTTON;
+            we.type = WinMsgType::MouseButton;
             we.mouse.position.x = GET_X_LPARAM(lp);
             we.mouse.position.y = GET_Y_LPARAM(lp);
             we.mouse.button.id = toMouseKey(msg, wp);
@@ -109,7 +109,7 @@ namespace core
          case WM_XBUTTONUP:
          {
             matched = true;
-            we.type = WindowEventType::WE_MOUSEBUTTON;
+            we.type = WinMsgType::MouseButton;
             we.mouse.position.x = GET_X_LPARAM(lp);
             we.mouse.position.y = GET_Y_LPARAM(lp);
             we.mouse.button.id = toMouseKey(msg, wp);
@@ -119,7 +119,7 @@ namespace core
          case WM_MOUSEWHEEL:
          {
             matched = true;
-            we.type = WindowEventType::WE_MOUSEWHEEL;
+            we.type = WinMsgType::MouseWheel;
             we.mouse.position.x = GET_X_LPARAM(lp);
             we.mouse.position.y = GET_Y_LPARAM(lp);
             we.mouse.wheel.scroll = GET_WHEEL_DELTA_WPARAM(wp);

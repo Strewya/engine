@@ -5,7 +5,7 @@
 #include "graphics/camera.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec3.h"
+#include "utility/geometry/vec3.h"
 /******* end headers *******/
 
 namespace core

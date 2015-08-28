@@ -6,11 +6,11 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "graphics/vertex.h"
-#include "util/color.h"
-#include "util/utility.h"
-#include "util/geometry/circle.h"
-#include "util/geometry/rect.h"
-#include "util/geometry/vec3.h"
+#include "utility/color.h"
+#include "utility/utility.h"
+#include "utility/geometry/circle.h"
+#include "utility/geometry/rect.h"
+#include "utility/geometry/vec3.h"
 /******* end headers *******/
 
 namespace core

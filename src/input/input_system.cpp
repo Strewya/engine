@@ -8,18 +8,17 @@
 #include "input/gamepad.h"
 #include "input/keyboard.h"
 #include "input/mouse.h"
-#include "util/time/clock.h"
-#include "util/utility.h"
-#include "window/window_event.h"
+#include "utility/time/clock.h"
+#include "utility/communication_buffer.h"
+#include "utility/utility.h"
+#include "window/window_message.h"
 /******* end headers *******/
 
 namespace core
 {
-   bool InputSystem::init(WindowProxy window)
+   bool InputSystem::init()
    {
       CORE_INIT_START(InputSystem);
-
-      m_window = window;
 
       CORE_INIT_END(InputSystem);
    }
@@ -31,10 +30,14 @@ namespace core
       CORE_SHUTDOWN_END(InputSystem);
    }
 
-   void InputSystem::gatherInputForCurrentFrame(uint64_t pollMicros)
+   void InputSystem::gatherInputForCurrentFrame(u64 pollMicros, CommunicationBuffer* comm)
    {
       m_inputEvents.clear();
-      m_inputEvents = m_window.collectEvents(pollMicros);
+      WinMsg msg{};
+      while( comm->peek(msg, pollMicros) )
+      {
+         m_inputEvents.push_back(msg);
+      }
    }
 
    const EventVector_t& InputSystem::getEvents() const

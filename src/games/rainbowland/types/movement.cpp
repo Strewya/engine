@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "games/util/entity.h"
-#include "util/geometry/vec2.h"
+#include "utility/geometry/vec2.h"
 /******* end headers *******/
 
 namespace core

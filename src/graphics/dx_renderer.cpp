@@ -6,22 +6,22 @@
 /******* c++ headers *******/
 #include <cassert>
 /******* extra headers *******/
-#include "util/color.h"
+#include "utility/color.h"
 #include "graphics/shader/vertex/vertex_shader.h"
 #include "graphics/shader/pixel/pixel_shader.h"
 #include "graphics/texture/texture.h"
 #include "graphics/vertex.h"
-#include "util/transform.h"
-#include "util/utility.h"
-#include "util/geometry/vec_types.h"
+#include "utility/transform.h"
+#include "utility/utility.h"
+#include "utility/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core
 {
-   static ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
-   static ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
-   static ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize);
-   static ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount);
+   core_internal ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount);
+   core_internal ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount);
+   core_internal ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, u32 unitSize);
+   core_internal ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount);
 
    bool DXRenderer::init(ID3D11Device* device,
                          ID3D11DeviceContext* deviceContext,
@@ -202,7 +202,7 @@ namespace core
       D3D11_MAPPED_SUBRESOURCE ms;
 
       auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), vertices.size());
-      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(uint32_t), indices.size());
+      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), indices.size());
 
       HRESULT hr = m_devcon->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       assert(SUCCEEDED(hr));
@@ -211,12 +211,12 @@ namespace core
 
       hr = m_devcon->Map(indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       assert(SUCCEEDED(hr));
-      memcpy(ms.pData, indices.data(), indices.size() * sizeof(uint32_t));
+      memcpy(ms.pData, indices.data(), indices.size() * sizeof(u32));
       m_devcon->Unmap(indexBuffer, 0);
 
 
-      uint32_t stride = sizeof(HealthVertex);
-      uint32_t offset = 0;
+      u32 stride = sizeof(HealthVertex);
+      u32 offset = 0;
 
       m_devcon->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
       m_devcon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -230,7 +230,7 @@ namespace core
    //*****************************************************************
    //          MAKE VERTEX BUFFER
    //*****************************************************************
-   ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
+   ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
       assert(unitSize > 0 && unitCount > 0);
 
@@ -251,7 +251,7 @@ namespace core
    //*****************************************************************
    //          MAKE INDEX BUFFER
    //*****************************************************************
-   ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
+   ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
       assert(unitSize > 0 && unitCount > 0);
 
@@ -272,7 +272,7 @@ namespace core
    //*****************************************************************
    //          MAKE CONSTANT BUFFER
    //*****************************************************************
-   ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, uint32_t unitSize)
+   ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, u32 unitSize)
    {
       assert(unitSize > 0);
 
@@ -294,7 +294,7 @@ namespace core
    //*****************************************************************
    //          MAKE INSTANCE BUFFER
    //*****************************************************************
-   ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, uint32_t unitSize, uint32_t unitCount)
+   ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
       assert(unitSize > 0);
 

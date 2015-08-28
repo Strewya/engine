@@ -9,7 +9,7 @@
 /******* extra headers *******/
 #include "graphics/texture/texture_handle.h"
 #include "graphics/shader/shader_handle.h"
-#include "util/geometry/rect.h"
+#include "utility/geometry/rect.h"
 /******* end header inclusion *******/
 
 namespace core

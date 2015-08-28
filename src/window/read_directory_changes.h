@@ -10,7 +10,7 @@
 /******* common headers *******/
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "util/types.h"
+#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core

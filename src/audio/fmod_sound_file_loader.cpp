@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "audio/fmod_sound.h"
-#include "util/utility.h"
+#include "utility/utility.h"
 /******* end headers *******/
 
 namespace core

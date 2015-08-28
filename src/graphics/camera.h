@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 /******* extra headers *******/
-#include "util/geometry/vec_types.h"
+#include "utility/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core

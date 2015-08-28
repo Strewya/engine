@@ -7,7 +7,7 @@
 /******* extra headers *******/
 #include "audio/audio_system.h"
 #include "graphics/graphics_system.h"
-#include "util/utility.h"
+#include "utility/utility.h"
 #include "games/rainbowland/logic/code.h"
 /******* end headers *******/
 
