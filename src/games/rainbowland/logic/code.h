@@ -5,9 +5,9 @@
 ********************************************/
 /******* c++ headers *******/
 #include <array>
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "audio/fmod_sound_handle.h"
 #include "graphics/camera.h"
@@ -22,7 +22,7 @@
 #include "utility/ring_buffer.h"
 #include "utility/transform.h"
 
-#include "games/util/entity.h"
+#include "games/entity.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -77,7 +77,7 @@ namespace core
 
    struct Line
    {
-      Vec2 lineFromOrigin;
+      v2 lineFromOrigin;
    };
 
    struct CollisionShape
@@ -92,7 +92,7 @@ namespace core
       Type type;
       union
       {
-         Vec2 point;
+         v2 point;
          Line line;
          Circle circle;
          Rect rect;
@@ -103,12 +103,12 @@ namespace core
    {
       Entity collider;
       Entity collidee;
-      Vec2 displacement;
+      v2 displacement;
    };
 
    struct SharedData
    {
-      Vec2 mousePosition;
+      v2 mousePosition;
       Camera camera;
       // #temp This should be in a cache, and handles should be stored in assets.
       FontDescriptor font;
@@ -141,8 +141,8 @@ namespace core
    template<int COUNT>
    struct Button
    {
-      std::array<Vec2, COUNT> position;
-      std::array<Vec2, COUNT> halfsize;
+      std::array<v2, COUNT> position;
+      std::array<v2, COUNT> halfsize;
       // #todo at some point, these should be texture handles probably
       std::array<Color, COUNT> idleColor;
       std::array<Color, COUNT> hoverColor;
@@ -284,16 +284,16 @@ namespace core
    struct ComponentMovement : public ComponentBase
    {
       std::vector<f32> m_acceleration;
-      std::vector<Vec2> m_turnDirection;
-      std::vector<Vec2> m_direction;
-      std::vector<Vec2> m_velocity;
-      std::vector<Vec2> m_position;
+      std::vector<v2> m_turnDirection;
+      std::vector<v2> m_direction;
+      std::vector<v2> m_velocity;
+      std::vector<v2> m_position;
    };
 
    struct ComponentTransform : public ComponentBase
    {
-      std::vector<Vec2> m_position;
-      std::vector<Vec2> m_scale;
+      std::vector<v2> m_position;
+      std::vector<v2> m_scale;
       std::vector<f32> m_rotation;
    };
 

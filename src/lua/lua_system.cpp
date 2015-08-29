@@ -12,8 +12,8 @@ namespace core
 {
    int luaPrint(lua_State* L)
    {
-      int32_t n = lua_gettop(L);
-      for( int32_t i = 1; i <= n; ++i )
+      i32 n = lua_gettop(L);
+      for( i32 i = 1; i <= n; ++i )
       {
          switch( lua_type(L, i) )
          {

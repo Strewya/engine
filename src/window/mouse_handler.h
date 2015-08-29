@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
 #include "window/window_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "window/window_message.h"
 /******* end header inclusion *******/

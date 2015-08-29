@@ -4,11 +4,10 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cassert>
-#include <cstdint>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
+#include "utility/utility.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -25,8 +24,8 @@ namespace core
 
       void init(u16 index)
       {
-         assert(isNull());
-         assert(index <= MAX_INDEX);
+         CORE_ASSERT_DEBUG(isNull(), "The handler is not null and init was called!");
+         CORE_ASSERT_DEBUG(index <= MAX_INDEX, "The index is too large!");
 
          core_local_persist u16 s_autoMagic = 0;
          if( ++s_autoMagic > MAX_MAGIC )

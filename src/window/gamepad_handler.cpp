@@ -4,7 +4,6 @@
 /******* personal header *******/
 #include "window/gamepad_handler.h"
 /******* c++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* extra headers *******/
 #include "input/gamepad.h"
@@ -24,7 +23,7 @@ namespace core
       memset(m_gamepadLastUpdateTime, 0, sizeof(m_gamepadLastUpdateTime));
    }
 
-   void writeButton(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, uint8_t button, bool isDown)
+   void writeButton(std::vector<WinMsg>& events, u64 timestamp, u8 id, u8 button, bool isDown)
    {
       events.emplace_back();
       events.back().type = WinMsgType::GamepadButton;
@@ -34,7 +33,7 @@ namespace core
       events.back().gamepad.button.isDown = isDown;
    }
 
-   void writeAxis(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, uint8_t axis, f32 x, f32 y, f32 mag, f32 norm)
+   void writeAxis(std::vector<WinMsg>& events, u64 timestamp, u8 id, u8 axis, f32 x, f32 y, f32 mag, f32 norm)
    {
       events.emplace_back();
       events.back().type = WinMsgType::GamepadAxis;
@@ -47,7 +46,7 @@ namespace core
       events.back().gamepad.axis.normalized = norm;
    }
 
-   void writeConnection(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, bool connected)
+   void writeConnection(std::vector<WinMsg>& events, u64 timestamp, u8 id, bool connected)
    {
       events.emplace_back();
       events.back().type = WinMsgType::GamepadConnection;
@@ -56,7 +55,7 @@ namespace core
       events.back().gamepad.connection.status = connected;
    }
 
-   void handleButton(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, XINPUT_STATE& oldState, XINPUT_STATE& newState, u32 xiButton, Gamepad::Key key)
+   void handleButton(std::vector<WinMsg>& events, u64 timestamp, u8 id, XINPUT_STATE& oldState, XINPUT_STATE& newState, u32 xiButton, Gamepad::Key key)
    {
       if( (oldState.Gamepad.wButtons & xiButton) != (newState.Gamepad.wButtons & xiButton) )
       {
@@ -89,7 +88,7 @@ namespace core
       return result;
    }
 
-   void handleTrigger(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, u32 oldValue, u32 newValue, u32 threshold, u32 maxValue, Gamepad::Key axis)
+   void handleTrigger(std::vector<WinMsg>& events, u64 timestamp, u8 id, u32 oldValue, u32 newValue, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
       f32 on = 0.8f;
       f32 off = 0.2f;
@@ -108,7 +107,7 @@ namespace core
       }
    }
 
-   void handleStick(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, Vec2 oldPos, Vec2 newPos, u32 threshold, u32 maxValue, Gamepad::Key axis)
+   void handleStick(std::vector<WinMsg>& events, u64 timestamp, u8 id, v2 oldPos, v2 newPos, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
       f32 on = 0.8f;
       f32 off = 0.2f;
@@ -123,7 +122,7 @@ namespace core
          if( (oldData.normalized < on && newData.normalized >= on) ||
             (oldData.normalized > off && newData.normalized <= off) )
          {
-            uint8_t button = 0;
+            u8 button = 0;
             if( newPos.x >= on )
                button = Gamepad::DPadRight;
             else if( newPos.x <= -on )
@@ -137,7 +136,7 @@ namespace core
       }
    }
 
-   bool handleConnection(std::vector<WinMsg>& events, u64 timestamp, uint8_t id, u32 result, bool oldConnectionState)
+   bool handleConnection(std::vector<WinMsg>& events, u64 timestamp, u8 id, u32 result, bool oldConnectionState)
    {
       if( (result == ERROR_SUCCESS && oldConnectionState == false) || (result == ERROR_DEVICE_NOT_CONNECTED && oldConnectionState == true) )
       {
@@ -150,7 +149,7 @@ namespace core
    void GamepadHandler::handle(CommunicationBuffer* buffer, u64 currentTime)
    {
       std::vector<WinMsg> events;
-      for( uint8_t i = 0; i < MAX_GAMEPADS; ++i )
+      for( u8 i = 0; i < MAX_GAMEPADS; ++i )
       {
          if( m_gamepadConnected[i] || (currentTime >= m_gamepadLastUpdateTime[i] + m_unconnectedReadDelay) )
          {

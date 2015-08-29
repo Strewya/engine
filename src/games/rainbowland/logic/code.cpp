@@ -15,7 +15,6 @@
 #include "input/keyboard.h"
 #include "input/mouse.h"
 #include "utility/collision_checks.h"
-#include "utility/types.h"
 /******* end headers *******/
 
 namespace core
@@ -63,15 +62,15 @@ namespace core
       return result;
    }
 
-   inline f32 radians(Vec2 v)
+   inline f32 radians(v2 v)
    {
       auto result = std::atan2(v.y, v.x);
       return result;
    }
 
-   inline Vec2 orthoMousePosition(MousePosition mouse, f32 windowWidth, f32 windowHeight)
+   inline v2 orthoMousePosition(MousePosition mouse, f32 windowWidth, f32 windowHeight)
    {
-      Vec2 result;
+      v2 result;
 
       result.x = mouse.x - windowWidth / 2;
       result.y = -mouse.y + windowHeight / 2;
@@ -189,7 +188,7 @@ namespace core
       return shouldCollide;
    }
 
-   core_internal void setCollisionShapePosition(CollisionShape& shape, Vec2 position)
+   core_internal void setCollisionShapePosition(CollisionShape& shape, v2 position)
    {
       switch( shape.type )
       {
@@ -208,7 +207,7 @@ namespace core
       }
    }
 
-   core_internal void setCollisionShapeScale(CollisionShape& shape, Vec2 scale)
+   core_internal void setCollisionShapeScale(CollisionShape& shape, v2 scale)
    {
       switch( shape.type )
       {
@@ -609,7 +608,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       auto count = getCount(transform);
       for( auto i = 0U; i < count; ++i )
       {
-         Vec2 totalDisplacement{};
+         v2 totalDisplacement{};
          for( auto p : pairs )
          {
             if( p.collider == transform.m_entity[i] || p.collidee == transform.m_entity[i] )
@@ -627,7 +626,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    //******************************************************************************************************************
    //******************************************************************************************************************
    template<int BUTTONS>
-   core_internal void handle_mouseMove(GuiData<BUTTONS>& gui, Vec2 mousePosition)
+   core_internal void handle_mouseMove(GuiData<BUTTONS>& gui, v2 mousePosition)
    {
       gui.hoverButton = BUTTONS;
       for( auto i = 0; i < BUTTONS; ++i )
@@ -821,8 +820,8 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       Entity entity;
       union
       {
-         Vec2 direction;
-         Vec2 aim;
+         v2 direction;
+         v2 aim;
          bool shooting;
       };
       bool isAnalogue;
@@ -912,7 +911,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                if( e.gamepad.axis.id == Gamepad::LeftStick )
                {
                   ge.type = GameMessage::Type::DirectionChange;
-                  ge.direction = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
+                  ge.direction = v2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.magnitude*e.gamepad.axis.normalized;
                   result.push_back(ge);
                }
                else if( e.gamepad.axis.id == Gamepad::RightStick )
@@ -920,7 +919,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                   if( e.gamepad.axis.normalized >= 0.1 )
                   {
                      ge.type = GameMessage::Type::AimChange;
-                     ge.aim = Vec2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
+                     ge.aim = v2{e.gamepad.axis.x, e.gamepad.axis.y}*e.gamepad.axis.normalized;
                      result.push_back(ge);
 
                      GameMessage fire{};
@@ -1610,7 +1609,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       gfx.setTransparency(true);
       caption += (time.virt.micros == 0 ? " (paused)" : " (running)");
       auto mesh = font.makeTextMesh(caption.c_str(), game.sharedData.font, {1, 1}, Left, Top);
-      gfx.renderMesh(Vec2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
+      gfx.renderMesh(v2{-game.constants.windowWidth*0.5f, game.constants.windowHeight*0.5f}, {}, mesh);
    }
 
 }

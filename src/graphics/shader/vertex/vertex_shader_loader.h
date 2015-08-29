@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
 /******* end header inclusion *******/
@@ -21,7 +21,7 @@ namespace core
       bool init(ID3D11Device* device);
       bool shutdown();
 
-      VertexShader load(InputLayout layout, const char* buffer, uint32_t bufferSize) const;
+      VertexShader load(InputLayout layout, const char* buffer, u32 bufferSize) const;
 
       void unload(VertexShader& data);
       

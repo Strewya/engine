@@ -9,37 +9,37 @@
 
 namespace core
 {
-   float Rect::left() const
+   f32 Rect::left() const
    {
       return center.x - halfSize.x;
    }
 
-   float Rect::right() const
+   f32 Rect::right() const
    {
       return center.x + halfSize.x;
    }
 
-   float Rect::top() const
+   f32 Rect::top() const
    {
       return center.y + halfSize.y;
    }
 
-   float Rect::bottom() const
+   f32 Rect::bottom() const
    {
       return center.y - halfSize.y;
    }
 
-   float Rect::width() const
+   f32 Rect::width() const
    {
       return halfSize.x * 2;
    }
 
-   float Rect::height() const
+   f32 Rect::height() const
    {
       return halfSize.y * 2;
    }
 
-   void Rect::set(float cx, float cy, float hw, float hh)
+   void Rect::set(f32 cx, f32 cy, f32 hw, f32 hh)
    {
       center = {cx, cy};
       halfSize = {hw, hh};

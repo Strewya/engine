@@ -20,8 +20,8 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   core_internal f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, Vec2 scale, f32 tw, f32 th);
-   core_internal f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, Vec2 scale, u32 start, u32 end, f32 x, f32 y);
+   core_internal f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, v2 scale, f32 tw, f32 th);
+   core_internal f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, v2 scale, u32 start, u32 end, f32 x, f32 y);
    core_internal void generateIndices(IndexBuffer& indices, u32 numberOfCharacters);
    core_internal void justifyAxisX(HealthVertexBuffer& vertices, u32 justify, u32 vert, f32 lineEnd, f32 boxHW);
    core_internal void justifyAxisY(HealthVertexBuffer& vertices, u32 justify, f32 fontHeight, f32 rowEnd, f32 boxHH);
@@ -51,7 +51,7 @@ namespace core
    //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y)
+   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y)
    {
       Mesh result{};
       result.pshader = fd.pshader;
@@ -92,7 +92,7 @@ namespace core
    //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, Vec2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox)
+   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox)
    {
       // #refactor
       // things to deal with:
@@ -217,7 +217,7 @@ namespace core
    //*****************************************************************
    //          GENERATE VERTICES
    //*****************************************************************
-   f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, Vec2 scale, f32 tw, f32 th)
+   f32 generateVertices(HealthVertexBuffer& vertices, const char* text, u32 characterCount, const Rect* glyphs, v2 scale, f32 tw, f32 th)
    {
       f32 x = 0;
       f32 y = 0;
@@ -242,7 +242,7 @@ namespace core
    //*****************************************************************
    //          GENERATE LINE VERTICES
    //*****************************************************************
-   f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, Vec2 scale, u32 start, u32 end, f32 x, f32 y)
+   f32 generateLineVertices(HealthVertexBuffer& vertices, const char* text, const Rect* glyphs, f32 tw, f32 th, v2 scale, u32 start, u32 end, f32 x, f32 y)
    {
       while( start != end )
       {

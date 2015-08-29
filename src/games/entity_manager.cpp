@@ -2,11 +2,9 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "games/util/entity_manager.h"
+#include "games/entity_manager.h"
 /******* c++ headers *******/
-#include <cassert>
 /******* extra headers *******/
-#include "games/util/entity.h"
 /******* end headers *******/
 
 namespace core
@@ -14,7 +12,7 @@ namespace core
 /*
    Entity EntityManager::create()
    {
-      uint32_t idx;
+      u32 idx;
       if( m_freeIndex.size() > 128 )
       {
          idx = m_freeIndex.front();
@@ -24,7 +22,7 @@ namespace core
       {
          m_generation.push_back(0);
          idx = m_generation.size() - 1;
-         assert(idx < (1 << Entity::INDEX_BITS));
+         CORE_ASSERT_DEBUG(idx < (1 << Entity::INDEX_BITS));
       }
       Entity result;
       result.id = (m_generation[idx] << Entity::INDEX_BITS) | idx;

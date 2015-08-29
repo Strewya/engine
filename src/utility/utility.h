@@ -5,12 +5,11 @@
 ********************************************/
 /******* c++ headers *******/
 #include <algorithm>
-#include <cstdint>
 #include <iostream>
 #include <string>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core

@@ -6,7 +6,6 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "utility/color.h"
-#include "utility/geometry/vec_types.h"
 /******* end headers *******/
 
 namespace core
@@ -18,18 +17,18 @@ namespace core
    {
    }
 
-   DefaultVertex::DefaultVertex(Vec3 position, Color color, Vec2 textureUV)
+   DefaultVertex::DefaultVertex(v3 position, Color color, v2 textureUV)
       : position(position.x, position.y, position.z, 0),
       diffuse(color.r, color.g, color.b, color.a),
       textureUV(textureUV.x, textureUV.y)
    {
    }
 
-   void DefaultVertex::setPosition(Vec3 pos)
+   void DefaultVertex::setPosition(v3 pos)
    {
       setPosition(pos.x, pos.y, pos.z);
    }
-   void DefaultVertex::setPosition(float x, float y, float z)
+   void DefaultVertex::setPosition(f32 x, f32 y, f32 z)
    {
       position.x = x;
       position.y = y;
@@ -40,18 +39,18 @@ namespace core
    {
       setColor(color.r, color.g, color.b, color.a);
    }
-   void DefaultVertex::setColor(float r, float g, float b, float a)
+   void DefaultVertex::setColor(f32 r, f32 g, f32 b, f32 a)
    {
       diffuse.x = r;
       diffuse.y = g;
       diffuse.z = b;
       diffuse.w = a;
    }
-   void DefaultVertex::setTextureUV(Vec2 textureUV)
+   void DefaultVertex::setTextureUV(v2 textureUV)
    {
       setTextureUV(textureUV.x, textureUV.y);
    }
-   void DefaultVertex::setTextureUV(float u, float v)
+   void DefaultVertex::setTextureUV(f32 u, f32 v)
    {
       textureUV.x = u;
       textureUV.y = v;
@@ -73,12 +72,12 @@ namespace core
       : HealthVertex({}, {}, {-1, -1}, 0)
    {
    }
-   HealthVertex::HealthVertex(Vec3 position, Color color, Vec2 textureUV, float health)
+   HealthVertex::HealthVertex(v3 position, Color color, v2 textureUV, f32 health)
       : DefaultVertex(position, color, textureUV), health(health, 0)
    {
    }
 
-   void HealthVertex::setHealth(float h)
+   void HealthVertex::setHealth(f32 h)
    {
       health.x = h;
       health.y = 0;

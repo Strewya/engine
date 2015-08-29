@@ -5,25 +5,25 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
-#include "utility/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Rect
    {
-      Vec2 center;
-      Vec2 halfSize;
+      v2 center;
+      v2 halfSize;
 
-      float left() const;
-      float right() const;
-      float top() const;
-      float bottom() const;
+      f32 left() const;
+      f32 right() const;
+      f32 top() const;
+      f32 bottom() const;
 
-      float width() const;
-      float height() const;
+      f32 width() const;
+      f32 height() const;
 
-      void set(float cx, float cy, float hw, float hh);
+      void set(f32 cx, f32 cy, f32 hw, f32 hh);
    };
 }

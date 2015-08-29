@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -14,8 +14,8 @@ namespace core
 {
    struct Texture
    {
-      uint32_t width;
-      uint32_t height;
+      u32 width;
+      u32 height;
       ID3D11ShaderResourceView* _shaderResourceView;
 
       bool loaded()

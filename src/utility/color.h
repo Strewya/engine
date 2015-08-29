@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -12,18 +13,18 @@ namespace core
 {
    struct Color
    {
-      float r;
-      float g;
-      float b;
-      float a;
+      f32 r;
+      f32 g;
+      f32 b;
+      f32 a;
 
-      Color(float r = 1, float g = 1, float b = 1, float a = 1);
+      Color(f32 r = 1, f32 g = 1, f32 b = 1, f32 a = 1);
 
-      void clip(float threshold);
+      void clip(f32 threshold);
    };
 
    bool operator==(Color l, Color r);
    bool operator!=(Color l, Color r);
    
-   Color colorFromHex(uint32_t hexValue);
+   Color colorFromHex(u32 hexValue);
 }

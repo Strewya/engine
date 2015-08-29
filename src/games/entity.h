@@ -4,8 +4,8 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -13,8 +13,8 @@ namespace core
 {
    struct Entity
    {
-      //explicit Entity(uint32_t i) : id(i) {}
-      uint32_t id;
+      //explicit Entity(u32 i) : id(i) {}
+      u32 id;
    };
 
    inline bool operator==(Entity l, Entity r)

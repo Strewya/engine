@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 

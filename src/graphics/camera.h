@@ -5,8 +5,8 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
-#include "utility/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -16,26 +16,26 @@ namespace core
    public:
       Camera();
 
-      void move(Vec3 translation);
-      void rotate(Vec3 rotation);
+      void move(v3 translation);
+      void rotate(v3 rotation);
 
-      Vec3 getPosition() const;
-      Vec3 getLookAtAxis() const;
-      Vec3 getUpAxis() const;
-      Vec3 getRotation() const;
-      float getSpeed() const;
+      v3 getPosition() const;
+      v3 getLookAtAxis() const;
+      v3 getUpAxis() const;
+      v3 getRotation() const;
+      f32 getSpeed() const;
 
-      void setPosition(Vec3 pos);
-      void setUpAxis(Vec3 upAxis);
-      void setLookAtAxis(Vec3 lookAtAxis);
-      void setRotation(Vec3 rot);
-      void setSpeed(float speed);
+      void setPosition(v3 pos);
+      void setUpAxis(v3 upAxis);
+      void setLookAtAxis(v3 lookAtAxis);
+      void setRotation(v3 rot);
+      void setSpeed(f32 speed);
 
    private:
-      Vec3 m_position;
-      Vec3 m_lookAtAxis;
-      Vec3 m_upAxis;
-      Vec3 m_rotation;
-      float m_speed;
+      v3 m_position;
+      v3 m_lookAtAxis;
+      v3 m_upAxis;
+      v3 m_rotation;
+      f32 m_speed;
    };
 }

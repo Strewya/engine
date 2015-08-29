@@ -4,10 +4,10 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cassert>
 #include <vector>
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/dx_renderer.h"
 #include "graphics/graphics_types.h"
@@ -15,7 +15,6 @@
 #include "graphics/shader/vertex/vertex_shader_manager.h"
 #include "graphics/texture/texture_manager.h"
 #include "utility/geometry/rect.h"
-#include "utility/geometry/vec_types.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -43,8 +42,8 @@ namespace core
       void setPerspectiveProjection();
       void applyCamera(const Camera& camera);
       void clearCamera();
-      Vec2 screenToWorld(const Camera& cam, Vec2 screenPos);
-      Vec2 worldToScreen(const Camera& cam, Vec2 worldPos);
+      v2 screenToWorld(const Camera& cam, v2 screenPos);
+      v2 worldToScreen(const Camera& cam, v2 worldPos);
 
       void setCulling(bool isEnabled);
       void setTransparency(bool isEnabled);
@@ -74,7 +73,7 @@ namespace core
       DXRenderer m_renderer;
 
       D3DXCOLOR m_backgroundColor;
-      Vec2 m_backbufferSize;
+      v2 m_backbufferSize;
 
       std::vector<IUnknown**> m_declaredObjects;
       

@@ -7,24 +7,24 @@
 #include <string>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   class CReadDirectoryChanges;
+   struct CReadDirectoryChanges;
 
    namespace RDCPrivate
    {
-      class CReadChangesServer;
+      struct CReadChangesServer;
 
       ///////////////////////////////////////////////////////////////////////////
 
       // All functions in CReadChangesRequest run in the context of the worker thread.
       // One instance of this object is created for each call to AddDirectory().
-      class CReadChangesRequest
+      struct CReadChangesRequest
       {
       public:
          CReadChangesRequest(CReadChangesServer* pServer, const std::string& dirName, BOOL trackSubdirs, DWORD trackFlags, DWORD bufferSize);
@@ -79,7 +79,7 @@ namespace core
       // One instance of this object is allocated for each instance of CReadDirectoryChanges.
       // This class is responsible for thread startup, orderly thread shutdown, and shimming
       // the various C++ member functions with C-style Win32 functions.
-      class CReadChangesServer
+      struct CReadChangesServer
       {
       public:
          CReadChangesServer(CReadDirectoryChanges* parent);

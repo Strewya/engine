@@ -4,13 +4,12 @@
 *  usage:   uses xinput
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 #include <xinput.h>
 /******* extra headers *******/
-#include "utility/types.h"
 #include "window/window_message.h"
 /******* end header inclusion *******/
 
@@ -31,10 +30,10 @@ namespace core
          MAX_GAMEPADS = 4,
       };
       
-      uint64_t m_unconnectedReadDelay;
+      u64 m_unconnectedReadDelay;
 
       XINPUT_STATE m_gamepadState[MAX_GAMEPADS];
-      uint64_t m_gamepadLastUpdateTime[MAX_GAMEPADS];
+      u64 m_gamepadLastUpdateTime[MAX_GAMEPADS];
       bool m_gamepadConnected[MAX_GAMEPADS];
    };
 }

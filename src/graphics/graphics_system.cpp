@@ -24,8 +24,8 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DECLARATIONS
    //*****************************************************************
-   core_internal XMVECTOR convert(Vec2 v);
-   core_internal XMVECTOR convert(Vec3 v);
+   core_internal XMVECTOR convert(v2 v);
+   core_internal XMVECTOR convert(v3 v);
    core_internal XMMATRIX calculateCamView(const Camera& cam);
 
    //*****************************************************************
@@ -216,7 +216,7 @@ namespace core
    //*****************************************************************
    //          WORLD TO SCREEN
    //*****************************************************************
-   Vec2 GraphicsSystem::worldToScreen(const Camera& cam, Vec2 worldPos)
+   v2 GraphicsSystem::worldToScreen(const Camera& cam, v2 worldPos)
    {
       auto world = XMMatrixIdentity();
       //world *= XMMatrixScaling(transform.scale.x, transform.scale.y, 1.0f);
@@ -229,21 +229,21 @@ namespace core
       XMVECTOR position = XMVector3Project(convert(worldPos), 0, 0, width, height, 0.0f, 1.0f,
                                            m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
 
-      Vec2 result{position.m128_f32[0], position.m128_f32[1]};
+      v2 result{position.m128_f32[0], position.m128_f32[1]};
       return result;
    }
 
    //*****************************************************************
    //          SCREEN TO WORLD
    //*****************************************************************
-   Vec2 GraphicsSystem::screenToWorld(const Camera& cam, Vec2 screen)
+   v2 GraphicsSystem::screenToWorld(const Camera& cam, v2 screen)
    {
-      auto objectSpace = XMVector3Unproject(convert(Vec3{screen.x, screen.y, 0.0f}), 0, 0, width, height, 0.0f, 1.0f,
+      auto objectSpace = XMVector3Unproject(convert(v3{screen.x, screen.y, 0.0f}), 0, 0, width, height, 0.0f, 1.0f,
                                             m_renderer.getProjection(), calculateCamView(cam), XMMatrixIdentity());
       auto camPos = convert(cam.getPosition());
       auto plane = XMPlaneFromPoints(convert({0, 0, 0}), convert({1, 0, 0}), convert({0, 1, 0}));
       auto loc = XMPlaneIntersectLine(plane, objectSpace, camPos);
-      return Vec2{loc.m128_f32[0], loc.m128_f32[1]};
+      return v2{loc.m128_f32[0], loc.m128_f32[1]};
    }
 
    //*****************************************************************
@@ -312,7 +312,7 @@ namespace core
          if( SUCCEEDED(hr) )
          {
             auto driverType = D3D_DRIVER_TYPE_UNKNOWN;
-            uint32_t flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+            u32 flags = D3D11_CREATE_DEVICE_SINGLETHREADED;
 #ifdef _DEBUG
             flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -472,12 +472,12 @@ namespace core
    //*****************************************************************
    //          FILE STATIC FUNCTION DEFINITIONS
    //*****************************************************************
-   XMVECTOR convert(Vec2 v)
+   XMVECTOR convert(v2 v)
    {
       return XMVectorSet(v.x, v.y, 0, 0);
    }
 
-   XMVECTOR convert(Vec3 v)
+   XMVECTOR convert(v3 v)
    {
       return XMVectorSet(v.x, v.y, v.z, 0);
    }

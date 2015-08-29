@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 #include "audio/fmod_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "audio/sound_manager.h"
 /******* end header inclusion *******/

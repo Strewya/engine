@@ -10,34 +10,34 @@
 
 namespace core
 {
-   Transform::Transform(Vec2 p, Vec2 s, float r)
+   Transform::Transform(v2 p, v2 s, f32 r)
       : position(p), scale(s), rotation(r)
    {
    }
 
-   void Transform::set(Vec2 p, Vec2 s, float r)
+   void Transform::set(v2 p, v2 s, f32 r)
    {
       position = p;
       scale = s;
       rotation = r;
    }
 
-   void Transform::translate(Vec2 delta)
+   void Transform::translate(v2 delta)
    {
       position += delta;
    }
 
-   void Transform::rescale(float uniform)
+   void Transform::rescale(f32 uniform)
    {
       scale *= uniform;
    }
 
-   void Transform::rescale(Vec2 nonUniform)
+   void Transform::rescale(v2 nonUniform)
    {
       scale *= nonUniform;
    }
 
-   void Transform::rotate(float degrees)
+   void Transform::rotate(f32 degrees)
    {
       rotation += degrees;
    }

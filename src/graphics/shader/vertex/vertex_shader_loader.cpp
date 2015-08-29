@@ -31,7 +31,7 @@ namespace core
       CORE_SHUTDOWN_END(VertexShaderLoader);
    }
 
-   VertexShader VertexShaderLoader::load(InputLayout layout, const char* buffer, uint32_t bufferSize) const
+   VertexShader VertexShaderLoader::load(InputLayout layout, const char* buffer, u32 bufferSize) const
    {
       VertexShader result{nullptr, nullptr};
       if( buffer != nullptr && bufferSize > 0 )

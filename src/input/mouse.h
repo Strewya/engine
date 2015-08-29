@@ -6,8 +6,8 @@
 /******* c++ headers *******/
 #include <string>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core

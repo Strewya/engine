@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 #include <string>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "utility/template/resource_cache_template.h"
 #include "utility/template/name_cache_template.h"

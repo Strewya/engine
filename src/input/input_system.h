@@ -4,11 +4,10 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core

@@ -4,8 +4,8 @@
 *  usage:      
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/texture/texture_handle.h"
 #include "graphics/shader/shader_handle.h"
@@ -22,7 +22,7 @@ namespace core
       HVertexShader vshader;
       HPixelShader pshader;
       Rect glyphs[128 - 32];
-      uint32_t height;
+      u32 height;
    };
 
    enum TextJustification

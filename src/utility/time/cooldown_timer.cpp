@@ -14,12 +14,12 @@ namespace core
    {
    }
 
-   CooldownTimer::CooldownTimer(uint32_t durationMicros)
+   CooldownTimer::CooldownTimer(u32 durationMicros)
       : m_durationMicros(durationMicros)
    {
    }
 
-   void CooldownTimer::advanceTimeBy(uint32_t deltaMicros)
+   void CooldownTimer::advanceTimeBy(u32 deltaMicros)
    {
       m_timer.advanceTimeBy(deltaMicros);
    }
@@ -27,7 +27,7 @@ namespace core
    {
       return m_timer.getCurrentMicros() >= m_durationMicros;
    }
-   uint32_t CooldownTimer::getRemainingMicros() const
+   u32 CooldownTimer::getRemainingMicros() const
    {
       if( m_durationMicros < m_timer.getCurrentMicros() )
       {
@@ -35,20 +35,20 @@ namespace core
       }
       return m_durationMicros - m_timer.getCurrentMicros();
    }
-   float CooldownTimer::getPercentDone() const
+   f32 CooldownTimer::getPercentDone() const
    {
-      return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_durationMicros);
+      return static_cast<f32>(m_timer.getCurrentMicros()) / static_cast<f32>(m_durationMicros);
    }
    void CooldownTimer::reset()
    {
       m_timer.reset();
    }
 
-   uint32_t CooldownTimer::getDurationMicros() const
+   u32 CooldownTimer::getDurationMicros() const
    {
       return m_durationMicros;
    }
-   void CooldownTimer::setDurationMicros(uint32_t durationMicros)
+   void CooldownTimer::setDurationMicros(u32 durationMicros)
    {
       m_durationMicros = durationMicros;
    }

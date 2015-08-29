@@ -91,7 +91,7 @@ namespace core
       return false;
    }
 
-   uint32_t CReadDirectoryChanges::GetThreadId()
+   u32 CReadDirectoryChanges::GetThreadId()
    {
       return m_threadId;
    }

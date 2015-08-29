@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -17,13 +18,13 @@ namespace core
    }
 
    template<typename T>
-   T LuaStack::to(int32_t stackIndex)
+   T LuaStack::to(i32 stackIndex)
    {
       throw std::logic_error(std::string("Invoked unspecialized LuaStack::to<") + typeid(T).name() + ">()");
    }
 
    template<typename T>
-   bool LuaStack::is(int32_t stackIndex)
+   bool LuaStack::is(i32 stackIndex)
    {
       throw std::logic_error(std::string("Invoked unspecialized LuaStack::is<") + typeid(T).name() + ">()");
    }
@@ -67,7 +68,7 @@ namespace core
       return valueIfMissing;
    }
 
-   template<typename T> T get(LuaStack& lua, int32_t stackIndex, T valueIfMissing)
+   template<typename T> T get(LuaStack& lua, i32 stackIndex, T valueIfMissing)
    {
       lua.pull(stackIndex);
       if( lua.is<T>() )

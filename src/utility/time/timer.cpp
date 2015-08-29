@@ -18,39 +18,39 @@ namespace core
    {
    }
 
-   void Timer::advanceTimeBy(uint32_t deltaMicros)
+   void Timer::advanceTimeBy(u32 deltaMicros)
    {
-      m_deltaMicros = static_cast<uint32_t>(static_cast<float>(deltaMicros)*m_timeScale);
+      m_deltaMicros = static_cast<u32>(static_cast<f32>(deltaMicros)*m_timeScale);
       m_currentMicros += m_deltaMicros;
       m_deltaSeconds = microsToSeconds(m_deltaMicros);
    }
 
-   void Timer::setTimeScale(float timeScale)
+   void Timer::setTimeScale(f32 timeScale)
    {
       m_timeScale = timeScale;
    }
 
-   float Timer::getTimeScale() const
+   f32 Timer::getTimeScale() const
    {
       return m_timeScale;
    }
 
-   uint32_t Timer::getCurrentMicros() const
+   u32 Timer::getCurrentMicros() const
    {
       return m_currentMicros;
    }
 
-   uint32_t Timer::getDeltaMicros() const
+   u32 Timer::getDeltaMicros() const
    {
       return m_deltaMicros;
    }
 
-   float Timer::getDeltaSeconds() const
+   f32 Timer::getDeltaSeconds() const
    {
       return m_deltaSeconds;
    }
 
-   void Timer::reset(uint32_t micros)
+   void Timer::reset(u32 micros)
    {
       if( micros == 0 )
       {

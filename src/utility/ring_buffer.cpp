@@ -4,25 +4,24 @@
 /******* personal header *******/
 #include "utility/ring_buffer.h"
 /******* c++ headers *******/
-#include <cassert>
 /******* extra headers *******/
 /******* end headers *******/
 
 namespace core
 {
-   RingBuffer::RingBuffer(int32_t initialSize, int32_t increment)
+   RingBuffer::RingBuffer(i32 initialSize, i32 increment)
       : m_nextWriteIndex(0), m_nextReadIndex(0), m_increment(increment)
    {
       m_data.resize(initialSize);
    }
 
-   void RingBuffer::init(int32_t initialSize, int32_t increment)
+   void RingBuffer::init(i32 initialSize, i32 increment)
    {
       m_increment = increment;
       m_data.resize(initialSize);
    }
 
-   void RingBuffer::push_back(uint32_t value)
+   void RingBuffer::push_back(u32 value)
    {
       m_data[m_nextWriteIndex++] = value;
 
@@ -67,9 +66,9 @@ namespace core
       return result;
    }
 
-   uint32_t RingBuffer::front() const
+   u32 RingBuffer::front() const
    {
-      uint32_t result{};
+      u32 result{};
       if( !empty() )
       {
          result = m_data[m_nextReadIndex];
@@ -78,7 +77,7 @@ namespace core
       return result;
    }
 
-   uint32_t RingBuffer::size() const
+   u32 RingBuffer::size() const
    {
       auto result = m_nextWriteIndex >= m_nextReadIndex ?
          m_nextWriteIndex - m_nextReadIndex :

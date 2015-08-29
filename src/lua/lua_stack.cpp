@@ -24,17 +24,17 @@ namespace core
       return (loadFile(file) && call());
    }
 
-   uint32_t LuaStack::getTop()
+   u32 LuaStack::getTop()
    {
       return lua_gettop(m_L);
    }
 
-   void LuaStack::pop(int32_t howMany)
+   void LuaStack::pop(i32 howMany)
    {
       lua_pop(m_L, howMany);
    }
 
-   void LuaStack::pull(uint32_t key, int32_t stackIndex)
+   void LuaStack::pull(u32 key, i32 stackIndex)
    {
       if( stackIndex < 0 )
       {
@@ -48,13 +48,13 @@ namespace core
       lua_gettable(m_L, stackIndex);
    }
 
-   void LuaStack::pull(const std::string& key, int32_t stackIndex)
+   void LuaStack::pull(const std::string& key, i32 stackIndex)
    {
       stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
       lua_getfield(m_L, stackIndex, key.c_str());
    }
 
-   void LuaStack::pairs(int32_t stackIndex)
+   void LuaStack::pairs(i32 stackIndex)
    {
       m_iters.emplace_back(Iteration{stackIndex < 0 ? getTop() + 1 + stackIndex : stackIndex, true, false});
       if( is<LuaTable>(m_iters.back().m_iterateTableIndex) )
@@ -73,7 +73,7 @@ namespace core
       }
    }
 
-   void LuaStack::ipairs(int32_t stackIndex)
+   void LuaStack::ipairs(i32 stackIndex)
    {
       pairs(stackIndex);
       m_iters.back().m_iterateAll = false;
@@ -87,19 +87,19 @@ namespace core
 
    bool LuaStack::next()
    {
-      int32_t res = 0;
+      i32 res = 0;
       if( is<LuaTable>(m_iters.back().m_iterateTableIndex) )
       {
          res = lua_next(m_L, m_iters.back().m_iterateTableIndex);
          if( res != 0 )
          {
-            if( !m_iters.back().m_iterateAll && !is<uint32_t>(-2) )
+            if( !m_iters.back().m_iterateAll && !is<u32>(-2) )
             {
                do
                {
                   pop();
                   res = lua_next(m_L, m_iters.back().m_iterateTableIndex);
-               } while( res != 0 && !is<uint32_t>(-2) );
+               } while( res != 0 && !is<u32>(-2) );
             }
          }
       }
@@ -114,7 +114,7 @@ namespace core
       return res != 0;
    }
 
-   void LuaStack::setValue(const std::string& key, int32_t stackIndex)
+   void LuaStack::setValue(const std::string& key, i32 stackIndex)
    {
       stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
       if( is<LuaTable>(stackIndex) )

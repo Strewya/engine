@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/texture/texture.h"
 #include "graphics/texture/texture_file_loader.h"

@@ -4,8 +4,8 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
    //services
 #include "audio/audio_system.h"

@@ -4,11 +4,10 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "utility/types.h"
 #include "window/window_message.h"
 /******* end header inclusion *******/
 

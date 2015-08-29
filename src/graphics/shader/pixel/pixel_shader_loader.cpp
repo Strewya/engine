@@ -31,7 +31,7 @@ namespace core
       CORE_SHUTDOWN_END(PixelShaderLoader);
    }
 
-   PixelShader PixelShaderLoader::load(const char* buffer, uint32_t bufferSize) const
+   PixelShader PixelShaderLoader::load(const char* buffer, u32 bufferSize) const
    {
       PixelShader result{nullptr};
       if( buffer != nullptr && bufferSize > 0 )

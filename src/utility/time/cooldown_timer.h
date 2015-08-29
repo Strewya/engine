@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <string>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "utility/time/timer.h"
 /******* end header inclusion *******/
@@ -17,20 +17,20 @@ namespace core
    {
    public:
       CooldownTimer();
-      CooldownTimer(uint32_t durationMicros);
+      CooldownTimer(u32 durationMicros);
 
-      void advanceTimeBy(uint32_t deltaMicros);
+      void advanceTimeBy(u32 deltaMicros);
       bool hasElapsed() const;
-      uint32_t getRemainingMicros() const;
-      float getPercentDone() const;
+      u32 getRemainingMicros() const;
+      f32 getPercentDone() const;
       void reset();
 
-      uint32_t getDurationMicros() const;
-      void setDurationMicros(uint32_t durationMicros);
+      u32 getDurationMicros() const;
+      void setDurationMicros(u32 durationMicros);
       const Timer& getTimer() const;
 
    private:
       Timer m_timer;
-      uint32_t m_durationMicros;
+      u32 m_durationMicros;
    };
 }

@@ -21,7 +21,7 @@ namespace core
       return result;
    }
 
-   Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result
       {
@@ -56,7 +56,7 @@ namespace core
       return result;
    }
 
-   Mesh makeOutlineQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeOutlineQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result
       {
@@ -87,13 +87,13 @@ namespace core
       return result;
    }
 
-   Mesh makeTexturedQuad(Rect rect, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeTexturedQuad(Rect rect, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader)
    {
       auto result = makeTexturedQuad(rect.center, rect.halfSize, texture, topLeftUV, botRightUV, vshader, pshader);
       return result;
    }
 
-   Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeTexturedQuad(v2 pos, v2 hs, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh mesh
       {
@@ -122,13 +122,13 @@ namespace core
       return mesh;
    }
 
-   Mesh makeSolidCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader)
    {
       auto result = makeSolidCircle(circle.center, circle.radius, points, vshader, pshader);
       return result;
    }
 
-   Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader)
    {
       --points;
       points |= points >> 1;
@@ -142,14 +142,14 @@ namespace core
       result.vshader = vshader;
       result.pshader = pshader;
       result.vertices.reserve(points+1);
-      float degreeOffset = 360.0f / points;
+      f32 degreeOffset = 360.0f / points;
       result.vertices.push_back({{pos.x, pos.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0});
-      for( uint32_t i = 0; i < points; ++i )
+      for( u32 i = 0; i < points; ++i )
       {
          result.vertices.push_back({{pos.x + radius*cos(Deg2Rad(i*degreeOffset)), pos.y + radius*sin(Deg2Rad(i*degreeOffset)), 0}, {1, 1, 1, 1}, {-1, -1}, 0});
       }
       result.indices.reserve(points * 3);
-      for( uint32_t i = 1; i <= points; ++i )
+      for( u32 i = 1; i <= points; ++i )
       {
          result.indices.push_back(i);
          result.indices.push_back(0);
@@ -160,13 +160,13 @@ namespace core
       return result;
    }
 
-   Mesh makeOutlineCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeOutlineCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader)
    {
       auto result = makeOutlineCircle(circle.center, circle.radius, points, vshader, pshader);
       return result;
    }
 
-   Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeOutlineCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader)
    {
       --points;
       points |= points >> 1;
@@ -180,13 +180,13 @@ namespace core
       result.vshader = vshader;
       result.pshader = pshader;
       result.vertices.reserve(points);
-      float degreeOffset = 360.0f / points;
-      for( uint32_t i = 0; i < points; ++i )
+      f32 degreeOffset = 360.0f / points;
+      for( u32 i = 0; i < points; ++i )
       {
          result.vertices.push_back({{pos.x + radius*cos(Deg2Rad(i*degreeOffset)), pos.y + radius*sin(Deg2Rad(i*degreeOffset)), 0}, {1, 1, 1, 1}, {-1, -1}, 0});
       }
       result.indices.reserve(points + 1);
-      for( uint32_t i = 0; i < points; ++i )
+      for( u32 i = 0; i < points; ++i )
       {
          result.indices.push_back(i);
       }
@@ -196,7 +196,7 @@ namespace core
       return result;
    }
 
-   Mesh makeLine(Vec2 a, Vec2 b, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeLine(v2 a, v2 b, HVertexShader vshader, HPixelShader pshader)
    {
       Mesh result{};
       result.pshader = pshader;

@@ -59,9 +59,8 @@ namespace core
    *     CLOCK IMPLEMENTATION
    ********************************************************/
 
-   class TimeSource
+   struct TimeSource
    {
-   public:
       u64 getSystemMicroseconds()
       {
          auto now = CLOCK_TYPE::now();

@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/shader/vertex/vertex_shader_loader.h"
 #include "graphics/graphics_types.h"

@@ -36,7 +36,7 @@ namespace core
          }
          for( lua.ipairs("glyphs"); lua.next(); lua.pop(1) )
          {
-            if( lua.is<uint32_t>(-2) && lua.is<LuaTable>(-1) )
+            if( lua.is<u32>(-2) && lua.is<LuaTable>(-1) )
             {
                auto ascii = get<char>(lua, "char", 0);
                auto left = get(lua, "left", -1);
@@ -55,7 +55,7 @@ namespace core
          result.pshader = pshader;
       }
       lua.pop();
-      assert(lua.getTop() == 0);
+      CORE_ASSERT_DEBUG(lua.getTop() == 0);
 
       return result;
    }

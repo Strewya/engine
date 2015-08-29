@@ -242,14 +242,15 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\audio\audio_system.cpp" />
     <ClCompile Include="..\..\..\src\audio\fmod_sound_file_loader.cpp" />
+    <ClCompile Include="..\..\..\src\games\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </None>
+    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland.cpp" />
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp" />
-    <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp" />
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp" />
     <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp" />
@@ -307,14 +308,14 @@
     <ClInclude Include="..\..\..\src\audio\fmod_sound_file_loader.h" />
     <ClInclude Include="..\..\..\src\audio\fmod_sound_handle.h" />
     <ClInclude Include="..\..\..\src\audio\sound_manager.h" />
+    <ClInclude Include="..\..\..\src\games\entity.h" />
+    <ClInclude Include="..\..\..\src\games\entity_manager.h" />
     <ClInclude Include="..\..\..\src\games\game_entry_point.h" />
-    <ClInclude Include="..\..\..\src\games\game_list.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\types\movement.h" />
-    <ClInclude Include="..\..\..\src\games\util\entity.h" />
-    <ClInclude Include="..\..\..\src\games\util\entity_manager.h" />
     <ClInclude Include="..\..\..\src\graphics\camera.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_include.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_renderer.h" />
@@ -356,7 +357,6 @@
     <ClInclude Include="..\..\..\src\utility\geometry\rect.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\vec2.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\vec3.h" />
-    <ClInclude Include="..\..\..\src\utility\geometry\vec_types.h" />
     <ClInclude Include="..\..\..\src\utility\memory.h" />
     <ClInclude Include="..\..\..\src\utility\random.h" />
     <ClInclude Include="..\..\..\src\utility\ring_buffer.h" />

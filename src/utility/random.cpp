@@ -13,40 +13,40 @@ namespace core
       : m_randEngine(std::default_random_engine()())
    {}
 
-   Random::Random(uint32_t seed)
+   Random::Random(u32 seed)
       : m_randEngine(seed)
    {}
 
-   Random::Random(uint64_t seed)
-      : m_randEngine(static_cast<uint32_t>(seed))
+   Random::Random(u64 seed)
+      : m_randEngine(static_cast<u32>(seed))
    {}
 
-   void Random::reseed(uint32_t seed)
+   void Random::reseed(u32 seed)
    {
       m_randEngine.seed(seed);
    }
 
-   void Random::reseed(uint64_t seed)
+   void Random::reseed(u64 seed)
    {
-      m_randEngine.seed(static_cast<uint32_t>(seed));
+      m_randEngine.seed(static_cast<u32>(seed));
    }
 
-   int32_t Random::randInt(int32_t a, int32_t b)
+   i32 Random::randInt(i32 a, i32 b)
    {
-      std::uniform_int_distribution<int32_t> distro(a, b);
+      std::uniform_int_distribution<i32> distro(a, b);
       auto result = distro(m_randEngine);
       return result;
    }
 
-   int32_t Random::randIndex(int32_t a, int32_t b)
+   i32 Random::randIndex(i32 a, i32 b)
    {
       auto result = randInt(a, b - 1);
       return result;
    }
 
-   float Random::randFloat()
+   f32 Random::randFloat()
    {
-      std::uniform_real_distribution<float> distro(0.0f, 1.0f);
+      std::uniform_real_distribution<f32> distro(0.0f, 1.0f);
       auto result = distro(m_randEngine);
       return result;
    }

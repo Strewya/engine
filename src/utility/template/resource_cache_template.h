@@ -4,11 +4,11 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cassert>
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
+#include "utility/utility.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -29,7 +29,7 @@ namespace core
       }
       core_iterator& operator++()
       {
-         uint32_t size = m_cache->m_magicNumbers.size();
+         u32 size = m_cache->m_magicNumbers.size();
          if( m_index < size )
          {
             while( (++m_index) < size && m_cache->m_magicNumbers[m_index] == 0 );
@@ -54,7 +54,7 @@ namespace core
    private:
       friend CACHE;
       CACHE* m_cache;
-      uint32_t m_index;
+      u32 m_index;
    };
 
    template<typename DATA, typename HANDLE>
@@ -67,16 +67,16 @@ namespace core
 
 
       typedef std::vector<DATA> DataVec;
-      typedef std::vector<uint16_t> MagicVec;
-      typedef std::vector<uint16_t> FreeVec;
+      typedef std::vector<u16> MagicVec;
+      typedef std::vector<u16> FreeVec;
       typedef core_iterator<ThisType> iterator;
 
       DATA& acquire(HANDLE& handle)
       {
-         uint16_t index;
+         u16 index;
          if( m_freeSlots.empty() )
          {
-            index = (uint16_t)m_magicNumbers.size();
+            index = (u16)m_magicNumbers.size();
             handle.init(index);
             m_data.emplace_back();
             m_magicNumbers.push_back(handle.getMagic());
@@ -94,8 +94,8 @@ namespace core
       void release(HANDLE handle)
       {
          auto index = handle.getIndex();
-         assert(index < m_data.size());
-         assert(m_magicNumbers[index] == handle.getMagic());
+         CORE_ASSERT_DEBUG(index < m_data.size(), "Index is not valid!");
+         CORE_ASSERT_DEBUG(m_magicNumbers[index] == handle.getMagic(), "The magic number is not equal!");
 
          m_magicNumbers[index] = 0;
          m_freeSlots.push_back(index);
@@ -119,7 +119,7 @@ namespace core
          return const_cast<ThisType*>(this)->dereference(handle);
       }
 
-      uint32_t getUsedHandleCount() const
+      u32 getUsedHandleCount() const
       {
          return m_magicNumbers.size() - m_freeSlots.size();
       }

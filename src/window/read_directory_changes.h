@@ -8,19 +8,19 @@
 #include <string>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    namespace RDCPrivate
    {
-      class CReadChangesServer;
+      struct CReadChangesServer;
    }
 
-   class CReadDirectoryChanges
+   struct CReadDirectoryChanges
    {
    public:
       typedef std::pair<DWORD, std::string> TDirectoryChangeNotification;

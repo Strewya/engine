@@ -5,8 +5,8 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 #define Bytes(n) (n)

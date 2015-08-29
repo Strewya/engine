@@ -9,79 +9,79 @@
 
 namespace core
 {
-   template<> std::string LuaStack::to<std::string>(int32_t stackIndex)
+   template<> std::string LuaStack::to<std::string>(i32 stackIndex)
    {
       return lua_tostring(m_L, stackIndex);
    }
 
-   template<> uint32_t LuaStack::to<uint32_t>(int32_t stackIndex)
+   template<> u32 LuaStack::to<u32>(i32 stackIndex)
    {
       return lua_tointeger(m_L, stackIndex);
    }
 
-   template<> int32_t LuaStack::to<int32_t>(int32_t stackIndex)
+   template<> i32 LuaStack::to<i32>(i32 stackIndex)
    {
       return lua_tointeger(m_L, stackIndex);
    }
 
-   template<> float LuaStack::to<float>(int32_t stackIndex)
+   template<> f32 LuaStack::to<f32>(i32 stackIndex)
    {
-      return (float)lua_tonumber(m_L, stackIndex);
+      return (f32)lua_tonumber(m_L, stackIndex);
    }
 
-   template<> double LuaStack::to<double>(int32_t stackIndex)
+   template<> f64 LuaStack::to<f64>(i32 stackIndex)
    {
-      return (double)lua_tonumber(m_L, stackIndex);
+      return (f64)lua_tonumber(m_L, stackIndex);
    }
 
-   template<> bool LuaStack::to<bool>(int32_t stackIndex)
+   template<> bool LuaStack::to<bool>(i32 stackIndex)
    {
       return lua_toboolean(m_L, stackIndex) == 1;
    }
 
 
 
-   template<> bool LuaStack::is<nullptr_t>(int32_t stackIndex)
+   template<> bool LuaStack::is<nullptr_t>(i32 stackIndex)
    {
       return lua_isnil(m_L, stackIndex);
    }
 
-   template<> bool LuaStack::is<bool>(int32_t stackIndex)
+   template<> bool LuaStack::is<bool>(i32 stackIndex)
    {
       return lua_isboolean(m_L, stackIndex);
    }
 
-   template<> bool LuaStack::is<int32_t>(int32_t stackIndex)
+   template<> bool LuaStack::is<i32>(i32 stackIndex)
    {
       return lua_isnumber(m_L, stackIndex) == 1;
    }
 
-   template<> bool LuaStack::is<uint32_t>(int32_t stackIndex)
+   template<> bool LuaStack::is<u32>(i32 stackIndex)
    {
       return lua_isnumber(m_L, stackIndex) == 1;
    }
 
-   template<> bool LuaStack::is<float>(int32_t stackIndex)
+   template<> bool LuaStack::is<f32>(i32 stackIndex)
    {
       return lua_isnumber(m_L, stackIndex) == 1;
    }
 
-   template<> bool LuaStack::is<double>(int32_t stackIndex)
+   template<> bool LuaStack::is<f64>(i32 stackIndex)
    {
       return lua_isnumber(m_L, stackIndex) == 1;
    }
 
-   template<> bool LuaStack::is<std::string>(int32_t stackIndex)
+   template<> bool LuaStack::is<std::string>(i32 stackIndex)
    {
       return (lua_isstring(m_L, stackIndex) == 1);
    }
 
-   template<> bool LuaStack::is<LuaTable>(int32_t stackIndex)
+   template<> bool LuaStack::is<LuaTable>(i32 stackIndex)
    {
       return lua_istable(m_L, stackIndex);
    }
 
-   template<> bool LuaStack::is<LuaFunction>(int32_t stackIndex)
+   template<> bool LuaStack::is<LuaFunction>(i32 stackIndex)
    {
       return lua_isfunction(m_L, stackIndex);
    }
@@ -92,12 +92,12 @@ namespace core
       lua_pushstring(m_L, arg.c_str());
    }
 
-   template<> void LuaStack::push<int32_t>(int32_t arg)
+   template<> void LuaStack::push<i32>(i32 arg)
    {
       lua_pushinteger(m_L, arg);
    }
 
-   template<> void LuaStack::push<uint32_t>(uint32_t arg)
+   template<> void LuaStack::push<u32>(u32 arg)
    {
       lua_pushinteger(m_L, arg);
    }
@@ -107,12 +107,12 @@ namespace core
       lua_pushboolean(m_L, arg);
    }
 
-   template<> void LuaStack::push<float>(float arg)
+   template<> void LuaStack::push<f32>(f32 arg)
    {
       lua_pushnumber(m_L, arg);
    }
 
-   template<> void LuaStack::push<double>(double arg)
+   template<> void LuaStack::push<f64>(f64 arg)
    {
       lua_pushnumber(m_L, arg);
    }
@@ -139,7 +139,7 @@ namespace core
       return valueIfMissing;
    }
 
-   template<> char get<char>(LuaStack& lua, int32_t stackIndex, char valueIfMissing)
+   template<> char get<char>(LuaStack& lua, i32 stackIndex, char valueIfMissing)
    {
       lua.pull(stackIndex);
       if( lua.is<std::string>() )

@@ -8,9 +8,9 @@
 #include <string>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
-#include "utility/types.h"
 #include "window/gamepad_handler.h"
 #include "window/keyboard_handler.h"
 #include "window/mouse_handler.h"

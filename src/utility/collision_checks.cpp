@@ -13,7 +13,7 @@
 
 namespace core
 {
-   CollisionResult checkCollision(Vec2 point, Rect rect)
+   CollisionResult checkCollision(v2 point, Rect rect)
    {
       auto toLeft = point.x - rect.left();
       auto toRight = rect.right() - point.x;
@@ -37,13 +37,13 @@ namespace core
       return result;
    }
 
-   CollisionResult checkCollision(Rect rect, Vec2 point)
+   CollisionResult checkCollision(Rect rect, v2 point)
    {
       auto result = checkCollision(point, rect);
       return result;
    }
 
-   CollisionResult checkCollision(Vec2 point, Circle circle)
+   CollisionResult checkCollision(v2 point, Circle circle)
    {
       auto direction = point - circle.center;
       auto l = vec2::length(direction);
@@ -56,7 +56,7 @@ namespace core
       return result;
    }
 
-   CollisionResult checkCollision(Circle circle, Vec2 point)
+   CollisionResult checkCollision(Circle circle, v2 point)
    {
       auto result = checkCollision(point, circle);
       return result;
@@ -85,7 +85,7 @@ namespace core
       return result;
    }
 
-   CollisionResult checkCollision(Vec2 a, Vec2 b)
+   CollisionResult checkCollision(v2 a, v2 b)
    {
       CollisionResult result{};
       result.isColliding = (a == b);
@@ -114,7 +114,7 @@ namespace core
 
 
 
-   bool isFullyWithin(Vec2 point, Rect rect)
+   bool isFullyWithin(v2 point, Rect rect)
    {
       auto result = true;
       if( point.x <= rect.left() ) result = false;
@@ -124,7 +124,7 @@ namespace core
       return result;
    }
 
-   bool isFullyWithin(Vec2 point, Circle circle)
+   bool isFullyWithin(v2 point, Circle circle)
    {
       auto result = (vec2::length2(point - circle.center) < circle.radius*circle.radius);
       return result;
@@ -142,10 +142,10 @@ namespace core
 //      circle.radius -= vec2::length(rect.halfSize);
 //      auto result = isFullyWithin(rect.center, circle);
       auto result = true;
-      if( !isFullyWithin(Vec2{rect.left(), rect.top()}, circle) ) result = false;
-      else if( !isFullyWithin(Vec2{rect.left(), rect.bottom()}, circle) ) result = false;
-      else if( !isFullyWithin(Vec2{rect.right(), rect.top()}, circle) ) result = false;
-      else if( !isFullyWithin(Vec2{rect.right(), rect.bottom()}, circle) ) result = false;
+      if( !isFullyWithin(v2{rect.left(), rect.top()}, circle) ) result = false;
+      else if( !isFullyWithin(v2{rect.left(), rect.bottom()}, circle) ) result = false;
+      else if( !isFullyWithin(v2{rect.right(), rect.top()}, circle) ) result = false;
+      else if( !isFullyWithin(v2{rect.right(), rect.bottom()}, circle) ) result = false;
       return result;
    }
 
@@ -165,11 +165,11 @@ namespace core
 
    struct Line
    {
-      Vec2 a;
-      Vec2 b;
+      v2 a;
+      v2 b;
    };
 
-   bool isLineTouchingCircle(Vec2 A, Vec2 B, Circle circle)
+   bool isLineTouchingCircle(v2 A, v2 B, Circle circle)
    {
       auto result = false;
       A -= circle.center;

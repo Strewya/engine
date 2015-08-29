@@ -5,7 +5,6 @@
 
 //	STL
 #include <algorithm>
-#include <assert.h>
 #include <chrono>
 #include <cstdint>
 #include <functional>

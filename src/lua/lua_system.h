@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
 #include "lua/lua_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "lua/lua_stack.h"
 /******* end header inclusion *******/

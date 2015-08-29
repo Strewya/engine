@@ -6,17 +6,15 @@
 /******* c++ headers *******/
 #include <string>
 /******* common headers *******/
+#include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core
 {
-   class WindowClass : public WNDCLASSEX
+   struct WindowClass : public WNDCLASSEX
    {
-   private:
-      void FillDefaultData();
-
    public:
       WindowClass(const char* className);
       WindowClass(HINSTANCE hInst, const char* className);
@@ -25,6 +23,9 @@ namespace core
 
       ATOM registerClass();
       const char* getClassName() const;
+
+   private:
+      void FillDefaultData();
    };
 
 }

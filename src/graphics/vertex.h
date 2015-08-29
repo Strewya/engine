@@ -6,27 +6,25 @@
 /******* c++ headers *******/
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
-#include "utility/types.h"
 /******* end header inclusion *******/
 
 namespace core
 {
    struct Color;
-   struct Vec2;
-   struct Vec3;
-
+   
    struct DefaultVertex
    {
       DefaultVertex();
-      DefaultVertex(Vec3 position, Color color, Vec2 textureUV);
-      void setPosition(Vec3 position);
-      void setPosition(float x, float y, float z);
+      DefaultVertex(v3 position, Color color, v2 textureUV);
+      void setPosition(v3 position);
+      void setPosition(f32 x, f32 y, f32 z);
       void setColor(Color color);
-      void setColor(float r, float g, float b, float a);
-      void setTextureUV(Vec2 textureUV);
-      void setTextureUV(float u, float v);
+      void setColor(f32 r, f32 g, f32 b, f32 a);
+      void setTextureUV(v2 textureUV);
+      void setTextureUV(f32 u, f32 v);
 
       XMFLOAT4 position;
       XMFLOAT4 diffuse;
@@ -38,8 +36,8 @@ namespace core
    struct HealthVertex : public DefaultVertex
    {
       HealthVertex();
-      HealthVertex(Vec3 position, Color color, Vec2 textureUV, float health);
-      void setHealth(float h);
+      HealthVertex(v3 position, Color color, v2 textureUV, f32 health);
+      void setHealth(f32 h);
 
       XMFLOAT2 health;
 

@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/shader/shader_handle.h"
 #include "graphics/shader/pixel/pixel_shader.h"

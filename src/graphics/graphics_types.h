@@ -4,10 +4,10 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -19,7 +19,7 @@ namespace core
    typedef std::vector<DefaultVertex> DefaultVertexBuffer;
    typedef std::vector<HealthVertex> HealthVertexBuffer;
 
-   typedef std::vector<uint32_t> IndexBuffer;
+   typedef std::vector<u32> IndexBuffer;
 
    typedef std::vector<D3D11_INPUT_ELEMENT_DESC> InputLayout;
 

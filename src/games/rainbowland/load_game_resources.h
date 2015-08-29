@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "audio/sound_manager.h"
 #include "graphics/shader/pixel/pixel_shader_manager.h"

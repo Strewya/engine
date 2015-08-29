@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/shader/shader_handle.h"
 #include "graphics/texture/texture_handle.h"
@@ -15,7 +16,6 @@ namespace core
 {
    struct Circle;
    struct Rect;
-   struct Vec2;
 
    enum VertexTopology;
 
@@ -29,18 +29,18 @@ namespace core
       IndexBuffer indices;
    };
    
-   Mesh makeSolidQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader);
    Mesh makeSolidQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineQuad(Vec2 pos, Vec2 hs, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader);
    Mesh makeOutlineQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeTexturedQuad(Vec2 pos, Vec2 hs, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeTexturedQuad(Rect rect, HTexture texture, Vec2 topLeftUV, Vec2 botRightUV, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeTexturedQuad(v2 pos, v2 hs, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeTexturedQuad(Rect rect, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
-   Mesh makeSolidCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeSolidCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeSolidCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader);
    // rounds 'points' to the next power of 2
-   Mesh makeOutlineCircle(Vec2 pos, float radius, uint32_t points, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineCircle(Circle circle, uint32_t points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeOutlineCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader);
 
-   Mesh makeLine(Vec2 a, Vec2 b, HVertexShader vshader, HPixelShader pshader);
+   Mesh makeLine(v2 a, v2 b, HVertexShader vshader, HPixelShader pshader);
 }

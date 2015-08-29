@@ -7,200 +7,198 @@
 /******* extra headers *******/
 /******* end headers *******/
 
-namespace core
+namespace vec2
 {
-   namespace vec2
+   bool isZero(v2 v)
    {
-      bool isZero(Vec2 v)
-      {
-         auto result = v.x == 0.0f && v.y == 0.0f;
-         return result;
-      }
-
-      float length(Vec2 v)
-      {
-         auto result = sqrt(length2(v));
-         return result;
-      }
-
-      float length2(Vec2 v)
-      {
-         auto result = dotProduct(v, v);
-         return result;
-      }
-
-      float dotProduct(Vec2 l, Vec2 r)
-      {
-         auto result = l.x*r.x + l.y*r.y;
-         return result;
-      }
-
-      Vec2 normalize(Vec2 v)
-      {
-         Vec2 result{0, 0};
-         auto l2 = length2(v);
-         if( l2 != 0 )
-         {
-            auto l = sqrt(l2);
-            result = {v.x / l, v.y / l};
-         }
-         return result;
-      }
-
-      Vec2 projection(Vec2 v, Vec2 target)
-      {
-         auto dpv = dotProduct(v, target);
-         auto dpt = dotProduct(target, target);
-         auto result = (dpv / dpt)*target;
-         return result;
-      }
-
-      Vec2 setLength(Vec2 v, float len)
-      {
-         auto result = normalize(v)*len;
-         return result;
-      }
-
-      Vec2 absolute(Vec2 v)
-      {
-         if( v.x < 0 ) { v.x = -v.x; }
-         if( v.y < 0 ) { v.y = -v.y; }
-         return v;
-      }
-   }
-
-   Vec2& operator+=(Vec2& t, float s)
-   {
-      t.x += s;
-      t.y += s;
-      return t;
-   }
-
-   Vec2& operator-=(Vec2& t, float s)
-   {
-      t.x -= s;
-      t.y -= s;
-      return t;
-   }
-
-   Vec2& operator*=(Vec2& t, float s)
-   {
-      t.x *= s;
-      t.y *= s;
-      return t;
-   }
-
-   Vec2& operator/=(Vec2& t, float s)
-   {
-      t.x /= s;
-      t.y /= s;
-      return t;
-   }
-
-   Vec2& operator+=(Vec2& t, Vec2 v)
-   {
-      t.x += v.x;
-      t.y += v.y;
-      return t;
-   }
-
-   Vec2& operator-=(Vec2& t, Vec2 v)
-   {
-      t.x -= v.x;
-      t.y -= v.y;
-      return t;
-   }
-
-   Vec2& operator*=(Vec2& t, Vec2 v)
-   {
-      t.x *= v.x;
-      t.y *= v.y;
-      return t;
-   }
-
-   Vec2& operator/=(Vec2& t, Vec2 v)
-   {
-      t.x /= v.x;
-      t.y /= v.y;
-      return t;
-   }
-
-   Vec2 operator-(Vec2 v)
-   {
-      Vec2 result{-v.x, -v.y};
+      auto result = v.x == 0.0f && v.y == 0.0f;
       return result;
    }
 
-   Vec2 operator+(Vec2 v, float s)
+   f32 length(v2 v)
    {
-      v += s;
-      return v;
-   }
-   Vec2 operator-(Vec2 v, float s)
-   {
-      v -= s;
-      return v;
-   }
-   Vec2 operator*(Vec2 v, float s)
-   {
-      v *= s;
-      return v;
-   }
-   Vec2 operator/(Vec2 v, float s)
-   {
-      v /= s;
-      return v;
-   }
-   Vec2 operator*(float s, Vec2 v)
-   {
-      return v*s;
-   }
-   Vec2 operator/(float s, Vec2 v)
-   {
-      return v / s;
-   }
-
-   Vec2 operator+(Vec2 l, Vec2 r)
-   {
-      l += r;
-      return l;
-   }
-   Vec2 operator-(Vec2 l, Vec2 r)
-   {
-      l -= r;
-      return l;
-   }
-   Vec2 operator*(Vec2 l, Vec2 r)
-   {
-      l *= r;
-      return l;
-   }
-   Vec2 operator/(Vec2 l, Vec2 r)
-   {
-      l /= r;
-      return l;
-   }
-
-   bool operator==(Vec2 l, Vec2 r)
-   {
-      auto result = l.x == r.x && l.y == r.y;
-      return result;
-   }
-   bool operator!=(Vec2 l, Vec2 r)
-   {
-      auto result = !(l == r);
+      auto result = sqrt(length2(v));
       return result;
    }
 
-   bool operator<(Vec2 l, Vec2 r)
+   f32 length2(v2 v)
    {
-      auto result = (l.x < r.x) && (l.y < r.y);
+      auto result = dotProduct(v, v);
       return result;
    }
 
-   std::ostream& operator<<(std::ostream& os, Vec2 v)
+   f32 dotProduct(v2 l, v2 r)
    {
-      os << "{" << v.x << "," << v.y << "}";
-      return os;
+      auto result = l.x*r.x + l.y*r.y;
+      return result;
+   }
+
+   v2 normalize(v2 v)
+   {
+      v2 result{0, 0};
+      auto l2 = length2(v);
+      if( l2 != 0 )
+      {
+         auto l = sqrt(l2);
+         result = {v.x / l, v.y / l};
+      }
+      return result;
+   }
+
+   v2 projection(v2 v, v2 target)
+   {
+      auto dpv = dotProduct(v, target);
+      auto dpt = dotProduct(target, target);
+      auto result = (dpv / dpt)*target;
+      return result;
+   }
+
+   v2 setLength(v2 v, f32 len)
+   {
+      auto result = normalize(v)*len;
+      return result;
+   }
+
+   v2 absolute(v2 v)
+   {
+      if( v.x < 0 ) { v.x = -v.x; }
+      if( v.y < 0 ) { v.y = -v.y; }
+      return v;
    }
 }
+
+v2& operator+=(v2& t, f32 s)
+{
+   t.x += s;
+   t.y += s;
+   return t;
+}
+
+v2& operator-=(v2& t, f32 s)
+{
+   t.x -= s;
+   t.y -= s;
+   return t;
+}
+
+v2& operator*=(v2& t, f32 s)
+{
+   t.x *= s;
+   t.y *= s;
+   return t;
+}
+
+v2& operator/=(v2& t, f32 s)
+{
+   t.x /= s;
+   t.y /= s;
+   return t;
+}
+
+v2& operator+=(v2& t, v2 v)
+{
+   t.x += v.x;
+   t.y += v.y;
+   return t;
+}
+
+v2& operator-=(v2& t, v2 v)
+{
+   t.x -= v.x;
+   t.y -= v.y;
+   return t;
+}
+
+v2& operator*=(v2& t, v2 v)
+{
+   t.x *= v.x;
+   t.y *= v.y;
+   return t;
+}
+
+v2& operator/=(v2& t, v2 v)
+{
+   t.x /= v.x;
+   t.y /= v.y;
+   return t;
+}
+
+v2 operator-(v2 v)
+{
+   v2 result{-v.x, -v.y};
+   return result;
+}
+
+v2 operator+(v2 v, f32 s)
+{
+   v += s;
+   return v;
+}
+v2 operator-(v2 v, f32 s)
+{
+   v -= s;
+   return v;
+}
+v2 operator*(v2 v, f32 s)
+{
+   v *= s;
+   return v;
+}
+v2 operator/(v2 v, f32 s)
+{
+   v /= s;
+   return v;
+}
+v2 operator*(f32 s, v2 v)
+{
+   return v*s;
+}
+v2 operator/(f32 s, v2 v)
+{
+   return v / s;
+}
+
+v2 operator+(v2 l, v2 r)
+{
+   l += r;
+   return l;
+}
+v2 operator-(v2 l, v2 r)
+{
+   l -= r;
+   return l;
+}
+v2 operator*(v2 l, v2 r)
+{
+   l *= r;
+   return l;
+}
+v2 operator/(v2 l, v2 r)
+{
+   l /= r;
+   return l;
+}
+
+bool operator==(v2 l, v2 r)
+{
+   auto result = l.x == r.x && l.y == r.y;
+   return result;
+}
+bool operator!=(v2 l, v2 r)
+{
+   auto result = !(l == r);
+   return result;
+}
+
+bool operator<(v2 l, v2 r)
+{
+   auto result = (l.x < r.x) && (l.y < r.y);
+   return result;
+}
+
+std::ostream& operator<<(std::ostream& os, v2 v)
+{
+   os << "{" << v.x << "," << v.y << "}";
+   return os;
+}
+

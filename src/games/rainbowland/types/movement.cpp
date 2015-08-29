@@ -5,7 +5,7 @@
 #include "games/rainbowland/types/movement.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "games/util/entity.h"
+#include "games/entity.h"
 #include "utility/geometry/vec2.h"
 /******* end headers *******/
 
@@ -16,27 +16,27 @@ namespace core
       _direction(nullptr), _position(nullptr), _inUse(0), m_allocated(0)
    {}
 
-   void MovementData::allocate(uint32_t newSize)
+   void MovementData::allocate(u32 newSize)
    {
       if( newSize <= m_allocated )
       {
          return;
       }
-      std::vector<uint8_t> newMemory;
-      auto newByteCount = newSize*(sizeof(Entity) + sizeof(float) + sizeof(Vec2) * 3);
+      std::vector<u8> newMemory;
+      auto newByteCount = newSize*(sizeof(Entity) + sizeof(f32) + sizeof(v2) * 3);
       newMemory.resize(newByteCount);
 
       Entity* newEntity = (Entity*)newMemory.data();
-      float* newAcceleration = (float*)(newEntity + newSize);
-      Vec2* newVelocity = (Vec2*)(newAcceleration + newSize);
-      Vec2* newDirection = (Vec2*)(newVelocity + newSize);
-      Vec2* newPosition = (Vec2*)(newDirection + newSize);
+      f32* newAcceleration = (f32*)(newEntity + newSize);
+      v2* newVelocity = (v2*)(newAcceleration + newSize);
+      v2* newDirection = (v2*)(newVelocity + newSize);
+      v2* newPosition = (v2*)(newDirection + newSize);
 
       memcpy(newEntity, _entity, _inUse*sizeof(Entity));
-      memcpy(newAcceleration, _acceleration, _inUse*sizeof(float));
-      memcpy(newVelocity, _velocity, _inUse*sizeof(Vec2));
-      memcpy(newDirection, _direction, _inUse*sizeof(Vec2));
-      memcpy(newPosition, _position, _inUse*sizeof(Vec2));
+      memcpy(newAcceleration, _acceleration, _inUse*sizeof(f32));
+      memcpy(newVelocity, _velocity, _inUse*sizeof(v2));
+      memcpy(newDirection, _direction, _inUse*sizeof(v2));
+      memcpy(newPosition, _position, _inUse*sizeof(v2));
 
       std::swap(m_memory, newMemory);
       _entity = newEntity;
@@ -60,7 +60,7 @@ namespace core
 
    void MovementData::destroy(Entity e)
    {
-      uint32_t c = makeComponent(e.id);
+      u32 c = makeComponent(e.id);
       auto i = getDataIndex(c);
       auto last = _inUse - 1;
       Entity last_e = _entity[last];
@@ -77,9 +77,9 @@ namespace core
       --_inUse;
    }
 
-   uint32_t MovementData::getEntitySlot(Entity e)
+   u32 MovementData::getEntitySlot(Entity e)
    {
-      uint32_t result = 0;
+      u32 result = 0;
       auto it = m_map.find(e.id);
       if( it != m_map.end() )
       {
@@ -95,9 +95,9 @@ namespace core
       return result;
    }
 
-   void doMovement(float dt, MovementData& data)
+   void doMovement(f32 dt, MovementData& data)
    {
-      for( uint32_t i = 0; i < data._inUse; ++i )
+      for( u32 i = 0; i < data._inUse; ++i )
       {
          auto acceleration = data._direction[i] * data._acceleration[i];
          acceleration += -data._velocity[i] * 10.0f;
@@ -106,14 +106,14 @@ namespace core
       }
    }
 
-   uint32_t MovementData::getDataIndex(uint32_t c)
+   u32 MovementData::getDataIndex(u32 c)
    {
       auto result = c - 1;
       return result;
    }
-   uint32_t MovementData::makeComponent(uint32_t idx)
+   u32 MovementData::makeComponent(u32 idx)
    {
-      uint32_t result{idx + 1};
+      u32 result{idx + 1};
       return result;
    }
 }

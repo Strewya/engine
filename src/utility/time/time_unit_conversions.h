@@ -4,45 +4,45 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core
 {
-   inline uint32_t secondsToMicros(uint32_t s)
+   inline u32 secondsToMicros(u32 s)
    {
       return s * 1000U * 1000U;
    }
 
-   inline uint32_t secondsToMicros(float s)
+   inline u32 secondsToMicros(f32 s)
    {
-      return static_cast<uint32_t>(s*1000.0f*1000.0f);
+      return static_cast<u32>(s*1000.0f*1000.0f);
    }
 
-   inline uint32_t secondsToMilis(uint32_t s)
+   inline u32 secondsToMilis(u32 s)
    {
       return s * 1000U;
    }
 
-   inline uint32_t secondsToMilis(float s)
+   inline u32 secondsToMilis(f32 s)
    {
-      return static_cast<uint32_t>(s*1000.0f);
+      return static_cast<u32>(s*1000.0f);
    }
 
-   inline uint32_t milisToMicros(uint32_t ms)
+   inline u32 milisToMicros(u32 ms)
    {
       return ms * 1000U;
    }
 
-   inline float milisToSeconds(uint32_t ms)
+   inline f32 milisToSeconds(u32 ms)
    {
-      return static_cast<float>(ms)*0.001f;
+      return static_cast<f32>(ms)*0.001f;
    }
 
-   inline float microsToSeconds(uint32_t us)
+   inline f32 microsToSeconds(u32 us)
    {
-      return static_cast<float>(us)*0.001f*0.001f;
+      return static_cast<f32>(us)*0.001f*0.001f;
    }
 }

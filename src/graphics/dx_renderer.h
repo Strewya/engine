@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 /******* common headers *******/
 #include "graphics/dx_include.h"
+#include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/graphics_types.h"
 #include "graphics/vertex.h"

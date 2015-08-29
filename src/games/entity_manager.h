@@ -4,9 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 #include <vector>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 #include "utility/ring_buffer.h"
 /******* end header inclusion *******/
@@ -24,6 +24,6 @@ namespace core
       
    private:
       RingBuffer m_freeIndex;
-      std::vector<uint8_t> m_generation;*/
+      std::vector<u8> m_generation;*/
    };
 }

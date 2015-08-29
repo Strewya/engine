@@ -5,8 +5,8 @@
 ********************************************/
 /******* c++ headers *******/
 #include <vector>
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -15,22 +15,22 @@ namespace core
    struct RingBuffer
    {
    public:
-      RingBuffer(int32_t initialSize = 8, int32_t increment = 3);
-      void init(int32_t initialSize, int32_t increment = 3);
+      RingBuffer(i32 initialSize = 8, i32 increment = 3);
+      void init(i32 initialSize, i32 increment = 3);
 
-      void push_back(uint32_t value);
+      void push_back(u32 value);
       void pop_front();
       void clear();
       
-      uint32_t front() const;
-      uint32_t size() const;
+      u32 front() const;
+      u32 size() const;
       bool empty() const;
 
    private:
-      std::vector<uint32_t> m_data;
-      uint32_t m_nextWriteIndex;
-      uint32_t m_nextReadIndex;
-      uint32_t m_increment;
+      std::vector<u32> m_data;
+      u32 m_nextWriteIndex;
+      u32 m_nextReadIndex;
+      u32 m_increment;
    };
 
    void test_ringBuffer();

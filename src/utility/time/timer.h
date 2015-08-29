@@ -4,8 +4,8 @@
 *  usage:   max resolution is 2^32 micros == 71min
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
@@ -16,21 +16,21 @@ namespace core
    public:
       Timer();
 
-      void advanceTimeBy(uint32_t deltaMicros);
+      void advanceTimeBy(u32 deltaMicros);
 
-      void setTimeScale(float timeScale);
-      float getTimeScale() const;
+      void setTimeScale(f32 timeScale);
+      f32 getTimeScale() const;
 
-      uint32_t getCurrentMicros() const;
-      uint32_t getDeltaMicros() const;
-      float getDeltaSeconds() const;
+      u32 getCurrentMicros() const;
+      u32 getDeltaMicros() const;
+      f32 getDeltaSeconds() const;
 
-      void reset(uint32_t micros = 0);
+      void reset(u32 micros = 0);
 
    private:
-      uint32_t m_currentMicros;
-      uint32_t m_deltaMicros;
-      float m_deltaSeconds;
-      float m_timeScale;
+      u32 m_currentMicros;
+      u32 m_deltaMicros;
+      f32 m_deltaSeconds;
+      f32 m_timeScale;
    };
 }

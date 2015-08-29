@@ -7,8 +7,8 @@
 #include <array>
 #include <atomic>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
+/******* extra headers *******/
 #include "utility/utility.h"
 #include "utility/time/clock.h"
 #include "window/window_message.h"

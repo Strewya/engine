@@ -82,9 +82,6 @@
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
       <Filter>code\games</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\util\entity_manager.cpp">
-      <Filter>code\games\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\lua\lua_stack.cpp">
       <Filter>code\framework\lua</Filter>
     </ClCompile>
@@ -113,49 +110,55 @@
       <Filter>code\games\rainbowland\logic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\geometry\circle.cpp">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\geometry\rect.cpp">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\geometry\vec2.cpp">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\geometry\vec3.cpp">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\time\clock.cpp">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\time\cooldown_timer.cpp">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\time\periodic_timer.cpp">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\time\timer.cpp">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\collision_checks.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\color.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\random.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\ring_buffer.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\ring_buffer_playground.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\transform.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\utility.cpp">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\entity_manager.cpp">
+      <Filter>code\games</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland.cpp">
+      <Filter>code\games\rainbowland</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,20 +282,11 @@
     <ClInclude Include="..\..\..\src\window\window_include.h">
       <Filter>code\framework\window\windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\game_list.h">
-      <Filter>code\games</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h">
       <Filter>code\framework\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_entry_point.h">
       <Filter>code\games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\util\entity_manager.h">
-      <Filter>code\games\util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\util\entity.h">
-      <Filter>code\games\util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\lua\lua_stack.h">
       <Filter>code\framework\lua</Filter>
@@ -331,73 +325,79 @@
       <Filter>code\framework\window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\geometry\circle.h">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\geometry\rect.h">
-      <Filter>code\framework\util\geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\utility\geometry\vec_types.h">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\geometry\vec2.h">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\geometry\vec3.h">
-      <Filter>code\framework\util\geometry</Filter>
+      <Filter>code\framework\utility\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\template\name_cache_template.h">
-      <Filter>code\framework\util\template</Filter>
+      <Filter>code\framework\utility\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\template\resource_cache_template.h">
-      <Filter>code\framework\util\template</Filter>
+      <Filter>code\framework\utility\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\template\resource_handle_template.h">
-      <Filter>code\framework\util\template</Filter>
+      <Filter>code\framework\utility\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\template\resource_manager_template.h">
-      <Filter>code\framework\util\template</Filter>
+      <Filter>code\framework\utility\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\time\clock.h">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\time\cooldown_timer.h">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\time\periodic_timer.h">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\time\time_unit_conversions.h">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\time\timer.h">
-      <Filter>code\framework\util\time</Filter>
+      <Filter>code\framework\utility\time</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\collision_checks.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\color.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\communication_buffer.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\memory.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\random.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\ring_buffer.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\transform.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\types.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\utility.h">
-      <Filter>code\framework\util</Filter>
+      <Filter>code\framework\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\entity.h">
+      <Filter>code\games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\entity_manager.h">
+      <Filter>code\games</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h">
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -434,18 +434,6 @@
     <Filter Include="code\framework\input\devices">
       <UniqueIdentifier>{ea2b549d-61ac-4f42-8c85-bae97d6801b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\framework\util">
-      <UniqueIdentifier>{565cb0f6-2f3c-4edb-9208-e53adeef455d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\framework\util\geometry">
-      <UniqueIdentifier>{32fe215e-3092-4a9f-acd9-17067b78d58b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\framework\util\template">
-      <UniqueIdentifier>{00d1644b-7bf8-43cd-8bfe-bc038d648a46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="code\framework\util\time">
-      <UniqueIdentifier>{9f53bd47-2c17-4739-88dd-38660f29f11a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\framework\window">
       <UniqueIdentifier>{8bbf906b-4ef6-4407-8979-d1c7f15135b6}</UniqueIdentifier>
     </Filter>
@@ -461,9 +449,6 @@
     <Filter Include="code\games\rainbowland\logic">
       <UniqueIdentifier>{5c7399e0-be04-4354-a4cc-d5ec3931ca40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="code\games\util">
-      <UniqueIdentifier>{fa3b9e3e-cdd7-40cd-9ea1-6bdd5b625ada}</UniqueIdentifier>
-    </Filter>
     <Filter Include="code\framework\lua">
       <UniqueIdentifier>{c8d983e7-3d8b-4c38-9cf7-649cddbf2133}</UniqueIdentifier>
     </Filter>
@@ -473,14 +458,26 @@
     <Filter Include="code\framework\graphics\font">
       <UniqueIdentifier>{35778f1b-e723-444c-9b01-b2ccc29cbd9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\framework\utility">
+      <UniqueIdentifier>{565cb0f6-2f3c-4edb-9208-e53adeef455d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\utility\geometry">
+      <UniqueIdentifier>{32fe215e-3092-4a9f-acd9-17067b78d58b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\utility\template">
+      <UniqueIdentifier>{00d1644b-7bf8-43cd-8bfe-bc038d648a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="code\framework\utility\time">
+      <UniqueIdentifier>{9f53bd47-2c17-4739-88dd-38660f29f11a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\graphics\shader\default_shader.hlsl">
       <Filter>code\framework\graphics\shader</Filter>
     </None>
+    <None Include="..\..\..\src\games\rainbowland\design.txt" />
     <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
       <Filter>code\games\rainbowland\logic</Filter>
     </None>
-    <None Include="..\..\..\src\games\rainbowland\design.txt" />
   </ItemGroup>
 </Project>

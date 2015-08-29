@@ -154,7 +154,7 @@ namespace core
       {
       }
 
-      uint32_t WINAPI CReadChangesServer::ThreadStartProc(LPVOID arg)
+      u32 WINAPI CReadChangesServer::ThreadStartProc(LPVOID arg)
       {
          CReadChangesServer* pServer = (CReadChangesServer*)arg;
          pServer->Run();

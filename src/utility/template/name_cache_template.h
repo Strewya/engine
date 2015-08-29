@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 

@@ -14,12 +14,12 @@ namespace core
    {
    }
 
-   PeriodicTimer::PeriodicTimer(uint32_t periodMicros)
+   PeriodicTimer::PeriodicTimer(u32 periodMicros)
       : m_periodMicros(periodMicros)
    {
    }
 
-   void PeriodicTimer::advanceTimeBy(uint32_t deltaMicros)
+   void PeriodicTimer::advanceTimeBy(u32 deltaMicros)
    {
       m_timer.advanceTimeBy(deltaMicros);
    }
@@ -27,13 +27,13 @@ namespace core
    {
       return m_timer.getCurrentMicros() >= m_periodMicros;
    }
-   uint32_t PeriodicTimer::getRemainingMicros() const
+   u32 PeriodicTimer::getRemainingMicros() const
    {
       return m_periodMicros - m_timer.getCurrentMicros();
    }
-   float PeriodicTimer::getPercentDone() const
+   f32 PeriodicTimer::getPercentDone() const
    {
-      return static_cast<float>(m_timer.getCurrentMicros()) / static_cast<float>(m_periodMicros);
+      return static_cast<f32>(m_timer.getCurrentMicros()) / static_cast<f32>(m_periodMicros);
    }
    void PeriodicTimer::period()
    {
@@ -44,11 +44,11 @@ namespace core
       m_timer.reset();
    }
 
-   uint32_t PeriodicTimer::getPeriodMicros() const
+   u32 PeriodicTimer::getPeriodMicros() const
    {
       return m_periodMicros;
    }
-   void PeriodicTimer::setPeriodMicros(uint32_t periodMicros)
+   void PeriodicTimer::setPeriodMicros(u32 periodMicros)
    {
       m_periodMicros = periodMicros;
    }

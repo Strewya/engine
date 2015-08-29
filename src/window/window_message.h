@@ -4,11 +4,9 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <cstdint>
 /******* common headers *******/
-/******* extra headers *******/
 #include "utility/types.h"
-#include "utility/geometry/vec2.h"
+/******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core
