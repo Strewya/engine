@@ -1,9 +1,10 @@
 #pragma once
 /********************************************
-*  contents:   fmod sound resource object
+*  contents:   fmod sound file loader
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <string>
 /******* common headers *******/
 #include "audio/fmod_include.h"
 #include "utility/types.h"
@@ -12,18 +13,19 @@
 
 namespace core
 {
-   struct FmodSound
+   struct Sound;
+
+   struct SoundFileLoader
    {
-      FMOD::Sound* _sound;
+   public:
+      bool init(FMOD::System* system);
+      bool shutdown();
 
-      bool loaded()
-      {
-         return _sound != nullptr;
-      }
+      Sound load(const char* filename) const;
 
-      bool unloaded()
-      {
-         return !loaded();
-      }
+      void unload(Sound& texture) const;
+
+   private:
+      FMOD::System* m_system;
    };
 }

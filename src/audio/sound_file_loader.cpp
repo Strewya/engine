@@ -2,38 +2,38 @@
 /******* precompiled header *******/
 #include "stdafx.h"
 /******* personal header *******/
-#include "audio/fmod_sound_file_loader.h"
+#include "audio/sound_file_loader.h"
 /******* c++ headers *******/
 /******* extra headers *******/
-#include "audio/fmod_sound.h"
+#include "audio/sound.h"
 #include "utility/utility.h"
 /******* end headers *******/
 
 namespace core
 {
-   bool FmodSoundFileLoader::init(FMOD::System* system)
+   bool SoundFileLoader::init(FMOD::System* system)
    {
-      CORE_INIT_START(FmodSoundFileLoader);
+      CORE_INIT_START(SoundFileLoader);
 
       m_system = system;
 
       CORE_STATUS_AND(m_system != nullptr);
 
-      CORE_INIT_END(FmodSoundFileLoader);
+      CORE_INIT_END(SoundFileLoader);
    }
 
-   bool FmodSoundFileLoader::shutdown()
+   bool SoundFileLoader::shutdown()
    {
-      CORE_SHUTDOWN_START(FmodSoundFileLoader);
+      CORE_SHUTDOWN_START(SoundFileLoader);
 
       m_system = nullptr;
 
-      CORE_SHUTDOWN_END(FmodSoundFileLoader);
+      CORE_SHUTDOWN_END(SoundFileLoader);
    }
 
-   FmodSound FmodSoundFileLoader::load(const char* filename) const
+   Sound SoundFileLoader::load(const char* filename) const
    {
-      FmodSound result{nullptr};
+      Sound result{nullptr};
       FMOD_RESULT fr = m_system->createSound(filename, FMOD_DEFAULT, nullptr, &result._sound);
       if( fr != FMOD_OK )
       {
@@ -42,7 +42,7 @@ namespace core
       return result;
    }
 
-   void FmodSoundFileLoader::unload(FmodSound& sound) const
+   void SoundFileLoader::unload(Sound& sound) const
    {
       sound._sound->release();
       sound._sound = nullptr;

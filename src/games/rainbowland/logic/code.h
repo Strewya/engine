@@ -9,7 +9,7 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
-#include "audio/fmod_sound_handle.h"
+#include "audio/sound_handle.h"
 #include "graphics/camera.h"
 #include "graphics/font/font_descriptor.h"
 #include "graphics/mesh/mesh.h"

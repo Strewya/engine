@@ -4,30 +4,34 @@
 /******* personal header *******/
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "games/rainbowland/types.h"
 #include "utility/communication_buffer.h"
 #include "utility/memory.h"
 /******* end headers *******/
 
-
 namespace core
 {
-   bool init_game(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
+   void* allocate(BlockAllocator& allocator, u32 size, u32 align)
+   {
+   }
+
+   core_internal bool init_game(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
+   {
+      return false;
+   }
+
+   core_internal bool tickLogic(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
+   {
+      return false;
+   }
+
+   core_internal void tickRender(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
    {
 
    }
 
-   bool tickLogic(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
+   core_internal bool shutdown_game(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
-
-   }
-
-   void tickRender(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
-   {
-
-   }
-
-   void shutdown_game(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
-   {
-
+      return true;
    }
 }

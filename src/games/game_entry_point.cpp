@@ -34,7 +34,9 @@ namespace core
       Clock logicTimer{};
       Clock renderTimer{};
 
-      bool running = init_game(memory, fromMain, toMain);
+      BlockAllocator mainAllocator{memory, memory.ptr};
+
+      bool running = init_game(mainAllocator, fromMain, toMain);
       while( running )
       {
          f32 fraction = 0;

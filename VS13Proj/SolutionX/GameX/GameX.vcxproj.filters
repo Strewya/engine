@@ -10,9 +10,6 @@
     <ClCompile Include="..\..\..\src\audio\audio_system.cpp">
       <Filter>code\framework\audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\audio\fmod_sound_file_loader.cpp">
-      <Filter>code\framework\audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp">
       <Filter>code\framework\graphics\mesh</Filter>
     </ClCompile>
@@ -154,11 +151,8 @@
     <ClCompile Include="..\..\..\src\utility\utility.cpp">
       <Filter>code\framework\utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\games\entity_manager.cpp">
-      <Filter>code\games</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\games\rainbowland\rainbowland.cpp">
-      <Filter>code\games\rainbowland</Filter>
+    <ClCompile Include="..\..\..\src\audio\sound_file_loader.cpp">
+      <Filter>code\framework\audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -169,15 +163,6 @@
       <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\fmod_include.h">
-      <Filter>code\framework\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\audio\fmod_sound.h">
-      <Filter>code\framework\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\audio\fmod_sound_file_loader.h">
-      <Filter>code\framework\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\audio\fmod_sound_handle.h">
       <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h">
@@ -393,11 +378,17 @@
     <ClInclude Include="..\..\..\src\games\entity.h">
       <Filter>code\games</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\entity_manager.h">
-      <Filter>code\games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h">
+    <ClInclude Include="..\..\..\src\games\rainbowland\types.h">
       <Filter>code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\audio\sound_handle.h">
+      <Filter>code\framework\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\audio\sound_file_loader.h">
+      <Filter>code\framework\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\audio\sound.h">
+      <Filter>code\framework\audio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -478,6 +469,9 @@
     <None Include="..\..\..\src\games\rainbowland\design.txt" />
     <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
       <Filter>code\games\rainbowland\logic</Filter>
+    </None>
+    <None Include="..\..\..\src\games\rainbowland\rainbowland.cpp">
+      <Filter>code\games\rainbowland</Filter>
     </None>
   </ItemGroup>
 </Project>

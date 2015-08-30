@@ -27,7 +27,7 @@ namespace core
       SoundManager sounds;
 
    private:
-      FmodSoundFileLoader m_fileLoader;
+      SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;
       HSound m_musicPlaying;
