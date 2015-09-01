@@ -34,7 +34,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
    auto baseAddress = (LPVOID)0;
 #endif
 
-   mainMemory.ptr = (LPVOID)VirtualAlloc(baseAddress, (SIZE_T)mainMemory.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+   mainMemory.ptr = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainMemory.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
    i32 result = core::WindowResult::OK;
    if( mainMemory.ptr )
    {

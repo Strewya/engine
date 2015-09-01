@@ -5,11 +5,14 @@
 #include "games/game_entry_point.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "audio/audio_system.h"
+#include "graphics/graphics_system.h"
 #include "utility/time/clock.h"
 #include "utility/communication_buffer.h"
 #include "utility/memory.h"
 #include "utility/utility.h"
 #include "window/window_message.h"
+
 
 #include "games/rainbowland/rainbowland.cpp"
 /******* end headers *******/
@@ -33,10 +36,21 @@ namespace core
    {
       Clock logicTimer{};
       Clock renderTimer{};
+      //initialization phase
+      MainAllocator mainMemory(memory);
+      
+      AudioSystem audio;
+      GraphicsSystem graphics;
+      GameState game;
 
-      BlockAllocator mainAllocator{memory, memory.ptr};
+      LinearAllocator 
+      graphics.init();
 
-      bool running = init_game(mainAllocator, fromMain, toMain);
+
+
+
+
+      auto running = false;
       while( running )
       {
          f32 fraction = 0;
@@ -48,9 +62,10 @@ namespace core
          droppedTime = updateCount > maxUpdateCount ? updateCount - maxUpdateCount : 0;
          droppedTime *= CORE_MICROS_PER_FRAME;
 
-         u32 count, l;
-         count = l = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
-         while( l-- && running )
+         u32 count;
+         count = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
+         CORE_ASSERT_DEBUG(AssertLevel::Notification, count == 1, "Lag spike...");
+         while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
             running = tickLogic(memory, fromMain, toMain, logicTimer);

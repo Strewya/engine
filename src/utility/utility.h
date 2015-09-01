@@ -39,17 +39,17 @@ namespace core
    // #todo think about what to do with this
    enum class AssertLevel
    {
-      CodeError,
-      DataError,
+      Fatal,
+      Notification,
    };
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-#define CORE_ASSERT(condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); *(int*)0 = 42; } } while(!(condition))
+#define CORE_ASSERT(level, condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); if(level == AssertLevel::Fatal) { *(int*)0 = 42; } } } while(!(condition))
 
 #ifndef CORE_DEPLOY
 
 #define CORE_LOG_DEBUG(...) CORE_LOG(__VA_ARGS__)
-#define CORE_ASSERT_DEBUG(condition, ...) CORE_ASSERT(condition, __VA_ARGS__)
+#define CORE_ASSERT_DEBUG(level, condition, ...) CORE_ASSERT(level, condition, __VA_ARGS__)
 
 #else
 
@@ -61,10 +61,17 @@ namespace core
 
 #define STR(type) #type
 
+#define CORE_STATUS bool status = true
+#define CORE_STATUS_OK (status == true)
+#define CORE_STATUS_NOK (status == false)
+#define CORE_STATUS_SET(x) status = (x)
+#define CORE_STATUS_AND(x) status = (x) && status
+#define CORE_STATUS_OR(x) status = (x) || status
+
 #define CORE_PHASE_INIT "init"
 #define CORE_PHASE_SHUTDOWN "shutdown"
 #define CORE_PHASE_LOG(obj, phase, text) CORE_LOG_DEBUG( obj, " "phase" ", text)
-#define CORE_START_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, "start"); bool status = true
+#define CORE_START_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, "start"); CORE_STATUS
 #define CORE_END_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, status ? "OK" : "FAILED"); return status
 
 
@@ -79,12 +86,6 @@ namespace core
 
 #define CORE_SHUTDOWN_START(c) CORE_SHUTDOWN_START_STR(#c)
 #define CORE_SHUTDOWN_END(c) CORE_SHUTDOWN_END_STR(#c)
-
-#define CORE_STATUS_OK (status == true)
-#define CORE_STATUS_NOK (status == false)
-#define CORE_STATUS_SET(x) status = (x)
-#define CORE_STATUS_AND(x) status = (x) && status
-#define CORE_STATUS_OR(x) status = (x) || status
 
 #define CORE_RESOURCE(x) "resources/"x
 

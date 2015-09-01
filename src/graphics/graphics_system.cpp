@@ -41,18 +41,17 @@ namespace core
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       clearCamera();
 
-      //should be declared in reverse order due to how the cleanup is performed
-      declare(m_cullingDisabled);
-      declare(m_cullingEnabled);
-      declare(m_transparency);
-      declare(m_depthStencilView);
-      declare(m_depthStencilBuffer);
-      declare(m_samplerState);
-      declare(m_renderTarget);
-      declare(m_swapchain);
-      declare(m_devcon);
-      declare(m_dev);
       declare(m_dxgiFactory);
+      declare(m_dev);
+      declare(m_devcon);
+      declare(m_swapchain);
+      declare(m_renderTarget);
+      declare(m_samplerState);
+      declare(m_depthStencilBuffer);
+      declare(m_depthStencilView);
+      declare(m_transparency);
+      declare(m_cullingEnabled);
+      declare(m_cullingDisabled);
 
       CORE_STATUS_AND(initDevice());
       CORE_STATUS_AND(initSwapChain());
@@ -152,9 +151,9 @@ namespace core
 
       ID3D11Debug* debug = nullptr;
       HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
-      for( auto** unknown : m_declaredObjects )
+      while( m_emptyInterfaceSlot-- )
       {
-         safeRelease(*unknown);
+         safeRelease(*m_declaredObjects[m_emptyInterfaceSlot]);
       }
       if( SUCCEEDED(hr) && debug != nullptr )
       {

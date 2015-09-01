@@ -19,7 +19,25 @@ namespace core
 {
    struct Memory
    {
-      u64 size;
-      void* ptr;
+      u8* ptr;
+      u32 size;
    };
+
+   struct MainAllocator
+   {
+      MainAllocator(Memory m) : memory{m.ptr}, sizeLeft{m.size} {}
+
+      u8* memory;
+      u32 sizeLeft;
+   };
+
+   u8* alloc(MainAllocator& a, u32 size, u32 align)
+   {
+      u8* result = nullptr;
+      if( size + align < a.sizeLeft )
+      {
+
+      }
+      return result;
+   }
 }

@@ -378,9 +378,6 @@
     <ClInclude Include="..\..\..\src\games\entity.h">
       <Filter>code\games</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\types.h">
-      <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\audio\sound_handle.h">
       <Filter>code\framework\audio</Filter>
     </ClInclude>
@@ -389,6 +386,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\audio\sound.h">
       <Filter>code\framework\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h">
+      <Filter>code\games\rainbowland</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <vector>
+#include <array>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 #include "utility/types.h"
@@ -75,7 +75,13 @@ namespace core
       D3DXCOLOR m_backgroundColor;
       v2 m_backbufferSize;
 
-      std::vector<IUnknown**> m_declaredObjects;
+      enum
+      {
+         InterfaceCount = 11,
+      };
+
+      IUnknown** m_declaredObjects[InterfaceCount];
+      u32 m_emptyInterfaceSlot;
       
       u64 m_window;
       f32 width;
@@ -96,7 +102,8 @@ namespace core
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)
    {
+      CORE_ASSERT_DEBUG(m_emptyInterfaceSlot < InterfaceCount);
       ptr = nullptr;
-      m_declaredObjects.emplace_back((IUnknown**)&ptr);
+      m_declaredObjects[m_emptyInterfaceSlot++] = (IUnknown**)&ptr;
    }
 }
