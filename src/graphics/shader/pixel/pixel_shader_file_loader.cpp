@@ -21,14 +21,14 @@ namespace core
 
       CORE_STATUS_AND(m_loader != nullptr);
 
-      CORE_INIT_END(PixelShaderFileLoader);
+      CORE_INIT_END;
    }
 
    bool PixelShaderFileLoader::shutdown()
    {
       CORE_SHUTDOWN_START(PixelShaderFileLoader);
 
-      CORE_SHUTDOWN_END(PixelShaderFileLoader);
+      CORE_SHUTDOWN_END;
    }
 
    PixelShader PixelShaderFileLoader::load(const char* filename) const

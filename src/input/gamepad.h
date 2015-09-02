@@ -16,8 +16,8 @@ namespace core
    {
       typedef u8 Key;
 
-      core_class_scope Key code(std::string name);
-      core_class_scope std::string name(Key code);
+      core_class_scope Key code(const char* name);
+      core_class_scope const char* name(Key code);
 
       enum : u8
       {

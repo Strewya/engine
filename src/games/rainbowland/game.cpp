@@ -64,7 +64,7 @@ namespace core
 
       updateCursorStuff(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
 
-      CORE_SHUTDOWN_END(Rainbowland);
+      CORE_SHUTDOWN_END;
    }
 
    bool Game::init(CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
@@ -110,7 +110,8 @@ namespace core
          game.constants.windowWidth = (f32)msg.screen.x;
          game.constants.windowHeight = (f32)msg.screen.y;
 
-         CORE_STATUS_AND(audioSystem.init());
+         LinearAllocator la{};
+         CORE_STATUS_AND(audioSystem.init(la));
          CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
          CORE_STATUS_AND(inputSystem.init());
          CORE_STATUS_AND(luaSystem.init());
@@ -124,7 +125,7 @@ namespace core
          updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
-      CORE_INIT_END(Rainbowland);
+      CORE_INIT_END;
    }
 
    bool Game::tickLogic(const Clock& logicClock)

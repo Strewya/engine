@@ -20,14 +20,14 @@ namespace core
    {
       CORE_INIT_START(InputSystem);
 
-      CORE_INIT_END(InputSystem);
+      CORE_INIT_END;
    }
 
    bool InputSystem::shutdown()
    {
       CORE_SHUTDOWN_START(InputSystem);
 
-      CORE_SHUTDOWN_END(InputSystem);
+      CORE_SHUTDOWN_END;
    }
 
    void InputSystem::gatherInputForCurrentFrame(u64 pollMicros, CommunicationBuffer* comm)

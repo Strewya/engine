@@ -22,7 +22,6 @@ namespace core
 
       LuaStack getStack() const;
 
-
    private:
       lua_State* m_L;
    };

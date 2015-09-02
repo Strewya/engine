@@ -5,40 +5,41 @@
 #include "audio/audio_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "utility/memory.h"
 #include "utility/utility.h"
 /******* end headers *******/
 
 namespace core
 {
-   bool AudioSystem::init()
+   bool AudioSystem::init(LinearAllocator& allocator)
    {
       CORE_INIT_START(AudioSystem);
 
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
+      u32 fmodMemorySize = Megabytes(40);
+      u8* fmodMemory = allocate(allocator, fmodMemorySize, 1);
+
+      CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
-
-      if( CORE_STATUS_OK )
-      {
-         CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
-      }
-
+      CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
+      
       CORE_STATUS_AND(m_fileLoader.init(m_system));
+      CORE_STATUS_AND(sounds.init(allocator, m_fileLoader, 20));
 
       if( CORE_STATUS_OK )
       {
          auto defaultSound = m_fileLoader.load(CORE_RESOURCE("Sounds/reload.wav"));
-         CORE_STATUS_AND(sounds.init(STR(SoundManager), m_fileLoader, defaultSound));
       }
 
-      CORE_INIT_END(AudioSystem);
+      CORE_INIT_END;
    }
 
    bool AudioSystem::shutdown()
    {
       CORE_SHUTDOWN_START(AudioSystem);
-
+      /*
       if( m_channel != nullptr )
       {
          CORE_STATUS_AND(m_channel->stop() == FMOD_OK);
@@ -49,8 +50,8 @@ namespace core
       CORE_STATUS_AND(m_fileLoader.shutdown());
       CORE_STATUS_AND(m_system->close() == FMOD_OK);
       CORE_STATUS_AND(m_system->release() == FMOD_OK);
-
-      CORE_SHUTDOWN_END(AudioSystem);
+      */
+      CORE_SHUTDOWN_END;
    }
 
    bool AudioSystem::update()

@@ -9,116 +9,116 @@
 
 namespace core
 {
-   Keyboard::Key Keyboard::code(std::string name)
+   Keyboard::Key Keyboard::code(const char* name)
    {
-      if( name == "Escape" ) { return Keyboard::Escape; }
-      else if( name == "Enter" ) { return Keyboard::Enter; }
-      else if( name == "Backspace" ) { return Keyboard::Backspace; }
-      else if( name == "Shift" ) { return Keyboard::Shift; }
-      else if( name == "LShift" ) { return Keyboard::LShift; }
-      else if( name == "RShift" ) { return Keyboard::RShift; }
-      else if( name == "Control" ) { return Keyboard::Control; }
-      else if( name == "LControl" ) { return Keyboard::LControl; }
-      else if( name == "RControl" ) { return Keyboard::RControl; }
-      else if( name == "Alt" ) { return Keyboard::Alt; }
-      else if( name == "LAlt" ) { return Keyboard::LAlt; }
-      else if( name == "RAlt" ) { return Keyboard::RAlt; }
-      else if( name == "PrintScreen" ) { return Keyboard::PrintScreen; }
-      else if( name == "Pause" ) { return Keyboard::Pause; }
-      else if( name == "F1" ) { return Keyboard::F1; }
-      else if( name == "F2" ) { return Keyboard::F2; }
-      else if( name == "F3" ) { return Keyboard::F3; }
-      else if( name == "F4" ) { return Keyboard::F4; }
-      else if( name == "F5" ) { return Keyboard::F5; }
-      else if( name == "F6" ) { return Keyboard::F6; }
-      else if( name == "F7" ) { return Keyboard::F7; }
-      else if( name == "F8" ) { return Keyboard::F8; }
-      else if( name == "F9" ) { return Keyboard::F9; }
-      else if( name == "F10" ) { return Keyboard::F10; }
-      else if( name == "F11" ) { return Keyboard::F11; }
-      else if( name == "F12" ) { return Keyboard::F12; }
-      else if( name == "Tilde" ) { return Keyboard::Tilde; }
-      else if( name == "_1" ) { return Keyboard::_1; }
-      else if( name == "_2" ) { return Keyboard::_2; }
-      else if( name == "_3" ) { return Keyboard::_3; }
-      else if( name == "_4" ) { return Keyboard::_4; }
-      else if( name == "_5" ) { return Keyboard::_5; }
-      else if( name == "_6" ) { return Keyboard::_6; }
-      else if( name == "_7" ) { return Keyboard::_7; }
-      else if( name == "_8" ) { return Keyboard::_8; }
-      else if( name == "_9" ) { return Keyboard::_9; }
-      else if( name == "_0" ) { return Keyboard::_0; }
-      else if( name == "Minus" ) { return Keyboard::Minus; }
-      else if( name == "Equals" ) { return Keyboard::Equals; }
-      else if( name == "OpenSquareBracket" ) { return Keyboard::OpenSquareBracket; }
-      else if( name == "CloseSquareBracket" ) { return Keyboard::CloseSquareBracket; }
-      else if( name == "Backslash" ) { return Keyboard::Backslash; }
-      else if( name == "Semicolon" ) { return Keyboard::Semicolon; }
-      else if( name == "Apostrophe" ) { return Keyboard::Apostrophe; }
-      else if( name == "Comma" ) { return Keyboard::Comma; }
-      else if( name == "Period" ) { return Keyboard::Period; }
-      else if( name == "Slash" ) { return Keyboard::Slash; }
-      else if( name == "Tab" ) { return Keyboard::Tab; }
-      else if( name == "Space" ) { return Keyboard::Space; }
-      else if( name == "A" ) { return Keyboard::A; }
-      else if( name == "B" ) { return Keyboard::B; }
-      else if( name == "C" ) { return Keyboard::C; }
-      else if( name == "D" ) { return Keyboard::D; }
-      else if( name == "E" ) { return Keyboard::E; }
-      else if( name == "F" ) { return Keyboard::F; }
-      else if( name == "G" ) { return Keyboard::G; }
-      else if( name == "H" ) { return Keyboard::H; }
-      else if( name == "I" ) { return Keyboard::I; }
-      else if( name == "J" ) { return Keyboard::J; }
-      else if( name == "K" ) { return Keyboard::K; }
-      else if( name == "L" ) { return Keyboard::L; }
-      else if( name == "M" ) { return Keyboard::M; }
-      else if( name == "N" ) { return Keyboard::N; }
-      else if( name == "O" ) { return Keyboard::O; }
-      else if( name == "P" ) { return Keyboard::P; }
-      else if( name == "Q" ) { return Keyboard::Q; }
-      else if( name == "R" ) { return Keyboard::R; }
-      else if( name == "S" ) { return Keyboard::S; }
-      else if( name == "T" ) { return Keyboard::T; }
-      else if( name == "U" ) { return Keyboard::U; }
-      else if( name == "V" ) { return Keyboard::V; }
-      else if( name == "W" ) { return Keyboard::W; }
-      else if( name == "X" ) { return Keyboard::X; }
-      else if( name == "Y" ) { return Keyboard::Y; }
-      else if( name == "Z" ) { return Keyboard::Z; }
-      else if( name == "CapsLock" ) { return Keyboard::CapsLock; }
-      else if( name == "ScrollLock" ) { return Keyboard::ScrollLock; }
-      else if( name == "NumLock" ) { return Keyboard::NumLock; }
-      else if( name == "Insert" ) { return Keyboard::Insert; }
-      else if( name == "Home" ) { return Keyboard::Home; }
-      else if( name == "PageUp" ) { return Keyboard::PageUp; }
-      else if( name == "Delete" ) { return Keyboard::Delete; }
-      else if( name == "End" ) { return Keyboard::End; }
-      else if( name == "PageDown" ) { return Keyboard::PageDown; }
-      else if( name == "ArrowUp" ) { return Keyboard::ArrowUp; }
-      else if( name == "ArrowLeft" ) { return Keyboard::ArrowLeft; }
-      else if( name == "ArrowDown" ) { return Keyboard::ArrowDown; }
-      else if( name == "ArrowRight" ) { return Keyboard::ArrowRight; }
-      else if( name == "NumDivide" ) { return Keyboard::NumDivide; }
-      else if( name == "NumMultiply" ) { return Keyboard::NumMultiply; }
-      else if( name == "NumSubtract" ) { return Keyboard::NumSubtract; }
-      else if( name == "NumAdd" ) { return Keyboard::NumAdd; }
-      else if( name == "NumEnter" ) { return Keyboard::NumEnter; }
-      else if( name == "NumDecimal" ) { return Keyboard::NumDecimal; }
-      else if( name == "Num0" ) { return Keyboard::Num0; }
-      else if( name == "Num1" ) { return Keyboard::Num1; }
-      else if( name == "Num2" ) { return Keyboard::Num2; }
-      else if( name == "Num3" ) { return Keyboard::Num3; }
-      else if( name == "Num4" ) { return Keyboard::Num4; }
-      else if( name == "Num5" ) { return Keyboard::Num5; }
-      else if( name == "Num6" ) { return Keyboard::Num6; }
-      else if( name == "Num7" ) { return Keyboard::Num7; }
-      else if( name == "Num8" ) { return Keyboard::Num8; }
-      else if( name == "Num9" ) { return Keyboard::Num9; }
+      if( strcmp(name, "Escape") == 0 ) { return Keyboard::Escape; }
+      else if( strcmp(name, "Enter") == 0 ) { return Keyboard::Enter; }
+      else if( strcmp(name, "Backspace") == 0 ) { return Keyboard::Backspace; }
+      else if( strcmp(name, "Shift") == 0 ) { return Keyboard::Shift; }
+      else if( strcmp(name, "LShift") == 0 ) { return Keyboard::LShift; }
+      else if( strcmp(name, "RShift") == 0 ) { return Keyboard::RShift; }
+      else if( strcmp(name, "Control") == 0 ) { return Keyboard::Control; }
+      else if( strcmp(name, "LControl") == 0 ) { return Keyboard::LControl; }
+      else if( strcmp(name, "RControl") == 0 ) { return Keyboard::RControl; }
+      else if( strcmp(name, "Alt") == 0 ) { return Keyboard::Alt; }
+      else if( strcmp(name, "LAlt") == 0 ) { return Keyboard::LAlt; }
+      else if( strcmp(name, "RAlt") == 0 ) { return Keyboard::RAlt; }
+      else if( strcmp(name, "PrintScreen") == 0 ) { return Keyboard::PrintScreen; }
+      else if( strcmp(name, "Pause") == 0 ) { return Keyboard::Pause; }
+      else if( strcmp(name, "F1") == 0 ) { return Keyboard::F1; }
+      else if( strcmp(name, "F2") == 0 ) { return Keyboard::F2; }
+      else if( strcmp(name, "F3") == 0 ) { return Keyboard::F3; }
+      else if( strcmp(name, "F4") == 0 ) { return Keyboard::F4; }
+      else if( strcmp(name, "F5") == 0 ) { return Keyboard::F5; }
+      else if( strcmp(name, "F6") == 0 ) { return Keyboard::F6; }
+      else if( strcmp(name, "F7") == 0 ) { return Keyboard::F7; }
+      else if( strcmp(name, "F8") == 0 ) { return Keyboard::F8; }
+      else if( strcmp(name, "F9") == 0 ) { return Keyboard::F9; }
+      else if( strcmp(name, "F10") == 0 ) { return Keyboard::F10; }
+      else if( strcmp(name, "F11") == 0 ) { return Keyboard::F11; }
+      else if( strcmp(name, "F12") == 0 ) { return Keyboard::F12; }
+      else if( strcmp(name, "Tilde") == 0 ) { return Keyboard::Tilde; }
+      else if( strcmp(name, "_1") == 0 ) { return Keyboard::_1; }
+      else if( strcmp(name, "_2") == 0 ) { return Keyboard::_2; }
+      else if( strcmp(name, "_3") == 0 ) { return Keyboard::_3; }
+      else if( strcmp(name, "_4") == 0 ) { return Keyboard::_4; }
+      else if( strcmp(name, "_5") == 0 ) { return Keyboard::_5; }
+      else if( strcmp(name, "_6") == 0 ) { return Keyboard::_6; }
+      else if( strcmp(name, "_7") == 0 ) { return Keyboard::_7; }
+      else if( strcmp(name, "_8") == 0 ) { return Keyboard::_8; }
+      else if( strcmp(name, "_9") == 0 ) { return Keyboard::_9; }
+      else if( strcmp(name, "_0") == 0 ) { return Keyboard::_0; }
+      else if( strcmp(name, "Minus") == 0 ) { return Keyboard::Minus; }
+      else if( strcmp(name, "Equals") == 0 ) { return Keyboard::Equals; }
+      else if( strcmp(name, "OpenSquareBracket") == 0 ) { return Keyboard::OpenSquareBracket; }
+      else if( strcmp(name, "CloseSquareBracket") == 0 ) { return Keyboard::CloseSquareBracket; }
+      else if( strcmp(name, "Backslash") == 0 ) { return Keyboard::Backslash; }
+      else if( strcmp(name, "Semicolon") == 0 ) { return Keyboard::Semicolon; }
+      else if( strcmp(name, "Apostrophe") == 0 ) { return Keyboard::Apostrophe; }
+      else if( strcmp(name, "Comma") == 0 ) { return Keyboard::Comma; }
+      else if( strcmp(name, "Period") == 0 ) { return Keyboard::Period; }
+      else if( strcmp(name, "Slash") == 0 ) { return Keyboard::Slash; }
+      else if( strcmp(name, "Tab") == 0 ) { return Keyboard::Tab; }
+      else if( strcmp(name, "Space") == 0 ) { return Keyboard::Space; }
+      else if( strcmp(name, "A") == 0 ) { return Keyboard::A; }
+      else if( strcmp(name, "B") == 0 ) { return Keyboard::B; }
+      else if( strcmp(name, "C") == 0 ) { return Keyboard::C; }
+      else if( strcmp(name, "D") == 0 ) { return Keyboard::D; }
+      else if( strcmp(name, "E") == 0 ) { return Keyboard::E; }
+      else if( strcmp(name, "F") == 0 ) { return Keyboard::F; }
+      else if( strcmp(name, "G") == 0 ) { return Keyboard::G; }
+      else if( strcmp(name, "H") == 0 ) { return Keyboard::H; }
+      else if( strcmp(name, "I") == 0 ) { return Keyboard::I; }
+      else if( strcmp(name, "J") == 0 ) { return Keyboard::J; }
+      else if( strcmp(name, "K") == 0 ) { return Keyboard::K; }
+      else if( strcmp(name, "L") == 0 ) { return Keyboard::L; }
+      else if( strcmp(name, "M") == 0 ) { return Keyboard::M; }
+      else if( strcmp(name, "N") == 0 ) { return Keyboard::N; }
+      else if( strcmp(name, "O") == 0 ) { return Keyboard::O; }
+      else if( strcmp(name, "P") == 0 ) { return Keyboard::P; }
+      else if( strcmp(name, "Q") == 0 ) { return Keyboard::Q; }
+      else if( strcmp(name, "R") == 0 ) { return Keyboard::R; }
+      else if( strcmp(name, "S") == 0 ) { return Keyboard::S; }
+      else if( strcmp(name, "T") == 0 ) { return Keyboard::T; }
+      else if( strcmp(name, "U") == 0 ) { return Keyboard::U; }
+      else if( strcmp(name, "V") == 0 ) { return Keyboard::V; }
+      else if( strcmp(name, "W") == 0 ) { return Keyboard::W; }
+      else if( strcmp(name, "X") == 0 ) { return Keyboard::X; }
+      else if( strcmp(name, "Y") == 0 ) { return Keyboard::Y; }
+      else if( strcmp(name, "Z") == 0 ) { return Keyboard::Z; }
+      else if( strcmp(name, "CapsLock") == 0 ) { return Keyboard::CapsLock; }
+      else if( strcmp(name, "ScrollLock") == 0 ) { return Keyboard::ScrollLock; }
+      else if( strcmp(name, "NumLock") == 0 ) { return Keyboard::NumLock; }
+      else if( strcmp(name, "Insert") == 0 ) { return Keyboard::Insert; }
+      else if( strcmp(name, "Home") == 0 ) { return Keyboard::Home; }
+      else if( strcmp(name, "PageUp") == 0 ) { return Keyboard::PageUp; }
+      else if( strcmp(name, "Delete") == 0 ) { return Keyboard::Delete; }
+      else if( strcmp(name, "End") == 0 ) { return Keyboard::End; }
+      else if( strcmp(name, "PageDown") == 0 ) { return Keyboard::PageDown; }
+      else if( strcmp(name, "ArrowUp") == 0 ) { return Keyboard::ArrowUp; }
+      else if( strcmp(name, "ArrowLeft") == 0 ) { return Keyboard::ArrowLeft; }
+      else if( strcmp(name, "ArrowDown") == 0 ) { return Keyboard::ArrowDown; }
+      else if( strcmp(name, "ArrowRight") == 0 ) { return Keyboard::ArrowRight; }
+      else if( strcmp(name, "NumDivide") == 0 ) { return Keyboard::NumDivide; }
+      else if( strcmp(name, "NumMultiply") == 0 ) { return Keyboard::NumMultiply; }
+      else if( strcmp(name, "NumSubtract") == 0 ) { return Keyboard::NumSubtract; }
+      else if( strcmp(name, "NumAdd") == 0 ) { return Keyboard::NumAdd; }
+      else if( strcmp(name, "NumEnter") == 0 ) { return Keyboard::NumEnter; }
+      else if( strcmp(name, "NumDecimal") == 0 ) { return Keyboard::NumDecimal; }
+      else if( strcmp(name, "Num0") == 0 ) { return Keyboard::Num0; }
+      else if( strcmp(name, "Num1") == 0 ) { return Keyboard::Num1; }
+      else if( strcmp(name, "Num2") == 0 ) { return Keyboard::Num2; }
+      else if( strcmp(name, "Num3") == 0 ) { return Keyboard::Num3; }
+      else if( strcmp(name, "Num4") == 0 ) { return Keyboard::Num4; }
+      else if( strcmp(name, "Num5") == 0 ) { return Keyboard::Num5; }
+      else if( strcmp(name, "Num6") == 0 ) { return Keyboard::Num6; }
+      else if( strcmp(name, "Num7") == 0 ) { return Keyboard::Num7; }
+      else if( strcmp(name, "Num8") == 0 ) { return Keyboard::Num8; }
+      else if( strcmp(name, "Num9") == 0 ) { return Keyboard::Num9; }
       return Keyboard::Unknown;
    }
 
-   std::string Keyboard::name(Keyboard::Key code)
+   const char* Keyboard::name(Keyboard::Key code)
    {
       switch( code )
       {

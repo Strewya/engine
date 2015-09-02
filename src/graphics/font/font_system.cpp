@@ -35,7 +35,7 @@ namespace core
 
       m_textures = &textures;
 
-      CORE_INIT_END(FontSystem);
+      CORE_INIT_END;
    }
 
    //*****************************************************************
@@ -45,7 +45,7 @@ namespace core
    {
       CORE_SHUTDOWN_START(FontSystem);
 
-      CORE_SHUTDOWN_END(FontSystem);
+      CORE_SHUTDOWN_END;
    }
 
    //*****************************************************************

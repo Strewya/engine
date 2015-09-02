@@ -9,14 +9,18 @@
 #include "utility/types.h"
 /******* extra headers *******/
 #include "audio/sound_manager.h"
+#include "sound_handle.h"
+#include "sound_file_loader.h"
 /******* end header inclusion *******/
 
 namespace core
 {
+   struct LinearAllocator;
+
    struct AudioSystem
    {
    public:
-      bool init();
+      bool init(LinearAllocator& allocator);
       bool shutdown();
       bool update();
 
@@ -27,6 +31,7 @@ namespace core
       SoundManager sounds;
 
    private:
+      //allocator type
       SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;

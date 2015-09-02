@@ -44,9 +44,9 @@ namespace core
    bool LuaSystem::init()
    {
       CORE_INIT_START(LuaSystem);
-      CORE_STATUS_AND(false);
       m_L = luaL_newstate();
-      if( m_L )
+      CORE_STATUS_AND(m_L != nullptr);
+      if( CORE_STATUS_OK )
       {
          luaL_openlibs(m_L);
          //tolua_core_open(m_L);
@@ -75,17 +75,17 @@ function class(name)
 end
 )rawLuaCode";
 
-         CORE_STATUS_OR(luaL_dostring(m_L, depend) == 0);
+         CORE_STATUS_AND(luaL_dostring(m_L, depend) == 0);
       }
 
-      CORE_INIT_END(LuaSystem);
+      CORE_INIT_END;
    }
 
    bool LuaSystem::shutdown()
    {
       CORE_SHUTDOWN_START(LuaSystem);
       lua_close(m_L);
-      CORE_SHUTDOWN_END(LuaSystem);
+      CORE_SHUTDOWN_END;
    }
 
    void LuaSystem::collectGarbage()

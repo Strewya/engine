@@ -52,7 +52,7 @@ namespace core
    template<typename DATA, typename HANDLE, typename LOADER>
    bool Manager<DATA, HANDLE, LOADER>::init(const char* type, LOADER& loader, DATA defaultData)
    {
-      CORE_INIT_START_STR(type);
+      CORE_INIT_START(ManagerTemplate);
 
       m_type = type;
       m_defaultData = defaultData;
@@ -61,13 +61,13 @@ namespace core
       CORE_STATUS_AND(m_loader != nullptr);
       CORE_STATUS_AND(m_defaultData.loaded());
 
-      CORE_INIT_END_STR(type);
+      CORE_INIT_END_STR;
    }
 
    template<typename DATA, typename HANDLE, typename LOADER>
    bool Manager<DATA, HANDLE, LOADER>::shutdown()
    {
-      CORE_SHUTDOWN_START_STR(m_type);
+      CORE_SHUTDOWN_START(ManagerTemplate);
 
       //unload all existing data
       m_loader->unload(m_defaultData);
@@ -81,7 +81,7 @@ namespace core
       CORE_STATUS_AND(m_defaultData.unloaded());
       CORE_STATUS_AND(m_data.hasUsedHandles() == false);
 
-      CORE_SHUTDOWN_END_STR(m_type);
+      CORE_SHUTDOWN_END_STR;
    }
 
    template<typename DATA, typename HANDLE, typename LOADER>

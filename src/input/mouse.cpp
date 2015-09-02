@@ -9,17 +9,17 @@
 
 namespace core
 {
-   Mouse::Key Mouse::code(std::string name)
+   Mouse::Key Mouse::code(const char* name)
    {
-      if(name == "LeftButton") { return Mouse::LeftButton; }
-      else if(name == "RightButton") { return Mouse::RightButton; }
-      else if(name == "MiddleButton") { return Mouse::MiddleButton; }
-      else if(name == "XButton1") { return Mouse::XButton1; }
-      else if(name == "XButton2") { return Mouse::XButton2; }
+      if( strcmp(name, "LeftButton") == 0 ) { return Mouse::LeftButton; }
+      else if( strcmp(name, "RightButton") == 0 ) { return Mouse::RightButton; }
+      else if( strcmp(name, "MiddleButton") == 0 ) { return Mouse::MiddleButton; }
+      else if( strcmp(name, "XButton1") == 0 ) { return Mouse::XButton1; }
+      else if( strcmp(name, "XButton2") == 0 ) { return Mouse::XButton2; }
       return Unknown;
    }
 
-   std::string Mouse::name(Mouse::Key code)
+   const char* Mouse::name(Mouse::Key code)
    {
       switch( code )
       {

@@ -21,14 +21,14 @@ namespace core
 
       CORE_STATUS_AND(m_loader != nullptr);
 
-      CORE_INIT_END(VertexShaderFileLoader);
+      CORE_INIT_END;
    }
 
    bool VertexShaderFileLoader::shutdown()
    {
       CORE_SHUTDOWN_START(VertexShaderFileLoader);
 
-      CORE_SHUTDOWN_END(VertexShaderFileLoader);
+      CORE_SHUTDOWN_END;
    }
 
    VertexShader VertexShaderFileLoader::load(const char* filename, InputLayout layout) const

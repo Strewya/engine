@@ -44,7 +44,7 @@ namespace core
    };
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-#define CORE_ASSERT(level, condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); if(level == AssertLevel::Fatal) { *(int*)0 = 42; } } } while(!(condition))
+#define CORE_ASSERT(level, condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); auto l = level; if(l == AssertLevel::Fatal) { *(int*)0 = 42; } } } while(!(condition))
 
 #ifndef CORE_DEPLOY
 
@@ -65,27 +65,21 @@ namespace core
 #define CORE_STATUS_OK (status == true)
 #define CORE_STATUS_NOK (status == false)
 #define CORE_STATUS_SET(x) status = (x)
-#define CORE_STATUS_AND(x) status = (x) && status
-#define CORE_STATUS_OR(x) status = (x) || status
+#define CORE_STATUS_AND(x) status = status && (x)
 
 #define CORE_PHASE_INIT "init"
 #define CORE_PHASE_SHUTDOWN "shutdown"
-#define CORE_PHASE_LOG(obj, phase, text) CORE_LOG_DEBUG( obj, " "phase" ", text)
-#define CORE_START_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, "start"); CORE_STATUS
-#define CORE_END_PHASE(obj, phase) CORE_PHASE_LOG(obj, phase, status ? "OK" : "FAILED"); return status
+#define CORE_PHASE_OBJECT(obj) const char* core_phase_object = #obj
+#define CORE_PHASE_LOG(phase, text) CORE_LOG_DEBUG( core_phase_object, " "phase" ", text)
+#define CORE_START_PHASE(phase) CORE_PHASE_LOG(phase, "start"); CORE_STATUS
+#define CORE_END_PHASE(phase) CORE_PHASE_LOG(phase, status ? "OK" : "FAILED"); return status
 
+// #deprecated remove this asap after implementing fixed memory
+#define CORE_INIT_START(c) CORE_PHASE_OBJECT(c); CORE_START_PHASE(CORE_PHASE_INIT)
+#define CORE_INIT_END CORE_END_PHASE(CORE_PHASE_INIT)
 
-#define CORE_INIT_START_STR(c) CORE_START_PHASE(c, CORE_PHASE_INIT)
-#define CORE_INIT_END_STR(c) CORE_END_PHASE(c, CORE_PHASE_INIT)
-
-#define CORE_INIT_START(c) CORE_INIT_START_STR(#c)
-#define CORE_INIT_END(c) CORE_INIT_END_STR(#c)
-
-#define CORE_SHUTDOWN_START_STR(c) CORE_START_PHASE(c, CORE_PHASE_SHUTDOWN)
-#define CORE_SHUTDOWN_END_STR(c) CORE_END_PHASE(c, CORE_PHASE_SHUTDOWN)
-
-#define CORE_SHUTDOWN_START(c) CORE_SHUTDOWN_START_STR(#c)
-#define CORE_SHUTDOWN_END(c) CORE_SHUTDOWN_END_STR(#c)
+#define CORE_SHUTDOWN_START(c) CORE_PHASE_OBJECT(c); CORE_START_PHASE(CORE_PHASE_SHUTDOWN)
+#define CORE_SHUTDOWN_END CORE_END_PHASE(CORE_PHASE_SHUTDOWN)
 
 #define CORE_RESOURCE(x) "resources/"x
 

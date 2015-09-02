@@ -127,7 +127,7 @@ namespace core
 
       CORE_STATUS_AND(vertexShaders.init(STR(VertexShaderManager), m_vsFileLoader, defaultVertexShader));
       CORE_STATUS_AND(pixelShaders.init(STR(PixelShaderManager), m_psFileLoader, defaultPixelShader));
-      CORE_INIT_END(GraphicsSystem);
+      CORE_INIT_END;
    }
 
    //*****************************************************************
@@ -161,7 +161,7 @@ namespace core
          safeRelease(debug);
       }
 
-      CORE_SHUTDOWN_END(GraphicsSystem);
+      CORE_SHUTDOWN_END;
    }
 
    //*****************************************************************

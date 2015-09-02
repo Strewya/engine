@@ -94,8 +94,8 @@ namespace core
       void release(HANDLE handle)
       {
          auto index = handle.getIndex();
-         CORE_ASSERT_DEBUG(index < m_data.size(), "Index is not valid!");
-         CORE_ASSERT_DEBUG(m_magicNumbers[index] == handle.getMagic(), "The magic number is not equal!");
+         CORE_ASSERT_DEBUG(AssertLevel::Fatal, index < m_data.size(), "Index is not valid!");
+         CORE_ASSERT_DEBUG(AssertLevel::Fatal, m_magicNumbers[index] == handle.getMagic(), "The magic number is not equal!");
 
          m_magicNumbers[index] = 0;
          m_freeSlots.push_back(index);

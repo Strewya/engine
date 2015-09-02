@@ -102,7 +102,7 @@ namespace core
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)
    {
-      CORE_ASSERT_DEBUG(m_emptyInterfaceSlot < InterfaceCount);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, m_emptyInterfaceSlot < InterfaceCount);
       ptr = nullptr;
       m_declaredObjects[m_emptyInterfaceSlot++] = (IUnknown**)&ptr;
    }

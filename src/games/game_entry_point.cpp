@@ -7,6 +7,7 @@
 /******* extra headers *******/
 #include "audio/audio_system.h"
 #include "graphics/graphics_system.h"
+#include "lua/lua_system.h"
 #include "utility/time/clock.h"
 #include "utility/communication_buffer.h"
 #include "utility/memory.h"
@@ -37,18 +38,32 @@ namespace core
       Clock logicTimer{};
       Clock renderTimer{};
       //initialization phase
-      MainAllocator mainMemory(memory);
+      LinearAllocator mainMemory{memory.ptr, memory.size};
       
-      AudioSystem audio;
-      GraphicsSystem graphics;
-      GameState game;
+      AudioSystem* audio = allocate<AudioSystem>(mainMemory);
+      audio->init(mainMemory);
 
-      LinearAllocator 
-      graphics.init();
+      /*
+         this function should orchestrate the following sequence of steps:
+         1. a filename is provided as to the location of the sound file
+         2. the filename is passed to a file loader (instantiated at the spot on the stack)
+         3. the file loader simply loads the contents of the file to memory and returns the memory
+         4. the memory is passed to a sound loader
+         5. the sound loader parses the memory and creates the sound
+         6. the sound is returned to the audio system
+         7. audio system inserts the sound into cache
+         8. cache returns a sound handle
+         9. sound handle is mapped with the filename in a name cache
+         10. sound handle is returned
+      */
+      HSound loadedSound = audio->loadFromFile(CORE_RESOURCE("Sounds/default.wav"));
 
+/*
 
-
-
+      GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
+      LuaSystem* lua = allocate<LuaSystem>(luaMemory);
+      GameState* game = allocate<GameState>(gameStateMemory);
+*/
 
       auto running = false;
       while( running )

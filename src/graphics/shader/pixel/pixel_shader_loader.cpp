@@ -19,7 +19,7 @@ namespace core
 
       CORE_STATUS_AND(m_dev != nullptr);
 
-      CORE_INIT_END(PixelShaderLoader);
+      CORE_INIT_END;
    }
 
    bool PixelShaderLoader::shutdown()
@@ -28,7 +28,7 @@ namespace core
 
       m_dev = nullptr;
 
-      CORE_SHUTDOWN_END(PixelShaderLoader);
+      CORE_SHUTDOWN_END;
    }
 
    PixelShader PixelShaderLoader::load(const char* buffer, u32 bufferSize) const

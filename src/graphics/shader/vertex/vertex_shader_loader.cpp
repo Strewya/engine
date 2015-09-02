@@ -19,7 +19,7 @@ namespace core
 
       CORE_STATUS_AND(m_dev != nullptr);
 
-      CORE_INIT_END(VertexShaderLoader);
+      CORE_INIT_END;
    }
 
    bool VertexShaderLoader::shutdown()
@@ -28,7 +28,7 @@ namespace core
 
       m_dev = nullptr;
 
-      CORE_SHUTDOWN_END(VertexShaderLoader);
+      CORE_SHUTDOWN_END;
    }
 
    VertexShader VertexShaderLoader::load(InputLayout layout, const char* buffer, u32 bufferSize) const
