@@ -4,7 +4,6 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <vector>
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
@@ -12,5 +11,12 @@
 
 namespace core
 {
-   bool loadFile(const char* filename, std::vector<char>& buffer);
+   enum class LoadFileResult
+   {
+      FileOpenError,
+      BufferTooSmall,
+      OK,
+   };
+
+   LoadFileResult loadFile(const char* filename, u8* buffer, u32 bufferSize);
 }

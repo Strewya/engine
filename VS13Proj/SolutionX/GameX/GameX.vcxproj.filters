@@ -25,9 +25,6 @@
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.cpp">
       <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\graphics\shader\file_loader.cpp">
-      <Filter>code\framework\graphics\shader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\texture\texture_file_loader.cpp">
       <Filter>code\framework\graphics\texture</Filter>
     </ClCompile>
@@ -154,6 +151,9 @@
     <ClCompile Include="..\..\..\src\audio\sound_file_loader.cpp">
       <Filter>code\framework\audio</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\utility\file_loader.cpp">
+      <Filter>code\framework\utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -197,9 +197,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_manager.h">
       <Filter>code\framework\graphics\shader\vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\shader\file_loader.h">
-      <Filter>code\framework\graphics\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\shader_handle.h">
       <Filter>code\framework\graphics\shader</Filter>
@@ -389,6 +386,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h">
       <Filter>code\games\rainbowland</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\utility\file_loader.h">
+      <Filter>code\framework\utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

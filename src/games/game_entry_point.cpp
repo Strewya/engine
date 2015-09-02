@@ -24,8 +24,8 @@ namespace core
    {
       CORE_FIXED_STEP_FPS = 60ULL,
       CORE_CLAMPED_STEP_MIN_FPS = 15ULL,
-      CORE_MICROS_PER_FRAME     = 1000000ULL/CORE_FIXED_STEP_FPS,
-      CORE_MAX_MICROS_PER_FRAME = 1000000ULL/CORE_CLAMPED_STEP_MIN_FPS,
+      CORE_MICROS_PER_FRAME = 1000000ULL / CORE_FIXED_STEP_FPS,
+      CORE_MAX_MICROS_PER_FRAME = 1000000ULL / CORE_CLAMPED_STEP_MIN_FPS,
       CORE_VARIABLE_STEP = 0,
       CORE_CLAMPED_STEP = 1,
       CORE_FIXED_STEP = 2,
@@ -39,31 +39,18 @@ namespace core
       Clock renderTimer{};
       //initialization phase
       LinearAllocator mainMemory{memory.ptr, memory.size};
-      
+
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
       audio->init(mainMemory);
 
-      /*
-         this function should orchestrate the following sequence of steps:
-         1. a filename is provided as to the location of the sound file
-         2. the filename is passed to a file loader (instantiated at the spot on the stack)
-         3. the file loader simply loads the contents of the file to memory and returns the memory
-         4. the memory is passed to a sound loader
-         5. the sound loader parses the memory and creates the sound
-         6. the sound is returned to the audio system
-         7. audio system inserts the sound into cache
-         8. cache returns a sound handle
-         9. sound handle is mapped with the filename in a name cache
-         10. sound handle is returned
-      */
       HSound loadedSound = audio->loadFromFile(CORE_RESOURCE("Sounds/default.wav"));
 
-/*
+      /*
 
-      GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
-      LuaSystem* lua = allocate<LuaSystem>(luaMemory);
-      GameState* game = allocate<GameState>(gameStateMemory);
-*/
+            GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
+            LuaSystem* lua = allocate<LuaSystem>(luaMemory);
+            GameState* game = allocate<GameState>(gameStateMemory);
+            */
 
       auto running = false;
       while( running )

@@ -29,6 +29,12 @@ namespace core
       u32 size;
    };
 
+   struct StackAllocator
+   {
+      u8* memory;
+   };
+
+
    inline u8* allocate(LinearAllocator& a, u32 size, u32 align)
    {
       u32 alignBytes = ((u32)a.memory % align);

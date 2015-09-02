@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 #include <vector>
 /******* extra headers *******/
-#include "graphics/shader/file_loader.h"
+#include "utility/file_loader.h"
 #include "graphics/shader/vertex/vertex_shader.h"
 #include "utility/utility.h"
 /******* end headers *******/

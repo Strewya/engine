@@ -256,7 +256,6 @@
     <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp" />
-    <ClCompile Include="..\..\..\src\graphics\shader\file_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.cpp" />
@@ -278,6 +277,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\utility\collision_checks.cpp" />
     <ClCompile Include="..\..\..\src\utility\color.cpp" />
+    <ClCompile Include="..\..\..\src\utility\file_loader.cpp" />
     <ClCompile Include="..\..\..\src\utility\geometry\circle.cpp" />
     <ClCompile Include="..\..\..\src\utility\geometry\rect.cpp" />
     <ClCompile Include="..\..\..\src\utility\geometry\vec2.cpp" />
@@ -322,7 +322,6 @@
     <ClInclude Include="..\..\..\src\graphics\graphics_system.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h" />
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h" />
-    <ClInclude Include="..\..\..\src\graphics\shader\file_loader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\default_pixel_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.h" />
@@ -351,6 +350,7 @@
     <ClInclude Include="..\..\..\src\utility\collision_checks.h" />
     <ClInclude Include="..\..\..\src\utility\color.h" />
     <ClInclude Include="..\..\..\src\utility\communication_buffer.h" />
+    <ClInclude Include="..\..\..\src\utility\file_loader.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\circle.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\rect.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\vec2.h" />

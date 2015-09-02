@@ -20,13 +20,15 @@ namespace core
    struct AudioSystem
    {
    public:
-      bool init(LinearAllocator& allocator);
+      bool init(LinearAllocator& allocator, u32 maxSounds);
       bool shutdown();
       bool update();
 
       void playSfx(HSound sound);
       void playMusic(HSound sound);
       void stopMusic();
+
+      HSound loadFromFile(const char* filename);
 
       SoundManager sounds;
 

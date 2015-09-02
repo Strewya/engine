@@ -11,7 +11,7 @@
 
 namespace core
 {
-   bool AudioSystem::init(LinearAllocator& allocator)
+   bool AudioSystem::init(LinearAllocator& allocator, u32 maxSounds)
    {
       CORE_INIT_START(AudioSystem);
 
@@ -26,7 +26,7 @@ namespace core
       CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
       
       CORE_STATUS_AND(m_fileLoader.init(m_system));
-      CORE_STATUS_AND(sounds.init(allocator, m_fileLoader, 20));
+      CORE_STATUS_AND(sounds.init(allocator, m_fileLoader, maxSounds));
 
       if( CORE_STATUS_OK )
       {
@@ -52,6 +52,24 @@ namespace core
       CORE_STATUS_AND(m_system->release() == FMOD_OK);
       */
       CORE_SHUTDOWN_END;
+   }
+
+   HSound AudioSystem::loadFromFile(const char* filename)
+   {
+      /*
+      this function should orchestrate the following sequence of steps:
+      1. a filename is provided as to the location of the sound file
+      2. the filename is passed to a file loader (instantiated at the spot on the stack)
+      3. the file loader simply loads the contents of the file to memory and returns the memory
+      4. the memory is passed to a sound loader
+      5. the sound loader parses the memory and creates the sound
+      6. the sound is returned to the audio system
+      7. audio system inserts the sound into cache
+      8. cache returns a sound handle
+      9. sound handle is mapped with the filename in a name cache
+      10. sound handle is returned
+      */
+      
    }
 
    bool AudioSystem::update()
