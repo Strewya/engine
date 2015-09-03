@@ -12,19 +12,19 @@
 *.la
 *.a
 
-Debug/
-Release/
-Deploy/
+lib/compiled
 output/*
 !output/resources/
 ipch/
+x64/
+VS2012Projects/
+deploy/
 *.sdf
 *.opensdf
 *.suo
 *.log
 *.exe
 
-lib/tolua*
 bin/*.dll
 luaBinding.*
 docs.html
