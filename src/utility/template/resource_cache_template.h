@@ -29,7 +29,7 @@ namespace core
       }
       core_iterator& operator++()
       {
-         u32 size = m_cache->m_magicNumbers.size();
+         u32 size = (u32)m_cache->m_magicNumbers.size();
          if( m_index < size )
          {
             while( (++m_index) < size && m_cache->m_magicNumbers[m_index] == 0 );
@@ -121,7 +121,7 @@ namespace core
 
       u32 getUsedHandleCount() const
       {
-         return m_magicNumbers.size() - m_freeSlots.size();
+         return (u32)(m_magicNumbers.size() - m_freeSlots.size());
       }
       
       bool hasUsedHandles() const
@@ -144,7 +144,7 @@ namespace core
       {
          iterator it;
          it.m_cache = this;
-         it.m_index = m_magicNumbers.size();
+         it.m_index = (u32)m_magicNumbers.size();
          return it;
       }
 

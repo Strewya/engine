@@ -246,7 +246,7 @@ namespace core
 
       core_internal DataId requestSlot(ComponentBase& cmp, Entity e)
       {
-         DataId id{cmp.m_mapping.size()};
+         DataId id{(u32)cmp.m_mapping.size()};
          cmp.m_mapping.insert({e, id});
          requestSlot(cmp.m_entity, id, e);
          return id;
@@ -267,7 +267,7 @@ namespace core
          auto it = cmp.m_mapping.find(e);
          if( it != std::end(cmp.m_mapping) )
          {
-            auto last = cmp.m_mapping.size() - 1;
+            auto last = (u32)cmp.m_mapping.size() - 1;
             result.first = it->second;
             result.second = {last};
             auto lastIt = std::find_if(std::begin(cmp.m_mapping), std::end(cmp.m_mapping),
@@ -317,7 +317,7 @@ namespace core
    //*****************************************************
    core_internal u32 getCount(const ComponentBase& cache)
    {
-      auto result = cache.m_mapping.size();
+      auto result = (u32)cache.m_mapping.size();
       return result;
    }
    //*******************************************************

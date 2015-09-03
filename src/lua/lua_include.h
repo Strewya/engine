@@ -7,3 +7,6 @@ extern "C"
 #include <lauxlib.h>
 }
 #include <tolua++.h>
+
+#define LUA_OK 0
+

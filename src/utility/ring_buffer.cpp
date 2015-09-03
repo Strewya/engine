@@ -28,7 +28,7 @@ namespace core
       if( m_nextWriteIndex == m_nextReadIndex )
       {
          std::rotate(m_data.begin(), m_data.begin() + m_nextReadIndex, m_data.end());
-         m_nextWriteIndex += std::distance(m_data.begin() + m_nextReadIndex, m_data.end());
+         m_nextWriteIndex += (u32)(std::distance(m_data.begin() + m_nextReadIndex, m_data.end()));
          m_nextReadIndex = 0;
       }
 
@@ -83,6 +83,6 @@ namespace core
          m_nextWriteIndex - m_nextReadIndex :
          m_data.size() + m_nextWriteIndex - m_nextReadIndex;
 
-      return result;
+      return (u32)result;
    }
 }

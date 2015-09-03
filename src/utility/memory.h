@@ -10,30 +10,18 @@
 /******* end header inclusion *******/
 
 #define Bytes(n) (n)
-#define Kilobytes(n) ((n)*1024)
-#define Megabytes(n) (Kilobytes(n)*1024)
-#define Gigabytes(n) (Megabytes(n)*1024)
-#define Terabytes(n) (Gigabytes(n)*1024)
+#define Kilobytes(n) (Bytes(n)*1024LL)
+#define Megabytes(n) (Kilobytes(n)*1024LL)
+#define Gigabytes(n) (Megabytes(n)*1024LL)
+#define Terabytes(n) (Gigabytes(n)*1024LL)
 
 namespace core
 {
-   struct Memory
-   {
-      u8* ptr;
-      u32 size;
-   };
-
    struct LinearAllocator
    {
-      u8* memory;
-      u32 size;
-   };
-
-   struct StackAllocator
-   {
+      u64 size;
       u8* memory;
    };
-
 
    inline u8* allocate(LinearAllocator& a, u32 size, u32 align)
    {
@@ -55,4 +43,12 @@ namespace core
       u8* result = allocate(a, sizeof(T)*count, __alignof(T));
       return (T*)result;
    }
+
+   struct StackAllocator
+   {
+      u8* memory;
+      u32 marker;
+   };
+
+
 }

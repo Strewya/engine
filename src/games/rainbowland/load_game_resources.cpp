@@ -24,12 +24,12 @@ namespace core
       assets.mainPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
       assets.healthPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
       
-      assets.reload = sounds.loadFromFile(CORE_RESOURCE("Sounds/reload.wav"));
-      assets.pistol = sounds.loadFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
-      assets.shotgun = sounds.loadFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
-      assets.uzi = sounds.loadFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
-      assets.sniper = sounds.loadFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
-      assets.rpg = sounds.loadFromFile(CORE_RESOURCE("Sounds/missile.wav"));
+//       assets.reload = sounds.loadFromFile(CORE_RESOURCE("Sounds/reload.wav"));
+//       assets.pistol = sounds.loadFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
+//       assets.shotgun = sounds.loadFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
+//       assets.uzi = sounds.loadFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
+//       assets.sniper = sounds.loadFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
+//       assets.rpg = sounds.loadFromFile(CORE_RESOURCE("Sounds/missile.wav"));
 
       return assets;
    }
@@ -56,12 +56,12 @@ namespace core
 
    void unloadGameResources(GameResources& assets, SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
-      sounds.release(assets.rpg);
-      sounds.release(assets.sniper);
-      sounds.release(assets.uzi);
-      sounds.release(assets.shotgun);
-      sounds.release(assets.pistol);
-      sounds.release(assets.reload);
+//       sounds.release(assets.rpg);
+//       sounds.release(assets.sniper);
+//       sounds.release(assets.uzi);
+//       sounds.release(assets.shotgun);
+//       sounds.release(assets.pistol);
+//       sounds.release(assets.reload);
 
       pixelShaders.release(assets.healthPS);
       pixelShaders.release(assets.mainPS);

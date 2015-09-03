@@ -45,7 +45,7 @@ typedef enum
     FMOD_DSP_TYPE_VSTPLUGIN,          /* This unit allows the use of Steinberg VST plugins */
     FMOD_DSP_TYPE_WINAMPPLUGIN,       /* This unit allows the use of Nullsoft Winamp plugins */
     FMOD_DSP_TYPE_ITECHO,             /* This unit produces an echo on the sound and fades out at the desired rate as is used in Impulse Tracker. */
-    FMOD_DSP_TYPE_COMPRESSOR,         /* This unit implements dynamic compression (linked multichannel, wideband) */
+    FMOD_DSP_TYPE_COMPRESSOR,         /* This unit implements dynamic compression (linked/unlinked multichannel, wideband) */
     FMOD_DSP_TYPE_SFXREVERB,          /* This unit implements SFX reverb */
     FMOD_DSP_TYPE_LOWPASS_SIMPLE,     /* This unit filters sound using a simple lowpass with no resonance, but has flexible cutoff and is fast. */
     FMOD_DSP_TYPE_DELAY,              /* This unit produces different delays on individual channels of the sound. */
@@ -415,7 +415,7 @@ typedef enum
 [
     [DESCRIPTION]
     Parameter types for the FMOD_DSP_TYPE_COMPRESSOR unit.
-    This is a simple linked multichannel software limiter that is uniform across the whole spectrum.<br>
+    This is a multichannel software limiter that is uniform across the whole spectrum.
 
     [REMARKS]
     The limiter is not guaranteed to catch every peak above the threshold level,
@@ -436,12 +436,13 @@ typedef enum
 */
 typedef enum
 {
-    FMOD_DSP_COMPRESSOR_THRESHOLD,   /* (Type:float) - Threshold level (dB) in the range from -80 through 0. The default value is 0. */ 
-    FMOD_DSP_COMPRESSOR_RATIO,       /* (Type:float) - Compression Ratio (dB/dB) in the range from 1 to 50. The default value is 2.5. */ 
-    FMOD_DSP_COMPRESSOR_ATTACK,      /* (Type:float) - Attack time (milliseconds), in the range from 0.1 through 1000. The default value is 20. */
-    FMOD_DSP_COMPRESSOR_RELEASE,     /* (Type:float) - Release time (milliseconds), in the range from 10 through 5000. The default value is 100 */
-    FMOD_DSP_COMPRESSOR_GAINMAKEUP,  /* (Type:float) - Make-up gain (dB) applied after limiting, in the range from 0 through 30. The default value is 0. */
-    FMOD_DSP_COMPRESSOR_USESIDECHAIN /* (Type:bool)  - Whether to analyse the sidechain signal instead of the input signal. The default value is false */
+    FMOD_DSP_COMPRESSOR_THRESHOLD,    /* (Type:float) - Threshold level (dB) in the range from -80 through 0. The default value is 0. */ 
+    FMOD_DSP_COMPRESSOR_RATIO,        /* (Type:float) - Compression Ratio (dB/dB) in the range from 1 to 50. The default value is 2.5. */ 
+    FMOD_DSP_COMPRESSOR_ATTACK,       /* (Type:float) - Attack time (milliseconds), in the range from 0.1 through 1000. The default value is 20. */
+    FMOD_DSP_COMPRESSOR_RELEASE,      /* (Type:float) - Release time (milliseconds), in the range from 10 through 5000. The default value is 100 */
+    FMOD_DSP_COMPRESSOR_GAINMAKEUP,   /* (Type:float) - Make-up gain (dB) applied after limiting, in the range from 0 through 30. The default value is 0. */
+    FMOD_DSP_COMPRESSOR_USESIDECHAIN, /* (Type:data)  - Data of type FMOD_DSP_PARAMETER_SIDECHAIN. Whether to analyse the sidechain signal instead of the input signal. Default is { false } */
+    FMOD_DSP_COMPRESSOR_LINKED        /* (Type:bool)  - FALSE = Independent (compressor per channel), TRUE = Linked.  The default value is TRUE. */
 } FMOD_DSP_COMPRESSOR;
 
 /*
@@ -615,8 +616,8 @@ typedef enum
 */
 typedef enum
 {
-    FMOD_DSP_RETURN_ID,             /* (Type:int) - [r]   ID of this Return DSP. Read-only.  Default = -1*/
-    FMOD_DSP_RETURN_INPUT_FORMAT    /* (Type:int) - [r/w] Input format of this return.  0 = mono, 1 = stereo, 2 = 'surround'.  Surround = the speaker format of the mixer.  Default = 2.*/
+    FMOD_DSP_RETURN_ID,                /* (Type:int) - [r]   ID of this Return DSP. Read-only.  Default = -1*/
+    FMOD_DSP_RETURN_INPUT_SPEAKER_MODE /* (Type:int) - [r/w] Input speaker mode of this return.  Default = FMOD_SPEAKERMODE_DEFAULT.*/
 } FMOD_DSP_RETURN;
 
 
@@ -659,6 +660,26 @@ typedef enum
     FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISTRIBUTED,
     FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISCRETE
 } FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_TYPE;
+
+
+/*
+[ENUM]
+[
+    [DESCRIPTION]
+    Parameter values for the FMOD_DSP_PAN_MODE parameter of the FMOD_DSP_TYPE_PAN DSP.
+
+    [REMARKS]
+
+    [SEE_ALSO]
+    FMOD_DSP_PAN
+]
+*/
+typedef enum
+{
+    FMOD_DSP_PAN_MODE_MONO,
+    FMOD_DSP_PAN_MODE_STEREO,
+    FMOD_DSP_PAN_MODE_SURROUND
+} FMOD_DSP_PAN_MODE_TYPE;
 
 
 /*
@@ -723,26 +744,27 @@ typedef enum
 */
 typedef enum
 {
-    FMOD_DSP_PAN_OUTPUT_FORMAT,                 /* (Type:float) - Output channel format.    0 = Mono, 1 = Stereo, 2 = Surround.  Default = 2 */
-    FMOD_DSP_PAN_STEREO_POSITION,               /* (Type:float) - Stereo pan position       STEREO_POSITION_MIN to STEREO_POSITION_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_SURROUND_DIRECTION,            /* (Type:float) - Surround pan direction    ROTATION_MIN to ROTATION_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_SURROUND_EXTENT,               /* (Type:float) - Surround pan extent       EXTENT_MIN to EXTENT_MAX.  Default = 360.0. */
-    FMOD_DSP_PAN_SURROUND_ROTATION,             /* (Type:float) - Surround pan rotation     ROTATION_MIN to ROTATION_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_SURROUND_LFE_LEVEL,            /* (Type:float) - Surround pan LFE level    SURROUND_LFE_LEVEL_MIN to SURROUND_LFE_LEVEL_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE,     /* (Type:int)   - Stereo-To-Surround Mode   FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISTRIBUTED to FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISCRETE.  Default = FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISCRETE. */
+    FMOD_DSP_PAN_MODE,                          /* (Type:int)   - Panner mode.              FMOD_DSP_PAN_MODE_MONO for mono down-mix, FMOD_DSP_PAN_MODE_STEREO for stereo panning or FMOD_DSP_PAN_MODE_SURROUND for surround panning.  Default = FMOD_DSP_PAN_MODE_SURROUND */
+    FMOD_DSP_PAN_STEREO_POSITION,               /* (Type:float) - Stereo pan position.      STEREO_POSITION_MIN to STEREO_POSITION_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_SURROUND_DIRECTION,            /* (Type:float) - Surround pan direction.   ROTATION_MIN to ROTATION_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_SURROUND_EXTENT,               /* (Type:float) - Surround pan extent.      EXTENT_MIN to EXTENT_MAX.  Default = 360.0. */
+    FMOD_DSP_PAN_SURROUND_ROTATION,             /* (Type:float) - Surround pan rotation.    ROTATION_MIN to ROTATION_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_SURROUND_LFE_LEVEL,            /* (Type:float) - Surround pan LFE level.   SURROUND_LFE_LEVEL_MIN to SURROUND_LFE_LEVEL_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE,     /* (Type:int)   - Stereo-To-Surround Mode.  FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISTRIBUTED to FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISCRETE.  Default = FMOD_DSP_PAN_SURROUND_FROM_STEREO_MODE_DISCRETE. */
     FMOD_DSP_PAN_SURROUND_STEREO_SEPARATION,    /* (Type:float) - Stereo-To-Surround Stereo Separation. ROTATION_MIN to ROTATION_MAX.  Default = 60.0. */
     FMOD_DSP_PAN_SURROUND_STEREO_AXIS,          /* (Type:float) - Stereo-To-Surround Stereo Axis. ROTATION_MIN to ROTATION_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_ENABLED_SURROUND_SPEAKERS,     /* (Type:int)   - Surround Speakers Enabled. 0 to 0xFFF.  Default = 0xFFF.  */
-    FMOD_DSP_PAN_3D_POSITION,                   /* (Type:data)  - 3D Position               data of type FMOD_DSP_PARAMETER_DATA_TYPE_3DPOS */
-    FMOD_DSP_PAN_3D_ROLLOFF,                    /* (Type:int)   - 3D Rolloff                FMOD_DSP_PAN_3D_ROLLOFF_LINEARSQUARED to FMOD_DSP_PAN_3D_ROLLOFF_CUSTOM.  Default = FMOD_DSP_PAN_3D_ROLLOFF_LINEARSQUARED. */
-    FMOD_DSP_PAN_3D_MIN_DISTANCE,               /* (Type:float) - 3D Min Distance           0.0 to GAME_UNITS_MAX.  Default = 1.0. */
-    FMOD_DSP_PAN_3D_MAX_DISTANCE,               /* (Type:float) - 3D Max Distance           0.0 to GAME_UNITS_MAX.  Default = 20.0. */
-    FMOD_DSP_PAN_3D_EXTENT_MODE,                /* (Type:int)   - 3D Extent Mode            FMOD_DSP_PAN_3D_EXTENT_MODE_AUTO to FMOD_DSP_PAN_3D_EXTENT_MODE_OFF.  Default = FMOD_DSP_PAN_3D_EXTENT_MODE_AUTO. */
-    FMOD_DSP_PAN_3D_SOUND_SIZE,                 /* (Type:float) - 3D Sound Size             0.0 to GAME_UNITS_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_3D_MIN_EXTENT,                 /* (Type:float) - 3D Min Extent             EXTENT_MIN to EXTENT_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_3D_PAN_BLEND,                  /* (Type:float) - 3D Pan Blend              PAN_BLEND_MIN to PAN_BLEND_MAX.  Default = 0.0. */
-    FMOD_DSP_PAN_LFE_UPMIX_ENABLED,             /* (Type:int)   - LFE Upmix Enabled         0 to 1.  Default = 0. */
-    FMOD_DSP_PAN_OVERALL_GAIN                   /* (Type:data)  - Overall Gain              data of type FMOD_DSP_PARAMETER_DATA_TYPE_OVERALLGAIN */
+    FMOD_DSP_PAN_ENABLED_SURROUND_SPEAKERS,     /* (Type:int)   - Surround Speakers Enabled.  0 to 0xFFF.  Default = 0xFFF.  */
+    FMOD_DSP_PAN_3D_POSITION,                   /* (Type:data)  - 3D Position.              data of type FMOD_DSP_PARAMETER_3DATTRIBUTES_MULTI */
+    FMOD_DSP_PAN_3D_ROLLOFF,                    /* (Type:int)   - 3D Rolloff.               FMOD_DSP_PAN_3D_ROLLOFF_LINEARSQUARED to FMOD_DSP_PAN_3D_ROLLOFF_CUSTOM.  Default = FMOD_DSP_PAN_3D_ROLLOFF_LINEARSQUARED. */
+    FMOD_DSP_PAN_3D_MIN_DISTANCE,               /* (Type:float) - 3D Min Distance.          0.0 to GAME_UNITS_MAX.  Default = 1.0. */
+    FMOD_DSP_PAN_3D_MAX_DISTANCE,               /* (Type:float) - 3D Max Distance.          0.0 to GAME_UNITS_MAX.  Default = 20.0. */
+    FMOD_DSP_PAN_3D_EXTENT_MODE,                /* (Type:int)   - 3D Extent Mode.           FMOD_DSP_PAN_3D_EXTENT_MODE_AUTO to FMOD_DSP_PAN_3D_EXTENT_MODE_OFF.  Default = FMOD_DSP_PAN_3D_EXTENT_MODE_AUTO. */
+    FMOD_DSP_PAN_3D_SOUND_SIZE,                 /* (Type:float) - 3D Sound Size.            0.0 to GAME_UNITS_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_3D_MIN_EXTENT,                 /* (Type:float) - 3D Min Extent.            EXTENT_MIN to EXTENT_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_3D_PAN_BLEND,                  /* (Type:float) - 3D Pan Blend.             PAN_BLEND_MIN to PAN_BLEND_MAX.  Default = 0.0. */
+    FMOD_DSP_PAN_LFE_UPMIX_ENABLED,             /* (Type:int)   - LFE Upmix Enabled.        0 to 1.  Default = 0. */
+    FMOD_DSP_PAN_OVERALL_GAIN,                  /* (Type:data)  - Overall gain.             data of type FMOD_DSP_PARAMETER_DATA_TYPE_OVERALLGAIN */
+    FMOD_DSP_PAN_SURROUND_SPEAKER_MODE          /* (Type:int)   - Surround speaker mode.    Target speaker mode for surround panning. */
 } FMOD_DSP_PAN;
 
 
@@ -897,7 +919,7 @@ typedef enum
     FMOD_DSP_ENVELOPEFOLLOWER_ATTACK,      /* (Type:float) [r/w] - Attack time (milliseconds), in the range from 0.1 through 1000. The default value is 20. */
     FMOD_DSP_ENVELOPEFOLLOWER_RELEASE,     /* (Type:float) [r/w] - Release time (milliseconds), in the range from 10 through 5000. The default value is 100 */
     FMOD_DSP_ENVELOPEFOLLOWER_ENVELOPE,    /* (Type:float) [r]   - Current value of the envelope, in the range 0 to 1. Read-only. */
-    FMOD_DSP_ENVELOPEFOLLOWER_USESIDECHAIN /* (Type:bool)  [r/w] - Whether to analyse the sidechain signal instead of the input signal. The default value is false */
+    FMOD_DSP_ENVELOPEFOLLOWER_USESIDECHAIN /* (Type:data)  [r/w] - Data of type FMOD_DSP_PARAMETER_SIDECHAIN. Whether to analyse the sidechain signal instead of the input signal. Default is { false } */
 } FMOD_DSP_ENVELOPEFOLLOWER;
 
 /*

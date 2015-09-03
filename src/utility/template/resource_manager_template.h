@@ -61,7 +61,7 @@ namespace core
       CORE_STATUS_AND(m_loader != nullptr);
       CORE_STATUS_AND(m_defaultData.loaded());
 
-      CORE_INIT_END_STR;
+      CORE_INIT_END;
    }
 
    template<typename DATA, typename HANDLE, typename LOADER>
@@ -81,7 +81,7 @@ namespace core
       CORE_STATUS_AND(m_defaultData.unloaded());
       CORE_STATUS_AND(m_data.hasUsedHandles() == false);
 
-      CORE_SHUTDOWN_END_STR;
+      CORE_SHUTDOWN_END;
    }
 
    template<typename DATA, typename HANDLE, typename LOADER>

@@ -9,9 +9,9 @@
     <SX_BIN>$(SXROOT)\bin</SX_BIN>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>$(SXROOT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SXROOT)\lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <LibraryPath>$(SXROOT)\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
     <SourcePath>$(SXROOT)\src;$(VC_SourcePath);</SourcePath>
+    <IncludePath>$(SXROOT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup>

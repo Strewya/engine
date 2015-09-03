@@ -199,8 +199,8 @@ namespace core
 
       D3D11_MAPPED_SUBRESOURCE ms;
 
-      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), vertices.size());
-      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), indices.size());
+      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), (u32)vertices.size());
+      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), (u32)indices.size());
 
       HRESULT hr = m_devcon->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
@@ -219,7 +219,7 @@ namespace core
       m_devcon->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
       m_devcon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-      m_devcon->DrawIndexed(indices.size(), 0, 0);
+      m_devcon->DrawIndexed((u32)indices.size(), 0, 0);
 
       safeRelease(indexBuffer);
       safeRelease(vertexBuffer);

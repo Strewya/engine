@@ -6,7 +6,7 @@
 /******* c++ headers *******/
 #include <vector>
 /******* extra headers *******/
-#include "graphics/shader/file_loader.h"
+#include "utility/file_loader.h"
 #include "graphics/shader/pixel/pixel_shader.h"
 #include "utility/utility.h"
 /******* end headers *******/
@@ -34,10 +34,11 @@ namespace core
    PixelShader PixelShaderFileLoader::load(const char* filename) const
    {
       PixelShader result{nullptr};
-      std::vector<char> buffer;
-      if( loadFile(filename, buffer) )
+      u8 buffer[1024];
+      u32 bufferSize = 1024;
+      if( loadFile(filename, buffer, bufferSize) == LoadFileResult::OK )
       {
-         result = m_loader->load(buffer.data(), buffer.size());
+         result = m_loader->load((const char*)buffer, bufferSize);
       }
       else
       {

@@ -111,7 +111,7 @@ namespace core
          game.constants.windowHeight = (f32)msg.screen.y;
 
          LinearAllocator la{};
-         CORE_STATUS_AND(audioSystem.init(la));
+         //CORE_STATUS_AND(audioSystem.init(la));
          CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
          CORE_STATUS_AND(inputSystem.init());
          CORE_STATUS_AND(luaSystem.init());
@@ -185,10 +185,10 @@ namespace core
                   }
                   else if( ext == "wav" || ext == "mp3" )
                   {
-                     if( audioSystem.sounds.isLoaded(file.c_str()) )
-                     {
-                        audioSystem.sounds.reloadFromFile(file.c_str());
-                     }
+//                      if( audioSystem.sounds.isLoaded(file.c_str()) )
+//                      {
+//                         audioSystem.sounds.reloadFromFile(file.c_str());
+//                      }
                   }
                }
             } break;

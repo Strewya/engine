@@ -21,41 +21,34 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-   core::Memory mainMemory{};
-   core::Memory gameMemory{};
+   core::LinearAllocator mainAllocator{};
 
    auto communicationBufferSize = Bytes(sizeof(core::CommunicationBuffer));
-   gameMemory.size = Megabytes(256);
-   mainMemory.size = gameMemory.size + communicationBufferSize * 2;
+   mainAllocator.size = Gigabytes(2) + communicationBufferSize * 2;
 
 #ifndef DEPLOY
-   auto baseAddress = (LPVOID)Gigabytes((u64)1);
+   auto baseAddress = (LPVOID)Terabytes(1);
 #else
    auto baseAddress = (LPVOID)0;
 #endif
 
-   mainMemory.ptr = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainMemory.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+   mainAllocator.memory = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainAllocator.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
    i32 result = core::WindowResult::OK;
-   if( mainMemory.ptr )
+   if( mainAllocator.memory )
    {
-      core::CommunicationBuffer* toGame = (core::CommunicationBuffer*)mainMemory.ptr;
-      core::CommunicationBuffer* fromGame = toGame + 1;
-      gameMemory.ptr = (u8*)mainMemory.ptr + communicationBufferSize * 2;
+      core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
+      toGame->init(mainAllocator, 1024);
 
-      toGame->init();
-      fromGame->init();
-
+      core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
+      fromGame->init(mainAllocator, 1024);
+      
       core::Window window("CoreEngine");
 
       result = core::initializeWindow(window);
       if( result == core::WindowResult::OK )
       {
-         std::thread logicThread(core::runGame, gameMemory, toGame, fromGame);
-         core::WinMsg msg;
-         msg.type = core::WinMsgType::WindowHandle;
-         msg.handle = (u64)window.getWindowHandle();
-         toGame->writeEvent(msg);
-
+         std::thread logicThread(core::runGame, mainAllocator, toGame, fromGame, (u64)window.getWindowHandle());
+         
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {
             // #think
@@ -65,6 +58,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
             window.processCommands(fromGame, toGame);
          }
 
+         core::WinMsg msg{};
          msg.type = core::WinMsgType::Close;
          toGame->writeEvent(msg);
 

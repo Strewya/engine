@@ -69,7 +69,7 @@ namespace core
          BOOL success = ::ReadDirectoryChangesW(
             m_dirHandle,               // handle to directory
             &m_mainBuffer[0],          // read results buffer
-            m_mainBuffer.size(),       // length of buffer
+            (DWORD)m_mainBuffer.size(),       // length of buffer
             m_trackSubdirs,            // monitoring option
             m_trackFlags,              // filter conditions
             &dwBytes,                  // bytes returned

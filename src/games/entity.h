@@ -4,6 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <ostream>
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/

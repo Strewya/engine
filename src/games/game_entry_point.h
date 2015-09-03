@@ -5,13 +5,14 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
+#include "utility/types.h"
 /******* extra headers *******/
 /******* end header inclusion *******/
 
 namespace core
 {
    struct CommunicationBuffer;
-   struct Memory;
+   struct LinearAllocator;
 
-   void runGame(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain);
+   void runGame(LinearAllocator allocator, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle);
 }

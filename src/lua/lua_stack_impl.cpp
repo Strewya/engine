@@ -16,12 +16,12 @@ namespace core
 
    template<> u32 LuaStack::to<u32>(i32 stackIndex)
    {
-      return lua_tointeger(m_L, stackIndex);
+      return (u32)lua_tointeger(m_L, stackIndex);
    }
 
    template<> i32 LuaStack::to<i32>(i32 stackIndex)
    {
-      return lua_tointeger(m_L, stackIndex);
+      return (i32)lua_tointeger(m_L, stackIndex);
    }
 
    template<> f32 LuaStack::to<f32>(i32 stackIndex)

@@ -34,10 +34,11 @@ namespace core
    VertexShader VertexShaderFileLoader::load(const char* filename, InputLayout layout) const
    {
       VertexShader result{nullptr, nullptr};
-      std::vector<char> buffer;
-      if( loadFile(filename, buffer) )
+      u8 buffer[1024];
+      u32 bufferSize = 1024;
+      if( loadFile(filename, buffer, bufferSize) == LoadFileResult::OK )
       {
-         result = m_loader->load(layout, buffer.data(), buffer.size());
+         result = m_loader->load(layout, (const char*)buffer, bufferSize);
       }
       else
       {

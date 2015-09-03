@@ -33,17 +33,38 @@ namespace core
       CORE_MAX_UPDATE_TIME = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
    };
 
-   void runGame(Memory memory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
+   void runGame(LinearAllocator mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle)
    {
       Clock logicTimer{};
       Clock renderTimer{};
       //initialization phase
-      LinearAllocator mainMemory{memory.ptr, memory.size};
+
+      //temporary until i get the lua state up, then for development use the config file, and for release use hardcoded values based on profiling memory usage
+#ifndef DEPLOY
+      enum
+      {
+         AudioMemorySize = Megabytes(40),
+         MaxNumberOfSoundSlots = 20,
+         GraphicsMemorySize = Megabytes(50),
+         MaxNumberOfTextureSlots = 5,
+         //...
+      };
+#else
+      //allocate a temporary lua state that reads a config file containing various sizes, such as:
+      //1. audio memory count
+      //2. number of sound slots available
+      //3. graphics memory
+      //4. texture slots
+      //5. shader slots
+      //...
+#endif
 
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
-      audio->init(mainMemory);
+      audio->init(mainMemory, AudioMemorySize, MaxNumberOfSoundSlots);
 
       HSound loadedSound = audio->loadFromFile(CORE_RESOURCE("Sounds/default.wav"));
+
+      audio->shutdown();
 
       /*
 
@@ -70,16 +91,16 @@ namespace core
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
-            running = tickLogic(memory, fromMain, toMain, logicTimer);
+            running = tickLogic(mainMemory, fromMain, toMain, logicTimer);
          }
          logicTimer.advanceTimeBy(droppedTime);
 
          u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
          // we might want to do interpolation ...
-         tickRender(memory, fromMain, toMain, renderTimer);
+         tickRender(mainMemory, fromMain, toMain, renderTimer);
          renderTimer.advanceTimeBy(fullUpdateTime);
       }
-      bool shutdownStatus = shutdown_game(memory, fromMain, toMain);
+      bool shutdownStatus = shutdown_game(mainMemory, fromMain, toMain);
       if( !shutdownStatus )
       {
          CORE_LOG("Game shutdown failed...");

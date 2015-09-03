@@ -41,7 +41,7 @@ namespace core
          {
             if( !layout.empty() )
             {
-               hr = m_dev->CreateInputLayout(layout.data(), layout.size(), buffer, bufferSize, &result._inputLayout);
+               hr = m_dev->CreateInputLayout(layout.data(), (UINT)layout.size(), buffer, bufferSize, &result._inputLayout);
                if( FAILED(hr) )
                {
                   CORE_LOG("Failed to create input layout for vertex shader");

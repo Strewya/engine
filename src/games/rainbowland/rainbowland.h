@@ -13,17 +13,6 @@
 
 namespace core
 {
-   struct MemoryDistributor
-   {
-      MemoryDistributor(Memory m) : memory{(u8*)m.ptr}, offset{0}, sizeLeft{m.size} {}
-
-      u8* memory;
-      u32 offset;
-      u32 sizeLeft;
-   };
-
-
-
    struct World
    {
 

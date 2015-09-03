@@ -18,5 +18,5 @@ namespace core
       OK,
    };
 
-   LoadFileResult loadFile(const char* filename, u8* buffer, u32 bufferSize);
+   LoadFileResult loadFile(const char* filename, u8* buffer, u32& bufferSize);
 }

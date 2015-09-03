@@ -10,7 +10,7 @@
 
 namespace core
 {
-   LoadFileResult loadFile(const char* filename, u8* buffer, u32 bufferSize)
+   LoadFileResult loadFile(const char* filename, u8* buffer, u32& bufferSize)
    {
       std::ifstream file{filename, std::ifstream::in | std::ifstream::binary};
       if( file.good() )
@@ -22,6 +22,7 @@ namespace core
             file.seekg(0, std::ios::beg);
             file.read((char*)buffer, fileSize);
             file.close();
+            bufferSize = (u32)fileSize;
             return LoadFileResult::OK;
          }
          return LoadFileResult::BufferTooSmall;

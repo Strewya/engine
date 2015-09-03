@@ -64,7 +64,7 @@ namespace core
       f32 textureHeight = (f32)textureData.height;
       f32 fontHeight = fd.height*scale.y;
 
-      auto characterCount = strlen(text);
+      auto characterCount = (u32)strlen(text);
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
 
@@ -74,14 +74,14 @@ namespace core
       {
          if( text[charIndex] == '\n' )
          {
-            auto verts = result.vertices.size();
+            auto verts = (u32)result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lastNewline, charIndex, 0, yPosition);
             justifyAxisX(result.vertices, justify_x, verts, x, 0);
             lastNewline = charIndex + 1;
             yPosition -= fontHeight;
          }
       }
-      auto verts = result.vertices.size();
+      auto verts = (u32)result.vertices.size();
       auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lastNewline, characterCount, 0, yPosition);
       justifyAxisX(result.vertices, justify_x, verts, x, 0);
       justifyAxisY(result.vertices, justify_y, fontHeight, 0, 0);
@@ -111,7 +111,7 @@ namespace core
       f32 textureWidth = (f32)textureData.width;
       f32 textureHeight = (f32)textureData.height;
 
-      auto characterCount = strlen(text);
+      auto characterCount = (u32)strlen(text);
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
 
@@ -135,7 +135,7 @@ namespace core
          char character = text[characterIndex];
          if( character == 0 )
          {
-            auto vertStart = result.vertices.size();
+            auto vertStart = (u32)result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, characterIndex, currentLinePosX, currentLinePosY);
             justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
             break;
@@ -159,7 +159,7 @@ namespace core
                else
                {
                   auto end = lastValidBreakpoint;
-                  auto vertStart = result.vertices.size();
+                  auto vertStart = (u32)result.vertices.size();
                   auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, end, currentLinePosX, currentLinePosY);
                   justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
                   characterIndex = lineStart = lastValidBreakpoint = end + 1;
@@ -176,7 +176,7 @@ namespace core
          else if( character == '\n' )
          {
             auto end = characterIndex;
-            auto vertStart = result.vertices.size();
+            auto vertStart = (u32)result.vertices.size();
             auto x = generateLineVertices(result.vertices, text, fd.glyphs, textureWidth, textureHeight, scale, lineStart, end, currentLinePosX, currentLinePosY);
             justifyAxisX(result.vertices, justify_x, vertStart, x, clipBox.halfSize.x);
             characterIndex = lineStart = lastValidBreakpoint = end + 1;

@@ -5,6 +5,7 @@
 #include "utility/utility.h"
 /******* c++ headers *******/
 #include <chrono>
+#include <cstdio>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
@@ -14,46 +15,40 @@
 
 namespace core
 {
-   core_internal std::string getCurrentDate()
+   core_internal u32 fillCurrentDate(char* buffer, u32 size)
    {
-      enum
-      {
-         //         YYYY_mm_dd         \0
-         dateSize = 4 + 1 + 2 + 1 + 2 + 1
-      };
-      char dateBuffer[dateSize] = {};
-
       auto now = time(nullptr);
-      std::strftime(dateBuffer, dateSize, "%Y_%m_%d", localtime(&now));
-      return dateBuffer;
+      u32 written = (u32)std::strftime(buffer, size, "%Y_%m_%d", localtime(&now));
+      return written;
    }
 
-   core_internal std::string getCurrentTime()
+   core_internal u32 fillCurrentTime(char* buffer, u32 size)
    {
-      enum
-      {
-         //             hh : mm : ss : ms        \0
-         timeTextSize = 2 + 1 + 2 + 1 + 2 + 1 + 3 + 1
-      };
-      char timeBuffer[timeTextSize] = {};
-
       //general time
       auto now = time(nullptr);
-      auto msBuffer = timeBuffer + std::strftime(timeBuffer, timeTextSize, "%H:%M:%S.", localtime(&now));
+      u32 written = (u32)std::strftime(buffer, size, "%H:%M:%S.", localtime(&now));
+      size -= written;
+      buffer += written;
       //milliseconds
       auto t = std::chrono::system_clock::now().time_since_epoch();
       auto s = std::chrono::duration_cast<std::chrono::seconds>(t);
       auto f = t - s;
       auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(f);
-      sprintf(msBuffer, "%-3d", ms.count());
-
-      return timeBuffer;
+      written += _snprintf(buffer, size, "%-3d", ms.count());
+      return written;
    }
 
-   core_internal std::string getFilename()
+   core_internal void getFilename(char* buffer, u32 size)
    {
-      std::string filename = "log_" + getCurrentDate() + ".log";
-      return filename;
+      u32 written = _snprintf(buffer, size, "log_");
+      size -= written;
+      buffer += written;
+      written = fillCurrentDate(buffer, size);
+      size -= written;
+      buffer += written;
+      written = _snprintf(buffer, size, ".log");
+      size -= written;
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, size >= 0);
    }
 
    std::ostream& getLogFileStream()
@@ -62,7 +57,10 @@ namespace core
 
       if( !gLogFileStream.is_open() )
       {
-         gLogFileStream.open(getFilename().c_str(), std::ios_base::app);
+         char filename[19] = {};
+         getFilename(filename, 19);
+
+         gLogFileStream.open(filename, std::ios_base::app);
          gLogFileStream << std::endl << std::endl << "Execution start" << std::endl;
       }
       return gLogFileStream;
@@ -70,14 +68,31 @@ namespace core
 
    void writeHeaderToLogStream(std::ostream& stream, const char* filepath, int line)
    {
-      std::string file(filepath);
-      file = file.substr(file.find_last_of("\\") + 1);
-      std::string header = "[" + getCurrentTime() + "] " + file + "@" + std::to_string(line);
-      const auto maxLen = 55;
-      if( header.length() < maxLen )
+      char buffer[13] = {};
+      u32 written = fillCurrentTime(buffer, 13);
+      stream << "[" << buffer;
+      while( written++ < 12 )
       {
-         header += std::string(maxLen - header.length(), '.');
+         stream << '0';
       }
-      stream << header;
+      stream << "] ";
+
+      u32 filenameLength = 0;
+      const char* finder = filepath + strlen(filepath) - 1;
+      while( *finder != '\\' && *finder != '/' && finder > filepath )
+      {
+         --finder;
+         ++filenameLength;
+      }
+      ++finder;
+      stream << finder << "@";
+
+      u32 dots = 35 - filenameLength - sprintf(buffer, "%d", line);
+
+      stream << buffer;
+      while( dots-- )
+      {
+         stream << '.';
+      }
    }
 }

@@ -102,7 +102,7 @@ namespace core
       {
          if( msg.message == WM_QUIT )
          {
-            m_exitCode = msg.wParam;
+            m_exitCode = (u32)msg.wParam;
             return false;
          }
          TranslateMessage(&msg);
@@ -331,11 +331,11 @@ namespace core
       if( msg == WM_NCCREATE )
       {
          window = reinterpret_cast<Window*>(((LPCREATESTRUCT)lParam)->lpCreateParams);
-         ::SetWindowLong(hwnd, GWL_USERDATA, reinterpret_cast<long>(window));
+         ::SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<long>(window));
          return ::DefWindowProc(hwnd, msg, wParam, lParam);
       }
 
-      window = reinterpret_cast<Window*>(::GetWindowLong(hwnd, GWL_USERDATA));
+      window = reinterpret_cast<Window*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
       if( msg == WM_DESTROY )
       {

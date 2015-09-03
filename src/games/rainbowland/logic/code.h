@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 #include <array>
+#include <functional>
 #include <vector>
 /******* common headers *******/
 #include "utility/types.h"
@@ -205,7 +206,7 @@ namespace core
       }
       Entity create()
       {
-         Entity e{m_liveEntities.size()};
+         Entity e{(u32)m_liveEntities.size()};
          if( m_freeIds.empty() )
          {
             m_liveEntities.push_back(true);

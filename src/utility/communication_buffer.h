@@ -9,6 +9,7 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
+#include "utility/memory.h"
 #include "utility/utility.h"
 #include "utility/time/clock.h"
 #include "window/window_message.h"
@@ -18,17 +19,25 @@ namespace core
 {
    struct CommunicationBuffer
    {
+   private:
+      std::atomic<u32> m_readIndex;
+      std::atomic<u32> m_writeIndex;
+      u32 m_maxMessages;
+      WinMsg* m_buffer;
+
    public:
-      void init()
+      void init(LinearAllocator& allocator, u32 messageCount)
       {
          m_writeIndex = 1;
+         m_maxMessages = messageCount;
+         m_buffer = allocate<WinMsg>(allocator, messageCount);
       }
 
       void writeEvent(const WinMsg& e)
       {
          if( !full() )
          {
-            auto index = m_writeIndex % MAX_MESSAGES;
+            auto index = m_writeIndex % m_maxMessages;
             m_buffer[index] = e;
             m_buffer[index].timestamp = Clock::getRealTimeMicros();
             ++m_writeIndex;
@@ -43,7 +52,7 @@ namespace core
       {
          if( !empty() )
          {
-            auto index = (m_readIndex + 1) % MAX_MESSAGES;
+            auto index = (m_readIndex + 1) % m_maxMessages;
             if( latestTime == 0 || m_buffer[index].timestamp <= latestTime )
             {
                e = m_buffer[index];
@@ -55,6 +64,7 @@ namespace core
          return false;
       }
 
+      //blocking call, use only in rare situations
       WinMsg wait()
       {
          WinMsg msg{};
@@ -73,15 +83,5 @@ namespace core
          auto result = m_readIndex == m_writeIndex;
          return result;
       }
-
-   private:
-      enum
-      {
-         MAX_MESSAGES = 1024
-      };
-      std::array<core::WinMsg, MAX_MESSAGES> m_buffer;
-      std::atomic<u32> m_readIndex;
-      std::atomic<u32> m_writeIndex;
    };
-
 }
