@@ -359,6 +359,7 @@
     <ClInclude Include="..\..\..\src\utility\collision_checks.h" />
     <ClInclude Include="..\..\..\src\utility\color.h" />
     <ClInclude Include="..\..\..\src\utility\communication_buffer.h" />
+    <ClInclude Include="..\..\..\src\utility\constructs.h" />
     <ClInclude Include="..\..\..\src\utility\file_loader.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\circle.h" />
     <ClInclude Include="..\..\..\src\utility\geometry\rect.h" />

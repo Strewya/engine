@@ -390,6 +390,9 @@
     <ClInclude Include="..\..\..\src\utility\file_loader.h">
       <Filter>code\framework\utility</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\utility\constructs.h">
+      <Filter>code\framework\utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="code">

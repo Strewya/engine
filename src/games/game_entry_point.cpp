@@ -33,7 +33,7 @@ namespace core
       CORE_MAX_UPDATE_TIME = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
    };
 
-   void runGame(LinearAllocator mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle)
+   void runGame(LinearAllocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle)
    {
       Clock logicTimer{};
       Clock renderTimer{};
@@ -41,7 +41,7 @@ namespace core
 
       //temporary until i get the lua state up, then for development use the config file, and for release use hardcoded values based on profiling memory usage
 #ifndef DEPLOY
-      enum
+      enum : u32
       {
          AudioMemorySize = Megabytes(40),
          MaxNumberOfSoundSlots = 20,

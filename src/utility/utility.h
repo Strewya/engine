@@ -27,7 +27,7 @@ namespace core
    {
       stream << t; writeContentToLogStream(stream, args...);
    }
-   template<typename... Args> void writeLog(const char* file, int line, Args... args)
+   template<typename... Args> inline void writeLog(const char* file, int line, Args... args)
    {
       auto& logStream = getLogFileStream();
 #ifndef DEPLOY

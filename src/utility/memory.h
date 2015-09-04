@@ -10,31 +10,43 @@
 /******* end header inclusion *******/
 
 #define Bytes(n) (n)
-#define Kilobytes(n) (Bytes(n)*1024LL)
-#define Megabytes(n) (Kilobytes(n)*1024LL)
-#define Gigabytes(n) (Megabytes(n)*1024LL)
-#define Terabytes(n) (Gigabytes(n)*1024LL)
+#define Kilobytes(n) (Bytes(n)*1024ULL)
+#define Megabytes(n) (Kilobytes(n)*1024ULL)
+#define Gigabytes(n) (Megabytes(n)*1024ULL)
+#define Terabytes(n) (Gigabytes(n)*1024ULL)
 
 namespace core
 {
+   // Fixed memory manager. Only allocations are supported, frees are not.
    struct LinearAllocator
    {
-      u64 size;
+      const char* tag;
       u8* memory;
+      u32 size;
+      u32 allocated;
    };
+
+   inline std::ostream& operator<<(std::ostream& stream, LinearAllocator& a)
+   {
+      u32 B = a.allocated;
+      f32 kB = B / 1024.0f;
+      f32 MB = kB / 1024;
+      stream << "Memory usage for allocator '" << a.tag << "':\n\tTotal memory: " << a.size << "\n\tMax used: " << B << " kB / " << kB << " kB / " << MB << " MB";
+      return stream;
+   }
 
    inline u8* allocate(LinearAllocator& a, u32 size, u32 align)
    {
-      u32 alignBytes = ((u32)a.memory % align);
+      u8* memory = a.memory + a.allocated;
+      u32 alignBytes = (u32)((u32)memory % align);
       u32 totalSize = size + alignBytes;
-      u8* result = nullptr;
-      if( totalSize <= a.size )
+      if( a.allocated + totalSize <= a.size )
       {
-         result = a.memory + alignBytes;
-         a.size -= totalSize;
-         a.memory += totalSize;
+         memory += alignBytes;
+         a.allocated += totalSize;
+         return memory;
       }
-      return result;
+      return nullptr;
    }
 
    template<typename T>
@@ -44,11 +56,32 @@ namespace core
       return (T*)result;
    }
 
-   struct StackAllocator
+
+
+
+   struct ScratchAllocator
    {
       u8* memory;
-      u32 marker;
+      u32 size;
+      u32 allocated;
    };
 
+   inline u8* allocate(ScratchAllocator& a, u32 size, u32 align)
+   {
+      u8* memory = a.memory + a.allocated;
+      u32 alignBytes = (u32)((u64)memory % align);
+      u32 totalSize = size + alignBytes;
+      if( a.allocated + totalSize <= a.size )
+      {
+         memory += alignBytes;
+         a.allocated += totalSize;
+         return memory;
+      }
+      return nullptr;
+   }
 
+   inline void reset(ScratchAllocator& a)
+   {
+      a.allocated = 0;
+   }
 }

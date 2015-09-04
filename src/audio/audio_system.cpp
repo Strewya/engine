@@ -11,21 +11,21 @@
 
 namespace core
 {
-   bool AudioSystem::init(LinearAllocator& allocator, u32 audioMemorySize, u32 maxSoundSlots)
+   bool AudioSystem::init(LinearAllocator& a, u32 audioMemorySize, u32 maxSoundSlots)
    {
       CORE_INIT_START(AudioSystem);
 
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
-      u8* audioMemory = allocate(allocator, audioMemorySize, 1);
+      u8* audioMemory = allocate(a, audioMemorySize, 1);
 
       CORE_STATUS_AND(FMOD::Memory_Initialize(audioMemory, audioMemorySize, 0, 0, 0) == FMOD_OK);
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
       CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
       
       CORE_STATUS_AND(m_fileLoader.init(m_system));
-      CORE_STATUS_AND(sounds.init(allocator, m_fileLoader, maxSoundSlots));
+      CORE_STATUS_AND(sounds.init(a, m_fileLoader, maxSoundSlots));
 
       if( CORE_STATUS_OK )
       {

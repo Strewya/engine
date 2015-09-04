@@ -35,7 +35,7 @@ namespace core
       SoundManager sounds;
 
    private:
-      //allocator type
+      LinearAllocator m_audioAllocator;
       SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;

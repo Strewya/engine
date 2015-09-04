@@ -34,6 +34,7 @@ namespace core
    Sound SoundFileLoader::load(const char* filename) const
    {
       Sound result{nullptr};
+      
       FMOD_RESULT fr = m_system->createSound(filename, FMOD_DEFAULT, nullptr, &result._sound);
       if( fr != FMOD_OK )
       {

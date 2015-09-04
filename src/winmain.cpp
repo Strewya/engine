@@ -4,7 +4,6 @@
 /******* personal header *******/
 //none
 /******* c++ headers *******/
-#include <array>
 #include <thread>
 /******* extra headers *******/
 #include "games/game_entry_point.h"
@@ -21,15 +20,14 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-   core::LinearAllocator mainAllocator{};
+   core::LinearAllocator mainAllocator{"Entire memory"};
 
-   auto communicationBufferSize = Bytes(sizeof(core::CommunicationBuffer));
-   mainAllocator.size = Gigabytes(2) + communicationBufferSize * 2;
+   mainAllocator.size = Gigabytes(2);
 
 #ifndef DEPLOY
-   auto baseAddress = (LPVOID)Terabytes(1);
+   LPVOID baseAddress = (LPVOID)Terabytes(1);
 #else
-   auto baseAddress = (LPVOID)0;
+   LPVOID baseAddress = (LPVOID)0;
 #endif
 
    mainAllocator.memory = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainAllocator.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -47,7 +45,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       result = core::initializeWindow(window);
       if( result == core::WindowResult::OK )
       {
-         std::thread logicThread(core::runGame, mainAllocator, toGame, fromGame, (u64)window.getWindowHandle());
+         std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle());
          
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {
@@ -64,6 +62,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          logicThread.join();
          result = window.getExitCode();
+         using core::writeLog;
+         CORE_LOG_DEBUG(mainAllocator);
       }
       else
       {
