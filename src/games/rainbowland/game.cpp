@@ -54,7 +54,7 @@ namespace core
    {
       CORE_SHUTDOWN_START(Rainbowland);
 
-      unloadGameResources(game.assets, audioSystem.sounds, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
+      unloadGameResources(game.assets, audioSystem, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
 
       CORE_STATUS_AND(fontSystem.shutdown());
       CORE_STATUS_AND(luaSystem.shutdown());
@@ -114,7 +114,7 @@ namespace core
          //CORE_STATUS_AND(audioSystem.init(la));
          CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
          CORE_STATUS_AND(inputSystem.init());
-         CORE_STATUS_AND(luaSystem.init());
+         //CORE_STATUS_AND(luaSystem.init());
          CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
       }
 

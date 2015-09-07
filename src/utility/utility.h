@@ -16,11 +16,24 @@ namespace core
 {
    std::ostream& getLogFileStream();
 
+
+   inline std::ostream& newLine(std::ostream& stream)
+   {
+      stream << "\n";
+      return stream;
+   }
+
+   inline std::ostream& logLine(std::ostream& stream)
+   {
+      stream << "\n        ";
+      return stream;
+   }
+
    void writeHeaderToLogStream(std::ostream& stream, const char* file, int line);
 
    inline void writeContentToLogStream(std::ostream& stream)
    {
-      stream << std::endl;
+      stream << newLine;
    }
 
    template<typename T, typename... Args> void writeContentToLogStream(std::ostream& stream, T t, Args... args)

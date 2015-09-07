@@ -19,11 +19,10 @@ namespace core
    {
    public:
       bool init(FMOD::System* system);
-      bool shutdown();
 
       Sound load(const char* filename) const;
 
-      void unload(Sound& texture) const;
+      void unload(Sound& sound) const;
 
    private:
       FMOD::System* m_system;

@@ -12,39 +12,36 @@ namespace core
 {
    void LuaStack::dumpStack()
    {
-      u32 top = lua_gettop(m_L);
-      for( u32 i = 1; i <= top; ++i )
-      {  /* repeat for each level */
-         int t = lua_type(m_L, i);
-         std::cout << "[" << i << "]=";
-         switch( t )
+      u32 n = lua_gettop(m_L);
+      for( u32 i = 1; i <= n; ++i )
+      {
+         switch( lua_type(m_L, i) )
          {
-            case LUA_TSTRING:  /* strings */
-               std::cout << lua_tostring(m_L, i);
-               break;
-
-            case LUA_TBOOLEAN:  /* booleans */
-               std::cout << lua_toboolean(m_L, i) ? "true" : "false";
-               break;
-
-            case LUA_TNUMBER:  /* numbers */
-               std::cout << lua_tonumber(m_L, i);
-               break;
-
-            default:  /* other values */
-               std::cout << lua_typename(m_L, t);
-               break;
-
+            case LUA_TNUMBER:
+            {
+               CORE_LOG_DEBUG("[", i, "]=", lua_tonumber(m_L, i));
+            } break;
+            case LUA_TSTRING:
+            {
+               CORE_LOG_DEBUG("[", i, "]=", lua_tostring(m_L, i));
+            } break;
+            case LUA_TBOOLEAN:
+            {
+               CORE_LOG_DEBUG("[", i, "]=", lua_toboolean(m_L, i) == 1 ? "true" : "false");
+            } break;
+            default:
+            {
+               CORE_LOG_DEBUG("[", i, "]=", lua_typename(m_L, i), "(", lua_tonumber(m_L, i), ")");
+            } break;
          }
-         std::cout << ", ";
       }
-      std::cout << std::endl;
+      CORE_LOG_DEBUG("-------------------");
    }
 
    void test_luaStack()
    {
       LuaSystem ls;
-      ls.init();
+      //ls.init();
 
       auto stack = ls.getStack();
 
@@ -255,15 +252,15 @@ namespace core
       CORE_ASSERT(AssertLevel::Fatal, called);
       CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);
       CORE_ASSERT(AssertLevel::Fatal, a == x && b == y && c == z);
-/*
-      stack.pull("test5", 0);
-      CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaFunction>());
-      Vec2 v{5, 5};
-      called = stack.call(LuaCustom{&v, STR(Vec2)});
-      CORE_ASSERT(AssertLevel::Fatal, called);
-      CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);
-      CORE_ASSERT(AssertLevel::Fatal, v.x == 1 && v.y == 1);
-*/
+      /*
+            stack.pull("test5", 0);
+            CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaFunction>());
+            Vec2 v{5, 5};
+            called = stack.call(LuaCustom{&v, STR(Vec2)});
+            CORE_ASSERT(AssertLevel::Fatal, called);
+            CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);
+            CORE_ASSERT(AssertLevel::Fatal, v.x == 1 && v.y == 1);
+            */
       stack.pull("test3", 0);
       CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaFunction>());
       called = stack.call(std::string("are you a monkey?"), &s);

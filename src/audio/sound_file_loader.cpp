@@ -22,15 +22,6 @@ namespace core
       CORE_INIT_END;
    }
 
-   bool SoundFileLoader::shutdown()
-   {
-      CORE_SHUTDOWN_START(SoundFileLoader);
-
-      m_system = nullptr;
-
-      CORE_SHUTDOWN_END;
-   }
-
    Sound SoundFileLoader::load(const char* filename) const
    {
       Sound result{nullptr};
@@ -45,7 +36,10 @@ namespace core
 
    void SoundFileLoader::unload(Sound& sound) const
    {
-      sound._sound->release();
-      sound._sound = nullptr;
+      if( sound._sound )
+      {
+         sound._sound->release();
+         sound._sound = nullptr;
+      }
    }
 }

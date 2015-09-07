@@ -30,16 +30,15 @@ namespace core
 
       HSound loadFromFile(const char* filename);
 
-      void unload(HSound);
+      void unload(HSound sound);
 
-      SoundManager sounds;
+      SoundCache sounds;
 
    private:
-      LinearAllocator m_audioAllocator;
+      LinearAllocator m_allocator;
       SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;
       HSound m_musicPlaying;
-      Sound defaultSound;
    };
 }

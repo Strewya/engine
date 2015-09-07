@@ -13,7 +13,7 @@
 
 namespace core
 {
-   GameResources loadGameResources(SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
+   GameResources loadGameResources(AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
       GameResources assets{};
       assets.atlas = textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
@@ -54,7 +54,7 @@ namespace core
               reload && pistol && shotgun && uzi && sniper && rpg);
    }
 
-   void unloadGameResources(GameResources& assets, SoundManager& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
+   void unloadGameResources(GameResources& assets, AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
    {
 //       sounds.release(assets.rpg);
 //       sounds.release(assets.sniper);

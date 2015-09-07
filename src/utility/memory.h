@@ -7,6 +7,7 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
+#include "utility/utility.h"
 /******* end header inclusion *******/
 
 #define Bytes(n) (n)
@@ -31,7 +32,9 @@ namespace core
       u32 B = a.allocated;
       f32 kB = B / 1024.0f;
       f32 MB = kB / 1024;
-      stream << "Memory usage for allocator '" << a.tag << "':\n\tTotal memory: " << a.size << "\n\tMax used: " << B << " kB / " << kB << " kB / " << MB << " MB";
+      stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
+      stream << "   Total memory: " << a.size << logLine;
+      stream << "   Max used: " << B << " kB / " << kB << " kB / " << MB << " MB";
       return stream;
    }
 
@@ -59,29 +62,42 @@ namespace core
 
 
 
-   struct ScratchAllocator
+
+   //not an allocator, but a helper class that operates on some memory, but is not in charge of doing actual allocations
+   struct Freelist
    {
-      u8* memory;
-      u32 size;
-      u32 allocated;
+      Freelist* next;
+
+      template<typename T>
+      void init(T* start, u32 slots)
+      {
+         static_assert(sizeof(T) >= sizeof(Freelist), "Using a freelist for a type too small.");
+
+         Freelist* runner = this;
+         for( u32 i = 0; i < slots; ++i )
+         {
+            runner->next = (Freelist*)&start[i];
+            runner = runner->next;
+         }
+         runner->next = nullptr;
+      }
    };
 
-   inline u8* allocate(ScratchAllocator& a, u32 size, u32 align)
+   inline u8* allocate(Freelist& a)
    {
-      u8* memory = a.memory + a.allocated;
-      u32 alignBytes = (u32)((u64)memory % align);
-      u32 totalSize = size + alignBytes;
-      if( a.allocated + totalSize <= a.size )
+      if( a.next == nullptr )
       {
-         memory += alignBytes;
-         a.allocated += totalSize;
-         return memory;
+         return nullptr;
       }
-      return nullptr;
+      Freelist* head = a.next;
+      a.next = head->next;
+      return (u8*)head;
    }
 
-   inline void reset(ScratchAllocator& a)
+   inline void release(Freelist& a, void* ptr)
    {
-      a.allocated = 0;
+      Freelist* head = (Freelist*)ptr;
+      head->next = a.next;
+      a.next = head;
    }
 }

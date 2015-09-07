@@ -43,9 +43,10 @@ namespace core
 #ifndef DEPLOY
       enum : u32
       {
-         AudioMemorySize = Megabytes(40),
+         AudioSystemMemorySize = Megabytes(40),
          MaxNumberOfSoundSlots = 20,
-         GraphicsMemorySize = Megabytes(50),
+         LuaSystemMemorySize = Megabytes(100),
+         GraphicsSystemMemorySize = Megabytes(50),
          MaxNumberOfTextureSlots = 5,
          //...
       };
@@ -60,16 +61,13 @@ namespace core
 #endif
 
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
-      audio->init(mainMemory, AudioMemorySize, MaxNumberOfSoundSlots);
+      audio->init(mainMemory, AudioSystemMemorySize, MaxNumberOfSoundSlots);
 
-      HSound loadedSound = audio->loadFromFile(CORE_RESOURCE("Sounds/default.wav"));
-
-      audio->shutdown();
-
+      LuaSystem* lua = allocate<LuaSystem>(mainMemory);
+      lua->init(mainMemory, LuaSystemMemorySize);
       /*
 
             GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
-            LuaSystem* lua = allocate<LuaSystem>(luaMemory);
             GameState* game = allocate<GameState>(gameStateMemory);
             */
 
@@ -105,6 +103,9 @@ namespace core
       {
          CORE_LOG("Game shutdown failed...");
       }
+
+      audio->shutdown();
+      lua->shutdown();
 
       WinMsg msg{};
       msg.type = WinMsgType::Close;

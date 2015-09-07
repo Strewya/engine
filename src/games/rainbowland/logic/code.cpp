@@ -1454,7 +1454,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    core_internal bool init_game(GameData& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
    {
       bool result = true;
-      game.assets = loadGameResources(audio.sounds, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
+      game.assets = loadGameResources(audio, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
 
       result = checkGameResourcesLoaded(game.assets);
 

@@ -5,6 +5,7 @@
 #include "lua/lua_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "utility/memory.h"
 #include "utility/utility.h"
 /******* end headers *******/
 
@@ -18,20 +19,23 @@ namespace core
          switch( lua_type(L, i) )
          {
             case LUA_TNUMBER:
-               std::cout << lua_tonumber(L, i);
-               break;
+            {
+               CORE_LOG_DEBUG(lua_tonumber(L, i));
+            } break;
             case LUA_TSTRING:
-               std::cout << lua_tostring(L, i);
-               break;
+            {
+               CORE_LOG_DEBUG(lua_tostring(L, i));
+            } break;
             case LUA_TBOOLEAN:
-               std::cout << (lua_toboolean(L, i) == 1 ? "true" : "false");
-               break;
+            {
+               CORE_LOG_DEBUG(lua_toboolean(L, i) == 1 ? "true" : "false");
+            } break;
             default:
-               std::cout << lua_typename(L, i) << "(" << lua_tonumber(L, i) << ")";
-               break;
+            {
+               CORE_LOG_DEBUG(lua_typename(L, i), "(", lua_tonumber(L, i), ")");
+            } break;
          }
       }
-      std::cout << std::endl;
       return 0;
    }
 
@@ -41,10 +45,119 @@ namespace core
       return 2;
    }
 
-   bool LuaSystem::init()
+
+
+   struct LuaAllocator
+   {
+      u8* memory;
+      u32 size;
+      struct Freelist
+      {
+         u32 freeSize;
+         union
+         {
+            u8* nextFreeAddress;
+            Freelist* nextFreelist;
+         };
+      } freelistHead;
+
+      void init(u8* start, u32 sz)
+      {
+         memory = start;
+         size = sz;
+         freelistHead.nextFreeAddress = start;
+         freelistHead.freeSize = sz;
+      }
+   };
+
+   void* allocate(LuaAllocator& a, u32 size)
+   {
+      LuaAllocator::Freelist* runner = &a.freelistHead;
+      while( runner->freeSize < size )
+      {
+         runner = runner->nextFreelist;
+      }
+      void* result = runner->nextFreeAddress;
+      runner->nextFreeAddress += size;
+      runner->freeSize -= size;
+      return result;
+   }
+
+   void* reallocate(LuaAllocator& a, void* ptr, u32 osize, u32 nsize)
+   {
+      return nullptr;
+   }
+
+   void deallocate(LuaAllocator& a, void* ptr, u32 size)
+   {
+      LuaAllocator::Freelist* runner = &a.freelistHead;
+      while( runner->nextFreeAddress > ptr )
+      {
+         runner = (LuaAllocator::Freelist*)runner->nextFreeAddress;
+      }
+      u8* nextAddress = runner->nextFreeAddress;
+      u8* freeAddress = (u8*)ptr;
+      if( freeAddress + size == nextAddress )
+      {
+         //combine
+         LuaAllocator::Freelist* nextRunner = (LuaAllocator::Freelist*)nextAddress;
+         runner->freeSize += size + nextRunner->freeSize;
+         runner->nextFreeAddress = nextRunner->nextFreeAddress;
+      }
+      else
+      {
+         //fragment
+      }
+      runner->nextFreeAddress = (u8*)ptr;
+      runner->freeSize += size;
+      
+   }
+
+
+   void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
+   {
+      LuaAllocator* a = (LuaAllocator*)ud;
+      void* result = nullptr;
+      if( nsize == 0 )
+      {
+         deallocate(*a, ptr, (u32)osize);
+      }
+      else if( osize == 0 && nsize > 0 )
+      {
+         result = allocate(*a, (u32)nsize);
+      }
+      else if( osize > 0 && nsize > 0 )
+      {
+         result = reallocate(*a, ptr, (u32)osize, (u32)nsize);
+      }
+      return result;
+   }
+
+   void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
+   {
+      CORE_LOG_DEBUG("Lua allocation, ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
+      
+      (void)ud;  (void)osize;  /* not used */
+      if( nsize == 0 )
+      {
+         free(ptr);
+         return nullptr;
+      }
+      
+      return realloc(ptr, nsize);
+   }
+
+   bool LuaSystem::init(LinearAllocator& a, u32 memorySize)
    {
       CORE_INIT_START(LuaSystem);
-      m_L = luaL_newstate();
+
+      m_allocator.size = memorySize;
+      m_allocator.tag = "Lua system";
+      m_allocator.allocated = 0;
+      m_allocator.memory = allocate(a, m_allocator.size, 1);
+
+      m_L = lua_newstate(lua_allocate, &m_allocator);
+      
       CORE_STATUS_AND(m_L != nullptr);
       if( CORE_STATUS_OK )
       {
@@ -85,6 +198,7 @@ end
    {
       CORE_SHUTDOWN_START(LuaSystem);
       lua_close(m_L);
+      CORE_LOG_DEBUG(m_allocator);
       CORE_SHUTDOWN_END;
    }
 

@@ -61,7 +61,7 @@ namespace core
          getFilename(filename, 19);
 
          gLogFileStream.open(filename, std::ios_base::app);
-         gLogFileStream << std::endl << std::endl << "Execution start" << std::endl;
+         gLogFileStream << newLine << newLine << logLine << "Execution start" << newLine;
       }
       return gLogFileStream;
    }
@@ -70,7 +70,7 @@ namespace core
    {
       char buffer[13] = {};
       u32 written = fillCurrentTime(buffer, 13);
-      stream << "[" << buffer;
+      stream << "\033[1;31m[" << buffer;
       while( written++ < 12 )
       {
          stream << '0';
@@ -85,14 +85,6 @@ namespace core
          ++filenameLength;
       }
       ++finder;
-      stream << finder << "@";
-
-      u32 dots = 35 - filenameLength - sprintf(buffer, "%d", line);
-
-      stream << buffer;
-      while( dots-- )
-      {
-         stream << '.';
-      }
+      stream << finder << " @ " << line << "\033[0m" << logLine;
    }
 }
