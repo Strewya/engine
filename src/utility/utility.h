@@ -33,7 +33,8 @@ namespace core
 
    inline void writeContentToLogStream(std::ostream& stream)
    {
-      stream << newLine;
+      //endl flushes the stream, which is what i want here.
+      stream << std::endl;
    }
 
    template<typename T, typename... Args> void writeContentToLogStream(std::ostream& stream, T t, Args... args)

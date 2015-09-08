@@ -45,123 +45,188 @@ namespace core
       return 2;
    }
 
-
-
-   struct LuaAllocator
+   void* allocate(LuaAllocator& a, u32 requestedSize)
    {
-      u8* memory;
-      u32 size;
-      struct Freelist
+      LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
+      while( currentFreelist->address && currentFreelist->size < requestedSize )
       {
-         u32 freeSize;
-         union
-         {
-            u8* nextFreeAddress;
-            Freelist* nextFreelist;
-         };
-      } freelistHead;
-
-      void init(u8* start, u32 sz)
-      {
-         memory = start;
-         size = sz;
-         freelistHead.nextFreeAddress = start;
-         freelistHead.freeSize = sz;
+         currentFreelist = currentFreelist->nextFreelist;
       }
-   };
 
-   void* allocate(LuaAllocator& a, u32 size)
-   {
-      LuaAllocator::Freelist* runner = &a.freelistHead;
-      while( runner->freeSize < size )
+      if( currentFreelist->address == nullptr )
       {
-         runner = runner->nextFreelist;
+         //case where we traversed the entire freelist and found no slot big enough for the requested size
+         return nullptr;
       }
-      void* result = runner->nextFreeAddress;
-      runner->nextFreeAddress += size;
-      runner->freeSize -= size;
+
+      //case where we found a slot big enough for the requested size
+      void* result = currentFreelist->address;
+
+      currentFreelist->size -= requestedSize;
+      if( currentFreelist->size )
+      {
+         //case where there is more room in the slot after the requested size is removed
+         LuaAllocator::Freelist* unmoved = currentFreelist->nextFreelist;
+         currentFreelist->address += requestedSize;
+         currentFreelist->nextFreelist->address = unmoved->address;
+         currentFreelist->nextFreelist->size = unmoved->size;
+      }
+      else
+      {
+         //case where the slot is exhausted by the requested size
+         currentFreelist->size = currentFreelist->nextFreelist->size;
+         currentFreelist->address = currentFreelist->nextFreelist->address;
+      }
+      a.allocated += requestedSize;
+      a.maxAllocated = max(a.maxAllocated, a.allocated);
+      memset(result, 0, requestedSize);
       return result;
-   }
-
-   void* reallocate(LuaAllocator& a, void* ptr, u32 osize, u32 nsize)
-   {
-      return nullptr;
    }
 
    void deallocate(LuaAllocator& a, void* ptr, u32 size)
    {
-      LuaAllocator::Freelist* runner = &a.freelistHead;
-      while( runner->nextFreeAddress > ptr )
+      if( !ptr )
       {
-         runner = (LuaAllocator::Freelist*)runner->nextFreeAddress;
+         return;
       }
-      u8* nextAddress = runner->nextFreeAddress;
-      u8* freeAddress = (u8*)ptr;
-      if( freeAddress + size == nextAddress )
+      LuaAllocator::Freelist* previousFreelist = nullptr;
+      LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
+      while( currentFreelist->address && currentFreelist->address < ptr )
       {
-         //combine
-         LuaAllocator::Freelist* nextRunner = (LuaAllocator::Freelist*)nextAddress;
-         runner->freeSize += size + nextRunner->freeSize;
-         runner->nextFreeAddress = nextRunner->nextFreeAddress;
+         previousFreelist = currentFreelist;
+         currentFreelist = currentFreelist->nextFreelist;
       }
-      else
+
+      LuaAllocator::Freelist* newFreelistNode = (LuaAllocator::Freelist*)ptr;
+      newFreelistNode->address = currentFreelist->address;
+      newFreelistNode->size = currentFreelist->size;
+      currentFreelist->nextFreelist = newFreelistNode;
+      currentFreelist->size = size;
+
+      while( previousFreelist && previousFreelist->address + previousFreelist->size == currentFreelist->address )
       {
-         //fragment
+         previousFreelist->size += currentFreelist->size;
+         currentFreelist->size = currentFreelist->nextFreelist->size;
+         currentFreelist->address = currentFreelist->nextFreelist->address;
       }
-      runner->nextFreeAddress = (u8*)ptr;
-      runner->freeSize += size;
-      
+
+      a.allocated -= size;
+   }
+
+   void* reallocate(LuaAllocator& a, void* ptr, u32 osize, u32 nsize)
+   {
+      void* result = nullptr;
+      if( nsize < osize )
+      {
+         //if the new size is less than the old size, we can just return the original pointer, and release the extra size
+         void* ptrToDeallocate = (u8*)ptr + nsize;
+         deallocate(a, ptrToDeallocate, osize - nsize);
+         result = ptr;
+      }
+      else //nsize > osize
+      {
+         // #todo try to allocate memory right after the current pointer to just expand the pointer in place, will save the memcpy
+         void* newPtr = allocate(a, nsize);
+         if( newPtr )
+         {
+            memcpy(newPtr, ptr, osize);
+            deallocate(a, ptr, osize);
+         }
+      }
+
+      return result;
    }
 
 
    void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
+      osize = osize ? max(osize, sizeof(LuaAllocator::Freelist)) : osize;
+      nsize = nsize ? max(nsize, sizeof(LuaAllocator::Freelist)) : nsize;
       LuaAllocator* a = (LuaAllocator*)ud;
       void* result = nullptr;
       if( nsize == 0 )
       {
+         CORE_LOG_DEBUG("Deallocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
          deallocate(*a, ptr, (u32)osize);
       }
       else if( osize == 0 && nsize > 0 )
       {
+         CORE_LOG_DEBUG("Allocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
          result = allocate(*a, (u32)nsize);
       }
-      else if( osize > 0 && nsize > 0 )
+      else if( osize > 0 && nsize > 0 && osize != nsize )
       {
+         CORE_LOG_DEBUG("Reallocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
          result = reallocate(*a, ptr, (u32)osize, (u32)nsize);
       }
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, result != (void*)0x000004000000FFC6);
       return result;
    }
 
    void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
    {
       CORE_LOG_DEBUG("Lua allocation, ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
-      
+
       (void)ud;  (void)osize;  /* not used */
       if( nsize == 0 )
       {
          free(ptr);
          return nullptr;
       }
-      
-      return realloc(ptr, nsize);
+
+      auto* result = realloc(ptr, nsize);
+      return result;
    }
+
+   static void test_luaAllocator(LinearAllocator a);
 
    bool LuaSystem::init(LinearAllocator& a, u32 memorySize)
    {
       CORE_INIT_START(LuaSystem);
 
-      m_allocator.size = memorySize;
-      m_allocator.tag = "Lua system";
-      m_allocator.allocated = 0;
-      m_allocator.memory = allocate(a, m_allocator.size, 1);
+      //test_luaAllocator(a);
 
-      m_L = lua_newstate(lua_allocate, &m_allocator);
-      
+      m_allocator.tag = "Lua system";
+      m_allocator.init(allocate(a, memorySize, 1), memorySize);
+
+      m_L = lua_newstate(lua_allocateCustom, &m_allocator);
+
       CORE_STATUS_AND(m_L != nullptr);
       if( CORE_STATUS_OK )
       {
-         luaL_openlibs(m_L);
+         u32 t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_base);
+         lua_pushliteral(m_L, "");
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_table);
+         lua_pushliteral(m_L, LUA_TABLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_os);
+         lua_pushliteral(m_L, LUA_OSLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_debug);
+         lua_pushliteral(m_L, LUA_DBLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_package);
+         lua_pushliteral(m_L, LUA_LOADLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_io);
+         lua_pushliteral(m_L, LUA_IOLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_string);
+         lua_pushliteral(m_L, LUA_STRLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
+         lua_pushcfunction(m_L, luaopen_math);
+         lua_pushliteral(m_L, LUA_MATHLIBNAME);
+         lua_call(m_L, 1, 0);
+         t = lua_gettop(m_L);
          //tolua_core_open(m_L);
 
          lua_register(m_L, "print", luaPrint);
@@ -210,5 +275,83 @@ end
    LuaStack LuaSystem::getStack() const
    {
       return LuaStack(m_L);
+   }
+
+
+
+   void test_luaAllocator(LinearAllocator a)
+   {
+      LuaAllocator la{};
+
+      u32 size = Megabytes(30);
+      la.init(allocate(a, size, 1), size);
+      u8* startAddress = la.memory;
+
+      void* a30 = allocate(la, 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, a30 == startAddress);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == size - 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == 0);
+
+      void* b40 = allocate(la, 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, b40 == startAddress + 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 70);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30 + 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == size - 30 - 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == 0);
+
+      void* c50 = allocate(la, 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, c50 == startAddress + 30 + 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 120);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30 + 40 + 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == size - 30 - 40 - 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == 0);
+
+      deallocate(la, b40, 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 80);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == 40);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == size - 30 - 40 - 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->nextFreelist->size == 0);
+
+      void* d20 = allocate(la, 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, d20 == startAddress + 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 100);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30 + 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == size - 30 - 40 - 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->nextFreelist->size == 0);
+
+      void* e20 = allocate(la, 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, e20 == startAddress + 30 + 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 120);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.address == startAddress + 30 + 40 + 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.size == size - 30 - 40 - 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->address == nullptr);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.freelistHead.nextFreelist->size == 0);
+
+      deallocate(la, e20, 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 100);
+      deallocate(la, d20, 20);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 80);
+
+      void* f60 = allocate(la, 60);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, f60 == startAddress + 30 + 40 + 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 140);
+
+      deallocate(la, c50, 50);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 90);
+      deallocate(la, f60, 60);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 30);
+      deallocate(la, a30, 30);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, la.allocated == 0);
    }
 }

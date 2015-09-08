@@ -14,6 +14,46 @@
 
 namespace core
 {
+   struct LuaAllocator
+   {
+      const char* tag;
+      u8* memory;
+      u32 size;
+      u32 allocated;
+      u32 maxAllocated;
+      struct Freelist
+      {
+         u32 size;
+         union
+         {
+            u8* address;
+            Freelist* nextFreelist;
+         };
+      } freelistHead;
+
+      void init(u8* start, u32 sz)
+      {
+         allocated = 0;
+         memory = start;
+         size = sz;
+         freelistHead.address = start;
+         freelistHead.size = sz;
+         freelistHead.nextFreelist->address = nullptr;
+         freelistHead.nextFreelist->size = 0;
+      }
+   };
+
+   inline std::ostream& operator<<(std::ostream& stream, LuaAllocator& a)
+   {
+      u32 B = a.allocated;
+      f32 kB = B / 1024.0f;
+      f32 MB = kB / 1024;
+      stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
+      stream << "   Total memory: " << a.size << logLine;
+      stream << "   Max used: " << B << " kB / " << kB << " kB / " << MB << " MB";
+      return stream;
+   }
+
    struct LuaSystem
    {
    public:
@@ -25,7 +65,7 @@ namespace core
 
    private:
       lua_State* m_L;
-      LinearAllocator m_allocator; //this should really be a heap allocator or something
+      LuaAllocator m_allocator;
    };
 
    void test_luaStack();
