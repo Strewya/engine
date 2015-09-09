@@ -39,8 +39,10 @@ namespace core
       Clock renderTimer{};
       //initialization phase
 
+
+
       //temporary until i get the lua state up, then for development use the config file, and for release use hardcoded values based on profiling memory usage
-#ifndef DEPLOY
+#ifdef DEPLOY
       enum : u32
       {
          AudioSystemMemorySize = Megabytes(40),
@@ -52,24 +54,42 @@ namespace core
       };
 #else
       //allocate a temporary lua state that reads a config file containing various sizes, such as:
-      //1. audio memory count
-      //2. number of sound slots available
-      //3. graphics memory
-      //4. texture slots
-      //5. shader slots
-      //...
+      LinearAllocator luaTemporaryAllocator = mainMemory;
+      LuaSystem* luaConfigReader = allocate<LuaSystem>(luaTemporaryAllocator);
+      luaConfigReader->init(luaTemporaryAllocator, Megabytes(10));
+
+      LuaStack config = luaConfigReader->getStack();
+      bool ok = config.doFile("config.lua");
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, ok, "Lua configuration file invalid or missing!");
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, config.is<LuaTable>());
+
+      u32 AudioSystemMegabytes = get<u32>(config, "AudioSystemMegabytes", 0);
+      u32 MaxNumberOfSoundSlots = get<u32>(config, "MaxNumberOfSoundSlots", 0);
+      u32 LuaSystemMegabytes = get<u32>(config, "LuaSystemMegabytes", 0);
+      u32 GraphicsSystemMegabytes = get<u32>(config, "GraphicsSystemMegabytes", 0);
+      u32 MaxNumberOfTextureSlots = get<u32>(config, "MaxNumberOfTextureSlots", 0);
+
+      config.pop();
+      luaConfigReader->shutdown();
+      memset(mainMemory.memory + mainMemory.allocated, 0, luaTemporaryAllocator.allocated - mainMemory.allocated);
 #endif
 
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, AudioSystemMegabytes > 0);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, MaxNumberOfSoundSlots > 0);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, LuaSystemMegabytes > 0);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, GraphicsSystemMegabytes > 0);
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, MaxNumberOfTextureSlots > 0);
+
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
-      audio->init(mainMemory, AudioSystemMemorySize, MaxNumberOfSoundSlots);
+      audio->init(mainMemory, Megabytes(AudioSystemMegabytes), MaxNumberOfSoundSlots);
 
       LuaSystem* lua = allocate<LuaSystem>(mainMemory);
-      lua->init(mainMemory, LuaSystemMemorySize);
+      lua->init(mainMemory, Megabytes(LuaSystemMegabytes));
+      
       /*
-
-            GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
-            GameState* game = allocate<GameState>(gameStateMemory);
-            */
+      GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
+      GameState* game = allocate<GameState>(gameStateMemory);
+      */
 
       auto running = false;
       while( running )

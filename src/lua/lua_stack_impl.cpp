@@ -9,9 +9,11 @@
 
 namespace core
 {
-   template<> std::string LuaStack::to<std::string>(i32 stackIndex)
+   template<> str_writeable LuaStack::to<str_writeable>(i32 stackIndex)
    {
-      return lua_tostring(m_L, stackIndex);
+      str_writeable str{};
+      strncpy(str.buffer, lua_tostring(m_L, stackIndex), str_writeable::MaxLength);
+      return str;
    }
 
    template<> u32 LuaStack::to<u32>(i32 stackIndex)
@@ -71,7 +73,7 @@ namespace core
       return lua_isnumber(m_L, stackIndex) == 1;
    }
 
-   template<> bool LuaStack::is<std::string>(i32 stackIndex)
+   template<> bool LuaStack::is<str>(i32 stackIndex)
    {
       return (lua_isstring(m_L, stackIndex) == 1);
    }
@@ -87,9 +89,9 @@ namespace core
    }
 
 
-   template<> void LuaStack::push<std::string>(std::string arg)
+   template<> void LuaStack::push<str>(str arg)
    {
-      lua_pushstring(m_L, arg.c_str());
+      lua_pushstring(m_L, arg.buffer);
    }
 
    template<> void LuaStack::push<i32>(i32 arg)
@@ -128,10 +130,10 @@ namespace core
    }
 
 
-   template<> char get<char>(LuaStack& lua, const std::string& id, char valueIfMissing)
+   template<> char get<char>(LuaStack& lua, const char* id, char valueIfMissing)
    {
       lua.pull(id);
-      if( lua.is<std::string>() )
+      if( lua.is<str>() )
       {
          valueIfMissing = lua.to<std::string>().at(0);
       }
@@ -142,7 +144,7 @@ namespace core
    template<> char get<char>(LuaStack& lua, i32 stackIndex, char valueIfMissing)
    {
       lua.pull(stackIndex);
-      if( lua.is<std::string>() )
+      if( lua.is<const char*>() )
       {
          valueIfMissing = lua.to<std::string>().at(0);
       }

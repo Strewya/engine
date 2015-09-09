@@ -17,7 +17,7 @@ namespace core
 
       if( !lua.doFile(filename) )
       {
-         auto str = lua.to<std::string>();
+         auto str = lua.to<str_writeable>();
          lua.pop();
          CORE_LOG(str);
          return result;
@@ -25,7 +25,7 @@ namespace core
 
       for( lua.pairs(); lua.next(); lua.pop(1) )
       {
-         if( !lua.is<std::string>(-2) || !lua.is<LuaTable>(-1) )
+         if( !lua.is<str>(-2) || !lua.is<LuaTable>(-1) )
          {
             return result;
          }

@@ -49,8 +49,8 @@ namespace core
 
       auto loaded = stack.loadFile(CORE_RESOURCE("Defs/hedgehog.shee"));
       CORE_ASSERT(AssertLevel::Fatal, !loaded);
-      CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>());
-      CORE_LOG_DEBUG(stack.to<std::string>());
+      CORE_ASSERT(AssertLevel::Fatal, stack.is<str>());
+      CORE_LOG_DEBUG(stack.to<str_writeable>());
       stack.pop(1); //string error message
       CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);
 
@@ -71,16 +71,16 @@ namespace core
 
       for( stack.pairs(); stack.next(); stack.pop(1)/*value*/ )
       {
-         CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>(-2));
+         CORE_ASSERT(AssertLevel::Fatal, stack.is<str>(-2));
          CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>(-1));
-         CORE_LOG_DEBUG("table name: ", stack.to<std::string>(-2));
+         CORE_LOG_DEBUG("table name: ", stack.to<str_writeable>(-2));
       }
 
       for( stack.pairs("images"); stack.next(); stack.pop(1) )
       {
-         CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>(-2));
+         CORE_ASSERT(AssertLevel::Fatal, stack.is<str>(-2));
          CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>());
-         CORE_LOG_DEBUG("table name: ", stack.to<std::string>(-2));
+         CORE_LOG_DEBUG("table name: ", stack.to<str_writeable>(-2));
          stack.pull("pos");
          CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>());
          stack.pull(1);
@@ -129,9 +129,9 @@ namespace core
 
       for( stack.pairs("animations"); stack.next(); stack.pop(1) )
       {
-         CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>(-2));
+         CORE_ASSERT(AssertLevel::Fatal, stack.is<str>(-2));
          CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>(-1));
-         CORE_LOG_DEBUG("table name: ", stack.to<std::string>(-2));
+         CORE_LOG_DEBUG("table name: ", stack.to<str_writeable>(-2));
          stack.pull("loop");
          CORE_ASSERT(AssertLevel::Fatal, stack.is<nullptr_t>() || stack.is<bool>());
          if( stack.is<bool>() )
@@ -153,8 +153,8 @@ namespace core
          for( stack.ipairs(); stack.next(); stack.pop(1) )
          {
             CORE_ASSERT(AssertLevel::Fatal, stack.is<u32>(-2));
-            CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>(-1));
-            auto img = stack.to<std::string>();
+            CORE_ASSERT(AssertLevel::Fatal, stack.is<str>(-1));
+            auto img = stack.to<str_writeable>();
             CORE_LOG_DEBUG("image name: ", img);
          }
          stack.pop(1);
@@ -167,12 +167,12 @@ namespace core
       CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>());
       for( stack.pairs(); stack.next(); stack.pop(1) )
       {
-         CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>(-2));
+         CORE_ASSERT(AssertLevel::Fatal, stack.is<str>(-2));
          CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>(-1));
-         CORE_LOG_DEBUG("table name: ", stack.to<std::string>(-2));
+         CORE_LOG_DEBUG("table name: ", stack.to<str_writeable>(-2));
          stack.pull("texture");
-         CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>());
-         auto tex = stack.to<std::string>();
+         CORE_ASSERT(AssertLevel::Fatal, stack.is<str>());
+         auto tex = stack.to<str_writeable>();
          CORE_LOG_DEBUG("texture: ", tex);
          stack.pop(1); //texture string
          stack.pull("size");
@@ -185,8 +185,8 @@ namespace core
             CORE_ASSERT(AssertLevel::Fatal, stack.is<u32>(-2));
             CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaTable>(-1));
             stack.pull("char");
-            CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>());
-            char ascii = stack.to<std::string>().at(0);
+            CORE_ASSERT(AssertLevel::Fatal, stack.is<str>());
+            char ascii = stack.to<str_writeable>().buffer[0];
             CORE_LOG_DEBUG("ascii: ", ascii);
             stack.pop(1); //char string
             stack.pull("left");
@@ -236,10 +236,10 @@ namespace core
 
       stack.pull("test3", 0);
       CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaFunction>());
-      called = stack.call(std::string("are you gay?"));
+      called = stack.call(str{"are you gay?"});
       CORE_ASSERT(AssertLevel::Fatal, called);
-      CORE_ASSERT(AssertLevel::Fatal, stack.is<std::string>());
-      auto s = stack.to<std::string>();
+      CORE_ASSERT(AssertLevel::Fatal, stack.is<str>());
+      auto s = stack.to<str_writeable>();
       CORE_ASSERT(AssertLevel::Fatal, s == "are you gay? yes");
       stack.pop(1);
       CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);
@@ -263,7 +263,7 @@ namespace core
             */
       stack.pull("test3", 0);
       CORE_ASSERT(AssertLevel::Fatal, stack.is<LuaFunction>());
-      called = stack.call(std::string("are you a monkey?"), &s);
+      called = stack.call(str{"are you a monkey?"}, &s);
       CORE_ASSERT(AssertLevel::Fatal, called);
       CORE_ASSERT(AssertLevel::Fatal, s == "are you a monkey? yes");
       CORE_ASSERT(AssertLevel::Fatal, stack.getTop() == 0);

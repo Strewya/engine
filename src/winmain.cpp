@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 {
    core::LinearAllocator mainAllocator{"Entire memory"};
 
-   mainAllocator.size = Gigabytes(2);
+   mainAllocator.size = Gigabytes(1);
 
 #ifndef DEPLOY
    LPVOID baseAddress = (LPVOID)Terabytes(1);

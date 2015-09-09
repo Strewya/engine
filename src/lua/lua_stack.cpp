@@ -10,23 +10,26 @@
 namespace core
 {
    LuaStack::LuaStack(lua_State* L)
-      : m_L(L), m_narg(0), m_nres(0)
+      : m_L(L), m_narg(0), m_nres(0), m_freeIterationSlot(0)
    {
    }
 
    bool LuaStack::loadFile(const char* file)
    {
-      return (luaL_loadfile(m_L, file) == LUA_OK);
+      auto result = (luaL_loadfile(m_L, file) == LUA_OK);
+      return result;
    }
 
    bool LuaStack::doFile(const char* file)
    {
-      return (loadFile(file) && call());
+      auto result = (loadFile(file) && call());
+      return result;
    }
 
    u32 LuaStack::getTop()
    {
-      return lua_gettop(m_L);
+      auto result = lua_gettop(m_L);
+      return result;
    }
 
    void LuaStack::pop(i32 howMany)
@@ -48,25 +51,27 @@ namespace core
       lua_gettable(m_L, stackIndex);
    }
 
-   void LuaStack::pull(const std::string& key, i32 stackIndex)
+   void LuaStack::pull(const char* key, i32 stackIndex)
    {
       stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
-      lua_getfield(m_L, stackIndex, key.c_str());
+      lua_getfield(m_L, stackIndex, key);
    }
 
    void LuaStack::pairs(i32 stackIndex)
    {
-      m_iters.emplace_back(Iteration{stackIndex < 0 ? getTop() + 1 + stackIndex : stackIndex, true, false});
-      if( is<LuaTable>(m_iters.back().m_iterateTableIndex) )
+      CORE_ASSERT(AssertLevel::Fatal, m_freeIterationSlot < MaxIterations);
+      m_iters[m_freeIterationSlot++] = Iteration{stackIndex < 0 ? getTop() + 1 + stackIndex : stackIndex, true, false};
+      if( is<LuaTable>(m_iters[m_freeIterationSlot - 1].m_iterateTableIndex) )
       {
          lua_pushnil(m_L);
       }
    }
 
-   void LuaStack::pairs(const std::string& table)
+   void LuaStack::pairs(const char* table)
    {
+      CORE_ASSERT(AssertLevel::Fatal, m_freeIterationSlot < MaxIterations);
       pull(table);
-      m_iters.emplace_back(Iteration{getTop(), true, true});
+      m_iters[m_freeIterationSlot++] = Iteration{getTop(), true, true};
       if( is<LuaTable>() )
       {
          lua_pushnil(m_L);
@@ -76,50 +81,51 @@ namespace core
    void LuaStack::ipairs(i32 stackIndex)
    {
       pairs(stackIndex);
-      m_iters.back().m_iterateAll = false;
+      m_iters[m_freeIterationSlot - 1].m_iterateAll = false;
    }
 
-   void LuaStack::ipairs(const std::string& table)
+   void LuaStack::ipairs(const char* table)
    {
       pairs(table);
-      m_iters.back().m_iterateAll = false;
+      m_iters[m_freeIterationSlot - 1].m_iterateAll = false;
    }
 
    bool LuaStack::next()
    {
       i32 res = 0;
-      if( is<LuaTable>(m_iters.back().m_iterateTableIndex) )
+      if( is<LuaTable>(m_iters[m_freeIterationSlot - 1].m_iterateTableIndex) )
       {
-         res = lua_next(m_L, m_iters.back().m_iterateTableIndex);
+         res = lua_next(m_L, m_iters[m_freeIterationSlot - 1].m_iterateTableIndex);
          if( res != 0 )
          {
-            if( !m_iters.back().m_iterateAll && !is<u32>(-2) )
+            if( !m_iters[m_freeIterationSlot - 1].m_iterateAll && !is<u32>(-2) )
             {
                do
                {
                   pop();
-                  res = lua_next(m_L, m_iters.back().m_iterateTableIndex);
+                  res = lua_next(m_L, m_iters[m_freeIterationSlot - 1].m_iterateTableIndex);
                } while( res != 0 && !is<u32>(-2) );
             }
          }
       }
       if( res == 0 )
       {
-         if( m_iters.back().m_autoPopTable )
+         if( m_iters[m_freeIterationSlot - 1].m_autoPopTable )
          {
             pop();
          }
-         m_iters.pop_back();
+         --m_freeIterationSlot;
       }
-      return res != 0;
+      auto result = res != 0;
+      return result;
    }
 
-   void LuaStack::setValue(const std::string& key, i32 stackIndex)
+   void LuaStack::setValue(const char* key, i32 stackIndex)
    {
       stackIndex = stackIndex == 0 ? LUA_GLOBALSINDEX : stackIndex;
       if( is<LuaTable>(stackIndex) )
       {
-         lua_setfield(m_L, stackIndex, key.c_str());
+         lua_setfield(m_L, stackIndex, key);
       }
    }
 

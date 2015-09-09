@@ -7,6 +7,7 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
+#include "utility/utility.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -14,19 +15,21 @@ namespace core
    template<typename T>
    void LuaStack::push(T arg)
    {
-      throw std::logic_error(std::string("Invoked unspecialized LuaStack::push<") + typeid(T).name() + ">()");
+      CORE_ASSERT(AssertLevel::Fatal, stackIndex == 9999, "Invoked unspecialized LuaStack::push<", typeid(T).name(), ">()");
    }
 
    template<typename T>
    T LuaStack::to(i32 stackIndex)
    {
-      throw std::logic_error(std::string("Invoked unspecialized LuaStack::to<") + typeid(T).name() + ">()");
+      CORE_ASSERT(AssertLevel::Fatal, stackIndex == 9999, "Invoked unspecialized LuaStack::to<", typeid(T).name(), ">()");
+      return T{};
    }
 
    template<typename T>
    bool LuaStack::is(i32 stackIndex)
    {
-      throw std::logic_error(std::string("Invoked unspecialized LuaStack::is<") + typeid(T).name() + ">()");
+      CORE_ASSERT(AssertLevel::Fatal, stackIndex == 9999, "Invoked unspecialized LuaStack::is<", typeid(T).name(), ">()");
+      return false;
    }
 
    template<typename T, typename ...Args>
@@ -57,7 +60,7 @@ namespace core
    }
 
 
-   template<typename T> T get(LuaStack& lua, const std::string& id, T valueIfMissing)
+   template<typename T> T get(LuaStack& lua, const char* id, T valueIfMissing)
    {
       lua.pull(id);
       if( lua.is<T>() )

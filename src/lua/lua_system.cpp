@@ -4,6 +4,7 @@
 /******* personal header *******/
 #include "lua/lua_system.h"
 /******* c++ headers *******/
+#include <cstdio>
 /******* extra headers *******/
 #include "utility/memory.h"
 #include "utility/utility.h"
@@ -45,10 +46,19 @@ namespace core
       return 2;
    }
 
-   void* allocate(LuaAllocator& a, u32 requestedSize)
+#define ALIGNMENT 16
+
+   void* allocate(LuaAllocator& a, u32 size)
    {
+      u32 sizeExpansionForFreelistPurposes = (ALIGNMENT - (size % ALIGNMENT));
+      sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & 0xF;
+
+      size += sizeExpansionForFreelistPurposes;
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, (size % ALIGNMENT) == 0, "The requested size should always be a multiple of 16 after expansion.");
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, size >= 16, "The requested size should be at least 16 bytes after expansion.");
+
       LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
-      while( currentFreelist->address && currentFreelist->size < requestedSize )
+      while( currentFreelist->address && currentFreelist->size < size )
       {
          currentFreelist = currentFreelist->nextFreelist;
       }
@@ -60,14 +70,15 @@ namespace core
       }
 
       //case where we found a slot big enough for the requested size
-      void* result = currentFreelist->address;
+      u8* result = currentFreelist->address;
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, ((u32)result % ALIGNMENT) == 0, "The returned address should always be aligned to 16 bytes.");
 
-      currentFreelist->size -= requestedSize;
+      currentFreelist->size -= size;
       if( currentFreelist->size )
       {
          //case where there is more room in the slot after the requested size is removed
          LuaAllocator::Freelist* unmoved = currentFreelist->nextFreelist;
-         currentFreelist->address += requestedSize;
+         currentFreelist->address += size;
          currentFreelist->nextFreelist->address = unmoved->address;
          currentFreelist->nextFreelist->size = unmoved->size;
       }
@@ -77,9 +88,10 @@ namespace core
          currentFreelist->size = currentFreelist->nextFreelist->size;
          currentFreelist->address = currentFreelist->nextFreelist->address;
       }
-      a.allocated += requestedSize;
+      a.allocated += size;
       a.maxAllocated = max(a.maxAllocated, a.allocated);
-      memset(result, 0, requestedSize);
+      memset(result, 0, size);
+
       return result;
    }
 
@@ -89,6 +101,14 @@ namespace core
       {
          return;
       }
+      u32 sizeExpansionForFreelistPurposes = (ALIGNMENT - (size % ALIGNMENT));
+      sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & 0xF;
+      size += sizeExpansionForFreelistPurposes;
+
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, (size % ALIGNMENT) == 0, "The size should always be a multiple of 16 after expansion.");
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, size >= 16, "The size should be at least 16 bytes after expansion.");
+      CORE_ASSERT_DEBUG(AssertLevel::Fatal, ((u32)ptr % ALIGNMENT) == 0, "Every address returned should be aligned to 16 bytes.");
+
       LuaAllocator::Freelist* previousFreelist = nullptr;
       LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
       while( currentFreelist->address && currentFreelist->address < ptr )
@@ -97,10 +117,10 @@ namespace core
          currentFreelist = currentFreelist->nextFreelist;
       }
 
-      LuaAllocator::Freelist* newFreelistNode = (LuaAllocator::Freelist*)ptr;
-      newFreelistNode->address = currentFreelist->address;
-      newFreelistNode->size = currentFreelist->size;
-      currentFreelist->nextFreelist = newFreelistNode;
+      LuaAllocator::Freelist* newFreelist = (LuaAllocator::Freelist*)ptr;
+      newFreelist->address = currentFreelist->address;
+      newFreelist->size = currentFreelist->size;
+      currentFreelist->nextFreelist = newFreelist;
       currentFreelist->size = size;
 
       while( previousFreelist && previousFreelist->address + previousFreelist->size == currentFreelist->address )
@@ -108,6 +128,13 @@ namespace core
          previousFreelist->size += currentFreelist->size;
          currentFreelist->size = currentFreelist->nextFreelist->size;
          currentFreelist->address = currentFreelist->nextFreelist->address;
+      }
+
+      while( currentFreelist->address && currentFreelist->address + currentFreelist->size == newFreelist->address )
+      {
+         currentFreelist->size += newFreelist->size;
+         newFreelist->size = newFreelist->nextFreelist->size;
+         newFreelist->address = newFreelist->nextFreelist->address;
       }
 
       a.allocated -= size;
@@ -119,8 +146,16 @@ namespace core
       if( nsize < osize )
       {
          //if the new size is less than the old size, we can just return the original pointer, and release the extra size
+         //first we need to modify the size to be multiple of 16
+         u32 sizeExpansionForFreelistPurposes = (ALIGNMENT - (nsize % ALIGNMENT));
+         sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & 0xF;
+         nsize += sizeExpansionForFreelistPurposes;
+
          void* ptrToDeallocate = (u8*)ptr + nsize;
-         deallocate(a, ptrToDeallocate, osize - nsize);
+         if( osize - nsize )
+         {
+            deallocate(a, ptrToDeallocate, osize - nsize);
+         }
          result = ptr;
       }
       else //nsize > osize
@@ -132,6 +167,7 @@ namespace core
             memcpy(newPtr, ptr, osize);
             deallocate(a, ptr, osize);
          }
+         result = newPtr;
       }
 
       return result;
@@ -140,26 +176,35 @@ namespace core
 
    void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
-      osize = osize ? max(osize, sizeof(LuaAllocator::Freelist)) : osize;
-      nsize = nsize ? max(nsize, sizeof(LuaAllocator::Freelist)) : nsize;
       LuaAllocator* a = (LuaAllocator*)ud;
       void* result = nullptr;
+      const char* action = "Unknown";
       if( nsize == 0 )
       {
-         CORE_LOG_DEBUG("Deallocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
+         action = "Deallocating";
          deallocate(*a, ptr, (u32)osize);
       }
       else if( osize == 0 && nsize > 0 )
       {
-         CORE_LOG_DEBUG("Allocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
+         action = "Allocating";
          result = allocate(*a, (u32)nsize);
       }
-      else if( osize > 0 && nsize > 0 && osize != nsize )
+      else if( osize > 0 && nsize > 0 )
       {
-         CORE_LOG_DEBUG("Reallocating ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
-         result = reallocate(*a, ptr, (u32)osize, (u32)nsize);
+         action = "Reallocating";
+         if( osize != nsize )
+         {
+            result = reallocate(*a, ptr, (u32)osize, (u32)nsize);
+         }
+         else
+         {
+            result = ptr;
+         }
       }
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, result != (void*)0x000004000000FFC6);
+
+      
+      CORE_LOG_DEBUG(action, " ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
+      CORE_LOG_DEBUG("LuaAllocator memory address and alignment: ", std::hex, (u32)result, std::dec, " /// ", (u32)result & 0xf);
       return result;
    }
 
@@ -175,6 +220,7 @@ namespace core
       }
 
       auto* result = realloc(ptr, nsize);
+      CORE_LOG_DEBUG("Realloc memory address and alignment: ", (u32)result, " /// ", (u32)result & 0xf);
       return result;
    }
 
@@ -187,48 +233,38 @@ namespace core
       //test_luaAllocator(a);
 
       m_allocator.tag = "Lua system";
-      m_allocator.init(allocate(a, memorySize, 1), memorySize);
+      m_allocator.init(allocate(a, memorySize, ALIGNMENT), memorySize);
 
       m_L = lua_newstate(lua_allocateCustom, &m_allocator);
 
       CORE_STATUS_AND(m_L != nullptr);
       if( CORE_STATUS_OK )
       {
-         u32 t = lua_gettop(m_L);
+#ifdef DEPLOY
          lua_pushcfunction(m_L, luaopen_base);
          lua_pushliteral(m_L, "");
          lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
+
          lua_pushcfunction(m_L, luaopen_table);
          lua_pushliteral(m_L, LUA_TABLIBNAME);
          lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
-         lua_pushcfunction(m_L, luaopen_os);
-         lua_pushliteral(m_L, LUA_OSLIBNAME);
-         lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
-         lua_pushcfunction(m_L, luaopen_debug);
-         lua_pushliteral(m_L, LUA_DBLIBNAME);
-         lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
+
          lua_pushcfunction(m_L, luaopen_package);
          lua_pushliteral(m_L, LUA_LOADLIBNAME);
          lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
-         lua_pushcfunction(m_L, luaopen_io);
-         lua_pushliteral(m_L, LUA_IOLIBNAME);
-         lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
+
          lua_pushcfunction(m_L, luaopen_string);
          lua_pushliteral(m_L, LUA_STRLIBNAME);
          lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
+
          lua_pushcfunction(m_L, luaopen_math);
          lua_pushliteral(m_L, LUA_MATHLIBNAME);
          lua_call(m_L, 1, 0);
-         t = lua_gettop(m_L);
-         //tolua_core_open(m_L);
+#else
+         luaL_openlibs(m_L);
+#endif
 
+         //tolua_core_open(m_L);
          lua_register(m_L, "print", luaPrint);
 
          const char* depend = R"rawLuaCode(
