@@ -524,7 +524,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       {
          auto e = movement.m_entity[i];
          auto iid = getDataId(deltaTimes, e);
-         CORE_ASSERT_DEBUG(AssertLevel::Fatal, iid != InvalidDataId, "Moveable entity [id=", e, "] lacks a DeltaTime component!");
+         CORE_ASSERT_FATAL_DEBUG(iid != InvalidDataId, "Moveable entity [id=", e, "] lacks a DeltaTime component!");
          auto dt = read_deltaTime(deltaTimes, iid);
          auto acceleration = movement.m_direction[i] * movement.m_acceleration[i];
          acceleration += -movement.m_velocity[i] * 10.0f;
@@ -579,8 +579,8 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                auto eid2 = collision.m_entity[j];
                auto iid1 = getDataId(transforms, eid1);
                auto iid2 = getDataId(transforms, eid2);
-               CORE_ASSERT_DEBUG(AssertLevel::Fatal, iid1 != InvalidDataId, "Colliding entity [id=", eid1, "] has no transform");
-               CORE_ASSERT_DEBUG(AssertLevel::Fatal, iid2 != InvalidDataId, "Colliding entity [id=", eid2, "] has no transform");
+               CORE_ASSERT_FATAL_DEBUG(iid1 != InvalidDataId, "Colliding entity [id=", eid1, "] has no transform");
+               CORE_ASSERT_FATAL_DEBUG(iid2 != InvalidDataId, "Colliding entity [id=", eid2, "] has no transform");
                setCollisionShapePosition(shape1, read_position(transforms, iid1));
                setCollisionShapePosition(shape2, read_position(transforms, iid2));
                setCollisionShapeScale(shape1, read_scale(transforms, iid1));

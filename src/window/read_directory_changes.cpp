@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 #include <process.h>
 /******* extra headers *******/
+#include "utility/utility.h"
 #include "window/read_directory_changes_private.h"
 /******* end headers *******/
 
@@ -15,11 +16,11 @@ namespace core
    // CReadDirectoryChanges
 
    CReadDirectoryChanges::CReadDirectoryChanges()
-      : m_notifications(), m_threadHandle(nullptr), m_threadId(0),
-      m_pServer(std::make_unique<RDCPrivate::CReadChangesServer>(this)),
-      m_notificationQueueSize(128), m_head(1), m_tail(0)
+      : m_threadHandle(nullptr), m_threadId(0),
+      m_pServer(this),
+      m_head(1), m_tail(0)
    {
-      m_notifications.resize(m_notificationQueueSize);
+      memset(m_notifications, 0, sizeof(m_notifications));
    }
 
    CReadDirectoryChanges::~CReadDirectoryChanges()
@@ -36,7 +37,7 @@ namespace core
       m_threadHandle = (HANDLE)_beginthreadex(nullptr,
                                               0,
                                               RDCPrivate::CReadChangesServer::ThreadStartProc,
-                                              m_pServer.get(),
+                                              &m_pServer,
                                               0,
                                               &m_threadId
                                               );
@@ -46,7 +47,7 @@ namespace core
    {
       if( m_threadHandle )
       {
-         ::QueueUserAPC(RDCPrivate::CReadChangesServer::TerminateProc, m_threadHandle, (ULONG_PTR)m_pServer.get());
+         ::QueueUserAPC(RDCPrivate::CReadChangesServer::TerminateProc, m_threadHandle, (ULONG_PTR)&m_pServer);
          ::WaitForSingleObjectEx(m_threadHandle, 10000, true);
          ::CloseHandle(m_threadHandle);
 
@@ -55,33 +56,35 @@ namespace core
       }
    }
 
-   void CReadDirectoryChanges::AddDirectory(const std::string& watchedDir, BOOL watchSubdirs, DWORD trackFlags, DWORD bufferSize)
+   void CReadDirectoryChanges::AddDirectory(const char* watchedDir, BOOL watchSubdirs, DWORD trackFlags)
    {
       if( !m_threadHandle )
          Init();
 
-      auto* pRequest = new RDCPrivate::CReadChangesRequest(m_pServer.get(), watchedDir, watchSubdirs, trackFlags, bufferSize);
+      auto* pRequest = new RDCPrivate::CReadChangesRequest(&m_pServer, watchedDir, watchSubdirs, trackFlags);
       QueueUserAPC(RDCPrivate::CReadChangesServer::AddDirectoryProc, m_threadHandle, (ULONG_PTR)pRequest);
    }
 
-   void CReadDirectoryChanges::Push(DWORD action, const std::string& filename)
+   void CReadDirectoryChanges::Push(DWORD action, const char* filename)
    {
-      m_head = (m_head + 1) % m_notificationQueueSize;
+      auto writeIndex = m_head % MaxNotifications;
 
-      m_notifications[m_head].first = action;
-      m_notifications[m_head].second = filename;
+      m_notifications[writeIndex].first = action;
+      strcpy(m_notifications[writeIndex].second, filename);
+      ++m_head;
    }
 
-   bool CReadDirectoryChanges::Pop(DWORD& outAction, std::string& outFilename)
+   bool CReadDirectoryChanges::Pop(DWORD& outAction, char* buffer, u32 bufferLength)
    {
       bool eventExists = false;
-      auto readIndex = (m_tail + 1) % m_notificationQueueSize;
-      if( readIndex != m_head )
+      if( m_tail + 1 != m_head )
       {
-         eventExists = true;
+         auto readIndex = (m_tail + 1) % MaxNotifications;
+         CORE_ASSERT_FATAL_DEBUG(strlen(m_notifications[readIndex].second) < bufferLength, "Buffer too small for filename");
          outAction = m_notifications[readIndex].first;
-         outFilename = m_notifications[readIndex].second;
-         m_tail = readIndex;
+         strcpy(buffer, m_notifications[readIndex].second);
+         ++m_tail;
+         eventExists = true;
       }
       return eventExists;
    }

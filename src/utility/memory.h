@@ -4,6 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <iomanip>
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
@@ -18,6 +19,46 @@
 
 namespace core
 {
+   struct byteSizes
+   {
+      u32 m_B;
+
+      byteSizes(u32 B) : m_B(B) {}
+   };
+   inline std::ostream& operator<<(std::ostream& stream, byteSizes bs)
+   {
+      u32 B = bs.m_B;
+      f32 kB = B / 1024.0f;
+      f32 MB = kB / 1024;
+      stream << B << " B / " << std::fixed << kB << " kB / " << MB << " MB";
+      return stream;
+   }
+
+   struct memoryRequirement
+   {
+      void* m_start;
+      void* m_end;
+
+      memoryRequirement(void* start, void* end) : m_start{start}, m_end{end} {}
+   };
+   inline std::ostream& operator<<(std::ostream& stream, memoryRequirement mr)
+   {
+      stream << byteSizes(u32((u8*)mr.m_end - (u8*)mr.m_start));
+      return stream;
+   }
+
+   struct memoryAddress
+   {
+      void* m_address;
+
+      memoryAddress(void* address) : m_address(address) {}
+   };
+   inline std::ostream& operator<<(std::ostream& stream, memoryAddress ma)
+   {
+      stream << "0x" << ma.m_address;
+      return stream;
+   }
+
    // Fixed memory manager. Only allocations are supported, frees are not.
    struct LinearAllocator
    {
@@ -33,8 +74,8 @@ namespace core
       f32 kB = B / 1024.0f;
       f32 MB = kB / 1024;
       stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
-      stream << "   Total memory: " << a.size << logLine;
-      stream << "   Max used: " << B << " kB / " << kB << " kB / " << MB << " MB";
+      stream << "   Total memory: " << byteSizes(a.size) << logLine;
+      stream << "   Currently using: " << byteSizes(a.allocated);
       return stream;
    }
 

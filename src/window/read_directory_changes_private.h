@@ -27,7 +27,12 @@ namespace core
       struct CReadChangesRequest
       {
       public:
-         CReadChangesRequest(CReadChangesServer* pServer, const std::string& dirName, BOOL trackSubdirs, DWORD trackFlags, DWORD bufferSize);
+         enum
+         {
+            BufferSize = 16384,
+         };
+
+         CReadChangesRequest(CReadChangesServer* pServer, const char* dirName, BOOL trackSubdirs, DWORD trackFlags);
 
          ~CReadChangesRequest();
 
@@ -55,7 +60,7 @@ namespace core
          DWORD       m_trackFlags;
          DWORD       m_bufferSize;
          BOOL        m_trackSubdirs;
-         std::string m_dirName;
+         char        m_dirName[256];
 
          // Result of calling CreateFile().
          HANDLE      m_dirHandle;
@@ -66,11 +71,11 @@ namespace core
          // Data buffer for the request.
          // Since the memory is allocated by malloc, it will always
          // be aligned as required by ReadDirectoryChangesW().
-         std::vector<BYTE> m_mainBuffer;
+         BYTE m_mainBuffer[BufferSize];
 
          // Double buffer strategy so that we can issue a new read
          // request before we process the current buffer.
-         std::vector<BYTE> m_backupBuffer;
+         BYTE m_backupBuffer[BufferSize];
       };
 
       ///////////////////////////////////////////////////////////////////////////
@@ -104,7 +109,12 @@ namespace core
 
          void RequestTermination();
 
-         std::vector<CReadChangesRequest*> m_pBlocks;
+         enum
+         {
+            MaxBlocks = 20,
+         };
+         CReadChangesRequest* m_pBlocks[MaxBlocks];
+         u32 m_freeSlot;
 
          bool m_bTerminate;
       };

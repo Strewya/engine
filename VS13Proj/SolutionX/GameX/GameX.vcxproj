@@ -300,6 +300,7 @@
     <ClCompile Include="..\..\..\src\utility\time\timer.cpp" />
     <ClCompile Include="..\..\..\src\utility\transform.cpp" />
     <ClCompile Include="..\..\..\src\utility\utility.cpp" />
+    <ClCompile Include="..\..\..\src\window\file_change_handler.cpp" />
     <ClCompile Include="..\..\..\src\window\gamepad_handler.cpp" />
     <ClCompile Include="..\..\..\src\window\keyboard_handler.cpp" />
     <ClCompile Include="..\..\..\src\window\mouse_handler.cpp" />
@@ -380,6 +381,7 @@
     <ClInclude Include="..\..\..\src\utility\transform.h" />
     <ClInclude Include="..\..\..\src\utility\types.h" />
     <ClInclude Include="..\..\..\src\utility\utility.h" />
+    <ClInclude Include="..\..\..\src\window\file_change_handler.h" />
     <ClInclude Include="..\..\..\src\window\gamepad_handler.h" />
     <ClInclude Include="..\..\..\src\window\keyboard_handler.h" />
     <ClInclude Include="..\..\..\src\window\mouse_handler.h" />

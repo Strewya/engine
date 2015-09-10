@@ -57,7 +57,6 @@ namespace core
 
    Window::~Window()
    {
-      m_monitor.Terminate();
       setLockCursor(false);
       setShowCursor(true);
       setRelativeCursor(false);
@@ -118,12 +117,12 @@ namespace core
          m_mouseHandler.handle(toGame, msg.message, msg.wParam, msg.lParam);
          m_keyboardHandler.handle(toGame, msg.message, msg.wParam, msg.lParam);
       }
-      m_gamepadHandler.handle(toGame, Clock::getRealTimeMicros());
-      processFileChanges(toGame);
-      while( (m_readAsyncIndex + 1) < m_writeAsyncIndex )
+      m_gamepadHandler.handle(toGame);
+      m_fileChangeHandler.handle(toGame);
+      while( (m_readAsyncIndex + 1) != m_writeAsyncIndex )
       {
-         toGame->writeEvent(m_asyncMessages[(m_readAsyncIndex + 1) % AsyncMsgCount]);
          ++m_readAsyncIndex;
+         toGame->writeEvent(m_asyncMessages[m_readAsyncIndex % AsyncMsgCount]);
       }
       return true;
    }
@@ -309,14 +308,17 @@ namespace core
       return m_ySize;
    }
 
-   void Window::monitorDirectoryForChanges(const char* directory)
+   void Window::monitorDirectoryForChanges(const char* gameRelativeDirectory)
    {
-      char lpName[128] = {0};
-      GetCurrentDirectory(128, lpName);
-      std::string dir(lpName);
-      dir.append("\\").append(directory).shrink_to_fit();
+      enum
+      {
+         MaxPathLength = 256,
+      };
+      char lpName[MaxPathLength] = {0};
+      u32 written = GetCurrentDirectory(MaxPathLength, lpName);
+      sprintf(lpName + written, "\\%s", gameRelativeDirectory);
 
-      m_monitor.AddDirectory(dir.c_str(), true, m_trackedChanges);
+      m_fileChangeHandler.addDirectory(lpName, m_trackedChanges);
    }
 
    void Window::setFileChangeDelay(u32 delay)
@@ -361,10 +363,12 @@ namespace core
             if( LOWORD(wParam) == WA_INACTIVE )
             {
                m_asyncMessages[m_writeAsyncIndex%AsyncMsgCount].type = WinMsgType::LostFocus;
+               ++m_writeAsyncIndex;
             }
             else
             {
                m_asyncMessages[m_writeAsyncIndex%AsyncMsgCount].type = WinMsgType::GainFocus;
+               ++m_writeAsyncIndex;
             }
             ++m_writeAsyncIndex;
          } break;
@@ -395,65 +399,6 @@ namespace core
       }
 
       return result;
-   }
-
-   core_internal FileChangeType toFileChangeType(DWORD action)
-   {
-      FileChangeType returnValue = core::FileChangeType::BadData;
-      switch( action )
-      {
-         case FILE_ACTION_ADDED:
-         {
-            returnValue = core::FileChangeType::Added;
-         }
-         break;
-         case FILE_ACTION_MODIFIED:
-         {
-            returnValue = core::FileChangeType::Modified;
-         }
-         break;
-         case FILE_ACTION_REMOVED:
-         {
-            returnValue = core::FileChangeType::Removed;
-         }
-         break;
-         case FILE_ACTION_RENAMED_OLD_NAME:
-         {
-            returnValue = core::FileChangeType::RenamedFrom;
-         }
-         break;
-         case FILE_ACTION_RENAMED_NEW_NAME:
-         {
-            returnValue = core::FileChangeType::RenamedTo;
-         }
-         break;
-         default:
-         {
-         } break;
-      }
-      return returnValue;
-   }
-
-   void Window::processFileChanges(CommunicationBuffer* buffer)
-   {
-      std::string file;
-      DWORD action;
-      while( m_monitor.Pop(action, file) )
-      {
-         if( file.size() < FileChangeEvent::NameStringSize && file.find(".") != file.npos )
-         {
-            WinMsg we{};
-            we.type = WinMsgType::FileChange;
-            we.fileChange.action = toFileChangeType(action);
-            strncpy(we.fileChange.name, file.c_str(), FileChangeEvent::NameStringSize);
-            we.fileChange.name[FileChangeEvent::NameStringSize] = 0;
-            buffer->writeEvent(we);
-         }
-         else
-         {
-            CORE_LOG_DEBUG("Filename too long (", file.size(), ") or not a file(", file, ")");
-         }
-      }
    }
 
    void calculateClientRect(u32 x, u32 y, u32 style, u32 styleEx, u32& outXSize, u32& outYSize)

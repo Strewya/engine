@@ -203,12 +203,12 @@ namespace core
       auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), (u32)indices.size());
 
       HRESULT hr = m_devcon->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not map vertex buffer for writing");
       memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(HealthVertex));
       m_devcon->Unmap(vertexBuffer, 0);
 
       hr = m_devcon->Map(indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not map index buffer for writing");
       memcpy(ms.pData, indices.data(), indices.size() * sizeof(u32));
       m_devcon->Unmap(indexBuffer, 0);
 
@@ -230,7 +230,7 @@ namespace core
    //*****************************************************************
    ID3D11Buffer* makeVertexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, unitSize > 0 && unitCount > 0);
+      CORE_ASSERT_FATAL_DEBUG(unitSize > 0 && unitCount > 0, "Attempting to create vertex buffer with unit size or unit count 0");
 
       D3D11_BUFFER_DESC desc;
       ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
@@ -242,7 +242,7 @@ namespace core
 
       ID3D11Buffer* buffer = nullptr;
       HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not create vertex buffer");
       return buffer;
    }
 
@@ -251,7 +251,7 @@ namespace core
    //*****************************************************************
    ID3D11Buffer* makeIndexBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, unitSize > 0 && unitCount > 0);
+      CORE_ASSERT_FATAL_DEBUG(unitSize > 0 && unitCount > 0, "Attempting to create index buffer with unit size 0");
 
       D3D11_BUFFER_DESC desc;
       ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
@@ -263,7 +263,7 @@ namespace core
 
       ID3D11Buffer* buffer = nullptr;
       HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not create index buffer");
       return buffer;
    }
 
@@ -272,7 +272,7 @@ namespace core
    //*****************************************************************
    ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, u32 unitSize)
    {
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, unitSize > 0);
+      CORE_ASSERT_FATAL_DEBUG(unitSize > 0, "Attempting to create constant buffer with unit size 0");
 
       D3D11_BUFFER_DESC desc;
 
@@ -285,7 +285,7 @@ namespace core
 
       ID3D11Buffer* buffer = nullptr;
       HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not create constant buffer");
       return buffer;
    }
 
@@ -294,7 +294,7 @@ namespace core
    //*****************************************************************
    ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount)
    {
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, unitSize > 0);
+      CORE_ASSERT_FATAL_DEBUG(unitSize > 0, "Attempting to create instance buffer with unit size 0");
 
       D3D11_BUFFER_DESC desc;
       ZeroMemory(&desc, sizeof(D3D11_BUFFER_DESC));
@@ -306,7 +306,7 @@ namespace core
 
       ID3D11Buffer* buffer = nullptr;
       HRESULT hr = dev->CreateBuffer(&desc, nullptr, &buffer);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, SUCCEEDED(hr));
+      CORE_ASSERT_FATAL_DEBUG(SUCCEEDED(hr), "D3D could not create instance buffer");
       return buffer;
    }
 }

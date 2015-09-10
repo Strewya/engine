@@ -23,43 +23,42 @@ namespace core
       memset(m_gamepadLastUpdateTime, 0, sizeof(m_gamepadLastUpdateTime));
    }
 
-   void writeButton(std::vector<WinMsg>& events, u64 timestamp, u8 id, u8 button, bool isDown)
+   core_internal void writeButton(CommunicationBuffer* buffer, u8 id, u8 button, bool isDown)
    {
-      events.emplace_back();
-      events.back().type = WinMsgType::GamepadButton;
-      events.back().timestamp = timestamp;
-      events.back().gamepad.id = id;
-      events.back().gamepad.button.id = button;
-      events.back().gamepad.button.isDown = isDown;
+      WinMsg msg{};
+      msg.type = WinMsgType::GamepadButton;
+      msg.gamepad.id = id;
+      msg.gamepad.button.id = button;
+      msg.gamepad.button.isDown = isDown;
+      buffer->writeEvent(msg);
    }
 
-   void writeAxis(std::vector<WinMsg>& events, u64 timestamp, u8 id, u8 axis, f32 x, f32 y, f32 mag, f32 norm)
+   core_internal void writeAxis(CommunicationBuffer* buffer, u8 id, u8 axis, f32 x, f32 y, f32 mag, f32 norm)
    {
-      events.emplace_back();
-      events.back().type = WinMsgType::GamepadAxis;
-      events.back().timestamp = timestamp;
-      events.back().gamepad.id = id;
-      events.back().gamepad.axis.id = axis;
-      events.back().gamepad.axis.x = x;
-      events.back().gamepad.axis.y = y;
-      events.back().gamepad.axis.magnitude = mag;
-      events.back().gamepad.axis.normalized = norm;
+      WinMsg msg{};
+      msg.type = WinMsgType::GamepadAxis;
+      msg.gamepad.id = id;
+      msg.gamepad.axis.id = axis;
+      msg.gamepad.axis.x = x;
+      msg.gamepad.axis.y = y;
+      msg.gamepad.axis.magnitude = mag;
+      msg.gamepad.axis.normalized = norm;
+      buffer->writeEvent(msg);
    }
 
-   void writeConnection(std::vector<WinMsg>& events, u64 timestamp, u8 id, bool connected)
+   core_internal void writeConnection(CommunicationBuffer* buffer, u8 id, bool connected)
    {
-      events.emplace_back();
-      events.back().type = WinMsgType::GamepadConnection;
-      events.back().timestamp = timestamp;
-      events.back().gamepad.id = id;
-      events.back().gamepad.connection.status = connected;
+      WinMsg msg{};
+      msg.type = WinMsgType::GamepadConnection;
+      msg.gamepad.id = id;
+      msg.gamepad.connection.status = connected;
    }
 
-   void handleButton(std::vector<WinMsg>& events, u64 timestamp, u8 id, XINPUT_STATE& oldState, XINPUT_STATE& newState, u32 xiButton, Gamepad::Key key)
+   core_internal void handleButton(CommunicationBuffer* buffer, u8 id, XINPUT_STATE& oldState, XINPUT_STATE& newState, u32 xiButton, Gamepad::Key key)
    {
       if( (oldState.Gamepad.wButtons & xiButton) != (newState.Gamepad.wButtons & xiButton) )
       {
-         writeButton(events, timestamp, id, key, (newState.Gamepad.wButtons & xiButton) != 0);
+         writeButton(buffer, id, key, (newState.Gamepad.wButtons & xiButton) != 0);
       }
    }
 
@@ -69,7 +68,7 @@ namespace core
       f32 normalized;
    };
 
-   AnalogData calcAnalogData(f32 inputValue, u32 deadzone, u32 maxValue)
+   core_internal AnalogData calcAnalogData(f32 inputValue, u32 deadzone, u32 maxValue)
    {
       AnalogData result{inputValue, 0};
       if( result.value > deadzone )
@@ -88,7 +87,7 @@ namespace core
       return result;
    }
 
-   void handleTrigger(std::vector<WinMsg>& events, u64 timestamp, u8 id, u32 oldValue, u32 newValue, u32 threshold, u32 maxValue, Gamepad::Key axis)
+   core_internal void handleTrigger(CommunicationBuffer* buffer, u8 id, u32 oldValue, u32 newValue, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
       f32 on = 0.8f;
       f32 off = 0.2f;
@@ -97,17 +96,17 @@ namespace core
       {
          auto newData = calcAnalogData((f32)newValue, threshold, maxValue);
          auto oldData = calcAnalogData((f32)oldValue, threshold, maxValue);
-         writeAxis(events, timestamp, id, axis, 0, 0, newData.value, newData.normalized);
+         writeAxis(buffer, id, axis, 0, 0, newData.value, newData.normalized);
 
          if( (oldData.normalized < on && newData.normalized >= on) ||
             (oldData.normalized > off && newData.normalized <= off) )
          {
-            writeButton(events, timestamp, id, axis, newData.normalized >= on);
+            writeButton(buffer, id, axis, newData.normalized >= on);
          }
       }
    }
 
-   void handleStick(std::vector<WinMsg>& events, u64 timestamp, u8 id, v2 oldPos, v2 newPos, u32 threshold, u32 maxValue, Gamepad::Key axis)
+   void handleStick(CommunicationBuffer* buffer, u8 id, v2 oldPos, v2 newPos, u32 threshold, u32 maxValue, Gamepad::Key axis)
    {
       f32 on = 0.8f;
       f32 off = 0.2f;
@@ -117,7 +116,7 @@ namespace core
          auto newData = calcAnalogData(vec2::length(newPos), threshold, maxValue);
          auto oldData = calcAnalogData(vec2::length(oldPos), threshold, maxValue);
          newPos = vec2::normalize(newPos);
-         writeAxis(events, timestamp, id, axis, newPos.x, newPos.y, newData.value, newData.normalized);
+         writeAxis(buffer, id, axis, newPos.x, newPos.y, newData.value, newData.normalized);
 
          if( (oldData.normalized < on && newData.normalized >= on) ||
             (oldData.normalized > off && newData.normalized <= off) )
@@ -131,24 +130,24 @@ namespace core
                button = Gamepad::DPadDown;
             else if( newPos.y >= on )
                button = Gamepad::DPadUp;
-            writeButton(events, timestamp, id, button, newData.normalized >= on);
+            writeButton(buffer, id, button, newData.normalized >= on);
          }
       }
    }
 
-   bool handleConnection(std::vector<WinMsg>& events, u64 timestamp, u8 id, u32 result, bool oldConnectionState)
+   bool handleConnection(CommunicationBuffer* buffer, u8 id, u32 result, bool oldConnectionState)
    {
       if( (result == ERROR_SUCCESS && oldConnectionState == false) || (result == ERROR_DEVICE_NOT_CONNECTED && oldConnectionState == true) )
       {
          oldConnectionState = !oldConnectionState;
-         writeConnection(events, timestamp, id, oldConnectionState);
+         writeConnection(buffer, id, oldConnectionState);
       }
       return oldConnectionState;
    }
 
-   void GamepadHandler::handle(CommunicationBuffer* buffer, u64 currentTime)
+   void GamepadHandler::handle(CommunicationBuffer* buffer)
    {
-      std::vector<WinMsg> events;
+      u64 currentTime = Clock::getRealTimeMicros();
       for( u8 i = 0; i < MAX_GAMEPADS; ++i )
       {
          if( m_gamepadConnected[i] || (currentTime >= m_gamepadLastUpdateTime[i] + m_unconnectedReadDelay) )
@@ -158,40 +157,36 @@ namespace core
             auto result = XInputGetState(i, &state);
 
             m_gamepadLastUpdateTime[i] = currentTime;
-            m_gamepadConnected[i] = handleConnection(events, currentTime, i, result, m_gamepadConnected[i]);
+            m_gamepadConnected[i] = handleConnection(buffer, i, result, m_gamepadConnected[i]);
             if( m_gamepadConnected[i] && state.dwPacketNumber != oldState.dwPacketNumber )
             {
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_DPAD_UP, Gamepad::DPadUp);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_DPAD_DOWN, Gamepad::DPadDown);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_DPAD_LEFT, Gamepad::DPadLeft);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_DPAD_RIGHT, Gamepad::DPadRight);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_START, Gamepad::Start);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_BACK, Gamepad::Back);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_LEFT_THUMB, Gamepad::LeftThumb);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_RIGHT_THUMB, Gamepad::RightThumb);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_LEFT_SHOULDER, Gamepad::LeftShoulder);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_RIGHT_SHOULDER, Gamepad::RightShoulder);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_A, Gamepad::BottomButton);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_B, Gamepad::RightButton);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_X, Gamepad::LeftButton);
-               handleButton(events, currentTime, i, oldState, state, XINPUT_GAMEPAD_Y, Gamepad::TopButton);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_DPAD_UP, Gamepad::DPadUp);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_DPAD_DOWN, Gamepad::DPadDown);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_DPAD_LEFT, Gamepad::DPadLeft);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_DPAD_RIGHT, Gamepad::DPadRight);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_START, Gamepad::Start);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_BACK, Gamepad::Back);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_LEFT_THUMB, Gamepad::LeftThumb);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_RIGHT_THUMB, Gamepad::RightThumb);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_LEFT_SHOULDER, Gamepad::LeftShoulder);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_RIGHT_SHOULDER, Gamepad::RightShoulder);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_A, Gamepad::BottomButton);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_B, Gamepad::RightButton);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_X, Gamepad::LeftButton);
+               handleButton(buffer, i, oldState, state, XINPUT_GAMEPAD_Y, Gamepad::TopButton);
 
 
                /*** TRIGGERS ***/
-               handleTrigger(events, currentTime, i, oldState.Gamepad.bLeftTrigger, state.Gamepad.bLeftTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff, Gamepad::LeftTrigger);
-               handleTrigger(events, currentTime, i, oldState.Gamepad.bRightTrigger, state.Gamepad.bRightTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff, Gamepad::RightTrigger);
+               handleTrigger(buffer, i, oldState.Gamepad.bLeftTrigger, state.Gamepad.bLeftTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff, Gamepad::LeftTrigger);
+               handleTrigger(buffer, i, oldState.Gamepad.bRightTrigger, state.Gamepad.bRightTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 0xff, Gamepad::RightTrigger);
 
                /*** THUMB STICKS ***/
-               handleStick(events, currentTime, i, {oldState.Gamepad.sThumbLX, oldState.Gamepad.sThumbLY}, {state.Gamepad.sThumbLX, state.Gamepad.sThumbLY},
+               handleStick(buffer, i, {oldState.Gamepad.sThumbLX, oldState.Gamepad.sThumbLY}, {state.Gamepad.sThumbLX, state.Gamepad.sThumbLY},
                            XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, 0x7fff, Gamepad::LeftStick);
-               handleStick(events, currentTime, i, {oldState.Gamepad.sThumbRX, oldState.Gamepad.sThumbRY}, {state.Gamepad.sThumbRX, state.Gamepad.sThumbRY},
+               handleStick(buffer, i, {oldState.Gamepad.sThumbRX, oldState.Gamepad.sThumbRY}, {state.Gamepad.sThumbRX, state.Gamepad.sThumbRY},
                            XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE, 0x7fff, Gamepad::RightStick);
             }
          }
-      }
-      for( auto e : events )
-      {
-         buffer->writeEvent(e);
       }
    }
 }

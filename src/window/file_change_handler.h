@@ -1,15 +1,14 @@
 #pragma once
 /********************************************
-*  contents:   handler for all gamepad related functionality
-*  usage:   uses xinput
+*  contents:   handler for file change events
+*  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <vector>
 /******* common headers *******/
-#include "utility/types.h"
 #include "window/window_include.h"
-#include <xinput.h>
+#include "utility/types.h"
 /******* extra headers *******/
+#include "window/read_directory_changes.h"
 #include "window/window_message.h"
 /******* end header inclusion *******/
 
@@ -17,23 +16,15 @@ namespace core
 {
    struct CommunicationBuffer;
 
-   struct  GamepadHandler
+   struct FileChangeHandler
    {
    public:
-      GamepadHandler();
 
+      void addDirectory(const char* fullPathDirectory, u32 trackedChanges);
       void handle(CommunicationBuffer* buffer);
 
    private:
-      enum
-      {
-         MAX_GAMEPADS = 4,
-      };
-      
-      u64 m_unconnectedReadDelay;
-
-      XINPUT_STATE m_gamepadState[MAX_GAMEPADS];
-      u64 m_gamepadLastUpdateTime[MAX_GAMEPADS];
-      bool m_gamepadConnected[MAX_GAMEPADS];
+      // #memory still uses the standard allocation strategies (new, malloc, unique_ptr). convert at some point.
+      CReadDirectoryChanges m_monitor;
    };
 }

@@ -20,33 +20,32 @@
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nShowCmd)
 {
-   core::LinearAllocator mainAllocator{"Entire memory"};
-
-   mainAllocator.size = Gigabytes(1);
-
-#ifndef DEPLOY
-   LPVOID baseAddress = (LPVOID)Terabytes(1);
-#else
-   LPVOID baseAddress = (LPVOID)0;
-#endif
-
-   mainAllocator.memory = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainAllocator.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-   i32 result = core::WindowResult::OK;
-   if( mainAllocator.memory )
+   core::Window window("CoreEngine");
+   
+   i32 result = core::initializeWindow(window);
+   if( result == core::WindowResult::OK )
    {
-      core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
-      toGame->init(mainAllocator, 1024);
+#ifndef DEPLOY
+      LPVOID baseAddress = (LPVOID)Terabytes(1);
+#else
+      LPVOID baseAddress = (LPVOID)0;
+#endif
+      core::LinearAllocator mainAllocator{"Entire memory"};
+      mainAllocator.size = Gigabytes(1);
+      mainAllocator.memory = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainAllocator.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-      core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
-      fromGame->init(mainAllocator, 1024);
-      
-      core::Window window("CoreEngine");
-
-      result = core::initializeWindow(window);
-      if( result == core::WindowResult::OK )
+      if( mainAllocator.memory )
       {
+         initializeFileStream(mainAllocator, Kilobytes(128));
+
+         core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
+         toGame->init(mainAllocator, 1024);
+
+         core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
+         fromGame->init(mainAllocator, 1024);
+
          std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle());
-         
+
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {
             // #think
@@ -67,13 +66,13 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       }
       else
       {
-         MessageBox(nullptr, "Cannot create window", "Startup error", MB_OK);
+         MessageBox(nullptr, "Not enough memory to run this game. Sorry :(", "Startup error", MB_OK);
+         result = core::WindowResult::InsufficientMemory;
       }
    }
    else
    {
-      MessageBox(nullptr, "Not enough memory to run this game. Sorry :(", "Startup error", MB_OK);
-      result = core::WindowResult::InsufficientMemory;
+      MessageBox(nullptr, "Cannot create window", "Startup error", MB_OK);
    }
 
    return result;

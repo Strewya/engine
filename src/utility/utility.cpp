@@ -11,6 +11,7 @@
 #include <iomanip>
 /******* extra headers *******/
 #include "utility/time/clock.h"
+#include "memory.h"
 /******* end headers *******/
 
 namespace core
@@ -48,22 +49,34 @@ namespace core
       buffer += written;
       written = _snprintf(buffer, size, ".log");
       size -= written;
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, size >= 0);
+      CORE_ASSERT_FATAL_DEBUG(size >= 0, "GetFilename of log file has overwritten the buffer!");
+   }
+
+   core_internal std::ofstream& getFileStream()
+   {
+      core_local_persist std::ofstream gLogFileStream;
+
+      return gLogFileStream;
+   }
+
+   void initializeFileStream(LinearAllocator& a, u32 size)
+   {
+      auto& stream = getFileStream();
+      CORE_ASSERT_FATAL(!stream.is_open(), "Logger has already been initialized");
+
+      stream.rdbuf()->pubsetbuf((char*)allocate(a, size, 1), size);
+
+      char filename[19] = {};
+      getFilename(filename, 19);
+
+      stream.open(filename, std::ios_base::app);
+      stream << newLine << newLine << logLine << "Execution start" << newLine;
    }
 
    std::ostream& getLogFileStream()
    {
-      core_local_persist std::ofstream gLogFileStream;
-
-      if( !gLogFileStream.is_open() )
-      {
-         char filename[19] = {};
-         getFilename(filename, 19);
-
-         gLogFileStream.open(filename, std::ios_base::app);
-         gLogFileStream << newLine << newLine << logLine << "Execution start" << newLine;
-      }
-      return gLogFileStream;
+      auto& result = getFileStream();
+      return result;
    }
 
    void writeHeaderToLogStream(std::ostream& stream, const char* filepath, int line)

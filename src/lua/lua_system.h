@@ -49,6 +49,7 @@ namespace core
       u32 size;
       u32 allocated;
       u32 maxAllocated;
+      u8* topFreeMemoryAddress;
       struct Freelist
       {
          u32 size;
@@ -73,13 +74,11 @@ namespace core
 
    inline std::ostream& operator<<(std::ostream& stream, LuaAllocator& a)
    {
-      u32 B = a.maxAllocated;
-      f32 kB = B / 1024.0f;
-      f32 MB = kB / 1024;
       stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
-      stream << "   Total memory: " << a.size << logLine;
-      stream << "   Currently using: " << a.allocated << logLine;
-      stream << "   Max used: " << B << " kB / " << kB << " kB / " << MB << " MB";
+      stream << "   Total memory: " << byteSizes(a.size) << logLine;
+      stream << "   Currently using: " << byteSizes(a.allocated) << logLine;
+      stream << "   Max used: " << byteSizes(a.maxAllocated) << logLine;
+      stream << "   Memory requirement: " << memoryRequirement(a.memory, a.topFreeMemoryAddress);
       return stream;
    }
 

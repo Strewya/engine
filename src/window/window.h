@@ -11,6 +11,7 @@
 #include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "window/file_change_handler.h"
 #include "window/gamepad_handler.h"
 #include "window/keyboard_handler.h"
 #include "window/mouse_handler.h"
@@ -69,12 +70,10 @@ namespace core
       i32 getPositionY() const;
       u32 getSizeX() const;
       u32 getSizeY() const;
-      void monitorDirectoryForChanges(const char* directory);
+      void monitorDirectoryForChanges(const char* gameRelativeDirectory);
       void setFileChangeDelay(u32 delay);
 
    private:
-      void processFileChanges(CommunicationBuffer* buffer);
-
       const char* m_class;
       const char* m_title;
 
@@ -100,15 +99,16 @@ namespace core
       GamepadHandler m_gamepadHandler;
       MouseHandler m_mouseHandler;
       KeyboardHandler m_keyboardHandler;
+      FileChangeHandler m_fileChangeHandler;
+
+      // WinProc specific messages
       enum
       {
-         AsyncMsgCount = 10
+         AsyncMsgCount = 8
       };
       u32 m_readAsyncIndex;
       u32 m_writeAsyncIndex;
       WinMsg m_asyncMessages[AsyncMsgCount];
-
-      CReadDirectoryChanges m_monitor;
    };
 
    void calculateClientRect(u32 x, u32 y, u32 style, u32 styleEx, u32& outXSize, u32& outYSize);

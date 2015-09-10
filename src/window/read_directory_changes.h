@@ -4,6 +4,7 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -11,6 +12,7 @@
 #include "utility/types.h"
 #include "window/window_include.h"
 /******* extra headers *******/
+#include "window/read_directory_changes_private.h"
 /******* end header inclusion *******/
 
 namespace core
@@ -23,7 +25,16 @@ namespace core
    struct CReadDirectoryChanges
    {
    public:
-      typedef std::pair<DWORD, std::string> TDirectoryChangeNotification;
+      enum
+      {
+         MaxFilenameLength = 256,
+         MaxNotifications = 128,
+      };
+      struct TDirectoryChangeNotification
+      {
+         DWORD first;
+         char second[MaxFilenameLength];
+      };
 
       CReadDirectoryChanges();
       ~CReadDirectoryChanges();
@@ -31,26 +42,25 @@ namespace core
       void Init();
       void Terminate();
 
-      void AddDirectory(const std::string& watchedDir, BOOL watchSubdirs, DWORD trackFlags, DWORD bufferSize = 16384);
+      void AddDirectory(const char* watchedDir, BOOL watchSubdirs, DWORD trackFlags);
 
-      bool Pop(DWORD& outAction, std::string& outFilename);
+      bool Pop(DWORD& outAction, char* buffer, u32 bufferLength);
 
-      void Push(DWORD action, const std::string& filename);
+      void Push(DWORD action, const char* filename);
 
       bool CheckOverflow();
 
       u32 GetThreadId();
 
    protected:
-      std::unique_ptr<RDCPrivate::CReadChangesServer> m_pServer;
+      RDCPrivate::CReadChangesServer m_pServer;
 
       HANDLE m_threadHandle;
 
       u32 m_threadId;
 
-      std::vector<TDirectoryChangeNotification> m_notifications;
-      u32 m_notificationQueueSize;
-      u32 m_head;
-      u32 m_tail;
+      TDirectoryChangeNotification m_notifications[MaxNotifications];
+      std::atomic<u32> m_head;
+      std::atomic<u32> m_tail;
    };
 }

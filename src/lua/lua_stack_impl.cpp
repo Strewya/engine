@@ -16,6 +16,13 @@ namespace core
       return str;
    }
 
+   template<> str LuaStack::to<str>(i32 stackIndex)
+   {
+      str s{};
+      s.buffer = lua_tostring(m_L, stackIndex);
+      return s;
+   }
+
    template<> u32 LuaStack::to<u32>(i32 stackIndex)
    {
       return (u32)lua_tointeger(m_L, stackIndex);
@@ -135,7 +142,7 @@ namespace core
       lua.pull(id);
       if( lua.is<str>() )
       {
-         valueIfMissing = lua.to<std::string>().at(0);
+         valueIfMissing = lua.to<str>().buffer[0];
       }
       lua.pop();
       return valueIfMissing;
@@ -144,9 +151,9 @@ namespace core
    template<> char get<char>(LuaStack& lua, i32 stackIndex, char valueIfMissing)
    {
       lua.pull(stackIndex);
-      if( lua.is<const char*>() )
+      if( lua.is<str>() )
       {
-         valueIfMissing = lua.to<std::string>().at(0);
+         valueIfMissing = lua.to<str>().buffer[0];
       }
       lua.pop();
       return valueIfMissing;

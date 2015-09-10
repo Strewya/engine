@@ -14,6 +14,10 @@
 
 namespace core
 {
+   struct LinearAllocator;
+
+   void initializeFileStream(LinearAllocator& a, u32 size);
+
    std::ostream& getLogFileStream();
 
 
@@ -50,25 +54,22 @@ namespace core
       writeContentToLogStream(logStream, args...);
    }
 
-   // #todo think about what to do with this
-   enum class AssertLevel
-   {
-      Fatal,
-      Notification,
-   };
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-#define CORE_ASSERT(level, condition, ...) do { if(!(condition)) { CORE_LOG(__VA_ARGS__); auto l = level; if(l == AssertLevel::Fatal) { *(int*)0 = 42; } } } while(!(condition))
+#define CORE_ASSERT_FATAL(condition, ...) do { if(!(condition)) { CORE_LOG("ERROR: ", __VA_ARGS__); *(int*)0 = 42; } } while(!(condition))
+#define CORE_ASSERT_WARNING(condition, ...) do { if(!(condition)) { CORE_LOG("WARNING: ", __VA_ARGS__); } } while(!(condition))
 
 #ifndef CORE_DEPLOY
 
 #define CORE_LOG_DEBUG(...) CORE_LOG(__VA_ARGS__)
-#define CORE_ASSERT_DEBUG(level, condition, ...) CORE_ASSERT(level, condition, __VA_ARGS__)
+#define CORE_ASSERT_FATAL_DEBUG(condition, ...) CORE_ASSERT_FATAL(condition, __VA_ARGS__)
+#define CORE_ASSERT_WARNING_DEBUG(condition, ...) CORE_ASSERT_WARNING(condition, __VA_ARGS__)
 
 #else
 
 #define CORE_LOG_DEBUG(...) (void)0
-#define CORE_ASSERT_DEBUG(...) (void)0
+#define CORE_ASSERT_FATAL_DEBUG(condition, ...) (void)0
+#define CORE_ASSERT_WARNING_DEBUG(condition, ...) (void)0
 
 #endif
 
@@ -88,7 +89,7 @@ namespace core
 #define CORE_START_PHASE(phase) CORE_PHASE_LOG(phase, "start"); CORE_STATUS
 #define CORE_END_PHASE(phase) CORE_PHASE_LOG(phase, status ? "OK" : "FAILED"); return status
 
-// #deprecated remove this asap after implementing fixed memory
+   // #deprecated remove this asap after implementing fixed memory
 #define CORE_INIT_START(c) CORE_PHASE_OBJECT(c); CORE_START_PHASE(CORE_PHASE_INIT)
 #define CORE_INIT_END CORE_END_PHASE(CORE_PHASE_INIT)
 
@@ -163,30 +164,6 @@ namespace core
          v = -v;
       }
       return v;
-   }
-
-   inline std::string replaceOne(std::string str, std::string from, std::string to)
-   {
-      size_t start_pos = str.find(from);
-      if( start_pos != std::string::npos )
-      {
-         str.replace(start_pos, from.length(), to);
-      }
-      return str;
-   }
-
-   inline std::string replaceAll(std::string str, std::string from, std::string to)
-   {
-      if( !from.empty() )
-      {
-         size_t start_pos = 0;
-         while( (start_pos = str.find(from, start_pos)) != std::string::npos )
-         {
-            str.replace(start_pos, from.length(), to);
-            start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-         }
-      }
-      return str;
    }
 
    template<typename C, typename F> size_t filterFind(const C& container, F filter)

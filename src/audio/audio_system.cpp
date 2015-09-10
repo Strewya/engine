@@ -25,10 +25,10 @@ namespace core
 
       u8* fmodMemory = allocate(m_allocator, fmodMemorySize, 1);
 
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, fmodMemorySize % 512 == 0);
+      CORE_ASSERT_FATAL_DEBUG(fmodMemorySize % 512 == 0, "FMOD memory size is not a multiple of 512!");
       CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
-      CORE_STATUS_AND(m_system->init(512, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
+      CORE_STATUS_AND(m_system->init(32, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
 
       CORE_STATUS_AND(m_fileLoader.init(m_system));
       CORE_STATUS_AND(sounds.init(m_allocator, maxSoundSlots));
@@ -36,7 +36,7 @@ namespace core
       CORE_INIT_END;
    }
 
-   // #todo the big question is do i need to do this anyway? the memory is going away anyway...
+   // #todo the big question is do i need to do this anyway? the memory is going away anyway... probably need to shut down fmod...
    bool AudioSystem::shutdown()
    {
       CORE_SHUTDOWN_START(AudioSystem);
@@ -52,7 +52,7 @@ namespace core
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
       
-      CORE_LOG_DEBUG(m_allocator, "\n\tFMOD system max allocation: ", maxAlloc, " B / ", maxAlloc / 1024.0f, " kB / ", maxAlloc / 1024.0f / 1024.0f, " MB");
+      CORE_LOG_DEBUG(m_allocator, "\n\tFMOD system max allocation: ", byteSizes(maxAlloc));
       CORE_SHUTDOWN_END;
    }
 

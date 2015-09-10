@@ -60,8 +60,8 @@ namespace core
 
       LuaStack config = luaConfigReader->getStack();
       bool ok = config.doFile("config.lua");
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, ok, "Lua configuration file invalid or missing!");
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, config.is<LuaTable>());
+      CORE_ASSERT_FATAL_DEBUG(ok, "Lua configuration file invalid or missing!");
+      CORE_ASSERT_FATAL_DEBUG(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
 
       u32 AudioSystemMegabytes = get<u32>(config, "AudioSystemMegabytes", 0);
       u32 MaxNumberOfSoundSlots = get<u32>(config, "MaxNumberOfSoundSlots", 0);
@@ -74,11 +74,11 @@ namespace core
       memset(mainMemory.memory + mainMemory.allocated, 0, luaTemporaryAllocator.allocated - mainMemory.allocated);
 #endif
 
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, AudioSystemMegabytes > 0);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, MaxNumberOfSoundSlots > 0);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, LuaSystemMegabytes > 0);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, GraphicsSystemMegabytes > 0);
-      CORE_ASSERT_DEBUG(AssertLevel::Fatal, MaxNumberOfTextureSlots > 0);
+      CORE_ASSERT_FATAL_DEBUG(AudioSystemMegabytes > 0, "Expected 'AudioSystemMegabytes' in config file, found none or has value 0!");
+      CORE_ASSERT_FATAL_DEBUG(MaxNumberOfSoundSlots > 0, "Expected 'MaxNumberOfSoundSlots' in config file, found none or has value 0!");
+      CORE_ASSERT_FATAL_DEBUG(LuaSystemMegabytes > 0, "Expected 'LuaSystemMegabytes' in config file, found none or has value 0!");
+      CORE_ASSERT_FATAL_DEBUG(GraphicsSystemMegabytes > 0, "Expected 'GraphicsSystemMegabytes' in config file, found none or has value 0!");
+      CORE_ASSERT_FATAL_DEBUG(MaxNumberOfTextureSlots > 0, "Expected 'MaxNumberOfTextureSlots' in config file, found none or has value 0!");
 
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
       audio->init(mainMemory, Megabytes(AudioSystemMegabytes), MaxNumberOfSoundSlots);
@@ -90,6 +90,11 @@ namespace core
       GraphicsSystem* graphics = allocate<GraphicsSystem>(graphicsMemory);
       GameState* game = allocate<GameState>(gameStateMemory);
       */
+
+      WinMsg msg{};
+      msg.type = WinMsgType::FileChange;
+      strcpy(msg.fileChange.name, "resources");
+      toMain->writeEvent(msg);
 
       auto running = false;
       while( running )
@@ -105,7 +110,7 @@ namespace core
 
          u32 count;
          count = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
-         CORE_ASSERT_DEBUG(AssertLevel::Notification, count == 1, "Lag spike...");
+         CORE_ASSERT_WARNING_DEBUG(count == 1, "Doing more than one update per tick, performance warning.");
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
@@ -127,7 +132,6 @@ namespace core
       audio->shutdown();
       lua->shutdown();
 
-      WinMsg msg{};
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);
    }

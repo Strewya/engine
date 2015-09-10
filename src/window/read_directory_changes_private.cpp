@@ -5,6 +5,7 @@
 #include "window/read_directory_changes_private.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "utility/utility.h"
 #include "window/read_directory_changes.h"
 /******* end headers *******/
 
@@ -15,21 +16,18 @@ namespace core
    namespace RDCPrivate
    {
       CReadChangesRequest::CReadChangesRequest(CReadChangesServer* pServer,
-                                               const std::string& dirName,
+                                               const char* dirName,
                                                BOOL trackSubdirs,
-                                               DWORD trackFlags,
-                                               DWORD bufferSize)
-                                               : m_pServer(pServer), m_dirName(dirName), m_trackSubdirs(trackSubdirs),
-                                               m_trackFlags(trackFlags), m_bufferSize(bufferSize), m_dirHandle(0)
+                                               DWORD trackFlags)
+                                               : m_pServer(pServer), m_trackSubdirs(trackSubdirs),
+                                               m_trackFlags(trackFlags), m_dirHandle(0)
       {
+         strcpy(m_dirName, dirName);
          ::ZeroMemory(&m_overlapped, sizeof(OVERLAPPED));
 
          // The hEvent member is not used when there is a completion
          // function, so it's ok to use it to point to the object.
          m_overlapped.hEvent = this;
-
-         m_mainBuffer.resize(bufferSize);
-         m_backupBuffer.resize(bufferSize);
       }
 
       CReadChangesRequest::~CReadChangesRequest()
@@ -45,7 +43,7 @@ namespace core
             return true;
 
          m_dirHandle = ::CreateFile(
-            m_dirName.c_str(),                                       // pointer to the file name
+            m_dirName,                                               // pointer to the file name
             FILE_LIST_DIRECTORY,                                     // access (read/write) mode
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,  // share mode
             NULL,                                                    // security descriptor
@@ -68,8 +66,8 @@ namespace core
          // This call needs to be reissued after every APC.
          BOOL success = ::ReadDirectoryChangesW(
             m_dirHandle,               // handle to directory
-            &m_mainBuffer[0],          // read results buffer
-            (DWORD)m_mainBuffer.size(),       // length of buffer
+            m_mainBuffer,              // read results buffer
+            BufferSize,                // length of buffer
             m_trackSubdirs,            // monitoring option
             m_trackFlags,              // filter conditions
             &dwBytes,                  // bytes returned
@@ -81,11 +79,9 @@ namespace core
       {
          // We could just swap back and forth between the two
          // buffers, but this code is easier to understand and debug.
-         m_backupBuffer.clear();
-         m_backupBuffer.resize(m_bufferSize);
-         memcpy(&m_backupBuffer[0], &m_mainBuffer[0], dwSize);
-         m_mainBuffer.clear();
-         m_mainBuffer.resize(m_bufferSize);
+         memset(m_backupBuffer, 0, BufferSize);
+         memcpy(m_backupBuffer, m_mainBuffer, dwSize);
+         memset(m_mainBuffer, 0, BufferSize);
       }
 
       VOID CALLBACK CReadChangesRequest::NotificationCompletion(
@@ -122,13 +118,14 @@ namespace core
 
       void CReadChangesRequest::ProcessNotification()
       {
-         char* pBase = (char*)&m_backupBuffer[0];
+         char* pBase = (char*)m_backupBuffer;
 
          for( ;; )
          {
             FILE_NOTIFY_INFORMATION& fni = (FILE_NOTIFY_INFORMATION&)*pBase;
             char fileName[256] = {0};
             WideCharToMultiByte(CP_UTF8, 0, fni.FileName, fni.FileNameLength, fileName, 256, 0, 0);
+            
 
             m_pServer->m_pParent->Push(fni.Action, fileName);
 
@@ -150,7 +147,7 @@ namespace core
 
 
       CReadChangesServer::CReadChangesServer(CReadDirectoryChanges* pParent)
-         : m_bTerminate(false), m_nOutstandingRequests(0), m_pParent(pParent)
+         : m_bTerminate(false), m_nOutstandingRequests(0), m_pParent(pParent), m_freeSlot(0)
       {
       }
 
@@ -183,10 +180,11 @@ namespace core
 
       void CReadChangesServer::AddDirectory(CReadChangesRequest* pBlock)
       {
+         CORE_ASSERT_FATAL_DEBUG(m_freeSlot < MaxBlocks, "Reached maximum number of directory watch blocks");
          if( pBlock->OpenDirectory() )
          {
             ::InterlockedIncrement(&pBlock->m_pServer->m_nOutstandingRequests);
-            m_pBlocks.push_back(pBlock);
+            m_pBlocks[m_freeSlot++] = pBlock;
             pBlock->BeginRead();
          }
          else
@@ -197,13 +195,13 @@ namespace core
       {
          m_bTerminate = true;
 
-         for( DWORD i = 0; i < m_pBlocks.size(); ++i )
+         for( DWORD i = 0; i < m_freeSlot; ++i )
          {
             // Each Request object will delete itself.
             m_pBlocks[i]->RequestTermination();
          }
 
-         m_pBlocks.clear();
+         m_freeSlot = 0;
       }
    }
 }

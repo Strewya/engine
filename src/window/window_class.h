@@ -18,8 +18,6 @@ namespace core
    public:
       WindowClass(const char* className);
       WindowClass(HINSTANCE hInst, const char* className);
-      WindowClass(const std::string& className);
-      WindowClass(HINSTANCE hInst, const std::string& className);
 
       ATOM registerClass();
       const char* getClassName() const;

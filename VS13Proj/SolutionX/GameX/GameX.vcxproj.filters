@@ -154,6 +154,9 @@
     <ClCompile Include="..\..\..\src\utility\file_loader.cpp">
       <Filter>code\framework\utility</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\window\file_change_handler.cpp">
+      <Filter>code\framework\window\windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
@@ -392,6 +395,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\utility\constructs.h">
       <Filter>code\framework\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\window\file_change_handler.h">
+      <Filter>code\framework\window\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

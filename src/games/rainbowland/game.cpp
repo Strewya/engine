@@ -106,7 +106,7 @@ namespace core
                onGainFocus();
             }
          }
-         
+
          game.constants.windowWidth = (f32)msg.screen.x;
          game.constants.windowHeight = (f32)msg.screen.y;
 
@@ -157,38 +157,45 @@ namespace core
             {
                if( msg.fileChange.action == FileChangeType::Modified )
                {
-                  auto getExtension = [](const std::string& str) -> std::string
+                  //normalize string first, turning \ to /, 
+                  char* str = msg.fileChange.name;
+                  const char* ext = nullptr;
+                  while( *str )
                   {
-                     auto lastDot = str.find_last_of('.');
-                     return str.substr(lastDot + 1);
-                  };
-                  std::string file = replaceAll(msg.fileChange.name, "\\", "/");
-                  file = "../resources/" + file;
-                  auto ext = getExtension(file);
-                  if( ext == "png" || ext == "bmp" || ext == "tif" || ext == "jpg" )
-                  {
-                     if( graphicsSystem.textures.isLoaded(file.c_str()) )
+                     if( *str == '\\' )
                      {
-                        graphicsSystem.textures.reloadFromFile(file.c_str());
+                        *str = '/';
+                     }
+                     if( *str == '.' )
+                     {
+                        ext = str + 1;
                      }
                   }
-                  else if( ext == "cso" )
+
+                  if( strcmp(ext, "png") == 0 || strcmp(ext, "bmp") == 0 || strcmp(ext, "tif") == 0 || strcmp(ext, "jpg") == 0 )
                   {
-                     if( graphicsSystem.pixelShaders.isLoaded(file.c_str()) )
+                     if( graphicsSystem.textures.isLoaded(msg.fileChange.name) )
                      {
-                        graphicsSystem.pixelShaders.reloadFromFile(file.c_str());
-                     }
-                     else if( graphicsSystem.vertexShaders.isLoaded(file.c_str()) )
-                     {
-                        graphicsSystem.vertexShaders.reloadFromFile(file.c_str(), HealthVertex::getDescription());
+                        graphicsSystem.textures.reloadFromFile(msg.fileChange.name);
                      }
                   }
-                  else if( ext == "wav" || ext == "mp3" )
+                  else if( strcmp(ext, "cso") == 0 )
                   {
-//                      if( audioSystem.sounds.isLoaded(file.c_str()) )
-//                      {
-//                         audioSystem.sounds.reloadFromFile(file.c_str());
-//                      }
+                     if( graphicsSystem.pixelShaders.isLoaded(msg.fileChange.name) )
+                     {
+                        graphicsSystem.pixelShaders.reloadFromFile(msg.fileChange.name);
+                     }
+                     else if( graphicsSystem.vertexShaders.isLoaded(msg.fileChange.name) )
+                     {
+                        graphicsSystem.vertexShaders.reloadFromFile(msg.fileChange.name, HealthVertex::getDescription());
+                     }
+                  }
+                  else if( strcmp(ext, "wav") == 0 || strcmp(ext, "mp3") == 0 )
+                  {
+//                   if( audioSystem.sounds.isLoaded(file.c_str()) )
+//                   {
+//                      audioSystem.sounds.reloadFromFile(file.c_str());
+//                   }
                   }
                }
             } break;

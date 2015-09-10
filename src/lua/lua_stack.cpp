@@ -59,7 +59,7 @@ namespace core
 
    void LuaStack::pairs(i32 stackIndex)
    {
-      CORE_ASSERT(AssertLevel::Fatal, m_freeIterationSlot < MaxIterations);
+      CORE_ASSERT_FATAL(m_freeIterationSlot < MaxIterations, "Reached maximum number of simultaneous table iterations");
       m_iters[m_freeIterationSlot++] = Iteration{stackIndex < 0 ? getTop() + 1 + stackIndex : stackIndex, true, false};
       if( is<LuaTable>(m_iters[m_freeIterationSlot - 1].m_iterateTableIndex) )
       {
@@ -69,7 +69,7 @@ namespace core
 
    void LuaStack::pairs(const char* table)
    {
-      CORE_ASSERT(AssertLevel::Fatal, m_freeIterationSlot < MaxIterations);
+      CORE_ASSERT_FATAL(m_freeIterationSlot < MaxIterations, "Reached maximum number of simultaneous table iterations");
       pull(table);
       m_iters[m_freeIterationSlot++] = Iteration{getTop(), true, true};
       if( is<LuaTable>() )

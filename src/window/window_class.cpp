@@ -16,16 +16,6 @@ namespace core
    {
    }
 
-   WindowClass::WindowClass(const std::string& className)
-      : WindowClass(className.c_str())
-   {
-   }
-
-   WindowClass::WindowClass(HINSTANCE hInst, const std::string& className)
-      : WindowClass(hInst, className.c_str())
-   {
-   }
-
    WindowClass::WindowClass(HINSTANCE hInst, const char* className)
    {
       FillDefaultData();
