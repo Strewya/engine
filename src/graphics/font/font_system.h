@@ -8,7 +8,7 @@
 #include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/shader/shader_handle.h"
-#include "graphics/texture/texture_manager.h"
+#include "graphics/texture/texture_cache.h"
 /******* end header inclusion *******/
 
 namespace core

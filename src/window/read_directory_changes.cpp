@@ -80,7 +80,7 @@ namespace core
       if( m_tail + 1 != m_head )
       {
          auto readIndex = (m_tail + 1) % MaxNotifications;
-         CORE_ASSERT_FATAL_DEBUG(strlen(m_notifications[readIndex].second) < bufferLength, "Buffer too small for filename");
+         CORE_ASSERT_DBGERR(strlen(m_notifications[readIndex].second) < bufferLength, "Buffer too small for filename");
          outAction = m_notifications[readIndex].first;
          strcpy(buffer, m_notifications[readIndex].second);
          ++m_tail;

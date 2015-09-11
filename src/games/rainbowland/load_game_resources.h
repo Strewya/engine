@@ -10,7 +10,7 @@
 #include "audio/audio_system.h"
 #include "graphics/shader/pixel/pixel_shader_manager.h"
 #include "graphics/shader/vertex/vertex_shader_manager.h"
-#include "graphics/texture/texture_manager.h"
+#include "graphics/texture/texture_cache.h"
 /******* end header inclusion *******/
 
 namespace core

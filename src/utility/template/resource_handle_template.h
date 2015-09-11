@@ -24,8 +24,8 @@ namespace core
 
       void init(u16 index)
       {
-         CORE_ASSERT_FATAL_DEBUG(isNull(), "The handler is not null and init was called!");
-         CORE_ASSERT_FATAL_DEBUG(index <= MAX_INDEX, "The index is too large!");
+         CORE_ASSERT_DBGERR(isNull(), "The handler is not null and init was called!");
+         CORE_ASSERT_DBGERR(index <= MAX_INDEX, "The index is too large!");
 
          core_local_persist u16 s_autoMagic = 0;
          if( ++s_autoMagic > MAX_MAGIC )

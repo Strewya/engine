@@ -316,7 +316,7 @@
     <ClInclude Include="..\..\..\src\audio\sound.h" />
     <ClInclude Include="..\..\..\src\audio\sound_file_loader.h" />
     <ClInclude Include="..\..\..\src\audio\sound_handle.h" />
-    <ClInclude Include="..\..\..\src\audio\sound_manager.h" />
+    <ClInclude Include="..\..\..\src\audio\sound_cache.h" />
     <ClInclude Include="..\..\..\src\games\entity.h" />
     <ClInclude Include="..\..\..\src\games\game_entry_point.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
@@ -346,7 +346,7 @@
     <ClInclude Include="..\..\..\src\graphics\texture\texture.h" />
     <ClInclude Include="..\..\..\src\graphics\texture\texture_file_loader.h" />
     <ClInclude Include="..\..\..\src\graphics\texture\texture_handle.h" />
-    <ClInclude Include="..\..\..\src\graphics\texture\texture_manager.h" />
+    <ClInclude Include="..\..\..\src\graphics\texture\texture_cache.h" />
     <ClInclude Include="..\..\..\src\graphics\vertex.h" />
     <ClInclude Include="..\..\..\src\input\gamepad.h" />
     <ClInclude Include="..\..\..\src\input\input_system.h" />

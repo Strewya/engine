@@ -49,7 +49,7 @@ namespace core
       buffer += written;
       written = _snprintf(buffer, size, ".log");
       size -= written;
-      CORE_ASSERT_FATAL_DEBUG(size >= 0, "GetFilename of log file has overwritten the buffer!");
+      CORE_ASSERT_DBGERR(size >= 0, "GetFilename of log file has overwritten the buffer!");
    }
 
    core_internal std::ofstream& getFileStream()
@@ -62,7 +62,7 @@ namespace core
    void initializeFileStream(LinearAllocator& a, u32 size)
    {
       auto& stream = getFileStream();
-      CORE_ASSERT_FATAL(!stream.is_open(), "Logger has already been initialized");
+      CORE_ASSERT_ERR(!stream.is_open(), "Logger has already been initialized");
 
       stream.rdbuf()->pubsetbuf((char*)allocate(a, size, 1), size);
 

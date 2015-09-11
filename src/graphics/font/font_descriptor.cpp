@@ -55,7 +55,7 @@ namespace core
          result.pshader = pshader;
       }
       lua.pop();
-      CORE_ASSERT_FATAL_DEBUG(lua.getTop() == 0, "Font loading did not clean up the Lua stack correctly");
+      CORE_ASSERT_DBGERR(lua.getTop() == 0, "Font loading did not clean up the Lua stack correctly");
 
       return result;
    }

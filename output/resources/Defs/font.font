@@ -1,6 +1,6 @@
 return {
 	font =
-	{ 
+	{
         texture = "Textures/font_t.png",
 		size = 32,
 		glyphs = {

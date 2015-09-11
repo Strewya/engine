@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
          core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
          fromGame->init(mainAllocator, 1024);
 
-         std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle());
+         std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
 
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {

@@ -54,8 +54,8 @@ namespace core
       sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & 0xF;
 
       size += sizeExpansionForFreelistPurposes;
-      CORE_ASSERT_FATAL_DEBUG((size % ALIGNMENT) == 0, "The requested size should always be a multiple of 16 after expansion.");
-      CORE_ASSERT_FATAL_DEBUG(size >= 16, "The requested size should be at least 16 bytes after expansion.");
+      CORE_ASSERT_DBGERR((size % ALIGNMENT) == 0, "The requested size should always be a multiple of 16 after expansion.");
+      CORE_ASSERT_DBGERR(size >= 16, "The requested size should be at least 16 bytes after expansion.");
 
       LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
       while( currentFreelist->address && currentFreelist->size < size )
@@ -71,7 +71,7 @@ namespace core
 
       //case where we found a slot big enough for the requested size
       u8* result = currentFreelist->address;
-      CORE_ASSERT_FATAL_DEBUG(((u32)result % ALIGNMENT) == 0, "The returned address should always be aligned to 16 bytes.");
+      CORE_ASSERT_DBGERR(((u32)result % ALIGNMENT) == 0, "The returned address should always be aligned to 16 bytes.");
 
       currentFreelist->size -= size;
       if( currentFreelist->size )
@@ -109,9 +109,9 @@ namespace core
       sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & 0xF;
       size += sizeExpansionForFreelistPurposes;
 
-      CORE_ASSERT_FATAL_DEBUG((size % ALIGNMENT) == 0, "The size should always be a multiple of 16 after expansion.");
-      CORE_ASSERT_FATAL_DEBUG(size >= 16, "The size should be at least 16 bytes after expansion.");
-      CORE_ASSERT_FATAL_DEBUG(((u32)ptr % ALIGNMENT) == 0, "Every address returned should be aligned to 16 bytes.");
+      CORE_ASSERT_DBGERR((size % ALIGNMENT) == 0, "The size should always be a multiple of 16 after expansion.");
+      CORE_ASSERT_DBGERR(size >= 16, "The size should be at least 16 bytes after expansion.");
+      CORE_ASSERT_DBGERR(((u32)ptr % ALIGNMENT) == 0, "Every address returned should be aligned to 16 bytes.");
 
       LuaAllocator::Freelist* previousFreelist = nullptr;
       LuaAllocator::Freelist* currentFreelist = &a.freelistHead;
@@ -326,70 +326,70 @@ end
       u8* startAddress = la.memory;
 
       void* a30 = allocate(la, 30);
-      CORE_ASSERT_FATAL_DEBUG(a30 == startAddress, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == size - 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(a30 == startAddress, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == size - 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == 0, "Playground error");
 
       void* b40 = allocate(la, 40);
-      CORE_ASSERT_FATAL_DEBUG(b40 == startAddress + 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 70, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30 + 40, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == size - 30 - 40, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(b40 == startAddress + 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 70, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30 + 40, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == size - 30 - 40, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == 0, "Playground error");
 
       void* c50 = allocate(la, 50);
-      CORE_ASSERT_FATAL_DEBUG(c50 == startAddress + 30 + 40, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 120, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(c50 == startAddress + 30 + 40, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 120, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30 + 40 + 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == size - 30 - 40 - 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == 0, "Playground error");
 
       deallocate(la, b40, 40);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 80, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == 40, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 80, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == 40, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == size - 30 - 40 - 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->nextFreelist->size == 0, "Playground error");
 
       void* d20 = allocate(la, 20);
-      CORE_ASSERT_FATAL_DEBUG(d20 == startAddress + 30, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 100, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30 + 20, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == 20, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(d20 == startAddress + 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 100, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30 + 20, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == 20, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == startAddress + 30 + 40 + 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == size - 30 - 40 - 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->nextFreelist->size == 0, "Playground error");
 
       void* e20 = allocate(la, 20);
-      CORE_ASSERT_FATAL_DEBUG(e20 == startAddress + 30 + 20, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 120, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.size == size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.freelistHead.nextFreelist->size == 0, "Playground error");
+      CORE_ASSERT_DBGERR(e20 == startAddress + 30 + 20, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 120, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.address == startAddress + 30 + 40 + 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.size == size - 30 - 40 - 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->address == nullptr, "Playground error");
+      CORE_ASSERT_DBGERR(la.freelistHead.nextFreelist->size == 0, "Playground error");
 
       deallocate(la, e20, 20);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 100, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 100, "Playground error");
       deallocate(la, d20, 20);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 80, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 80, "Playground error");
 
       void* f60 = allocate(la, 60);
-      CORE_ASSERT_FATAL_DEBUG(f60 == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 140, "Playground error");
+      CORE_ASSERT_DBGERR(f60 == startAddress + 30 + 40 + 50, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 140, "Playground error");
 
       deallocate(la, c50, 50);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 90, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 90, "Playground error");
       deallocate(la, f60, 60);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 30, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 30, "Playground error");
       deallocate(la, a30, 30);
-      CORE_ASSERT_FATAL_DEBUG(la.allocated == 0, "Playground error");
+      CORE_ASSERT_DBGERR(la.allocated == 0, "Playground error");
    }
 }

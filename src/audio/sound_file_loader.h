@@ -21,7 +21,6 @@ namespace core
       bool init(FMOD::System* system);
 
       Sound load(const char* filename) const;
-
       void unload(Sound& sound) const;
 
    private:

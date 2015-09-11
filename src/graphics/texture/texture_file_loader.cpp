@@ -22,15 +22,6 @@ namespace core
       CORE_INIT_END;
    }
 
-   bool TextureFileLoader::shutdown()
-   {
-      CORE_SHUTDOWN_START(TextureFileLoader);
-
-      m_dev = nullptr;
-
-      CORE_SHUTDOWN_END;
-   }
-
    Texture TextureFileLoader::load(const char* filename) const
    {
       Texture result{0, 0, nullptr};

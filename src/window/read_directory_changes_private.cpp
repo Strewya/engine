@@ -123,11 +123,18 @@ namespace core
          for( ;; )
          {
             FILE_NOTIFY_INFORMATION& fni = (FILE_NOTIFY_INFORMATION&)*pBase;
-            char fileName[256] = {0};
-            WideCharToMultiByte(CP_UTF8, 0, fni.FileName, fni.FileNameLength, fileName, 256, 0, 0);
-            
+            char fileName[MAX_PATH] = {0};
+            u32 written = sprintf(fileName, "%s\\", m_dirName);
+            WideCharToMultiByte(CP_UTF8, 0, fni.FileName, fni.FileNameLength, fileName + written, MAX_PATH - written, 0, 0);
 
-            m_pServer->m_pParent->Push(fni.Action, fileName);
+            auto attribs = GetFileAttributes(fileName);
+            auto invalid = attribs == INVALID_FILE_ATTRIBUTES;
+            auto isDir = (attribs & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+
+            if( !invalid && !isDir )
+            {
+               m_pServer->m_pParent->Push(fni.Action, fileName);
+            }
 
             if( !fni.NextEntryOffset )
                break;
@@ -148,8 +155,7 @@ namespace core
 
       CReadChangesServer::CReadChangesServer(CReadDirectoryChanges* pParent)
          : m_bTerminate(false), m_nOutstandingRequests(0), m_pParent(pParent), m_freeSlot(0)
-      {
-      }
+      {}
 
       u32 WINAPI CReadChangesServer::ThreadStartProc(LPVOID arg)
       {
@@ -180,7 +186,7 @@ namespace core
 
       void CReadChangesServer::AddDirectory(CReadChangesRequest* pBlock)
       {
-         CORE_ASSERT_FATAL_DEBUG(m_freeSlot < MaxBlocks, "Reached maximum number of directory watch blocks");
+         CORE_ASSERT_DBGERR(m_freeSlot < MaxBlocks, "Reached maximum number of directory watch blocks");
          if( pBlock->OpenDirectory() )
          {
             ::InterlockedIncrement(&pBlock->m_pServer->m_nOutstandingRequests);

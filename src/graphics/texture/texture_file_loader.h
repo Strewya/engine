@@ -18,10 +18,8 @@ namespace core
    {
    public:
       bool init(ID3D11Device* device);
-      bool shutdown();
 
       Texture load(const char* filename) const;
-
       void unload(Texture& data) const;
 
    private:

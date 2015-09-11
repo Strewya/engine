@@ -56,20 +56,20 @@ namespace core
 
 
 #define CORE_LOG(...) writeLog(__FILE__, __LINE__, __VA_ARGS__)
-#define CORE_ASSERT_FATAL(condition, ...) do { if(!(condition)) { CORE_LOG("ERROR: ", __VA_ARGS__); *(int*)0 = 42; } } while(!(condition))
-#define CORE_ASSERT_WARNING(condition, ...) do { if(!(condition)) { CORE_LOG("WARNING: ", __VA_ARGS__); } } while(!(condition))
+#define CORE_ASSERT_ERR(condition, ...) do { if(!(condition)) { CORE_LOG("ERROR: ", __VA_ARGS__); *(int*)0 = 42; } } while(!(condition))
+#define CORE_ASSERT_WRN(condition, ...) do { if(!(condition)) { CORE_LOG("WARNING: ", __VA_ARGS__); } } while(!(condition))
 
 #ifndef CORE_DEPLOY
 
 #define CORE_LOG_DEBUG(...) CORE_LOG(__VA_ARGS__)
-#define CORE_ASSERT_FATAL_DEBUG(condition, ...) CORE_ASSERT_FATAL(condition, __VA_ARGS__)
-#define CORE_ASSERT_WARNING_DEBUG(condition, ...) CORE_ASSERT_WARNING(condition, __VA_ARGS__)
+#define CORE_ASSERT_DBGERR(condition, ...) CORE_ASSERT_ERR(condition, __VA_ARGS__)
+#define CORE_ASSERT_DBGWRN(condition, ...) CORE_ASSERT_WRN(condition, __VA_ARGS__)
 
 #else
 
 #define CORE_LOG_DEBUG(...) (void)0
-#define CORE_ASSERT_FATAL_DEBUG(condition, ...) (void)0
-#define CORE_ASSERT_WARNING_DEBUG(condition, ...) (void)0
+#define CORE_ASSERT_DBGERR(condition, ...) (void)0
+#define CORE_ASSERT_DBGWRN(condition, ...) (void)0
 
 #endif
 

@@ -31,7 +31,7 @@ namespace core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool GraphicsSystem::init(u64 handle, f32 width, f32 height)
+   bool GraphicsSystem::init(LinearAllocator& a, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
    {
       CORE_INIT_START(GraphicsSystem);
 
@@ -66,13 +66,7 @@ namespace core
       CORE_STATUS_AND(m_vsFileLoader.init(m_vsLoader));
       CORE_STATUS_AND(m_psLoader.init(m_dev));
       CORE_STATUS_AND(m_psFileLoader.init(m_psLoader));
-
-      if( CORE_STATUS_OK )
-      {
-         auto defaultTexture = m_textureFileLoader.load(CORE_RESOURCE("Textures/defaultTexture.png"));
-         CORE_STATUS_AND(textures.init(STR(TextureManager), m_textureFileLoader, defaultTexture));
-      }
-
+      CORE_STATUS_AND(textures.init(a, textureSlots));
 
       VertexShader defaultVertexShader{nullptr, nullptr};
       if( CORE_STATUS_OK )
@@ -139,13 +133,7 @@ namespace core
 
       CORE_STATUS_AND(pixelShaders.shutdown());
       CORE_STATUS_AND(vertexShaders.shutdown());
-      CORE_STATUS_AND(textures.shutdown());
-
-      CORE_STATUS_AND(m_psFileLoader.shutdown());
-      CORE_STATUS_AND(m_psLoader.shutdown());
-      CORE_STATUS_AND(m_vsFileLoader.shutdown());
-      CORE_STATUS_AND(m_vsLoader.shutdown());
-      CORE_STATUS_AND(m_textureFileLoader.shutdown());
+      CORE_STATUS_AND(textures.getCount() == 0);
 
       CORE_STATUS_AND(m_renderer.shutdown());
 
@@ -319,14 +307,14 @@ namespace core
 
             safeRelease(adapter);
          }
-      }
+         }
 
       if( FAILED(hr) )
       {
          CORE_LOG("initDevice failed");
       }
       return SUCCEEDED(hr);
-   }
+      }
 
    //*****************************************************************
    //          INIT SWAP CHAIN
@@ -494,5 +482,5 @@ namespace core
 
       return XMMatrixLookAtLH(pos, lookAt, up);
    }
-}
+   }
 

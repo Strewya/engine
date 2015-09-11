@@ -13,7 +13,8 @@
 #include "graphics/graphics_types.h"
 #include "graphics/shader/pixel/pixel_shader_manager.h"
 #include "graphics/shader/vertex/vertex_shader_manager.h"
-#include "graphics/texture/texture_manager.h"
+#include "graphics/texture/texture_cache.h"
+#include "graphics/texture/texture_file_loader.h"
 #include "utility/geometry/rect.h"
 /******* end header inclusion *******/
 
@@ -32,7 +33,7 @@ namespace core
    struct GraphicsSystem
    {
    public:
-      bool init(u64 window, f32 width, f32 height);
+      bool init(LinearAllocator& a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
       bool shutdown();
 
       void begin();
@@ -51,7 +52,7 @@ namespace core
       void renderMesh(Transform t, Color c, const Mesh& mesh);
 
       
-      TextureManager textures;
+      TextureCache textures;
       VertexShaderManager vertexShaders;
       PixelShaderManager pixelShaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
@@ -102,7 +103,7 @@ namespace core
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)
    {
-      CORE_ASSERT_FATAL_DEBUG(m_emptyInterfaceSlot < InterfaceCount, "Reached maximum available interface declarations!");
+      CORE_ASSERT_DBGERR(m_emptyInterfaceSlot < InterfaceCount, "Reached maximum available interface declarations!");
       ptr = nullptr;
       m_declaredObjects[m_emptyInterfaceSlot++] = (IUnknown**)&ptr;
    }

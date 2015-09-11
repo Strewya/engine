@@ -8,7 +8,7 @@
 #include "audio/fmod_include.h"
 #include "utility/types.h"
 /******* extra headers *******/
-#include "audio/sound_manager.h"
+#include "audio/sound_cache.h"
 #include "sound_handle.h"
 #include "sound_file_loader.h"
 /******* end header inclusion *******/

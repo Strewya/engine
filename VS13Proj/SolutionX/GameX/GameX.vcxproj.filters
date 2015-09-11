@@ -213,9 +213,6 @@
     <ClInclude Include="..\..\..\src\graphics\texture\texture_handle.h">
       <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\texture\texture_manager.h">
-      <Filter>code\framework\graphics\texture</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\camera.h">
       <Filter>code\framework\graphics</Filter>
     </ClInclude>
@@ -296,9 +293,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
       <Filter>code\games\rainbowland</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\audio\sound_manager.h">
-      <Filter>code\framework\audio</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h">
       <Filter>code\games\rainbowland\logic</Filter>
@@ -398,6 +392,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\window\file_change_handler.h">
       <Filter>code\framework\window\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\audio\sound_cache.h">
+      <Filter>code\framework\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\texture\texture_cache.h">
+      <Filter>code\framework\graphics\texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

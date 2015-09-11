@@ -71,7 +71,6 @@ namespace core
       u32 getSizeX() const;
       u32 getSizeY() const;
       void monitorDirectoryForChanges(const char* gameRelativeDirectory);
-      void setFileChangeDelay(u32 delay);
 
    private:
       const char* m_class;
@@ -85,8 +84,6 @@ namespace core
       u32 m_exitCode;
       u32 m_style;
       u32 m_extendedStyle;
-      u32 m_minFileChangeDelay;
-      u32 m_fileChangeDelay;
       
       HWND m_hwnd;
 

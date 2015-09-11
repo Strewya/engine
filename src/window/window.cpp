@@ -48,7 +48,6 @@ namespace core
       m_xPos(0), m_yPos(0),
       m_xSize(GetSystemMetrics(SM_CXSCREEN)), m_ySize(GetSystemMetrics(SM_CYSCREEN)),
       m_exitCode(0), m_style(0), m_extendedStyle(0),
-      m_minFileChangeDelay(200), m_fileChangeDelay(m_minFileChangeDelay),
       m_hwnd(nullptr),
       m_fullscreen(false), m_showCursor(false), m_lockCursor(false), m_relativeMouse(false),
       m_isRunning(true),
@@ -320,12 +319,7 @@ namespace core
 
       m_fileChangeHandler.addDirectory(lpName, m_trackedChanges);
    }
-
-   void Window::setFileChangeDelay(u32 delay)
-   {
-      m_fileChangeDelay = (delay > m_minFileChangeDelay ? delay : m_minFileChangeDelay);
-   }
-
+   
    LRESULT CALLBACK Window::messageRouter(HWND hwnd, u32 msg, WPARAM wParam, LPARAM lParam)
    {
       Window* window = nullptr;

@@ -27,13 +27,12 @@ namespace core
    public:
       enum
       {
-         MaxFilenameLength = 256,
          MaxNotifications = 128,
       };
       struct TDirectoryChangeNotification
       {
          DWORD first;
-         char second[MaxFilenameLength];
+         char second[MAX_PATH];
       };
 
       CReadDirectoryChanges();

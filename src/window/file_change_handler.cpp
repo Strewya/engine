@@ -50,12 +50,16 @@ namespace core
    void FileChangeHandler::handle(CommunicationBuffer* buffer)
    {
       WinMsg we{};
+      we.fileChange.name[0] = '2';
       DWORD action;
-      while( m_monitor.Pop(action, we.fileChange.name, FileChangeEvent::NameStringSize) )
+      char file[FileChangeEvent::NameStringSize] = "1";
+      while( m_monitor.Pop(action, file, FileChangeEvent::NameStringSize) && strcmp(file, we.fileChange.name) != 0 )
       {
          we.type = WinMsgType::FileChange;
          we.fileChange.action = toFileChangeType(action);
-         we.fileChange.name[FileChangeEvent::NameStringSize] = 0;
+         strcpy(we.fileChange.name, file);
+         we.fileChange.name[FileChangeEvent::NameStringSize - 1] = 0;
+
          buffer->writeEvent(we);
       }
    }

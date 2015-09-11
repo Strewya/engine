@@ -25,7 +25,7 @@ namespace core
 
       u8* fmodMemory = allocate(m_allocator, fmodMemorySize, 1);
 
-      CORE_ASSERT_FATAL_DEBUG(fmodMemorySize % 512 == 0, "FMOD memory size is not a multiple of 512!");
+      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size is not a multiple of 512!");
       CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
       CORE_STATUS_AND(m_system->init(32, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);

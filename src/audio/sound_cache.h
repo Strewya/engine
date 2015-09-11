@@ -14,18 +14,16 @@
 
 namespace core
 {
-   struct LinearAllocator;
-
    struct SoundCache
    {
-      bool init(LinearAllocator& allocator, u32 soundCount)
+      bool init(LinearAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(SoundCache);
 
-         m_soundCount = 0;
-         m_maxSounds = soundCount;
-         m_soundsBuffer = allocate<Sound>(allocator, soundCount);
-         m_freelist.init(m_soundsBuffer, soundCount);
+         m_count = 0;
+         m_maxSlots = maxSlots;
+         m_buffer = allocate<Sound>(a, maxSlots);
+         m_freelist.init(m_buffer, maxSlots);
 
          CORE_INIT_END;
       }
@@ -38,7 +36,7 @@ namespace core
          {
             Sound* soundSlot = (Sound*)slot;
             *soundSlot = s;
-            u16 index = (u16)(soundSlot - m_soundsBuffer);
+            u16 index = u16(soundSlot - m_buffer);
             result.init(index);
          }
          return result;
@@ -46,22 +44,21 @@ namespace core
 
       Sound remove(HSound handle)
       {
-         Sound s = m_soundsBuffer[handle.getIndex()];
-         release(m_freelist, &m_soundsBuffer[handle.getIndex()]);
+         Sound s = m_buffer[handle.getIndex()];
+         release(m_freelist, &m_buffer[handle.getIndex()]);
          return s;
       }
 
       Sound getData(HSound handle)
       {
-         Sound result = m_soundsBuffer[handle.getIndex()];
+         Sound result = m_buffer[handle.getIndex()];
          return result;
       }
 
    private:
-      Sound* m_soundsBuffer;
+      Sound* m_buffer;
       Freelist m_freelist;
-      u32 m_maxSounds;
-      u32 m_soundCount;
+      u32 m_maxSlots;
+      u32 m_count;
    };
-
 }
