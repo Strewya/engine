@@ -13,23 +13,23 @@
 
 namespace core
 {
-   GameResources loadGameResources(AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
+   GameResources loadGameResources(AudioSystem& audio, GraphicsSystem& gfx)
    {
       GameResources assets{};
-      assets.atlas = textures.loadFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
-      assets.background = textures.loadFromFile(CORE_RESOURCE("Textures/background.png"));
-      assets.font = textures.loadFromFile(CORE_RESOURCE("Textures/font_t.png"));
+      assets.atlas = gfx.loadTextureFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
+      assets.background = gfx.loadTextureFromFile(CORE_RESOURCE("Textures/background.png"));
+      assets.font = gfx.loadTextureFromFile(CORE_RESOURCE("Textures/font_t.png"));
 
-      assets.mainVS = vertexShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), HealthVertex::getDescription());
-      assets.mainPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
-      assets.healthPS = pixelShaders.loadFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
+      assets.mainVS = gfx.loadVertexShaderFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), VertexType::Health);
+      assets.mainPS = gfx.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
+      assets.healthPS = gfx.loadPixelShaderFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
       
-//       assets.reload = sounds.loadFromFile(CORE_RESOURCE("Sounds/reload.wav"));
-//       assets.pistol = sounds.loadFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
-//       assets.shotgun = sounds.loadFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
-//       assets.uzi = sounds.loadFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
-//       assets.sniper = sounds.loadFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
-//       assets.rpg = sounds.loadFromFile(CORE_RESOURCE("Sounds/missile.wav"));
+      assets.reload = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/reload.wav"));
+      assets.pistol = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
+      assets.shotgun = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
+      assets.uzi = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
+      assets.sniper = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
+      assets.rpg = audio.loadSoundFromFile(CORE_RESOURCE("Sounds/missile.wav"));
 
       return assets;
    }
@@ -54,20 +54,20 @@ namespace core
               reload && pistol && shotgun && uzi && sniper && rpg);
    }
 
-   void unloadGameResources(GameResources& assets, AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures)
+   void unloadGameResources(GameResources& assets, AudioSystem& audio, GraphicsSystem& gfx)
    {
-//       sounds.release(assets.rpg);
-//       sounds.release(assets.sniper);
-//       sounds.release(assets.uzi);
-//       sounds.release(assets.shotgun);
-//       sounds.release(assets.pistol);
-//       sounds.release(assets.reload);
+      audio.unload(assets.rpg);
+      audio.unload(assets.sniper);
+      audio.unload(assets.uzi);
+      audio.unload(assets.shotgun);
+      audio.unload(assets.pistol);
+      audio.unload(assets.reload);
 
-      pixelShaders.release(assets.healthPS);
-      pixelShaders.release(assets.mainPS);
-      vertexShaders.release(assets.mainVS);
-      textures.release(assets.font);
-      textures.release(assets.background);
-      textures.release(assets.atlas);
+      gfx.unload(assets.healthPS);
+      gfx.unload(assets.mainPS);
+      gfx.unload(assets.mainVS);
+      gfx.unload(assets.font);
+      gfx.unload(assets.background);
+      gfx.unload(assets.atlas);
    }
 }

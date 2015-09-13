@@ -265,9 +265,7 @@
     <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp" />
-    <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.cpp" />
-    <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\texture\texture_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\vertex.cpp" />
@@ -334,15 +332,13 @@
     <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\default_pixel_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader.h" />
-    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.h" />
-    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_manager.h" />
+    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_cache.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\shader_handle.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\default_vertex_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader.h" />
-    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.h" />
-    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_manager.h" />
+    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_cache.h" />
     <ClInclude Include="..\..\..\src\graphics\texture\texture.h" />
     <ClInclude Include="..\..\..\src\graphics\texture\texture_file_loader.h" />
     <ClInclude Include="..\..\..\src\graphics\texture\texture_handle.h" />

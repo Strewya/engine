@@ -13,6 +13,7 @@
 #include "utility/geometry/rect.h"
 #include "utility/geometry/vec2.h"
 #include "utility/utility.h"
+#include "utility/memory.h"
 /******* end headers *******/
 
 namespace core
@@ -29,11 +30,17 @@ namespace core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool FontSystem::init(const TextureManager& textures)
+   bool FontSystem::init(LinearAllocator& a, TextureCache& textures)
    {
       CORE_INIT_START(FontSystem);
 
       m_textures = &textures;
+      m_allocator.tag = "Font system allocator";
+      m_allocator.allocated = 0;
+      m_allocator.size = Megabytes(10);
+      m_allocator.memory = allocate(a, m_allocator.size, 1);
+
+      CORE_STATUS_AND(m_allocator.memory != nullptr);
 
       CORE_INIT_END;
    }

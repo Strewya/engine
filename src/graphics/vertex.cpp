@@ -6,6 +6,8 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "utility/color.h"
+#include "utility/utility.h"
+#include "utility/memory.h"
 /******* end headers *******/
 
 namespace core
@@ -56,14 +58,15 @@ namespace core
       textureUV.y = v;
    }
 
-   InputLayout DefaultVertex::getDescription()
+   InputLayout DefaultVertex::getDescription(StackAllocator& a)
    {
-      return
-      {
-         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-         {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
-      };
+      u32 count = 3;
+      CORE_ASSERT_ERR((a.size - a.allocated) >= sizeof(D3D11_INPUT_ELEMENT_DESC) * count, "Not enough memory to generate DefaultVertex layout information");
+      InputLayout layout{allocate<D3D11_INPUT_ELEMENT_DESC>(a, count), 0};
+      layout.buffer[layout.size++] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      layout.buffer[layout.size++] = {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      layout.buffer[layout.size++] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      return layout;
    }
 
    //////////// HEALTH VERTEX
@@ -83,11 +86,17 @@ namespace core
       health.y = 0;
    }
 
-   InputLayout HealthVertex::getDescription()
+   InputLayout HealthVertex::getDescription(StackAllocator& a)
    {
-      auto parentInputLayout = DefaultVertex::getDescription();
-      parentInputLayout.push_back({"HEALTH", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0});
-      return parentInputLayout;
+      u32 count = 4;
+      CORE_ASSERT_ERR((a.size - a.allocated) >= sizeof(D3D11_INPUT_ELEMENT_DESC) * count, "Not enough memory to generate HealthVertex layout information");
+      InputLayout layout{allocate<D3D11_INPUT_ELEMENT_DESC>(a, count), 0};
+      layout.buffer[layout.size++] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      layout.buffer[layout.size++] = {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      layout.buffer[layout.size++] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      layout.buffer[layout.size++] = {"HEALTH", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
+      return layout;
+
       /*{
          {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
          {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},

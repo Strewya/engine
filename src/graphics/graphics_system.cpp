@@ -14,6 +14,7 @@
 #include "utility/color.h"
 #include "utility/transform.h"
 #include "utility/utility.h"
+#include "utility/file_loader.h"
 #include "utility/geometry/rect.h"
 #include "utility/geometry/vec3.h"
 #include "window/window.h"
@@ -36,8 +37,8 @@ namespace core
       CORE_INIT_START(GraphicsSystem);
 
       m_window = handle;
-      m_backbufferSize.x = this->width = width;
-      m_backbufferSize.y = this->height = height;
+      m_backbufferSize.x = this->width = (f32)width;
+      m_backbufferSize.y = this->height = (f32)height;
       m_backgroundColor.r = m_backgroundColor.g = m_backgroundColor.b = 0;
       clearCamera();
 
@@ -59,29 +60,43 @@ namespace core
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
+      m_stackAllocator.tag = "Graphics scratch memory";
+      m_stackAllocator.size = Megabytes(10);
+      m_stackAllocator.memory = allocate(a, m_stackAllocator.size, 1);
+      m_stackAllocator.allocated = 0;
+
       CORE_STATUS_AND(m_renderer.init(m_dev, m_devcon, m_samplerState));
 
       CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
-      CORE_STATUS_AND(m_vsLoader.init(m_dev));
-      CORE_STATUS_AND(m_vsFileLoader.init(m_vsLoader));
-      CORE_STATUS_AND(m_psLoader.init(m_dev));
-      CORE_STATUS_AND(m_psFileLoader.init(m_psLoader));
       CORE_STATUS_AND(textures.init(a, textureSlots));
 
-      VertexShader defaultVertexShader{nullptr, nullptr};
+      CORE_STATUS_AND(m_vsLoader.init(m_dev));
+      CORE_STATUS_AND(vertexShaders.init(a, shaderSlots));
+
+      CORE_STATUS_AND(m_psLoader.init(m_dev));
+      CORE_STATUS_AND(pixelShaders.init(a, shaderSlots));
+
       if( CORE_STATUS_OK )
       {
 #include "graphics/shader/vertex/default_vertex_shader.h"
 
-         defaultVertexShader = m_vsLoader.load(DefaultVertex::getDescription(), (const char*)g_VShader, sizeof(g_VShader));
+         auto layout = DefaultVertex::getDescription(m_stackAllocator);
+         CORE_ASSERT_DBGERR(layout.buffer != nullptr, "Error generating input layout information");
+         auto defaultVertexShader = m_vsLoader.load(layout, (u8*)g_VShader, sizeof(g_VShader));
+
+         deallocate(m_stackAllocator);
+         auto vhandle = vertexShaders.insert(defaultVertexShader);
+         CORE_ASSERT_DBGERR(vhandle.getIndex() == 0, "The default pixel shader should be at index 0");
+         // #todo think about a sane way of using the default shader with different actual vertices being sent to the pipeline
       }
 
-      PixelShader defaultPixelShader{nullptr};
       if( CORE_STATUS_OK )
       {
 #include "graphics/shader/pixel/default_pixel_shader.h"
 
-         defaultPixelShader = m_psLoader.load((const char*)g_PShader, sizeof(g_PShader));
+         auto defaultPixelShader = m_psLoader.load((u8*)g_PShader, sizeof(g_PShader));
+         auto phandle = pixelShaders.insert(defaultPixelShader);
+         CORE_ASSERT_DBGERR(phandle.getIndex() == 0, "The default pixel shader should be at index 0");
       }
 
       if( CORE_STATUS_OK )
@@ -119,8 +134,7 @@ namespace core
       }
 
 
-      CORE_STATUS_AND(vertexShaders.init(STR(VertexShaderManager), m_vsFileLoader, defaultVertexShader));
-      CORE_STATUS_AND(pixelShaders.init(STR(PixelShaderManager), m_psFileLoader, defaultPixelShader));
+
       CORE_INIT_END;
    }
 
@@ -131,8 +145,8 @@ namespace core
    {
       CORE_SHUTDOWN_START(GraphicsSystem);
 
-      CORE_STATUS_AND(pixelShaders.shutdown());
-      CORE_STATUS_AND(vertexShaders.shutdown());
+      CORE_STATUS_AND(pixelShaders.getCount() == 0);
+      CORE_STATUS_AND(vertexShaders.getCount() == 0);
       CORE_STATUS_AND(textures.getCount() == 0);
 
       CORE_STATUS_AND(m_renderer.shutdown());
@@ -151,6 +165,90 @@ namespace core
 
       CORE_SHUTDOWN_END;
    }
+
+   //*****************************************************************
+   //          LOAD TEXTURE FROM FILE
+   //*****************************************************************
+   HTexture GraphicsSystem::loadTextureFromFile(const char* filename)
+   {
+      Texture t = m_textureFileLoader.load(filename);
+      HTexture result = textures.insert(t);
+      return result;
+   }
+
+   //*****************************************************************
+   //          UNLOAD TEXTURE
+   //*****************************************************************
+   void GraphicsSystem::unload(HTexture handle)
+   {
+      if( !handle.isNull() )
+      {
+         Texture t = textures.remove(handle);
+         m_textureFileLoader.unload(t);
+      }
+   }
+
+   //*****************************************************************
+   //          LOAD VERTEX SHADER FROM FILE
+   //*****************************************************************
+   HVertexShader GraphicsSystem::loadVertexShaderFromFile(const char* filename, VertexType vType)
+   {
+      auto file = loadFile(filename, m_stackAllocator);
+      CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
+      InputLayout layout{};
+      switch( vType )
+      {
+         case VertexType::Default:
+         {
+            layout = DefaultVertex::getDescription(m_stackAllocator);
+         } break;
+         case VertexType::Health:
+         {
+            layout = HealthVertex::getDescription(m_stackAllocator);
+         } break;
+      }
+      CORE_ASSERT_ERR(layout.buffer != nullptr && layout.size > 0, "Error generating input layout information");
+      auto shader = m_vsLoader.load(layout, file.memory, file.size);
+
+      deallocate(m_stackAllocator);
+
+      auto result = vertexShaders.insert(shader);
+      return result;
+   }
+
+   //*****************************************************************
+   //          UNLOAD VERTEX SHADER
+   //*****************************************************************
+   void GraphicsSystem::unload(HVertexShader handle)
+   {
+      auto shader = vertexShaders.remove(handle);
+      m_vsLoader.unload(shader);
+   }
+
+   //*****************************************************************
+   //          LOAD PIXEL SHADER FROM FILE
+   //*****************************************************************
+   HPixelShader GraphicsSystem::loadPixelShaderFromFile(const char* filename)
+   {
+      auto file = loadFile(filename, m_stackAllocator);
+      CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
+      auto shader = m_psLoader.load(file.memory, file.size);
+
+      deallocate(m_stackAllocator);
+
+      auto result = pixelShaders.insert(shader);
+      return result;
+   }
+
+   //*****************************************************************
+   //          UNLOAD PIXEL SHADER
+   //*****************************************************************
+   void GraphicsSystem::unload(HPixelShader handle)
+   {
+      auto shader = pixelShaders.remove(handle);
+      m_psLoader.unload(shader);
+   }
+
 
    //*****************************************************************
    //          BEGIN
@@ -307,14 +405,14 @@ namespace core
 
             safeRelease(adapter);
          }
-         }
+   }
 
       if( FAILED(hr) )
       {
          CORE_LOG("initDevice failed");
       }
       return SUCCEEDED(hr);
-      }
+}
 
    //*****************************************************************
    //          INIT SWAP CHAIN

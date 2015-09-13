@@ -47,6 +47,7 @@ namespace core
          m_channel = nullptr;
       }
 
+      CORE_STATUS_AND(sounds.getCount() == 0);
       CORE_STATUS_AND(m_system->release() == FMOD_OK);
       int curAlloc = 0;
       int maxAlloc = 0;
@@ -56,11 +57,10 @@ namespace core
       CORE_SHUTDOWN_END;
    }
 
-   HSound AudioSystem::loadFromFile(const char* filename)
+   HSound AudioSystem::loadSoundFromFile(const char* filename)
    {
       Sound loadedSound = m_fileLoader.load(filename);
       HSound handle = sounds.insert(loadedSound);
-
       return handle;
    }
 

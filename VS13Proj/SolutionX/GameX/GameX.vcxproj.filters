@@ -13,14 +13,8 @@
     <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp">
       <Filter>code\framework\graphics\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.cpp">
-      <Filter>code\framework\graphics\shader\pixel</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.cpp">
       <Filter>code\framework\graphics\shader\pixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.cpp">
-      <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.cpp">
       <Filter>code\framework\graphics\shader\vertex</Filter>
@@ -177,13 +171,7 @@
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader.h">
       <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_file_loader.h">
-      <Filter>code\framework\graphics\shader\pixel</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.h">
-      <Filter>code\framework\graphics\shader\pixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_manager.h">
       <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\default_vertex_shader.h">
@@ -192,13 +180,7 @@
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader.h">
       <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_file_loader.h">
-      <Filter>code\framework\graphics\shader\vertex</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.h">
-      <Filter>code\framework\graphics\shader\vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_manager.h">
       <Filter>code\framework\graphics\shader\vertex</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\shader_handle.h">
@@ -398,6 +380,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\texture\texture_cache.h">
       <Filter>code\framework\graphics\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\shader\vertex\vertex_shader_cache.h">
+      <Filter>code\framework\graphics\shader\vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_cache.h">
+      <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

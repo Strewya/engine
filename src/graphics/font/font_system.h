@@ -22,14 +22,15 @@ namespace core
    struct FontSystem
    {
    public:
-      bool init(const TextureManager& textures);
+      bool init(LinearAllocator& a, TextureCache& textures);
       bool shutdown();
 
       Mesh makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
       Mesh makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
 
    private:
-      const TextureManager* m_textures;
+      StackAllocator m_allocator;
+      TextureCache* m_textures;
    };
 
 }

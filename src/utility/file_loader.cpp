@@ -6,27 +6,27 @@
 /******* c++ headers *******/
 #include <fstream>
 /******* extra headers *******/
+#include "utility/memory.h"
 /******* end headers *******/
 
 namespace core
 {
-   LoadFileResult loadFile(const char* filename, u8* buffer, u32& bufferSize)
+   LoadedFile loadFile(const char* filename, StackAllocator& a)
    {
+      LoadedFile result{nullptr, 0};
       std::ifstream file{filename, std::ifstream::in | std::ifstream::binary};
       if( file.good() )
       {
          file.seekg(0, std::ios::end);
-         auto fileSize = size_t(file.tellg());
-         if( bufferSize >= fileSize )
+         result.size = size_t(file.tellg());
+         result.memory = allocate(a, result.size, 1);
+         if( result.memory )
          {
             file.seekg(0, std::ios::beg);
-            file.read((char*)buffer, fileSize);
-            file.close();
-            bufferSize = (u32)fileSize;
-            return LoadFileResult::OK;
+            file.read((char*)result.memory, result.size);
          }
-         return LoadFileResult::BufferTooSmall;
+         file.close();
       }
-      return LoadFileResult::FileOpenError;
+      return result;
    }
 }

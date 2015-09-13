@@ -7,17 +7,15 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
-#include "audio/audio_system.h"
-#include "graphics/shader/pixel/pixel_shader_manager.h"
-#include "graphics/shader/vertex/vertex_shader_manager.h"
-#include "graphics/texture/texture_cache.h"
 /******* end header inclusion *******/
 
 namespace core
 {
+   struct AudioSystem;
    struct GameResources;
+   struct GraphicsSystem;
 
-   GameResources loadGameResources(AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures);
+   GameResources loadGameResources(AudioSystem& audio, GraphicsSystem& gfx);
    bool checkGameResourcesLoaded(GameResources& assets);
-   void unloadGameResources(GameResources& assets, AudioSystem& sounds, PixelShaderManager& pixelShaders, VertexShaderManager& vertexShaders, TextureManager& textures);
+   void unloadGameResources(GameResources& assets, AudioSystem& sounds, GraphicsSystem& gfx);
 }

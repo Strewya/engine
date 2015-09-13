@@ -28,7 +28,7 @@ namespace core
       void playMusic(HSound sound);
       void stopMusic();
 
-      HSound loadFromFile(const char* filename);
+      HSound loadSoundFromFile(const char* filename);
 
       void unload(HSound sound);
 

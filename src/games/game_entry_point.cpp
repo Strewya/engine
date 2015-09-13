@@ -77,6 +77,13 @@ namespace core
       luaConfigReader->shutdown();
       memset(mainMemory.memory + mainMemory.allocated, 0, luaTemporaryAllocator.allocated - mainMemory.allocated);
 #endif
+      
+      Memory audioMemory = getMemory(mainMemory, Megabytes(AudioSystemMegabytes));
+      Memory graphicsMemory = getMemory(mainMemory, Megabytes(GraphicsSystemMegabytes));
+      Memory scriptMemory = getMemory(mainMemory, Megabytes(LuaSystemMegabytes));
+
+      Memory textureMemory
+      
 
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
       audio->init(mainMemory, Megabytes(AudioSystemMegabytes), MaxNumberOfSoundSlots);

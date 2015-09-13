@@ -54,7 +54,7 @@ namespace core
    {
       CORE_SHUTDOWN_START(Rainbowland);
 
-      unloadGameResources(game.assets, audioSystem, graphicsSystem.pixelShaders, graphicsSystem.vertexShaders, graphicsSystem.textures);
+      unloadGameResources(game.assets, audioSystem, graphicsSystem);
 
       CORE_STATUS_AND(fontSystem.shutdown());
       CORE_STATUS_AND(luaSystem.shutdown());
@@ -112,19 +112,20 @@ namespace core
 
          LinearAllocator la{};
          //CORE_STATUS_AND(audioSystem.init(la));
-         CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
-         CORE_STATUS_AND(inputSystem.init());
+         //CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
+         //CORE_STATUS_AND(inputSystem.init());
          //CORE_STATUS_AND(luaSystem.init());
-         CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
+         //CORE_STATUS_AND(fontSystem.init(graphicsSystem.textures));
       }
 
       if( CORE_STATUS_OK )
       {
-         CORE_STATUS_AND(init_game(game, audioSystem, graphicsSystem, luaSystem.getStack()));
+         //CORE_STATUS_AND(init_game(game, audioSystem, graphicsSystem, luaSystem.getStack()));
 
-         updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+         //updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
+      CORE_STATUS_SET(false);
       CORE_INIT_END;
    }
 
@@ -174,20 +175,20 @@ namespace core
 
                   if( strcmp(ext, "png") == 0 || strcmp(ext, "bmp") == 0 || strcmp(ext, "tif") == 0 || strcmp(ext, "jpg") == 0 )
                   {
-                     if( graphicsSystem.textures.isLoaded(msg.fileChange.name) )
+                     //if( graphicsSystem.textures.isLoaded(msg.fileChange.name) )
                      {
-                        graphicsSystem.textures.reloadFromFile(msg.fileChange.name);
+                        //graphicsSystem.textures.reloadFromFile(msg.fileChange.name);
                      }
                   }
                   else if( strcmp(ext, "cso") == 0 )
                   {
-                     if( graphicsSystem.pixelShaders.isLoaded(msg.fileChange.name) )
+                     //if( graphicsSystem.pixelShaders.isLoaded(msg.fileChange.name) )
                      {
-                        graphicsSystem.pixelShaders.reloadFromFile(msg.fileChange.name);
+                        //graphicsSystem.pixelShaders.reloadFromFile(msg.fileChange.name);
                      }
-                     else if( graphicsSystem.vertexShaders.isLoaded(msg.fileChange.name) )
+                     //else if( graphicsSystem.vertexShaders.isLoaded(msg.fileChange.name) )
                      {
-                        graphicsSystem.vertexShaders.reloadFromFile(msg.fileChange.name, HealthVertex::getDescription());
+                        //graphicsSystem.vertexShaders.reloadFromFile(msg.fileChange.name, HealthVertex::getDescription());
                      }
                   }
                   else if( strcmp(ext, "wav") == 0 || strcmp(ext, "mp3") == 0 )

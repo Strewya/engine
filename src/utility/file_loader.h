@@ -11,12 +11,13 @@
 
 namespace core
 {
-   enum class LoadFileResult
+   struct StackAllocator;
+
+   struct LoadedFile
    {
-      FileOpenError,
-      BufferTooSmall,
-      OK,
+      u8* memory;
+      u32 size;
    };
 
-   LoadFileResult loadFile(const char* filename, u8* buffer, u32& bufferSize);
+   LoadedFile loadFile(const char* filename, StackAllocator& a);
 }

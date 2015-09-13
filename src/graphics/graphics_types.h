@@ -4,7 +4,6 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <vector>
 /******* common headers *******/
 #include "graphics/dx_include.h"
 #include "utility/types.h"
@@ -16,12 +15,35 @@ namespace core
    struct DefaultVertex;
    struct HealthVertex;
 
-   typedef std::vector<DefaultVertex> DefaultVertexBuffer;
-   typedef std::vector<HealthVertex> HealthVertexBuffer;
+   enum class VertexType
+   {
+      Default,
+      Health
+   };
 
-   typedef std::vector<u32> IndexBuffer;
+   struct HealthVertexBuffer
+   {
+      HealthVertex* data;
+      u32 size;
+   };
 
-   typedef std::vector<D3D11_INPUT_ELEMENT_DESC> InputLayout;
+   struct DefaultVertexBuffer
+   {
+      DefaultVertex* data;
+      u32 size;
+   };
+
+   struct IndexBuffer
+   {
+      u32* data;
+      u32 size;
+   };
+
+   struct InputLayout
+   {
+      D3D11_INPUT_ELEMENT_DESC* buffer;
+      u32 size;
+   };
 
    enum VertexTopology
    {

@@ -19,9 +19,8 @@ namespace core
    {
    public:
       bool init(ID3D11Device* device);
-      bool shutdown();
 
-      VertexShader load(InputLayout layout, const char* buffer, u32 bufferSize) const;
+      VertexShader load(InputLayout layout, u8* buffer, u32 bufferSize) const;
 
       void unload(VertexShader& data);
       

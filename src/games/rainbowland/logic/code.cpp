@@ -1169,7 +1169,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    }
 
    core_internal void loadMeshBundle(f32 left, f32 top, f32 right, f32 bottom, u32 columns, u32 rows,
-                              TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel,
+                              TextureCache& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel,
                               std::vector<Mesh>& outMeshes)
    {
       f32 width = right - left;
@@ -1194,7 +1194,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       }
    }
 
-   core_internal Mesh makeMesh(f32 x, f32 y, f32 w, f32 h, TextureManager& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
+   core_internal Mesh makeMesh(f32 x, f32 y, f32 w, f32 h, TextureCache& textures, HTexture texture, HVertexShader vertex, HPixelShader pixel)
    {
       auto txtr = textures.getData(texture);
       f32 tw = (f32)txtr.width;
@@ -1208,7 +1208,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
       return result;
    }
 
-   core_internal std::vector<Mesh> loadMeshes(GameData& game, TextureManager& textures)
+   core_internal std::vector<Mesh> loadMeshes(GameData& game, TextureCache& textures)
    {
       std::vector<Mesh> result{};
       //players
@@ -1454,7 +1454,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    core_internal bool init_game(GameData& game, AudioSystem& audio, GraphicsSystem& gfx, LuaStack lua)
    {
       bool result = true;
-      game.assets = loadGameResources(audio, gfx.pixelShaders, gfx.vertexShaders, gfx.textures);
+      game.assets = loadGameResources(audio, gfx);
 
       result = checkGameResourcesLoaded(game.assets);
 

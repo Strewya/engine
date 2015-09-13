@@ -11,8 +11,10 @@
 /******* extra headers *******/
 #include "graphics/dx_renderer.h"
 #include "graphics/graphics_types.h"
-#include "graphics/shader/pixel/pixel_shader_manager.h"
-#include "graphics/shader/vertex/vertex_shader_manager.h"
+#include "graphics/shader/pixel/pixel_shader_cache.h"
+#include "graphics/shader/pixel/pixel_shader_loader.h"
+#include "graphics/shader/vertex/vertex_shader_cache.h"
+#include "graphics/shader/vertex/vertex_shader_loader.h"
 #include "graphics/texture/texture_cache.h"
 #include "graphics/texture/texture_file_loader.h"
 #include "utility/geometry/rect.h"
@@ -51,10 +53,17 @@ namespace core
 
       void renderMesh(Transform t, Color c, const Mesh& mesh);
 
+      HTexture loadTextureFromFile(const char* filename);
+      HVertexShader loadVertexShaderFromFile(const char* filename, VertexType vType);
+      HPixelShader loadPixelShaderFromFile(const char* filename);
+
+      void unload(HTexture handle);
+      void unload(HVertexShader handle);
+      void unload(HPixelShader handle);
       
       TextureCache textures;
-      VertexShaderManager vertexShaders;
-      PixelShaderManager pixelShaders;
+      VertexShaderCache vertexShaders;
+      PixelShaderCache pixelShaders;
       //DXBufferManager m_buffers; //predefined mesh buffers?
       
    private:
@@ -66,11 +75,10 @@ namespace core
       bool initSamplerState();
       bool initDepthBuffer();
 
+      StackAllocator m_stackAllocator;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
-      VertexShaderFileLoader m_vsFileLoader;
       PixelShaderLoader m_psLoader;
-      PixelShaderFileLoader m_psFileLoader;
       DXRenderer m_renderer;
 
       D3DXCOLOR m_backgroundColor;

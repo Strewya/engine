@@ -70,9 +70,6 @@ namespace core
 
    inline std::ostream& operator<<(std::ostream& stream, LinearAllocator& a)
    {
-      u32 B = a.allocated;
-      f32 kB = B / 1024.0f;
-      f32 MB = kB / 1024;
       stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
       stream << "   Total memory: " << byteSizes(a.size) << logLine;
       stream << "   Currently using: " << byteSizes(a.allocated);
@@ -82,7 +79,7 @@ namespace core
    inline u8* allocate(LinearAllocator& a, u32 size, u32 align)
    {
       u8* memory = a.memory + a.allocated;
-      u32 alignBytes = (u32)((u32)memory % align);
+      u32 alignBytes = (u32)memory % align;
       u32 totalSize = size + alignBytes;
       if( a.allocated + totalSize <= a.size )
       {
@@ -101,7 +98,47 @@ namespace core
    }
 
 
+   struct StackAllocator
+   {
+      const char* tag;
+      u8* memory;
+      u32 size;
+      u32 allocated;
+   };
 
+   inline std::ostream& operator<<(std::ostream& stream, StackAllocator& a)
+   {
+      stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
+      stream << "   Total memory: " << byteSizes(a.size) << logLine;
+      stream << "   Currently using: " << byteSizes(a.allocated);
+      return stream;
+   }
+
+   inline u8* allocate(StackAllocator& a, u32 size, u32 align)
+   {
+      u8* memory = a.memory + a.allocated;
+      u32 alignBytes = (u32)memory % align;
+      u32 totalSize = size + alignBytes;
+      if( a.allocated + totalSize <= a.size )
+      {
+         memory += alignBytes;
+         a.allocated += totalSize;
+         return memory;
+      }
+      return nullptr;
+   }
+
+   template<typename T>
+   inline T* allocate(StackAllocator& a, u32 count = 1)
+   {
+      u8* result = allocate(a, sizeof(T)*count, __alignof(T));
+      return (T*)result;
+   }
+
+   inline void deallocate(StackAllocator& a)
+   {
+      a.allocated = 0;
+   }
 
 
    //not an allocator, but a helper class that operates on some memory, but is not in charge of doing actual allocations
@@ -135,7 +172,7 @@ namespace core
       return (u8*)head;
    }
 
-   inline void release(Freelist& a, void* ptr)
+   inline void deallocate(Freelist& a, void* ptr)
    {
       Freelist* head = (Freelist*)ptr;
       head->next = a.next;

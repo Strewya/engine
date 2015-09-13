@@ -1,59 +1,60 @@
 #pragma once
 /********************************************
-*  contents:   fmod sound resource manager
+*  contents:   vertex shader resource manager
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
-#include "audio/sound.h"
-#include "audio/sound_handle.h"
+#include "graphics/shader/shader_handle.h"
+#include "graphics/shader/vertex/vertex_shader.h"
 #include "utility/memory.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct SoundCache
+   struct VertexShaderCache
    {
       bool init(LinearAllocator& a, u32 maxSlots)
       {
-         CORE_INIT_START(SoundCache);
+         CORE_INIT_START(VertexShaderCache);
 
          m_count = 0;
          m_maxSlots = maxSlots;
-         m_buffer = allocate<Sound>(a, maxSlots);
+         m_buffer = allocate<VertexShader>(a, maxSlots);
          m_freelist.init(m_buffer, maxSlots);
 
          CORE_INIT_END;
       }
 
-      HSound insert(Sound s)
+      HVertexShader insert(VertexShader vs)
       {
-         HSound result{};
+         HVertexShader result{};
          u8* slot = allocate(m_freelist);
          if( slot )
          {
-            Sound* soundSlot = (Sound*)slot;
-            *soundSlot = s;
-            u16 index = u16(soundSlot - m_buffer);
-            result.init(index);
+            VertexShader* shaderSlot = (VertexShader*)slot;
+            *shaderSlot = vs;
+            u16 index = u16(shaderSlot - m_buffer);
             ++m_count;
+            result.init(index);
          }
          return result;
       }
 
-      Sound remove(HSound handle)
+      VertexShader remove(HVertexShader handle)
       {
-         Sound s = m_buffer[handle.getIndex()];
-         deallocate(m_freelist, &m_buffer[handle.getIndex()]);
+         u16 index = handle.getIndex();
+         VertexShader vs = m_buffer[index];
+         deallocate(m_freelist, &m_buffer[index]);
          --m_count;
-         return s;
+         return vs;
       }
 
-      Sound getData(HSound handle)
+      VertexShader getData(HVertexShader handle)
       {
-         Sound result = m_buffer[handle.getIndex()];
+         VertexShader result = m_buffer[handle.getIndex()];
          return result;
       }
 
@@ -63,7 +64,7 @@ namespace core
       }
 
    private:
-      Sound* m_buffer;
+      VertexShader* m_buffer;
       Freelist m_freelist;
       u32 m_maxSlots;
       u32 m_count;

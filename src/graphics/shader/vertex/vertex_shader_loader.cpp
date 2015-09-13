@@ -22,16 +22,7 @@ namespace core
       CORE_INIT_END;
    }
 
-   bool VertexShaderLoader::shutdown()
-   {
-      CORE_SHUTDOWN_START(VertexShaderLoader);
-
-      m_dev = nullptr;
-
-      CORE_SHUTDOWN_END;
-   }
-
-   VertexShader VertexShaderLoader::load(InputLayout layout, const char* buffer, u32 bufferSize) const
+   VertexShader VertexShaderLoader::load(InputLayout layout, u8* buffer, u32 bufferSize) const
    {
       VertexShader result{nullptr, nullptr};
       if( buffer != nullptr && bufferSize > 0 )
@@ -39,17 +30,10 @@ namespace core
          HRESULT hr = m_dev->CreateVertexShader(buffer, bufferSize, nullptr, &result._vertex);
          if( SUCCEEDED(hr) )
          {
-            if( !layout.empty() )
+            hr = m_dev->CreateInputLayout(layout.buffer, layout.size, buffer, bufferSize, &result._inputLayout);
+            if( FAILED(hr) )
             {
-               hr = m_dev->CreateInputLayout(layout.data(), (UINT)layout.size(), buffer, bufferSize, &result._inputLayout);
-               if( FAILED(hr) )
-               {
-                  CORE_LOG("Failed to create input layout for vertex shader");
-               }
-            }
-            else
-            {
-               CORE_LOG("Received empty input layout");
+               CORE_LOG("Failed to create input layout for vertex shader");
             }
          }
          else

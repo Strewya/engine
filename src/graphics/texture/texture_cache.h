@@ -46,7 +46,7 @@ namespace core
       {
          auto index = handle.getIndex();
          Texture t = m_buffer[index];
-         release(m_freelist, &m_buffer[index]);
+         deallocate(m_freelist, &m_buffer[index]);
          --m_count;
          return t;
       }

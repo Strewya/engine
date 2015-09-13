@@ -14,5 +14,5 @@ namespace core
    struct CommunicationBuffer;
    struct LinearAllocator;
 
-   void runGame(LinearAllocator& allocator, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle);
+   void runGame(LinearAllocator& allocator, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight);
 }

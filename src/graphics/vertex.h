@@ -14,6 +14,7 @@
 namespace core
 {
    struct Color;
+   struct StackAllocator;
    
    struct DefaultVertex
    {
@@ -30,7 +31,7 @@ namespace core
       XMFLOAT4 diffuse;
       XMFLOAT2 textureUV;
 
-      core_class_scope InputLayout getDescription();
+      core_class_scope InputLayout getDescription(StackAllocator& a);
    };
 
    struct HealthVertex : public DefaultVertex
@@ -41,6 +42,6 @@ namespace core
 
       XMFLOAT2 health;
 
-      core_class_scope InputLayout getDescription();
+      core_class_scope InputLayout getDescription(StackAllocator& a);
    };
 }

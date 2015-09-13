@@ -53,7 +53,7 @@ namespace core
 
       m_devcon = nullptr;
       m_samplerState = nullptr;
-      
+
       CORE_SHUTDOWN_END;
    }
 
@@ -148,7 +148,7 @@ namespace core
    //*****************************************************************
    void DXRenderer::setShader(ID3D11VertexShader* shader)
    {
-      if( m_vertexShader != shader)
+      if( m_vertexShader != shader )
       {
          m_devcon->VSSetShader(shader, nullptr, 0);
          m_vertexShader = shader;
@@ -160,7 +160,7 @@ namespace core
    //*****************************************************************
    void DXRenderer::setShader(ID3D11PixelShader* shader)
    {
-      if( m_pixelShader != shader)
+      if( m_pixelShader != shader )
       {
          m_devcon->PSSetShader(shader, nullptr, 0);
          m_pixelShader = shader;
@@ -172,13 +172,14 @@ namespace core
    //*****************************************************************
    void DXRenderer::render(Transform transform, Color color, HealthVertexBuffer vertices, IndexBuffer indices)
    {
-      if( vertices.empty() || indices.empty() )
+      if( vertices.size == 0 || indices.size == 0 )
       {
          return;
       }
 
-      for( auto& vx : vertices )
+      for( auto i = 0U; i < vertices.size; ++i )
       {
+         auto& vx = vertices.data[i];
          XMCOLOR fillColor(color.r, color.g, color.b, color.a);
          XMVECTOR fill = XMLoadColor(&fillColor);
          XMVECTOR diffuse = XMLoadFloat4(&vx.diffuse);
@@ -199,17 +200,17 @@ namespace core
 
       D3D11_MAPPED_SUBRESOURCE ms;
 
-      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), (u32)vertices.size());
-      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), (u32)indices.size());
+      auto* vertexBuffer = makeVertexBuffer(m_dev, sizeof(HealthVertex), vertices.size);
+      auto* indexBuffer = makeIndexBuffer(m_dev, sizeof(u32), indices.size);
 
       HRESULT hr = m_devcon->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       CORE_ASSERT_DBGERR(SUCCEEDED(hr), "D3D could not map vertex buffer for writing");
-      memcpy(ms.pData, vertices.data(), vertices.size() * sizeof(HealthVertex));
+      memcpy(ms.pData, vertices.data, vertices.size * sizeof(HealthVertex));
       m_devcon->Unmap(vertexBuffer, 0);
 
       hr = m_devcon->Map(indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms);
       CORE_ASSERT_DBGERR(SUCCEEDED(hr), "D3D could not map index buffer for writing");
-      memcpy(ms.pData, indices.data(), indices.size() * sizeof(u32));
+      memcpy(ms.pData, indices.data, indices.size * sizeof(u32));
       m_devcon->Unmap(indexBuffer, 0);
 
 
@@ -219,7 +220,7 @@ namespace core
       m_devcon->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
       m_devcon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-      m_devcon->DrawIndexed((u32)indices.size(), 0, 0);
+      m_devcon->DrawIndexed(indices.size, 0, 0);
 
       safeRelease(indexBuffer);
       safeRelease(vertexBuffer);
