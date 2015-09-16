@@ -30,7 +30,7 @@ namespace core
       HTexture insert(Texture t)
       {
          HTexture result{};
-         u8* slot = allocate(m_freelist);
+         auto* slot = allocate(m_freelist);
          if( slot )
          {
             Texture* textureSlot = (Texture*)slot;

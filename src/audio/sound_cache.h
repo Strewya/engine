@@ -31,7 +31,7 @@ namespace core
       HSound insert(Sound s)
       {
          HSound result{};
-         u8* slot = allocate(m_freelist);
+         auto* slot = allocate(m_freelist);
          if( slot )
          {
             Sound* soundSlot = (Sound*)slot;

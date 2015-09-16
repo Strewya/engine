@@ -133,8 +133,6 @@ namespace core
          CORE_STATUS_AND(SUCCEEDED(hr));
       }
 
-
-
       CORE_INIT_END;
    }
 

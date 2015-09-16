@@ -37,11 +37,7 @@ namespace core
    {
       Clock logicTimer{};
       Clock renderTimer{};
-      //initialization phase
 
-
-
-      //temporary until i get the lua state up, then for development use the config file, and for release use hardcoded values based on profiling memory usage
 #ifdef DEPLOY
       enum : u32
       {
@@ -53,13 +49,12 @@ namespace core
          //...
       };
 #else
-      //allocate a temporary lua state that reads a config file containing various sizes, such as:
       LinearAllocator luaTemporaryAllocator = mainMemory;
       LuaSystem* luaConfigReader = allocate<LuaSystem>(luaTemporaryAllocator);
       luaConfigReader->init(luaTemporaryAllocator, Megabytes(10));
 
       LuaStack config = luaConfigReader->getStack();
-      bool ok = config.doFile("config.lua");
+      bool ok = config.doFile("memory.lua");
       CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
       CORE_ASSERT_DBGERR(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
 
@@ -73,17 +68,11 @@ namespace core
       ExtractNumber(MaxNumberOfShaderSlots);
 
 #undef ExtractNumber
+
       config.pop();
       luaConfigReader->shutdown();
       memset(mainMemory.memory + mainMemory.allocated, 0, luaTemporaryAllocator.allocated - mainMemory.allocated);
 #endif
-      
-      Memory audioMemory = getMemory(mainMemory, Megabytes(AudioSystemMegabytes));
-      Memory graphicsMemory = getMemory(mainMemory, Megabytes(GraphicsSystemMegabytes));
-      Memory scriptMemory = getMemory(mainMemory, Megabytes(LuaSystemMegabytes));
-
-      Memory textureMemory
-      
 
       AudioSystem* audio = allocate<AudioSystem>(mainMemory);
       audio->init(mainMemory, Megabytes(AudioSystemMegabytes), MaxNumberOfSoundSlots);

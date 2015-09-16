@@ -31,7 +31,7 @@ namespace core
       HPixelShader insert(PixelShader vs)
       {
          HPixelShader result{};
-         u8* slot = allocate(m_freelist);
+         auto* slot = allocate(m_freelist);
          if( slot )
          {
             PixelShader* shaderSlot = (PixelShader*)slot;

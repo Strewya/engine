@@ -31,7 +31,7 @@ namespace core
       HVertexShader insert(VertexShader vs)
       {
          HVertexShader result{};
-         u8* slot = allocate(m_freelist);
+         auto* slot = allocate(m_freelist);
          if( slot )
          {
             VertexShader* shaderSlot = (VertexShader*)slot;
