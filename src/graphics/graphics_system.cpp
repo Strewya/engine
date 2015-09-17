@@ -32,7 +32,16 @@ namespace core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   bool GraphicsSystem::init(LinearAllocator& a, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
+   GraphicsSystem* createGraphicsSystem(MemoryBlock memory)
+   {
+      LinearAllocator a;
+      a.init("Graphics allocator", memory);
+      GraphicsSystem* result = allocate<GraphicsSystem>(a);
+      result->m_staticMemory = a;
+      return result;
+   }
+
+   bool GraphicsSystem::init(u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
    {
       CORE_INIT_START(GraphicsSystem);
 
@@ -60,21 +69,16 @@ namespace core
       CORE_STATUS_AND(initViewport());
       CORE_STATUS_AND(initSamplerState());
 
-      m_stackAllocator.tag = "Graphics scratch memory";
-      m_stackAllocator.size = Megabytes(10);
-      m_stackAllocator.memory = allocate(a, m_stackAllocator.size, 1);
-      m_stackAllocator.allocated = 0;
-
       CORE_STATUS_AND(m_renderer.init(m_dev, m_devcon, m_samplerState));
 
       CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
-      CORE_STATUS_AND(textures.init(a, textureSlots));
+      CORE_STATUS_AND(textures.init(m_staticMemory, textureSlots));
 
       CORE_STATUS_AND(m_vsLoader.init(m_dev));
-      CORE_STATUS_AND(vertexShaders.init(a, shaderSlots));
+      CORE_STATUS_AND(vertexShaders.init(m_staticMemory, shaderSlots));
 
       CORE_STATUS_AND(m_psLoader.init(m_dev));
-      CORE_STATUS_AND(pixelShaders.init(a, shaderSlots));
+      CORE_STATUS_AND(pixelShaders.init(m_staticMemory, shaderSlots));
 
       if( CORE_STATUS_OK )
       {

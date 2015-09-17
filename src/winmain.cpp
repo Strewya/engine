@@ -26,23 +26,32 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
    if( result == core::WindowResult::OK )
    {
 #ifndef DEPLOY
-      LPVOID baseAddress = (LPVOID)Terabytes(1);
+      LPVOID baseAddress = (LPVOID)TeraBytes(1);
 #else
       LPVOID baseAddress = (LPVOID)0;
 #endif
-      core::LinearAllocator mainAllocator{"Entire memory"};
-      mainAllocator.size = Gigabytes(1);
-      mainAllocator.memory = (u8*)VirtualAlloc(baseAddress, (SIZE_T)mainAllocator.size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+      SIZE_T size = GigaBytes(1);
+      LPVOID address = VirtualAlloc(baseAddress, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-      if( mainAllocator.memory )
+      if( address )
       {
-         initializeFileStream(mainAllocator, Kilobytes(128));
+         using core::writeLog;
+         core::LargeLinearAllocator mainAllocator;
+         mainAllocator.init("Entire memory allocator", address, size);
 
-         core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
-         toGame->init(mainAllocator, 1024);
+         auto logMemory = allocateBlock(mainAllocator, KiloBytes(128));
+         initializeFileStream(logMemory);
 
-         core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(mainAllocator);
-         fromGame->init(mainAllocator, 1024);
+         core::LinearAllocator communicationAllocator;
+         communicationAllocator.init("Communication allocator", allocateBlock(mainAllocator, MegaBytes(1)));
+
+         core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(communicationAllocator);
+         toGame->init(communicationAllocator, 2048);
+
+         core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(communicationAllocator);
+         fromGame->init(communicationAllocator, 128);
+
+         CORE_LOG(communicationAllocator);
 
          std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
 
@@ -61,7 +70,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          logicThread.join();
          result = window.getExitCode();
-         using core::writeLog;
          CORE_LOG_DEBUG(mainAllocator);
       }
       else

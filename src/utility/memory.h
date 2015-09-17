@@ -12,25 +12,28 @@
 /******* end header inclusion *******/
 
 #define Bytes(n) (n)
-#define Kilobytes(n) (Bytes(n)*1024ULL)
-#define Megabytes(n) (Kilobytes(n)*1024ULL)
-#define Gigabytes(n) (Megabytes(n)*1024ULL)
-#define Terabytes(n) (Gigabytes(n)*1024ULL)
+#define KiloBytes(n) (Bytes(n)*1024ULL)
+#define MegaBytes(n) (KiloBytes(n)*1024ULL)
+#define GigaBytes(n) (MegaBytes(n)*1024ULL)
+#define TeraBytes(n) (GigaBytes(n)*1024ULL)
 
 namespace core
 {
+   /************************************************************************/
+   /* Utility stream operations                                            */
+   /************************************************************************/
    struct byteSizes
    {
-      u32 m_B;
+      u64 m_B;
 
-      byteSizes(u32 B) : m_B(B) {}
+      byteSizes(u64 B) : m_B(B) {}
    };
    inline std::ostream& operator<<(std::ostream& stream, byteSizes bs)
    {
-      u32 B = bs.m_B;
+      u64 B = bs.m_B;
       f32 kB = B / 1024.0f;
       f32 MB = kB / 1024;
-      stream << B << " B / " << std::fixed << kB << " kB / " << MB << " MB";
+      stream << B << " B / " << std::fixed << kB << " kB / " << MB << " MB" << std::defaultfloat;
       return stream;
    }
 
@@ -59,7 +62,7 @@ namespace core
       return stream;
    }
 
-   inline void outputAllocatorData(std::ostream& stream, const char* tag, u32 totalSize, u32 allocated, u32 peakAllocation)
+   inline void outputAllocatorData(std::ostream& stream, const char* tag, u64 totalSize, u64 allocated, u64 peakAllocation)
    {
       stream << "Memory usage for allocator '" << tag << "':" << logLine;
       stream << "   Total memory: " << byteSizes(totalSize) << logLine;
@@ -67,219 +70,371 @@ namespace core
       stream << "   Peak usage: " << byteSizes(peakAllocation) << logLine;
    }
 
+   /************************************************************************/
+   /* Base memory allocator done on program start                          */
+   /************************************************************************/
+   struct LargeLinearAllocator
+   {
+      const char* m_tag;
+      u8* m_memory;
+      u64 m_size;
+      u64 m_allocated;
+      u64 m_maxAllocated;
+
+      void init(const char* tag, void* memory, u64 size)
+      {
+         CORE_ASSERT_DBGERR(m_memory == nullptr, "Attempting to initialize a large allocator that has already been initialized.");
+         m_tag = tag;
+         m_memory = (u8*)memory;
+         m_size = size;
+      }
+   };
+
+   inline std::ostream& operator<<(std::ostream& stream, LargeLinearAllocator& lla)
+   {
+      outputAllocatorData(stream, lla.m_tag, lla.m_size, lla.m_allocated, lla.m_maxAllocated);
+      return stream;
+   }
+
+   struct MemoryBlock
+   {
+      u8* address;
+      u32 size;
+   };
+
+   inline MemoryBlock allocateBlock(LargeLinearAllocator& a, u32 size)
+   {
+      MemoryBlock result{};
+      auto* address = a.m_memory + a.m_allocated;
+      if( a.m_allocated + size <= a.m_size )
+      {
+         result.address = address;
+         result.size = size;
+         a.m_allocated += size;
+         a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
+      }
+      return result;
+   }
+   inline MemoryBlock allocateBlock(LargeLinearAllocator& a)
+   {
+      MemoryBlock result{};
+      if( a.m_allocated != a.m_size )
+      {
+         result.size = a.m_size - a.m_allocated;
+         result.address = a.m_memory + a.m_allocated;
+         a.m_maxAllocated = a.m_allocated = a.m_size;
+      }
+      return result;
+   }
+
 
    // Fixed memory manager. Only allocations are supported, frees are not.
    struct LinearAllocator
    {
-      const char* tag;
-      u8* memory;
-      u32 size;
-      u32 allocated;
-      u32 maxAllocated;
+      const char* m_tag;
+      MemoryBlock m_memory;
+      u32 m_allocated;
+      u32 m_maxAllocated;
+
+      void init(const char* tag, MemoryBlock memory)
+      {
+         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching allocator memory that has already allocated memory!");
+         m_tag = tag;
+         m_memory = memory;
+      }
    };
-
-   template<typename T>
-   inline LinearAllocator spawnLinearAllocator(const char* tag, T& parent, u32 size)
-   {
-      LinearAllocator result{};
-      result.tag = tag;
-      result.memory = allocate(parent, size, 4);
-      result.size = size;
-      result.allocated = result.maxAllocated = 0;
-      return result;
-   }
-
    inline std::ostream& operator<<(std::ostream& stream, LinearAllocator& a)
    {
-      outputAllocatorData(stream, a.tag, a.size, a.allocated, a.maxAllocated);
+      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
       return stream;
    }
 
-   inline u8* allocate(LinearAllocator& a, u32 size, u32 align)
+   inline void* allocate(LinearAllocator& a, u32 size, u32 align)
    {
-      u8* result = a.memory + a.allocated;
+      u8* result = a.m_memory.address + a.m_allocated;
       align = align - (u32)result % align;
       size += align;
-      if( a.allocated + size <= a.size )
+      if( a.m_allocated + size <= a.m_memory.size )
       {
          result += align;
-         a.allocated += size;
+         a.m_allocated += size;
+         a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
          return result;
       }
       return nullptr;
    }
-
    template<typename T>
    inline T* allocate(LinearAllocator& a, u32 count = 1)
    {
       u8* result = allocate(a, sizeof(T)*count, __alignof(T));
       return (T*)result;
    }
+   inline MemoryBlock allocateBlock(LinearAllocator& a, u32 size)
+   {
+      MemoryBlock result{};
+      result.address = (u8*)allocate(a, size, 1);
+      result.size = size;
+      return result;
+   }
+   inline MemoryBlock allocateBlock(LinearAllocator& a)
+   {
+      MemoryBlock result{};
+      if( a.m_allocated != a.m_memory.size )
+      {
+         result.size = a.m_memory.size - a.m_allocated;
+         result.address = a.m_memory.address + a.m_allocated;
+         a.m_maxAllocated = a.m_allocated = a.m_memory.size;
+      }
+      return result;
+   }
 
 
    struct StackAllocator
    {
-      const char* tag;
-      u8* memory;
-      u32 size;
-      u32 allocated;
-      u32 maxAllocated;
-   };
-   
-   template<typename T>
-   inline StackAllocator spawnStackAllocator(const char* tag, T& parent, u32 size)
-   {
-      StackAllocator result{};
-      result.memory = allocate(parent, size, 4);
-      result.size = size;
-      result.tag = tag;
-      result.allocated = result.maxAllocated = 0;
-      return result;
-   }
+      const char* m_tag;
+      MemoryBlock m_memory;
+      u32 m_allocated;
+      u32 m_maxAllocated;
 
+      void init(const char* tag, MemoryBlock memory)
+      {
+         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching allocator memory that has some memory allocated!");
+         m_tag = tag;
+         m_memory = memory;
+      }
+   };
    inline std::ostream& operator<<(std::ostream& stream, StackAllocator& a)
    {
-      outputAllocatorData(stream, a.tag, a.size, a.allocated, a.maxAllocated);
+      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
       return stream;
    }
 
-   inline u8* allocate(StackAllocator& a, u32 size, u32 align)
+   inline void* allocate(StackAllocator& a, u32 size, u32 align)
    {
-      u8* result = a.memory + a.allocated;
+      u8* result = a.m_memory.address + a.m_allocated;
       if( (u32)result % align != 0 )
       {
          align = align - (u32)result % align;
       }
       size += align;
-      if( a.allocated + size <= a.size )
+      if( a.m_allocated + size <= a.m_memory.size )
       {
          result += align;
-         a.allocated += size;
+         a.m_allocated += size;
          *(result - 1) = (u8)align;
          return result;
       }
       return nullptr;
    }
-
    template<typename T>
    inline T* allocate(StackAllocator& a, u32 count = 1)
    {
       u8* result = allocate(a, sizeof(T)*count, __alignof(T));
       return (T*)result;
    }
-
    inline void deallocate(StackAllocator& a)
    {
-      a.allocated = 0;
+      a.m_allocated = 0;
    }
-
    inline void deallocate(StackAllocator& a, void* ptr)
    {
-      CORE_ASSERT_DBGERR(a.memory <= ptr && ptr < a.memory + a.size, "Attempting to free a pointer not owned by allocator ", a.tag);
-      CORE_ASSERT_DBGERR(a.memory <= ptr && ptr < a.memory + a.allocated, "Attempting to free an already free pointer in ", a.tag);
-      
+      CORE_ASSERT_DBGERR(a.m_memory.address <= ptr && ptr < a.m_memory.address + a.m_memory.size, "Attempting to free a pointer not owned by allocator ", a.m_tag);
+      CORE_ASSERT_DBGERR(a.m_memory.address <= ptr && ptr < a.m_memory.address + a.m_allocated, "Attempting to free an already free pointer in ", a.m_tag);
+
       u32 alignment = *((u8*)ptr - 1);
-      u32 size = (u32)(((u8*)a.memory + a.allocated) - (u8*)ptr);
+      u32 size = (u32)(((u8*)a.m_memory.address + a.m_allocated) - (u8*)ptr);
       size += alignment;
-      a.allocated -= size;
+      a.m_allocated -= size;
+   }
+   inline MemoryBlock allocateBlock(StackAllocator& a, u32 size)
+   {
+      MemoryBlock result{};
+      result.address = (u8*)allocate(a, size, 1);
+      result.size = size;
+      return result;
+   }
+   inline MemoryBlock allocateBlock(StackAllocator& a)
+   {
+      MemoryBlock result{};
+      if( a.m_allocated != a.m_memory.size )
+      {
+         result.size = a.m_memory.size - a.m_allocated;
+         result.address = a.m_memory.address + a.m_allocated;
+         a.m_maxAllocated = a.m_allocated = a.m_memory.size;
+      }
+      return result;
+   }
+   void deallocateBlock(StackAllocator& a, MemoryBlock memory)
+   {
+      CORE_ASSERT_DBGERR(a.m_memory.address <= memory.address && memory.address < a.m_memory.address + a.m_memory.size, "Attempting to free a pointer not owned by allocator ", a.m_tag);
+      CORE_ASSERT_DBGERR(a.m_memory.address <= memory.address && memory.address < a.m_memory.address + a.m_allocated, "Attempting to free an already free pointer in ", a.m_tag);
+
+      a.m_allocated -= memory.size;
    }
 
 
-   //not an allocator, but a helper class that operates on some memory, but is not in charge of doing actual allocations
-   struct Freelist
+
+   struct FixedSizeFreelistAllocator
    {
-      Freelist* next;
+      struct Node
+      {
+         Node* next;
+      };
+
+      const char* m_tag;
+      MemoryBlock m_memory;
+      u32 m_allocated;
+      u32 m_maxAllocated;
+      Node m_head;
 
       template<typename T>
-      void init(T* start, u32 slots)
+      void init(const char* tag, MemoryBlock memory, u32 slots)
       {
-         static_assert(sizeof(T) >= sizeof(Freelist), "Using the freelist for a type too small.");
+         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching freelist memory while some of it is in use!");
+         m_tag = tag;
+         m_memory = memory;
 
-         Freelist* runner = this;
+         static_assert(sizeof(T) >= sizeof(Node), "Cannot use plain freelist for type too small");
+         CORE_ASSERT_DBGERR(m_memory.address != nullptr, "Cannot setup freelist ", m_tag, " without it being initialized!");
+
+         T* start = (T*)m_memory.address;
+         CORE_ASSERT_DBGERR(m_memory.address + m_memory.size < (start + slots), "Trying to use too much slots for available memory in freelist ", m_tag);
+
+         Node* runner = &m_head;
          for( u32 i = 0; i < slots; ++i )
          {
-            runner->next = (Freelist*)&start[i];
+            runner->next = (Node*)(start + i);
             runner = runner->next;
          }
          runner->next = nullptr;
       }
    };
-
-   inline void* allocate(Freelist& a)
+   inline std::ostream& operator<<(std::ostream& stream, FixedSizeFreelistAllocator& a)
    {
-      if( a.next == nullptr )
+      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
+      return stream;
+   }
+
+   inline void* allocate(FixedSizeFreelistAllocator& a)
+   {
+      if( a.m_head.next == nullptr )
       {
          return nullptr;
       }
       union
       {
-         Freelist* head;
+         FixedSizeFreelistAllocator::Node* head;
          void* result;
       };
-      head = a.next;
-      a.next = head->next;
+      head = a.m_head.next;
+      a.m_head.next = head->next;
       return result;
    }
-
-   inline void deallocate(Freelist& a, void* ptr)
+   inline void deallocate(FixedSizeFreelistAllocator& a, void* ptr)
    {
       union
       {
-         Freelist* head;
+         FixedSizeFreelistAllocator::Node* head;
          void* address;
       };
       address = ptr;
-      head->next = a.next;
-      a.next = head;
+      head->next = a.m_head.next;
+      a.m_head.next = head;
    }
 
-   struct IndexedFreelist
-   {
-      u8* memory;
-      u32 objectSize;
-      u32 arraySize;
-      u32 next;
 
-      template<typename T>
-      void init(T* start, u32 slots)
+
+   struct ChunkFreelistAllocator
+   {
+      struct Node
       {
-         static_assert(sizeof(T) >= sizeof(u32), "Using the indexed freelist for a type too small.");
-         memory = (u8*)start;
-         objectSize = sizeof(T);
-         arraySize = slots;
-         u32* runner = &next;
-         for( auto i = 0; i <= slots; ++i )
+         u64 size;
+         union
          {
-            *runner = i;
-            runner = (u32*)(start + i);
-         }
+            void* address;
+            u8* byte;
+            Node* next;
+         };
+      };
+
+      const char* m_tag;
+      MemoryBlock m_memory;
+      void* m_topFreeMemoryAddress;
+      Node m_head;
+      u32 m_allocated;
+      u32 m_maxAllocated;
+      u32 m_alignment;
+
+      void init(const char* tag, MemoryBlock memory, u32 alignment)
+      {
+         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching memory while some is already in use!");
+         CORE_ASSERT_DBGERR((u32(memory.address) % alignment) == 0, "Received memory is not 16 byte aligned");
+         m_tag = tag;
+         m_memory = memory;
+         m_topFreeMemoryAddress = memory.address;
+         m_head.address = memory.address;
+         m_head.size = memory.size;
+         m_head.next->address = nullptr;
+         m_head.next->size = 0;
+         m_allocated = m_maxAllocated = 0;
+         m_alignment = alignment >= __alignof(Node) ? alignment : __alignof(Node);
       }
    };
-
-   inline void* allocate(IndexedFreelist& a)
+   inline std::ostream& operator<<(std::ostream& stream, ChunkFreelistAllocator& a)
    {
-      if( a.next == a.arraySize )
-      {
-         return nullptr;
-      }
-      void* result = a.memory + a.next*a.objectSize;
-      a.next = *((u32*)result);
-      memset(result, 0, a.objectSize);
-      return result;
+      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
+      stream << "   Memory requirement: " << memoryRequirement(a.m_memory.address, a.m_topFreeMemoryAddress) << logLine;
+      return stream;
    }
 
-   inline void deallocate(IndexedFreelist& a, void* ptr)
+   void* allocate(ChunkFreelistAllocator& a, u32 size)
    {
-      CORE_ASSERT_DBGERR(a.memory <= ptr && ptr <= (a.memory + a.objectSize*a.arraySize), "Attempting to free a pointer not belonging to indexed freelist");
-      union
+      u32 sizeExpansionForFreelistPurposes = (a.m_alignment - (size % a.m_alignment));
+      sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & (a.m_alignment - 1);
+
+      size += sizeExpansionForFreelistPurposes;
+      CORE_ASSERT_DBGERR((size % a.m_alignment) == 0, "The requested size should always be a multiple of ", a.m_alignment, " after expansion.");
+      CORE_ASSERT_DBGERR(size >= sizeof(ChunkFreelistAllocator::Node), "The requested size should be at least ", sizeof(ChunkFreelistAllocator::Node), " bytes after expansion.");
+
+      ChunkFreelistAllocator::Node* currentNode = &a.m_head;
+      while( currentNode->address && currentNode->size < size )
       {
-         u32* asNode;
-         void* address;
-         u8* asMemory;
-      };
-      address = ptr;
-      *asNode = a.next;
-      a.next = ((u32)(asMemory - a.memory)) / a.objectSize;
-      CORE_ASSERT_DBGERR((a.memory + a.next*a.objectSize) == asMemory, "Invalid pointer passed to indexed freelist");
+         currentNode = currentNode->next;
+      }
+
+      if( currentNode->address == nullptr )
+      {
+         //case where we traversed the entire freelist and found no slot big enough for the requested size
+         return nullptr;
+      }
+
+      //case where we found a slot big enough for the requested size
+      u8* result = currentNode->byte;
+      CORE_ASSERT_DBGERR(((u32)result % a.m_alignment) == 0, "The returned address should always be aligned to ", a.m_alignment, " bytes.");
+
+      currentNode->size -= size;
+      if( currentNode->size )
+      {
+         //case where there is more room in the slot after the requested size is removed
+         ChunkFreelistAllocator::Node* unmoved = currentNode->next;
+         currentNode->byte += size;
+         currentNode->next->address = unmoved->address;
+         currentNode->next->size = unmoved->size;
+         if( currentNode->next->address == nullptr && currentNode->address > a.m_topFreeMemoryAddress )
+         {
+            a.m_topFreeMemoryAddress = currentNode->address;
+         }
+      }
+      else
+      {
+         //case where the slot is exhausted by the requested size
+         currentNode->size = currentNode->next->size;
+         currentNode->address = currentNode->next->address;
+      }
+      a.m_allocated += size;
+      a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
+      memset(result, 0, size);
+
+      return result;
    }
 }

@@ -35,7 +35,7 @@ namespace core
    struct GraphicsSystem
    {
    public:
-      bool init(LinearAllocator& a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
+      bool init(u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
       bool shutdown();
 
       void begin();
@@ -75,7 +75,8 @@ namespace core
       bool initSamplerState();
       bool initDepthBuffer();
 
-      StackAllocator m_stackAllocator;
+      LinearAllocator m_staticMemory;
+      FixedSizeFreelistAllocator m_dynamicMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
       PixelShaderLoader m_psLoader;
@@ -107,7 +108,11 @@ namespace core
       ID3D11BlendState* m_transparency;
       ID3D11RasterizerState* m_cullingEnabled;
       ID3D11RasterizerState* m_cullingDisabled;
+
+      friend GraphicsSystem* createGraphicsSystem(MemoryBlock memory);
    };
+
+   GraphicsSystem* createGraphicsSystem(MemoryBlock memory);
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)
    {

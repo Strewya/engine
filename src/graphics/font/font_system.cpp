@@ -37,7 +37,7 @@ namespace core
       m_textures = &textures;
       m_allocator.tag = "Font system allocator";
       m_allocator.allocated = 0;
-      m_allocator.size = Megabytes(10);
+      m_allocator.size = MegaBytes(10);
       m_allocator.memory = allocate(a, m_allocator.size, 1);
 
       CORE_STATUS_AND(m_allocator.memory != nullptr);

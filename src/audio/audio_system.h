@@ -20,7 +20,7 @@ namespace core
    struct AudioSystem
    {
    public:
-      bool init(LinearAllocator& allocator, u32 audioMemory, u32 maxSoundSlots);
+      bool init(u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
       bool shutdown();
       bool update();
 
@@ -35,10 +35,14 @@ namespace core
       SoundCache sounds;
 
    private:
-      LinearAllocator m_allocator;
+      LinearAllocator m_staticMemory;
       SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;
       HSound m_musicPlaying;
+
+      friend AudioSystem* createAudioSystem(MemoryBlock memory);
    };
+
+   AudioSystem* createAudioSystem(MemoryBlock memory);
 }

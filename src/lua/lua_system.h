@@ -44,12 +44,11 @@ namespace core
     */
    struct LuaAllocator
    {
-      const char* tag;
-      u8* memory;
-      u32 size;
-      u32 allocated;
-      u32 maxAllocated;
-      u8* topFreeMemoryAddress;
+      const char* m_tag;
+      MemoryBlock m_memory;
+      u32 m_allocated;
+      u32 m_maxAllocated;
+      u8* m_topFreeMemoryAddress;
       struct Freelist
       {
          u32 size;
@@ -58,34 +57,32 @@ namespace core
             u8* address;
             Freelist* nextFreelist;
          };
-      } freelistHead;
+      } m_freelistHead;
 
-      void init(u8* start, u32 sz)
+      void init(const char* tag, MemoryBlock memory)
       {
-         allocated = 0;
-         memory = start;
-         size = sz;
-         freelistHead.address = start;
-         freelistHead.size = sz;
-         freelistHead.nextFreelist->address = nullptr;
-         freelistHead.nextFreelist->size = 0;
+         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching memory while some is already in use!");
+         CORE_ASSERT_DBGERR((u32(memory.address) & 0xf) == 0, "Received memory is not 16 byte aligned");
+         m_tag = tag;
+         m_memory = memory;
+         m_freelistHead.address = memory.address;
+         m_freelistHead.size = memory.size;
+         m_freelistHead.nextFreelist->address = nullptr;
+         m_freelistHead.nextFreelist->size = 0;
       }
    };
 
    inline std::ostream& operator<<(std::ostream& stream, LuaAllocator& a)
    {
-      stream << "Memory usage for allocator '" << a.tag << "':" << logLine;
-      stream << "   Total memory: " << byteSizes(a.size) << logLine;
-      stream << "   Currently using: " << byteSizes(a.allocated) << logLine;
-      stream << "   Max used: " << byteSizes(a.maxAllocated) << logLine;
-      stream << "   Memory requirement: " << memoryRequirement(a.memory, a.topFreeMemoryAddress);
+      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
+      stream << "   Memory requirement: " << memoryRequirement(a.m_memory.address, a.m_topFreeMemoryAddress) << logLine;
       return stream;
    }
 
    struct LuaSystem
    {
    public:
-      bool init(LinearAllocator& a, u32 memorySize);
+      bool init();
       bool shutdown();
       void collectGarbage();
 
@@ -93,8 +90,13 @@ namespace core
 
    private:
       lua_State* m_L;
-      LuaAllocator m_allocator;
+      LinearAllocator m_staticMemory;
+      LuaAllocator m_luaMemory;
+
+      friend LuaSystem* createScriptSystem(MemoryBlock memory);
    };
+
+   LuaSystem* createScriptSystem(MemoryBlock memory);
 
    void test_luaStack();
 }

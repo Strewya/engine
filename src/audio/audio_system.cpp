@@ -11,27 +11,33 @@
 
 namespace core
 {
-   bool AudioSystem::init(LinearAllocator& a, u32 fmodMemorySize, u32 maxSoundSlots)
+   AudioSystem* createAudioSystem(MemoryBlock memory)
+   {
+      LinearAllocator a;
+      a.init("Audio allocator", memory);
+      AudioSystem* result = allocate<AudioSystem>(a);
+      result->m_staticMemory = a;
+   }
+
+   bool AudioSystem::init(u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
    {
       CORE_INIT_START(AudioSystem);
 
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
-      m_allocator.size = Megabytes(100);
-      m_allocator.tag = "Audio allocator";
-      m_allocator.allocated = 0;
-      m_allocator.memory = allocate(a, m_allocator.size, 1);
-
-      u8* fmodMemory = allocate(m_allocator, fmodMemorySize, 1);
-
+      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
       CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size is not a multiple of 512!");
+
+      void* fmodMemory = allocate(m_staticMemory, fmodMemorySize, 1);
+      CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
+
       CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);
       CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
-      CORE_STATUS_AND(m_system->init(32, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
+      CORE_STATUS_AND(m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
 
       CORE_STATUS_AND(m_fileLoader.init(m_system));
-      CORE_STATUS_AND(sounds.init(m_allocator, maxSoundSlots));
+      CORE_STATUS_AND(sounds.init(m_staticMemory, maxSoundSlots));
 
       CORE_INIT_END;
    }
@@ -53,7 +59,7 @@ namespace core
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
       
-      CORE_LOG_DEBUG(m_allocator, "\n\tFMOD system max allocation: ", byteSizes(maxAlloc));
+      CORE_LOG_DEBUG(m_staticMemory, logLine, "   FMOD system max allocation: ", byteSizes(maxAlloc));
       CORE_SHUTDOWN_END;
    }
 

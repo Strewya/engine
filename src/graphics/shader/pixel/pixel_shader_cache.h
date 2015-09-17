@@ -65,7 +65,7 @@ namespace core
 
    private:
       PixelShader* m_buffer;
-      Freelist m_freelist;
+      FixedSizeFreelistAllocator m_freelist;
       u32 m_maxSlots;
       u32 m_count;
    };
