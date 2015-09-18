@@ -16,14 +16,19 @@ namespace core
 {
    struct SoundCache
    {
+   private:
+      Sound* m_buffer;
+      u32 m_maxSlots;
+      u32 m_usedSlots;
+
+   public:
       bool init(LinearAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(SoundCache);
 
-         m_count = 0;
-         m_maxSlots = maxSlots;
          m_buffer = allocate<Sound>(a, maxSlots);
-         m_freelist.init(m_buffer, maxSlots);
+         m_maxSlots = maxSlots;
+         m_usedSlots = 0;
 
          CORE_INIT_END;
       }
@@ -31,24 +36,27 @@ namespace core
       HSound insert(Sound s)
       {
          HSound result{};
-         auto* slot = allocate(m_freelist);
-         if( slot )
+
+         // #todo maybe some day when this becomes a long loop change to a pool based freelist finder or something.
+         for( u16 i = 0; i < m_maxSlots; ++i )
          {
-            Sound* soundSlot = (Sound*)slot;
-            *soundSlot = s;
-            u16 index = u16(soundSlot - m_buffer);
-            result.init(index);
-            ++m_count;
+            if( m_buffer[i].unloaded() )
+            {
+               m_buffer[i] = s;
+               result.init(i);
+               ++m_usedSlots;
+            }
          }
+
          return result;
       }
 
       Sound remove(HSound handle)
       {
-         Sound s = m_buffer[handle.getIndex()];
-         deallocate(m_freelist, &m_buffer[handle.getIndex()]);
-         --m_count;
-         return s;
+         Sound result = m_buffer[handle.getIndex()];
+         m_buffer[handle.getIndex()] = {};
+         --m_usedSlots;
+         return result;
       }
 
       Sound getData(HSound handle)
@@ -59,13 +67,8 @@ namespace core
 
       u32 getCount() const
       {
-         return m_count;
+         return m_usedSlots;
       }
 
-   private:
-      Sound* m_buffer;
-      FixedSizeFreelistAllocator m_freelist;
-      u32 m_maxSlots;
-      u32 m_count;
    };
 }

@@ -38,8 +38,8 @@ namespace core
       Clock logicTimer{};
       Clock renderTimer{};
 
-      StackAllocator scratchAllocator;
-      scratchAllocator.init("Scratch allocator", allocateBlock(mainMemory, MegaBytes(5)));
+      StackAllocator reusableMemory;
+      reusableMemory.init("Reusable memory", allocateBlock(mainMemory, MegaBytes(10)));
 
 #ifdef DEPLOY
       enum : u32
@@ -52,8 +52,8 @@ namespace core
          //...
       };
 #else
+      auto configMemory = allocateBlock(reusableMemory, MegaBytes(1));
 
-      auto configMemory = allocateBlock(scratchAllocator, MegaBytes(1));
       LuaSystem* luaConfigReader = createScriptSystem(configMemory);
       luaConfigReader->init();
 
@@ -71,19 +71,21 @@ namespace core
       ExtractNumber(FmodMemoryMegabytes);
       ExtractNumber(FmodMaxChannels);
       ExtractNumber(MaxNumberOfSoundSlots);
-      
+
       ExtractNumber(MaxNumberOfTextureSlots);
       ExtractNumber(MaxNumberOfShaderSlots);
-      
+
       ExtractNumber(GameMemoryMegabytes);
 
 #undef ExtractNumber
 
       config.pop();
       luaConfigReader->shutdown();
-      deallocate(scratchAllocator, luaConfigReader);
+
+      deallocateBlock(reusableMemory, configMemory);
 #endif
 
+      //memory blocks for each of the bigger subsystems
       auto audioMemory = allocateBlock(mainMemory, MegaBytes(AudioSystemMegabytes));
       auto graphicsMemory = allocateBlock(mainMemory, MegaBytes(GraphicsSystemMegabytes));
       auto scriptMemory = allocateBlock(mainMemory, MegaBytes(ScriptSystemMegabytes));

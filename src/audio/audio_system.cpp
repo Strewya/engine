@@ -27,7 +27,7 @@ namespace core
       m_musicPlaying = HSound{};
 
       u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
-      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size is not a multiple of 512!");
+      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
       void* fmodMemory = allocate(m_staticMemory, fmodMemorySize, 1);
       CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
@@ -42,7 +42,7 @@ namespace core
       CORE_INIT_END;
    }
 
-   // #todo the big question is do i need to do this anyway? the memory is going away anyway... probably need to shut down fmod...
+   // #todo the big question is do i need to do this anyway? the memory is going away anyway... probably just need to shut down fmod...
    bool AudioSystem::shutdown()
    {
       CORE_SHUTDOWN_START(AudioSystem);

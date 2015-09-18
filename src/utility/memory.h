@@ -274,7 +274,7 @@ namespace core
 
 
 
-   struct FixedSizeFreelistAllocator
+   struct PoolAllocator
    {
       struct Node
       {
@@ -309,13 +309,13 @@ namespace core
          runner->next = nullptr;
       }
    };
-   inline std::ostream& operator<<(std::ostream& stream, FixedSizeFreelistAllocator& a)
+   inline std::ostream& operator<<(std::ostream& stream, PoolAllocator& a)
    {
       outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
       return stream;
    }
 
-   inline void* allocate(FixedSizeFreelistAllocator& a)
+   inline void* allocate(PoolAllocator& a)
    {
       if( a.m_head.next == nullptr )
       {
@@ -323,18 +323,18 @@ namespace core
       }
       union
       {
-         FixedSizeFreelistAllocator::Node* head;
+         PoolAllocator::Node* head;
          void* result;
       };
       head = a.m_head.next;
       a.m_head.next = head->next;
       return result;
    }
-   inline void deallocate(FixedSizeFreelistAllocator& a, void* ptr)
+   inline void deallocate(PoolAllocator& a, void* ptr)
    {
       union
       {
-         FixedSizeFreelistAllocator::Node* head;
+         PoolAllocator::Node* head;
          void* address;
       };
       address = ptr;
@@ -342,9 +342,37 @@ namespace core
       a.m_head.next = head;
    }
 
-
-
-   struct ChunkFreelistAllocator
+   /*
+    *       TEXT COPIED DIRECTLY FROM BEING A LUA ALLOCATOR, REFERENCES TO LUA ARE NOW JUST GENERAL
+    *
+    *    This is the lua allocator object. It is in charge of memory allocation, reallocation and deallocation for the Lua VM.
+    *    It is initialized by receiving a memory block within which to work in.
+    *    Every time Lua allocates a memory chunk, it calls a function provided to it in the LuaSystem::init() function.
+    *    This function will call allocate/reallocate/deallocate on the LuaAllocator object.
+    *    The allocations are all in chunks of multiples of ALIGNMENT, which currently, for a 64bit build is 16 bytes.
+    *    LuaAllocator uses a freelist implementation. The allocator itself contains the head of the freelist, which contains
+    *    the memory address of some free memory and its size. That memory address in turn also contains the next free memory address and its size,
+    *    recursively until the rest of the free memory is found, which contains nullptr and 0 to indicate there is no more memory.
+    *
+    *    head          | 0x100         | 0x150         | 0x200
+    *    size: 16      | size: 48      | size: 100000  | size: 0
+    *    memory: 0x100 | memory: 0x150 | memory: 0x200 | memory: 0
+    *
+    *    All allocations happen in multiple of 16 chunks. Any requested allocation size is increased to the first next multiple of 16.
+    *    Then, the freelist is traversed from the head in search of a chunk big enough for the requested increased size.
+    *    When a chunk big enough is found, it is removed from teh freelist by pointing the currentFreelist node to point to the one after the chunk being allocated.
+    *    Deallocation is done in a similar fashion, the freelist is traversed to find the first free chunk after the memory being freed.
+    *    The freelist nodes around that memory are updated so the currently freed memory is a new node occuring in between them.
+    *    An additional step is done which checks the newly created chunk if it can be merged with any other free chunk directly surrounding it.
+    *    Reallocation simply uses the allocation and deallocation methods to do it's work. If reallocation is done from a bigger memory size to a smaller one,
+    *    the same pointer is returned, and if the difference between the old size and new size is >= 16, then the extra memory is freed.
+    *    If reallocation si done from a smaller to a bigger memory size, then a new chunk is allocated to suit the bigger size, a memcpy is performed,
+    *    and the old memory is freed.
+    *    #todo An improvement can be made to the reallocation method, so reallocs from a smaller to a bigger memory size is first checked if it can be
+    *    expanded in place.
+    *
+    */
+   struct HeapAllocator
    {
       struct Node
       {
@@ -380,23 +408,23 @@ namespace core
          m_alignment = alignment >= __alignof(Node) ? alignment : __alignof(Node);
       }
    };
-   inline std::ostream& operator<<(std::ostream& stream, ChunkFreelistAllocator& a)
+   inline std::ostream& operator<<(std::ostream& stream, HeapAllocator& a)
    {
       outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
       stream << "   Memory requirement: " << memoryRequirement(a.m_memory.address, a.m_topFreeMemoryAddress) << logLine;
       return stream;
    }
 
-   void* allocate(ChunkFreelistAllocator& a, u32 size)
+   void* allocate(HeapAllocator& a, u32 size)
    {
       u32 sizeExpansionForFreelistPurposes = (a.m_alignment - (size % a.m_alignment));
       sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & (a.m_alignment - 1);
 
       size += sizeExpansionForFreelistPurposes;
       CORE_ASSERT_DBGERR((size % a.m_alignment) == 0, "The requested size should always be a multiple of ", a.m_alignment, " after expansion.");
-      CORE_ASSERT_DBGERR(size >= sizeof(ChunkFreelistAllocator::Node), "The requested size should be at least ", sizeof(ChunkFreelistAllocator::Node), " bytes after expansion.");
+      CORE_ASSERT_DBGERR(size >= sizeof(HeapAllocator::Node), "The requested size should be at least ", sizeof(HeapAllocator::Node), " bytes after expansion.");
 
-      ChunkFreelistAllocator::Node* currentNode = &a.m_head;
+      HeapAllocator::Node* currentNode = &a.m_head;
       while( currentNode->address && currentNode->size < size )
       {
          currentNode = currentNode->next;
@@ -416,7 +444,7 @@ namespace core
       if( currentNode->size )
       {
          //case where there is more room in the slot after the requested size is removed
-         ChunkFreelistAllocator::Node* unmoved = currentNode->next;
+         HeapAllocator::Node* unmoved = currentNode->next;
          currentNode->byte += size;
          currentNode->next->address = unmoved->address;
          currentNode->next->size = unmoved->size;
@@ -434,6 +462,136 @@ namespace core
       a.m_allocated += size;
       a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
       memset(result, 0, size);
+
+      return result;
+   }
+   template<typename T>
+   T* allocate(HeapAllocator& a)
+   {
+      auto* result = allocate(a, sizeof(T));
+      return (T*)result;
+   }
+
+   void deallocate(HeapAllocator& a, void* ptr, u32 size)
+   {
+      if( !ptr )
+      {
+         return;
+      }
+      u32 sizeExpansionForFreelistPurposes = (a.m_alignment - (size % a.m_alignment));
+      sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & (a.m_alignment - 1);
+      size += sizeExpansionForFreelistPurposes;
+
+      CORE_ASSERT_DBGERR((size % a.m_alignment) == 0, "The size should always be a multiple of ", a.m_alignment, " after expansion.");
+      CORE_ASSERT_DBGERR(size >= sizeof(HeapAllocator::Node), "The size should be at least ", sizeof(HeapAllocator::Node), " bytes after expansion.");
+      CORE_ASSERT_DBGERR(((u32)ptr % a.m_alignment) == 0, "Every address returned should be aligned to ", a.m_alignment, " bytes.");
+
+      HeapAllocator::Node* previousNode = nullptr;
+      HeapAllocator::Node* currentNode = &a.m_head;
+      while( currentNode->address && currentNode->address < ptr )
+      {
+         previousNode = currentNode;
+         currentNode = currentNode->next;
+      }
+
+      HeapAllocator::Node* newNode = (HeapAllocator::Node*)ptr;
+      newNode->address = currentNode->address;
+      newNode->size = currentNode->size;
+      currentNode->next = newNode;
+      currentNode->size = size;
+
+      while( previousNode && previousNode->byte + previousNode->size == currentNode->address )
+      {
+         previousNode->size += currentNode->size;
+         currentNode->size = currentNode->next->size;
+         currentNode->address = currentNode->next->address;
+      }
+
+      while( currentNode->address && currentNode->byte + currentNode->size == newNode->address )
+      {
+         currentNode->size += newNode->size;
+         newNode->size = newNode->next->size;
+         newNode->address = newNode->next->address;
+      }
+
+      a.m_allocated -= size;
+   }
+   template<typename T>
+   void deallocate(HeapAllocator& a, T* ptr)
+   {
+      deallocate(a, ptr, sizeof(T));
+   }
+
+   void* reallocate(HeapAllocator& a, void* ptr, u32 osize, u32 nsize)
+   {
+      void* result = nullptr;
+      if( nsize < osize )
+      {
+         //if the new size is less than the old size, we can just return the original pointer, and release the extra size
+         //first we need to modify the size to be multiple of 16
+         u32 sizeExpansionForFreelistPurposes = (a.m_alignment - (nsize % a.m_alignment));
+         sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & (a.m_alignment - 1);
+         nsize += sizeExpansionForFreelistPurposes;
+
+         void* ptrToDeallocate = (u8*)ptr + nsize;
+         if( osize - nsize )
+         {
+            deallocate(a, ptrToDeallocate, osize - nsize);
+         }
+         result = ptr;
+      }
+      else //nsize > osize
+      {
+         HeapAllocator::Node* currentNode = &a.m_head;
+         union
+         {
+            u8* byte;
+            void* address;
+         };
+         address = ptr;
+         while( currentNode->byte < (byte + osize) )
+         {
+            currentNode = currentNode->next;
+         }
+         if( currentNode->byte == byte + osize && currentNode->size >= (nsize - osize) )
+         {
+            //this means there is enough room to expand, so we need to allocate that piece
+            u32 size = (nsize - osize);
+            currentNode->size -= size;
+            if( currentNode->size )
+            {
+               //case where there is more room in the slot after the requested size is removed
+               HeapAllocator::Node* unmoved = currentNode->next;
+               currentNode->byte += size;
+               currentNode->next->address = unmoved->address;
+               currentNode->next->size = unmoved->size;
+               if( currentNode->next->address == nullptr && currentNode->address > a.m_topFreeMemoryAddress )
+               {
+                  a.m_topFreeMemoryAddress = currentNode->address;
+               }
+            }
+            else
+            {
+               //case where the slot is exhausted by the requested size
+               currentNode->size = currentNode->next->size;
+               currentNode->address = currentNode->next->address;
+            }
+            a.m_allocated += size;
+            a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
+            memset(byte + osize, 0, size);
+            result = ptr;
+         }
+         else
+         {
+            void* newPtr = allocate(a, nsize);
+            if( newPtr )
+            {
+               memcpy(newPtr, ptr, osize);
+               deallocate(a, ptr, osize);
+            }
+            result = newPtr;
+         }
+      }
 
       return result;
    }

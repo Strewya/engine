@@ -16,40 +16,45 @@ namespace core
 {
    struct PixelShaderCache
    {
+   private:
+      PixelShader* m_buffer;
+      u32 m_maxSlots;
+      u32 m_usedSlots;
+
+   public:
       bool init(LinearAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(PixelShaderCache);
 
-         m_count = 0;
-         m_maxSlots = maxSlots;
          m_buffer = allocate<PixelShader>(a, maxSlots);
-         m_freelist.init(m_buffer, maxSlots);
+         m_maxSlots = maxSlots;
+         m_usedSlots = 0;
 
          CORE_INIT_END;
       }
 
-      HPixelShader insert(PixelShader vs)
+      HPixelShader insert(PixelShader ps)
       {
          HPixelShader result{};
-         auto* slot = allocate(m_freelist);
-         if( slot )
+
+         for( u16 i = 0; i < m_maxSlots; ++i )
          {
-            PixelShader* shaderSlot = (PixelShader*)slot;
-            *shaderSlot = vs;
-            u16 index = u16(shaderSlot - m_buffer);
-            ++m_count;
-            result.init(index);
+            if( m_buffer[i].unloaded() )
+            {
+               m_buffer[i] = ps;
+               result.init(i);
+               ++m_usedSlots;
+            }
          }
+
          return result;
       }
 
       PixelShader remove(HPixelShader handle)
       {
-         u16 index = handle.getIndex();
-         PixelShader vs = m_buffer[index];
-         deallocate(m_freelist, &m_buffer[index]);
-         --m_count;
-         return vs;
+         PixelShader ps = m_buffer[handle.getIndex()];
+         --m_usedSlots;
+         return ps;
       }
 
       PixelShader getData(HPixelShader handle)
@@ -60,13 +65,8 @@ namespace core
 
       u32 getCount() const
       {
-         return m_count;
+         return m_usedSlots;
       }
 
-   private:
-      PixelShader* m_buffer;
-      FixedSizeFreelistAllocator m_freelist;
-      u32 m_maxSlots;
-      u32 m_count;
    };
 }

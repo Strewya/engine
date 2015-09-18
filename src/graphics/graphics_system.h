@@ -76,7 +76,7 @@ namespace core
       bool initDepthBuffer();
 
       LinearAllocator m_staticMemory;
-      FixedSizeFreelistAllocator m_dynamicMemory;
+      HeapAllocator m_dynamicMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
       PixelShaderLoader m_psLoader;

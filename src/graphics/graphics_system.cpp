@@ -80,11 +80,13 @@ namespace core
       CORE_STATUS_AND(m_psLoader.init(m_dev));
       CORE_STATUS_AND(pixelShaders.init(m_staticMemory, shaderSlots));
 
+
+
       if( CORE_STATUS_OK )
       {
 #include "graphics/shader/vertex/default_vertex_shader.h"
 
-         auto layout = DefaultVertex::getDescription(m_stackAllocator);
+         auto layout = DefaultVertex::getDescription(m_heapAllocator);
          CORE_ASSERT_DBGERR(layout.buffer != nullptr, "Error generating input layout information");
          auto defaultVertexShader = m_vsLoader.load(layout, (u8*)g_VShader, sizeof(g_VShader));
 

@@ -16,13 +16,19 @@ namespace core
 {
    struct TextureCache
    {
+   private:
+      Texture* m_buffer;
+      u32 m_maxSlots;
+      u32 m_usedSlots;
+   
+   public:
       bool init(LinearAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(TextureCache);
 
-         m_count = 0;
-         m_maxSlots = maxSlots;
          m_buffer = allocate<Texture>(a, maxSlots);
+         m_maxSlots = maxSlots;
+         m_usedSlots = 0;
 
          CORE_INIT_END;
       }
@@ -30,24 +36,24 @@ namespace core
       HTexture insert(Texture t)
       {
          HTexture result{};
-         auto* slot = allocate(m_freelist);
-         if( slot )
+
+         for( u16 i = 0; i < m_maxSlots; ++i )
          {
-            Texture* textureSlot = (Texture*)slot;
-            *textureSlot = t;
-            u16 index = u16(textureSlot - m_buffer);
-            result.init(index);
-            ++m_count;
+            if( m_buffer[i].unloaded() )
+            {
+               m_buffer[i] = t;
+               result.init(i);
+               ++m_usedSlots;
+            }
          }
+
          return result;
       }
 
       Texture remove(HTexture handle)
       {
-         auto index = handle.getIndex();
-         Texture t = m_buffer[index];
-         deallocate(m_freelist, &m_buffer[index]);
-         --m_count;
+         Texture t = m_buffer[handle.getIndex()];
+         --m_usedSlots;
          return t;
       }
 
@@ -59,14 +65,7 @@ namespace core
 
       u32 getCount() const
       {
-         return m_count;
+         return m_usedSlots;
       }
-
-   private:
-      Texture* m_buffer;
-      FixedSizeFreelistAllocator m_freelist;
-      u32 m_maxSlots;
-      u32 m_count;
    };
-
 }

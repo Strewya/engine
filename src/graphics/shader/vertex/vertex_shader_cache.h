@@ -16,39 +16,44 @@ namespace core
 {
    struct VertexShaderCache
    {
+   private:
+      VertexShader* m_buffer;
+      u32 m_maxSlots;
+      u32 m_usedSlots;
+
+   public:
       bool init(LinearAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(VertexShaderCache);
 
-         m_count = 0;
-         m_maxSlots = maxSlots;
          m_buffer = allocate<VertexShader>(a, maxSlots);
-         m_freelist.init(m_buffer, maxSlots);
-
+         m_maxSlots = maxSlots;
+         m_usedSlots = 0;
+      
          CORE_INIT_END;
       }
 
       HVertexShader insert(VertexShader vs)
       {
          HVertexShader result{};
-         auto* slot = allocate(m_freelist);
-         if( slot )
+
+         for( u16 i = 0; i < m_maxSlots; ++i )
          {
-            VertexShader* shaderSlot = (VertexShader*)slot;
-            *shaderSlot = vs;
-            u16 index = u16(shaderSlot - m_buffer);
-            ++m_count;
-            result.init(index);
+            if( m_buffer[i].unloaded() )
+            {
+               m_buffer[i] = vs;
+               result.init(i);
+               ++m_usedSlots;
+            }
          }
+
          return result;
       }
 
       VertexShader remove(HVertexShader handle)
       {
-         u16 index = handle.getIndex();
-         VertexShader vs = m_buffer[index];
-         deallocate(m_freelist, &m_buffer[index]);
-         --m_count;
+         VertexShader vs = m_buffer[handle.getIndex()];
+         --m_usedSlots;
          return vs;
       }
 
@@ -60,13 +65,7 @@ namespace core
 
       u32 getCount() const
       {
-         return m_count;
+         return m_usedSlots;
       }
-
-   private:
-      VertexShader* m_buffer;
-      FixedSizeFreelistAllocator m_freelist;
-      u32 m_maxSlots;
-      u32 m_count;
    };
 }
