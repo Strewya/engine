@@ -71,7 +71,7 @@ namespace core
    }
 
    /************************************************************************/
-   /* Base memory allocator done on program start                          */
+   /* Base memory allocator created on program start                       */
    /************************************************************************/
    struct LargeLinearAllocator
    {
@@ -120,15 +120,16 @@ namespace core
       MemoryBlock result{};
       if( a.m_allocated != a.m_size )
       {
-         result.size = a.m_size - a.m_allocated;
+         result.size = (u32)(a.m_size - a.m_allocated);
          result.address = a.m_memory + a.m_allocated;
          a.m_maxAllocated = a.m_allocated = a.m_size;
       }
       return result;
    }
 
-
-   // Fixed memory manager. Only allocations are supported, frees are not.
+   /************************************************************************/
+   /* Fixed memory manager. Only allocations are supported, frees are not. */
+   /************************************************************************/
    struct LinearAllocator
    {
       const char* m_tag;
@@ -164,9 +165,15 @@ namespace core
       return nullptr;
    }
    template<typename T>
-   inline T* allocate(LinearAllocator& a, u32 count = 1)
+   inline T* allocate(LinearAllocator& a)
    {
-      u8* result = allocate(a, sizeof(T)*count, __alignof(T));
+      void* result = allocate(a, sizeof(T), __alignof(T));
+      return (T*)result;
+   }
+   template<typename T>
+   inline T* allocateArray(LinearAllocator& a, u32 count)
+   {
+      void* result = allocate(a, sizeof(T)*count, __alignof(T));
       return (T*)result;
    }
    inline MemoryBlock allocateBlock(LinearAllocator& a, u32 size)
@@ -227,9 +234,15 @@ namespace core
       return nullptr;
    }
    template<typename T>
-   inline T* allocate(StackAllocator& a, u32 count = 1)
+   inline T* allocate(StackAllocator& a)
    {
-      u8* result = allocate(a, sizeof(T)*count, __alignof(T));
+      void* result = allocate(a, sizeof(T), __alignof(T));
+      return (T*)result;
+   }
+   template<typename T>
+   inline T* allocateArray(StackAllocator& a, u32 count)
+   {
+      void* result = allocate(a, sizeof(T)*count, __alignof(T));
       return (T*)result;
    }
    inline void deallocate(StackAllocator& a)
@@ -343,46 +356,43 @@ namespace core
    }
 
    /*
-    *       TEXT COPIED DIRECTLY FROM BEING A LUA ALLOCATOR, REFERENCES TO LUA ARE NOW JUST GENERAL
-    *
-    *    This is the lua allocator object. It is in charge of memory allocation, reallocation and deallocation for the Lua VM.
+    *    This is the heap allocator object. It can do memory allocation, deallocation and reallocation.
     *    It is initialized by receiving a memory block within which to work in.
-    *    Every time Lua allocates a memory chunk, it calls a function provided to it in the LuaSystem::init() function.
-    *    This function will call allocate/reallocate/deallocate on the LuaAllocator object.
-    *    The allocations are all in chunks of multiples of ALIGNMENT, which currently, for a 64bit build is 16 bytes.
-    *    LuaAllocator uses a freelist implementation. The allocator itself contains the head of the freelist, which contains
-    *    the memory address of some free memory and its size. That memory address in turn also contains the next free memory address and its size,
+    *    The allocations are all in chunks of multiples of m_alignment, which can be set on initialization.
+    *    HeapAllocator uses a freelist implementation. The allocator itself contains the head of the freelist, which contains
+    *    the memory address of the next free memory block and its size. That memory address in turn also contains the next free memory address and its size,
     *    recursively until the rest of the free memory is found, which contains nullptr and 0 to indicate there is no more memory.
     *
     *    head          | 0x100         | 0x150         | 0x200
     *    size: 16      | size: 48      | size: 100000  | size: 0
     *    memory: 0x100 | memory: 0x150 | memory: 0x200 | memory: 0
     *
-    *    All allocations happen in multiple of 16 chunks. Any requested allocation size is increased to the first next multiple of 16.
+    *    All allocations happen in multiple of m_alignment chunks. Any requested allocation size is increased to the first next multiple of 16.
     *    Then, the freelist is traversed from the head in search of a chunk big enough for the requested increased size.
-    *    When a chunk big enough is found, it is removed from teh freelist by pointing the currentFreelist node to point to the one after the chunk being allocated.
+    *    When a chunk big enough is found, it is removed from the freelist by pointing the currentNode to point to the one after the chunk being allocated.
     *    Deallocation is done in a similar fashion, the freelist is traversed to find the first free chunk after the memory being freed.
     *    The freelist nodes around that memory are updated so the currently freed memory is a new node occuring in between them.
     *    An additional step is done which checks the newly created chunk if it can be merged with any other free chunk directly surrounding it.
     *    Reallocation simply uses the allocation and deallocation methods to do it's work. If reallocation is done from a bigger memory size to a smaller one,
     *    the same pointer is returned, and if the difference between the old size and new size is >= 16, then the extra memory is freed.
-    *    If reallocation si done from a smaller to a bigger memory size, then a new chunk is allocated to suit the bigger size, a memcpy is performed,
+    *    If reallocation is done from a smaller to a bigger memory size, then a new chunk is allocated to suit the bigger size, a memcpy is performed,
     *    and the old memory is freed.
     *    #todo An improvement can be made to the reallocation method, so reallocs from a smaller to a bigger memory size is first checked if it can be
     *    expanded in place.
+    *    #todo The previous todo is implemented, just need to test it works now.
     *
     */
    struct HeapAllocator
    {
       struct Node
       {
-         u64 size;
          union
          {
             void* address;
             u8* byte;
             Node* next;
          };
+         u64 size;
       };
 
       const char* m_tag;
@@ -400,12 +410,17 @@ namespace core
          m_tag = tag;
          m_memory = memory;
          m_topFreeMemoryAddress = memory.address;
-         m_head.address = memory.address;
-         m_head.size = memory.size;
-         m_head.next->address = nullptr;
-         m_head.next->size = 0;
+         initNodes();
          m_allocated = m_maxAllocated = 0;
          m_alignment = alignment >= __alignof(Node) ? alignment : __alignof(Node);
+      }
+
+      void initNodes()
+      {
+         m_head.address = m_memory.address;
+         m_head.size = m_memory.size;
+         m_head.next->address = nullptr;
+         m_head.next->size = 0;
       }
    };
    inline std::ostream& operator<<(std::ostream& stream, HeapAllocator& a)
@@ -471,8 +486,14 @@ namespace core
       auto* result = allocate(a, sizeof(T));
       return (T*)result;
    }
+   template<typename T>
+   T* allocateArray(HeapAllocator& a, u32 count)
+   {
+      auto* result = allocate(a, sizeof(T)*count);
+      return (T*)result;
+   }
 
-   void deallocate(HeapAllocator& a, void* ptr, u32 size)
+   void deallocate(HeapAllocator& a, void* ptr, u32 size) // #todo maybe allocate a block extra before the pointer to store the size of the allocation
    {
       if( !ptr )
       {

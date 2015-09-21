@@ -22,7 +22,7 @@ namespace core
       CORE_INIT_END;
    }
 
-   VertexShader VertexShaderLoader::load(InputLayout layout, u8* buffer, u32 bufferSize) const
+   VertexShader VertexShaderLoader::load(InputLayout layout, void* buffer, u32 bufferSize) const
    {
       VertexShader result{nullptr, nullptr};
       if( buffer != nullptr && bufferSize > 0 )

@@ -58,11 +58,10 @@ namespace core
       textureUV.y = v;
    }
 
-   InputLayout DefaultVertex::getDescription(StackAllocator& a)
+   InputLayout DefaultVertex::getDescription()
    {
-      u32 count = 3;
-      CORE_ASSERT_ERR((a.size - a.allocated) >= sizeof(D3D11_INPUT_ELEMENT_DESC) * count, "Not enough memory to generate DefaultVertex layout information");
-      InputLayout layout{allocate<D3D11_INPUT_ELEMENT_DESC>(a, count), 0};
+      core_local_persist D3D11_INPUT_ELEMENT_DESC description[3];
+      InputLayout layout{description};
       layout.buffer[layout.size++] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
       layout.buffer[layout.size++] = {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
       layout.buffer[layout.size++] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
@@ -86,11 +85,10 @@ namespace core
       health.y = 0;
    }
 
-   InputLayout HealthVertex::getDescription(StackAllocator& a)
+   InputLayout HealthVertex::getDescription()
    {
-      u32 count = 4;
-      CORE_ASSERT_ERR((a.size - a.allocated) >= sizeof(D3D11_INPUT_ELEMENT_DESC) * count, "Not enough memory to generate HealthVertex layout information");
-      InputLayout layout{allocate<D3D11_INPUT_ELEMENT_DESC>(a, count), 0};
+      core_local_persist D3D11_INPUT_ELEMENT_DESC description[4];
+      InputLayout layout{description};
       layout.buffer[layout.size++] = {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0};
       layout.buffer[layout.size++] = {"DIFFUSE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};
       layout.buffer[layout.size++] = {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0};

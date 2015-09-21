@@ -14,23 +14,17 @@
 namespace core
 {
    struct FontDescriptor;
-   struct Mesh;
-   struct Rect;
-
+   struct IndexBuffer;
+   struct VertexBuffer;
+   
    enum TextJustification;
 
-   struct FontSystem
-   {
-   public:
-      bool init(LinearAllocator& a, TextureCache& textures);
-      bool shutdown();
+   u32 countVisibleCharacters(const char* text);
+   u32 calculateVertexCount(u32 visibleCharacters);
+   u32 calculateIndexCount(u32 visibleCharacters);
 
-      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
-      Mesh makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
-
-   private:
-      StackAllocator m_allocator;
-      TextureCache* m_textures;
-   };
+   // #todo potentially more than bool return codes, like bufferTooSmall or something...
+   bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
+   bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
 
 }

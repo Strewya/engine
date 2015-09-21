@@ -18,6 +18,7 @@
 #include "graphics/texture/texture_cache.h"
 #include "graphics/texture/texture_file_loader.h"
 #include "utility/geometry/rect.h"
+#include "utility/memory.h"
 /******* end header inclusion *******/
 
 namespace core

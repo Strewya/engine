@@ -15,6 +15,7 @@
 namespace core
 {
    struct LinearAllocator;
+   struct MemoryBlock;
 
    void initializeFileStream(MemoryBlock memory);
 

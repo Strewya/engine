@@ -31,7 +31,7 @@ namespace core
       XMFLOAT4 diffuse;
       XMFLOAT2 textureUV;
 
-      core_class_scope InputLayout getDescription(StackAllocator& a);
+      core_class_scope InputLayout getDescription();
    };
 
    struct HealthVertex : public DefaultVertex
@@ -42,6 +42,6 @@ namespace core
 
       XMFLOAT2 health;
 
-      core_class_scope InputLayout getDescription(StackAllocator& a);
+      core_class_scope InputLayout getDescription();
    };
 }

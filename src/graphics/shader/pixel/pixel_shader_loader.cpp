@@ -22,7 +22,7 @@ namespace core
       CORE_INIT_END;
    }
 
-   PixelShader PixelShaderLoader::load(u8* buffer, u32 bufferSize) const
+   PixelShader PixelShaderLoader::load(void* buffer, u32 bufferSize) const
    {
       PixelShader result{nullptr};
       if( buffer != nullptr && bufferSize > 0 )

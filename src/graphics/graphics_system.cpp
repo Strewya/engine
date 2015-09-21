@@ -45,6 +45,8 @@ namespace core
    {
       CORE_INIT_START(GraphicsSystem);
 
+      m_dynamicMemory.init("Graphics dynamic memory", allocateBlock(m_staticMemory, MegaBytes(10)), 16);
+
       m_window = handle;
       m_backbufferSize.x = this->width = (f32)width;
       m_backbufferSize.y = this->height = (f32)height;
@@ -86,11 +88,10 @@ namespace core
       {
 #include "graphics/shader/vertex/default_vertex_shader.h"
 
-         auto layout = DefaultVertex::getDescription(m_heapAllocator);
+         auto layout = DefaultVertex::getDescription();
          CORE_ASSERT_DBGERR(layout.buffer != nullptr, "Error generating input layout information");
          auto defaultVertexShader = m_vsLoader.load(layout, (u8*)g_VShader, sizeof(g_VShader));
 
-         deallocate(m_stackAllocator);
          auto vhandle = vertexShaders.insert(defaultVertexShader);
          CORE_ASSERT_DBGERR(vhandle.getIndex() == 0, "The default pixel shader should be at index 0");
          // #todo think about a sane way of using the default shader with different actual vertices being sent to the pipeline
@@ -197,24 +198,24 @@ namespace core
    //*****************************************************************
    HVertexShader GraphicsSystem::loadVertexShaderFromFile(const char* filename, VertexType vType)
    {
-      auto file = loadFile(filename, m_stackAllocator);
+      auto file = loadFile(filename, m_dynamicMemory);
       CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
       InputLayout layout{};
       switch( vType )
       {
          case VertexType::Default:
          {
-            layout = DefaultVertex::getDescription(m_stackAllocator);
+            layout = DefaultVertex::getDescription();
          } break;
          case VertexType::Health:
          {
-            layout = HealthVertex::getDescription(m_stackAllocator);
+            layout = HealthVertex::getDescription();
          } break;
       }
       CORE_ASSERT_ERR(layout.buffer != nullptr && layout.size > 0, "Error generating input layout information");
       auto shader = m_vsLoader.load(layout, file.memory, file.size);
 
-      deallocate(m_stackAllocator);
+      deallocate(m_dynamicMemory, file.memory, file.size);
 
       auto result = vertexShaders.insert(shader);
       return result;
@@ -234,11 +235,11 @@ namespace core
    //*****************************************************************
    HPixelShader GraphicsSystem::loadPixelShaderFromFile(const char* filename)
    {
-      auto file = loadFile(filename, m_stackAllocator);
+      auto file = loadFile(filename, m_dynamicMemory);
       CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
       auto shader = m_psLoader.load(file.memory, file.size);
 
-      deallocate(m_stackAllocator);
+      deallocate(m_dynamicMemory, file.memory, file.size);
 
       auto result = pixelShaders.insert(shader);
       return result;

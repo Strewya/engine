@@ -11,13 +11,13 @@
 
 namespace core
 {
-   struct StackAllocator;
+   struct HeapAllocator;
 
    struct LoadedFile
    {
-      u8* memory;
+      void* memory;
       u32 size;
    };
 
-   LoadedFile loadFile(const char* filename, StackAllocator& a);
+   LoadedFile loadFile(const char* filename, HeapAllocator& a);
 }

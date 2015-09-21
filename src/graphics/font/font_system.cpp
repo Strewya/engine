@@ -9,6 +9,7 @@
 #include "graphics/font/font_descriptor.h"
 #include "graphics/mesh/mesh.h"
 #include "graphics/vertex.h"
+#include "graphics/graphics_types.h"
 #include "utility/color.h"
 #include "utility/geometry/rect.h"
 #include "utility/geometry/vec2.h"
@@ -28,37 +29,9 @@ namespace core
    core_internal void justifyAxisY(HealthVertexBuffer& vertices, u32 justify, f32 fontHeight, f32 rowEnd, f32 boxHH);
 
    //*****************************************************************
-   //          INIT
-   //*****************************************************************
-   bool FontSystem::init(LinearAllocator& a, TextureCache& textures)
-   {
-      CORE_INIT_START(FontSystem);
-
-      m_textures = &textures;
-      m_allocator.tag = "Font system allocator";
-      m_allocator.allocated = 0;
-      m_allocator.size = MegaBytes(10);
-      m_allocator.memory = allocate(a, m_allocator.size, 1);
-
-      CORE_STATUS_AND(m_allocator.memory != nullptr);
-
-      CORE_INIT_END;
-   }
-
-   //*****************************************************************
-   //          SHUTDOWN
-   //*****************************************************************
-   bool FontSystem::shutdown()
-   {
-      CORE_SHUTDOWN_START(FontSystem);
-
-      CORE_SHUTDOWN_END;
-   }
-
-   //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y)
+   bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y)
    {
       Mesh result{};
       result.pshader = fd.pshader;
@@ -66,12 +39,10 @@ namespace core
       result.texture = fd.fontTexture;
       result.topology = TriangleList;
 
-      auto textureData = m_textures->getData(fd.fontTexture);
-      f32 textureWidth = (f32)textureData.width;
-      f32 textureHeight = (f32)textureData.height;
       f32 fontHeight = fd.height*scale.y;
 
-      auto characterCount = (u32)strlen(text);
+      auto characterCount = countVisibleCharacters(text);
+
       result.vertices.reserve(characterCount * 4);
       generateIndices(result.indices, characterCount);
 
@@ -99,7 +70,7 @@ namespace core
    //*****************************************************************
    //          MAKE TEXT MESH
    //*****************************************************************
-   Mesh FontSystem::makeTextMesh(const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox)
+   bool makeTextMesh(void* buffer, u32 bufferSize, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox)
    {
       // #refactor
       // things to deal with:
@@ -297,5 +268,33 @@ namespace core
       {
          vert.position.y -= offset;
       }
+   }
+
+   /************************************************************************/
+   /*          COUNT VISIBLE CHARACTERS                                    */
+   /************************************************************************/
+   u32 countVisibleCharacters(const char* text)
+   {
+      u32 count = 0;
+      while( *text )
+      {
+         if( *text >= ' ' && *text <= '~' )
+         {
+            ++count;
+         }
+      }
+      return count;
+   }
+
+   u32 calculateVertexCount(u32 visibleCharacters)
+   {
+      auto result = visibleCharacters * 4;
+      return result;
+   }
+
+   u32 calculateIndexCount(u32 visibleCharacters)
+   {
+      auto result = visibleCharacters * 6;
+      return result;
    }
 }

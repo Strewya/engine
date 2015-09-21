@@ -20,7 +20,7 @@ namespace core
    public:
       bool init(ID3D11Device* device);
 
-      PixelShader load(u8* buffer, u32 bufferSize) const;
+      PixelShader load(void* buffer, u32 bufferSize) const;
       void unload(PixelShader& data);
 
    private:
