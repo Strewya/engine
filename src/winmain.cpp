@@ -36,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       if( address )
       {
          using core::writeLog;
-         core::LargeLinearAllocator mainAllocator;
+         core::LargeAllocator mainAllocator;
          mainAllocator.init("Entire memory allocator", address, size);
 
          auto logMemory = allocateBlock(mainAllocator, KiloBytes(128));

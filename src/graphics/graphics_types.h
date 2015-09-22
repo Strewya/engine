@@ -21,6 +21,14 @@ namespace core
       Health
    };
 
+   enum VertexTopology
+   {
+      LineList,
+      LineStrip,
+      TriangleList,
+      TriangleStrip,
+   };
+
    struct HealthVertexBuffer
    {
       HealthVertex* data;
@@ -45,11 +53,10 @@ namespace core
       u32 size;
    };
 
-   enum VertexTopology
+   struct Material
    {
-      LineList,
-      LineStrip,
-      TriangleList,
-      TriangleStrip,
+      HVertexShader vertexShaderHandle;
+      HPixelShader pixelShaderHandle;
+      HTexture textureHandle;
    };
 }

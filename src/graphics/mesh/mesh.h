@@ -21,26 +21,24 @@ namespace core
 
    struct Mesh
    {
-      HVertexShader vshader;
-      HPixelShader pshader;
-      HTexture texture;
       VertexTopology topology;
       HealthVertexBuffer vertices;
       IndexBuffer indices;
    };
-   
-   Mesh makeSolidQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeSolidQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineQuad(Rect rect, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeTexturedQuad(v2 pos, v2 hs, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeTexturedQuad(Rect rect, HTexture texture, v2 topLeftUV, v2 botRightUV, HVertexShader vshader, HPixelShader pshader);
-   // rounds 'points' to the next power of 2
-   Mesh makeSolidCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeSolidCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader);
-   // rounds 'points' to the next power of 2
-   Mesh makeOutlineCircle(v2 pos, f32 radius, u32 points, HVertexShader vshader, HPixelShader pshader);
-   Mesh makeOutlineCircle(Circle circle, u32 points, HVertexShader vshader, HPixelShader pshader);
 
-   Mesh makeLine(v2 a, v2 b, HVertexShader vshader, HPixelShader pshader);
+
+   Mesh makeSolidQuad(v2 pos, v2 hs);
+   Mesh makeSolidQuad(Rect rect);
+   Mesh makeOutlineQuad(v2 pos, v2 hs);
+   Mesh makeOutlineQuad(Rect rect);
+   Mesh makeTexturedQuad(v2 pos, v2 hs, v2 topLeftUV, v2 botRightUV);
+   Mesh makeTexturedQuad(Rect rect, v2 topLeftUV, v2 botRightUV);
+   // rounds 'points' to the next power of 2
+   Mesh makeSolidCircle(v2 pos, f32 radius, u32 points);
+   Mesh makeSolidCircle(Circle circle, u32 points);
+   // rounds 'points' to the next power of 2
+   Mesh makeOutlineCircle(v2 pos, f32 radius, u32 points);
+   Mesh makeOutlineCircle(Circle circle, u32 points);
+
+   Mesh makeLine(v2 a, v2 b);
 }

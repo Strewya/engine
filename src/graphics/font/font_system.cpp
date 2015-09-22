@@ -282,6 +282,7 @@ namespace core
          {
             ++count;
          }
+         ++text;
       }
       return count;
    }

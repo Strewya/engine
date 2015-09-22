@@ -12,9 +12,9 @@
 namespace core
 {
    struct CommunicationBuffer;
-   struct LargeLinearAllocator;
+   struct LargeAllocator;
 
-   void runGame(LargeLinearAllocator& allocator,
+   void runGame(LargeAllocator& allocator,
                 CommunicationBuffer* fromMain, CommunicationBuffer* toMain,
                 u64 windowHandle, u32 windowWidth, u32 windowHeight);
 }

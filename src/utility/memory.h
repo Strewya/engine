@@ -70,43 +70,113 @@ namespace core
       stream << "   Peak usage: " << byteSizes(peakAllocation) << logLine;
    }
 
-   /************************************************************************/
-   /* Base memory allocator created on program start                       */
-   /************************************************************************/
-   struct LargeLinearAllocator
-   {
-      const char* m_tag;
-      u8* m_memory;
-      u64 m_size;
-      u64 m_allocated;
-      u64 m_maxAllocated;
-
-      void init(const char* tag, void* memory, u64 size)
-      {
-         CORE_ASSERT_DBGERR(m_memory == nullptr, "Attempting to initialize a large allocator that has already been initialized.");
-         m_tag = tag;
-         m_memory = (u8*)memory;
-         m_size = size;
-      }
-   };
-
-   inline std::ostream& operator<<(std::ostream& stream, LargeLinearAllocator& lla)
-   {
-      outputAllocatorData(stream, lla.m_tag, lla.m_size, lla.m_allocated, lla.m_maxAllocated);
-      return stream;
-   }
-
+   /************************************************************************
+    *          MEMORY BLOCK TO INITIALIZE ALLOCATORS
+    ************************************************************************/
    struct MemoryBlock
    {
       u8* address;
       u32 size;
    };
 
-   inline MemoryBlock allocateBlock(LargeLinearAllocator& a, u32 size)
+   /************************************************************************
+    *       Base class for all allocators.
+    *       
+    ************************************************************************/
+
+   /************************************************************************
+    *              Interface for all allocators
+    *    I have decided that i want to keep the coding sane, and take
+    *    the small performance penalty with memory allocation in order
+    *    to leverage the use of manual memory allocation, and to have
+    *    most functions that need dynamic allocation receive this
+    *    interface, so function signatures remain as simple as possible
+    ************************************************************************/
+   struct Allocator
+   {
+      virtual void* allocateRaw(u32 size, u32 align) = 0;
+      virtual void deallocateRaw(void* ptr, u32 size, u32 align) = 0;
+      virtual u32 allocatedSize() = 0;
+
+      template<typename T> T* allocate()
+      {
+         void* result = allocate(sizeof(T), __alignof(T));
+         return static_cast<T*>(result);
+      }
+      template<typename T> deallocate(T* ptr)
+      {
+         deallocate(ptr, sizeof(T), __alignof(T));
+      }
+   };
+
+   /************************************************************************
+    *              Allocators to implement:
+    *    HeapAllocator - An allocator that allocates varied sized blocks
+    *    and keeps an in-place linked list of free blocks. Look at
+    *    dlmalloc, it is pretty much the standard allocator.
+    *    
+    *    FrameAllocator - Also called "arena allocator" or "pointer bump
+    *    allocator". An allocator that doesn't deallocate individual blocks
+    *    but releases all its memory in one go. That means it has a super
+    *    simple internal state (just a pointer to the next free byte and
+    *    the remaining bytes of free memory).
+    *    
+    *    PageAllocator - The virtual memory allocator provided by the
+    *    system. Allocates memory as a number of "pages". The page size is
+    *    OS dependent (typically something like 1K -- 64K). You don't want
+    *    to use it for small allocations, but it can be used as a "backing
+    *    allocator" for any of the other allocators. Google "virtual memory"
+    *    and you should find lots of information.
+    *    
+    *    PoolAllocator - An allocator that has pools for allocations of
+    *    certain sizes. For example, one pool may only allocate 16 byte
+    *    blocks. The pool can be packed tight in memory, you don't need
+    *    headers and footers for the blocks, since they are always the same
+    *    size. This saves memory and reduces fragmentation and allocation
+    *    time.
+    ************************************************************************/
+
+   /************************************************************************
+    *              LargeAllocator
+    *    Used for allocating the first and only system memory. Receives
+    *    memory from the OS, and distributes it to other systems on a need
+    *    basis.
+    ************************************************************************/
+   struct LargeAllocator
+   {
+      const char* m_tag;
+      struct
+      {
+         union
+         {
+            void* vAddress;
+            u8* bAddress;
+         };
+         u64 size;
+      } m_memory;
+      u64 m_allocated;
+      u64 m_maxAllocated;
+
+      void init(const char* tag, void* memory, u64 size)
+      {
+         CORE_ASSERT_DBGERR(m_memory.vAddress == nullptr, "Attempting to initialize a large allocator that has already been initialized.");
+         m_tag = tag;
+         m_memory.vAddress = memory;
+         m_memory.size = size;
+         m_allocated = m_maxAllocated = 0;
+      }
+   };
+   inline std::ostream& operator<<(std::ostream& stream, LargeAllocator& lla)
+   {
+      outputAllocatorData(stream, lla.m_tag, lla.m_memory.size, lla.m_allocated, lla.m_maxAllocated);
+      return stream;
+   }
+
+   inline MemoryBlock allocateBlock(LargeAllocator& a, u32 size)
    {
       MemoryBlock result{};
-      auto* address = a.m_memory + a.m_allocated;
-      if( a.m_allocated + size <= a.m_size )
+      auto* address = a.m_memory.bAddress + a.m_allocated;
+      if( a.m_allocated + size <= a.m_memory.size )
       {
          result.address = address;
          result.size = size;
@@ -115,14 +185,14 @@ namespace core
       }
       return result;
    }
-   inline MemoryBlock allocateBlock(LargeLinearAllocator& a)
+   inline MemoryBlock allocateBlock(LargeAllocator& a)
    {
       MemoryBlock result{};
-      if( a.m_allocated != a.m_size )
+      if( a.m_allocated != a.m_memory.size )
       {
-         result.size = (u32)(a.m_size - a.m_allocated);
-         result.address = a.m_memory + a.m_allocated;
-         a.m_maxAllocated = a.m_allocated = a.m_size;
+         result.size = (u32)(a.m_memory.size - a.m_allocated);
+         result.address = a.m_memory.bAddress + a.m_allocated;
+         a.m_maxAllocated = a.m_allocated = a.m_memory.size;
       }
       return result;
    }
@@ -616,4 +686,15 @@ namespace core
 
       return result;
    }
+
+
+
+
+   /************************************************************************/
+   /*       ALLOCATOR, since i need a fixed interface for all allocators   */
+   /************************************************************************/
+   struct Allocator
+   {
+
+   };
 }

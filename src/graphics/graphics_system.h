@@ -65,8 +65,7 @@ namespace core
       TextureCache textures;
       VertexShaderCache vertexShaders;
       PixelShaderCache pixelShaders;
-      //DXBufferManager m_buffers; //predefined mesh buffers?
-      
+
    private:
       template<typename T> void declare(T*& ptr);
       bool initDevice();

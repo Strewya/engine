@@ -15,18 +15,16 @@
 
 namespace core
 {
-   Mesh makeSolidQuad(Rect rect, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidQuad(Rect rect)
    {
-      auto result = makeSolidQuad(rect.center, rect.halfSize, vshader, pshader);
+      auto result = makeSolidQuad(rect.center, rect.halfSize);
       return result;
    }
 
-   Mesh makeSolidQuad(v2 pos, v2 hs, HVertexShader vshader, HPixelShader pshader)
+   Mesh makeSolidQuad(v2 pos, v2 hs)
    {
       Mesh result
       {
-         vshader, pshader,
-         HTexture{},
          TriangleList,
          //vertices
          {

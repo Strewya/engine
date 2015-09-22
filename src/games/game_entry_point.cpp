@@ -33,7 +33,7 @@ namespace core
       CORE_MAX_UPDATE_TIME = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
    };
 
-   void runGame(LargeLinearAllocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
+   void runGame(LargeAllocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
    {
       Clock logicTimer{};
       Clock renderTimer{};
@@ -67,6 +67,7 @@ namespace core
       ExtractNumber(AudioSystemMegabytes);
       ExtractNumber(GraphicsSystemMegabytes);
       ExtractNumber(ScriptSystemMegabytes);
+      ExtractNumber(GameMemoryMegabytes);
 
       ExtractNumber(FmodMemoryMegabytes);
       ExtractNumber(FmodMaxChannels);
@@ -74,8 +75,6 @@ namespace core
 
       ExtractNumber(MaxNumberOfTextureSlots);
       ExtractNumber(MaxNumberOfShaderSlots);
-
-      ExtractNumber(GameMemoryMegabytes);
 
 #undef ExtractNumber
 
@@ -106,7 +105,7 @@ namespace core
       toMain->writeEvent(msg);
       //
 
-      auto running = false;
+      auto running = true;
       while( running )
       {
          f32 fraction = 0;
