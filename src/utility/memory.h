@@ -28,14 +28,7 @@ namespace core
 
       byteSizes(u64 B) : m_B(B) {}
    };
-   inline std::ostream& operator<<(std::ostream& stream, byteSizes bs)
-   {
-      u64 B = bs.m_B;
-      f32 kB = B / 1024.0f;
-      f32 MB = kB / 1024;
-      stream << B << " B / " << std::fixed << kB << " kB / " << MB << " MB" << std::defaultfloat;
-      return stream;
-   }
+   std::ostream& operator<<(std::ostream& stream, byteSizes bs);
 
    struct memoryRequirement
    {
@@ -44,11 +37,7 @@ namespace core
 
       memoryRequirement(void* start, void* end) : m_start{start}, m_end{end} {}
    };
-   inline std::ostream& operator<<(std::ostream& stream, memoryRequirement mr)
-   {
-      stream << byteSizes(u32((u8*)mr.m_end - (u8*)mr.m_start));
-      return stream;
-   }
+   std::ostream& operator<<(std::ostream& stream, memoryRequirement mr);
 
    struct memoryAddress
    {
@@ -56,33 +45,20 @@ namespace core
 
       memoryAddress(void* address) : m_address(address) {}
    };
-   inline std::ostream& operator<<(std::ostream& stream, memoryAddress ma)
-   {
-      stream << "0x" << ma.m_address;
-      return stream;
-   }
-
-   inline void outputAllocatorData(std::ostream& stream, const char* tag, u64 totalSize, u64 allocated, u64 peakAllocation)
-   {
-      stream << "Memory usage for allocator '" << tag << "':" << logLine;
-      stream << "   Total memory: " << byteSizes(totalSize) << logLine;
-      stream << "   Currently using: " << byteSizes(allocated) << logLine;
-      stream << "   Peak usage: " << byteSizes(peakAllocation) << logLine;
-   }
+   std::ostream& operator<<(std::ostream& stream, memoryAddress ma);
 
    /************************************************************************
-    *          MEMORY BLOCK TO INITIALIZE ALLOCATORS
+    *          Basic memory block used by most allocators
     ************************************************************************/
    struct MemoryBlock
    {
-      u8* address;
+      union
+      {
+         void* voidAddress;
+         u8* byteAddress;
+      };
       u32 size;
    };
-
-   /************************************************************************
-    *       Base class for all allocators.
-    *       
-    ************************************************************************/
 
    /************************************************************************
     *              Interface for all allocators
@@ -94,20 +70,76 @@ namespace core
     ************************************************************************/
    struct Allocator
    {
+      /*
+       *    virtual functions for concrete allocator overriding
+       */
       virtual void* allocateRaw(u32 size, u32 align) = 0;
       virtual void deallocateRaw(void* ptr, u32 size, u32 align) = 0;
-      virtual u32 allocatedSize() = 0;
+      virtual void outputToStream(std::ostream& stream) = 0;
 
+      /*
+       *    array helper to extract type and count from array syntax
+       */
+      template<typename T>
+      struct ArrayHelper
+      {
+      };
+      template<typename T, int N>
+      struct ArrayHelper<T[N]>
+      {
+         typedef T Type;
+         static const int Count = N;
+      };
+
+      /*
+       *    templated functions used to allocate types and arrays in an easy manner
+       */
       template<typename T> T* allocate()
       {
-         void* result = allocate(sizeof(T), __alignof(T));
-         return static_cast<T*>(result);
+         T* result = static_cast<T*>(allocateRaw(sizeof(T), __alignof(T)));
+         memset(result, 0, sizeof(T));
+         return result;
       }
+      template<typename A> auto allocateArray() -> ArrayHelper<A>::Type*
+      {
+         typedef ArrayHelper<A>::Type T;
+         const int N = ArrayHelper<A>::Count;
+         union
+         {
+            T* result;
+            u32* count;
+         };
+         result = static_cast<T*>(allocateRaw(sizeof(T)*(N + 1), __alignof(T)));
+         *count = N + 1;
+         ++result;
+         memset(result, 0, sizeof(T)*N);
+         return (result);
+      }
+      
+      /*
+       *    templated functions used to deallocate types in an easy manner
+       */
       template<typename T> deallocate(T* ptr)
       {
-         deallocate(ptr, sizeof(T), __alignof(T));
+         deallocateRaw(ptr, sizeof(T), __alignof(T));
       }
+      template<typename T> deallocateArray(T* ptr)
+      {
+         union
+         {
+            T* array;
+            u32* count;
+         };
+         array = ptr - 1;
+         deallocateRaw(array, sizeof(T)*(*count), __alignof(T));
+      }
+
    };
+   inline std::ostream& operator<<(std::ostream& stream, Allocator& a)
+   {
+      a.outputToStream(stream);
+      return stream;
+   }
 
    /************************************************************************
     *              Allocators to implement:
@@ -137,135 +169,58 @@ namespace core
     ************************************************************************/
 
    /************************************************************************
-    *              LargeAllocator
+    *              LargeAllocator, a type of FrameAllocator
     *    Used for allocating the first and only system memory. Receives
     *    memory from the OS, and distributes it to other systems on a need
-    *    basis.
+    *    basis. No deallocations required. This is the only allocator that
+    *    receives raw memory and size.
     ************************************************************************/
-   struct LargeAllocator
+   struct MainAllocator : public Allocator
    {
-      const char* m_tag;
-      struct
+   private:
+      union
       {
-         union
-         {
-            void* vAddress;
-            u8* bAddress;
-         };
-         u64 size;
-      } m_memory;
-      u64 m_allocated;
-      u64 m_maxAllocated;
+         void* m_voidAddress;
+         u8* m_byteAddress;
+      };
+      u64 m_sizeBytes;
+      u64 m_allocatedBytes;
+      u32 m_allocationsCount;
+   public:
+      void init(void* memory, u64 size);
+      ~MainAllocator();
 
-      void init(const char* tag, void* memory, u64 size)
-      {
-         CORE_ASSERT_DBGERR(m_memory.vAddress == nullptr, "Attempting to initialize a large allocator that has already been initialized.");
-         m_tag = tag;
-         m_memory.vAddress = memory;
-         m_memory.size = size;
-         m_allocated = m_maxAllocated = 0;
-      }
+      void* allocateRaw(u32 size, u32 align) override;
+      void deallocateRaw(void* ptr, u32 size, u32 align) override;
+      void outputToStream(std::ostream& stream) override;
    };
-   inline std::ostream& operator<<(std::ostream& stream, LargeAllocator& lla)
-   {
-      outputAllocatorData(stream, lla.m_tag, lla.m_memory.size, lla.m_allocated, lla.m_maxAllocated);
-      return stream;
-   }
 
-   inline MemoryBlock allocateBlock(LargeAllocator& a, u32 size)
+   /************************************************************************
+    *              LinearAllocator
+    *    This allocator is a smaller version of the LargeAllocator, and is
+    *    also a type of FrameAllocator. Only allocations are supported,
+    *    deallocations are not.
+    ************************************************************************/
+   struct LinearAllocator : public Allocator
    {
-      MemoryBlock result{};
-      auto* address = a.m_memory.bAddress + a.m_allocated;
-      if( a.m_allocated + size <= a.m_memory.size )
-      {
-         result.address = address;
-         result.size = size;
-         a.m_allocated += size;
-         a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
-      }
-      return result;
-   }
-   inline MemoryBlock allocateBlock(LargeAllocator& a)
-   {
-      MemoryBlock result{};
-      if( a.m_allocated != a.m_memory.size )
-      {
-         result.size = (u32)(a.m_memory.size - a.m_allocated);
-         result.address = a.m_memory.bAddress + a.m_allocated;
-         a.m_maxAllocated = a.m_allocated = a.m_memory.size;
-      }
-      return result;
-   }
-
-   /************************************************************************/
-   /* Fixed memory manager. Only allocations are supported, frees are not. */
-   /************************************************************************/
-   struct LinearAllocator
-   {
-      const char* m_tag;
+   private:
       MemoryBlock m_memory;
-      u32 m_allocated;
-      u32 m_maxAllocated;
+      u32 m_allocatedBytes;
+      u32 m_allocationsCount;
+   public:
+      void init(Allocator& parent, u32 sizeBytes);
+      ~LinearAllocator();
 
-      void init(const char* tag, MemoryBlock memory)
-      {
-         CORE_ASSERT_DBGWRN(m_allocated == 0, "Switching allocator memory that has already allocated memory!");
-         m_tag = tag;
-         m_memory = memory;
-      }
+      void* allocateRaw(u32 size, u32 align) override;
+      void deallocateRaw(void* ptr, u32 size, u32 align) override;
+      void outputToStream(std::ostream& stream) override;
    };
-   inline std::ostream& operator<<(std::ostream& stream, LinearAllocator& a)
-   {
-      outputAllocatorData(stream, a.m_tag, a.m_memory.size, a.m_allocated, a.m_maxAllocated);
-      return stream;
-   }
 
-   inline void* allocate(LinearAllocator& a, u32 size, u32 align)
-   {
-      u8* result = a.m_memory.address + a.m_allocated;
-      align = align - (u32)result % align;
-      size += align;
-      if( a.m_allocated + size <= a.m_memory.size )
-      {
-         result += align;
-         a.m_allocated += size;
-         a.m_maxAllocated = max(a.m_maxAllocated, a.m_allocated);
-         return result;
-      }
-      return nullptr;
-   }
-   template<typename T>
-   inline T* allocate(LinearAllocator& a)
-   {
-      void* result = allocate(a, sizeof(T), __alignof(T));
-      return (T*)result;
-   }
-   template<typename T>
-   inline T* allocateArray(LinearAllocator& a, u32 count)
-   {
-      void* result = allocate(a, sizeof(T)*count, __alignof(T));
-      return (T*)result;
-   }
-   inline MemoryBlock allocateBlock(LinearAllocator& a, u32 size)
-   {
-      MemoryBlock result{};
-      result.address = (u8*)allocate(a, size, 1);
-      result.size = size;
-      return result;
-   }
-   inline MemoryBlock allocateBlock(LinearAllocator& a)
-   {
-      MemoryBlock result{};
-      if( a.m_allocated != a.m_memory.size )
-      {
-         result.size = a.m_memory.size - a.m_allocated;
-         result.address = a.m_memory.address + a.m_allocated;
-         a.m_maxAllocated = a.m_allocated = a.m_memory.size;
-      }
-      return result;
-   }
-
-
+   /************************************************************************
+    *              HeapAllocator
+    *    The heap allocator allocates memory in chunks of 16 bytes aligned
+    *    to a 16 byte boundary.
+    ************************************************************************/
    struct StackAllocator
    {
       const char* m_tag;
@@ -686,15 +641,4 @@ namespace core
 
       return result;
    }
-
-
-
-
-   /************************************************************************/
-   /*       ALLOCATOR, since i need a fixed interface for all allocators   */
-   /************************************************************************/
-   struct Allocator
-   {
-
-   };
 }

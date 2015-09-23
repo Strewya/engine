@@ -14,10 +14,9 @@
 
 namespace core
 {
-   struct LinearAllocator;
-   struct MemoryBlock;
+   struct Allocator;
 
-   void initializeFileStream(MemoryBlock memory);
+   void initializeFileStream(Allocator& a);
 
    std::ostream& getLogFileStream();
 

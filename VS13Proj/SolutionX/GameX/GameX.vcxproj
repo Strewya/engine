@@ -289,6 +289,7 @@
     <ClCompile Include="..\..\..\src\utility\geometry\rect.cpp" />
     <ClCompile Include="..\..\..\src\utility\geometry\vec2.cpp" />
     <ClCompile Include="..\..\..\src\utility\geometry\vec3.cpp" />
+    <ClCompile Include="..\..\..\src\utility\memory.cpp" />
     <ClCompile Include="..\..\..\src\utility\random.cpp" />
     <ClCompile Include="..\..\..\src\utility\ring_buffer.cpp" />
     <ClCompile Include="..\..\..\src\utility\ring_buffer_playground.cpp" />

@@ -59,11 +59,12 @@ namespace core
       return gLogFileStream;
    }
 
-   void initializeFileStream(MemoryBlock memory)
+   void initializeFileStream(Allocator& a)
    {
       auto& stream = getFileStream();
       CORE_ASSERT_ERR(!stream.is_open(), "Logger has already been initialized");
 
+      char* memory = a.allocate<char[KiloBytes(128)]>();
       stream.rdbuf()->pubsetbuf((char*)memory.address, memory.size);
 
       char filename[19] = {};

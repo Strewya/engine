@@ -151,6 +151,7 @@
     <ClCompile Include="..\..\..\src\window\file_change_handler.cpp">
       <Filter>code\framework\window\windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\utility\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\stdafx.h">
