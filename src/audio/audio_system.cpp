@@ -11,25 +11,19 @@
 
 namespace core
 {
-   AudioSystem* createAudioSystem(MemoryBlock memory)
-   {
-      LinearAllocator a;
-      a.init("Audio allocator", memory);
-      AudioSystem* result = allocate<AudioSystem>(a);
-      result->m_staticMemory = a;
-   }
-
-   bool AudioSystem::init(u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+   bool AudioSystem::init(Allocator& a, u32 systemMemory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
    {
       CORE_INIT_START(AudioSystem);
 
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
+      m_staticMemory.init(a, systemMemory);
+
       u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
       CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
-      void* fmodMemory = allocate(m_staticMemory, fmodMemorySize, 1);
+      void* fmodMemory = m_staticMemory.allocateRaw(fmodMemorySize, 1);
       CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
       CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);

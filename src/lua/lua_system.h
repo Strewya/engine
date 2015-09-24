@@ -17,7 +17,7 @@ namespace core
    struct LuaSystem
    {
    public:
-      bool init();
+      bool init(Allocator& a, u32 systemMemory);
       bool shutdown();
       void collectGarbage();
 
@@ -25,13 +25,8 @@ namespace core
 
    private:
       lua_State* m_L;
-      LinearAllocator m_staticMemory;
       HeapAllocator m_luaMemory;
-
-      friend LuaSystem* createScriptSystem(MemoryBlock memory);
    };
-
-   LuaSystem* createScriptSystem(MemoryBlock memory);
 
    void test_luaStack();
 }

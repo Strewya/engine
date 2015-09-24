@@ -22,15 +22,19 @@ namespace core
       u32 m_usedSlots;
 
    public:
-      bool init(LinearAllocator& a, u32 maxSlots)
+      bool init(Allocator& a, u32 maxSlots)
       {
          CORE_INIT_START(SoundCache);
 
-         m_buffer = allocate<Sound>(a, maxSlots);
+         m_buffer = a.allocateArray<Sound>(maxSlots);
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
 
          CORE_INIT_END;
+      }
+      void shutdown(Allocator& a)
+      {
+         a.deallocateArray(m_buffer);
       }
 
       HSound insert(Sound s)

@@ -34,7 +34,7 @@ namespace core
    //*****************************************************************
    GraphicsSystem* createGraphicsSystem(MemoryBlock memory)
    {
-      LinearAllocator a;
+      FrameAllocator a;
       a.init("Graphics allocator", memory);
       GraphicsSystem* result = allocate<GraphicsSystem>(a);
       result->m_staticMemory = a;

@@ -26,12 +26,12 @@ namespace core
       WinMsg* m_buffer;
 
    public:
-      void init(LinearAllocator& allocator, u32 messageCount)
+      void init(Allocator& parent, u32 messageCount)
       {
          m_writeIndex = 1;
          m_readIndex = 0;
          m_maxMessages = messageCount;
-         m_buffer = allocate<WinMsg>(allocator, messageCount);
+         m_buffer = parent.allocateArray<WinMsg>(messageCount);
       }
 
       void writeEvent(const WinMsg& e)

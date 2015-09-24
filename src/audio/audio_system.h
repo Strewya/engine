@@ -11,16 +11,15 @@
 #include "audio/sound_cache.h"
 #include "sound_handle.h"
 #include "sound_file_loader.h"
+#include "utility/memory.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct LinearAllocator;
-
    struct AudioSystem
    {
    public:
-      bool init(u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
+      bool init(Allocator& a, u32 systemMemory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
       bool shutdown();
       bool update();
 
@@ -35,14 +34,10 @@ namespace core
       SoundCache sounds;
 
    private:
-      LinearAllocator m_staticMemory;
+      FrameAllocator m_staticMemory;
       SoundFileLoader m_fileLoader;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;
       HSound m_musicPlaying;
-
-      friend AudioSystem* createAudioSystem(MemoryBlock memory);
    };
-
-   AudioSystem* createAudioSystem(MemoryBlock memory);
 }

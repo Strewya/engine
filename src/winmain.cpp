@@ -37,21 +37,17 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       {
          using core::writeLog;
          core::MainAllocator mainAllocator;
-         mainAllocator.init("Entire memory allocator", address, size);
+         mainAllocator.init(address, size);
 
-         auto logMemory = allocateBlock(mainAllocator, KiloBytes(128));
-         initializeFileStream(logMemory);
+         initializeFileStream(mainAllocator, KiloBytes(128));
 
-         core::LinearAllocator communicationAllocator;
-         communicationAllocator.init("Communication allocator", allocateBlock(mainAllocator, MegaBytes(1)));
+         core::CommunicationBuffer* toGame = mainAllocator.allocate<core::CommunicationBuffer>();
+         toGame->init(mainAllocator, 2048);
 
-         core::CommunicationBuffer* toGame = core::allocate<core::CommunicationBuffer>(communicationAllocator);
-         toGame->init(communicationAllocator, 2048);
+         core::CommunicationBuffer* fromGame = mainAllocator.allocate<core::CommunicationBuffer>();
+         fromGame->init(mainAllocator, 128);
 
-         core::CommunicationBuffer* fromGame = core::allocate<core::CommunicationBuffer>(communicationAllocator);
-         fromGame->init(communicationAllocator, 128);
-
-         CORE_LOG(communicationAllocator);
+         CORE_LOG("Status after allocating communication buffers:", core::logLine, mainAllocator);
 
          std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
 

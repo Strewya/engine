@@ -22,7 +22,7 @@ namespace core
       u32 m_usedSlots;
 
    public:
-      bool init(LinearAllocator& a, u32 maxSlots)
+      bool init(FrameAllocator& a, u32 maxSlots)
       {
          CORE_INIT_START(VertexShaderCache);
 

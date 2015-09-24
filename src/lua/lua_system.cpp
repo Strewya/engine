@@ -48,25 +48,28 @@ namespace core
    
    void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
+      CORE_LOG_DEBUG("lua_allocateCustom, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
       HeapAllocator* a = (HeapAllocator*)ud;
       void* result = nullptr;
-      const char* action = "Unknown";
       if( nsize == 0 )
       {
-         action = "Deallocating";
-         deallocate(*a, ptr, (u32)osize);
+         a->deallocateRaw(ptr, (u32)osize);
       }
       else if( osize == 0 && nsize > 0 )
       {
-         action = "Allocating";
-         result = allocate(*a, (u32)nsize);
+         auto before = __rdtsc();
+         result = a->allocateRaw((u32)nsize, 16);
+         auto after = __rdtsc();
+         CORE_LOG_DEBUG("allocateRaw took ", (after - before), " cycles");
       }
       else if( osize > 0 && nsize > 0 )
       {
-         action = "Reallocating";
          if( osize != nsize )
          {
-            result = reallocate(*a, ptr, (u32)osize, (u32)nsize);
+            auto before = __rdtsc();
+            result = a->reallocateRaw(ptr, (u32)osize, (u32)nsize);
+            auto after = __rdtsc();
+            CORE_LOG_DEBUG("reallocateRaw took ", (after - before), " cycles");
          }
          else
          {
@@ -74,13 +77,12 @@ namespace core
          }
       }
 
-      CORE_LOG_DEBUG(action, " ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
       return result;
    }
 
    void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
    {
-      CORE_LOG_DEBUG("Lua allocation, ptr/osize/nsize: ", (u64)ptr, "/", osize, "/", nsize);
+      CORE_LOG_DEBUG("lua_allocate, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
 
       (void)ud;  (void)osize;  /* not used */
       if( nsize == 0 )
@@ -88,32 +90,18 @@ namespace core
          free(ptr);
          return nullptr;
       }
-
+      auto before = __rdtsc();
       auto* result = realloc(ptr, nsize);
-      CORE_LOG_DEBUG("Realloc memory address and alignment: ", (u32)result, " /// ", (u32)result & 0xf);
+      auto after = __rdtsc();
+      CORE_LOG_DEBUG("realloc took ", (after - before), " cycles");
       return result;
    }
 
-
-   LuaSystem* createScriptSystem(MemoryBlock memory)
-   {
-      LinearAllocator a;
-      a.init("Lua allocator", memory);
-      LuaSystem* result = allocate<LuaSystem>(a);
-      result->m_staticMemory = a;
-      return result;
-   }
-
-   static void test_luaAllocator(MemoryBlock memory);
-
-   bool LuaSystem::init()
+   bool LuaSystem::init(Allocator& a, u32 systemMemory)
    {
       CORE_INIT_START(LuaSystem);
 
-      //test_luaAllocator(memory);
-
-      m_luaMemory.init("Lua system", allocateBlock(m_staticMemory), 16);
-
+      m_luaMemory.init(a, systemMemory);
       m_L = lua_newstate(lua_allocateCustom, &m_luaMemory);
 
       CORE_STATUS_AND(m_L != nullptr);
@@ -178,7 +166,7 @@ end
    {
       CORE_SHUTDOWN_START(LuaSystem);
       lua_close(m_L);
-      CORE_LOG_DEBUG(m_staticMemory, m_luaMemory);
+      CORE_LOG_DEBUG(m_luaMemory);
       CORE_SHUTDOWN_END;
    }
 
@@ -190,82 +178,5 @@ end
    LuaStack LuaSystem::getStack() const
    {
       return LuaStack(m_L);
-   }
-
-
-
-   void test_luaAllocator(MemoryBlock memory)
-   {
-      HeapAllocator la{};
-      la.init("Lua allocator test", memory, 16);
-
-      u8* startAddress = la.m_memory.address;
-
-      void* a30 = allocate(la, 30);
-      CORE_ASSERT_DBGERR(a30 == startAddress, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == la.m_memory.size - 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == 0, "Playground error");
-
-      void* b40 = allocate(la, 40);
-      CORE_ASSERT_DBGERR(b40 == startAddress + 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 70, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30 + 40, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == la.m_memory.size - 30 - 40, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == 0, "Playground error");
-
-      void* c50 = allocate(la, 50);
-      CORE_ASSERT_DBGERR(c50 == startAddress + 30 + 40, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 120, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == la.m_memory.size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == 0, "Playground error");
-
-      deallocate(la, b40, 40);
-      CORE_ASSERT_DBGERR(la.m_allocated == 80, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == 40, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == la.m_memory.size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->next->size == 0, "Playground error");
-
-      void* d20 = allocate(la, 20);
-      CORE_ASSERT_DBGERR(d20 == startAddress + 30, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 100, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30 + 20, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == 20, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == la.m_memory.size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->next->size == 0, "Playground error");
-
-      void* e20 = allocate(la, 20);
-      CORE_ASSERT_DBGERR(e20 == startAddress + 30 + 20, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 120, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.address == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.size == la.m_memory.size - 30 - 40 - 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->address == nullptr, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_head.next->size == 0, "Playground error");
-
-      deallocate(la, e20, 20);
-      CORE_ASSERT_DBGERR(la.m_allocated == 100, "Playground error");
-      deallocate(la, d20, 20);
-      CORE_ASSERT_DBGERR(la.m_allocated == 80, "Playground error");
-
-      void* f60 = allocate(la, 60);
-      CORE_ASSERT_DBGERR(f60 == startAddress + 30 + 40 + 50, "Playground error");
-      CORE_ASSERT_DBGERR(la.m_allocated == 140, "Playground error");
-
-      deallocate(la, c50, 50);
-      CORE_ASSERT_DBGERR(la.m_allocated == 90, "Playground error");
-      deallocate(la, f60, 60);
-      CORE_ASSERT_DBGERR(la.m_allocated == 30, "Playground error");
-      deallocate(la, a30, 30);
-      CORE_ASSERT_DBGERR(la.m_allocated == 0, "Playground error");
    }
 }

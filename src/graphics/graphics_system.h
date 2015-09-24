@@ -75,7 +75,7 @@ namespace core
       bool initSamplerState();
       bool initDepthBuffer();
 
-      LinearAllocator m_staticMemory;
+      FrameAllocator m_staticMemory;
       HeapAllocator m_dynamicMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;

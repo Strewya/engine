@@ -110,7 +110,7 @@ namespace core
          game.constants.windowWidth = (f32)msg.screen.x;
          game.constants.windowHeight = (f32)msg.screen.y;
 
-         LinearAllocator la{};
+         FrameAllocator la{};
          //CORE_STATUS_AND(audioSystem.init(la));
          //CORE_STATUS_AND(graphicsSystem.init(window, game.constants.windowWidth, game.constants.windowHeight));
          //CORE_STATUS_AND(inputSystem.init());

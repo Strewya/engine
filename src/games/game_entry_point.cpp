@@ -33,13 +33,10 @@ namespace core
       CORE_MAX_UPDATE_TIME = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
    };
 
-   void runGame(MainAllocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
+   void runGame(Allocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
    {
       Clock logicTimer{};
       Clock renderTimer{};
-
-      StackAllocator reusableMemory;
-      reusableMemory.init("Reusable memory", allocateBlock(mainMemory, MegaBytes(10)));
 
 #ifdef DEPLOY
       enum : u32
@@ -52,12 +49,10 @@ namespace core
          //...
       };
 #else
-      auto configMemory = allocateBlock(reusableMemory, MegaBytes(1));
+      LuaSystem* memoryConfig = mainMemory.allocate<LuaSystem>();
+      memoryConfig->init(mainMemory, MegaBytes(1));
 
-      LuaSystem* luaConfigReader = createScriptSystem(configMemory);
-      luaConfigReader->init();
-
-      LuaStack config = luaConfigReader->getStack();
+      LuaStack config = memoryConfig->getStack();
       bool ok = config.doFile("memory.lua");
       CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
       CORE_ASSERT_DBGERR(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
@@ -79,24 +74,18 @@ namespace core
 #undef ExtractNumber
 
       config.pop();
-      luaConfigReader->shutdown();
+      memoryConfig->shutdown();
 
-      deallocateBlock(reusableMemory, configMemory);
+      mainMemory.deallocate(memoryConfig);
 #endif
+      AudioSystem* audio = mainMemory.allocate<AudioSystem>();
+      audio->init(mainMemory, MegaBytes(AudioSystemMegabytes), FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
-      //memory blocks for each of the bigger subsystems
-      auto audioMemory = allocateBlock(mainMemory, MegaBytes(AudioSystemMegabytes));
-      auto graphicsMemory = allocateBlock(mainMemory, MegaBytes(GraphicsSystemMegabytes));
-      auto scriptMemory = allocateBlock(mainMemory, MegaBytes(ScriptSystemMegabytes));
-      auto gameMemory = allocateBlock(mainMemory, MegaBytes(GameMemoryMegabytes));
+      GraphicsSystem* graphics = mainMemory.allocate<GraphicsSystem>();
+      graphics->init(mainMemory, MegaBytes(GraphicsSystemMegabytes), MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
 
-      AudioSystem* audio = createAudioSystem(audioMemory);
-      GraphicsSystem* graphics = createGraphicsSystem(graphicsMemory);
-      LuaSystem* script = createScriptSystem(scriptMemory);
-
-      audio->init(FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
-      graphics->init(MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
-      script->init();
+      LuaSystem* script = mainMemory.allocate<LuaSystem>();
+      script->init(mainMemory, MegaBytes(ScriptSystemMegabytes));
 
       // #todo decide if this should stay enabled in release build
       WinMsg msg{};
