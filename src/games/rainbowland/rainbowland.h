@@ -18,18 +18,10 @@ namespace core
 
    };
 
-   struct GameState
+   struct Game
    {
       World world;
       //GameAssets assets;
-      //...
-   };
-
-   struct GameData
-   {
-      GameState game;
-      GraphicsSystem gfx;
-      //AudioSystem* audio;
       //...
    };
 }

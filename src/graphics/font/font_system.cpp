@@ -34,9 +34,6 @@ namespace core
    bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y)
    {
       Mesh result{};
-      result.pshader = fd.pshader;
-      result.vshader = fd.vshader;
-      result.texture = fd.fontTexture;
       result.topology = TriangleList;
 
       f32 fontHeight = fd.height*scale.y;

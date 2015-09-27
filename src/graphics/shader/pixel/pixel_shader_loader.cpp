@@ -11,15 +11,10 @@
 
 namespace core
 {
-   bool PixelShaderLoader::init(ID3D11Device* device)
+   void PixelShaderLoader::init(ID3D11Device* device)
    {
-      CORE_INIT_START(PixelShaderLoader);
-
       m_dev = device;
-
-      CORE_STATUS_AND(m_dev != nullptr);
-
-      CORE_INIT_END;
+      CORE_ASSERT_DBGERR(m_dev != nullptr, "D3D11 device is NULL in PixelShaderLoader");
    }
 
    PixelShader PixelShaderLoader::load(void* buffer, u32 bufferSize) const

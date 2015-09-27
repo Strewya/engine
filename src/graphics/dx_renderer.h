@@ -23,8 +23,8 @@ namespace core
    struct DXRenderer
    {
    public:
-      bool init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11SamplerState* samplerState);
-      bool shutdown();
+      void init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ID3D11SamplerState* samplerState);
+      void shutdown();
 
       void setProjection(const XMMATRIX& matrix);
       void setView(const XMMATRIX& matrix);

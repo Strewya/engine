@@ -71,11 +71,11 @@
     <LibraryPath>$(SXROOT)\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(DXSDK_DIR)\Lib\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">
-    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SXROOT)\output\</OutDir>
     <LibraryPath>$(SXROOT)\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(DXSDK_DIR)\Lib\x64</LibraryPath>
     <IncludePath>$(SXROOT)\src;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(DXSDK_DIR)\Include</IncludePath>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -86,7 +86,7 @@
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4201;4100;4189;4505;4127;4101;</DisableSpecificWarnings>
       <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
@@ -151,7 +151,7 @@
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4201;4100;4189;4505;4127;4101;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
       <AdditionalOptions>/D$(COMPUTERNAME) %(AdditionalOptions)</AdditionalOptions>
@@ -207,7 +207,7 @@
       <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <DisableSpecificWarnings>4201;4100;4189;4505;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4201;4100;4189;4505;4127;4101;</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ExceptionHandling>SyncCThrow</ExceptionHandling>
       <BrowseInformation>true</BrowseInformation>
@@ -227,7 +227,8 @@
       <ShowProgress>NotSet</ShowProgress>
     </Link>
     <PreBuildEvent>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_prebuild</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <CustomBuild>
       <Command>
@@ -238,12 +239,14 @@
       </Command>
     </PostBuildEvent>
     <CustomBuildStep>
-      <Command>call $(SX_BIN)\luaBuild.lua $(SXROOT) game_postbuild $(Configuration)</Command>
+      <Command>
+      </Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Inputs>
       </Inputs>
-      <Outputs>dummy</Outputs>
+      <Outputs>
+      </Outputs>
       <Message>
       </Message>
     </CustomBuildStep>
@@ -252,7 +255,11 @@
     <ClCompile Include="..\..\..\src\audio\audio_system.cpp" />
     <ClCompile Include="..\..\..\src\audio\sound_file_loader.cpp" />
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp" />
-    <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp" />
+    <ClCompile Include="..\..\..\src\games\rainbowland\game.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\load_game_resources.cpp" />
     <None Include="..\..\..\src\games\rainbowland\logic\code.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -262,9 +269,17 @@
     <ClCompile Include="..\..\..\src\graphics\camera.cpp" />
     <ClCompile Include="..\..\..\src\graphics\dx_renderer.cpp" />
     <ClCompile Include="..\..\..\src\graphics\font\font_descriptor.cpp" />
-    <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp" />
+    <ClCompile Include="..\..\..\src\graphics\font\font_system.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\graphics_system.cpp" />
-    <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp" />
+    <ClCompile Include="..\..\..\src\graphics\mesh\mesh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\shader\vertex\vertex_shader_loader.cpp" />
     <ClCompile Include="..\..\..\src\graphics\texture\texture_file_loader.cpp" />
@@ -318,7 +333,11 @@
     <ClInclude Include="..\..\..\src\audio\sound_cache.h" />
     <ClInclude Include="..\..\..\src\games\entity.h" />
     <ClInclude Include="..\..\..\src\games\game_entry_point.h" />
-    <ClInclude Include="..\..\..\src\games\rainbowland\game.h" />
+    <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h" />
     <ClInclude Include="..\..\..\src\games\rainbowland\rainbowland.h" />
@@ -327,10 +346,18 @@
     <ClInclude Include="..\..\..\src\graphics\dx_include.h" />
     <ClInclude Include="..\..\..\src\graphics\dx_renderer.h" />
     <ClInclude Include="..\..\..\src\graphics\font\font_descriptor.h" />
-    <ClInclude Include="..\..\..\src\graphics\font\font_system.h" />
+    <ClInclude Include="..\..\..\src\graphics\font\font_system.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\graphics_system.h" />
     <ClInclude Include="..\..\..\src\graphics\graphics_types.h" />
-    <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h" />
+    <ClInclude Include="..\..\..\src\graphics\mesh\mesh.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\default_pixel_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader.h" />
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_loader.h" />

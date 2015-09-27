@@ -14,7 +14,6 @@
 #include "utility/utility.h"
 #include "window/window_message.h"
 
-
 #include "games/rainbowland/rainbowland.cpp"
 /******* end headers *******/
 
@@ -33,6 +32,8 @@ namespace core
       CORE_MAX_UPDATE_TIME = (CORE_STEP == CORE_CLAMPED_STEP) ? CORE_MAX_MICROS_PER_FRAME : ~0ULL,
    };
 
+
+
    void runGame(Allocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
    {
       Clock logicTimer{};
@@ -41,51 +42,85 @@ namespace core
 #ifdef DEPLOY
       enum : u32
       {
-         AudioSystemMemorySize = MegaBytes(40),
-         MaxNumberOfSoundSlots = 20,
-         ScriptSystemMemorySize = MegaBytes(100),
-         GraphicsSystemMemorySize = MegaBytes(50),
+         AudioSystemMegabytes = 40,
+         GraphicsSystemMegabytes = 40,
+         ScriptSystemMegabytes = 40,
+         GameMemoryMegabytes = 500,
+
+         FmodMemoryMegabytes = 30,
+         FmodMaxChannels = 32,
+         MaxNumberOfSoundSlots = 10,
+
          MaxNumberOfTextureSlots = 5,
-         //...
+         MaxNumberOfShaderSlots = 5,
       };
 #else
-      LuaSystem* memoryConfig = mainMemory.allocate<LuaSystem>();
-      memoryConfig->init(mainMemory, MegaBytes(1));
+      u32 AudioSystemMegabytes;
+      u32 GraphicsSystemMegabytes;
+      u32 ScriptSystemMegabytes;
+      u32 GameMemoryMegabytes;
 
-      LuaStack config = memoryConfig->getStack();
-      bool ok = config.doFile("memory.lua");
-      CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
-      CORE_ASSERT_DBGERR(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
+      u32 FmodMemoryMegabytes;
+      u32 FmodMaxChannels;
+      u32 MaxNumberOfSoundSlots;
 
-#define ExtractNumber(name) u32 name = get<u32>(config, #name, 0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' inconfig file, found none or has value 0!")
+      u32 MaxNumberOfTextureSlots;
+      u32 MaxNumberOfShaderSlots;
 
-      ExtractNumber(AudioSystemMegabytes);
-      ExtractNumber(GraphicsSystemMegabytes);
-      ExtractNumber(ScriptSystemMegabytes);
-      ExtractNumber(GameMemoryMegabytes);
+      {
+         HeapAllocator configAllocator;
+         configAllocator.acquireMemory(mainMemory, KiloBytes(64));
+         LuaSystem* memoryConfig = configAllocator.allocate<LuaSystem>();
+         memoryConfig->init(configAllocator);
+         
+         LuaStack config = memoryConfig->getStack();
+         bool ok = config.doFile("memory.lua");
+         CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
+         CORE_ASSERT_DBGERR(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
 
-      ExtractNumber(FmodMemoryMegabytes);
-      ExtractNumber(FmodMaxChannels);
-      ExtractNumber(MaxNumberOfSoundSlots);
+#define ExtractNumber(name) name = get<u32>(config, #name, 0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' in config file, found none or has value 0!")
 
-      ExtractNumber(MaxNumberOfTextureSlots);
-      ExtractNumber(MaxNumberOfShaderSlots);
+         ExtractNumber(AudioSystemMegabytes);
+         ExtractNumber(GraphicsSystemMegabytes);
+         ExtractNumber(ScriptSystemMegabytes);
+         ExtractNumber(GameMemoryMegabytes);
+
+         ExtractNumber(FmodMemoryMegabytes);
+         ExtractNumber(FmodMaxChannels);
+         ExtractNumber(MaxNumberOfSoundSlots);
+
+         ExtractNumber(MaxNumberOfTextureSlots);
+         ExtractNumber(MaxNumberOfShaderSlots);
 
 #undef ExtractNumber
 
-      config.pop();
-      memoryConfig->shutdown();
-
-      mainMemory.deallocate(memoryConfig);
+         config.pop();
+         memoryConfig->shutdown();
+         configAllocator.deallocate(memoryConfig);
+         configAllocator.returnMemory(mainMemory);
+      }
 #endif
-      AudioSystem* audio = mainMemory.allocate<AudioSystem>();
-      audio->init(mainMemory, MegaBytes(AudioSystemMegabytes), FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
-      GraphicsSystem* graphics = mainMemory.allocate<GraphicsSystem>();
-      graphics->init(mainMemory, MegaBytes(GraphicsSystemMegabytes), MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
+      auto before = __rdtsc();
 
-      LuaSystem* script = mainMemory.allocate<LuaSystem>();
-      script->init(mainMemory, MegaBytes(ScriptSystemMegabytes));
+      FrameAllocator* audioMemory = mainMemory.allocate<FrameAllocator>();
+      audioMemory->acquireMemory(mainMemory, MegaBytes(AudioSystemMegabytes));
+      AudioSystem* audio = audioMemory->allocate<AudioSystem>();
+      audio->init(*audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+
+      FrameAllocator* graphicsMemory = mainMemory.allocate<FrameAllocator>();
+      graphicsMemory->acquireMemory(mainMemory, MegaBytes(GraphicsSystemMegabytes));
+      GraphicsSystem* graphics = graphicsMemory->allocate<GraphicsSystem>();
+      graphics->init(*graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
+
+      HeapAllocator* scriptMemory = mainMemory.allocate<HeapAllocator>();
+      scriptMemory->acquireMemory(mainMemory, MegaBytes(ScriptSystemMegabytes));
+      LuaSystem* script = scriptMemory->allocate<LuaSystem>();
+      script->init(*scriptMemory);
+      
+      FrameAllocator* gameMemory = mainMemory.allocate<FrameAllocator>();
+      gameMemory->acquireMemory(mainMemory, MegaBytes(GameMemoryMegabytes));
+      Game* game = init_game(*gameMemory, fromMain, toMain);
 
       // #todo decide if this should stay enabled in release build
       WinMsg msg{};
@@ -94,7 +129,7 @@ namespace core
       toMain->writeEvent(msg);
       //
 
-      auto running = true;
+      auto running = (game == nullptr);
       while( running )
       {
          f32 fraction = 0;
@@ -112,25 +147,58 @@ namespace core
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
-            running = tickLogic(fromMain, toMain, logicTimer);
+            running = tickLogic(*game, fromMain, toMain, logicTimer);
          }
          logicTimer.advanceTimeBy(droppedTime);
 
          u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
          // we might want to do interpolation ...
-         tickRender(fromMain, toMain, renderTimer);
+         tickRender(*game, fromMain, toMain, renderTimer);
          renderTimer.advanceTimeBy(fullUpdateTime);
       }
-      bool shutdownStatus = shutdown_game(fromMain, toMain);
-      if( !shutdownStatus )
+      if( game )
       {
-         CORE_LOG("Game shutdown failed...");
+         shutdown_game(*game, fromMain, toMain);
+         gameMemory->deallocate(game);
+         gameMemory->returnMemory(mainMemory);
+         mainMemory.deallocate(gameMemory);
       }
 
-      //all major systems should have a shutdown method which, in the least, logs the memory usage from the allocators
-      audio->shutdown();
-      graphics->shutdown();
       script->shutdown();
+      scriptMemory->deallocate(script);
+      scriptMemory->returnMemory(mainMemory);
+      mainMemory.deallocate(scriptMemory);
+
+      graphics->shutdown();
+      graphicsMemory->deallocate(graphics);
+      graphicsMemory->returnMemory(mainMemory);
+      mainMemory.deallocate(graphicsMemory);
+
+      audio->shutdown();
+      audioMemory->deallocate(audio);
+      audioMemory->returnMemory(mainMemory);
+      mainMemory.deallocate(audioMemory);
+
+      auto after = __rdtsc();
+      CORE_LOG("All systems init and shutdown took ", (after - before), " cycles");
+
+
+      before = __rdtsc();
+      struct Bleb
+      {
+         f64 d;
+         f32 f;
+         u32 i;
+      };
+      HeapAllocator* testHeap = mainMemory.allocate<HeapAllocator>();
+      testHeap->acquireMemory(mainMemory, KiloBytes(1));
+      for( u32 i = 1; i != 0; ++i )
+      {
+         auto* t = testHeap->allocate<Bleb>();
+         testHeap->deallocate(t);
+      }
+      after = __rdtsc();
+      CORE_LOG("Stupid took ", (after - before), " cycles");
 
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);

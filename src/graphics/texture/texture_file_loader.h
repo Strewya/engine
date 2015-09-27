@@ -17,7 +17,7 @@ namespace core
    struct TextureFileLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      void init(ID3D11Device* device);
 
       Texture load(const char* filename) const;
       void unload(Texture& data) const;

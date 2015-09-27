@@ -5,6 +5,7 @@
 ********************************************/
 /******* c++ headers *******/
 #include <cstdint>
+#include <ostream>
 /******* common headers *******/
 /******* extra headers *******/
 /******* end header inclusion *******/
@@ -52,10 +53,17 @@ struct str_writeable
    operator str() { return str{buffer}; }
 };
 
-inline bool operator==(const str_writeable& a, const char* b)
+inline bool operator==(const str_writeable& a, const char* rb)
 {
-   auto result = strcmp(a.buffer, b) == 0;
-   return result;
+   const char* ra = a.buffer;
+   while( *ra || *rb )
+   {
+      if( *(ra++) != *(rb++) )
+      {
+         return false;
+      }
+   }
+   return true;
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const str_writeable& s)

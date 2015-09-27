@@ -18,7 +18,7 @@ namespace core
    struct SoundFileLoader
    {
    public:
-      bool init(FMOD::System* system);
+      void init(FMOD::System* system);
 
       Sound load(const char* filename) const;
       void unload(Sound& sound) const;

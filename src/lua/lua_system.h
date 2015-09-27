@@ -17,15 +17,15 @@ namespace core
    struct LuaSystem
    {
    public:
-      bool init(Allocator& a, u32 systemMemory);
-      bool shutdown();
+      void init(Allocator& a);
+      void shutdown();
       void collectGarbage();
 
       LuaStack getStack() const;
 
    private:
       lua_State* m_L;
-      HeapAllocator m_luaMemory;
+      Allocator* m_luaMemory;
    };
 
    void test_luaStack();

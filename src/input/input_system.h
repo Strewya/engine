@@ -21,9 +21,6 @@ namespace core
    struct InputSystem
    {
    public:
-      bool init();
-      bool shutdown();
-
       void gatherInputForCurrentFrame(u64 pollMicros, CommunicationBuffer* comm);
 
       const EventVector_t& getEvents() const;

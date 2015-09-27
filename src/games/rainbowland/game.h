@@ -31,7 +31,6 @@ namespace core
       GraphicsSystem graphicsSystem;
       InputSystem inputSystem;
       LuaSystem luaSystem;
-      FontSystem fontSystem;
 
       //game state stuff
       GameData game;

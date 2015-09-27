@@ -11,15 +11,10 @@
 
 namespace core
 {
-   bool TextureFileLoader::init(ID3D11Device* device)
+   void TextureFileLoader::init(ID3D11Device* device)
    {
-      CORE_INIT_START(TextureFileLoader);
-
       m_dev = device;
-
-      CORE_STATUS_AND(m_dev != nullptr);
-
-      CORE_INIT_END;
+      CORE_ASSERT_DBGERR(m_dev != nullptr, "D3D11 device is NULL in TextureFileLoader!");
    }
 
    Texture TextureFileLoader::load(const char* filename) const

@@ -18,7 +18,7 @@ namespace core
    struct PixelShaderLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      void init(ID3D11Device* device);
 
       PixelShader load(void* buffer, u32 bufferSize) const;
       void unload(PixelShader& data);

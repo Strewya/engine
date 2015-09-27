@@ -32,20 +32,10 @@ namespace core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   GraphicsSystem* createGraphicsSystem(MemoryBlock memory)
+   void GraphicsSystem::init(Allocator& a, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
    {
-      FrameAllocator a;
-      a.init("Graphics allocator", memory);
-      GraphicsSystem* result = allocate<GraphicsSystem>(a);
-      result->m_staticMemory = a;
-      return result;
-   }
-
-   bool GraphicsSystem::init(u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
-   {
-      CORE_INIT_START(GraphicsSystem);
-
-      m_dynamicMemory.init("Graphics dynamic memory", allocateBlock(m_staticMemory, MegaBytes(10)), 16);
+      m_staticMemory = &a;
+      m_dynamicMemory.acquireMemory(*m_staticMemory, MegaBytes(10));
 
       m_window = handle;
       m_backbufferSize.x = this->width = (f32)width;
@@ -65,26 +55,23 @@ namespace core
       declare(m_cullingEnabled);
       declare(m_cullingDisabled);
 
-      CORE_STATUS_AND(initDevice());
-      CORE_STATUS_AND(initSwapChain());
-      CORE_STATUS_AND(initRenderTarget());
-      CORE_STATUS_AND(initViewport());
-      CORE_STATUS_AND(initSamplerState());
+      initDevice();
+      initSwapChain();
+      initRenderTarget();
+      initViewport();
+      initSamplerState();
 
-      CORE_STATUS_AND(m_renderer.init(m_dev, m_devcon, m_samplerState));
+      m_renderer.init(m_dev, m_devcon, m_samplerState);
 
-      CORE_STATUS_AND(m_textureFileLoader.init(m_dev));
-      CORE_STATUS_AND(textures.init(m_staticMemory, textureSlots));
+      m_textureFileLoader.init(m_dev);
+      textures.init(*m_staticMemory, textureSlots);
 
-      CORE_STATUS_AND(m_vsLoader.init(m_dev));
-      CORE_STATUS_AND(vertexShaders.init(m_staticMemory, shaderSlots));
+      m_vsLoader.init(m_dev);
+      vertexShaders.init(*m_staticMemory, shaderSlots);
 
-      CORE_STATUS_AND(m_psLoader.init(m_dev));
-      CORE_STATUS_AND(pixelShaders.init(m_staticMemory, shaderSlots));
+      m_psLoader.init(m_dev);
+      pixelShaders.init(*m_staticMemory, shaderSlots);
 
-
-
-      if( CORE_STATUS_OK )
       {
 #include "graphics/shader/vertex/default_vertex_shader.h"
 
@@ -92,69 +79,68 @@ namespace core
          CORE_ASSERT_DBGERR(layout.buffer != nullptr, "Error generating input layout information");
          auto defaultVertexShader = m_vsLoader.load(layout, (u8*)g_VShader, sizeof(g_VShader));
 
-         auto vhandle = vertexShaders.insert(defaultVertexShader);
-         CORE_ASSERT_DBGERR(vhandle.getIndex() == 0, "The default pixel shader should be at index 0");
+         m_defaultVertexShaderHandle = vertexShaders.insert(defaultVertexShader);
+         CORE_ASSERT_DBGERR(m_defaultVertexShaderHandle.getIndex() == 0, "The default pixel shader should be at index 0");
          // #todo think about a sane way of using the default shader with different actual vertices being sent to the pipeline
       }
 
-      if( CORE_STATUS_OK )
       {
 #include "graphics/shader/pixel/default_pixel_shader.h"
 
          auto defaultPixelShader = m_psLoader.load((u8*)g_PShader, sizeof(g_PShader));
-         auto phandle = pixelShaders.insert(defaultPixelShader);
-         CORE_ASSERT_DBGERR(phandle.getIndex() == 0, "The default pixel shader should be at index 0");
+         m_defaultPixelShaderHandle = pixelShaders.insert(defaultPixelShader);
+         CORE_ASSERT_DBGERR(m_defaultPixelShaderHandle.getIndex() == 0, "The default pixel shader should be at index 0");
       }
 
-      if( CORE_STATUS_OK )
-      {
-         D3D11_BLEND_DESC blendDesc;
-         ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
 
-         blendDesc.AlphaToCoverageEnable = false;
+      D3D11_BLEND_DESC blendDesc;
+      ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
 
-         D3D11_RENDER_TARGET_BLEND_DESC& rtbd = blendDesc.RenderTarget[0];
-         rtbd.BlendEnable = true;
-         rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
-         rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-         rtbd.BlendOp = D3D11_BLEND_OP_ADD;
-         rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
-         rtbd.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-         rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
-         rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+      blendDesc.AlphaToCoverageEnable = false;
 
-         HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
+      D3D11_RENDER_TARGET_BLEND_DESC& rtbd = blendDesc.RenderTarget[0];
+      rtbd.BlendEnable = true;
+      rtbd.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+      rtbd.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+      rtbd.BlendOp = D3D11_BLEND_OP_ADD;
+      rtbd.SrcBlendAlpha = D3D11_BLEND_ONE;
+      rtbd.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+      rtbd.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+      rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
 
-         CORE_STATUS_AND(SUCCEEDED(hr));
+      HRESULT hr = m_dev->CreateBlendState(&blendDesc, &m_transparency);
 
-         D3D11_RASTERIZER_DESC rd;
-         ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
-         rd.FillMode = D3D11_FILL_SOLID;
+      CORE_ASSERT_DBGERR(SUCCEEDED(hr), "Failed to create blend state for transparency!");
 
-         rd.CullMode = D3D11_CULL_BACK;
-         hr = m_dev->CreateRasterizerState(&rd, &m_cullingEnabled);
-         CORE_STATUS_AND(SUCCEEDED(hr));
+      D3D11_RASTERIZER_DESC rd;
+      ZeroMemory(&rd, sizeof(D3D11_RASTERIZER_DESC));
+      rd.FillMode = D3D11_FILL_SOLID;
 
-         rd.CullMode = D3D11_CULL_NONE;
-         hr = m_dev->CreateRasterizerState(&rd, &m_cullingDisabled);
-         CORE_STATUS_AND(SUCCEEDED(hr));
-      }
+      rd.CullMode = D3D11_CULL_BACK;
+      hr = m_dev->CreateRasterizerState(&rd, &m_cullingEnabled);
+      CORE_ASSERT_DBGERR(SUCCEEDED(hr), "Failed to create rasterizer state for cullingEnabled!");
 
-      CORE_INIT_END;
+      rd.CullMode = D3D11_CULL_NONE;
+      hr = m_dev->CreateRasterizerState(&rd, &m_cullingDisabled);
+      CORE_ASSERT_DBGERR(SUCCEEDED(hr), "Failed to create rasterizer state for cullingDisabled!");
    }
 
    //*****************************************************************
    //          SHUTDOWN
    //*****************************************************************
-   bool GraphicsSystem::shutdown()
+   void GraphicsSystem::shutdown()
    {
-      CORE_SHUTDOWN_START(GraphicsSystem);
+      unload(m_defaultPixelShaderHandle);
+      unload(m_defaultVertexShaderHandle);
 
-      CORE_STATUS_AND(pixelShaders.getCount() == 0);
-      CORE_STATUS_AND(vertexShaders.getCount() == 0);
-      CORE_STATUS_AND(textures.getCount() == 0);
+      CORE_ASSERT_DBGWRN(pixelShaders.getCount() == 0, "Some pixel shaders were not released!");
+      CORE_ASSERT_DBGWRN(vertexShaders.getCount() == 0, "Some vertex shaders were not released!");
+      CORE_ASSERT_DBGWRN(textures.getCount() == 0, "Some textures were not released!");
+      pixelShaders.shutdown();
+      vertexShaders.shutdown();
+      textures.shutdown();
 
-      CORE_STATUS_AND(m_renderer.shutdown());
+      m_renderer.shutdown();
 
       ID3D11Debug* debug = nullptr;
       HRESULT hr = m_dev->QueryInterface(IID_PPV_ARGS(&debug));
@@ -167,8 +153,8 @@ namespace core
          debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
          safeRelease(debug);
       }
-
-      CORE_SHUTDOWN_END;
+      CORE_LOG(m_dynamicMemory);
+      m_dynamicMemory.returnMemory(*m_staticMemory);
    }
 
    //*****************************************************************
@@ -215,7 +201,7 @@ namespace core
       CORE_ASSERT_ERR(layout.buffer != nullptr && layout.size > 0, "Error generating input layout information");
       auto shader = m_vsLoader.load(layout, file.memory, file.size);
 
-      deallocate(m_dynamicMemory, file.memory, file.size);
+      m_dynamicMemory.deallocateRaw(file.memory, file.size);
 
       auto result = vertexShaders.insert(shader);
       return result;
@@ -239,7 +225,7 @@ namespace core
       CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
       auto shader = m_psLoader.load(file.memory, file.size);
 
-      deallocate(m_dynamicMemory, file.memory, file.size);
+      m_dynamicMemory.deallocateRaw(file.memory, file.size);
 
       auto result = pixelShaders.insert(shader);
       return result;
@@ -369,22 +355,25 @@ namespace core
    //*****************************************************************
    //          RENDER MESH
    //*****************************************************************
-   void GraphicsSystem::renderMesh(Transform t, Color c, const Mesh& mesh)
+   void GraphicsSystem::renderMesh(Transform t, Color c, const Mesh& mesh, Material material)
    {
-      D3D_PRIMITIVE_TOPOLOGY topology[] = {
+      D3D_PRIMITIVE_TOPOLOGY d3dTopologies[] = {
          D3D_PRIMITIVE_TOPOLOGY_LINELIST,
          D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
          D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
          D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
       };
 
-      auto vshader = vertexShaders.getData(mesh.vshader);
+      auto vshader = vertexShaders.getData(material.vertexShaderHandle);
+      auto pshader = pixelShaders.getData(material.pixelShaderHandle);
+      auto texture = textures.getData(material.textureHandle);
+      auto topology = d3dTopologies[mesh.topology];
 
       m_renderer.setInputLayout(vshader._inputLayout);
       m_renderer.setShader(vshader._vertex);
-      m_renderer.setShader(pixelShaders.getData(mesh.pshader)._pixel);
-      m_renderer.setTexture(textures.getData(mesh.texture)._shaderResourceView);
-      m_renderer.setVertexTopology(topology[mesh.topology]);
+      m_renderer.setShader(pshader._pixel);
+      m_renderer.setTexture(texture._shaderResourceView);
+      m_renderer.setVertexTopology(topology);
       m_renderer.render(t, c, mesh.vertices, mesh.indices);
    }
 
@@ -410,14 +399,14 @@ namespace core
 
             safeRelease(adapter);
          }
-   }
+      }
 
       if( FAILED(hr) )
       {
          CORE_LOG("initDevice failed");
       }
       return SUCCEEDED(hr);
-}
+   }
 
    //*****************************************************************
    //          INIT SWAP CHAIN
@@ -585,5 +574,5 @@ namespace core
 
       return XMMatrixLookAtLH(pos, lookAt, up);
    }
-   }
+}
 

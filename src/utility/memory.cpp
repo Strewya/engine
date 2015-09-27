@@ -30,11 +30,14 @@ namespace core
       return stream;
    }
 
-
+#ifndef TEST_MEMORY_ALLOCATION_PERFORMANCE
    /************************************************************************
     *              MainAllocator functions
     ************************************************************************/
-   void MainAllocator::init(void* memory, u64 size)
+   MainAllocator::MainAllocator()
+      : m_voidAddress{nullptr}, m_sizeBytes{0}, m_allocatedBytes{0}, m_allocations{0}
+   {}
+   void MainAllocator::initializeMemory(void* memory, u64 size)
    {
       CORE_ASSERT_DBGERR(m_voidAddress == nullptr, "Attempting to initialize a large allocator that has already been initialized.");
       m_voidAddress = memory;
@@ -44,7 +47,8 @@ namespace core
    }
    void* MainAllocator::allocateRaw(u32 size, u32 align)
    {
-      auto alignment = align - (u32(m_byteAddress + m_allocatedBytes) % align);
+      auto alignment = (u32(m_byteAddress + m_allocatedBytes) % align);
+      alignment = alignment != 0 ? align - alignment : alignment;
       size += alignment;
       if( m_allocatedBytes + size <= m_sizeBytes )
       {
@@ -61,7 +65,7 @@ namespace core
       {
          return;
       }
-      // #todo
+      // [Struja 26.9.2015.] #todo:  
       CORE_ASSERT_DBGWRN(false, "Not implemented yet!");
       --m_allocations;
    }
@@ -78,19 +82,23 @@ namespace core
    /************************************************************************
     *              FrameAllocator functions
     ************************************************************************/
-   void FrameAllocator::init(Allocator& parent, u32 sizeBytes)
+   FrameAllocator::FrameAllocator()
+      : m_voidAddress{nullptr}, m_sizeBytes{0}, m_allocatedBytes{0}, m_allocations{0}
+   {}
+   void FrameAllocator::acquireMemory(Allocator& parent, u32 sizeBytes)
    {
       CORE_ASSERT_DBGWRN(m_voidAddress == nullptr, "Attempting to initialize a frame allocator that has already been initialized.");
-      m_parent = &parent;
       m_sizeBytes = sizeBytes;
       m_voidAddress = parent.allocateRaw(sizeBytes, 16);
+      CORE_ASSERT_DBGERR(m_voidAddress != nullptr, "Failed to allocate memory for pool!");
       m_allocatedBytes = 0;
       m_allocations = 0;
    }
    void* FrameAllocator::allocateRaw(u32 size, u32 align)
    {
       u8* result = m_byteAddress + m_allocatedBytes;
-      auto alignment = align - (u32(result) % align);
+      auto alignment = (u32(m_byteAddress + m_allocatedBytes) % align);
+      alignment = alignment != 0 ? align - alignment : alignment;
       size += alignment;
       if( m_allocatedBytes + size <= m_sizeBytes )
       {
@@ -107,7 +115,7 @@ namespace core
       {
          return;
       }
-      // #todo
+      // [Struja 26.9.2015.] #todo:  
       CORE_ASSERT_DBGWRN(false, "Not implemented yet!");
       --m_allocations;
    }
@@ -116,31 +124,29 @@ namespace core
       stream << "Allocated memory: " << byteSizes(m_allocatedBytes) << logLine;
       stream << "Allocation count: " << m_allocations << logLine;
    }
-   void FrameAllocator::shutdown()
+   void FrameAllocator::returnMemory(Allocator& a)
    {
       CORE_ASSERT_DBGERR(m_allocations == 0, "Missing ", m_allocations, " deallocations for frame allocator.");
-      m_parent->deallocateRaw(m_voidAddress, m_sizeBytes);
+      a.deallocateRaw(m_voidAddress, m_sizeBytes);
    }
 
    /************************************************************************
     *              PoolAllocator
     ************************************************************************/
-   void PoolAllocator::init(Allocator& parent, u32 slotCount, u32 slotSize)
+   PoolAllocator::PoolAllocator()
+      : m_voidAddress{nullptr}, m_sizeBytes{0}, m_allocatedBytes{0}, m_allocations{0}, m_slotSize{0}
+   {}
+   void PoolAllocator::acquireMemory(Allocator& parent, u32 slotCount, u32 slotSize)
    {
-      CORE_ASSERT_DBGWRN(m_head.next == nullptr, "Attempting to initialize a pool allocator that has already been initialized.");
+      CORE_ASSERT_DBGWRN(m_voidAddress == nullptr, "Attempting to initialize a pool allocator that has already been initialized.");
       CORE_ASSERT_DBGWRN(sizeof(Node) <= slotSize, "Creating pool for type smaller than internal Node, increasing allocation size");
-      m_parent = &parent;
-
+      
       m_slotSize = sizeof(Node) > slotSize ? (u32)sizeof(Node) : slotSize;
-      union
-      {
-         void* voidAddress;
-         u8* byteAddress;
-      };
+      
       m_sizeBytes = slotCount*m_slotSize;
-      m_voidAddress = parent.allocateRaw(m_sizeBytes, 16);
+      u8* byteAddress = (u8*)(m_voidAddress = parent.allocateRaw(m_sizeBytes, 16));
         
-      CORE_ASSERT_DBGERR(voidAddress != nullptr, "Failed to allocate memory for pool!");
+      CORE_ASSERT_DBGERR(m_voidAddress != nullptr, "Failed to allocate memory for pool!");
 
       Node* runner = &m_head;
       for( u32 i = 0; i < slotCount; ++i )
@@ -151,6 +157,11 @@ namespace core
       runner->next = nullptr;
       m_allocations = 0;
       m_allocatedBytes = 0;
+   }
+   void PoolAllocator::returnMemory(Allocator& a)
+   {
+      CORE_ASSERT_DBGERR(m_allocations == 0, "Missing ", m_allocations, " deallocations for pool allocator.");
+      a.deallocateRaw(m_voidAddress, m_sizeBytes);
    }
    void* PoolAllocator::allocateRaw(u32 size, u32 align)
    {
@@ -187,27 +198,31 @@ namespace core
       stream << "Allocated memory: " << byteSizes(m_allocatedBytes) << logLine;
       stream << "Allocation count: " << m_allocations << logLine;
    }
-   void PoolAllocator::shutdown()
-   {
-      CORE_ASSERT_DBGERR(m_allocations == 0, "Missing ", m_allocations, " deallocations for pool allocator.");
-      m_parent->deallocateRaw(m_voidAddress, m_sizeBytes);
-   }
 
    /************************************************************************
     *              HeapAllocator functions
     ************************************************************************/
-   void HeapAllocator::init(Allocator& parent, u32 sizeBytes)
+   HeapAllocator::HeapAllocator()
+      : m_voidAddress{nullptr}, m_sizeBytes{0}, m_allocatedBytes{0}, m_allocations{0}
+   {}
+   void HeapAllocator::acquireMemory(Allocator& parent, u32 sizeBytes)
    {
-      CORE_ASSERT_DBGWRN(m_head.voidAddress == nullptr, "Attempting to initialize a heap allocator that has already been initialized.");
+      CORE_ASSERT_DBGWRN(m_voidAddress == nullptr, "Attempting to initialize a heap allocator that has already been initialized.");
 
-      void* memory = parent.allocateRaw(sizeBytes, 16);
+      m_voidAddress = parent.allocateRaw(sizeBytes, 16);
+      m_sizeBytes = sizeBytes;
       
-      CORE_ASSERT_DBGERR(memory != nullptr, "Failed to allocate memory for pool!");
+      CORE_ASSERT_DBGERR(m_voidAddress != nullptr, "Failed to allocate memory for heap!");
       
-      m_head.voidAddress = memory;
+      m_head.voidAddress = m_voidAddress;
       m_head.size = sizeBytes;
       m_head.next->voidAddress = nullptr;
       m_head.next->size = 0;
+   }
+   void HeapAllocator::returnMemory(Allocator& parent)
+   {
+      CORE_ASSERT_DBGERR(m_allocations == 0, "Missing ", m_allocations, " deallocations for heap allocator.");
+      parent.deallocateRaw(m_voidAddress, m_sizeBytes);
    }
 #define ALIGNMENT 16
    void* HeapAllocator::allocateRaw(u32 size, u32 align)
@@ -305,79 +320,5 @@ namespace core
       stream << "Allocated memory: " << byteSizes(m_allocatedBytes) << logLine;
       stream << "Allocation count: " << m_allocations << logLine;
    }
-   void HeapAllocator::shutdown()
-   {
-      CORE_ASSERT_DBGERR(m_allocations == 0, "Missing ", m_allocations, " deallocations for pool allocator.");
-      m_parent->deallocateRaw(m_voidAddress, m_sizeBytes);
-   }
-
-   void* HeapAllocator::reallocateRaw(void* ptr, u32 osize, u32 nsize)
-   {
-      void* result = nullptr;
-      if( nsize < osize )
-      {
-         //if the new size is less than the old size, we can just return the original pointer, and release the extra size
-         //first we need to modify the size to be multiple of 16
-         u32 sizeExpansionForFreelistPurposes = (ALIGNMENT - (nsize % ALIGNMENT));
-         sizeExpansionForFreelistPurposes = sizeExpansionForFreelistPurposes & (ALIGNMENT - 1);
-         nsize += sizeExpansionForFreelistPurposes;
-
-         void* ptrToDeallocate = (u8*)ptr + nsize;
-         if( osize - nsize )
-         {
-            deallocateRaw(ptrToDeallocate, osize - nsize);
-            ++m_allocations;
-         }
-         result = ptr;
-      }
-      else //nsize > osize
-      {
-         HeapAllocator::Node* currentNode = &m_head;
-         union
-         {
-            u8* byte;
-            void* address;
-         };
-         address = ptr;
-         while( currentNode->byteAddress < (byte + osize) )
-         {
-            currentNode = currentNode->next;
-         }
-         if( currentNode->byteAddress == byte + osize && currentNode->size >= (nsize - osize) )
-         {
-            //this means there is enough room to expand, so we need to allocate that piece
-            u32 size = (nsize - osize);
-            currentNode->size -= size;
-            if( currentNode->size )
-            {
-               //case where there is more room in the slot after the requested size is removed
-               HeapAllocator::Node* unmoved = currentNode->next;
-               currentNode->byteAddress += size;
-               currentNode->next->voidAddress = unmoved->voidAddress;
-               currentNode->next->size = unmoved->size;
-            }
-            else
-            {
-               //case where the slot is exhausted by the requested size
-               currentNode->size = currentNode->next->size;
-               currentNode->voidAddress = currentNode->next->voidAddress;
-            }
-            m_allocatedBytes += size;
-            memset(byte + osize, 0, size);
-            result = ptr;
-         }
-         else
-         {
-            void* newPtr = allocateRaw(nsize, 16);
-            if( newPtr )
-            {
-               memcpy(newPtr, ptr, osize);
-               deallocateRaw(ptr, osize);
-            }
-            result = newPtr;
-         }
-      }
-
-      return result;
-   }
+#endif
 }

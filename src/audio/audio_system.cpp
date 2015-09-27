@@ -11,50 +11,48 @@
 
 namespace core
 {
-   bool AudioSystem::init(Allocator& a, u32 systemMemory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+   void AudioSystem::init(Allocator& a, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
    {
-      CORE_INIT_START(AudioSystem);
-
+      m_staticMemory = &a;
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
-      m_staticMemory.init(a, systemMemory);
+      m_fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
+      CORE_ASSERT_DBGERR(m_fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", m_fmodMemorySize % 512);
 
-      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
-      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
+      m_fmodMemory = m_staticMemory->allocateRaw(m_fmodMemorySize, 16);
+      CORE_ASSERT_DBGERR(m_fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
-      void* fmodMemory = m_staticMemory.allocateRaw(fmodMemorySize, 1);
-      CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
+      auto result = FMOD::Memory_Initialize(m_fmodMemory, m_fmodMemorySize, 0, 0, 0);
+      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD memory");
+      result = FMOD::System_Create(&m_system);
+      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to create FMOD::System");
+      result = m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
+      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD::System");
 
-      CORE_STATUS_AND(FMOD::Memory_Initialize(fmodMemory, fmodMemorySize, 0, 0, 0) == FMOD_OK);
-      CORE_STATUS_AND(FMOD::System_Create(&m_system) == FMOD_OK);
-      CORE_STATUS_AND(m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr) == FMOD_OK);
-
-      CORE_STATUS_AND(m_fileLoader.init(m_system));
-      CORE_STATUS_AND(sounds.init(m_staticMemory, maxSoundSlots));
-
-      CORE_INIT_END;
+      m_fileLoader.init(m_system);
+      sounds.init(*m_staticMemory, maxSoundSlots);
    }
 
-   // #todo the big question is do i need to do this anyway? the memory is going away anyway... probably just need to shut down fmod...
-   bool AudioSystem::shutdown()
+   void AudioSystem::shutdown()
    {
-      CORE_SHUTDOWN_START(AudioSystem);
-
       if( m_channel != nullptr )
       {
-         CORE_STATUS_AND(m_channel->stop() == FMOD_OK);
+         auto result = m_channel->stop();
+         CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to stop a channel from playing");
          m_channel = nullptr;
       }
 
-      CORE_STATUS_AND(sounds.getCount() == 0);
-      CORE_STATUS_AND(m_system->release() == FMOD_OK);
+      CORE_ASSERT_DBGWRN(sounds.getCount() == 0, "Some sounds were not cleaned up!");
+      sounds.shutdown();
+      auto result = m_system->release();
+      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to release FMOD::System");
       int curAlloc = 0;
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
-      
-      CORE_LOG_DEBUG(m_staticMemory, logLine, "   FMOD system max allocation: ", byteSizes(maxAlloc));
-      CORE_SHUTDOWN_END;
+      CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
+
+      m_staticMemory->deallocateRaw(m_fmodMemory, m_fmodMemorySize);
    }
 
    HSound AudioSystem::loadSoundFromFile(const char* filename)

@@ -36,8 +36,8 @@ namespace core
    struct GraphicsSystem
    {
    public:
-      bool init(u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
-      bool shutdown();
+      void init(Allocator& a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
+      void shutdown();
 
       void begin();
       void present();
@@ -52,7 +52,7 @@ namespace core
       void setCulling(bool isEnabled);
       void setTransparency(bool isEnabled);
 
-      void renderMesh(Transform t, Color c, const Mesh& mesh);
+      void renderMesh(Transform t, Color c, const Mesh& mesh, Material material);
 
       HTexture loadTextureFromFile(const char* filename);
       HVertexShader loadVertexShaderFromFile(const char* filename, VertexType vType);
@@ -75,7 +75,7 @@ namespace core
       bool initSamplerState();
       bool initDepthBuffer();
 
-      FrameAllocator m_staticMemory;
+      Allocator* m_staticMemory;
       HeapAllocator m_dynamicMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
@@ -84,6 +84,8 @@ namespace core
 
       D3DXCOLOR m_backgroundColor;
       v2 m_backbufferSize;
+      HPixelShader m_defaultPixelShaderHandle;
+      HVertexShader m_defaultVertexShaderHandle;
 
       enum
       {
@@ -108,11 +110,7 @@ namespace core
       ID3D11BlendState* m_transparency;
       ID3D11RasterizerState* m_cullingEnabled;
       ID3D11RasterizerState* m_cullingDisabled;
-
-      friend GraphicsSystem* createGraphicsSystem(MemoryBlock memory);
    };
-
-   GraphicsSystem* createGraphicsSystem(MemoryBlock memory);
 
    template<typename T> void GraphicsSystem::declare(T*& ptr)
    {

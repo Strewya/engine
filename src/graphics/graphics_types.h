@@ -8,6 +8,8 @@
 #include "graphics/dx_include.h"
 #include "utility/types.h"
 /******* extra headers *******/
+#include "graphics/texture/texture_handle.h"
+#include "graphics/shader/shader_handle.h"
 /******* end header inclusion *******/
 
 namespace core

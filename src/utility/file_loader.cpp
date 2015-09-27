@@ -11,15 +11,15 @@
 
 namespace core
 {
-   LoadedFile loadFile(const char* filename, HeapAllocator& a)
+   LoadedFile loadFile(const char* filename, Allocator& a)
    {
       LoadedFile result{nullptr, 0};
       std::ifstream file{filename, std::ifstream::in | std::ifstream::binary};
       if( file.good() )
       {
          file.seekg(0, std::ios::end);
-         result.size = size_t(file.tellg());
-         result.memory = allocate(a, result.size);
+         result.size = u32(file.tellg());
+         result.memory = a.allocateRaw(result.size, 1);
          if( result.memory )
          {
             file.seekg(0, std::ios::beg);

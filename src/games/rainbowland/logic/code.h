@@ -6,6 +6,7 @@
 /******* c++ headers *******/
 #include <array>
 #include <functional>
+#include <unordered_map>
 #include <vector>
 /******* common headers *******/
 #include "utility/types.h"

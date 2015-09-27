@@ -69,46 +69,76 @@ namespace core
        */
       template<typename T> T* allocate()
       {
-         T* result = static_cast<T*>(allocateRaw(sizeof(T), __alignof(T)));
-         memset(result, 0, sizeof(T));
+         void* raw = allocateRaw(sizeof(T), __alignof(T));
+         memset(raw, 0, sizeof(T));
+         T* result = new(raw)T();
          return result;
       }
       template<typename T> T* allocateArray(u32 N)
       {
          union
          {
-            T* result;
-            u32* count;
+            void* asVoid;
+            u8* asByte;
+            u32* asInt;
          };
-         u32 bytes = sizeof(T)*(N + 1);
-         result = static_cast<T*>(allocateRaw(bytes, __alignof(T)));
-         memset(result, 0, bytes);
-         *count = bytes;
-         ++result;
+         u32 align = max((u32)__alignof(u32), (u32)__alignof(T));
+         u32 extraSizeForCount = max((u32)sizeof(u32), align);
+
+         u32 bytes = sizeof(T)*N;
+         asVoid = (u8*)allocateRaw(bytes + extraSizeForCount, align);
+         memset(asVoid, 0, bytes + extraSizeForCount);
+         *asInt = N;
+         
+         T* result = (T*)(asByte + extraSizeForCount);
+         /*
+         for( u32 i = 0U; i < N; ++i )
+         {
+            new(result + i)T();
+         }*/
          return (result);
       }
-      
+
       /*
        *    templated functions used to deallocate types in an easy manner
        */
-      template<typename T> deallocate(T* ptr)
+      template<typename T> void deallocate(T* ptr)
       {
+         ptr->~T();
          deallocateRaw(ptr, sizeof(T));
       }
-      template<typename T> deallocateArray(T* ptr)
+      template<typename T> void deallocateArray(T* ptr)
       {
          union
          {
             T* array;
             u32* count;
+            u8* byte;
          };
-         array = ptr - 1;
-         deallocateRaw(array, *count);
+         u32 align = max((u32)__alignof(u32), (u32)__alignof(T));
+         u32 extraSizeForCount = max((u32)sizeof(u32), align);
+         
+         array = ptr;
+         byte -= extraSizeForCount;
+         auto N = *count;
+         /*
+         for( u32 i = 0U; i < N; ++i )
+         {
+            (ptr + i)->~T();
+         }
+         }*/
+         u32 bytes = sizeof(T)*N;
+         deallocateRaw(array, bytes + extraSizeForCount);
       }
    };
    inline std::ostream& operator<<(std::ostream& stream, Allocator& a)
    {
       a.outputToStream(stream);
+      return stream;
+   }
+   inline std::ostream& operator<<(std::ostream& stream, Allocator* a)
+   {
+      a->outputToStream(stream);
       return stream;
    }
 
@@ -117,20 +147,20 @@ namespace core
     *    HeapAllocator - An allocator that allocates varied sized blocks
     *    and keeps an in-place linked list of free blocks. Look at
     *    dlmalloc, it is pretty much the standard allocator.
-    *    
+    *
     *    FrameAllocator - Also called "arena allocator" or "pointer bump
     *    allocator". An allocator that doesn't deallocate individual blocks
     *    but releases all its memory in one go. That means it has a super
     *    simple internal state (just a pointer to the next free byte and
     *    the remaining bytes of free memory).
-    *    
+    *
     *    PageAllocator - The virtual memory allocator provided by the
     *    system. Allocates memory as a number of "pages". The page size is
     *    OS dependent (typically something like 1K -- 64K). You don't want
     *    to use it for small allocations, but it can be used as a "backing
     *    allocator" for any of the other allocators. Google "virtual memory"
     *    and you should find lots of information.
-    *    
+    *
     *    PoolAllocator - An allocator that has pools for allocations of
     *    certain sizes. For example, one pool may only allocate 16 byte
     *    blocks. The pool can be packed tight in memory, you don't need
@@ -138,7 +168,8 @@ namespace core
     *    size. This saves memory and reduces fragmentation and allocation
     *    time.
     ************************************************************************/
-
+#define TEST_MEMORY_ALLOCATION_PERFORMANCE_OFF
+#ifndef TEST_MEMORY_ALLOCATION_PERFORMANCE
    /************************************************************************
     *              LargeAllocator, a type of FrameAllocator
     *    Created on game startup. Initialized with raw memory.
@@ -156,8 +187,10 @@ namespace core
       u64 m_sizeBytes;
       u64 m_allocatedBytes;
       u32 m_allocations;
-   
-      void init(void* memory, u64 size);
+
+      MainAllocator();
+
+      void initializeMemory(void* memory, u64 size);
       void shutdown();
 
       void* allocateRaw(u32 size, u32 align) override;
@@ -173,7 +206,6 @@ namespace core
     ************************************************************************/
    struct FrameAllocator : public Allocator
    {
-      Allocator* m_parent;
       union
       {
          void* m_voidAddress;
@@ -182,9 +214,11 @@ namespace core
       u32 m_sizeBytes;
       u32 m_allocatedBytes;
       u32 m_allocations;
-   
-      void init(Allocator& parent, u32 sizeBytes);
-      void shutdown();
+
+      FrameAllocator();
+
+      void acquireMemory(Allocator& parent, u32 sizeBytes);
+      void returnMemory(Allocator& parent);
 
       void* allocateRaw(u32 size, u32 align) override;
       void deallocateRaw(void* ptr, u32 size) override;
@@ -203,22 +237,23 @@ namespace core
       {
          Node* next;
       };
-      Allocator* m_parent;
       void* m_voidAddress;
-      u32 m_sizeBytes;
       Node m_head;
-      u32 m_slotSize;
+      u32 m_sizeBytes;
       u32 m_allocatedBytes;
       u32 m_allocations;
+      u32 m_slotSize;
 
-      void init(Allocator& parent, u32 slotCount, u32 slotSize);
-      void shutdown();
+      PoolAllocator();
+
+      void acquireMemory(Allocator& parent, u32 slotCount, u32 slotSize);
+      void returnMemory(Allocator& parent);
 
       void* allocateRaw(u32 size, u32 align) override;
       void deallocateRaw(void* ptr, u32 size) override;
       void outputToStream(std::ostream& stream) override;
    };
-   
+
    /*
     *    This is the heap allocator object. It can do memory allocation, deallocation and reallocation.
     *    It is initialized by receiving a memory block within which to work in.
@@ -264,20 +299,56 @@ namespace core
             Node* next;
          };
       };
-      Allocator* m_parent;
       void* m_voidAddress;
-      u32 m_sizeBytes;
       Node m_head;
+      u32 m_sizeBytes;
       u32 m_allocatedBytes;
       u32 m_allocations;
-   
-      void init(Allocator& parent, u32 sizeBytes);
-      void shutdown();
+
+      HeapAllocator();
+
+      void acquireMemory(Allocator& parent, u32 sizeBytes);
+      void returnMemory(Allocator& parent);
 
       void* allocateRaw(u32 size, u32 align) override;
       void deallocateRaw(void* ptr, u32 size) override;
       void outputToStream(std::ostream& stream) override;
-      //extra function
-      void* reallocateRaw(void* ptr, u32 oldSize, u32 newSize);
    };
+
+#else
+
+   /************************************************************************
+    *              MallocAllocator
+    *    Allocator based on malloc, just to see the difference of speed.
+    ************************************************************************/
+   struct MallocAllocator : public core::Allocator
+   {
+      void initializeMemory(void* ptr, u64 size)
+      {}
+      void acquireMemory(Allocator& a, u32 size)
+      {}
+      void returnMemory(Allocator& a)
+      {}
+
+      void* allocateRaw(u32 size, u32 align) override
+      {
+         void* result = malloc(size);
+         return result;
+      }
+
+      void deallocateRaw(void* ptr, u32 size) override
+      {
+         free(ptr);
+      }
+
+      void outputToStream(std::ostream& stream) override
+      {}
+   };
+
+   typedef MallocAllocator MainAllocator;
+   typedef MallocAllocator FrameAllocator;
+   typedef MallocAllocator PoolAllocator;
+   typedef MallocAllocator HeapAllocator;
+
+#endif
 }

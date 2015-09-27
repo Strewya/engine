@@ -17,33 +17,39 @@ namespace core
    struct TextureCache
    {
    private:
+      Allocator* m_allocator;
       Texture* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
    
    public:
-      bool init(FrameAllocator& a, u32 maxSlots)
+      void init(Allocator& a, u32 maxSlots)
       {
-         CORE_INIT_START(TextureCache);
-
-         m_buffer = allocate<Texture>(a, maxSlots);
+         m_allocator = &a;
+         m_buffer = m_allocator->allocateArray<Texture>(maxSlots);
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-
-         CORE_INIT_END;
+      }
+      void shutdown()
+      {
+         m_allocator->deallocateArray(m_buffer);
       }
 
       HTexture insert(Texture t)
       {
          HTexture result{};
 
-         for( u16 i = 0; i < m_maxSlots; ++i )
+         if( m_maxSlots != m_usedSlots )
          {
-            if( m_buffer[i].unloaded() )
+            for( u16 i = 0; i < m_maxSlots; ++i )
             {
-               m_buffer[i] = t;
-               result.init(i);
-               ++m_usedSlots;
+               if( m_buffer[i].unloaded() )
+               {
+                  m_buffer[i] = t;
+                  result.init(i);
+                  ++m_usedSlots;
+                  break;
+               }
             }
          }
 
@@ -53,6 +59,7 @@ namespace core
       Texture remove(HTexture handle)
       {
          Texture t = m_buffer[handle.getIndex()];
+         m_buffer[handle.getIndex()] = {};
          --m_usedSlots;
          return t;
       }

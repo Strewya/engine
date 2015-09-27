@@ -19,8 +19,8 @@ namespace core
    struct AudioSystem
    {
    public:
-      bool init(Allocator& a, u32 systemMemory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
-      bool shutdown();
+      void init(Allocator& a, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
+      void shutdown();
       bool update();
 
       void playSfx(HSound sound);
@@ -34,10 +34,12 @@ namespace core
       SoundCache sounds;
 
    private:
-      FrameAllocator m_staticMemory;
-      SoundFileLoader m_fileLoader;
+      Allocator* m_staticMemory;
+      void* m_fmodMemory;
+      u32 m_fmodMemorySize;
       FMOD::System* m_system;
       FMOD::Channel* m_channel;
+      SoundFileLoader m_fileLoader;
       HSound m_musicPlaying;
    };
 }

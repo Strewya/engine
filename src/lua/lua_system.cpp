@@ -45,11 +45,11 @@ namespace core
       lua_pushnil(L);
       return 2;
    }
-   
+
    void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
       CORE_LOG_DEBUG("lua_allocateCustom, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
-      HeapAllocator* a = (HeapAllocator*)ud;
+      Allocator* a = (Allocator*)ud;
       void* result = nullptr;
       if( nsize == 0 )
       {
@@ -67,9 +67,11 @@ namespace core
          if( osize != nsize )
          {
             auto before = __rdtsc();
-            result = a->reallocateRaw(ptr, (u32)osize, (u32)nsize);
+            result = a->allocateRaw((u32)nsize, 16);
+            memcpy(result, ptr, min(osize, nsize));
+            a->deallocateRaw(ptr, (u32)osize);
             auto after = __rdtsc();
-            CORE_LOG_DEBUG("reallocateRaw took ", (after - before), " cycles");
+            CORE_LOG_DEBUG("allocateRaw + memcpy + deallocateRaw took ", (after - before), " cycles");
          }
          else
          {
@@ -97,44 +99,40 @@ namespace core
       return result;
    }
 
-   bool LuaSystem::init(Allocator& a, u32 systemMemory)
+   void LuaSystem::init(Allocator& a)
    {
-      CORE_INIT_START(LuaSystem);
+      m_luaMemory = &a;
+      m_L = lua_newstate(lua_allocateCustom, m_luaMemory);
 
-      m_luaMemory.init(a, systemMemory);
-      m_L = lua_newstate(lua_allocateCustom, &m_luaMemory);
-
-      CORE_STATUS_AND(m_L != nullptr);
-      if( CORE_STATUS_OK )
-      {
+      CORE_ASSERT_DBGERR(m_L != nullptr, "Failed to create Lua state!");
 #ifdef DEPLOY
-         lua_pushcfunction(m_L, luaopen_base);
-         lua_pushliteral(m_L, "");
-         lua_call(m_L, 1, 0);
+      lua_pushcfunction(m_L, luaopen_base);
+      lua_pushliteral(m_L, "");
+      lua_call(m_L, 1, 0);
 
-         lua_pushcfunction(m_L, luaopen_table);
-         lua_pushliteral(m_L, LUA_TABLIBNAME);
-         lua_call(m_L, 1, 0);
+      lua_pushcfunction(m_L, luaopen_table);
+      lua_pushliteral(m_L, LUA_TABLIBNAME);
+      lua_call(m_L, 1, 0);
 
-         lua_pushcfunction(m_L, luaopen_package);
-         lua_pushliteral(m_L, LUA_LOADLIBNAME);
-         lua_call(m_L, 1, 0);
+      lua_pushcfunction(m_L, luaopen_package);
+      lua_pushliteral(m_L, LUA_LOADLIBNAME);
+      lua_call(m_L, 1, 0);
 
-         lua_pushcfunction(m_L, luaopen_string);
-         lua_pushliteral(m_L, LUA_STRLIBNAME);
-         lua_call(m_L, 1, 0);
+      lua_pushcfunction(m_L, luaopen_string);
+      lua_pushliteral(m_L, LUA_STRLIBNAME);
+      lua_call(m_L, 1, 0);
 
-         lua_pushcfunction(m_L, luaopen_math);
-         lua_pushliteral(m_L, LUA_MATHLIBNAME);
-         lua_call(m_L, 1, 0);
+      lua_pushcfunction(m_L, luaopen_math);
+      lua_pushliteral(m_L, LUA_MATHLIBNAME);
+      lua_call(m_L, 1, 0);
 #else
-         luaL_openlibs(m_L);
+      luaL_openlibs(m_L);
 #endif
 
-         //tolua_core_open(m_L);
-         lua_register(m_L, "print", luaPrint);
+      //tolua_core_open(m_L);
+      lua_register(m_L, "print", luaPrint);
 
-         const char* depend = R"rawLuaCode(
+      const char* depend = R"rawLuaCode(
 Lua = {};
 global_dependency_table = {};
 global_dependency_missing = nil;
@@ -156,18 +154,13 @@ function class(name)
 end
 )rawLuaCode";
 
-         CORE_STATUS_AND(luaL_dostring(m_L, depend) == 0);
-      }
-
-      CORE_INIT_END;
+      auto result = luaL_dostring(m_L, depend);
+      CORE_ASSERT_DBGERR(result == 0, "Failed to register dependency code to Lua!");
    }
 
-   bool LuaSystem::shutdown()
+   void LuaSystem::shutdown()
    {
-      CORE_SHUTDOWN_START(LuaSystem);
       lua_close(m_L);
-      CORE_LOG_DEBUG(m_luaMemory);
-      CORE_SHUTDOWN_END;
    }
 
    void LuaSystem::collectGarbage()

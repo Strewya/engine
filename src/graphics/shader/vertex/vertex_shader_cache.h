@@ -17,33 +17,39 @@ namespace core
    struct VertexShaderCache
    {
    private:
+      Allocator* m_allocator;
       VertexShader* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
 
    public:
-      bool init(FrameAllocator& a, u32 maxSlots)
+      void init(Allocator& a, u32 maxSlots)
       {
-         CORE_INIT_START(VertexShaderCache);
-
-         m_buffer = allocate<VertexShader>(a, maxSlots);
+         m_allocator = &a;
+         m_buffer = m_allocator->allocateArray<VertexShader>(maxSlots);
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-      
-         CORE_INIT_END;
+      }
+      void shutdown()
+      {
+         m_allocator->deallocateArray(m_buffer);
       }
 
       HVertexShader insert(VertexShader vs)
       {
          HVertexShader result{};
 
-         for( u16 i = 0; i < m_maxSlots; ++i )
+         if( m_maxSlots != m_usedSlots )
          {
-            if( m_buffer[i].unloaded() )
+            for( u16 i = 0; i < m_maxSlots; ++i )
             {
-               m_buffer[i] = vs;
-               result.init(i);
-               ++m_usedSlots;
+               if( m_buffer[i].unloaded() )
+               {
+                  m_buffer[i] = vs;
+                  result.init(i);
+                  ++m_usedSlots;
+                  break;
+               }
             }
          }
 
@@ -53,6 +59,7 @@ namespace core
       VertexShader remove(HVertexShader handle)
       {
          VertexShader vs = m_buffer[handle.getIndex()];
+         m_buffer[handle.getIndex()] = {};
          --m_usedSlots;
          return vs;
       }

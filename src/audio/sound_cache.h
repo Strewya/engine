@@ -17,41 +17,45 @@ namespace core
    struct SoundCache
    {
    private:
+      // [Struja 26.9.2015.] #todo: Replace this raw array with a pool allocator based container so i can more easily track how much sounds are
+      // actually in use
+      Allocator* m_allocator;
       Sound* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
 
    public:
-      bool init(Allocator& a, u32 maxSlots)
+      void init(Allocator& a, u32 maxSlots)
       {
-         CORE_INIT_START(SoundCache);
+         m_allocator = &a;
 
-         m_buffer = a.allocateArray<Sound>(maxSlots);
+         m_buffer = m_allocator->allocateArray<Sound>(maxSlots);
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-
-         CORE_INIT_END;
       }
-      void shutdown(Allocator& a)
+      void shutdown()
       {
-         a.deallocateArray(m_buffer);
+         m_allocator->deallocateArray(m_buffer);
       }
 
       HSound insert(Sound s)
       {
          HSound result{};
 
-         // #todo maybe some day when this becomes a long loop change to a pool based freelist finder or something.
-         for( u16 i = 0; i < m_maxSlots; ++i )
+         if( m_maxSlots != m_usedSlots )
          {
-            if( m_buffer[i].unloaded() )
+            // #todo maybe some day when this becomes a long loop change to a pool based freelist finder or something.
+            for( u16 i = 0; i < m_maxSlots; ++i )
             {
-               m_buffer[i] = s;
-               result.init(i);
-               ++m_usedSlots;
+               if( m_buffer[i].unloaded() )
+               {
+                  m_buffer[i] = s;
+                  result.init(i);
+                  ++m_usedSlots;
+                  break;
+               }
             }
          }
-
          return result;
       }
 

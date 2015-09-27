@@ -11,7 +11,7 @@
 
 namespace core
 {
-   struct HeapAllocator;
+   struct Allocator;
 
    struct LoadedFile
    {
@@ -19,5 +19,5 @@ namespace core
       u32 size;
    };
 
-   LoadedFile loadFile(const char* filename, HeapAllocator& a);
+   LoadedFile loadFile(const char* filename, Allocator& a);
 }

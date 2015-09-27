@@ -37,8 +37,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       {
          using core::writeLog;
          core::MainAllocator mainAllocator;
-         mainAllocator.init(address, size);
-
+         mainAllocator.initializeMemory(address, size);
+         auto before = __rdtsc();
          initializeFileStream(mainAllocator, KiloBytes(128));
 
          core::CommunicationBuffer* toGame = mainAllocator.allocate<core::CommunicationBuffer>();
@@ -46,7 +46,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          core::CommunicationBuffer* fromGame = mainAllocator.allocate<core::CommunicationBuffer>();
          fromGame->init(mainAllocator, 128);
+         auto after = __rdtsc();
 
+         CORE_LOG("Initializing log and comm buffers took ", (after - before), " cycles");
          CORE_LOG("Status after allocating communication buffers:", core::logLine, mainAllocator);
 
          std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());

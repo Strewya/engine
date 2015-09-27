@@ -17,33 +17,39 @@ namespace core
    struct PixelShaderCache
    {
    private:
+      Allocator* m_allocator;
       PixelShader* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
 
    public:
-      bool init(FrameAllocator& a, u32 maxSlots)
+      void init(Allocator& a, u32 maxSlots)
       {
-         CORE_INIT_START(PixelShaderCache);
-
-         m_buffer = allocate<PixelShader>(a, maxSlots);
+         m_allocator = &a;
+         m_buffer = m_allocator->allocateArray<PixelShader>(maxSlots);
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-
-         CORE_INIT_END;
+      }
+      void shutdown()
+      {
+         m_allocator->deallocateArray(m_buffer);
       }
 
       HPixelShader insert(PixelShader ps)
       {
          HPixelShader result{};
 
-         for( u16 i = 0; i < m_maxSlots; ++i )
+         if( m_maxSlots != m_usedSlots )
          {
-            if( m_buffer[i].unloaded() )
+            for( u16 i = 0; i < m_maxSlots; ++i )
             {
-               m_buffer[i] = ps;
-               result.init(i);
-               ++m_usedSlots;
+               if( m_buffer[i].unloaded() )
+               {
+                  m_buffer[i] = ps;
+                  result.init(i);
+                  ++m_usedSlots;
+                  break;
+               }
             }
          }
 
@@ -53,6 +59,7 @@ namespace core
       PixelShader remove(HPixelShader handle)
       {
          PixelShader ps = m_buffer[handle.getIndex()];
+         m_buffer[handle.getIndex()] = {};
          --m_usedSlots;
          return ps;
       }

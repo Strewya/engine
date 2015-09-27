@@ -21,12 +21,10 @@ namespace core
    core_internal ID3D11Buffer* makeConstantBuffer(ID3D11Device* dev, u32 unitSize);
    core_internal ID3D11Buffer* makeInstanceBuffer(ID3D11Device* dev, u32 unitSize, u32 unitCount);
 
-   bool DXRenderer::init(ID3D11Device* device,
+   void DXRenderer::init(ID3D11Device* device,
                          ID3D11DeviceContext* deviceContext,
                          ID3D11SamplerState* samplerState)
    {
-      CORE_INIT_START(DXRenderer);
-
       m_dev = device;
       m_devcon = deviceContext;
       m_samplerState = samplerState;
@@ -40,21 +38,15 @@ namespace core
       m_rasterizerState = nullptr;
       m_blendState = nullptr;
 
-      CORE_STATUS_AND(m_dev != nullptr);
-      CORE_STATUS_AND(m_devcon != nullptr);
-      CORE_STATUS_AND(m_samplerState != nullptr);
-
-      CORE_INIT_END;
+      CORE_ASSERT_DBGERR(m_dev != nullptr, "D3D11 device is NULL in DXRenderer!");
+      CORE_ASSERT_DBGERR(m_devcon != nullptr, "D3D11 device context is NULL in DXRenderer!");
+      CORE_ASSERT_DBGERR(m_samplerState != nullptr, "D3D11 sampler state is NULL in DXRenderer!");
    }
 
-   bool DXRenderer::shutdown()
+   void DXRenderer::shutdown()
    {
-      CORE_SHUTDOWN_START(DXRenderer);
-
       m_devcon = nullptr;
       m_samplerState = nullptr;
-
-      CORE_SHUTDOWN_END;
    }
 
    //*****************************************************************
@@ -90,8 +82,8 @@ namespace core
    {
       if( m_blendState != blendState )
       {
-         m_devcon->OMSetBlendState(blendState, nullptr, 0xffffffff);
          m_blendState = blendState;
+         m_devcon->OMSetBlendState(blendState, nullptr, 0xffffffff);
       }
    }
 
@@ -102,8 +94,8 @@ namespace core
    {
       if( m_rasterizerState != rasterizerState )
       {
-         m_devcon->RSSetState(rasterizerState);
          m_rasterizerState = rasterizerState;
+         m_devcon->RSSetState(rasterizerState);
       }
    }
 
@@ -114,8 +106,8 @@ namespace core
    {
       if( m_texture != shaderResourceView )
       {
-         m_devcon->PSSetShaderResources(0, 1, &shaderResourceView);
          m_texture = shaderResourceView;
+         m_devcon->PSSetShaderResources(0, 1, &shaderResourceView);
       }
    }
 
@@ -126,8 +118,8 @@ namespace core
    {
       if( m_topology != topology )
       {
-         m_devcon->IASetPrimitiveTopology(topology);
          m_topology = topology;
+         m_devcon->IASetPrimitiveTopology(topology);
       }
    }
 
@@ -138,8 +130,8 @@ namespace core
    {
       if( m_inputLayout != layout )
       {
-         m_devcon->IASetInputLayout(layout);
          m_inputLayout = layout;
+         m_devcon->IASetInputLayout(layout);
       }
    }
 
@@ -150,8 +142,8 @@ namespace core
    {
       if( m_vertexShader != shader )
       {
-         m_devcon->VSSetShader(shader, nullptr, 0);
          m_vertexShader = shader;
+         m_devcon->VSSetShader(shader, nullptr, 0);
       }
    }
 
@@ -162,8 +154,8 @@ namespace core
    {
       if( m_pixelShader != shader )
       {
-         m_devcon->PSSetShader(shader, nullptr, 0);
          m_pixelShader = shader;
+         m_devcon->PSSetShader(shader, nullptr, 0);
       }
    }
 

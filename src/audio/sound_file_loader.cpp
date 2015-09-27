@@ -11,15 +11,10 @@
 
 namespace core
 {
-   bool SoundFileLoader::init(FMOD::System* system)
+   void SoundFileLoader::init(FMOD::System* system)
    {
-      CORE_INIT_START(SoundFileLoader);
-
       m_system = system;
-
-      CORE_STATUS_AND(m_system != nullptr);
-
-      CORE_INIT_END;
+      CORE_ASSERT_DBGERR(m_system != nullptr, "NULL FMOD::System passed to SoundFileLoader!");
    }
 
    Sound SoundFileLoader::load(const char* filename) const

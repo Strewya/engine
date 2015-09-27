@@ -11,31 +11,25 @@
 
 namespace core
 {
-   struct InitResult
+   core_internal Game* init_game(Allocator& a, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
-      GameData* game;
-      bool success;
-   };
+      Game* game = a.allocate<Game>();
 
-   core_internal InitResult init_game(CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
-   {
-
-
-      return{nullptr, false};
+      return game;
    }
 
-   core_internal bool tickLogic(CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
+   core_internal bool tickLogic(Game& game, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
    {
       return false;
    }
 
-   core_internal void tickRender(CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
+   core_internal void tickRender(Game& game, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock& timer)
    {
 
    }
 
-   core_internal bool shutdown_game(CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
+   core_internal void shutdown_game(Game& game, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
-      return true;
+
    }
 }

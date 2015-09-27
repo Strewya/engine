@@ -18,7 +18,7 @@ namespace core
    struct VertexShaderLoader
    {
    public:
-      bool init(ID3D11Device* device);
+      void init(ID3D11Device* device);
 
       VertexShader load(InputLayout layout, void* buffer, u32 bufferSize) const;
 
