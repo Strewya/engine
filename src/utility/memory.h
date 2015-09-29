@@ -168,6 +168,8 @@ namespace core
     *    size. This saves memory and reduces fragmentation and allocation
     *    time.
     ************************************************************************/
+#define ALLOCATOR_V2
+#ifdef ALLOCATOR_V1
 #define TEST_MEMORY_ALLOCATION_PERFORMANCE_OFF
 #ifndef TEST_MEMORY_ALLOCATION_PERFORMANCE
    /************************************************************************
@@ -315,7 +317,7 @@ namespace core
       void outputToStream(std::ostream& stream) override;
    };
 
-#else
+#else //!TEST_MEMORY_ALLOCATION_PERFORMANCE
 
    /************************************************************************
     *              MallocAllocator
@@ -350,5 +352,33 @@ namespace core
    typedef MallocAllocator PoolAllocator;
    typedef MallocAllocator HeapAllocator;
 
+#endif //TEST_MEMORY_ALLOCATION_PERFORMANCE
+
+#endif //ALLOCATOR_V1
+
+#ifdef ALLOCATOR_V2
+   struct StaticMemory
+   {
+   private:
+      u8* m_currentMemory;
+      u64 m_remainingBytes;
+   public:
+      void init(void* memory, u64 size);
+      void* allocate(u32 size);
+   };
+
+   struct DynamicMemory
+   {
+   private:
+      struct Node
+      {
+         Node* next;
+      };
+      Node m_head;
+   public:
+      void init(void* memory, u32 memorySize, u32 slots, u32 slotSize);
+      void* allocate();
+      void deallocate(void* ptr);
+   };
 #endif
 }

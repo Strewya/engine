@@ -30,6 +30,7 @@ namespace core
       return stream;
    }
 
+#ifdef ALLOCATOR_V1
 #ifndef TEST_MEMORY_ALLOCATION_PERFORMANCE
    /************************************************************************
     *              MainAllocator functions
@@ -321,4 +322,52 @@ namespace core
       stream << "Allocation count: " << m_allocations << logLine;
    }
 #endif
+#endif
+
+#ifdef ALLOCATOR_V2
+   void StaticMemory::init(void* memory, u64 size)
+   {
+      m_currentMemory = (u8*)memory;
+      m_remainingBytes = size;
+   }
+   void* StaticMemory::allocate(u32 size)
+   {
+      void* result = nullptr;
+      if( m_remainingBytes >= size )
+      {
+         m_remainingBytes -= size;
+         result = m_currentMemory;
+         m_currentMemory += 16;
+         m_currentMemory -= ((uintptr_t)m_currentMemory & 0xf);
+      }
+      return result;
+   }
+
+   void DynamicMemory::init(void* memory, u32 memorySize, u32 slots, u32 slotSize)
+   {
+      CORE_ASSERT_DBGERR(slotSize >= sizeof(Node), "Using dynamic memory pool for a slot size too small!");
+      CORE_ASSERT_DBGERR(slots*slotSize == memorySize, "Provided memory size does not match pool size requirements!");
+      CORE_ASSERT_DBGWRN(slotSize % __alignof(Node) == 0, "Performance warning, slot size does not match Node alignment");
+      Node* runner = &m_head;
+      for( auto i = 0U; i < slots; ++i )
+      {
+         runner->next = (Node*)memory;
+         runner = runner->next;
+         memory = (u8*)memory + slotSize;
+      }
+   }
+   void* DynamicMemory::allocate()
+   {
+      void* result = m_head.next;
+      m_head.next = m_head.next->next;
+      return result;
+   }
+   void DynamicMemory::deallocate(void* ptr)
+   {
+      Node* next = (Node*)ptr;
+      next->next = m_head.next;
+      m_head.next = next;
+   }
+#endif
+
 }
