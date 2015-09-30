@@ -11,7 +11,7 @@
 #include <iomanip>
 /******* extra headers *******/
 #include "utility/time/clock.h"
-#include "memory.h"
+#include "utility/memory.h"
 /******* end headers *******/
 
 namespace core
@@ -59,13 +59,15 @@ namespace core
       return gLogFileStream;
    }
 
-   void initializeFileStream(Allocator& a, u32 bufferSize)
+   void initializeFileStream(Memory& m, u32 bufferSize)
    {
       auto& stream = getFileStream();
       CORE_ASSERT_ERR(!stream.is_open(), "Logger has already been initialized");
 
-      char* memory = a.allocateArray<char>(bufferSize);
+      char* memory = (char*)m.address;
       stream.rdbuf()->pubsetbuf(memory, bufferSize);
+      m.address = memory + bufferSize;
+      m.remainingBytes -= bufferSize;
 
       char filename[19] = {};
       getFilename(filename, 19);

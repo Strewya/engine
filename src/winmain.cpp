@@ -36,22 +36,22 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
       if( address )
       {
          using core::writeLog;
-         core::MainAllocator mainAllocator;
-         mainAllocator.initializeMemory(address, size);
+         core::Memory memory{address, size};
+
          auto before = __rdtsc();
-         initializeFileStream(mainAllocator, KiloBytes(128));
+         core::initializeFileStream(memory, KiloBytes(128));
 
-         core::CommunicationBuffer* toGame = mainAllocator.allocate<core::CommunicationBuffer>();
-         toGame->init(mainAllocator, 2048);
+         core::CommunicationBuffer* toGame = core::make<core::CommunicationBuffer>(memory);
+         toGame->init(memory, 2048);
 
-         core::CommunicationBuffer* fromGame = mainAllocator.allocate<core::CommunicationBuffer>();
-         fromGame->init(mainAllocator, 128);
+         core::CommunicationBuffer* fromGame = core::make<core::CommunicationBuffer>(memory);
+         fromGame->init(memory, 128);
          auto after = __rdtsc();
 
          CORE_LOG("Initializing log and comm buffers took ", (after - before), " cycles");
-         CORE_LOG("Status after allocating communication buffers:", core::logLine, mainAllocator);
+         CORE_LOG("Status after allocating communication buffers:", core::logLine, memory);
 
-         std::thread logicThread(core::runGame, std::ref(mainAllocator), toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
+         std::thread logicThread(core::runGame, memory, toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
 
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {
@@ -68,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          logicThread.join();
          result = window.getExitCode();
-         CORE_LOG_DEBUG(mainAllocator);
+         CORE_LOG_DEBUG(memory);
       }
       else
       {

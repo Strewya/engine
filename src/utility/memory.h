@@ -89,12 +89,12 @@ namespace core
          asVoid = (u8*)allocateRaw(bytes + extraSizeForCount, align);
          memset(asVoid, 0, bytes + extraSizeForCount);
          *asInt = N;
-         
+
          T* result = (T*)(asByte + extraSizeForCount);
          /*
          for( u32 i = 0U; i < N; ++i )
          {
-            new(result + i)T();
+         new(result + i)T();
          }*/
          return (result);
       }
@@ -117,14 +117,14 @@ namespace core
          };
          u32 align = max((u32)__alignof(u32), (u32)__alignof(T));
          u32 extraSizeForCount = max((u32)sizeof(u32), align);
-         
+
          array = ptr;
          byte -= extraSizeForCount;
          auto N = *count;
          /*
          for( u32 i = 0U; i < N; ++i )
          {
-            (ptr + i)->~T();
+         (ptr + i)->~T();
          }
          }*/
          u32 bytes = sizeof(T)*N;
@@ -357,28 +357,77 @@ namespace core
 #endif //ALLOCATOR_V1
 
 #ifdef ALLOCATOR_V2
-   struct StaticMemory
+   struct Memory
    {
-   private:
-      u8* m_currentMemory;
-      u64 m_remainingBytes;
-   public:
-      void init(void* memory, u64 size);
-      void* allocate(u32 size);
+      void* address;
+      u64 remainingBytes;
    };
+   bool operator==(Memory m, nullptr_t p)
+   {
+      auto result = m.address == nullptr;
+      return result;
+   }
+   bool operator!=(Memory m, nullptr_t p)
+   {
+      auto result = m.address != nullptr;
+      return result;
+   }
+   std::ostream& operator<<(std::ostream& stream, Memory m)
+   {
+      stream << "Remaining memory: " << m.remainingBytes << logLine;
+   }
 
-   struct DynamicMemory
+   Memory advanceMemory(Memory m, u32 size)
    {
-   private:
-      struct Node
+      Memory result{};
+      if( m.remainingBytes >= size )
       {
-         Node* next;
-      };
-      Node m_head;
-   public:
-      void init(void* memory, u32 memorySize, u32 slots, u32 slotSize);
-      void* allocate();
-      void deallocate(void* ptr);
-   };
+         result.address = (u8*)m.address + size;
+         result.remainingBytes = m.remainingBytes - size;
+      }
+      return result;
+   }
+
+   Memory alignMemory(Memory m, u32 alignment)
+   {
+      CORE_ASSERT_DBGERR((alignment != 0) && !(alignment & (alignment - 1)), "Alignment is not power of two!");
+      u32 memAlign = (u32)m.address % alignment;
+      if( memAlign )
+      {
+         alignment -= memAlign;
+      }
+      auto result = advanceMemory(m, alignment);
+      return result;
+   }
+
+
+   template<typename T>
+   T* make(Memory& m)
+   {
+      auto alignedMemory = alignMemory(m, __alignof(T));
+      auto memoryAfterAllocation = advanceMemory(alignedMemory, sizeof(T));
+      if( memoryAfterAllocation == nullptr )
+      {
+         return nullptr;
+      }
+      T* result = new(alignedMemory.address)T();
+      m = memoryAfterAllocation;
+      return result;
+
+   }
+
+   template<typename T>
+   T* makeArray(Memory& m, u32 count)
+   {
+      auto alignedMemory = alignMemory(m, __alignof(T));
+      auto memoryAfterAllocation = advanceMemory(alignedMemory, sizeof(T[count]));
+      if( memoryAfterAllocation == nullptr )
+      {
+         return nullptr;
+      }
+      T* result = static_cast<T*>(alignedMemory.address);
+      m = memoryAfterAllocation;
+      return result;
+   }
 #endif
 }

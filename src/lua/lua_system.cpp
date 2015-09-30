@@ -49,16 +49,16 @@ namespace core
    void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
       CORE_LOG_DEBUG("lua_allocateCustom, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
-      Allocator* a = (Allocator*)ud;
+      auto* memory = (Memory*)ud;
       void* result = nullptr;
       if( nsize == 0 )
       {
-         a->deallocateRaw(ptr, (u32)osize);
+         //a->deallocateRaw(ptr, (u32)osize);
       }
       else if( osize == 0 && nsize > 0 )
       {
          auto before = __rdtsc();
-         result = a->allocateRaw((u32)nsize, 16);
+         //result = a->allocateRaw((u32)nsize, 16);
          auto after = __rdtsc();
          CORE_LOG_DEBUG("allocateRaw took ", (after - before), " cycles");
       }
@@ -67,9 +67,9 @@ namespace core
          if( osize != nsize )
          {
             auto before = __rdtsc();
-            result = a->allocateRaw((u32)nsize, 16);
+            //result = a->allocateRaw((u32)nsize, 16);
             memcpy(result, ptr, min(osize, nsize));
-            a->deallocateRaw(ptr, (u32)osize);
+            //a->deallocateRaw(ptr, (u32)osize);
             auto after = __rdtsc();
             CORE_LOG_DEBUG("allocateRaw + memcpy + deallocateRaw took ", (after - before), " cycles");
          }
@@ -99,10 +99,10 @@ namespace core
       return result;
    }
 
-   void LuaSystem::init(Allocator& a)
+   void LuaSystem::init(Memory a)
    {
-      m_luaMemory = &a;
-      m_L = lua_newstate(lua_allocateCustom, m_luaMemory);
+      m_luaMemory = a;
+      m_L = lua_newstate(lua_allocate, &m_luaMemory);
 
       CORE_ASSERT_DBGERR(m_L != nullptr, "Failed to create Lua state!");
 #ifdef DEPLOY

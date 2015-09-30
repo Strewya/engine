@@ -14,9 +14,9 @@
 
 namespace core
 {
-   struct Allocator;
+   struct Memory;
 
-   void initializeFileStream(Allocator& a, u32 bufferSize);
+   void initializeFileStream(Memory& m, u32 bufferSize);
 
    std::ostream& getLogFileStream();
 

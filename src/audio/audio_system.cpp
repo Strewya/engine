@@ -11,19 +11,21 @@
 
 namespace core
 {
-   void AudioSystem::init(Allocator& a, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+   void AudioSystem::init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
    {
-      m_staticMemory = &a;
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
-      m_fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
-      CORE_ASSERT_DBGERR(m_fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", m_fmodMemorySize % 512);
+      auto fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
+      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
-      m_fmodMemory = m_staticMemory->allocateRaw(m_fmodMemorySize, 16);
-      CORE_ASSERT_DBGERR(m_fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
+      auto fmodMemory = alignMemory(memory, 16);
+      auto fragmentationLostBytes = memory.remainingBytes - fmodMemory.remainingBytes;
+      CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
+      
+      CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
-      auto result = FMOD::Memory_Initialize(m_fmodMemory, m_fmodMemorySize, 0, 0, 0);
+      auto result = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD memory");
       result = FMOD::System_Create(&m_system);
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to create FMOD::System");
@@ -31,7 +33,7 @@ namespace core
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD::System");
 
       m_fileLoader.init(m_system);
-      sounds.init(*m_staticMemory, maxSoundSlots);
+      sounds.init(m_staticMemory, maxSoundSlots);
    }
 
    void AudioSystem::shutdown()
@@ -51,8 +53,6 @@ namespace core
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
       CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
-
-      m_staticMemory->deallocateRaw(m_fmodMemory, m_fmodMemorySize);
    }
 
    HSound AudioSystem::loadSoundFromFile(const char* filename)

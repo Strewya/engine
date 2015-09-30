@@ -34,7 +34,7 @@ namespace core
 
 
 
-   void runGame(Allocator& mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
+   void runGame(Memory mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
    {
       Clock logicTimer{};
       Clock renderTimer{};
@@ -68,10 +68,9 @@ namespace core
       u32 MaxNumberOfShaderSlots;
 
       {
-         HeapAllocator configAllocator;
-         configAllocator.acquireMemory(mainMemory, KiloBytes(64));
-         LuaSystem* memoryConfig = configAllocator.allocate<LuaSystem>();
-         memoryConfig->init(configAllocator);
+         Memory configMemory = mainMemory;
+         LuaSystem* memoryConfig = make<LuaSystem>(configMemory);
+         memoryConfig->init(configMemory);
          
          LuaStack config = memoryConfig->getStack();
          bool ok = config.doFile("memory.lua");
@@ -96,17 +95,18 @@ namespace core
 
          config.pop();
          memoryConfig->shutdown();
-         configAllocator.deallocate(memoryConfig);
-         configAllocator.returnMemory(mainMemory);
       }
 #endif
 
       auto before = __rdtsc();
 
-      FrameAllocator* audioMemory = mainMemory.allocate<FrameAllocator>();
-      audioMemory->acquireMemory(mainMemory, MegaBytes(AudioSystemMegabytes));
-      AudioSystem* audio = audioMemory->allocate<AudioSystem>();
-      audio->init(*audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+      Memory audioMemory = alignMemory(mainMemory, 16);
+      auto fragmentationLostBytes = mainMemory.remainingBytes - audioMemory.remainingBytes;
+      CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
+      mainMemory = advanceMemory(audioMemory, MegaBytes(AudioSystemMegabytes));
+      
+      AudioSystem* audio = make<AudioSystem>(audioMemory);
+      audio->init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
       FrameAllocator* graphicsMemory = mainMemory.allocate<FrameAllocator>();
       graphicsMemory->acquireMemory(mainMemory, MegaBytes(GraphicsSystemMegabytes));

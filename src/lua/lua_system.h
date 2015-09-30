@@ -17,7 +17,7 @@ namespace core
    struct LuaSystem
    {
    public:
-      void init(Allocator& a);
+      void init(Memory a);
       void shutdown();
       void collectGarbage();
 
@@ -25,7 +25,7 @@ namespace core
 
    private:
       lua_State* m_L;
-      Allocator* m_luaMemory;
+      Memory m_luaMemory;
    };
 
    void test_luaStack();
