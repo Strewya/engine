@@ -69,7 +69,7 @@ namespace core
 
       {
          Memory configMemory = mainMemory;
-         LuaSystem* memoryConfig = make<LuaSystem>(configMemory);
+         LuaSystem* memoryConfig = emplace<LuaSystem>(configMemory);
          memoryConfig->init(configMemory);
          
          LuaStack config = memoryConfig->getStack();
@@ -101,11 +101,16 @@ namespace core
       auto before = __rdtsc();
 
       Memory audioMemory = alignMemory(mainMemory, 16);
+      Memory graphicsMemory;
+      Memory scriptMemory;
+      Memory gameMemory;
+
+
       auto fragmentationLostBytes = mainMemory.remainingBytes - audioMemory.remainingBytes;
       CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
       mainMemory = advanceMemory(audioMemory, MegaBytes(AudioSystemMegabytes));
       
-      AudioSystem* audio = make<AudioSystem>(audioMemory);
+      AudioSystem* audio = emplace<AudioSystem>(audioMemory);
       audio->init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
       FrameAllocator* graphicsMemory = mainMemory.allocate<FrameAllocator>();

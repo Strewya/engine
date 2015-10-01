@@ -41,10 +41,10 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
          auto before = __rdtsc();
          core::initializeFileStream(memory, KiloBytes(128));
 
-         core::CommunicationBuffer* toGame = core::make<core::CommunicationBuffer>(memory);
+         core::CommunicationBuffer* toGame = core::emplace<core::CommunicationBuffer>(memory);
          toGame->init(memory, 2048);
 
-         core::CommunicationBuffer* fromGame = core::make<core::CommunicationBuffer>(memory);
+         core::CommunicationBuffer* fromGame = core::emplace<core::CommunicationBuffer>(memory);
          fromGame->init(memory, 128);
          auto after = __rdtsc();
 

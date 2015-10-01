@@ -377,56 +377,65 @@ namespace core
       stream << "Remaining memory: " << m.remainingBytes << logLine;
    }
 
-   Memory advanceMemory(Memory m, u32 size)
-   {
-      Memory result{};
-      if( m.remainingBytes >= size )
-      {
-         result.address = (u8*)m.address + size;
-         result.remainingBytes = m.remainingBytes - size;
-      }
-      return result;
-   }
-
-   Memory alignMemory(Memory m, u32 alignment)
+   u32 getAlignmentBytes(Memory m, u32 alignment)
    {
       CORE_ASSERT_DBGERR((alignment != 0) && !(alignment & (alignment - 1)), "Alignment is not power of two!");
-      u32 memAlign = (u32)m.address % alignment;
+      u32 memAlign = reinterpret_cast<u32>(m.address) % alignment;
       if( memAlign )
       {
          alignment -= memAlign;
       }
+      return alignment;
+   }
+
+   Memory advanceMemory(Memory m, u32 size)
+   {
+      m.address = static_cast<u8*>(m.address) + size;
+      m.remainingBytes -= size;
+      return m;
+   }
+
+   Memory alignMemory(Memory m, u32 alignment)
+   {
+      alignment = getAlignmentBytes(m, alignment);
       auto result = advanceMemory(m, alignment);
       return result;
    }
 
-
-   template<typename T>
-   T* make(Memory& m)
+   bool hasMemory(Memory m, u32 size, u32 alignment)
    {
-      auto alignedMemory = alignMemory(m, __alignof(T));
-      auto memoryAfterAllocation = advanceMemory(alignedMemory, sizeof(T));
-      if( memoryAfterAllocation == nullptr )
-      {
-         return nullptr;
-      }
-      T* result = new(alignedMemory.address)T();
-      m = memoryAfterAllocation;
+      alignment = getAlignmentBytes(m, alignment);
+      auto result = m.remainingBytes >= (size + alignment);
       return result;
-
    }
 
    template<typename T>
-   T* makeArray(Memory& m, u32 count)
+   T* emplace(Memory& m)
    {
-      auto alignedMemory = alignMemory(m, __alignof(T));
-      auto memoryAfterAllocation = advanceMemory(alignedMemory, sizeof(T[count]));
-      if( memoryAfterAllocation == nullptr )
+      auto size = sizeof(T);
+      auto align = __alignof(T);
+      if( !hasMemory(m, size, align) )
       {
          return nullptr;
       }
+      auto alignedMemory = alignMemory(m, align);
+      m = advanceMemory(alignedMemory, size);
+      T* result = new(alignedMemory.address)T();
+      return result;
+   }
+
+   template<typename T>
+   T* emplaceArray(Memory& m, u32 count)
+   {
+      auto size = sizeof(T[count]);
+      auto align = __alignof(T);
+      if( !hasMemory(m, size, align) )
+      {
+         return nullptr;
+      }
+      auto alignedMemory = alignMemory(m, align);
+      m = advanceMemory(alignedMemory, size);
       T* result = static_cast<T*>(alignedMemory.address);
-      m = memoryAfterAllocation;
       return result;
    }
 #endif

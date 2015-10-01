@@ -23,6 +23,7 @@ namespace core
       auto fragmentationLostBytes = memory.remainingBytes - fmodMemory.remainingBytes;
       CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
       
+      CORE_ASSERT_DBGERR(fmodMemory.remainingBytes >= fmodMemorySize, "Not enough memory for FMOD!");
       CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
       auto result = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);

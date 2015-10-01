@@ -31,7 +31,8 @@ namespace core
          m_writeIndex = 1;
          m_readIndex = 0;
          m_maxMessages = messageCount;
-         m_buffer = makeArray<WinMsg>(memory, messageCount);
+         m_buffer = emplaceArray<WinMsg>(memory, messageCount);
+         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory to emplace communication buffer.");
       }
 
       void writeEvent(const WinMsg& e)
