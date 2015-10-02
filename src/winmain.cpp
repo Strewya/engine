@@ -55,10 +55,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP
          {
-            // #think
-            //maybe read messages from the game to the window? it might be a nice way of cross thread communication...
-            //could be used as a means for the game to ask the window to close because it is dead...
-            //and could be used to ask the window stuff from the game without actually doing it through a pointer/proxy...
             window.processCommands(fromGame, toGame);
          }
 

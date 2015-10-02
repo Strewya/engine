@@ -17,25 +17,19 @@ namespace core
    struct SoundCache
    {
    private:
-      // [Struja 26.9.2015.] #todo: Replace this raw array with a pool allocator based container so i can more easily track how much sounds are
-      // actually in use
-      Allocator* m_allocator;
+      // [Struja 26.9.2015.] #todo: Replace this raw array with a pool allocator based container
+      // so i can more easily track how much sounds are actually in use
       Sound* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
 
    public:
-      void init(Allocator& a, u32 maxSlots)
+      void init(Memory& mem, u32 maxSlots)
       {
-         m_allocator = &a;
-
-         m_buffer = m_allocator->allocateArray<Sound>(maxSlots);
+         m_buffer = emplaceArray<Sound>(mem, maxSlots);
+         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory to emplace SoundCache storage.");
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-      }
-      void shutdown()
-      {
-         m_allocator->deallocateArray(m_buffer);
       }
 
       HSound insert(Sound s)
@@ -44,7 +38,6 @@ namespace core
 
          if( m_maxSlots != m_usedSlots )
          {
-            // #todo maybe some day when this becomes a long loop change to a pool based freelist finder or something.
             for( u16 i = 0; i < m_maxSlots; ++i )
             {
                if( m_buffer[i].unloaded() )

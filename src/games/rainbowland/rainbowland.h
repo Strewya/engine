@@ -20,6 +20,7 @@ namespace core
 
    struct Game
    {
+      Memory gameMemory;
       World world;
       //GameAssets assets;
       //...

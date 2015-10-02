@@ -16,7 +16,7 @@ namespace core
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
-      auto fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
+      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
       CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
       auto fmodMemory = alignMemory(memory, 16);
@@ -47,13 +47,14 @@ namespace core
       }
 
       CORE_ASSERT_DBGWRN(sounds.getCount() == 0, "Some sounds were not cleaned up!");
-      sounds.shutdown();
       auto result = m_system->release();
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to release FMOD::System");
       int curAlloc = 0;
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
+      CORE_LOG_DEBUG("Audio system shutdown, stats:");
       CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
+      CORE_LOG_DEBUG("Static memory: ", m_staticMemory);
    }
 
    HSound AudioSystem::loadSoundFromFile(const char* filename)

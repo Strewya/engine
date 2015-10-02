@@ -17,22 +17,17 @@ namespace core
    struct TextureCache
    {
    private:
-      Allocator* m_allocator;
       Texture* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
    
    public:
-      void init(Allocator& a, u32 maxSlots)
+      void init(Memory& m, u32 maxSlots)
       {
-         m_allocator = &a;
-         m_buffer = m_allocator->allocateArray<Texture>(maxSlots);
+         m_buffer = emplaceArray<Texture>(m, maxSlots);
+         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory for TextureCache storage!");
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-      }
-      void shutdown()
-      {
-         m_allocator->deallocateArray(m_buffer);
       }
 
       HTexture insert(Texture t)

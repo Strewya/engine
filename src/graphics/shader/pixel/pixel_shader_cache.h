@@ -17,22 +17,17 @@ namespace core
    struct PixelShaderCache
    {
    private:
-      Allocator* m_allocator;
       PixelShader* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
 
    public:
-      void init(Allocator& a, u32 maxSlots)
+      void init(Memory& m, u32 maxSlots)
       {
-         m_allocator = &a;
-         m_buffer = m_allocator->allocateArray<PixelShader>(maxSlots);
+         m_buffer = emplaceArray<PixelShader>(m, maxSlots);
+         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory to emplace PixelShaderCache storage.");
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
-      }
-      void shutdown()
-      {
-         m_allocator->deallocateArray(m_buffer);
       }
 
       HPixelShader insert(PixelShader ps)

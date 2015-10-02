@@ -48,6 +48,108 @@ namespace core
    std::ostream& operator<<(std::ostream& stream, memoryAddress ma);
 
    /************************************************************************
+    *              Memory
+    *    The main object through which memory allocation and reservation
+    *    is done.
+    ************************************************************************/
+   struct Memory
+   {
+      void* address;
+      u64 remainingBytes;
+   };
+   inline bool operator==(Memory m, nullptr_t p)
+   {
+      auto result = m.address == nullptr;
+      return result;
+   }
+   inline bool operator!=(Memory m, nullptr_t p)
+   {
+      auto result = m.address != nullptr;
+      return result;
+   }
+   inline std::ostream& operator<<(std::ostream& stream, Memory m)
+   {
+      stream << "Remaining memory: " << m.remainingBytes << logLine;
+      return stream;
+   }
+
+   inline u32 getAlignmentBytes(Memory m, u32 alignment)
+   {
+      CORE_ASSERT_DBGERR((alignment != 0) && !(alignment & (alignment - 1)), "Alignment is not power of two!");
+      u32 memAlign = reinterpret_cast<u32>(m.address) % alignment;
+      if( memAlign )
+      {
+         alignment -= memAlign;
+      }
+      return memAlign;
+   }
+
+   inline Memory advanceMemory(Memory m, u32 size)
+   {
+      m.address = static_cast<u8*>(m.address) + size;
+      m.remainingBytes -= size;
+      return m;
+   }
+
+   inline Memory alignMemory(Memory m, u32 alignment)
+   {
+      alignment = getAlignmentBytes(m, alignment);
+      CORE_ASSERT_DBGWRN(alignment == 0, "Losing ", alignment, " bytes due to alignment!");
+      auto result = advanceMemory(m, alignment);
+      return result;
+   }
+
+   inline bool hasMemory(Memory m, u32 size, u32 alignment)
+   {
+      alignment = getAlignmentBytes(m, alignment);
+      auto result = m.remainingBytes >= (size + alignment);
+      return result;
+   }
+
+   inline Memory allocateMemoryChunk(Memory& m, u32 size, u32 align)
+   {
+      Memory result{};
+      if( hasMemory(m, size, align) )
+      {
+         result = alignMemory(m, align);
+         m = advanceMemory(result, size);
+         result.remainingBytes = size;
+      }
+      return result;
+   }
+
+   template<typename T>
+   inline T* emplace(Memory& m)
+   {
+      u32 size = sizeof(T);
+      u32 align = __alignof(T);
+      if( !hasMemory(m, size, align) )
+      {
+         return nullptr;
+      }
+      auto alignedMemory = alignMemory(m, align);
+      m = advanceMemory(alignedMemory, size);
+      T* result = new(alignedMemory.address)T();
+      return result;
+   }
+
+   template<typename T>
+   inline T* emplaceArray(Memory& m, u32 count)
+   {
+      u32 size = sizeof(T)*count;
+      u32 align = __alignof(T);
+      if( !hasMemory(m, size, align) )
+      {
+         return nullptr;
+      }
+      auto alignedMemory = alignMemory(m, align);
+      m = advanceMemory(alignedMemory, size);
+      T* result = static_cast<T*>(alignedMemory.address);
+      return result;
+   }
+
+#ifdef ALLOCATOR_V1
+   /************************************************************************
     *              Interface for all allocators
     *    I have decided that i want to keep the coding sane, and take
     *    the small performance penalty with memory allocation in order
@@ -168,8 +270,7 @@ namespace core
     *    size. This saves memory and reduces fragmentation and allocation
     *    time.
     ************************************************************************/
-#define ALLOCATOR_V2
-#ifdef ALLOCATOR_V1
+
 #define TEST_MEMORY_ALLOCATION_PERFORMANCE_OFF
 #ifndef TEST_MEMORY_ALLOCATION_PERFORMANCE
    /************************************************************************
@@ -278,9 +379,9 @@ namespace core
     *    the same pointer is returned, and if the difference between the old size and new size is >= 16, then the extra memory is freed.
     *    If reallocation is done from a smaller to a bigger memory size, then a new chunk is allocated to suit the bigger size, a memcpy is performed,
     *    and the old memory is freed.
-    *    #todo An improvement can be made to the reallocation method, so reallocs from a smaller to a bigger memory size is first checked if it can be
+    *    An improvement can be made to the reallocation method, so reallocs from a smaller to a bigger memory size is first checked if it can be
     *    expanded in place.
-    *    #todo The previous todo is implemented, just need to test it works now.
+    *    #test The previous todo is implemented, just need to test it works now.
     *
     */
    /************************************************************************
@@ -355,88 +456,4 @@ namespace core
 #endif //TEST_MEMORY_ALLOCATION_PERFORMANCE
 
 #endif //ALLOCATOR_V1
-
-#ifdef ALLOCATOR_V2
-   struct Memory
-   {
-      void* address;
-      u64 remainingBytes;
-   };
-   bool operator==(Memory m, nullptr_t p)
-   {
-      auto result = m.address == nullptr;
-      return result;
-   }
-   bool operator!=(Memory m, nullptr_t p)
-   {
-      auto result = m.address != nullptr;
-      return result;
-   }
-   std::ostream& operator<<(std::ostream& stream, Memory m)
-   {
-      stream << "Remaining memory: " << m.remainingBytes << logLine;
-   }
-
-   u32 getAlignmentBytes(Memory m, u32 alignment)
-   {
-      CORE_ASSERT_DBGERR((alignment != 0) && !(alignment & (alignment - 1)), "Alignment is not power of two!");
-      u32 memAlign = reinterpret_cast<u32>(m.address) % alignment;
-      if( memAlign )
-      {
-         alignment -= memAlign;
-      }
-      return alignment;
-   }
-
-   Memory advanceMemory(Memory m, u32 size)
-   {
-      m.address = static_cast<u8*>(m.address) + size;
-      m.remainingBytes -= size;
-      return m;
-   }
-
-   Memory alignMemory(Memory m, u32 alignment)
-   {
-      alignment = getAlignmentBytes(m, alignment);
-      auto result = advanceMemory(m, alignment);
-      return result;
-   }
-
-   bool hasMemory(Memory m, u32 size, u32 alignment)
-   {
-      alignment = getAlignmentBytes(m, alignment);
-      auto result = m.remainingBytes >= (size + alignment);
-      return result;
-   }
-
-   template<typename T>
-   T* emplace(Memory& m)
-   {
-      auto size = sizeof(T);
-      auto align = __alignof(T);
-      if( !hasMemory(m, size, align) )
-      {
-         return nullptr;
-      }
-      auto alignedMemory = alignMemory(m, align);
-      m = advanceMemory(alignedMemory, size);
-      T* result = new(alignedMemory.address)T();
-      return result;
-   }
-
-   template<typename T>
-   T* emplaceArray(Memory& m, u32 count)
-   {
-      auto size = sizeof(T[count]);
-      auto align = __alignof(T);
-      if( !hasMemory(m, size, align) )
-      {
-         return nullptr;
-      }
-      auto alignedMemory = alignMemory(m, align);
-      m = advanceMemory(alignedMemory, size);
-      T* result = static_cast<T*>(alignedMemory.address);
-      return result;
-   }
-#endif
 }

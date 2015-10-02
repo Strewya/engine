@@ -11,9 +11,10 @@
 
 namespace core
 {
-   core_internal Game* init_game(Allocator& a, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
+   core_internal Game* init_game(Memory mem, CommunicationBuffer* fromMain, CommunicationBuffer* toMain)
    {
-      Game* game = a.allocate<Game>();
+      Game* game = emplace<Game>(mem);
+      game->gameMemory = mem;
 
       return game;
    }

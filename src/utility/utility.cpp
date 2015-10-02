@@ -64,11 +64,10 @@ namespace core
       auto& stream = getFileStream();
       CORE_ASSERT_ERR(!stream.is_open(), "Logger has already been initialized");
 
-      char* memory = (char*)m.address;
+      char* memory = emplaceArray<char>(m, bufferSize);
+      CORE_ASSERT_DBGERR(memory != nullptr, "Not enough memory to allocate log file buffer!");
       stream.rdbuf()->pubsetbuf(memory, bufferSize);
-      m.address = memory + bufferSize;
-      m.remainingBytes -= bufferSize;
-
+      
       char filename[19] = {};
       getFilename(filename, 19);
 

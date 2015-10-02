@@ -99,33 +99,28 @@ namespace core
 #endif
 
       auto before = __rdtsc();
-
-      Memory audioMemory = alignMemory(mainMemory, 16);
-      Memory graphicsMemory;
-      Memory scriptMemory;
-      Memory gameMemory;
-
-
-      auto fragmentationLostBytes = mainMemory.remainingBytes - audioMemory.remainingBytes;
-      CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
-      mainMemory = advanceMemory(audioMemory, MegaBytes(AudioSystemMegabytes));
       
+      
+      Memory audioMemory = allocateMemoryChunk(mainMemory, MegaBytes(AudioSystemMegabytes), 16);
+      Memory graphicsMemory = allocateMemoryChunk(mainMemory, MegaBytes(GraphicsSystemMegabytes), 16);
+      Memory scriptMemory = allocateMemoryChunk(mainMemory, MegaBytes(ScriptSystemMegabytes), 16);
+      Memory gameMemory = mainMemory;
+
+      CORE_ASSERT_DBGERR(audioMemory != nullptr, "Not enough memory for the audio service.");
+      CORE_ASSERT_DBGERR(graphicsMemory != nullptr, "Not enough memory for the graphics service.");
+      CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
+      CORE_ASSERT_DBGERR(gameMemory != nullptr, "Not enough memory for the core game.");
+
       AudioSystem* audio = emplace<AudioSystem>(audioMemory);
       audio->init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
-      FrameAllocator* graphicsMemory = mainMemory.allocate<FrameAllocator>();
-      graphicsMemory->acquireMemory(mainMemory, MegaBytes(GraphicsSystemMegabytes));
-      GraphicsSystem* graphics = graphicsMemory->allocate<GraphicsSystem>();
-      graphics->init(*graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
+      GraphicsSystem* graphics = emplace<GraphicsSystem>(graphicsMemory);
+      graphics->init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
 
-      HeapAllocator* scriptMemory = mainMemory.allocate<HeapAllocator>();
-      scriptMemory->acquireMemory(mainMemory, MegaBytes(ScriptSystemMegabytes));
-      LuaSystem* script = scriptMemory->allocate<LuaSystem>();
-      script->init(*scriptMemory);
+      LuaSystem* script = emplace<LuaSystem>(scriptMemory);
+      script->init(scriptMemory);
       
-      FrameAllocator* gameMemory = mainMemory.allocate<FrameAllocator>();
-      gameMemory->acquireMemory(mainMemory, MegaBytes(GameMemoryMegabytes));
-      Game* game = init_game(*gameMemory, fromMain, toMain);
+      Game* game = init_game(gameMemory, fromMain, toMain);
 
       // #todo decide if this should stay enabled in release build
       WinMsg msg{};
@@ -164,46 +159,14 @@ namespace core
       if( game )
       {
          shutdown_game(*game, fromMain, toMain);
-         gameMemory->deallocate(game);
-         gameMemory->returnMemory(mainMemory);
-         mainMemory.deallocate(gameMemory);
       }
 
       script->shutdown();
-      scriptMemory->deallocate(script);
-      scriptMemory->returnMemory(mainMemory);
-      mainMemory.deallocate(scriptMemory);
-
       graphics->shutdown();
-      graphicsMemory->deallocate(graphics);
-      graphicsMemory->returnMemory(mainMemory);
-      mainMemory.deallocate(graphicsMemory);
-
       audio->shutdown();
-      audioMemory->deallocate(audio);
-      audioMemory->returnMemory(mainMemory);
-      mainMemory.deallocate(audioMemory);
-
+      
       auto after = __rdtsc();
       CORE_LOG("All systems init and shutdown took ", (after - before), " cycles");
-
-
-      before = __rdtsc();
-      struct Bleb
-      {
-         f64 d;
-         f32 f;
-         u32 i;
-      };
-      HeapAllocator* testHeap = mainMemory.allocate<HeapAllocator>();
-      testHeap->acquireMemory(mainMemory, KiloBytes(1));
-      for( u32 i = 1; i != 0; ++i )
-      {
-         auto* t = testHeap->allocate<Bleb>();
-         testHeap->deallocate(t);
-      }
-      after = __rdtsc();
-      CORE_LOG("Stupid took ", (after - before), " cycles");
 
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);

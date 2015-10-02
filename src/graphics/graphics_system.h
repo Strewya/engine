@@ -36,7 +36,7 @@ namespace core
    struct GraphicsSystem
    {
    public:
-      void init(Allocator& a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
+      void init(Memory a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
       void shutdown();
 
       void begin();
@@ -75,8 +75,8 @@ namespace core
       bool initSamplerState();
       bool initDepthBuffer();
 
-      Allocator* m_staticMemory;
-      HeapAllocator m_dynamicMemory;
+      Memory m_staticMemory;
+      Memory m_dynamicMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
       PixelShaderLoader m_psLoader;

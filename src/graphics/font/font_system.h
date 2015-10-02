@@ -23,7 +23,6 @@ namespace core
    u32 calculateVertexCount(u32 visibleCharacters);
    u32 calculateIndexCount(u32 visibleCharacters);
 
-   // #todo potentially more than bool return codes, like bufferTooSmall or something...
    bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
    bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
 

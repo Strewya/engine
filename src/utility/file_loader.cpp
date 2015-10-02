@@ -11,7 +11,7 @@
 
 namespace core
 {
-   LoadedFile loadFile(const char* filename, Allocator& a)
+   LoadedFile loadFile(const char* filename, Memory& mem)
    {
       LoadedFile result{nullptr, 0};
       std::ifstream file{filename, std::ifstream::in | std::ifstream::binary};
@@ -19,7 +19,7 @@ namespace core
       {
          file.seekg(0, std::ios::end);
          result.size = u32(file.tellg());
-         result.memory = a.allocateRaw(result.size, 1);
+         result.memory = emplaceArray<u8>(mem, result.size);
          if( result.memory )
          {
             file.seekg(0, std::ios::beg);

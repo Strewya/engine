@@ -32,10 +32,10 @@ namespace core
    //*****************************************************************
    //          INIT
    //*****************************************************************
-   void GraphicsSystem::init(Allocator& a, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
+   void GraphicsSystem::init(Memory mem, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
    {
-      m_staticMemory = &a;
-      m_dynamicMemory.acquireMemory(*m_staticMemory, MegaBytes(10));
+      m_staticMemory = mem;
+      m_dynamicMemory = allocateMemoryChunk(m_staticMemory, MegaBytes(10), 16);
 
       m_window = handle;
       m_backbufferSize.x = this->width = (f32)width;
@@ -64,13 +64,13 @@ namespace core
       m_renderer.init(m_dev, m_devcon, m_samplerState);
 
       m_textureFileLoader.init(m_dev);
-      textures.init(*m_staticMemory, textureSlots);
+      textures.init(m_staticMemory, textureSlots);
 
       m_vsLoader.init(m_dev);
-      vertexShaders.init(*m_staticMemory, shaderSlots);
+      vertexShaders.init(m_staticMemory, shaderSlots);
 
       m_psLoader.init(m_dev);
-      pixelShaders.init(*m_staticMemory, shaderSlots);
+      pixelShaders.init(m_staticMemory, shaderSlots);
 
       {
 #include "graphics/shader/vertex/default_vertex_shader.h"
@@ -133,13 +133,10 @@ namespace core
       unload(m_defaultPixelShaderHandle);
       unload(m_defaultVertexShaderHandle);
 
-      CORE_ASSERT_DBGWRN(pixelShaders.getCount() == 0, "Some pixel shaders were not released!");
-      CORE_ASSERT_DBGWRN(vertexShaders.getCount() == 0, "Some vertex shaders were not released!");
-      CORE_ASSERT_DBGWRN(textures.getCount() == 0, "Some textures were not released!");
-      pixelShaders.shutdown();
-      vertexShaders.shutdown();
-      textures.shutdown();
-
+      CORE_ASSERT_DBGERR(pixelShaders.getCount() == 0, "Some pixel shaders were not released!");
+      CORE_ASSERT_DBGERR(vertexShaders.getCount() == 0, "Some vertex shaders were not released!");
+      CORE_ASSERT_DBGERR(textures.getCount() == 0, "Some textures were not released!");
+      
       m_renderer.shutdown();
 
       ID3D11Debug* debug = nullptr;
@@ -153,8 +150,8 @@ namespace core
          debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
          safeRelease(debug);
       }
-      CORE_LOG(m_dynamicMemory);
-      m_dynamicMemory.returnMemory(*m_staticMemory);
+      CORE_LOG_DEBUG("Graphics memory stats:");
+      CORE_LOG_DEBUG("Static memory: ", m_staticMemory, "Dynamic memory: ", m_dynamicMemory);
    }
 
    //*****************************************************************
@@ -184,7 +181,8 @@ namespace core
    //*****************************************************************
    HVertexShader GraphicsSystem::loadVertexShaderFromFile(const char* filename, VertexType vType)
    {
-      auto file = loadFile(filename, m_dynamicMemory);
+      auto fileMemory = m_dynamicMemory;
+      auto file = loadFile(filename, fileMemory);
       CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
       InputLayout layout{};
       switch( vType )
@@ -200,8 +198,6 @@ namespace core
       }
       CORE_ASSERT_ERR(layout.buffer != nullptr && layout.size > 0, "Error generating input layout information");
       auto shader = m_vsLoader.load(layout, file.memory, file.size);
-
-      m_dynamicMemory.deallocateRaw(file.memory, file.size);
 
       auto result = vertexShaders.insert(shader);
       return result;
@@ -221,11 +217,10 @@ namespace core
    //*****************************************************************
    HPixelShader GraphicsSystem::loadPixelShaderFromFile(const char* filename)
    {
-      auto file = loadFile(filename, m_dynamicMemory);
+      auto fileMemory = m_dynamicMemory;
+      auto file = loadFile(filename, fileMemory);
       CORE_ASSERT_ERR(file.memory != nullptr, "Not enough scratch memory to load shader file '", filename, "'");
       auto shader = m_psLoader.load(file.memory, file.size);
-
-      m_dynamicMemory.deallocateRaw(file.memory, file.size);
 
       auto result = pixelShaders.insert(shader);
       return result;
