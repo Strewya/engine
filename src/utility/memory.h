@@ -64,7 +64,7 @@ namespace core
    }
    inline bool operator!=(Memory m, nullptr_t p)
    {
-      auto result = m.address != nullptr;
+      auto result = m.address != nullptr && m.remainingBytes != 0;
       return result;
    }
    inline std::ostream& operator<<(std::ostream& stream, Memory m)
@@ -116,6 +116,11 @@ namespace core
          result.remainingBytes = size;
       }
       return result;
+   }
+
+   inline void zeroUsedMemory(Memory& m, u64 size)
+   {
+      memset(m.address, 0, size);
    }
 
    template<typename T>

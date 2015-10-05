@@ -19,11 +19,9 @@ namespace core
       u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
       CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
-      auto fmodMemory = alignMemory(memory, 16);
-      auto fragmentationLostBytes = memory.remainingBytes - fmodMemory.remainingBytes;
-      CORE_ASSERT_DBGWRN(fragmentationLostBytes == 0, "Losing ", fragmentationLostBytes, " bytes due to alignment");
-      
+      auto fmodMemory = allocateMemoryChunk(memory, fmodMemorySize, 16);
       CORE_ASSERT_DBGERR(fmodMemory.remainingBytes >= fmodMemorySize, "Not enough memory for FMOD!");
+      CORE_ASSERT_DBGWRN(fmodMemory.remainingBytes == fmodMemorySize, "Allocated more for FMOD than requested, whaaat?");
       CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
       auto result = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
@@ -32,6 +30,8 @@ namespace core
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to create FMOD::System");
       result = m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
       CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD::System");
+
+      m_staticMemory = memory;
 
       m_fileLoader.init(m_system);
       sounds.init(m_staticMemory, maxSoundSlots);

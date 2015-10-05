@@ -95,12 +95,11 @@ namespace core
 
          config.pop();
          memoryConfig->shutdown();
+         zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }
 #endif
-
       auto before = __rdtsc();
-      
-      
+
       Memory audioMemory = allocateMemoryChunk(mainMemory, MegaBytes(AudioSystemMegabytes), 16);
       Memory graphicsMemory = allocateMemoryChunk(mainMemory, MegaBytes(GraphicsSystemMegabytes), 16);
       Memory scriptMemory = allocateMemoryChunk(mainMemory, MegaBytes(ScriptSystemMegabytes), 16);
