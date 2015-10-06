@@ -84,7 +84,7 @@ namespace core
 
    void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
    {
-      CORE_LOG_DEBUG("lua_allocate, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
+      //CORE_LOG_DEBUG("lua_allocate, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
 
       (void)ud;  (void)osize;  /* not used */
       if( nsize == 0 )
@@ -95,7 +95,7 @@ namespace core
       auto before = __rdtsc();
       auto* result = realloc(ptr, nsize);
       auto after = __rdtsc();
-      CORE_LOG_DEBUG("realloc took ", (after - before), " cycles");
+      //CORE_LOG_DEBUG("realloc took ", (after - before), " cycles");
       return result;
    }
 

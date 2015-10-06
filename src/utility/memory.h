@@ -69,7 +69,7 @@ namespace core
    }
    inline std::ostream& operator<<(std::ostream& stream, Memory m)
    {
-      stream << "Remaining memory: " << m.remainingBytes << logLine;
+      stream << "Remaining memory: " << byteSizes(m.remainingBytes) << logLine;
       return stream;
    }
 

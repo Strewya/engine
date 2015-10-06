@@ -13,25 +13,23 @@ namespace core
 {
    void AudioSystem::init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
    {
+      m_staticMemory = memory;
+      
       m_channel = nullptr;
       m_musicPlaying = HSound{};
 
       u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
       CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
 
-      auto fmodMemory = allocateMemoryChunk(memory, fmodMemorySize, 16);
-      CORE_ASSERT_DBGERR(fmodMemory.remainingBytes >= fmodMemorySize, "Not enough memory for FMOD!");
-      CORE_ASSERT_DBGWRN(fmodMemory.remainingBytes == fmodMemorySize, "Allocated more for FMOD than requested, whaaat?");
+      auto fmodMemory = allocateMemoryChunk(m_staticMemory, fmodMemorySize, 16);
       CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
 
-      auto result = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
-      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD memory");
-      result = FMOD::System_Create(&m_system);
-      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to create FMOD::System");
-      result = m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
-      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to initialize FMOD::System");
-
-      m_staticMemory = memory;
+      auto fmodResult = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
+      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to initialize FMOD memory");
+      fmodResult = FMOD::System_Create(&m_system);
+      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to create FMOD::System");
+      fmodResult = m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
+      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to initialize FMOD::System");
 
       m_fileLoader.init(m_system);
       sounds.init(m_staticMemory, maxSoundSlots);
@@ -39,16 +37,19 @@ namespace core
 
    void AudioSystem::shutdown()
    {
+      auto fmodResult = FMOD_OK;
       if( m_channel != nullptr )
       {
-         auto result = m_channel->stop();
-         CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to stop a channel from playing");
+         fmodResult = m_channel->stop();
+         CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to stop a channel from playing");
          m_channel = nullptr;
       }
 
       CORE_ASSERT_DBGWRN(sounds.getCount() == 0, "Some sounds were not cleaned up!");
-      auto result = m_system->release();
-      CORE_ASSERT_DBGERR(result == FMOD_OK, "Failed to release FMOD::System");
+
+      fmodResult = m_system->release();
+      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to release FMOD::System");
+      
       int curAlloc = 0;
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);

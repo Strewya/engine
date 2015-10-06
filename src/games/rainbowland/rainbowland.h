@@ -13,6 +13,22 @@
 
 namespace core
 {
+   struct GameAssets
+   {
+      HTexture atlas;
+      HTexture background;
+      HTexture font;
+      HVertexShader mainVS;
+      HPixelShader mainPS;
+      HPixelShader healthPS;
+      HSound reload;
+      HSound pistol;
+      HSound uzi;
+      HSound rpg;
+      HSound sniper;
+      HSound shotgun;
+   };
+
    struct World
    {
 
@@ -21,8 +37,8 @@ namespace core
    struct Game
    {
       Memory gameMemory;
+      GameAssets assets;
       World world;
-      //GameAssets assets;
       //...
    };
 }

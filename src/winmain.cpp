@@ -40,6 +40,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          auto before = __rdtsc();
          core::initializeFileStream(memory, KiloBytes(128));
+         CORE_LOG(core::newLine, core::newLine, core::logLine, "Execution start", core::newLine);
 
          core::CommunicationBuffer* toGame = core::emplace<core::CommunicationBuffer>(memory);
          toGame->init(memory, 2048);
@@ -64,7 +65,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          logicThread.join();
          result = window.getExitCode();
-         CORE_LOG_DEBUG(memory);
       }
       else
       {

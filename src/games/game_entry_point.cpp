@@ -58,7 +58,6 @@ namespace core
       u32 AudioSystemMegabytes;
       u32 GraphicsSystemMegabytes;
       u32 ScriptSystemMegabytes;
-      u32 GameMemoryMegabytes;
 
       u32 FmodMemoryMegabytes;
       u32 FmodMaxChannels;
@@ -71,7 +70,7 @@ namespace core
          Memory configMemory = mainMemory;
          LuaSystem* memoryConfig = emplace<LuaSystem>(configMemory);
          memoryConfig->init(configMemory);
-         
+
          LuaStack config = memoryConfig->getStack();
          bool ok = config.doFile("memory.lua");
          CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
@@ -82,7 +81,6 @@ namespace core
          ExtractNumber(AudioSystemMegabytes);
          ExtractNumber(GraphicsSystemMegabytes);
          ExtractNumber(ScriptSystemMegabytes);
-         ExtractNumber(GameMemoryMegabytes);
 
          ExtractNumber(FmodMemoryMegabytes);
          ExtractNumber(FmodMaxChannels);
@@ -98,8 +96,6 @@ namespace core
          zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }
 #endif
-      auto before = __rdtsc();
-
       Memory audioMemory = allocateMemoryChunk(mainMemory, MegaBytes(AudioSystemMegabytes), 16);
       Memory graphicsMemory = allocateMemoryChunk(mainMemory, MegaBytes(GraphicsSystemMegabytes), 16);
       Memory scriptMemory = allocateMemoryChunk(mainMemory, MegaBytes(ScriptSystemMegabytes), 16);
@@ -108,7 +104,6 @@ namespace core
       CORE_ASSERT_DBGERR(audioMemory != nullptr, "Not enough memory for the audio service.");
       CORE_ASSERT_DBGERR(graphicsMemory != nullptr, "Not enough memory for the graphics service.");
       CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
-      CORE_ASSERT_DBGERR(gameMemory != nullptr, "Not enough memory for the core game.");
 
       AudioSystem* audio = emplace<AudioSystem>(audioMemory);
       audio->init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
@@ -118,17 +113,21 @@ namespace core
 
       LuaSystem* script = emplace<LuaSystem>(scriptMemory);
       script->init(scriptMemory);
-      
-      Game* game = init_game(gameMemory, fromMain, toMain);
 
-      // #todo decide if this should stay enabled in release build
+      Game* game = init_game(gameMemory, fromMain, toMain, audio, graphics, script);
+
       WinMsg msg{};
+      msg.type = WinMsgType::Fullscreen;
+      msg.fullscreen = true;
+      toMain->writeEvent(msg);
+      
+      // #todo decide if this should stay enabled in release build
       msg.type = WinMsgType::FileChange;
       strcpy(msg.fileChange.name, "resources");
       toMain->writeEvent(msg);
       //
 
-      auto running = (game == nullptr);
+      auto running = (game != nullptr);
       while( running )
       {
          f32 fraction = 0;
@@ -146,26 +145,23 @@ namespace core
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
-            running = tickLogic(*game, fromMain, toMain, logicTimer);
+            running = tickLogic(fromMain, toMain, &logicTimer, audio, graphics, script, game);
          }
          logicTimer.advanceTimeBy(droppedTime);
 
          u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
          // we might want to do interpolation ...
-         tickRender(*game, fromMain, toMain, renderTimer);
+         tickRender(fromMain, toMain, &renderTimer, audio, graphics, script, game);
          renderTimer.advanceTimeBy(fullUpdateTime);
       }
       if( game )
       {
-         shutdown_game(*game, fromMain, toMain);
+         shutdown_game(fromMain, toMain, audio, graphics, script, game);
       }
 
       script->shutdown();
       graphics->shutdown();
       audio->shutdown();
-      
-      auto after = __rdtsc();
-      CORE_LOG("All systems init and shutdown took ", (after - before), " cycles");
 
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);

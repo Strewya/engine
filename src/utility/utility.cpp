@@ -52,32 +52,28 @@ namespace core
       CORE_ASSERT_DBGERR(size >= 0, "GetFilename of log file has overwritten the buffer!");
    }
 
-   core_internal std::ofstream& getFileStream()
-   {
-      core_local_persist std::ofstream gLogFileStream;
-
-      return gLogFileStream;
-   }
+   core_local_persist std::ostream* gLogStream;
 
    void initializeFileStream(Memory& m, u32 bufferSize)
    {
-      auto& stream = getFileStream();
-      CORE_ASSERT_ERR(!stream.is_open(), "Logger has already been initialized");
-
+      CORE_ASSERT_DBGERR(gLogStream == nullptr, "Logging stream has already been initialized!");
+      
+      auto* stream = emplace<std::ofstream>(m);
       char* memory = emplaceArray<char>(m, bufferSize);
       CORE_ASSERT_DBGERR(memory != nullptr, "Not enough memory to allocate log file buffer!");
-      stream.rdbuf()->pubsetbuf(memory, bufferSize);
+      stream->rdbuf()->pubsetbuf(memory, bufferSize);
       
       char filename[19] = {};
       getFilename(filename, 19);
 
-      stream.open(filename, std::ios_base::app);
-      stream << newLine << newLine << logLine << "Execution start" << newLine;
+      stream->open(filename, std::ios_base::app);
+      
+      gLogStream = stream;
    }
 
    std::ostream& getLogFileStream()
    {
-      auto& result = getFileStream();
+      auto& result = *gLogStream;
       return result;
    }
 

@@ -133,9 +133,9 @@ namespace core
       unload(m_defaultPixelShaderHandle);
       unload(m_defaultVertexShaderHandle);
 
-      CORE_ASSERT_DBGERR(pixelShaders.getCount() == 0, "Some pixel shaders were not released!");
-      CORE_ASSERT_DBGERR(vertexShaders.getCount() == 0, "Some vertex shaders were not released!");
-      CORE_ASSERT_DBGERR(textures.getCount() == 0, "Some textures were not released!");
+      CORE_ASSERT_DBGWRN(pixelShaders.getCount() == 0, "Some pixel shaders were not released!");
+      CORE_ASSERT_DBGWRN(vertexShaders.getCount() == 0, "Some vertex shaders were not released!");
+      CORE_ASSERT_DBGWRN(textures.getCount() == 0, "Some textures were not released!");
       
       m_renderer.shutdown();
 
