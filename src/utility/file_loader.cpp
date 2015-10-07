@@ -15,7 +15,7 @@ namespace core
    {
       LoadedFile result{nullptr, 0};
       std::ifstream file{filename, std::ifstream::in | std::ifstream::binary};
-      if( file.good() )
+      if( file.good() && file.is_open() )
       {
          file.seekg(0, std::ios::end);
          result.size = u32(file.tellg());

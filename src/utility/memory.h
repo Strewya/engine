@@ -93,8 +93,8 @@ namespace core
 
    inline Memory alignMemory(Memory m, u32 alignment)
    {
-      alignment = getAlignmentBytes(m, alignment);
-      CORE_ASSERT_DBGWRN(alignment == 0, "Losing ", alignment, " bytes due to alignment!");
+      auto align = getAlignmentBytes(m, alignment);
+      CORE_ASSERT_DBGWRN(align == 0, "Losing ", align, " bytes due to alignment requirement of ", alignment, " for address ", m.address);
       auto result = advanceMemory(m, alignment);
       return result;
    }

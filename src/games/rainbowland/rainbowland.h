@@ -13,6 +13,21 @@
 
 namespace core
 {
+   /************************************************************************
+    *              ENUMS
+    ************************************************************************/
+
+   enum class State
+   {
+      MainMenu,
+      GameplaySetup,
+      GameplaySession,
+      Score,
+      Quit,
+      Startup,
+      Shutdown
+   };
+
    struct GameAssets
    {
       HTexture atlas;
@@ -34,11 +49,35 @@ namespace core
 
    };
 
+   struct CursorState
+   {
+      bool show;
+      bool lock;
+      bool relativeMovement;
+   };
+
    struct Game
    {
       Memory gameMemory;
       GameAssets assets;
-      World world;
-      //...
+
+      State currentState;
+      State nextState;
+
+      bool isPaused;
+      
+      CursorState cursorState;
+   };
+
+   struct Time
+   {
+      u32 micros;
+      f32 seconds;
+   };
+
+   struct DeltaTime
+   {
+      Time real;
+      Time virt;
    };
 }

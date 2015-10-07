@@ -114,7 +114,7 @@ namespace core
       LuaSystem* script = emplace<LuaSystem>(scriptMemory);
       script->init(scriptMemory);
 
-      Game* game = init_game(gameMemory, fromMain, toMain, audio, graphics, script);
+      Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, script);
 
       WinMsg msg{};
       msg.type = WinMsgType::Fullscreen;
@@ -156,7 +156,7 @@ namespace core
       }
       if( game )
       {
-         shutdown_game(fromMain, toMain, audio, graphics, script, game);
+         shutdownGame(fromMain, toMain, audio, graphics, script, game);
       }
 
       script->shutdown();
