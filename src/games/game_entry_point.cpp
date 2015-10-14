@@ -7,6 +7,7 @@
 /******* extra headers *******/
 #include "audio/audio_system.h"
 #include "graphics/graphics_system.h"
+#include "input/input_system.h"
 #include "lua/lua_system.h"
 #include "utility/time/clock.h"
 #include "utility/communication_buffer.h"
@@ -57,6 +58,7 @@ namespace core
 #else
       u32 AudioSystemMegabytes;
       u32 GraphicsSystemMegabytes;
+      u32 InputSystemMegabytes;
       u32 ScriptSystemMegabytes;
 
       u32 FmodMemoryMegabytes;
@@ -80,6 +82,7 @@ namespace core
 
          ExtractNumber(AudioSystemMegabytes);
          ExtractNumber(GraphicsSystemMegabytes);
+         ExtractNumber(InputSystemMegabytes);
          ExtractNumber(ScriptSystemMegabytes);
 
          ExtractNumber(FmodMemoryMegabytes);
@@ -98,11 +101,13 @@ namespace core
 #endif
       Memory audioMemory = allocateMemoryChunk(mainMemory, MegaBytes(AudioSystemMegabytes), 16);
       Memory graphicsMemory = allocateMemoryChunk(mainMemory, MegaBytes(GraphicsSystemMegabytes), 16);
+      Memory inputMemory = allocateMemoryChunk(mainMemory, MegaBytes(InputSystemMegabytes), 16);
       Memory scriptMemory = allocateMemoryChunk(mainMemory, MegaBytes(ScriptSystemMegabytes), 16);
       Memory gameMemory = mainMemory;
 
       CORE_ASSERT_DBGERR(audioMemory != nullptr, "Not enough memory for the audio service.");
       CORE_ASSERT_DBGERR(graphicsMemory != nullptr, "Not enough memory for the graphics service.");
+      CORE_ASSERT_DBGERR(inputMemory != nullptr, "Not enough memory for the input service.");
       CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
 
       AudioSystem* audio = emplace<AudioSystem>(audioMemory);
@@ -111,10 +116,13 @@ namespace core
       GraphicsSystem* graphics = emplace<GraphicsSystem>(graphicsMemory);
       graphics->init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
 
+      InputSystem* input = emplace<InputSystem>(inputMemory);
+      input->init(inputMemory);
+
       LuaSystem* script = emplace<LuaSystem>(scriptMemory);
       script->init(scriptMemory);
 
-      Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, script);
+      Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, input, script);
 
       WinMsg msg{};
       msg.type = WinMsgType::Fullscreen;
@@ -145,7 +153,7 @@ namespace core
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
-            running = tickLogic(fromMain, toMain, &logicTimer, audio, graphics, script, game);
+            running = tickLogic(fromMain, toMain, &logicTimer, audio, graphics, input, script, game);
          }
          logicTimer.advanceTimeBy(droppedTime);
 
@@ -156,7 +164,7 @@ namespace core
       }
       if( game )
       {
-         shutdownGame(fromMain, toMain, audio, graphics, script, game);
+         shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
       }
 
       script->shutdown();

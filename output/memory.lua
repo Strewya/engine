@@ -1,6 +1,7 @@
 return {
     AudioSystemMegabytes = 100,
     GraphicsSystemMegabytes = 100,
+    InputSystemMegabytes = 10,
     ScriptSystemMegabytes = 50,
     
     FmodMemoryMegabytes = 40,

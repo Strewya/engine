@@ -137,19 +137,19 @@ namespace core
       IDLE,
       HOVER,
       HOT,
-      COUNT
+      N
    };
 
-   template<int COUNT>
+   template<int N>
    struct Button
    {
-      std::array<v2, COUNT> position;
-      std::array<v2, COUNT> halfsize;
+      std::array<v2, N> position;
+      std::array<v2, N> halfsize;
       // #todo at some point, these should be texture handles probably
-      std::array<Color, COUNT> idleColor;
-      std::array<Color, COUNT> hoverColor;
-      std::array<Color, COUNT> hotColor;
-      std::array<std::string, COUNT> caption;
+      std::array<Color, N> idleColor;
+      std::array<Color, N> hoverColor;
+      std::array<Color, N> hotColor;
+      std::array<std::string, N> caption;
    };
 
    template<int BUTTON_COUNT>

@@ -4,28 +4,20 @@
 *  usage:
 ********************************************/
 /******* c++ headers *******/
-#include <vector>
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
+#include "utility/memory.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct Clock;
-   struct WinMsg;
-   struct CommunicationBuffer;
-
-   typedef std::vector<WinMsg> EventVector_t;
-
    struct InputSystem
    {
    public:
-      void gatherInputForCurrentFrame(u64 pollMicros, CommunicationBuffer* comm);
-
-      const EventVector_t& getEvents() const;
+      void init(Memory memory);
 
    private:
-      EventVector_t m_inputEvents;
+      Memory m_staticMemory;
    };
 }

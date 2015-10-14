@@ -24,7 +24,7 @@
 
 namespace core
 {
-   core_internal void updateCursorStuff(CommunicationBuffer* toMain, bool show, bool lock, bool relative)
+   core_internal void updateCursorInfo(CommunicationBuffer* toMain, bool show, bool lock, bool relative)
    {
       WinMsg msg;
       msg.type = WinMsgType::ShowCursor;
@@ -41,13 +41,13 @@ namespace core
    void Game::onLostFocus()
    {
       isPaused = true;
-      updateCursorStuff(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
+      updateCursorInfo(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
    }
 
    void Game::onGainFocus()
    {
       isPaused = false;
-      updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+      updateCursorInfo(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
    }
 
    bool Game::shutdown()
@@ -62,7 +62,7 @@ namespace core
       CORE_STATUS_AND(graphicsSystem.shutdown());
       CORE_STATUS_AND(audioSystem.shutdown());
 
-      updateCursorStuff(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
+      updateCursorInfo(toMain, Cursor_Show, Cursor_Unlock, Cursor_Absolute);
 
       CORE_SHUTDOWN_END;
    }
@@ -225,7 +225,7 @@ namespace core
 
       if( !isPaused )
       {
-         updateCursorStuff(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
+         updateCursorInfo(toMain, game.sharedData.showCursor, game.sharedData.lockCursor, game.sharedData.relativeCursor);
       }
 
       luaSystem.collectGarbage();
