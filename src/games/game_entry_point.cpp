@@ -149,7 +149,7 @@ namespace core
 
          u32 count;
          count = (updateCount <= maxUpdateCount ? updateCount : maxUpdateCount);
-         CORE_ASSERT_DBGWRN(count == 1, "Doing more than one update per tick, performance warning.");
+         CORE_ASSERT_DBGWRN(count == 1, "Doing ", count, " updates per tick instead of one, performance warning.");
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
@@ -162,11 +162,8 @@ namespace core
          tickRender(fromMain, toMain, &renderTimer, audio, graphics, script, game);
          renderTimer.advanceTimeBy(fullUpdateTime);
       }
-      if( game )
-      {
-         shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
-      }
-
+      
+      shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
       script->shutdown();
       graphics->shutdown();
       audio->shutdown();

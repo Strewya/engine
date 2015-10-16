@@ -44,8 +44,9 @@ namespace core
       const char** caption;
    };
 
-   struct GuiData
+   struct GuiSystem
    {
+      Memory dynamicMemory;
       u32 hoverButton;
       u32 hotButton;
       u32 activatedButton;
@@ -105,7 +106,6 @@ namespace core
       };
 
       u32 buttonFunctionToExecute;
-      GuiData gui;
    };
 
    struct Game
@@ -121,7 +121,7 @@ namespace core
       SharedData sharedData;
       Constants constants;
 
-      MainMenuData mainMenuState;
+      GuiSystem gui;
    };
 
    struct Time

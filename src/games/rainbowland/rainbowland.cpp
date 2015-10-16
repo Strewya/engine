@@ -103,6 +103,18 @@ namespace core
     *              GUI RELATED
     ************************************************************************/
 
+   core_internal void allocateGuiButtons(GuiSystem& gui, u32 buttonCount)
+   {
+      auto memory = gui.dynamicMemory;
+      gui.button.count = buttonCount;
+      gui.button.position = emplaceArray<v2>(memory, buttonCount);
+      gui.button.halfsize = emplaceArray<v2>(memory, buttonCount);
+      gui.button.idleColor = emplaceArray<Color>(memory, buttonCount);
+      gui.button.hoverColor = emplaceArray<Color>(memory, buttonCount);
+      gui.button.hotColor = emplaceArray<Color>(memory, buttonCount);
+      gui.button.caption = emplaceArray<const char*>(memory, buttonCount);
+   }
+
    inline v2 orthoMousePosition(MousePosition mouse, f32 windowWidth, f32 windowHeight)
    {
       v2 result;
@@ -113,7 +125,7 @@ namespace core
       return result;
    }
 
-   core_internal void handle_mouseMove(GuiData& gui, v2 mousePosition)
+   core_internal void handle_mouseMove(GuiSystem& gui, v2 mousePosition)
    {
       u32 buttonCount = gui.button.count;
       gui.hoverButton = buttonCount;
@@ -127,12 +139,12 @@ namespace core
       }
    }
 
-   core_internal void handle_mouseDown(GuiData& gui)
+   core_internal void handle_mouseDown(GuiSystem& gui)
    {
       gui.hotButton = gui.hoverButton;
    }
 
-   core_internal u32 handle_mouseUp(GuiData& gui)
+   core_internal u32 handle_mouseUp(GuiSystem& gui)
    {
       u32 activateButton = gui.button.count;
       if( gui.hotButton == gui.hoverButton )
@@ -143,7 +155,7 @@ namespace core
       return activateButton;
    }
 
-   core_internal u32 handle_guiInput(GuiData& gui, SharedData& shared, const Constants& constants, std::array<WinMsg, 10>& frameEvents)
+   core_internal u32 handle_guiInput(GuiSystem& gui, SharedData& shared, const Constants& constants, std::array<WinMsg, 10>& frameEvents)
    {
       u32 activatedButton = gui.button.count;
       for( auto event : frameEvents )
@@ -182,74 +194,87 @@ namespace core
       return activatedButton;
    }
 
-   core_internal void render_guiData(GuiData& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem& gfx)
+   core_internal void render_guiData(GuiSystem& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem& gfx)
    {
       gfx.setOrthographicProjection();
 
-/*
-      for( auto i = 0U; i < BUTTONS; ++i )
-      {
-         Transform buttonTransform{gui.button.position[i]};
-         Color color = gui.button.idleColor[i];
-         if( i == gui.hoverButton )
-         {
+      /*
+            for( auto i = 0U; i < BUTTONS; ++i )
+            {
+            Transform buttonTransform{gui.button.position[i]};
+            Color color = gui.button.idleColor[i];
+            if( i == gui.hoverButton )
+            {
             color = gui.button.hoverColor[i];
             if( i == gui.hotButton )
             {
-               color = gui.button.hotColor[i];
+            color = gui.button.hotColor[i];
             }
-         }
-         auto buttonFrameMesh = makeOutlineQuad({}, gui.button.halfsize[i], assets.mainVS, assets.mainPS);
-         gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
+            }
+            auto buttonFrameMesh = makeOutlineQuad({}, gui.button.halfsize[i], assets.mainVS, assets.mainPS);
+            gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
 
-         auto buttonTextMesh = font.makeTextMesh(gui.button.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
-         gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
-      }
+            auto buttonTextMesh = font.makeTextMesh(gui.button.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
+            gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
+            }
 
-      auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
-      gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
-*/
+            auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
+            gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
+            */
    }
 
    /************************************************************************
     *              MAIN MENU RELATED
     ************************************************************************/
-   core_internal void initState_mainMenu(MainMenuData& state, SharedData& shared, const Constants& constants, GameAssets& assets)
+   core_internal void initState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
    {
-      state.buttonFunctionToExecute = MainMenuData::COUNT;
+      allocateGuiButtons(game->gui, MainMenuData::COUNT);
 
-      state.gui.hoverButton = state.COUNT;
-      state.gui.hotButton = state.COUNT;
+      game->gui.hoverButton = MainMenuData::COUNT;
+      game->gui.hotButton = MainMenuData::COUNT;
+      game->gui.activatedButton = MainMenuData::COUNT;
 
       Color defaultIdleColor{1, 1, 1};
       Color defaultHoverColor{1, 1, 0};
       Color defaultHotColor{1, 0, 0};
 
-
-
-      auto i = 0;
-      state.gui.button.position[i++] = {0, 100};
-      state.gui.button.position[i++] = {0, -100};
+      auto i = 0U;
+      game->gui.button.position[i++] = {0, 100};
+      game->gui.button.position[i++] = {0, -100};
 
       i = 0;
-      state.gui.button.halfsize[i++] = {200, 50};
-      state.gui.button.halfsize[i++] = {200, 50};
+      game->gui.button.halfsize[i++] = {200, 50};
+      game->gui.button.halfsize[i++] = {200, 50};
 
       i = 0;
-      state.gui.button.idleColor[i++] = {0, 1, 0};
-      state.gui.button.idleColor[i++] = {0, 1, 1};
+      game->gui.button.idleColor[i++] = {0, 1, 0};
+      game->gui.button.idleColor[i++] = {0, 1, 1};
 
       i = 0;
-      state.gui.button.hoverColor[i++] = defaultHoverColor;
-      state.gui.button.hoverColor[i++] = defaultHoverColor;
+      game->gui.button.hoverColor[i++] = defaultHoverColor;
+      game->gui.button.hoverColor[i++] = defaultHoverColor;
 
       i = 0;
-      state.gui.button.hotColor[i++] = defaultHotColor;
-      state.gui.button.hotColor[i++] = defaultHotColor;
+      game->gui.button.hotColor[i++] = defaultHotColor;
+      game->gui.button.hotColor[i++] = defaultHotColor;
 
       i = 0;
-      state.gui.button.caption[i++] = "Start game";
-      state.gui.button.caption[i++] = "Quit";
+      game->gui.button.caption[i++] = "Start game";
+      game->gui.button.caption[i++] = "Quit";
+   }
+
+   core_internal void updateState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
+   {
+
+   }
+
+   core_internal void renderState_mainMenu(GraphicsSystem* gfx, Game* game)
+   {
+
+   }
+
+   core_internal void cleanState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
+   {
 
    }
 
@@ -319,30 +344,77 @@ namespace core
    /************************************************************************
     *              STATE RELATED
     ************************************************************************/
-   core_internal void transitionState(Game* game)
+
+   core_internal void initState(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
    {
-      if( game->nextState != game->currentState )
+      switch( game->currentState )
       {
-         // #todo cleanup call for the current state before switching
-         game->currentState = game->nextState;
-         switch( game->currentState )
+         case State::MainMenu:
          {
-            case State::MainMenu:
-            {
-               initState_mainMenu(game->mainMenuState, game->sharedData, game->constants, game->assets);
-            } break;
-
-            case State::GameplaySetup:
-            {
-               //result = init_gameplaySetup(game.gameplay, game.sharedData, game.constants, game.assets);
-            } break;
-
-            case State::GameplaySession:
-            {
-               //result = init_session(game, game.session);
-            } break;
-         }
+            initState_mainMenu(audio, gfx, input, script, game);
+         } break;
+         
+         default:
+         {
+            CORE_LOG_DEBUG("State not implemented yet.");
+         } break;
       }
+   }
+   core_internal void updateState(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
+   {
+      switch( game->currentState )
+      {
+         case State::MainMenu:
+         {
+            updateState_mainMenu(audio, gfx, input, script, game);
+         } break;
+
+         default:
+         {
+            CORE_LOG_DEBUG("State not implemented yet.");
+         } break;
+      }
+   }
+   core_internal void renderState(GraphicsSystem* gfx, Game* game)
+   {
+      switch( game->currentState )
+      {
+         case State::MainMenu:
+         {
+            renderState_mainMenu(gfx, game);
+         } break;
+
+         default:
+         {
+            CORE_LOG_DEBUG("State not implemented yet.");
+         } break;
+      }
+   }
+   core_internal void cleanState(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
+   {
+      switch( game->currentState )
+      {
+         case State::MainMenu:
+         {
+            cleanState_mainMenu(audio, gfx, input, script, game);
+         } break;
+
+         default:
+         {
+            CORE_LOG_DEBUG("State not implemented yet.");
+         } break;
+      }
+   }
+   core_internal bool transitionState(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
+                                      Game* game)
+   {
+      if( game->currentState != game->nextState )
+      {
+         cleanState(audio, gfx, input, script, game);
+         game->currentState = game->nextState;
+         initState(audio, gfx, input, script, game);
+      }
+      return game->currentState != State::Quit;
    }
 
    /************************************************************************
@@ -352,6 +424,8 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script)
    {
       Game* game = emplace<Game>(mem);
+      CORE_ASSERT_DBGERR(game != nullptr, "Not enough memory for core Game object.");
+
       game->gameMemory = mem;
 
       game->assets = loadGameAssets(audio, gfx);
@@ -361,10 +435,12 @@ namespace core
          return nullptr;
       }
 
-      game->currentState = State::Startup;
-      game->nextState = State::MainMenu;
+      game->gui.dynamicMemory = allocateMemoryChunk(game->gameMemory, MegaBytes(5), 16);
 
+      game->currentState = game->nextState = State::MainMenu;
       game->isPaused = false;
+
+      initState(audio, gfx, input, script, game);
 
       return game;
    }
@@ -373,6 +449,7 @@ namespace core
                                    AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                    Game* game)
    {
+      cleanState(audio, gfx, input, script, game);
       unloadGameAssets(game->assets, audio, gfx);
    }
 
@@ -380,7 +457,6 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                 Game* game)
    {
-      transitionState(game);
 
       WinMsg msg{};
       auto timeLimit = timer->getCurrentMicros();
@@ -397,7 +473,7 @@ namespace core
             case WinMsgType::GamepadButton:
             case WinMsgType::GamepadConnection:
             {
-               
+
             } break;
             case WinMsgType::FileChange:
             {
@@ -424,43 +500,15 @@ namespace core
       time.virt.micros = game->isPaused ? 0 : time.real.micros;
       time.virt.seconds = game->isPaused ? 0 : time.real.seconds;
 
-      switch( game->currentState )
-      {
-         case State::MainMenu:
-         {
-            //game->nextState = update_mainMenu(time, game.mainMenu, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
+      updateState(audio, gfx, input, script, game);
 
-            //skip state on button down or something.
-         } break;
-         case State::GameplaySetup:
-         {
-            //game->nextState = update_gameplaySetup(time, game.gameplay, game.sharedData, game.constants, frameEvents, audio, lua, gfx);
-
-            //skip state on button down.
-         } break;
-         case State::GameplaySession:
-         {
-            //game.nextState = update_gameplaySession(time, game.constants, game.session, frameEvents, audio, lua, gfx, game.sharedData.camera);
-
-            //skip state on button down
-         } break;
-         case State::Score:
-         {
-            //skip state on button down
-         } break;
-         case State::Quit:
-         {
-            return false;
-         } break;
-      }
-
-      return true;
+      return transitionState(audio, gfx, input, script, game);
    }
 
    core_internal void tickRender(CommunicationBuffer* fromMain, CommunicationBuffer* toMain, Clock* timer,
                                  AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script,
                                  Game* game)
    {
-
+      renderState(gfx, game);
    }
 }

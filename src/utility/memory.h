@@ -79,7 +79,7 @@ namespace core
       u32 memAlign = reinterpret_cast<u32>(m.address) % alignment;
       if( memAlign )
       {
-         alignment -= memAlign;
+         memAlign = alignment - memAlign;
       }
       return memAlign;
    }
@@ -95,7 +95,7 @@ namespace core
    {
       auto align = getAlignmentBytes(m, alignment);
       CORE_ASSERT_DBGWRN(align == 0, "Losing ", align, " bytes due to alignment requirement of ", alignment, " for address ", m.address);
-      auto result = advanceMemory(m, alignment);
+      auto result = advanceMemory(m, align);
       return result;
    }
 
