@@ -13,6 +13,16 @@
 
 namespace core
 {
+   WinMsg* begin(WinMsgArray a)
+   {
+      return a.array;
+   }
+   WinMsg* end(WinMsgArray a)
+   {
+      return a.array + a.size;
+   }
+
+
    void InputSystem::init(Memory memory)
    {
       m_staticMemory = m_dynamicMemory = memory;
@@ -24,7 +34,17 @@ namespace core
    {
       WinMsg* msgSlot = emplace<WinMsg>(m_dynamicMemory);
       *msgSlot = msg;
+      ++m_messageCount;
    }
 
+   void InputSystem::clear()
+   {
+      m_messageCount = 0;
+   }
 
+   WinMsgArray InputSystem::getMessageArray() const
+   {
+      WinMsgArray result{m_messages, m_messageCount};
+      return result;
+   }
 }

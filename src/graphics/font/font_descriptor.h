@@ -18,6 +18,7 @@ namespace core
 
    struct FontDescriptor
    {
+      // #todo replace with material
       HTexture fontTexture;
       HVertexShader vshader;
       HPixelShader pshader;

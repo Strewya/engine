@@ -54,6 +54,9 @@ namespace core
 
       void renderMesh(Transform t, Color c, const Mesh& mesh, Material material);
 
+      HealthVertexBuffer allocateVertexBuffer(u32 size);
+      IndexBuffer allocateIndexBuffer(u32 size);
+
       HTexture loadTextureFromFile(const char* filename);
       HVertexShader loadVertexShaderFromFile(const char* filename, VertexType vType);
       HPixelShader loadPixelShaderFromFile(const char* filename);
@@ -77,6 +80,10 @@ namespace core
 
       Memory m_staticMemory;
       Memory m_dynamicMemory;
+      Memory m_staticVertexMemory;
+      Memory m_dynamicVertexMemory;
+      Memory m_staticIndexMemory;
+      Memory m_dynamicIndexMemory;
       TextureFileLoader m_textureFileLoader;
       VertexShaderLoader m_vsLoader;
       PixelShaderLoader m_psLoader;

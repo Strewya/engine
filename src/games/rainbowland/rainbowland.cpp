@@ -6,10 +6,14 @@
 /******* extra headers *******/
 #include "input/mouse.h"
 #include "games/rainbowland/rainbowland.h"
+#include "graphics/mesh/mesh.h"
+#include "graphics/font/font_system.h"
+#include "graphics/font/font_descriptor.h"
 #include "utility/collision_checks.h"
 #include "utility/color.h"
 #include "utility/communication_buffer.h"
 #include "utility/memory.h"
+#include "utility/transform.h"
 /******* end headers *******/
 
 namespace core
@@ -125,7 +129,7 @@ namespace core
       return result;
    }
 
-   core_internal void handle_mouseMove(GuiSystem& gui, v2 mousePosition)
+   core_internal void handleWinMsg_mouseMove(GuiSystem& gui, v2 mousePosition)
    {
       u32 buttonCount = gui.button.count;
       gui.hoverButton = buttonCount;
@@ -139,12 +143,12 @@ namespace core
       }
    }
 
-   core_internal void handle_mouseDown(GuiSystem& gui)
+   core_internal void handleWinMsg_mouseDown(GuiSystem& gui)
    {
       gui.hotButton = gui.hoverButton;
    }
 
-   core_internal u32 handle_mouseUp(GuiSystem& gui)
+   core_internal u32 handleWinMsg_mouseUp(GuiSystem& gui)
    {
       u32 activateButton = gui.button.count;
       if( gui.hotButton == gui.hoverButton )
@@ -155,9 +159,9 @@ namespace core
       return activateButton;
    }
 
-   core_internal u32 handle_guiInput(GuiSystem& gui, SharedData& shared, const Constants& constants, std::array<WinMsg, 10>& frameEvents)
+   core_internal void handleInput_gui(GuiSystem& gui, SharedData& shared, const Constants& constants, WinMsgArray frameEvents)
    {
-      u32 activatedButton = gui.button.count;
+      gui.activatedButton = gui.button.count;
       for( auto event : frameEvents )
       {
          switch( event.type )
@@ -172,7 +176,7 @@ namespace core
                {
                   shared.mousePosition += {(f32)event.mouse.position.x, -(f32)event.mouse.position.y};
                }
-               handle_mouseMove(gui, shared.mousePosition);
+               handleWinMsg_mouseMove(gui, shared.mousePosition);
             } break;
 
             case WinMsgType::MouseButton:
@@ -181,46 +185,50 @@ namespace core
                {
                   if( event.mouse.button.isDown )
                   {
-                     handle_mouseDown(gui);
+                     handleWinMsg_mouseDown(gui);
                   }
                   else
                   {
-                     activatedButton = handle_mouseUp(gui);
+                     gui.activatedButton = handleWinMsg_mouseUp(gui);
                   }
                }
             } break;
          }
       }
-      return activatedButton;
    }
 
-   core_internal void render_guiData(GuiSystem& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem& gfx)
+   core_internal void render_gui(GuiSystem& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem* gfx)
    {
-      gfx.setOrthographicProjection();
+      gfx->setOrthographicProjection();
 
-      /*
-            for( auto i = 0U; i < BUTTONS; ++i )
-            {
-            Transform buttonTransform{gui.button.position[i]};
-            Color color = gui.button.idleColor[i];
-            if( i == gui.hoverButton )
-            {
+      Material m;
+      m.pixelShaderHandle = assets.mainPS;
+      m.vertexShaderHandle = assets.mainVS;
+      m.textureHandle = assets.font;
+
+      for( auto i = 0U; i < gui.button.count; ++i )
+      {
+         Transform buttonTransform{gui.button.position[i]};
+         Color color = gui.button.idleColor[i];
+         if( i == gui.hoverButton )
+         {
             color = gui.button.hoverColor[i];
             if( i == gui.hotButton )
             {
-            color = gui.button.hotColor[i];
+               color = gui.button.hotColor[i];
             }
-            }
-            auto buttonFrameMesh = makeOutlineQuad({}, gui.button.halfsize[i], assets.mainVS, assets.mainPS);
-            gfx.renderMesh(buttonTransform, color, buttonFrameMesh);
+         }
 
-            auto buttonTextMesh = font.makeTextMesh(gui.button.caption[i].c_str(), shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
-            gfx.renderMesh(buttonTransform, {}, buttonTextMesh);
-            }
+         auto buttonFrameMesh = makeMesh_outlinedQuad(gfx, {}, gui.button.halfsize[i]);
+         auto buttonTextMesh = makeMesh_text(gfx, gui.button.caption[i], shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
 
-            auto cursorMesh = makeSolidCircle({}, 3, 16, assets.mainVS, assets.mainPS);
-            gfx.renderMesh({shared.mousePosition}, {}, cursorMesh);
-            */
+         gfx->renderMesh(buttonTransform, color, buttonFrameMesh, m);
+         gfx->renderMesh(buttonTransform, {}, buttonTextMesh, m);
+      }
+
+      auto cursorMesh = makeMesh_solidCircle(gfx, {}, 3, 16);
+      gfx->renderMesh({shared.mousePosition}, {}, cursorMesh, m);
+
    }
 
    /************************************************************************
@@ -265,12 +273,13 @@ namespace core
 
    core_internal void updateState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
    {
-
+      auto frameEvents = input->getMessageArray();
+      handleInput_gui(game->gui, game->sharedData, game->constants, frameEvents);
    }
 
    core_internal void renderState_mainMenu(GraphicsSystem* gfx, Game* game)
    {
-
+      render_gui(game->gui, game->sharedData, game->assets, gfx);
    }
 
    core_internal void cleanState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
@@ -353,7 +362,7 @@ namespace core
          {
             initState_mainMenu(audio, gfx, input, script, game);
          } break;
-         
+
          default:
          {
             CORE_LOG_DEBUG("State not implemented yet.");
@@ -457,7 +466,6 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                 Game* game)
    {
-
       WinMsg msg{};
       auto timeLimit = timer->getCurrentMicros();
       while( fromMain->peek(msg, timeLimit) )
@@ -473,7 +481,7 @@ namespace core
             case WinMsgType::GamepadButton:
             case WinMsgType::GamepadConnection:
             {
-
+               input->insert(msg);
             } break;
             case WinMsgType::FileChange:
             {
@@ -502,6 +510,8 @@ namespace core
 
       updateState(audio, gfx, input, script, game);
 
+      input->clear();
+
       return transitionState(audio, gfx, input, script, game);
    }
 
@@ -509,6 +519,10 @@ namespace core
                                  AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script,
                                  Game* game)
    {
+      gfx->begin();
+
       renderState(gfx, game);
+
+      gfx->present();
    }
 }

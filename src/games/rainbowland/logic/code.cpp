@@ -626,7 +626,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    //******************************************************************************************************************
    //******************************************************************************************************************
    template<int BUTTONS>
-   core_internal void handle_mouseMove(GuiData<BUTTONS>& gui, v2 mousePosition)
+   core_internal void handleWinMsg_mouseMove(GuiData<BUTTONS>& gui, v2 mousePosition)
    {
       gui.hoverButton = BUTTONS;
       for( auto i = 0; i < BUTTONS; ++i )
@@ -658,7 +658,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
    }
 
    template<int BUTTONS>
-   core_internal u32 handle_guiInput(GuiData<BUTTONS>& gui, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents)
+   core_internal u32 handleInput_gui(GuiData<BUTTONS>& gui, SharedData& shared, const Constants& constants, const EventVector_t& frameEvents)
    {
       u32 activatedButton = BUTTONS;
       for( auto event : frameEvents )
@@ -675,7 +675,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                {
                   shared.mousePosition += {(f32)event.mouse.position.x, -(f32)event.mouse.position.y};
                }
-               handle_mouseMove(gui, shared.mousePosition);
+               handleWinMsg_mouseMove(gui, shared.mousePosition);
             } break;
 
             case WinMsgType::MouseButton:
@@ -775,7 +775,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                                        AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       auto nextState = State::MainMenu;
-      auto activateButton = handle_guiInput(state.gui, shared, constants, frameEvents);
+      auto activateButton = handleInput_gui(state.gui, shared, constants, frameEvents);
 
       if( activateButton != MainMenuData::COUNT )
       {
@@ -1120,7 +1120,7 @@ core_internal void write_##field(storage& component, DataId id, std::remove_refe
                                      AudioSystem& audio, LuaStack lua, GraphicsSystem& gfx)
    {
       auto nextState = State::GameplaySetup;
-      u32 activatedButton = handle_guiInput(state.setupGui, shared, constants, frameEvents);
+      u32 activatedButton = handleInput_gui(state.setupGui, shared, constants, frameEvents);
 
       if( activatedButton == GameplayData::GuiButton::BACK )
       {

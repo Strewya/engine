@@ -14,16 +14,13 @@
 namespace core
 {
    struct FontDescriptor;
-   struct IndexBuffer;
-   struct VertexBuffer;
-   
+   struct GraphicsSystem;
+   struct Mesh;
+   struct Rect;
+
    enum TextJustification;
 
-   u32 countVisibleCharacters(const char* text);
-   u32 calculateVertexCount(u32 visibleCharacters);
-   u32 calculateIndexCount(u32 visibleCharacters);
-
-   bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
-   bool makeTextMesh(VertexBuffer& vb, IndexBuffer& ib, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
+   Mesh makeMesh_text(GraphicsSystem* gfx, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y);
+   Mesh makeMesh_text(GraphicsSystem* gfx, const char* text, const FontDescriptor& fd, v2 scale, TextJustification justify_x, TextJustification justify_y, Rect clipBox);
 
 }

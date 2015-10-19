@@ -8,6 +8,7 @@
 #include "utility/types.h"
 /******* extra headers *******/
 #include "graphics/camera.h"
+#include "graphics/font/font_descriptor.h"
 #include "utility/memory.h"
 /******* end header inclusion *******/
 
@@ -91,7 +92,7 @@ namespace core
       v2 mousePosition;
       Camera camera;
       // #temp This should be in a cache, and handles should be stored in assets.
-      //FontDescriptor font;
+      FontDescriptor font;
       //std::vector<Mesh> meshes;
       CursorState cursorState;
    };

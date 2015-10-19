@@ -35,7 +35,12 @@ namespace core
    void GraphicsSystem::init(Memory mem, u32 textureSlots, u32 shaderSlots, u64 handle, u32 width, u32 height)
    {
       m_staticMemory = mem;
+      m_staticVertexMemory = allocateMemoryChunk(m_staticMemory, MegaBytes(10), 16);
+      m_staticIndexMemory = allocateMemoryChunk(m_staticMemory, MegaBytes(10), 16);
       m_dynamicMemory = allocateMemoryChunk(m_staticMemory, MegaBytes(10), 16);
+
+      m_dynamicVertexMemory = m_staticVertexMemory;
+      m_dynamicIndexMemory = m_staticIndexMemory;
 
       m_window = handle;
       m_backbufferSize.x = this->width = (f32)width;
@@ -234,7 +239,27 @@ namespace core
       auto shader = pixelShaders.remove(handle);
       m_psLoader.unload(shader);
    }
+   /************************************************************************
+    *              ALLOCATE VERTEX BUFFER
+    ************************************************************************/
+   HealthVertexBuffer GraphicsSystem::allocateVertexBuffer(u32 size)
+   {
+      HealthVertexBuffer result;
+      result.data = emplaceArray<HealthVertex>(m_dynamicVertexMemory, size);
+      result.size = size;
+      return result;
+   }
 
+   /************************************************************************
+    *              ALLOCATE INDEX BUFFER
+    ************************************************************************/
+   IndexBuffer GraphicsSystem::allocateIndexBuffer(u32 size)
+   {
+      IndexBuffer result;
+      result.data = emplaceArray<u32>(m_dynamicIndexMemory, size);
+      result.size = size;
+      return result;
+   }
 
    //*****************************************************************
    //          BEGIN
@@ -250,6 +275,8 @@ namespace core
    void GraphicsSystem::present()
    {
       m_swapchain->Present(0, 0);
+      m_dynamicIndexMemory = m_staticIndexMemory;
+      m_dynamicVertexMemory = m_staticVertexMemory;
    }
 
    //*****************************************************************

@@ -279,9 +279,6 @@
     <ClInclude Include="..\..\..\src\games\rainbowland\game.h">
       <Filter>code\games\rainbowland</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\games\rainbowland\logic\code.h">
-      <Filter>code\games\rainbowland\logic</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h">
       <Filter>code\games\rainbowland\logic</Filter>
     </ClInclude>
@@ -472,6 +469,9 @@
     </None>
     <None Include="..\..\..\src\games\rainbowland\rainbowland.cpp">
       <Filter>code\games\rainbowland</Filter>
+    </None>
+    <None Include="..\..\..\src\games\rainbowland\logic\code.h">
+      <Filter>code\games\rainbowland\logic</Filter>
     </None>
   </ItemGroup>
 </Project>
