@@ -19,7 +19,7 @@ namespace core
 
    Texture TextureFileLoader::load(const char* filename) const
    {
-      Texture result{0, 0, nullptr};
+      Texture result{0, 0, 0, nullptr};
       HRESULT hr = D3DX11CreateShaderResourceViewFromFile(m_dev, filename, nullptr, nullptr, &result._shaderResourceView, nullptr);
       if( SUCCEEDED(hr) )
       {

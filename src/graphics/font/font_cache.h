@@ -1,36 +1,35 @@
 #pragma once
 /********************************************
-*  contents:   texture resource manager
+*  contents:   #description
 *  usage:
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
-#include "graphics/texture/texture.h"
-#include "graphics/texture/texture_handle.h"
+#include "graphics/font/font_descriptor.h"
 #include "utility/memory.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct TextureCache
+   struct FontCache
    {
    private:
-      Texture* m_buffer;
+      FontDescriptor* m_buffer;
       u32 m_maxSlots;
       u32 m_usedSlots;
-   
+
    public:
       void init(Memory& m, u32 maxSlots)
       {
-         m_buffer = emplaceArray<Texture>(m, maxSlots);
-         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory for TextureCache storage!");
+         m_buffer = emplaceArray<FontDescriptor>(m, maxSlots);
+         CORE_ASSERT_DBGERR(m_buffer != nullptr, "Not enough memory for FontCache storage!");
          m_maxSlots = maxSlots;
          m_usedSlots = 0;
       }
 
-      HTexture insert(Texture t)
+      HTexture insert(FontDescriptor fd)
       {
          HTexture result{};
 
@@ -40,7 +39,7 @@ namespace core
             {
                if( m_buffer[i].unloaded() )
                {
-                  m_buffer[i] = t;
+                  m_buffer[i] = fd;
                   result.init(i);
                   ++m_usedSlots;
                   break;
@@ -51,17 +50,17 @@ namespace core
          return result;
       }
 
-      Texture remove(HTexture handle)
+      FontDescriptor remove(HFont handle)
       {
-         Texture t = m_buffer[handle.getIndex()];
+         FontDescriptor fd = m_buffer[handle.getIndex()];
          m_buffer[handle.getIndex()] = {};
          --m_usedSlots;
-         return t;
+         return fd;
       }
 
-      Texture getData(HTexture handle) const
+      FontDescriptor& getData(HFont handle) const
       {
-         Texture result = m_buffer[handle.getIndex()];
+         FontDescriptor& result = m_buffer[handle.getIndex()];
          return result;
       }
 

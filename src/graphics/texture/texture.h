@@ -14,18 +14,21 @@ namespace core
 {
    struct Texture
    {
+      u32 referenceId;
       u32 width;
       u32 height;
       ID3D11ShaderResourceView* _shaderResourceView;
 
       bool loaded()
       {
-         return _shaderResourceView != nullptr && width > 0 && height > 0;
+         auto result = _shaderResourceView != nullptr && width > 0 && height > 0;
+         return result;
       }
 
       bool unloaded()
       {
-         return _shaderResourceView == nullptr && width == 0 && height == 0;
+         auto result = _shaderResourceView == nullptr && width == 0 && height == 0;
+         return result;
       }
    };
 }

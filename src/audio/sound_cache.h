@@ -60,7 +60,7 @@ namespace core
          return result;
       }
 
-      Sound getData(HSound handle)
+      Sound getData(HSound handle) const
       {
          Sound result = m_buffer[handle.getIndex()];
          return result;

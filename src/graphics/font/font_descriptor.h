@@ -15,6 +15,7 @@
 namespace core
 {
    struct LuaStack;
+   struct GraphicsSystem;
 
    struct FontDescriptor
    {
@@ -24,7 +25,20 @@ namespace core
       HPixelShader pshader;
       Rect glyphs[128 - 32];
       u32 height;
+
+      bool loaded()
+      {
+         auto result = fontTexture.isNull() == false && vshader.isNull() == false && pshader.isNull() == false && height != 0;
+         return !result;
+      }
+      bool unloaded()
+      {
+         auto result = fontTexture.isNull() && vshader.isNull() && pshader.isNull() && height == 0;
+         return result;
+      }
    };
+
+   CORE_RESOURCE_HANDLE(HFont);
 
    enum TextJustification
    {
@@ -36,5 +50,5 @@ namespace core
       Middle = Center
    };
 
-   FontDescriptor loadFont(LuaStack lua, const char* filename, HTexture texture, HVertexShader vshader, HPixelShader pshader);
+   HFont loadFont(LuaStack lua, GraphicsSystem* gfx, char* definitionFile);
 }

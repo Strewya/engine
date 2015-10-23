@@ -11,6 +11,7 @@
 /******* extra headers *******/
 #include "graphics/dx_renderer.h"
 #include "graphics/graphics_types.h"
+#include "graphics/font/font_cache.h"
 #include "graphics/shader/pixel/pixel_shader_cache.h"
 #include "graphics/shader/pixel/pixel_shader_loader.h"
 #include "graphics/shader/vertex/vertex_shader_cache.h"
@@ -60,6 +61,7 @@ namespace core
       HTexture loadTextureFromFile(const char* filename);
       HVertexShader loadVertexShaderFromFile(const char* filename, VertexType vType);
       HPixelShader loadPixelShaderFromFile(const char* filename);
+      HFont processFont(FontDescriptor font);
 
       void unload(HTexture handle);
       void unload(HVertexShader handle);
@@ -68,6 +70,7 @@ namespace core
       TextureCache textures;
       VertexShaderCache vertexShaders;
       PixelShaderCache pixelShaders;
+      FontCache fonts;
 
    private:
       template<typename T> void declare(T*& ptr);

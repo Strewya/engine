@@ -15,20 +15,20 @@ namespace core
    template<typename T>
    void LuaStack::push(T arg)
    {
-      CORE_ASSERT_ERR(stackIndex == 9999, "Invoked unspecialized LuaStack::push<", typeid(T).name(), ">()");
+      CORE_ASSERT_ERR(false, "Invoked unspecialized LuaStack::push<", typeid(T).name(), ">()");
    }
 
    template<typename T>
    T LuaStack::to(i32 stackIndex)
    {
-      CORE_ASSERT_ERR(stackIndex == 9999, "Invoked unspecialized LuaStack::to<", typeid(T).name(), ">()");
+      CORE_ASSERT_ERR(false, "Invoked unspecialized LuaStack::to<", typeid(T).name(), ">()");
       return T{};
    }
 
    template<typename T>
    bool LuaStack::is(i32 stackIndex)
    {
-      CORE_ASSERT_ERR(stackIndex == 9999, "Invoked unspecialized LuaStack::is<", typeid(T).name(), ">()");
+      CORE_ASSERT_ERR(false, "Invoked unspecialized LuaStack::is<", typeid(T).name(), ">()");
       return false;
    }
 

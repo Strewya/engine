@@ -279,6 +279,8 @@ namespace core
 
    core_internal void renderState_mainMenu(GraphicsSystem* gfx, Game* game)
    {
+      gfx->applyCamera(game->sharedData.camera);
+
       render_gui(game->gui, game->sharedData, game->assets, gfx);
    }
 
@@ -290,9 +292,51 @@ namespace core
    /************************************************************************
     *              ASSET RELATED
     ************************************************************************/
-   core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx)
+   core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script)
    {
       GameAssets assets{};
+      /*
+      auto lua = script->getStack();
+      auto ok = lua.doFile("resources/toc.lua");
+      if( ok )
+      {
+         //load sounds first
+         for( lua.ipairs("sounds"); lua.next(); lua.pop(1) )
+         {
+            //the sounds are just the path to the file
+            str path = lua.to<str>(-1);
+            u32 id = lua.to<u32>(-2);
+            auto handle = audio->loadSoundFromFile(path.buffer);
+         }
+         lua.pop();
+         for( lua.ipairs("textures"); lua.next(); lua.pop(1) )
+         {
+            //the textures are just the path to the file
+            str path = lua.to<str>(-1);
+            u32 id = lua.to<u32>(-2);
+            auto handle = gfx->loadTextureFromFile(path.buffer);
+         }
+         lua.pop();
+         for( lua.ipairs("pixelShaders"); lua.next(); lua.pop(1) )
+         {
+            str path = lua.to<str>(-1);
+            u32 id = lua.to<u32>(-2);
+            auto handle = gfx->loadPixelShaderFromFile(path.buffer);
+         }
+         lua.pop();
+      }
+      lua.pop();
+      CORE_ASSERT_DBGERR(lua.getTop() == 0, "Lua stack not properly cleaned up!");
+      */
+
+      // sounds - standalone
+      // textures - standalone
+      // shaders - standalone
+      // mesh - standalone
+      // materials - requires texture, shader
+      // sprites - requires mesh, material
+      // fonts - requires material
+
       assets.atlas = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
       assets.background = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/background.png"));
       assets.font = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/font_t.png"));
@@ -437,7 +481,7 @@ namespace core
 
       game->gameMemory = mem;
 
-      game->assets = loadGameAssets(audio, gfx);
+      game->assets = loadGameAssets(audio, gfx, script);
       bool allLoaded = checkGameAssetsLoaded(game->assets);
       if( !allLoaded )
       {
@@ -448,6 +492,8 @@ namespace core
 
       game->currentState = game->nextState = State::MainMenu;
       game->isPaused = false;
+
+      game->sharedData.camera.setPosition({0, 0, -50});
 
       initState(audio, gfx, input, script, game);
 

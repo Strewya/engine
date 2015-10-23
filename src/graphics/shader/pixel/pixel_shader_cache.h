@@ -59,7 +59,7 @@ namespace core
          return ps;
       }
 
-      PixelShader getData(HPixelShader handle)
+      PixelShader getData(HPixelShader handle) const
       {
          PixelShader result = m_buffer[handle.getIndex()];
          return result;

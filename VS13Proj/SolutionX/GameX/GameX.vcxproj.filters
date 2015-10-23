@@ -387,6 +387,9 @@
     <ClInclude Include="..\..\..\src\graphics\shader\pixel\pixel_shader_cache.h">
       <Filter>code\framework\graphics\shader\pixel</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\graphics\font\font_cache.h">
+      <Filter>code\framework\graphics\font</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="code">

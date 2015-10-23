@@ -58,12 +58,14 @@ namespace core
       bool next();
       //sets the last pushed value to the table at stack index (default: top) and binds it to key
       void setValue(const char* key, i32 stackIndex = -2);
+      
       //pushes the argument onto the stack
       template<typename T> void push(T arg);
       //casts the value at top of the stack to template argument
       template<typename T> T to(i32 stackIndex = -1);
       //tests whether the value at the top of the stack is of certain type
       template<typename T> bool is(i32 stackIndex = -1);
+      
       //calls a function
       bool call();
       //calls a function with the specified arguments
@@ -99,6 +101,7 @@ namespace core
    template<> void LuaStack::push<nullptr_t>(nullptr_t arg);
 
    template<> str_writeable LuaStack::to<str_writeable>(i32 stackIndex);
+   template<> str LuaStack::to<str>(i32 stackIndex);
    template<> u32 LuaStack::to<u32>(i32 stackIndex);
    template<> i32 LuaStack::to<i32>(i32 stackIndex);
    template<> f32 LuaStack::to<f32>(i32 stackIndex);

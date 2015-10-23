@@ -59,7 +59,7 @@ namespace core
          return vs;
       }
 
-      VertexShader getData(HVertexShader handle)
+      VertexShader getData(HVertexShader handle) const
       {
          VertexShader result = m_buffer[handle.getIndex()];
          return result;

@@ -1,7 +1,9 @@
 return {
 	font =
 	{
+        id = 0,
         texture = "Textures/font_t.png",
+        materialId
 		size = 32,
 		glyphs = {
 			{ char=' ',  left=5,   right=29,  top=0},
