@@ -70,16 +70,7 @@
     <ClCompile Include="..\..\..\src\games\game_entry_point.cpp">
       <Filter>code\games</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\lua\lua_stack.cpp">
-      <Filter>code\framework\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lua\lua_stack_impl.cpp">
-      <Filter>code\framework\lua</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\lua\lua_system.cpp">
-      <Filter>code\framework\lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\lua\lua_system_playground.cpp">
       <Filter>code\framework\lua</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\games\rainbowland\types\movement.cpp">
@@ -254,12 +245,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\game_entry_point.h">
       <Filter>code\games</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\lua\lua_stack.h">
-      <Filter>code\framework\lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\lua\lua_stack_impl.h">
-      <Filter>code\framework\lua</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\lua\lua_system.h">
       <Filter>code\framework\lua</Filter>

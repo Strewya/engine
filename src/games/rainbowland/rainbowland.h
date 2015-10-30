@@ -29,6 +29,27 @@ namespace core
       Shutdown
    };
 
+   enum Asset
+   {
+      AssetTextureAtlas = 0,
+      AssetTextureBackground,
+      AssetTextureFont,
+      AssetSoundReload = 0,
+      AssetSoundPistol,
+      AssetSoundShotgun,
+      AssetSoundUzi,
+      AssetSoundSniper,
+      AssetSoundMissile,
+      AssetPixelShaderMain = 0,
+      AssetPixelShaderHealth,
+      AssetVertexShaderMain = 0,
+      AssetMaterialWorld = 0,
+      AssetMaterialFont,
+      AssetMaterialHealth,
+      AssetMaterialBackground,
+      AssetFontMain = 0,
+   };
+
    /************************************************************************
     *              GUI STRUCTS
     ************************************************************************/

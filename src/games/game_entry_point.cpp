@@ -70,15 +70,13 @@ namespace core
 
       {
          Memory configMemory = mainMemory;
-         LuaSystem* memoryConfig = emplace<LuaSystem>(configMemory);
-         memoryConfig->init(configMemory);
+         LuaSystem* L = emplace<LuaSystem>(configMemory);
+         L->init(configMemory);
 
-         LuaStack config = memoryConfig->getStack();
-         bool ok = config.doFile("memory.lua");
+         auto ok = script::runFile(L, "memory.lua");
          CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
-         CORE_ASSERT_DBGERR(config.is<LuaTable>(), "Lua configuration file has invalid structure!");
-
-#define ExtractNumber(name) name = get<u32>(config, #name, 0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' in config file, found none or has value 0!")
+         
+#define ExtractNumber(name) name = script::readValue(L, #name, (u32)0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' in config file, found none or has value 0!")
 
          ExtractNumber(AudioSystemMegabytes);
          ExtractNumber(GraphicsSystemMegabytes);
@@ -94,8 +92,7 @@ namespace core
 
 #undef ExtractNumber
 
-         config.pop();
-         memoryConfig->shutdown();
+         L->shutdown();
          zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }
 #endif
@@ -128,7 +125,7 @@ namespace core
       msg.type = WinMsgType::Fullscreen;
       msg.fullscreen = true;
       toMain->writeEvent(msg);
-      
+
       // #todo decide if this should stay enabled in release build
       msg.type = WinMsgType::FileChange;
       strcpy(msg.fileChange.name, "resources");
@@ -162,7 +159,7 @@ namespace core
          tickRender(fromMain, toMain, &renderTimer, audio, graphics, script, game);
          renderTimer.advanceTimeBy(fullUpdateTime);
       }
-      
+
       shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
       script->shutdown();
       graphics->shutdown();

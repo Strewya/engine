@@ -295,7 +295,8 @@ namespace core
    core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script)
    {
       GameAssets assets{};
-      /*
+
+#if 0
       auto lua = script->getStack();
       auto ok = lua.doFile("resources/toc.lua");
       if( ok )
@@ -327,7 +328,7 @@ namespace core
       }
       lua.pop();
       CORE_ASSERT_DBGERR(lua.getTop() == 0, "Lua stack not properly cleaned up!");
-      */
+#endif
 
       // sounds - standalone
       // textures - standalone
@@ -473,15 +474,27 @@ namespace core
    /************************************************************************
     *              GAME RELATED - GLOBAL
     ************************************************************************/
+
+   core_internal void registerAssetValues(LuaSystem* L)
+   {
+#define RegisterNumberToScript(name, value) script::setValue(L, #name, name)
+
+
+
+#undef RegisterNumberToScript
+   }
+
    core_internal Game* initGame(Memory mem, CommunicationBuffer* fromMain, CommunicationBuffer* toMain,
-                                AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script)
+                                AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* lua)
    {
       Game* game = emplace<Game>(mem);
       CORE_ASSERT_DBGERR(game != nullptr, "Not enough memory for core Game object.");
 
       game->gameMemory = mem;
 
-      game->assets = loadGameAssets(audio, gfx, script);
+      registerAssetValues(lua);
+
+      game->assets = loadGameAssets(audio, gfx, lua);
       bool allLoaded = checkGameAssetsLoaded(game->assets);
       if( !allLoaded )
       {
@@ -495,7 +508,7 @@ namespace core
 
       game->sharedData.camera.setPosition({0, 0, -50});
 
-      initState(audio, gfx, input, script, game);
+      initState(audio, gfx, input, lua, game);
 
       return game;
    }

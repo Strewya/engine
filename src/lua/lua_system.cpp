@@ -167,9 +167,4 @@ end
    {
       lua_gc(m_L, LUA_GCSTEP, 20);
    }
-
-   LuaStack LuaSystem::getStack() const
-   {
-      return LuaStack(m_L);
-   }
 }

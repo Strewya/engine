@@ -36,41 +36,7 @@ struct v3
    f32 z;
 };
 
-struct str
-{
-   const char* buffer;
-};
-
-
-struct str_writeable
-{
-   enum
-   {
-      MaxLength = 1024,
-   };
-   char buffer[MaxLength];
-
-   operator str() { return str{buffer}; }
-};
-
-inline bool operator==(const str_writeable& a, const char* rb)
-{
-   const char* ra = a.buffer;
-   while( *ra || *rb )
-   {
-      if( *(ra++) != *(rb++) )
-      {
-         return false;
-      }
-   }
-   return true;
-}
-
-inline std::ostream& operator<<(std::ostream& stream, const str_writeable& s)
-{
-   stream << s.buffer;
-   return stream;
-}
+typedef const char* str;
 
 
 #define core_internal static

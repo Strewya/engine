@@ -100,7 +100,6 @@ namespace core
    template<> void LuaStack::push<LuaCustom>(LuaCustom arg);
    template<> void LuaStack::push<nullptr_t>(nullptr_t arg);
 
-   template<> str_writeable LuaStack::to<str_writeable>(i32 stackIndex);
    template<> str LuaStack::to<str>(i32 stackIndex);
    template<> u32 LuaStack::to<u32>(i32 stackIndex);
    template<> i32 LuaStack::to<i32>(i32 stackIndex);
@@ -124,6 +123,10 @@ namespace core
 
    template<> char get<char>(LuaStack& lua, const char* id, char valueIfMissing);
    template<> char get<char>(LuaStack& lua, i32 stackIndex, char valueIfMissing);
+
+
+
+
 }
 
 #include <lua/lua_stack_impl.h>
