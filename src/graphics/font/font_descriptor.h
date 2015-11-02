@@ -14,7 +14,7 @@
 
 namespace core
 {
-   struct LuaStack;
+   struct LuaStack {};
    struct GraphicsSystem;
 
    struct FontDescriptor
@@ -50,5 +50,5 @@ namespace core
       Middle = Center
    };
 
-   HFont loadFont(LuaStack lua, GraphicsSystem* gfx, char* definitionFile);
+   inline HFont loadFont(LuaStack lua, GraphicsSystem* gfx, char* definitionFile) { return{}; };
 }

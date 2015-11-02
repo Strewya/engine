@@ -12,6 +12,7 @@
 
 namespace core
 {
+#if 0
    HFont loadFont(LuaStack lua, GraphicsSystem* gfx, char* definitionFile)
    {
       HFont result{};
@@ -63,4 +64,5 @@ namespace core
 
       return result;
    }
+#endif
 }

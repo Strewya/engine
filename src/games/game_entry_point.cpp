@@ -73,10 +73,10 @@ namespace core
          LuaSystem* L = emplace<LuaSystem>(configMemory);
          L->init(configMemory);
 
-         auto ok = script::runFile(L, "memory.lua");
-         CORE_ASSERT_DBGERR(ok, "Lua configuration file invalid or missing!");
+         auto luaFile = script::openConfigFile(L, "memory.lua");
+         CORE_ASSERT_DBGERR(luaFile.index != 0, "Lua configuration file invalid or missing!");
          
-#define ExtractNumber(name) name = script::readValue(L, #name, (u32)0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' in config file, found none or has value 0!")
+#define ExtractNumber(name) name = script::readNamedValue(L, luaFile, #name, (u32)0); CORE_ASSERT_DBGERR(name > 0, "Expected '"#name"' in config file, found none or has value 0!")
 
          ExtractNumber(AudioSystemMegabytes);
          ExtractNumber(GraphicsSystemMegabytes);

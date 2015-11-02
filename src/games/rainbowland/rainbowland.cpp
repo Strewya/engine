@@ -477,11 +477,13 @@ namespace core
 
    core_internal void registerAssetValues(LuaSystem* L)
    {
-#define RegisterNumberToScript(name, value) script::setValue(L, #name, name)
+      auto luaGlobalTable = script::getGlobalTable(L);
+      auto luaAssetTable = script::createTable(L);
 
+      script::writeNamedValue(L, luaAssetTable, "AssetSoundReload", AssetSoundReload);
+      //...
 
-
-#undef RegisterNumberToScript
+      script::writeNamedValue(L, luaGlobalTable, "AssetID", luaAssetTable);
    }
 
    core_internal Game* initGame(Memory mem, CommunicationBuffer* fromMain, CommunicationBuffer* toMain,

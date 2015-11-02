@@ -12,32 +12,37 @@
 
 namespace core
 {
-   int luaPrint(lua_State* L)
+   namespace script
    {
-      i32 n = lua_gettop(L);
-      for( i32 i = 1; i <= n; ++i )
+
+      int luaPrint(lua_State* L)
       {
-         switch( lua_type(L, i) )
+         i32 n = lua_gettop(L);
+         for( i32 i = 1; i <= n; ++i )
          {
-            case LUA_TNUMBER:
+            switch( lua_type(L, i) )
             {
-               CORE_LOG_DEBUG(lua_tonumber(L, i));
-            } break;
-            case LUA_TSTRING:
-            {
-               CORE_LOG_DEBUG(lua_tostring(L, i));
-            } break;
-            case LUA_TBOOLEAN:
-            {
-               CORE_LOG_DEBUG(lua_toboolean(L, i) == 1 ? "true" : "false");
-            } break;
-            default:
-            {
-               CORE_LOG_DEBUG(lua_typename(L, i), "(", lua_tonumber(L, i), ")");
-            } break;
+               case LUA_TNUMBER:
+               {
+                  CORE_LOG_DEBUG(lua_tonumber(L, i));
+               } break;
+               case LUA_TSTRING:
+               {
+                  CORE_LOG_DEBUG(lua_tostring(L, i));
+               } break;
+               case LUA_TBOOLEAN:
+               {
+                  CORE_LOG_DEBUG(lua_toboolean(L, i) == 1 ? "true" : "false");
+               } break;
+               default:
+               {
+                  CORE_LOG_DEBUG(lua_typename(L, lua_type(L, i)), "(", lua_tonumber(L, i), ")");
+               } break;
+            }
          }
+         return 0;
       }
-      return 0;
+
    }
 
    int luaErrHandler(lua_State* L)
@@ -130,7 +135,7 @@ namespace core
 #endif
 
       //tolua_core_open(m_L);
-      lua_register(m_L, "print", luaPrint);
+      lua_register(m_L, "print", script::luaPrint);
 
       const char* depend = R"rawLuaCode(
 Lua = {};
