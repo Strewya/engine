@@ -150,6 +150,7 @@ namespace core
       auto alignedMemory = alignMemory(m, align);
       m = advanceMemory(alignedMemory, size);
       T* result = static_cast<T*>(alignedMemory.address);
+      memset(result, 0, size);
       return result;
    }
 

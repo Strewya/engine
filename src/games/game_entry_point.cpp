@@ -92,6 +92,8 @@ namespace core
 
 #undef ExtractNumber
 
+         script::closeConfigFile(L, luaFile);
+
          L->shutdown();
          zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }

@@ -14,13 +14,18 @@ namespace core
 {
    namespace script
    {
-
       int luaPrint(lua_State* L)
       {
          i32 n = lua_gettop(L);
+         if( n == 0 )
+         {
+            CORE_LOG_DEBUG("Empty");
+            return 0;
+         }
          for( i32 i = 1; i <= n; ++i )
          {
-            switch( lua_type(L, i) )
+            auto t = lua_type(L, i);
+            switch( t )
             {
                case LUA_TNUMBER:
                {
@@ -36,13 +41,12 @@ namespace core
                } break;
                default:
                {
-                  CORE_LOG_DEBUG(lua_typename(L, lua_type(L, i)), "(", lua_tonumber(L, i), ")");
+                  CORE_LOG_DEBUG(lua_typename(L, t), "(", lua_tonumber(L, i), ")");
                } break;
             }
          }
          return 0;
       }
-
    }
 
    int luaErrHandler(lua_State* L)

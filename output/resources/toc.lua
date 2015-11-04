@@ -1,34 +1,34 @@
 return {
     textures = {
-        [1] = "resources/Textures/rainbowland_atlas.tif",
-        [2] = "resources/Textures/background.png",
-        [3] = "resources/Textures/font_t.png"        
+        [AssetID.AssetTextureAtlas] = "resources/Textures/rainbowland_atlas.tif",
+        [AssetID.AssetTextureBackground] = "resources/Textures/background.png",
+        [AssetID.AssetTextureFont] = "resources/Textures/font_t.png"        
     },
     vertexShaders = {
-        [1] = {path="resources/Shaders/shader_vs.cso", vertex=1}
+        [AssetID.AssetVertexShaderMain] = {path="resources/Shaders/shader_vs.cso", vertex=1}
     },
     pixelShaders = {
-        [1] = "resources/Shaders/shader_ps.cso",
-        [2] = "resources/Shaders/health_ps.cso"
+        [AssetID.AssetPixelShaderMain] = "resources/Shaders/shader_ps.cso",
+        [AssetID.AssetPixelShaderHealth] = "resources/Shaders/health_ps.cso"
     },
     sounds = {
-        [1] = "resources/Sounds/reload.wav",
-        [2] = "resources/Sounds/pistol.wav",
-        [3] = "resources/Sounds/shotgun.wav",
-        [4] = "resources/Sounds/uzi.wav",
-        [5] = "resources/Sounds/sniper.wav",
-        [6] = "resources/Sounds/missile.wav",
+        [AssetID.AssetSoundReload] = "resources/Sounds/reload.wav",
+        [AssetID.AssetSoundPistol] = "resources/Sounds/pistol.wav",
+        [AssetID.AssetSoundShotgun] = "resources/Sounds/shotgun.wav",
+        [AssetID.AssetSoundUzi] = "resources/Sounds/uzi.wav",
+        [AssetID.AssetSoundSniper] = "resources/Sounds/sniper.wav",
+        [AssetID.AssetSoundMissile] = "resources/Sounds/missile.wav",
     },
     meshes = {
     },
     materials = {
-        [1] = {vertex = 1, pixel = 1, texture = 1},
-        [2] = {vertex = 1, pixel = 1, texture = 2},
-        [3] = {vertex = 1, pixel = 1, texture = 3},
-        [4] = {vertex = 1, pixel = 2, texture = 1},
+        [AssetID.AssetMaterialWorld] = {vertex = AssetID.AssetVertexShaderMain, pixel = AssetID.AssetPixelShaderMain, texture = AssetID.AssetTextureAtlas},
+        [AssetID.AssetMaterialFont] = {vertex = AssetID.AssetVertexShaderMain, pixel = AssetID.AssetPixelShaderMain, texture = AssetID.AssetTextureFont},
+        [AssetID.AssetMaterialBackground] = {vertex = AssetID.AssetVertexShaderMain, pixel = AssetID.AssetPixelShaderMain, texture = AssetID.AssetTextureBackground},
+        [AssetID.AssetMaterialHealth] = {vertex = AssetID.AssetVertexShaderMain, pixel = AssetID.AssetPixelShaderHealth, texture = AssetID.AssetTextureAtlas},
     },
     fonts = {
-        [1] = {path="resources/Defs/font.font", material=3}
+        [AssetID.AssetFontMain] = {path="resources/Defs/font.font", material=AssetID.AssetMaterialFont}
     },
     sprites = {
     }

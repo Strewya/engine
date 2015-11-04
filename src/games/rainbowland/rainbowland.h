@@ -34,20 +34,26 @@ namespace core
       AssetTextureAtlas = 0,
       AssetTextureBackground,
       AssetTextureFont,
+      AssetTextureCount,
       AssetSoundReload = 0,
       AssetSoundPistol,
       AssetSoundShotgun,
       AssetSoundUzi,
       AssetSoundSniper,
       AssetSoundMissile,
+      AssetSoundCount,
       AssetPixelShaderMain = 0,
       AssetPixelShaderHealth,
+      AssetPixelShaderCount,
       AssetVertexShaderMain = 0,
+      AssetVertexShaderCount,
       AssetMaterialWorld = 0,
       AssetMaterialFont,
       AssetMaterialHealth,
       AssetMaterialBackground,
+      AssetMaterialCount,
       AssetFontMain = 0,
+      AssetFontCount,
    };
 
    /************************************************************************
@@ -133,6 +139,7 @@ namespace core
    struct Game
    {
       Memory gameMemory;
+      Memory dynamicMemory;
       GameAssets assets;
 
       State currentState;

@@ -36,19 +36,90 @@ namespace core
          i32 index;
       };
 
-      inline LuaTable getGlobalTable(LuaSystem* L)
+      inline LuaTable getGlobalNamespace(LuaSystem* L)
       {
          LuaTable result{LUA_GLOBALSINDEX};
          return result;
       }
 
-      inline LuaTable createTable(LuaSystem* L)
+      inline LuaTable beginNewNamespace(LuaSystem* L, str k)
       {
+         luaPrint(Lua);
+         lua_pushstring(Lua, k);
          luaPrint(Lua);
          lua_createtable(Lua, 0, 0);
          luaPrint(Lua);
          LuaTable result{lua_gettop(Lua)};
          return result;
+      }
+
+      inline void endNewNamespace(LuaSystem* L, LuaTable t)
+      {
+         //assumption is that somebody called startNewNamespace first, placing a string and then a table onto the stack
+         //we now make sure that the top contains a table, the slot beneath it contains a string and the target table is a valid table
+         luaPrint(Lua);
+         auto top = lua_gettop(Lua);
+         if( !lua_istable(Lua, -1) )
+         {
+            //error, top of the stack does not contain a table
+            return;
+         }
+
+         if( !lua_isstring(Lua, -2) )
+         {
+            //error, the slot beneath the top is not a string
+            return;
+         }
+
+         if( !lua_istable(Lua, t.index) )
+         {
+            //error, target table index does not contain a table
+            return;
+         }
+
+         lua_settable(Lua, t.index);
+         luaPrint(Lua);
+         CORE_ASSERT_DBGERR(top - 2 == lua_gettop(Lua), "Unexpected number of values on Lua stack! Expected ", top - 2, ", have ", lua_gettop(Lua));
+      }
+
+      inline LuaTable openNamespace(LuaSystem* L, LuaTable t, str k)
+      {
+         luaPrint(Lua);
+         auto top = lua_gettop(Lua);
+         LuaTable result{0};
+
+         if( !lua_istable(Lua, t.index) )
+         {
+            //error, source table index is not actually a table
+            return result;
+         }
+
+         lua_getfield(Lua, t.index, k);
+         luaPrint(Lua);
+         if( !lua_istable(Lua, -1) )
+         {
+            //error, the key does not contain a table
+            lua_settop(Lua, top);
+            return result;
+         }
+
+         result.index = lua_gettop(Lua);
+         return result;
+      }
+
+      inline void closeNamespace(LuaSystem* L, LuaTable t)
+      {
+         luaPrint(Lua);
+         auto top = lua_gettop(Lua);
+         if( top != t.index )
+         {
+            //error, table is not at top of stack
+            //is this really an error? i could just set the top to be t.index-1...
+            return;
+         }
+
+         lua_pop(Lua, 1);
+         luaPrint(Lua);
       }
 
       inline LuaTable openConfigFile(LuaSystem* L, str file)
@@ -114,6 +185,35 @@ namespace core
          return result;
       }
 
+      inline str readIndexedValue(LuaSystem* L, LuaTable t, u32 k, str valueIfMissing, Memory resultBuffer)
+      {
+         luaPrint(Lua);
+         auto top = lua_gettop(Lua);
+         if( !lua_istable(Lua, t.index) )
+         {
+            //error
+            return valueIfMissing;
+         }
+
+         lua_pushnumber(Lua, k);
+         luaPrint(Lua);
+         lua_gettable(Lua, t.index);
+         luaPrint(Lua);
+
+         if( !lua_isstring(Lua, -1) )
+         {
+            //error
+            return valueIfMissing;
+         }
+         u32 l = (u32)lua_objlen(Lua, -1);
+         char* result = emplaceArray<char>(resultBuffer, l + 1);
+         str v = (str)lua_tostring(Lua, -1);
+         std::copy(v, v + l, result);
+         lua_pop(Lua, 1);
+         luaPrint(Lua);
+         return result;
+      }
+
       inline void writeNamedValue(LuaSystem* L, LuaTable t, str k, u32 v)
       {
          luaPrint(Lua);
@@ -131,26 +231,6 @@ namespace core
          CORE_ASSERT_DBGERR(top == lua_gettop(Lua), "Unexpected number of values on Lua stack! Expected ", top + 1, ", have ", lua_gettop(Lua));
       }
 
-      inline void writeNamedValue(LuaSystem* L, LuaTable t, str k, LuaTable v)
-      {
-         luaPrint(Lua);
-         auto top = lua_gettop(Lua);
-         if( top != v.index )
-         {
-            //error? how do i handle this scenario???
-            return;
-         }
-
-         if( !lua_istable(Lua, t.index) )
-         {
-            //error
-            return;
-         }
-
-         lua_setfield(Lua, t.index, k);
-         luaPrint(Lua);
-         CORE_ASSERT_DBGERR(top == lua_gettop(Lua), "Unexpected number of values on Lua stack! Expected ", top + 1, ", have ", lua_gettop(Lua));
-      }
 
 
 #if 0

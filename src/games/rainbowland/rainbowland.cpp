@@ -292,43 +292,24 @@ namespace core
    /************************************************************************
     *              ASSET RELATED
     ************************************************************************/
-   core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script)
+   core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
    {
-      GameAssets assets{};
-
-#if 0
-      auto lua = script->getStack();
-      auto ok = lua.doFile("resources/toc.lua");
-      if( ok )
+      Memory stringBuffer = game->dynamicMemory;
+      auto tocFile = script::openConfigFile(lua, CORE_RESOURCE("toc.lua"));
+      if( tocFile.index )
       {
-         //load sounds first
-         for( lua.ipairs("sounds"); lua.next(); lua.pop(1) )
+         auto textureBlock = script::openNamespace(lua, tocFile, "textures");
+         if( textureBlock.index )
          {
-            //the sounds are just the path to the file
-            str path = lua.to<str>(-1);
-            u32 id = lua.to<u32>(-2);
-            auto handle = audio->loadSoundFromFile(path.buffer);
+            for( auto i = 0U; i < AssetTextureCount; ++i )
+            {
+               str path = script::readIndexedValue(lua, textureBlock, i, "", stringBuffer);
+               gfx->loadTextureFromFile(path);
+            }
          }
-         lua.pop();
-         for( lua.ipairs("textures"); lua.next(); lua.pop(1) )
-         {
-            //the textures are just the path to the file
-            str path = lua.to<str>(-1);
-            u32 id = lua.to<u32>(-2);
-            auto handle = gfx->loadTextureFromFile(path.buffer);
-         }
-         lua.pop();
-         for( lua.ipairs("pixelShaders"); lua.next(); lua.pop(1) )
-         {
-            str path = lua.to<str>(-1);
-            u32 id = lua.to<u32>(-2);
-            auto handle = gfx->loadPixelShaderFromFile(path.buffer);
-         }
-         lua.pop();
+         script::closeNamespace(lua, textureBlock);
       }
-      lua.pop();
-      CORE_ASSERT_DBGERR(lua.getTop() == 0, "Lua stack not properly cleaned up!");
-#endif
+      script::closeConfigFile(lua, tocFile);
 
       // sounds - standalone
       // textures - standalone
@@ -338,6 +319,7 @@ namespace core
       // sprites - requires mesh, material
       // fonts - requires material
 
+      GameAssets assets{};
       assets.atlas = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
       assets.background = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/background.png"));
       assets.font = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/font_t.png"));
@@ -477,13 +459,37 @@ namespace core
 
    core_internal void registerAssetValues(LuaSystem* L)
    {
-      auto luaGlobalTable = script::getGlobalTable(L);
-      auto luaAssetTable = script::createTable(L);
+      auto luaGlobalNamespace = script::getGlobalNamespace(L);
+      auto luaAssetsNamespace = script::beginNewNamespace(L, "AssetID");
 
-      script::writeNamedValue(L, luaAssetTable, "AssetSoundReload", AssetSoundReload);
-      //...
+#define RegisterNumber(name) script::writeNamedValue(L, luaAssetsNamespace, #name, name)
 
-      script::writeNamedValue(L, luaGlobalTable, "AssetID", luaAssetTable);
+      RegisterNumber(AssetSoundReload);
+      RegisterNumber(AssetSoundPistol);
+      RegisterNumber(AssetSoundShotgun);
+      RegisterNumber(AssetSoundUzi);
+      RegisterNumber(AssetSoundSniper);
+      RegisterNumber(AssetSoundMissile);
+
+      RegisterNumber(AssetTextureAtlas);
+      RegisterNumber(AssetTextureBackground);
+      RegisterNumber(AssetTextureFont);
+
+      RegisterNumber(AssetPixelShaderHealth);
+      RegisterNumber(AssetPixelShaderMain);
+
+      RegisterNumber(AssetVertexShaderMain);
+
+      RegisterNumber(AssetFontMain);
+
+      RegisterNumber(AssetMaterialBackground);
+      RegisterNumber(AssetMaterialFont);
+      RegisterNumber(AssetMaterialHealth);
+      RegisterNumber(AssetMaterialWorld);
+
+#undef RegisterNumber
+
+      script::endNewNamespace(L, luaGlobalNamespace);
    }
 
    core_internal Game* initGame(Memory mem, CommunicationBuffer* fromMain, CommunicationBuffer* toMain,
@@ -493,10 +499,11 @@ namespace core
       CORE_ASSERT_DBGERR(game != nullptr, "Not enough memory for core Game object.");
 
       game->gameMemory = mem;
+      game->dynamicMemory = allocateMemoryChunk(game->gameMemory, MegaBytes(1), 16);
 
       registerAssetValues(lua);
 
-      game->assets = loadGameAssets(audio, gfx, lua);
+      game->assets = loadGameAssets(audio, gfx, lua, game);
       bool allLoaded = checkGameAssetsLoaded(game->assets);
       if( !allLoaded )
       {
