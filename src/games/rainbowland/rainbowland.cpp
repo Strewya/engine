@@ -202,9 +202,9 @@ namespace core
       gfx->setOrthographicProjection();
 
       Material m;
-      m.pixelShaderHandle = assets.mainPS;
-      m.vertexShaderHandle = assets.mainVS;
-      m.textureHandle = assets.font;
+      //m.pixelShaderHandle = assets.mainPS;
+      //m.vertexShaderHandle = assets.mainVS;
+      //m.textureHandle = assets.font;
 
       for( auto i = 0U; i < gui.button.count; ++i )
       {
@@ -292,22 +292,57 @@ namespace core
    /************************************************************************
     *              ASSET RELATED
     ************************************************************************/
-   core_internal GameAssets loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
+   core_internal void loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
    {
       Memory stringBuffer = game->dynamicMemory;
       auto tocFile = script::openConfigFile(lua, CORE_RESOURCE("toc.lua"));
       if( tocFile.index )
       {
-         auto textureBlock = script::openNamespace(lua, tocFile, "textures");
-         if( textureBlock.index )
+         auto block = script::openNamespace(lua, tocFile, "textures");
+         game->assets.textures = nullptr; //this line should rather setup a default texture
+         game->assets.numTextures = 0;
+         if( block.index )
          {
             for( auto i = 0U; i < AssetTextureCount; ++i )
             {
-               str path = script::readIndexedValue(lua, textureBlock, i, "", stringBuffer);
-               gfx->loadTextureFromFile(path);
+               str path = script::readIndexedValue(lua, block, i, "", stringBuffer);
+               auto handle = gfx->loadTextureFromFile(path);
+               if( !handle.isNull() )
+               {
+                  auto* ptr = emplace<HTexture>(game->gameMemory);
+                  *ptr = handle;
+                  ++game->assets.numTextures;
+                  if( game->assets.textures == nullptr )
+                  {
+                     game->assets.textures = ptr;
+                  }
+               }
             }
+            script::closeNamespace(lua, block);
          }
-         script::closeNamespace(lua, textureBlock);
+         block = script::openNamespace(lua, tocFile, "sounds");
+         game->assets.sounds = nullptr;
+         game->assets.numSounds = 0;
+         if( block.index )
+         {
+            for( auto i = 0U; i < AssetSoundCount; ++i )
+            {
+               str path = script::readIndexedValue(lua, block, i, "", stringBuffer);
+               auto handle = audio->loadSoundFromFile(path);
+               if( !handle.isNull() )
+               {
+                  auto* ptr = emplace<HSound>(game->gameMemory);
+                  *ptr = handle;
+                  ++game->assets.numSounds;
+                  if( game->assets.sounds == nullptr )
+                  {
+                     game->assets.sounds = ptr;
+                  }
+               }
+            }
+            script::closeNamespace(lua, block);
+         }
+         block = script::openNamespace(lua, tocFile, "");
       }
       script::closeConfigFile(lua, tocFile);
 
@@ -318,63 +353,34 @@ namespace core
       // materials - requires texture, shader
       // sprites - requires mesh, material
       // fonts - requires material
-
-      GameAssets assets{};
-      assets.atlas = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/rainbowland_atlas.tif"));
-      assets.background = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/background.png"));
-      assets.font = gfx->loadTextureFromFile(CORE_RESOURCE("Textures/font_t.png"));
-
-      assets.mainVS = gfx->loadVertexShaderFromFile(CORE_RESOURCE("Shaders/shader_vs.cso"), VertexType::Health);
-      assets.mainPS = gfx->loadPixelShaderFromFile(CORE_RESOURCE("Shaders/shader_ps.cso"));
-      assets.healthPS = gfx->loadPixelShaderFromFile(CORE_RESOURCE("Shaders/health_ps.cso"));
-
-      assets.reload = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/reload.wav"));
-      assets.pistol = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/pistol.wav"));
-      assets.shotgun = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/shotgun.wav"));
-      assets.uzi = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/uzi.wav"));
-      assets.sniper = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/sniper.wav"));
-      assets.rpg = audio->loadSoundFromFile(CORE_RESOURCE("Sounds/missile.wav"));
-
-      return assets;
    }
 
    core_internal bool checkGameAssetsLoaded(GameAssets& assets)
    {
-      auto noAtlas = assets.atlas.isNull();
-      auto noBackground = assets.background.isNull();
-      auto noFont = assets.font.isNull();
-      auto noMainVS = assets.mainVS.isNull();
-      auto noMainPS = assets.mainPS.isNull();
-      auto noHealthPS = assets.healthPS.isNull();
-      auto noReload = assets.reload.isNull();
-      auto noPistol = assets.pistol.isNull();
-      auto noShotgun = assets.shotgun.isNull();
-      auto noUzi = assets.uzi.isNull();
-      auto noSniper = assets.sniper.isNull();
-      auto noRpg = assets.rpg.isNull();
+      auto notLoaded = false;
 
-      auto result = noAtlas || noBackground || noFont ||
-         noMainVS || noMainPS || noHealthPS ||
-         noReload || noPistol || noShotgun || noUzi || noSniper || noRpg;
-
-      return !result;
+      for( auto i = 0U; i < assets.numTextures; ++i )
+      {
+         notLoaded = notLoaded || assets.textures[i].isNull();
+      }
+      for( auto i = 0U; i < assets.numSounds; ++i )
+      {
+         notLoaded = notLoaded || assets.sounds[i].isNull();
+      }
+      
+      return notLoaded;
    }
 
    core_internal void unloadGameAssets(GameAssets& assets, AudioSystem* audio, GraphicsSystem* gfx)
    {
-      gfx->unload(assets.atlas);
-      gfx->unload(assets.background);
-      gfx->unload(assets.font);
-      gfx->unload(assets.mainVS);
-      gfx->unload(assets.mainPS);
-      gfx->unload(assets.healthPS);
-
-      audio->unload(assets.reload);
-      audio->unload(assets.pistol);
-      audio->unload(assets.shotgun);
-      audio->unload(assets.uzi);
-      audio->unload(assets.sniper);
-      audio->unload(assets.rpg);
+      for( auto i = 0U; i < assets.numTextures; ++i )
+      {
+         gfx->unload(assets.textures[i]);
+      }
+      for( auto i = 0U; i < assets.numSounds; ++i )
+      {
+         audio->unload(assets.sounds[i]);
+      }
    }
 
    /************************************************************************
@@ -503,7 +509,7 @@ namespace core
 
       registerAssetValues(lua);
 
-      game->assets = loadGameAssets(audio, gfx, lua, game);
+      loadGameAssets(audio, gfx, lua, game);
       bool allLoaded = checkGameAssetsLoaded(game->assets);
       if( !allLoaded )
       {

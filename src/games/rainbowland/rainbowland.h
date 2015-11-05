@@ -93,18 +93,15 @@ namespace core
 
    struct GameAssets
    {
-      HTexture atlas;
-      HTexture background;
-      HTexture font;
-      HVertexShader mainVS;
-      HPixelShader mainPS;
-      HPixelShader healthPS;
-      HSound reload;
-      HSound pistol;
-      HSound uzi;
-      HSound rpg;
-      HSound sniper;
-      HSound shotgun;
+      HTexture* textures;
+      HVertexShader* vertexShaders;
+      HPixelShader* pixelShaders;
+      HSound* sounds;
+
+      u32 numTextures;
+      u32 numVertexShaders;
+      u32 numPixelShaders;
+      u32 numSounds;
    };
 
    struct CursorState
@@ -140,6 +137,7 @@ namespace core
    {
       Memory gameMemory;
       Memory dynamicMemory;
+
       GameAssets assets;
 
       State currentState;
