@@ -13,6 +13,22 @@
 
 namespace core
 {
+   struct WinMsg;
+
+   struct WinMsgArray
+   {
+      WinMsg* array;
+      u32 size;
+   };
+
+   struct InputSystem
+   {
+      Memory memory;
+      Memory frameMemory;
+      WinMsg* messages;
+      u32 numMessage;
+   };
+
    WinMsg* begin(WinMsgArray a)
    {
       return a.array;
@@ -22,15 +38,38 @@ namespace core
       return a.array + a.size;
    }
 
-
-   void InputSystem::init(Memory memory)
+   InputSystem* initInputSystem(Memory memory, CommunicationBuffer* receivingQueue)
    {
-      m_staticMemory = m_dynamicMemory = memory;
-      m_messages = new(m_dynamicMemory.address)WinMsg;
-      m_messageCount = 0;
+      auto* input = emplace<InputSystem>(memory);
+      if( !input )
+      {
+         CORE_LOG("Not enough memory for Input subsystem!");
+         return nullptr;
+      }
+
+      input->memory = input->frameMemory = memory;
+      input->numMessage = 0;
+      input->messages = cast<WinMsg>(input->frameMemory);
+      if( !input->messages )
+      {
+         CORE_LOG("Not enough memory for the message array!");
+         return nullptr;
+      }
+
+      return input;
    }
 
-   void InputSystem::insert(WinMsg msg)
+   void shutdown(InputSystem* input)
+   {
+      //hmmmm............
+   }
+
+   void frameUpdate(InputSystem* input, u64 timePoint)
+   {
+
+   }
+#if 0
+   void insert(WinMsg msg)
    {
       WinMsg* msgSlot = emplace<WinMsg>(m_dynamicMemory);
       *msgSlot = msg;
@@ -47,4 +86,5 @@ namespace core
       WinMsgArray result{m_messages, m_messageCount};
       return result;
    }
+endif
 }

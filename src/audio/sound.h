@@ -15,15 +15,21 @@ namespace core
    struct Sound
    {
       FMOD::Sound* _sound;
-
-      bool loaded()
-      {
-         return _sound != nullptr;
-      }
-
-      bool unloaded()
-      {
-         return !loaded();
-      }
+      u32 assetId;
    };
+
+   bool isLoaded(Sound s)
+   {
+      return s._sound != nullptr;
+   }
+
+   bool isUnloaded(Sound s)
+   {
+      return s._sound == nullptr;
+   }
+
+   u32 getAssetId(Sound s)
+   {
+      return s.assetId;
+   }
 }

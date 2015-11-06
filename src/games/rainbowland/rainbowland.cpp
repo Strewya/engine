@@ -292,9 +292,9 @@ namespace core
    /************************************************************************
     *              ASSET RELATED
     ************************************************************************/
-   core_internal void loadGameAssets(AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
+   core_internal void loadGameAssets(AudioSystem* sfx, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
    {
-      Memory stringBuffer = game->dynamicMemory;
+      char stringBuffer[128] = {0};
       auto tocFile = script::openConfigFile(lua, CORE_RESOURCE("toc.lua"));
       if( tocFile.index )
       {
@@ -328,7 +328,7 @@ namespace core
             for( auto i = 0U; i < AssetSoundCount; ++i )
             {
                str path = script::readIndexedValue(lua, block, i, "", stringBuffer);
-               auto handle = audio->loadSoundFromFile(path);
+               auto handle = audio::loadSoundFromFile(sfx, path);
                if( !handle.isNull() )
                {
                   auto* ptr = emplace<HSound>(game->gameMemory);
@@ -371,7 +371,7 @@ namespace core
       return notLoaded;
    }
 
-   core_internal void unloadGameAssets(GameAssets& assets, AudioSystem* audio, GraphicsSystem* gfx)
+   core_internal void unloadGameAssets(GameAssets& assets, AudioSystem* sfx, GraphicsSystem* gfx)
    {
       for( auto i = 0U; i < assets.numTextures; ++i )
       {
@@ -379,7 +379,7 @@ namespace core
       }
       for( auto i = 0U; i < assets.numSounds; ++i )
       {
-         audio->unload(assets.sounds[i]);
+         audio::unload(sfx, assets.sounds[i]);
       }
    }
 

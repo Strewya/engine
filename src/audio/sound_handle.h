@@ -13,10 +13,4 @@
 namespace core
 {
    CORE_RESOURCE_HANDLE(HSound);
-   /*
-   struct HSound
-   {
-      u32 handle;
-   };
-   */
 }

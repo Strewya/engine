@@ -5,39 +5,28 @@
 ********************************************/
 /******* c++ headers *******/
 /******* common headers *******/
-#include "audio/fmod_include.h"
 #include "utility/types.h"
 /******* extra headers *******/
-#include "audio/sound_cache.h"
-#include "sound_handle.h"
-#include "sound_file_loader.h"
-#include "utility/memory.h"
+#include "audio/sound_handle.h"
 /******* end header inclusion *******/
 
 namespace core
 {
-   struct AudioSystem
+   struct AudioSystem;
+   struct Memory;
+
+   AudioSystem* initAudioSystem(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
+   void shutdown(AudioSystem* audio);
+
+   bool frameUpdate(AudioSystem* audio);
+
+   namespace audio
    {
-   public:
-      void init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
-      void shutdown();
-      bool update();
+      void playSfx(AudioSystem* sfx, HSound sound);
+      void playMusic(AudioSystem* sfx, HSound sound);
+      void stopMusic(AudioSystem* sfx);
 
-      void playSfx(HSound sound);
-      void playMusic(HSound sound);
-      void stopMusic();
-
-      HSound loadSoundFromFile(const char* filename);
-
-      void unload(HSound sound);
-
-      SoundCache sounds;
-
-   private:
-      Memory m_staticMemory;
-      FMOD::System* m_system;
-      FMOD::Channel* m_channel;
-      SoundFileLoader m_fileLoader;
-      HSound m_musicPlaying;
-   };
+      HSound loadSoundFromFile(AudioSystem* sfx, str filename);
+      void unload(AudioSystem* sfx, HSound sound);
+   }
 }

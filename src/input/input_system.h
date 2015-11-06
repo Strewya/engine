@@ -12,31 +12,17 @@
 
 namespace core
 {
-   struct WinMsg;
+   struct CommunicationBuffer;
+   struct InputSystem;
+   struct Memory;
 
-   struct WinMsgArray
+   InputSystem* initInputSystem(Memory memory, CommunicationBuffer* receivingQueue);
+   void shutdown(InputSystem* input);
+
+   void frameUpdate(InputSystem* input, u64 timePoint);
+
+   namespace input
    {
-      WinMsg* array;
-      u32 size;
-   };
-
-   WinMsg* begin(WinMsgArray a);
-   WinMsg* end(WinMsgArray a);
-
-   struct InputSystem
-   {
-   public:
-      void init(Memory memory);
-
-      void insert(WinMsg msg);
-      void clear();
-
-      WinMsgArray getMessageArray() const;
       
-   private:
-      Memory m_staticMemory;
-      Memory m_dynamicMemory;
-      WinMsg* m_messages;
-      u32 m_messageCount;
-   };
+   }
 }

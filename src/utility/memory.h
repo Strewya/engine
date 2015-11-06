@@ -154,6 +154,13 @@ namespace core
       return result;
    }
 
+   template<typename T>
+   inline T* cast(Memory m)
+   {
+      T* result = emplace<T>(m);
+      return result;
+   }
+
 #ifdef ALLOCATOR_V1
    /************************************************************************
     *              Interface for all allocators

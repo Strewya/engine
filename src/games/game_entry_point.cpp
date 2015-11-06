@@ -70,8 +70,7 @@ namespace core
 
       {
          Memory configMemory = mainMemory;
-         LuaSystem* L = emplace<LuaSystem>(configMemory);
-         L->init(configMemory);
+         LuaSystem* L = initLuaSystem(configMemory);
 
          auto luaFile = script::openConfigFile(L, "memory.lua");
          CORE_ASSERT_DBGERR(luaFile.index != 0, "Lua configuration file invalid or missing!");
@@ -94,7 +93,7 @@ namespace core
 
          script::closeConfigFile(L, luaFile);
 
-         L->shutdown();
+         shutdown(L);
          zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }
 #endif
@@ -109,8 +108,7 @@ namespace core
       CORE_ASSERT_DBGERR(inputMemory != nullptr, "Not enough memory for the input service.");
       CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
 
-      AudioSystem* audio = emplace<AudioSystem>(audioMemory);
-      audio->init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+      AudioSystem* audio = initAudioSystem(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
       GraphicsSystem* graphics = emplace<GraphicsSystem>(graphicsMemory);
       graphics->init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
@@ -118,8 +116,7 @@ namespace core
       InputSystem* input = emplace<InputSystem>(inputMemory);
       input->init(inputMemory);
 
-      LuaSystem* script = emplace<LuaSystem>(scriptMemory);
-      script->init(scriptMemory);
+      LuaSystem* script = initLuaSystem(scriptMemory);
 
       Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, input, script);
 
@@ -163,7 +160,7 @@ namespace core
       }
 
       shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
-      script->shutdown();
+      shutdown(script);
       graphics->shutdown();
       audio->shutdown();
 

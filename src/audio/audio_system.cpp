@@ -5,122 +5,278 @@
 #include "audio/audio_system.h"
 /******* c++ headers *******/
 /******* extra headers *******/
+#include "audio/fmod_include.h"
+#include "audio/sound.h"
+#include "audio/sound_cache.h"
+#include "audio/sound_file_loader.h"
+#include "audio/sound_handle.h"
 #include "utility/memory.h"
 #include "utility/utility.h"
 /******* end headers *******/
 
 namespace core
 {
-   void AudioSystem::init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+
+   /************************************************************************
+    *              STRUCTS
+    ************************************************************************/
+
+   struct SoundCache
    {
-      m_staticMemory = memory;
-      
-      m_channel = nullptr;
-      m_musicPlaying = HSound{};
+      // [Struja 26.9.2015.] #todo: Replace this raw array with a pool allocator based container
+      // so i can more easily track how much sounds are actually in use
+      Sound* storage;
+      u32 maxSlots;
+      u32 usedSlots;
+   };
 
-      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
-      CORE_ASSERT_DBGERR(fmodMemorySize % 512 == 0, "FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
+   struct AudioSystem
+   {
+      Memory memory;
 
-      auto fmodMemory = allocateMemoryChunk(m_staticMemory, fmodMemorySize, 16);
-      CORE_ASSERT_DBGERR(fmodMemory != nullptr, "Failed to allocate enough memory for FMOD");
+      FMOD::System* fmodSystem;
+      FMOD::Channel* fmodChannel;
 
-      auto fmodResult = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
-      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to initialize FMOD memory");
-      fmodResult = FMOD::System_Create(&m_system);
-      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to create FMOD::System");
-      fmodResult = m_system->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
-      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to initialize FMOD::System");
+      SoundCache soundCache;
 
-      m_fileLoader.init(m_system);
-      sounds.init(m_staticMemory, maxSoundSlots);
+      HSound musicPlaying;
+   };
+
+   /************************************************************************
+    *              STATIC FUNCTIONS
+    ************************************************************************/
+
+   static Sound loadSound(FMOD::System* system, str filename)
+   {
+      Sound result{nullptr};
+
+      FMOD_RESULT fr = system->createSound(filename, FMOD_DEFAULT, nullptr, &result._sound);
+      if( fr != FMOD_OK )
+      {
+         CORE_LOG("Failed to load sound '", filename, "'");
+      }
+      return result;
    }
 
-   void AudioSystem::shutdown()
+   static void unload(Sound& sound)
    {
-      auto fmodResult = FMOD_OK;
-      if( m_channel != nullptr )
+      if( sound._sound )
       {
-         fmodResult = m_channel->stop();
-         CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to stop a channel from playing");
-         m_channel = nullptr;
+         sound._sound->release();
+         sound._sound = nullptr;
+      }
+   }
+
+   /************************************************************************
+    *              PUBLIC FUNCTIONS
+    ************************************************************************/
+
+   AudioSystem* initAudioSystem(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+   {
+      auto* sfx = emplace<AudioSystem>(memory);
+      if( !sfx )
+      {
+         CORE_LOG("Not enough memory for Audio subsystem!");
+         return nullptr;
       }
 
-      CORE_ASSERT_DBGWRN(sounds.getCount() == 0, "Some sounds were not cleaned up!");
+      sfx->memory = memory;
 
-      fmodResult = m_system->release();
+      sfx->fmodChannel = nullptr;
+      sfx->musicPlaying = HSound{};
+
+      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
+      if( fmodMemorySize % 512 != 0 )
+      {
+         CORE_LOG("FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
+         return nullptr;
+      }
+
+      auto fmodMemory = allocateMemoryChunk(sfx->memory, fmodMemorySize, 16);
+      if( fmodMemory == nullptr )
+      {
+         CORE_LOG("Failed to allocate enough memory for FMOD!");
+         return nullptr;
+      }
+
+      auto fmodResult = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
+      if( fmodResult != FMOD_OK )
+      {
+         CORE_LOG("Failed to initialize FMOD memory");
+         return nullptr;
+      }
+
+      fmodResult = FMOD::System_Create(&sfx->fmodSystem);
+      if( fmodResult != FMOD_OK )
+      {
+         CORE_LOG("Failed to create FMOD::System");
+         return nullptr;
+      }
+      fmodResult = sfx->fmodSystem->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
+      if( fmodResult != FMOD_OK )
+      {
+         CORE_LOG("Failed to initialize FMOD::System");
+         return nullptr;
+      }
+
+      initSoundCache(&sfx->soundCache, sfx->memory, maxSoundSlots);
+
+      return sfx;
+   }
+
+   void shutdown(AudioSystem* sfx)
+   {
+      auto fmodResult = FMOD_OK;
+      if( sfx->fmodChannel != nullptr )
+      {
+         fmodResult = sfx->fmodChannel->stop();
+         CORE_ASSERT_DBGWRN(fmodResult == FMOD_OK, "Failed to stop a channel from playing");
+         sfx->fmodChannel = nullptr;
+      }
+
+      CORE_ASSERT_DBGWRN(cache::getUsedCount(&sfx->soundCache) == 0, "Some sounds were not cleaned up!");
+
+      fmodResult = sfx->fmodSystem->release();
       CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to release FMOD::System");
-      
+
       int curAlloc = 0;
       int maxAlloc = 0;
       FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
       CORE_LOG_DEBUG("Audio system shutdown, stats:");
       CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
-      CORE_LOG_DEBUG("Static memory: ", m_staticMemory);
+      CORE_LOG_DEBUG("Static memory: ", sfx->memory);
    }
-
-   HSound AudioSystem::loadSoundFromFile(const char* filename)
+   
+   bool frameUpdate(AudioSystem* sfx)
    {
-      Sound loadedSound = m_fileLoader.load(filename);
-      HSound handle = sounds.insert(loadedSound);
-      return handle;
-   }
-
-   void AudioSystem::unload(HSound handle)
-   {
-      if( !handle.isNull() )
-      {
-         Sound sound = sounds.remove(handle);
-         m_fileLoader.unload(sound);
-      }
-   }
-
-   bool AudioSystem::update()
-   {
-      FMOD_RESULT result = m_system->update();
-      if( result == FMOD_OK && m_channel != nullptr )
+      FMOD_RESULT result = sfx->fmodSystem->update();
+      if( result == FMOD_OK && sfx->fmodChannel != nullptr )
       {
          bool playing = false;
-         result = m_channel->isPlaying(&playing);
+         result = sfx->fmodChannel->isPlaying(&playing);
          if( !playing )
          {
-            m_channel = nullptr;
-            playMusic(m_musicPlaying);
+            sfx->fmodChannel = nullptr;
+            audio::playMusic(sfx, sfx->musicPlaying);
          }
       }
       return (result == FMOD_OK);
    }
 
-   void AudioSystem::playSfx(HSound handle)
+   namespace audio
    {
-      if( !handle.isNull() )
+      HSound loadSoundFromFile(AudioSystem* sfx, str filename)
       {
-         auto sound = sounds.getData(handle);
-         FMOD::Channel* channel = nullptr;
-         m_system->playSound(sound._sound, nullptr, false, &channel);
-         channel->setVolume(0.5f);
+         Sound loadedSound = loadSound(sfx->fmodSystem, filename);
+         HSound handle = cache::insert(&sfx->soundCache, loadedSound);
+         return handle;
       }
-   }
 
-   void AudioSystem::playMusic(HSound handle)
-   {
-      if( !handle.isNull() )
+      void unload(AudioSystem* sfx, HSound handle)
       {
-         auto sound = sounds.getData(handle);
-         if( m_channel != nullptr )
+         if( !handle.isNull() )
          {
-            m_channel->stop();
+            Sound sound = cache::remove(&sfx->soundCache, handle);
+            unload(sound);
          }
-         m_musicPlaying = handle;
-         m_system->playSound(sound._sound, nullptr, false, &m_channel);
+      }
+
+
+      void playSfx(AudioSystem* sfx, HSound handle)
+      {
+         if( !handle.isNull() )
+         {
+            auto sound = cache::get(&sfx->soundCache, handle);
+            FMOD::Channel* channel = nullptr;
+            sfx->fmodSystem->playSound(sound._sound, nullptr, false, &channel);
+            channel->setVolume(0.5f);
+         }
+      }
+
+      void playMusic(AudioSystem* sfx, HSound handle)
+      {
+         if( !handle.isNull() )
+         {
+            auto sound = cache::get(&sfx->soundCache, handle);
+            if( sfx->fmodChannel != nullptr )
+            {
+               sfx->fmodChannel->stop();
+            }
+            sfx->musicPlaying = handle;
+            sfx->fmodSystem->playSound(sound._sound, nullptr, false, &sfx->fmodChannel);
+         }
+      }
+
+      void stopMusic(AudioSystem* sfx)
+      {
+         if( sfx->fmodChannel != nullptr )
+         {
+            sfx->fmodChannel->stop();
+            sfx->fmodChannel = nullptr;
+         }
       }
    }
 
-   void AudioSystem::stopMusic()
+   void init(SoundCache* cache, Memory& mem, u32 maxSlots)
    {
-      if( m_channel != nullptr )
+      cache->storage = emplaceArray<Sound>(mem, maxSlots);
+      CORE_ASSERT_DBGERR(cache->storage != nullptr, "Not enough memory to emplace SoundCache storage.");
+      cache->maxSlots = maxSlots;
+      cache->usedSlots = 0;
+   }
+   
+   namespace cache
+   {
+      HSound insert(SoundCache* cache, Sound s)
       {
-         m_channel->stop();
-         m_channel = nullptr;
+         HSound result{};
+         if( cache->maxSlots != cache->usedSlots )
+         {
+            for( u16 i = 0; i < cache->maxSlots; ++i )
+            {
+               if( isUnloaded(cache->storage[i]) )
+               {
+                  cache->storage[i] = s;
+                  result.init(i);
+                  ++cache->usedSlots;
+                  break;
+               }
+            }
+         }
+         return result;
+      }
+
+      Sound remove(SoundCache* cache, HSound handle)
+      {
+         Sound result = cache->storage[handle.getIndex()];
+         cache->storage[handle.getIndex()] = {};
+         --cache->usedSlots;
+         return result;
+      }
+
+      Sound get(SoundCache* cache, HSound handle)
+      {
+         Sound result = cache->storage[handle.getIndex()];
+         return result;
+      }
+
+      u32 getUsedCount(SoundCache* cache)
+      {
+         return cache->usedSlots;
+      }
+
+      HSound find(SoundCache* cache, u32 assetId)
+      {
+         HSound result{};
+         for( u16 i = 0u; i < cache->maxSlots; ++i )
+         {
+            if( getAssetId(cache->storage[i]) == assetId )
+            {
+               result.init(i);
+               break;
+            }
+         }
+         return result;
       }
    }
 }
