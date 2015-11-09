@@ -70,7 +70,7 @@ namespace core
 
       {
          Memory configMemory = mainMemory;
-         LuaSystem* L = initLuaSystem(configMemory);
+         LuaSystem* L = script::init(configMemory);
 
          auto luaFile = script::openConfigFile(L, "memory.lua");
          CORE_ASSERT_DBGERR(luaFile.index != 0, "Lua configuration file invalid or missing!");
@@ -93,7 +93,7 @@ namespace core
 
          script::closeConfigFile(L, luaFile);
 
-         shutdown(L);
+         script::shutdown(L);
          zeroUsedMemory(mainMemory, mainMemory.remainingBytes - configMemory.remainingBytes);
       }
 #endif
@@ -108,17 +108,21 @@ namespace core
       CORE_ASSERT_DBGERR(inputMemory != nullptr, "Not enough memory for the input service.");
       CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
 
-      AudioSystem* audio = initAudioSystem(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+      AudioSystem* audio = audio::init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
 
       GraphicsSystem* graphics = emplace<GraphicsSystem>(graphicsMemory);
       graphics->init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
 
-      InputSystem* input = emplace<InputSystem>(inputMemory);
-      input->init(inputMemory);
-
-      LuaSystem* script = initLuaSystem(scriptMemory);
+      InputSystem* input = input::init(inputMemory, fromMain);
+      LuaSystem* script = script::init(scriptMemory);
 
       Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, input, script);
+
+      CORE_ASSERT_DBGERR(audio != nullptr, "Failed to initialize audio subsystem");
+      CORE_ASSERT_DBGERR(graphics != nullptr, "Failed to initialize graphics subsystem");
+      CORE_ASSERT_DBGERR(input != nullptr, "Failed to initialize input subsystem");
+      CORE_ASSERT_DBGERR(script != nullptr, "Failed to initialize script subsystem");
+      CORE_ASSERT_DBGERR(game != nullptr, "Failed to initialize game");
 
       WinMsg msg{};
       msg.type = WinMsgType::Fullscreen;
@@ -160,9 +164,9 @@ namespace core
       }
 
       shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
-      shutdown(script);
+      script::shutdown(script);
       graphics->shutdown();
-      audio->shutdown();
+      audio::shutdown(audio);
 
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);

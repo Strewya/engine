@@ -8,83 +8,63 @@
 #include "input/gamepad.h"
 #include "input/keyboard.h"
 #include "input/mouse.h"
+#include "utility/communication_buffer.h"
 #include "window/window_message.h"
 /******* end headers *******/
 
 namespace core
 {
-   struct WinMsg;
-
-   struct WinMsgArray
-   {
-      WinMsg* array;
-      u32 size;
-   };
-
    struct InputSystem
    {
       Memory memory;
-      Memory frameMemory;
+      CommunicationBuffer* receivingQueue;
       WinMsg* messages;
-      u32 numMessage;
+      u32 numMessages;
    };
 
-   WinMsg* begin(WinMsgArray a)
+   namespace input
    {
-      return a.array;
-   }
-   WinMsg* end(WinMsgArray a)
-   {
-      return a.array + a.size;
-   }
-
-   InputSystem* initInputSystem(Memory memory, CommunicationBuffer* receivingQueue)
-   {
-      auto* input = emplace<InputSystem>(memory);
-      if( !input )
+      InputSystem* init(Memory memory, CommunicationBuffer* receivingQueue)
       {
-         CORE_LOG("Not enough memory for Input subsystem!");
-         return nullptr;
+         auto* input = emplace<InputSystem>(memory);
+         if( !input )
+         {
+            CORE_LOG("Not enough memory for Input subsystem!");
+            return nullptr;
+         }
+
+         input->memory = memory;
+         input->receivingQueue = receivingQueue;
+         input->numMessages = 0;
+         input->messages = cast<WinMsg>(input->memory);
+         if( !input->messages )
+         {
+            CORE_LOG("Not enough memory for the message array!");
+            return nullptr;
+         }
+
+         return input;
       }
 
-      input->memory = input->frameMemory = memory;
-      input->numMessage = 0;
-      input->messages = cast<WinMsg>(input->frameMemory);
-      if( !input->messages )
+      void shutdown(InputSystem* input)
       {
-         CORE_LOG("Not enough memory for the message array!");
-         return nullptr;
+         //hmmmm............
       }
 
-      return input;
-   }
+      void frameUpdate(InputSystem* input, u64 timePoint)
+      {
+         auto messages = input->receivingQueue->getMessagesUntil(timePoint);
+         auto mem = input->memory;
+         input->messages = emplaceArray<WinMsg>(mem, messages.count);
+         std::copy(begin(messages), end(messages), input->messages);
 
-   void shutdown(InputSystem* input)
-   {
-      //hmmmm............
-   }
+      }
 
-   void frameUpdate(InputSystem* input, u64 timePoint)
-   {
+      WinMsgArray getInputDeviceEvents(InputSystem* input)
+      {
+         WinMsgArray result{input->messages, input->numMessages};
+         return result;
+      }
 
    }
-#if 0
-   void insert(WinMsg msg)
-   {
-      WinMsg* msgSlot = emplace<WinMsg>(m_dynamicMemory);
-      *msgSlot = msg;
-      ++m_messageCount;
-   }
-
-   void InputSystem::clear()
-   {
-      m_messageCount = 0;
-   }
-
-   WinMsgArray InputSystem::getMessageArray() const
-   {
-      WinMsgArray result{m_messages, m_messageCount};
-      return result;
-   }
-endif
 }

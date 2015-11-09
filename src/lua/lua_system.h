@@ -14,17 +14,17 @@ namespace core
    struct LuaSystem;
    struct Memory;
 
-   LuaSystem* initLuaSystem(Memory memBlock);
-   void shutdown(LuaSystem* lua);
-
-   void frameUpdate(LuaSystem* lua);
+   struct LuaTable
+   {
+      i32 index;
+   };
 
    namespace script
    {
-      struct LuaTable
-      {
-         i32 index;
-      };
+      LuaSystem* init(Memory memBlock);
+      void shutdown(LuaSystem* lua);
+
+      void frameUpdate(LuaSystem* lua);
 
       LuaTable getGlobalNamespace(LuaSystem* L);
       

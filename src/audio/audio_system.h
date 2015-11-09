@@ -15,13 +15,13 @@ namespace core
    struct AudioSystem;
    struct Memory;
 
-   AudioSystem* initAudioSystem(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
-   void shutdown(AudioSystem* audio);
-
-   bool frameUpdate(AudioSystem* audio);
-
    namespace audio
    {
+      AudioSystem* init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots);
+      void shutdown(AudioSystem* audio);
+
+      bool frameUpdate(AudioSystem* audio);
+
       void playSfx(AudioSystem* sfx, HSound sound);
       void playMusic(AudioSystem* sfx, HSound sound);
       void stopMusic(AudioSystem* sfx);

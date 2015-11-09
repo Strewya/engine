@@ -375,6 +375,9 @@
     <ClInclude Include="..\..\..\src\graphics\font\font_cache.h">
       <Filter>code\framework\graphics\font</Filter>
     </ClInclude>
+    <ClInclude Include="W:\src\utility\array.h">
+      <Filter>code\framework\utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="code">

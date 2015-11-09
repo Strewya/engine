@@ -85,5 +85,28 @@ namespace core
          auto result = m_readIndex == m_writeIndex;
          return result;
       }
+
+      bool isReadableIndex(u32 index) const
+      {
+         auto empty = m_writeIndex == (index + 1);
+         return !empty;
+      }
+
+      ReadOnlyArray<WinMsg> getMessagesUntil(u64 timepoint) const
+      {
+         ReadOnlyArray<WinMsg> result{m_buffer, 0};
+         u32 readIndex = m_readIndex;
+         while( isReadableIndex(readIndex) && (result.data + result.count)->timestamp <= timepoint )
+         {
+            ++result.count;
+            ++readIndex;
+         }
+         return result;
+      }
+
+      void consumeMessages(u32 count)
+      {
+         m_readIndex += count;
+      }
    };
 }

@@ -20,7 +20,7 @@ namespace core
       Memory memory;
    };
 
-   int luaPrint(lua_State* L)
+   core_internal int luaPrint(lua_State* L)
    {
       i32 n = lua_gettop(L);
       if( n == 0 )
@@ -54,13 +54,13 @@ namespace core
       return 0;
    }
 
-   int luaErrHandler(lua_State* L)
+   core_internal int luaErrHandler(lua_State* L)
    {
       lua_pushnil(L);
       return 2;
    }
 
-   void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
+   core_internal void* lua_allocateCustom(void* ud, void* ptr, size_t osize, size_t nsize)
    {
       CORE_LOG_DEBUG("lua_allocateCustom, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
       auto* memory = (Memory*)ud;
@@ -96,7 +96,7 @@ namespace core
       return result;
    }
 
-   void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
+   core_internal void* lua_allocate(void* ud, void* ptr, size_t osize, size_t nsize)
    {
       //CORE_LOG_DEBUG("lua_allocate, ptr/osize/nsize: ", memoryAddress(ptr), "/", osize, "/", nsize);
 
@@ -113,51 +113,53 @@ namespace core
       return result;
    }
 
-   LuaSystem* initLuaSystem(Memory a)
+   namespace script
    {
-      auto* lua = emplace<LuaSystem>(a);
-      if( !lua )
+      LuaSystem* initLuaSystem(Memory a)
       {
-         CORE_LOG("Not enough memory for Lua subsystem!");
-         return nullptr;
-      }
+         auto* lua = emplace<LuaSystem>(a);
+         if( !lua )
+         {
+            CORE_LOG("Not enough memory for Lua subsystem!");
+            return nullptr;
+         }
 
-      lua->memory = a;
-      lua->luaState = lua_newstate(lua_allocate, &lua->memory);
-      
-      if(!lua->luaState)
-      {
-         CORE_LOG("Failed to create Lua state!");
-         return nullptr;
-      }
+         lua->memory = a;
+         lua->luaState = lua_newstate(lua_allocate, &lua->memory);
+
+         if( !lua->luaState )
+         {
+            CORE_LOG("Failed to create Lua state!");
+            return nullptr;
+         }
 #ifdef DEPLOY
-      lua_pushcfunction(m_L, luaopen_base);
-      lua_pushliteral(m_L, "");
-      lua_call(m_L, 1, 0);
+         lua_pushcfunction(m_L, luaopen_base);
+         lua_pushliteral(m_L, "");
+         lua_call(m_L, 1, 0);
 
-      lua_pushcfunction(m_L, luaopen_table);
-      lua_pushliteral(m_L, LUA_TABLIBNAME);
-      lua_call(m_L, 1, 0);
+         lua_pushcfunction(m_L, luaopen_table);
+         lua_pushliteral(m_L, LUA_TABLIBNAME);
+         lua_call(m_L, 1, 0);
 
-      lua_pushcfunction(m_L, luaopen_package);
-      lua_pushliteral(m_L, LUA_LOADLIBNAME);
-      lua_call(m_L, 1, 0);
+         lua_pushcfunction(m_L, luaopen_package);
+         lua_pushliteral(m_L, LUA_LOADLIBNAME);
+         lua_call(m_L, 1, 0);
 
-      lua_pushcfunction(m_L, luaopen_string);
-      lua_pushliteral(m_L, LUA_STRLIBNAME);
-      lua_call(m_L, 1, 0);
+         lua_pushcfunction(m_L, luaopen_string);
+         lua_pushliteral(m_L, LUA_STRLIBNAME);
+         lua_call(m_L, 1, 0);
 
-      lua_pushcfunction(m_L, luaopen_math);
-      lua_pushliteral(m_L, LUA_MATHLIBNAME);
-      lua_call(m_L, 1, 0);
+         lua_pushcfunction(m_L, luaopen_math);
+         lua_pushliteral(m_L, LUA_MATHLIBNAME);
+         lua_call(m_L, 1, 0);
 #else
-      luaL_openlibs(lua->luaState);
+         luaL_openlibs(lua->luaState);
 #endif
 
-      //tolua_core_open(m_L);
-      lua_register(lua->luaState, "print", luaPrint);
+         //tolua_core_open(m_L);
+         lua_register(lua->luaState, "print", luaPrint);
 
-      const char* depend = R"rawLuaCode(
+         const char* depend = R"rawLuaCode(
 Lua = {};
 global_dependency_table = {};
 global_dependency_missing = nil;
@@ -179,27 +181,27 @@ function class(name)
 end
 )rawLuaCode";
 
-      auto result = luaL_dostring(lua->luaState, depend);
-      if( result != 0 )
-      {
-         CORE_LOG("Failed to register dependency code to Lua!");
+         auto result = luaL_dostring(lua->luaState, depend);
+         if( result != 0 )
+         {
+            CORE_LOG("Failed to register dependency code to Lua!");
+         }
+
+         return lua;
       }
 
-      return lua;
-   }
+      void shutdown(LuaSystem* lua)
+      {
+         lua_close(lua->luaState);
+      }
 
-   void shutdown(LuaSystem* lua)
-   {
-      lua_close(lua->luaState);
-   }
+      void frameUpdate(LuaSystem* lua)
+      {
+         lua_gc(lua->luaState, LUA_GCSTEP, 20);
+      }
 
-   void frameUpdate(LuaSystem* lua)
-   {
-      lua_gc(lua->luaState, LUA_GCSTEP, 20);
-   }
 
-   namespace script
-   {
+
       LuaTable getGlobalNamespace(LuaSystem* L)
       {
          LuaTable result{LUA_GLOBALSINDEX};

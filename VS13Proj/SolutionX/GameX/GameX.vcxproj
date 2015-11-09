@@ -330,6 +330,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\src\games\rainbowland\load_game_resources.h" />
+    <ClInclude Include="W:\src\utility\array.h" />
     <None Include="..\..\..\src\games\rainbowland\logic\code.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Deploy|x64'">true</ExcludedFromBuild>

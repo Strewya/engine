@@ -46,7 +46,7 @@ namespace core
     *              STATIC FUNCTIONS
     ************************************************************************/
 
-   static Sound loadSound(FMOD::System* system, str filename)
+   core_internal Sound loadSound(FMOD::System* system, str filename)
    {
       Sound result{nullptr};
 
@@ -58,7 +58,7 @@ namespace core
       return result;
    }
 
-   static void unload(Sound& sound)
+   core_internal void unload(Sound& sound)
    {
       if( sound._sound )
       {
@@ -70,101 +70,101 @@ namespace core
    /************************************************************************
     *              PUBLIC FUNCTIONS
     ************************************************************************/
-
-   AudioSystem* initAudioSystem(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
-   {
-      auto* sfx = emplace<AudioSystem>(memory);
-      if( !sfx )
-      {
-         CORE_LOG("Not enough memory for Audio subsystem!");
-         return nullptr;
-      }
-
-      sfx->memory = memory;
-
-      sfx->fmodChannel = nullptr;
-      sfx->musicPlaying = HSound{};
-
-      u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
-      if( fmodMemorySize % 512 != 0 )
-      {
-         CORE_LOG("FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
-         return nullptr;
-      }
-
-      auto fmodMemory = allocateMemoryChunk(sfx->memory, fmodMemorySize, 16);
-      if( fmodMemory == nullptr )
-      {
-         CORE_LOG("Failed to allocate enough memory for FMOD!");
-         return nullptr;
-      }
-
-      auto fmodResult = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
-      if( fmodResult != FMOD_OK )
-      {
-         CORE_LOG("Failed to initialize FMOD memory");
-         return nullptr;
-      }
-
-      fmodResult = FMOD::System_Create(&sfx->fmodSystem);
-      if( fmodResult != FMOD_OK )
-      {
-         CORE_LOG("Failed to create FMOD::System");
-         return nullptr;
-      }
-      fmodResult = sfx->fmodSystem->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
-      if( fmodResult != FMOD_OK )
-      {
-         CORE_LOG("Failed to initialize FMOD::System");
-         return nullptr;
-      }
-
-      initSoundCache(&sfx->soundCache, sfx->memory, maxSoundSlots);
-
-      return sfx;
-   }
-
-   void shutdown(AudioSystem* sfx)
-   {
-      auto fmodResult = FMOD_OK;
-      if( sfx->fmodChannel != nullptr )
-      {
-         fmodResult = sfx->fmodChannel->stop();
-         CORE_ASSERT_DBGWRN(fmodResult == FMOD_OK, "Failed to stop a channel from playing");
-         sfx->fmodChannel = nullptr;
-      }
-
-      CORE_ASSERT_DBGWRN(cache::getUsedCount(&sfx->soundCache) == 0, "Some sounds were not cleaned up!");
-
-      fmodResult = sfx->fmodSystem->release();
-      CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to release FMOD::System");
-
-      int curAlloc = 0;
-      int maxAlloc = 0;
-      FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
-      CORE_LOG_DEBUG("Audio system shutdown, stats:");
-      CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
-      CORE_LOG_DEBUG("Static memory: ", sfx->memory);
-   }
-   
-   bool frameUpdate(AudioSystem* sfx)
-   {
-      FMOD_RESULT result = sfx->fmodSystem->update();
-      if( result == FMOD_OK && sfx->fmodChannel != nullptr )
-      {
-         bool playing = false;
-         result = sfx->fmodChannel->isPlaying(&playing);
-         if( !playing )
-         {
-            sfx->fmodChannel = nullptr;
-            audio::playMusic(sfx, sfx->musicPlaying);
-         }
-      }
-      return (result == FMOD_OK);
-   }
-
    namespace audio
    {
+      AudioSystem* init(Memory memory, u32 fmodMemoryMegabytes, u32 fmodMaxChannels, u32 maxSoundSlots)
+      {
+         auto* sfx = emplace<AudioSystem>(memory);
+         if( !sfx )
+         {
+            CORE_LOG("Not enough memory for Audio subsystem!");
+            return nullptr;
+         }
+
+         sfx->memory = memory;
+
+         sfx->fmodChannel = nullptr;
+         sfx->musicPlaying = HSound{};
+
+         u32 fmodMemorySize = MegaBytes(fmodMemoryMegabytes);
+         if( fmodMemorySize % 512 != 0 )
+         {
+            CORE_LOG("FMOD memory size has to be a multiple of 512, instead is ", fmodMemorySize % 512);
+            return nullptr;
+         }
+
+         auto fmodMemory = allocateMemoryChunk(sfx->memory, fmodMemorySize, 16);
+         if( fmodMemory == nullptr )
+         {
+            CORE_LOG("Failed to allocate enough memory for FMOD!");
+            return nullptr;
+         }
+
+         auto fmodResult = FMOD::Memory_Initialize(fmodMemory.address, fmodMemorySize, 0, 0, 0);
+         if( fmodResult != FMOD_OK )
+         {
+            CORE_LOG("Failed to initialize FMOD memory");
+            return nullptr;
+         }
+
+         fmodResult = FMOD::System_Create(&sfx->fmodSystem);
+         if( fmodResult != FMOD_OK )
+         {
+            CORE_LOG("Failed to create FMOD::System");
+            return nullptr;
+         }
+         fmodResult = sfx->fmodSystem->init(fmodMaxChannels, FMOD_INIT_NORMAL, nullptr);
+         if( fmodResult != FMOD_OK )
+         {
+            CORE_LOG("Failed to initialize FMOD::System");
+            return nullptr;
+         }
+
+         initSoundCache(&sfx->soundCache, sfx->memory, maxSoundSlots);
+
+         return sfx;
+      }
+
+      void shutdown(AudioSystem* sfx)
+      {
+         auto fmodResult = FMOD_OK;
+         if( sfx->fmodChannel != nullptr )
+         {
+            fmodResult = sfx->fmodChannel->stop();
+            CORE_ASSERT_DBGWRN(fmodResult == FMOD_OK, "Failed to stop a channel from playing");
+            sfx->fmodChannel = nullptr;
+         }
+
+         CORE_ASSERT_DBGWRN(cache::getUsedCount(&sfx->soundCache) == 0, "Some sounds were not cleaned up!");
+
+         fmodResult = sfx->fmodSystem->release();
+         CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to release FMOD::System");
+
+         int curAlloc = 0;
+         int maxAlloc = 0;
+         FMOD::Memory_GetStats(&curAlloc, &maxAlloc);
+         CORE_LOG_DEBUG("Audio system shutdown, stats:");
+         CORE_LOG_DEBUG("FMOD system max allocation: ", byteSizes(maxAlloc));
+         CORE_LOG_DEBUG("Static memory: ", sfx->memory);
+      }
+
+      bool frameUpdate(AudioSystem* sfx)
+      {
+         FMOD_RESULT result = sfx->fmodSystem->update();
+         if( result == FMOD_OK && sfx->fmodChannel != nullptr )
+         {
+            bool playing = false;
+            result = sfx->fmodChannel->isPlaying(&playing);
+            if( !playing )
+            {
+               sfx->fmodChannel = nullptr;
+               audio::playMusic(sfx, sfx->musicPlaying);
+            }
+         }
+         return (result == FMOD_OK);
+      }
+
+
       HSound loadSoundFromFile(AudioSystem* sfx, str filename)
       {
          Sound loadedSound = loadSound(sfx->fmodSystem, filename);
@@ -224,7 +224,7 @@ namespace core
       cache->maxSlots = maxSlots;
       cache->usedSlots = 0;
    }
-   
+
    namespace cache
    {
       HSound insert(SoundCache* cache, Sound s)

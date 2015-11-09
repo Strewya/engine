@@ -540,8 +540,13 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                 Game* game)
    {
+      input::frameUpdate(input, timer->getCurrentMicros());
+
+
+
+
       WinMsg msg{};
-      auto timeLimit = timer->getCurrentMicros();
+      auto timeLimit = ;
       while( fromMain->peek(msg, timeLimit) )
       {
          switch( msg.type )
@@ -555,7 +560,7 @@ namespace core
             case WinMsgType::GamepadButton:
             case WinMsgType::GamepadConnection:
             {
-               input->insert(msg);
+               input::insert(input, msg);
             } break;
             case WinMsgType::FileChange:
             {
