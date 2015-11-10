@@ -8,7 +8,6 @@
 #include "audio/fmod_include.h"
 #include "audio/sound.h"
 #include "audio/sound_cache.h"
-#include "audio/sound_file_loader.h"
 #include "audio/sound_handle.h"
 #include "utility/memory.h"
 #include "utility/utility.h"
@@ -58,12 +57,12 @@ namespace core
       return result;
    }
 
-   core_internal void unload(Sound& sound)
+   core_internal void unloadSound(Sound* sound)
    {
-      if( sound._sound )
+      if( sound->_sound )
       {
-         sound._sound->release();
-         sound._sound = nullptr;
+         sound->_sound->release();
+         sound->_sound = nullptr;
       }
    }
 
@@ -120,7 +119,7 @@ namespace core
             return nullptr;
          }
 
-         initSoundCache(&sfx->soundCache, sfx->memory, maxSoundSlots);
+         cache::init(&sfx->soundCache, sfx->memory, maxSoundSlots);
 
          return sfx;
       }
@@ -135,7 +134,8 @@ namespace core
             sfx->fmodChannel = nullptr;
          }
 
-         CORE_ASSERT_DBGWRN(cache::getUsedCount(&sfx->soundCache) == 0, "Some sounds were not cleaned up!");
+         CORE_ASSERT_DBGWRN(cache::getUsedCount(&sfx->soundCache) == 0, cache::getUsedCount(&sfx->soundCache), " sounds unaccounted for during shutdown!");
+         cache::shutdown(&sfx->soundCache);
 
          fmodResult = sfx->fmodSystem->release();
          CORE_ASSERT_DBGERR(fmodResult == FMOD_OK, "Failed to release FMOD::System");
@@ -177,7 +177,7 @@ namespace core
          if( !handle.isNull() )
          {
             Sound sound = cache::remove(&sfx->soundCache, handle);
-            unload(sound);
+            unloadSound(&sound);
          }
       }
 
@@ -217,16 +217,28 @@ namespace core
       }
    }
 
-   void init(SoundCache* cache, Memory& mem, u32 maxSlots)
-   {
-      cache->storage = emplaceArray<Sound>(mem, maxSlots);
-      CORE_ASSERT_DBGERR(cache->storage != nullptr, "Not enough memory to emplace SoundCache storage.");
-      cache->maxSlots = maxSlots;
-      cache->usedSlots = 0;
-   }
 
    namespace cache
    {
+      void init(SoundCache* cache, Memory& mem, u32 maxSlots)
+      {
+         cache->storage = emplaceArray<Sound>(mem, maxSlots);
+         CORE_ASSERT_DBGERR(cache->storage != nullptr, "Not enough memory to emplace SoundCache storage.");
+         cache->maxSlots = maxSlots;
+         cache->usedSlots = 0;
+      }
+
+      void shutdown(SoundCache* cache)
+      {
+         for( auto i = 0U; i < cache->maxSlots; ++i )
+         {
+            if( isLoaded(cache->storage[i]) )
+            {
+               unloadSound(&cache->storage[i]);
+            }
+         }
+      }
+
       HSound insert(SoundCache* cache, Sound s)
       {
          HSound result{};

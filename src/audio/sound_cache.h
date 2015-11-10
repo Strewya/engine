@@ -16,11 +16,12 @@ namespace core
    struct Sound;
    struct SoundCache;
 
-   void initSoundCache(SoundCache* cache, Memory& mem, u32 maxSlots);
-   void shutdown(SoundCache* cache);
 
    namespace cache
    {
+      void init(SoundCache* cache, Memory& mem, u32 maxSlots);
+      void shutdown(SoundCache* cache);
+      
       HSound insert(SoundCache* cache, Sound s);
       Sound remove(SoundCache* cache, HSound handle);
       Sound get(SoundCache* cache, HSound handle);

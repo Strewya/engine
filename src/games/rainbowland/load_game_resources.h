@@ -15,7 +15,7 @@ namespace core
    struct GameResources;
    struct GraphicsSystem;
 
-   GameResources loadGameResources(AudioSystem& audio, GraphicsSystem& gfx);
-   bool checkGameResourcesLoaded(GameResources& assets);
-   void unloadGameResources(GameResources& assets, AudioSystem& sounds, GraphicsSystem& gfx);
+   GameResources loadGameResources(AudioSystem* sfx, GraphicsSystem* gfx);
+   bool checkGameResourcesLoaded(GameResources* assets);
+   void unloadGameResources(GameResources* assets, AudioSystem* sounds, GraphicsSystem* gfx);
 }

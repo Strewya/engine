@@ -5,6 +5,7 @@
 /******* c++ headers *******/
 /******* extra headers *******/
 #include "input/mouse.h"
+#include "input/input_system.h"
 #include "games/rainbowland/rainbowland.h"
 #include "graphics/mesh/mesh.h"
 #include "graphics/font/font_system.h"
@@ -273,7 +274,7 @@ namespace core
 
    core_internal void updateState_mainMenu(AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script, Game* game)
    {
-      auto frameEvents = input->getMessageArray();
+      auto frameEvents = input::getInputEvents(input);
       handleInput_gui(game->gui, game->sharedData, game->constants, frameEvents);
    }
 
@@ -294,7 +295,7 @@ namespace core
     ************************************************************************/
    core_internal void loadGameAssets(AudioSystem* sfx, GraphicsSystem* gfx, LuaSystem* lua, Game* game)
    {
-      char stringBuffer[128] = {0};
+      char stringBuffer[256] = {0};
       auto tocFile = script::openConfigFile(lua, CORE_RESOURCE("toc.lua"));
       if( tocFile.index )
       {
@@ -368,7 +369,7 @@ namespace core
          notLoaded = notLoaded || assets.sounds[i].isNull();
       }
       
-      return notLoaded;
+      return !notLoaded;
    }
 
    core_internal void unloadGameAssets(GameAssets& assets, AudioSystem* sfx, GraphicsSystem* gfx)
@@ -540,28 +541,14 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                 Game* game)
    {
-      input::frameUpdate(input, timer->getCurrentMicros());
-
-
-
-
-      WinMsg msg{};
-      auto timeLimit = ;
-      while( fromMain->peek(msg, timeLimit) )
+      auto windowEvents = fromMain->getMessagesUntil(timer->getCurrentMicros());
+      auto inputCount = windowEvents.count;
+      
+      input::frameUpdate(input, &windowEvents);
+      for(auto msg : windowEvents )
       {
          switch( msg.type )
          {
-            case WinMsgType::KeyboardKey:
-            case WinMsgType::KeyboardText:
-            case WinMsgType::MouseButton:
-            case WinMsgType::MouseMove:
-            case WinMsgType::MouseWheel:
-            case WinMsgType::GamepadAxis:
-            case WinMsgType::GamepadButton:
-            case WinMsgType::GamepadConnection:
-            {
-               input::insert(input, msg);
-            } break;
             case WinMsgType::FileChange:
             {
                onFileChange(msg, audio, gfx, input, script, game);
@@ -580,6 +567,7 @@ namespace core
             } break;
          }
       }
+      fromMain->consumeMessages(inputCount);
 
       DeltaTime time{};
       time.real.micros = timer->getDeltaMicros();
@@ -589,7 +577,6 @@ namespace core
 
       updateState(audio, gfx, input, script, game);
 
-      input->clear();
 
       return transitionState(audio, gfx, input, script, game);
    }

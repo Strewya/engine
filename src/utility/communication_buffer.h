@@ -9,6 +9,7 @@
 /******* common headers *******/
 #include "utility/types.h"
 /******* extra headers *******/
+#include "utility/array.h"
 #include "utility/memory.h"
 #include "utility/utility.h"
 #include "utility/time/clock.h"
@@ -66,14 +67,6 @@ namespace core
          return false;
       }
 
-      //blocking call, use only in rare situations
-      WinMsg wait()
-      {
-         WinMsg msg{};
-         while( peek(msg) == false ) {}
-         return msg;
-      }
-
       bool empty() const
       {
          auto result = m_writeIndex == (m_readIndex + 1);
@@ -88,14 +81,14 @@ namespace core
 
       bool isReadableIndex(u32 index) const
       {
-         auto empty = m_writeIndex == (index + 1);
+         auto empty = m_writeIndex == (index + 1); //the bug IS HERE BECAUSE THE INDEX PASSED IS ALREADY INCREASED SO I AM STUPID
          return !empty;
       }
 
-      ReadOnlyArray<WinMsg> getMessagesUntil(u64 timepoint) const
+      Array<WinMsg> getMessagesUntil(u64 timepoint) const
       {
-         ReadOnlyArray<WinMsg> result{m_buffer, 0};
-         u32 readIndex = m_readIndex;
+         u32 readIndex = m_readIndex + 1;
+         Array<WinMsg> result{m_buffer + readIndex, 0};
          while( isReadableIndex(readIndex) && (result.data + result.count)->timestamp <= timepoint )
          {
             ++result.count;

@@ -12,27 +12,6 @@
 namespace core
 {
    template<typename T>
-   struct ReadOnlyArray
-   {
-      const T* const data;
-      u32 count;
-   };
-
-   template<typename T>
-   const T* begin(const ReadOnlyArray<T>& roarray)
-   {
-      return roarray.data;
-   }
-
-   template<typename T>
-   const T* end(const ReadOnlyArray<T>& roarray)
-   {
-      return roarray.data + roarray.count;
-   }
-
-
-
-   template<typename T>
    struct Array
    {
       T* data;
@@ -40,13 +19,13 @@ namespace core
    };
 
    template<typename T>
-   T* begin(Array<T>& array)
+   T* begin(Array<T> array)
    {
       return array.data;
    }
 
    template<typename T>
-   T* end(Array<T>& array)
+   T* end(Array<T> array)
    {
       return array.data + array.count;
    }

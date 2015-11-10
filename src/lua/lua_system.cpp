@@ -115,7 +115,7 @@ namespace core
 
    namespace script
    {
-      LuaSystem* initLuaSystem(Memory a)
+      LuaSystem* init(Memory a)
       {
          auto* lua = emplace<LuaSystem>(a);
          if( !lua )

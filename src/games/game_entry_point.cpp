@@ -37,9 +37,6 @@ namespace core
 
    void runGame(Memory mainMemory, CommunicationBuffer* fromMain, CommunicationBuffer* toMain, u64 windowHandle, u32 windowWidth, u32 windowHeight)
    {
-      Clock logicTimer{};
-      Clock renderTimer{};
-
 #ifdef DEPLOY
       enum : u32
       {
@@ -135,6 +132,8 @@ namespace core
       toMain->writeEvent(msg);
       //
 
+      Clock logicTimer{};
+      Clock renderTimer{};
       auto running = (game != nullptr);
       while( running )
       {

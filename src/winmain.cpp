@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nS
 
          CORE_LOG("Initializing log and comm buffers took ", (after - before), " cycles");
          CORE_LOG("Status after allocating communication buffers:", core::logLine, memory);
-
+         
          std::thread logicThread(core::runGame, memory, toGame, fromGame, (u64)window.getWindowHandle(), window.getSizeX(), window.getSizeY());
 
          while( window.processWin32Messages(toGame) )  //INFINITE LOOP MESSAGE PUMP

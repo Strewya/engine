@@ -17,7 +17,6 @@ namespace core
    struct InputSystem
    {
       Memory memory;
-      CommunicationBuffer* receivingQueue;
       WinMsg* messages;
       u32 numMessages;
    };
@@ -34,7 +33,6 @@ namespace core
          }
 
          input->memory = memory;
-         input->receivingQueue = receivingQueue;
          input->numMessages = 0;
          input->messages = cast<WinMsg>(input->memory);
          if( !input->messages )
@@ -51,16 +49,40 @@ namespace core
          //hmmmm............
       }
 
-      void frameUpdate(InputSystem* input, u64 timePoint)
+      void frameUpdate(InputSystem* input, WinMsgArray* messages)
       {
-         auto messages = input->receivingQueue->getMessagesUntil(timePoint);
-         auto mem = input->memory;
-         input->messages = emplaceArray<WinMsg>(mem, messages.count);
-         std::copy(begin(messages), end(messages), input->messages);
-
+         input->numMessages = 0;
+         if( messages->count )
+         {
+            auto mem = input->memory;
+            auto predicate = [input, &mem](WinMsg& msg)
+            {
+               auto eaten = false;
+               switch( msg.type )
+               {
+                  case WinMsgType::GamepadAxis:
+                  case WinMsgType::GamepadButton:
+                  case WinMsgType::GamepadConnection:
+                  case WinMsgType::KeyboardKey:
+                  case WinMsgType::KeyboardText:
+                  case WinMsgType::MouseButton:
+                  case WinMsgType::MouseMove:
+                  case WinMsgType::MouseWheel:
+                  {
+                     auto* m = emplace<WinMsg>(mem);
+                     *m = msg;
+                     ++input->numMessages;
+                     eaten = true;
+                  } break;
+               }
+               return eaten;
+            };
+            std::remove_if(begin(*messages), end(*messages), predicate);
+            messages->count -= input->numMessages;
+         }
       }
 
-      WinMsgArray getInputDeviceEvents(InputSystem* input)
+      WinMsgArray getInputEvents(InputSystem* input)
       {
          WinMsgArray result{input->messages, input->numMessages};
          return result;

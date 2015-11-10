@@ -357,12 +357,10 @@ namespace core
             if( LOWORD(wParam) == WA_INACTIVE )
             {
                m_asyncMessages[m_writeAsyncIndex%AsyncMsgCount].type = WinMsgType::LostFocus;
-               ++m_writeAsyncIndex;
             }
             else
             {
                m_asyncMessages[m_writeAsyncIndex%AsyncMsgCount].type = WinMsgType::GainFocus;
-               ++m_writeAsyncIndex;
             }
             ++m_writeAsyncIndex;
          } break;

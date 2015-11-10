@@ -24,8 +24,8 @@ namespace core
       InputSystem* init(Memory memory, CommunicationBuffer* receivingQueue);
       void shutdown(InputSystem* input);
 
-      void frameUpdate(InputSystem* input, u64 timePoint);
+      void frameUpdate(InputSystem* input, WinMsgArray* messages);
 
-      WinMsgArray getInputDeviceEvents(InputSystem* input);
+      WinMsgArray getInputEvents(InputSystem* input);
    }
 }
