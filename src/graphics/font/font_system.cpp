@@ -42,8 +42,8 @@ namespace core
 
       auto characterCount = countVisibleCharacters(text);
 
-      result.vertices = gfx->allocateVertexBuffer(characterCount * 4);
-      result.indices = gfx->allocateIndexBuffer(characterCount * 6);
+      result.vertices = graphics::allocateVertexBuffer(gfx, characterCount * 4);
+      result.indices = graphics::allocateIndexBuffer(gfx, characterCount * 6);
       generateIndices(result.indices, characterCount);
 
       u32 lastNewline = 0;
@@ -85,8 +85,8 @@ namespace core
 
       Mesh result{};
       result.topology = TriangleList;
-      result.vertices = gfx->allocateVertexBuffer(characterCount * 4);
-      result.indices = gfx->allocateIndexBuffer(characterCount * 6);
+      result.vertices = graphics::allocateVertexBuffer(gfx, characterCount * 4);
+      result.indices = graphics::allocateIndexBuffer(gfx, characterCount * 6);
 
       generateIndices(result.indices, characterCount);
 

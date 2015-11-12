@@ -31,101 +31,49 @@ namespace core
    struct Transform;
    struct Vertex;
    struct FontDescriptor;
-   
+
    enum TextJustification;
 
-   struct GraphicsSystem
+   struct GraphicsSystem;
+
+   namespace graphics
    {
-   public:
-      void init(Memory a, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
-      void shutdown();
+      GraphicsSystem* init(Memory m, u32 textureSlots, u32 shaderSlots, u64 window, u32 width, u32 height);
+      void shutdown(GraphicsSystem* gfx);
 
-      void begin();
-      void present();
+      void frameUpdate(GraphicsSystem* gfx/*, pushBufferWithSubmittedRenderables...*/);
 
-      void setOrthographicProjection();
-      void setPerspectiveProjection();
-      void applyCamera(const Camera& camera);
-      void clearCamera();
-      v2 screenToWorld(const Camera& cam, v2 screenPos);
-      v2 worldToScreen(const Camera& cam, v2 worldPos);
-
-      void setCulling(bool isEnabled);
-      void setTransparency(bool isEnabled);
-
-      void renderMesh(Transform t, Color c, const Mesh& mesh, Material material);
-
-      HealthVertexBuffer allocateVertexBuffer(u32 size);
-      IndexBuffer allocateIndexBuffer(u32 size);
-
-      HTexture loadTextureFromFile(const char* filename);
-      HVertexShader loadVertexShaderFromFile(const char* filename, VertexType vType);
-      HPixelShader loadPixelShaderFromFile(const char* filename);
-      HFont processFont(FontDescriptor font);
-
-      void unload(HTexture handle);
-      void unload(HVertexShader handle);
-      void unload(HPixelShader handle);
+      // #todo push buffer rendering once i find out how casey implemented it
+      // meanwhile, just change the entire graphics api to function based
       
-      TextureCache textures;
-      VertexShaderCache vertexShaders;
-      PixelShaderCache pixelShaders;
-      FontCache fonts;
+      f32 getWindowWidth(GraphicsSystem* gfx);
+      f32 getWindowHeight(GraphicsSystem* gfx);
 
-   private:
-      template<typename T> void declare(T*& ptr);
-      bool initDevice();
-      bool initSwapChain();
-      bool initRenderTarget();
-      bool initViewport();
-      bool initSamplerState();
-      bool initDepthBuffer();
+      void begin(GraphicsSystem* gfx);
+      void present(GraphicsSystem* gfx);
 
-      Memory m_staticMemory;
-      Memory m_dynamicMemory;
-      Memory m_staticVertexMemory;
-      Memory m_dynamicVertexMemory;
-      Memory m_staticIndexMemory;
-      Memory m_dynamicIndexMemory;
-      TextureFileLoader m_textureFileLoader;
-      VertexShaderLoader m_vsLoader;
-      PixelShaderLoader m_psLoader;
-      DXRenderer m_renderer;
+      void setOrthographicProjection(GraphicsSystem* gfx);
+      void setPerspectiveProjection(GraphicsSystem* gfx);
+      void applyCamera(GraphicsSystem* gfx, const Camera& camera);
+      void clearCamera(GraphicsSystem* gfx);
+      v2 screenToWorld(GraphicsSystem* gfx, const Camera& cam, v2 screenPos);
+      v2 worldToScreen(GraphicsSystem* gfx, const Camera& cam, v2 worldPos);
 
-      D3DXCOLOR m_backgroundColor;
-      v2 m_backbufferSize;
-      HPixelShader m_defaultPixelShaderHandle;
-      HVertexShader m_defaultVertexShaderHandle;
+      void setCulling(GraphicsSystem* gfx, bool isEnabled);
+      void setTransparency(GraphicsSystem* gfx, bool isEnabled);
 
-      enum
-      {
-         InterfaceCount = 11,
-      };
+      void renderMesh(GraphicsSystem* gfx, Transform t, Color c, const Mesh& mesh, Material material);
 
-      IUnknown** m_declaredObjects[InterfaceCount];
-      u32 m_emptyInterfaceSlot;
-      
-      u64 m_window;
-      f32 width;
-      f32 height;
+      HealthVertexBuffer allocateVertexBuffer(GraphicsSystem* gfx, u32 size);
+      IndexBuffer allocateIndexBuffer(GraphicsSystem* gfx, u32 size);
 
-      IDXGIFactory* m_dxgiFactory;
-      ID3D11Device* m_dev;
-      ID3D11DeviceContext* m_devcon;
-      IDXGISwapChain* m_swapchain;
-      ID3D11RenderTargetView* m_renderTarget;
-      ID3D11SamplerState* m_samplerState;
-      ID3D11Texture2D* m_depthStencilBuffer;
-      ID3D11DepthStencilView* m_depthStencilView;
-      ID3D11BlendState* m_transparency;
-      ID3D11RasterizerState* m_cullingEnabled;
-      ID3D11RasterizerState* m_cullingDisabled;
-   };
+      HTexture loadTextureFromFile(GraphicsSystem* gfx, const char* filename);
+      HVertexShader loadVertexShaderFromFile(GraphicsSystem* gfx, const char* filename, VertexType vType);
+      HPixelShader loadPixelShaderFromFile(GraphicsSystem* gfx, const char* filename);
+      HFont processFont(GraphicsSystem* gfx, FontDescriptor font);
 
-   template<typename T> void GraphicsSystem::declare(T*& ptr)
-   {
-      CORE_ASSERT_DBGERR(m_emptyInterfaceSlot < InterfaceCount, "Reached maximum available interface declarations!");
-      ptr = nullptr;
-      m_declaredObjects[m_emptyInterfaceSlot++] = (IUnknown**)&ptr;
+      void unload(GraphicsSystem* gfx, HTexture handle);
+      void unload(GraphicsSystem* gfx, HVertexShader handle);
+      void unload(GraphicsSystem* gfx, HPixelShader handle);
    }
 }

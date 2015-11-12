@@ -239,7 +239,7 @@ namespace core
          }
       }
 
-      HSound insert(SoundCache* cache, Sound s)
+      HSound insert(SoundCache* cache, Sound asset)
       {
          HSound result{};
          if( cache->maxSlots != cache->usedSlots )
@@ -248,7 +248,7 @@ namespace core
             {
                if( isUnloaded(cache->storage[i]) )
                {
-                  cache->storage[i] = s;
+                  cache->storage[i] = asset;
                   result.init(i);
                   ++cache->usedSlots;
                   break;

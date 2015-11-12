@@ -21,7 +21,7 @@ namespace core
 
    namespace input
    {
-      InputSystem* init(Memory memory, CommunicationBuffer* receivingQueue);
+      InputSystem* init(Memory memory);
       void shutdown(InputSystem* input);
 
       void frameUpdate(InputSystem* input, WinMsgArray* messages);

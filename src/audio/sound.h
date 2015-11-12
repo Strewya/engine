@@ -18,18 +18,21 @@ namespace core
       u32 assetId;
    };
 
-   bool isLoaded(Sound s)
+   inline bool isLoaded(Sound s)
    {
-      return s._sound != nullptr;
+      auto result = (s._sound != nullptr);
+      return result;
    }
 
-   bool isUnloaded(Sound s)
+   inline bool isUnloaded(Sound s)
    {
-      return s._sound == nullptr;
+      auto result = (s._sound == nullptr);
+      return result;
    }
 
-   u32 getAssetId(Sound s)
+   inline u32 getAssetId(Sound s)
    {
-      return s.assetId;
+      auto result = s.assetId;
+      return result;
    }
 }

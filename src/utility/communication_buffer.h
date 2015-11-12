@@ -38,11 +38,12 @@ namespace core
 
       void writeEvent(const WinMsg& e)
       {
-         if( !full() )
+         u32 writeIndex = m_writeIndex;
+         if( canWrite(writeIndex) )
          {
-            auto index = m_writeIndex % m_maxMessages;
-            m_buffer[index] = e;
-            m_buffer[index].timestamp = Clock::getRealTimeMicros();
+            writeIndex = writeIndex % m_maxMessages;
+            m_buffer[writeIndex] = e;
+            m_buffer[writeIndex].timestamp = Clock::getRealTimeMicros();
             ++m_writeIndex;
          }
          else
@@ -51,45 +52,37 @@ namespace core
          }
       }
 
-      bool peek(WinMsg& e, u64 latestTime = 0)
+      bool peek(WinMsg& e)
       {
-         if( !empty() )
+         u32 readIndex = m_readIndex;
+         if( canRead(readIndex) )
          {
-            auto index = (m_readIndex + 1) % m_maxMessages;
-            if( latestTime == 0 || m_buffer[index].timestamp <= latestTime )
-            {
-               e = m_buffer[index];
-               memset(&m_buffer[index], 0, sizeof(WinMsg));
-               ++m_readIndex;
-               return true;
-            }
+            readIndex = (readIndex + 1) % m_maxMessages;
+            e = m_buffer[readIndex];
+            memset(&m_buffer[readIndex], 0, sizeof(WinMsg));
+            ++m_readIndex;
+            return true;
          }
          return false;
       }
 
-      bool empty() const
+      bool canRead(u32 index) const
       {
-         auto result = m_writeIndex == (m_readIndex + 1);
-         return result;
-      }
-
-      bool full() const
-      {
-         auto result = m_readIndex == m_writeIndex;
-         return result;
-      }
-
-      bool isReadableIndex(u32 index) const
-      {
-         auto empty = m_writeIndex == (index + 1); //the bug IS HERE BECAUSE THE INDEX PASSED IS ALREADY INCREASED SO I AM STUPID
+         auto empty = m_writeIndex == (index + 1);
          return !empty;
+      }
+
+      bool canWrite(u32 index) const
+      {
+         auto full = (m_readIndex == index);
+         return !full;
       }
 
       Array<WinMsg> getMessagesUntil(u64 timepoint) const
       {
-         u32 readIndex = m_readIndex + 1;
-         Array<WinMsg> result{m_buffer + readIndex, 0};
-         while( isReadableIndex(readIndex) && (result.data + result.count)->timestamp <= timepoint )
+         u32 readIndex = m_readIndex;
+         Array<WinMsg> result{m_buffer + readIndex + 1, 0};
+         while( canRead(readIndex) && (result.data + result.count)->timestamp <= timepoint )
          {
             ++result.count;
             ++readIndex;
@@ -99,6 +92,7 @@ namespace core
 
       void consumeMessages(u32 count)
       {
+         memset(m_buffer + m_readIndex + 1, 0, sizeof(WinMsg)*count);
          m_readIndex += count;
       }
    };

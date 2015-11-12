@@ -200,7 +200,7 @@ namespace core
 
    core_internal void render_gui(GuiSystem& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem* gfx)
    {
-      gfx->setOrthographicProjection();
+      graphics::setOrthographicProjection(gfx);
 
       Material m;
       //m.pixelShaderHandle = assets.mainPS;
@@ -223,12 +223,12 @@ namespace core
          auto buttonFrameMesh = makeMesh_outlinedQuad(gfx, {}, gui.button.halfsize[i]);
          auto buttonTextMesh = makeMesh_text(gfx, gui.button.caption[i], shared.font, {1, 1}, TextJustification::Center, TextJustification::Middle);
 
-         gfx->renderMesh(buttonTransform, color, buttonFrameMesh, m);
-         gfx->renderMesh(buttonTransform, {}, buttonTextMesh, m);
+         graphics::renderMesh(gfx, buttonTransform, color, buttonFrameMesh, m);
+         graphics::renderMesh(gfx, buttonTransform, {}, buttonTextMesh, m);
       }
 
       auto cursorMesh = makeMesh_solidCircle(gfx, {}, 3, 16);
-      gfx->renderMesh({shared.mousePosition}, {}, cursorMesh, m);
+      graphics::renderMesh(gfx, {shared.mousePosition}, {}, cursorMesh, m);
 
    }
 
@@ -276,11 +276,20 @@ namespace core
    {
       auto frameEvents = input::getInputEvents(input);
       handleInput_gui(game->gui, game->sharedData, game->constants, frameEvents);
+
+      switch( game->gui.activatedButton )
+      {
+         case MainMenuData::START_GAME:
+         case MainMenuData::QUIT:
+         {
+            game->nextState = State::Quit;
+         } break;
+      }
    }
 
    core_internal void renderState_mainMenu(GraphicsSystem* gfx, Game* game)
    {
-      gfx->applyCamera(game->sharedData.camera);
+      graphics::applyCamera(gfx, game->sharedData.camera);
 
       render_gui(game->gui, game->sharedData, game->assets, gfx);
    }
@@ -307,7 +316,7 @@ namespace core
             for( auto i = 0U; i < AssetTextureCount; ++i )
             {
                str path = script::readIndexedValue(lua, block, i, "", stringBuffer);
-               auto handle = gfx->loadTextureFromFile(path);
+               auto handle = graphics::loadTextureFromFile(gfx, path);
                if( !handle.isNull() )
                {
                   auto* ptr = emplace<HTexture>(game->gameMemory);
@@ -376,7 +385,7 @@ namespace core
    {
       for( auto i = 0U; i < assets.numTextures; ++i )
       {
-         gfx->unload(assets.textures[i]);
+         graphics::unload(gfx, assets.textures[i]);
       }
       for( auto i = 0U; i < assets.numSounds; ++i )
       {
@@ -524,6 +533,9 @@ namespace core
 
       game->sharedData.camera.setPosition({0, 0, -50});
 
+      game->constants.windowHeight = graphics::getWindowHeight(gfx);
+      game->constants.windowWidth = graphics::getWindowWidth(gfx);
+
       initState(audio, gfx, input, lua, game);
 
       return game;
@@ -541,7 +553,8 @@ namespace core
                                 AudioSystem* audio, GraphicsSystem* gfx, InputSystem* input, LuaSystem* script,
                                 Game* game)
    {
-      auto windowEvents = fromMain->getMessagesUntil(timer->getCurrentMicros());
+      auto currentMicros = timer->getCurrentMicros();
+      auto windowEvents = fromMain->getMessagesUntil(currentMicros);
       auto inputCount = windowEvents.count;
       
       input::frameUpdate(input, &windowEvents);
@@ -585,10 +598,10 @@ namespace core
                                  AudioSystem* audio, GraphicsSystem* gfx, LuaSystem* script,
                                  Game* game)
    {
-      gfx->begin();
+      graphics::begin(gfx);
 
       renderState(gfx, game);
 
-      gfx->present();
+      graphics::present(gfx);
    }
 }

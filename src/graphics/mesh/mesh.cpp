@@ -27,8 +27,8 @@ namespace core
    {
       Mesh result;
       result.topology = TriangleList;
-      result.vertices = gfx->allocateVertexBuffer(4);
-      result.indices = gfx->allocateIndexBuffer(6);
+      result.vertices = graphics::allocateVertexBuffer(gfx, 4);
+      result.indices = graphics::allocateIndexBuffer(gfx, 6);
 
       auto index = 0U;
       //                            x             y             z    r  g  b  a     u   v    h
@@ -58,8 +58,8 @@ namespace core
    {
       Mesh result;
       result.topology = LineList;
-      result.vertices = gfx->allocateVertexBuffer(4);
-      result.indices = gfx->allocateIndexBuffer(8);
+      result.vertices = graphics::allocateVertexBuffer(gfx, 4);
+      result.indices = graphics::allocateIndexBuffer(gfx, 8);
 
       auto index = 0U;
       //                            x             y             z    r  g  b  a     u   v    h
@@ -91,8 +91,8 @@ namespace core
    {
       Mesh result;
       result.topology = TriangleList;
-      result.vertices = gfx->allocateVertexBuffer(4);
-      result.indices = gfx->allocateIndexBuffer(6);
+      result.vertices = graphics::allocateVertexBuffer(gfx, 4);
+      result.indices = graphics::allocateIndexBuffer(gfx, 6);
 
       auto index = 0U;
       //                            x             y             z    r  g  b  a     u   v    h
@@ -131,9 +131,9 @@ namespace core
 
       Mesh result;
       result.topology = TriangleList;
-      result.vertices = gfx->allocateVertexBuffer(points + 1);
-      result.indices = gfx->allocateIndexBuffer(points * 3);
-
+      result.vertices = graphics::allocateVertexBuffer(gfx, points + 1);
+      result.indices = graphics::allocateIndexBuffer(gfx, points * 3);
+      
       auto index = 0U;
       f32 degreeOffset = 360.0f / points;
       result.vertices.data[index++] = {{pos.x, pos.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0};
@@ -171,8 +171,8 @@ namespace core
 
       Mesh result;
       result.topology = LineStrip;
-      result.vertices = gfx->allocateVertexBuffer(points);
-      result.indices = gfx->allocateIndexBuffer(points + 1);
+      result.vertices = graphics::allocateVertexBuffer(gfx, points);
+      result.indices = graphics::allocateIndexBuffer(gfx, points + 1);
 
       auto index = 0U;
 
@@ -201,8 +201,8 @@ namespace core
    {
       Mesh result{};
       result.topology = LineList;
-      result.indices = gfx->allocateIndexBuffer(2);
-      result.vertices = gfx->allocateVertexBuffer(2);
+      result.vertices = graphics::allocateVertexBuffer(gfx, 2);
+      result.indices = graphics::allocateIndexBuffer(gfx, 2);
       
       auto index = 0U;
       result.vertices.data[index++] = {{a.x, a.y, 0}, {1, 1, 1, 1}, {-1, -1}, 0};

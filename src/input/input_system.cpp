@@ -23,7 +23,7 @@ namespace core
 
    namespace input
    {
-      InputSystem* init(Memory memory, CommunicationBuffer* receivingQueue)
+      InputSystem* init(Memory memory)
       {
          auto* input = emplace<InputSystem>(memory);
          if( !input )
@@ -35,12 +35,7 @@ namespace core
          input->memory = memory;
          input->numMessages = 0;
          input->messages = cast<WinMsg>(input->memory);
-         if( !input->messages )
-         {
-            CORE_LOG("Not enough memory for the message array!");
-            return nullptr;
-         }
-
+         
          return input;
       }
 
@@ -87,6 +82,5 @@ namespace core
          WinMsgArray result{input->messages, input->numMessages};
          return result;
       }
-
    }
 }

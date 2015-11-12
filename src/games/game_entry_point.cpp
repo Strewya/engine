@@ -105,20 +105,16 @@ namespace core
       CORE_ASSERT_DBGERR(inputMemory != nullptr, "Not enough memory for the input service.");
       CORE_ASSERT_DBGERR(scriptMemory != nullptr, "Not enough memory for the script service.");
 
-      AudioSystem* audio = audio::init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+      AudioSystem* sfx = audio::init(audioMemory, FmodMemoryMegabytes, FmodMaxChannels, MaxNumberOfSoundSlots);
+      GraphicsSystem* gfx = graphics::init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
+      InputSystem* input = input::init(inputMemory);
+      LuaSystem* lua = script::init(scriptMemory);
+      Game* game = initGame(gameMemory, fromMain, toMain, sfx, gfx, input, lua);
 
-      GraphicsSystem* graphics = emplace<GraphicsSystem>(graphicsMemory);
-      graphics->init(graphicsMemory, MaxNumberOfShaderSlots, MaxNumberOfTextureSlots, windowHandle, windowWidth, windowHeight);
-
-      InputSystem* input = input::init(inputMemory, fromMain);
-      LuaSystem* script = script::init(scriptMemory);
-
-      Game* game = initGame(gameMemory, fromMain, toMain, audio, graphics, input, script);
-
-      CORE_ASSERT_DBGERR(audio != nullptr, "Failed to initialize audio subsystem");
-      CORE_ASSERT_DBGERR(graphics != nullptr, "Failed to initialize graphics subsystem");
+      CORE_ASSERT_DBGERR(sfx != nullptr, "Failed to initialize audio subsystem");
+      CORE_ASSERT_DBGERR(gfx != nullptr, "Failed to initialize graphics subsystem");
       CORE_ASSERT_DBGERR(input != nullptr, "Failed to initialize input subsystem");
-      CORE_ASSERT_DBGERR(script != nullptr, "Failed to initialize script subsystem");
+      CORE_ASSERT_DBGERR(lua != nullptr, "Failed to initialize script subsystem");
       CORE_ASSERT_DBGERR(game != nullptr, "Failed to initialize game");
 
       WinMsg msg{};
@@ -152,20 +148,23 @@ namespace core
          while( count-- && running )
          {
             logicTimer.advanceTimeBy(CORE_MICROS_PER_FRAME);
-            running = tickLogic(fromMain, toMain, &logicTimer, audio, graphics, input, script, game);
+            running = tickLogic(fromMain, toMain, &logicTimer, sfx, gfx, input, lua, game);
          }
          logicTimer.advanceTimeBy(droppedTime);
-
-         u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
-         // we might want to do interpolation ...
-         tickRender(fromMain, toMain, &renderTimer, audio, graphics, script, game);
-         renderTimer.advanceTimeBy(fullUpdateTime);
+         
+         if( running )
+         {
+            u64 fullUpdateTime = logicTimer.getLastRealTimeMicros() + unusedMicros - renderTimer.getCurrentMicros();
+            // we might want to do interpolation ...
+            tickRender(fromMain, toMain, &renderTimer, sfx, gfx, lua, game);
+            renderTimer.advanceTimeBy(fullUpdateTime);
+         }
       }
 
-      shutdownGame(fromMain, toMain, audio, graphics, input, script, game);
-      script::shutdown(script);
-      graphics->shutdown();
-      audio::shutdown(audio);
+      shutdownGame(fromMain, toMain, sfx, gfx, input, lua, game);
+      script::shutdown(lua);
+      graphics::shutdown(gfx);
+      audio::shutdown(sfx);
 
       msg.type = WinMsgType::Close;
       toMain->writeEvent(msg);
