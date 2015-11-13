@@ -201,7 +201,10 @@ namespace core
    core_internal void render_gui(GuiSystem& gui, SharedData& shared, const GameAssets& assets, GraphicsSystem* gfx)
    {
       graphics::setOrthographicProjection(gfx);
-
+      struct RenderContext
+      {
+      } renderContext;
+      
       Material m;
       //m.pixelShaderHandle = assets.mainPS;
       //m.vertexShaderHandle = assets.mainVS;
@@ -225,6 +228,19 @@ namespace core
 
          graphics::renderMesh(gfx, buttonTransform, color, buttonFrameMesh, m);
          graphics::renderMesh(gfx, buttonTransform, {}, buttonTextMesh, m);
+#if 0
+         gui::drawButton(renderContext, gui, i);
+         {
+            graphics::renderHollowQuad(renderContext, buttonTransform, color, rectangleCenterHalfsize({}, gui.button.halfsize[i])); // internally generates the vertices, indices and material.
+            graphics::renderLabel(renderContext, )
+            // the material is selected to use the default vertex shader, default vertex type, default pixel shader, and no texture.
+            // the vertices are generated based on the passed in rectangle, which is created via rectangleCenterHalfsize() call. The vertices are in camera space, whichever camera was set.
+            // the indices are automatically generated together with the vertices.
+         }
+         graphics::renderSolidQuad(renderContext, buttonTransform, color, rectangleMinMaxCorner({-1, -1}, {1, 1})); //internally generates the vertices, indices and material
+#endif
+         
+
       }
 
       auto cursorMesh = makeMesh_solidCircle(gfx, {}, 3, 16);
