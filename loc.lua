@@ -61,7 +61,7 @@ function iterateDirectory(path, exclude, linesPerFile)
 end;
 
 local path = "w:/src";
-local exclude = {path .. "/box2D", path .. "/to_lua++"};
+local exclude = {path .. "/box2D", path .. "/to_lua++", path .. "/toLua++", path .. "/Box2D"};
 local lpf = {};
 local count, lpf = iterateDirectory(path, exclude, lpf);
 local maxLen = 0;
