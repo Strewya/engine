@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Sources\Windows\win_main.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Sources\windows\window.cpp">
+      <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Sources\game_tic_tac_toe\game.cpp">
+      <Filter>tic_tac_toe</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Sources\core\std.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Sources\windows\window.h">
+      <Filter>windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Sources\windows\window_include.h">
+      <Filter>windows</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{34b9b701-fc0b-4967-9228-1bc26492f7ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows">
+      <UniqueIdentifier>{b35d832a-58bd-4b38-9ee4-0b7a3589d6df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tic_tac_toe">
+      <UniqueIdentifier>{6107b40c-c9cf-465f-823a-a8b4a0bec550}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
